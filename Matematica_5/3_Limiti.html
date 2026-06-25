@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 3 — I Limiti di una Funzione</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quinto anno · Lezione 3</div>
+    <h1>I Limiti di una Funzione</h1>
+    <p>Il cuore dell'analisi matematica: avvicinarsi senza (per forza) toccare</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quinto anno</a>
+    <span class="sep">/</span> I Limiti
+  </nav>
+
+  <main>
+
+    <!-- 1 — COSA SIGNIFICA LIMITE -->
+    <section id="sec1">
+      <h2>1. Cosa significa "limite"?</h2>
+      <p>Immagina di camminare verso un muro: a ogni passo dimezzi la distanza. Dopo un passo sei a metà strada, dopo due
+        a un quarto, e così via. Non toccherai mai il muro — c'è sempre una piccola distanza residua — ma ti ci avvicini
+        sempre di più. Quel muro è il tuo <strong>limite</strong>.</p>
+      <p>Il <em>limite</em> è il valore a cui qualcosa <strong>tende</strong>, senza necessariamente raggiungerlo: il
+        "muro" verso cui una funzione si muove quando la variabile $x$ si avvicina a un certo valore.</p>
+      <div class="rule">Il limite risponde a: <em>"Cosa succede ai valori di $f(x)$ quando $x$ si avvicina sempre di più
+        a un certo numero (o all'infinito)?"</em></div>
+
+      <h3>1.1 — Un esempio illuminante</h3>
+      <div class="formula-box">$$f(x) = \frac{x^2 - 1}{x - 1}$$</div>
+      <p>In $x = 1$ otteniamo $\frac{0}{0}$: una <strong>forma indeterminata</strong>, la funzione non esiste. Eppure,
+        avvicinandoci a $1$:</p>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>$x$</th><th>0,9</th><th>0,99</th><th>0,999</th><th>1</th><th>1,001</th><th>1,01</th><th>1,1</th></tr></thead>
+          <tbody><tr><td>$f(x)$</td><td>1,9</td><td>1,99</td><td>1,999</td><td>❌</td><td>2,001</td><td>2,01</td><td>2,1</td></tr></tbody>
+        </table>
+      </div>
+      <p>Da entrambi i lati $f(x)$ si avvicina a <strong>2</strong>: è il <em>limite</em> di $f(x)$ per $x \to 1$.</p>
+
+      <div class="interactive-demo">
+        <div class="demo-title">Visualizza il grafico: il "buco" in $(1, 2)$</div>
+        <div class="controls">
+          <div class="control-group">
+            <label>Posizione x: <span class="val" id="intro-x-val">0.5</span></label>
+            <input type="range" id="intro-x" min="-0.5" max="2.5" step="0.01" value="0.5">
+          </div>
+        </div>
+        <div class="demo-plot" id="intro-plot"></div>
+        <div class="demo-result">Il grafico di $f(x) = \dfrac{x^2-1}{x-1}$ è la retta $y = x+1$, ma con un
+          <strong>buco</strong> in $(1, 2)$. La funzione non è definita lì, eppure il limite esiste e vale $2$.</div>
+      </div>
+
+      <div class="note"><strong>Curiosità algebrica:</strong> $\frac{x^2-1}{x-1} = \frac{(x-1)(x+1)}{x-1} = x + 1$ per
+        ogni $x \neq 1$. Per $x \to 1$, $x+1 \to 2$. Tutto torna!</div>
+
+      <h3>1.2 — Perché ci servono i limiti?</h3>
+      <ul>
+        <li>Cosa succede a $\frac{1}{x}$ quando $x$ diventa "grandissimo"?</li>
+        <li>Una funzione si avvicina a un asintoto?</li>
+        <li>Una serie infinita ha una somma finita?</li>
+        <li>Qual è la pendenza istantanea di una curva? (la derivata)</li>
+      </ul>
+    </section>
+
+    <!-- 2 — NOTAZIONE LIM -->
+    <section id="sec2">
+      <h2>2. La notazione "lim"</h2>
+      <div class="formula-box">$$\lim_{x \to c} f(x) = L$$</div>
+      <p style="text-align:center;"><em>«il limite, per $x$ che tende a $c$, di $f(x)$ è uguale a $L$»</em></p>
+
+      <h3>2.1 — Anatomia del simbolo</h3>
+      <div class="card-row">
+        <div class="card"><h4>$\lim$</h4><p>Da <em>limes</em> (latino): "limite, confine". È il simbolo dell'operazione.</p></div>
+        <div class="card"><h4>$x \to c$</h4><p>"$x$ tende a $c$": $x$ si avvicina sempre di più a $c$, senza per forza raggiungerlo.</p></div>
+        <div class="card"><h4>$f(x)$</h4><p>La funzione di cui studiamo il comportamento.</p></div>
+        <div class="card"><h4>$= L$</h4><p>Il valore <em>limite</em>: può essere un numero, $+\infty$ o $-\infty$.</p></div>
+      </div>
+
+      <h3>2.2 — Le possibili "destinazioni"</h3>
+      <ul>
+        <li><strong>Un numero reale $c$</strong>: $x \to 2$, $x \to -5$, $x \to 0$;</li>
+        <li><strong>$+\infty$</strong> / <strong>$-\infty$</strong>: la $x$ diventa grande quanto vogliamo;</li>
+        <li><strong>$c^+$</strong> o <strong>$c^-$</strong>: si avvicina a $c$ solo da destra o solo da sinistra.</li>
+      </ul>
+
+      <h3>2.3 — La protagonista segreta: $\varepsilon$</h3>
+      <p>$\varepsilon$ ("èpsilon") è il simbolo dei numeri piccolissimi, infinitesimi. Tradizione vuole che il primo a
+        usarla così sia stato <strong>Cauchy</strong> nell'Ottocento. Quando un matematico scrive $\varepsilon > 0$
+        sottintende: <em>"prendi il numero più piccolo che ti viene in mente — anzi, più piccolo ancora"</em>.</p>
+    </section>
+
+    <!-- 3 — QUATTRO TIPOLOGIE -->
+    <section id="sec3">
+      <h2>3. Classifichiamo i limiti: quattro grandi famiglie</h2>
+      <div class="card-row">
+        <div class="card"><h4>🅐 Dove va la $x$?</h4><p>Verso un numero finito $c$, oppure a $\pm\infty$.</p></div>
+        <div class="card"><h4>🅑 Dove va $f(x)$?</h4><p>Verso un numero finito $L$, oppure a $\pm\infty$.</p></div>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead><tr><th></th><th>$f(x) \to L$ (finito)</th><th>$f(x) \to \pm\infty$</th></tr></thead>
+          <tbody>
+            <tr><td><strong>$x \to c$ (finito)</strong></td><td>Limite finito in un punto <em>(sez. 4)</em></td><td>Asintoto verticale <em>(sez. 5)</em></td></tr>
+            <tr><td><strong>$x \to \pm\infty$</strong></td><td>Asintoto orizzontale <em>(sez. 6)</em></td><td>Limite infinito all'infinito <em>(sez. 7)</em></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="rule"><strong>L'idea-pattern di tutte le definizioni:</strong> "Per quanto piccola sia la tolleranza
+        che mi imponi sul risultato, riesco a trovare un intorno della $x$ abbastanza ristretto da garantirla."</div>
+    </section>
+
+    <!-- 4 — LIMITE FINITO IN PUNTO FINITO -->
+    <section id="sec4">
+      <h2>4. Limite finito in un punto finito</h2>
+      <p>La $x$ si avvicina a $c$ e il risultato $f(x)$ si avvicina a $L$. Entrambi finiti.</p>
+      <div class="formula-box">$$\lim_{x \to c} f(x) = L$$</div>
+
+      <h3>4.1 — La definizione formale</h3>
+      <div class="definition">Si dice che $\lim_{x \to c} f(x) = L$ se:
+        $$\forall \varepsilon > 0, \; \exists \delta > 0 \;:\; 0 < |x - c| < \delta \;\Longrightarrow\; |f(x) - L| < \varepsilon$$</div>
+      <ul>
+        <li><strong>$\forall \varepsilon > 0$</strong>: "comunque scelga una tolleranza $\varepsilon$, anche piccolissima";</li>
+        <li><strong>$\exists \delta > 0$</strong>: "riesco a trovare un raggio $\delta$";</li>
+        <li><strong>$0 < |x - c| < \delta$</strong>: "se $x$ dista da $c$ meno di $\delta$ (ma è diverso da $c$)";</li>
+        <li><strong>$\Rightarrow |f(x) - L| < \varepsilon$</strong>: "allora $f(x)$ dista da $L$ meno di $\varepsilon$".</li>
+      </ul>
+      <div class="rule">In parole semplici: «se ti accontenti che $f(x)$ disti da $L$ meno di $\varepsilon$, basta che $x$
+        disti da $c$ meno di $\delta$». <strong>Tu</strong> scegli $\varepsilon$, <strong>io</strong> devo trovare $\delta$.</div>
+
+      <h3>4.2 — Vediamolo in azione: gioca con $\varepsilon$</h3>
+      <p>Prendiamo $f(x) = x^2$ e $\lim_{x \to 2} f(x) = 4$.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Demo 1: $\lim_{x \to 2} x^2 = 4$ — sposta lo slider di $\varepsilon$</div>
+        <div class="demo-controls">
+          <label for="demo1-eps">$\varepsilon$:</label>
+          <input type="range" id="demo1-eps" min="0.1" max="3" value="1.5" step="0.05">
+          <span class="demo-value" id="demo1-eps-value">1.50</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background: rgba(40,167,69,0.4);"></span>Banda $|f(x) - L| &lt; \varepsilon$</div>
+          <div class="legend-item"><span class="legend-color" style="background: rgba(245,180,0,0.4);"></span>Banda $|x - c| &lt; \delta$</div>
+          <div class="legend-item"><span class="legend-color" style="background: #ef4444;"></span>$f(x) = x^2$</div>
+        </div>
+        <div class="demo-plot" id="demo1-plot"></div>
+        <div class="demo-result">Hai scelto <strong>$\varepsilon = $<span id="demo1-eps-text">1.50</span></strong>. Per
+          garantire $|f(x) - 4| < \varepsilon$ basta $\delta \approx$ <strong><span id="demo1-delta-value">0.34</span></strong>
+          attorno a $c = 2$. <em>Diminuisci $\varepsilon$ e anche $\delta$ si stringe.</em></div>
+      </div>
+
+      <h3>4.3 — Il caso facile (funzione continua)</h3>
+      <p>Quando $f$ è <strong>continua</strong> in $c$, il limite si calcola sostituendo: $$\lim_{x \to c} f(x) = f(c)$$</p>
+      <ul>
+        <li>$\lim_{x \to 3} (2x + 1) = 7$</li>
+        <li>$\lim_{x \to 0} (x^2 + 5) = 5$</li>
+        <li>$\lim_{x \to 1} \dfrac{x^2 - 1}{x + 1} = 0$</li>
+      </ul>
+      <div class="warning"><strong>⚠️ Attenzione al significato di "sostituzione".</strong> Calcolando $\lim_{x \to 0}
+        f(x)$ non "inseriamo 0" in $f$: osserviamo verso quale valore tende $f(x)$ mentre $x \to 0$. Il limite di un
+        rapporto il cui denominatore tende a 0 è ben definito: se il numeratore resta finito e non nullo, il limite è
+        infinito; se numeratore e denominatore tendono entrambi a 0, è una forma indeterminata.</div>
+
+      <h3>4.4 — Verificare un limite con la definizione</h3>
+      <div class="rule"><strong>Strategia.</strong> Scrivi $|f(x) - L| < \varepsilon$, semplifica finché compare
+        $|x - c|$, e ricava quanto deve valere: quello è $\delta$ (in funzione di $\varepsilon$).</div>
+      <p><strong>Esempio 1.</strong> Verifichiamo $\lim_{x \to 3} (2x - 1) = 5$.</p>
+      <div class="formula-box">$$|(2x - 1) - 5| = 2\,|x - 3| < \varepsilon \;\Longleftrightarrow\; |x - 3| < \frac{\varepsilon}{2}.$$</div>
+      <p>Basta $\delta = \dfrac{\varepsilon}{2}$. ✓</p>
+      <p><strong>Esempio 2 (all'infinito).</strong> Per $\lim_{x \to +\infty} \dfrac{1}{x}=0$:</p>
+      <div class="formula-box">$$\left|\frac{1}{x}\right| = \frac{1}{x} < \varepsilon \;\Longleftrightarrow\; x > \frac{1}{\varepsilon} \quad (x > 0).$$</div>
+      <p>Basta $M = \dfrac{1}{\varepsilon}$. ✓</p>
+    </section>
+
+    <!-- 5 — LIMITE INFINITO IN PUNTO FINITO -->
+    <section id="sec5">
+      <h2>5. Limite infinito in un punto finito</h2>
+      <p>La $x$ tende a $c$ finito, ma $f(x)$ "esplode" verso l'infinito: <strong>asintoto verticale</strong> in $x = c$.</p>
+      <div class="formula-box">$$\lim_{x \to c} f(x) = +\infty$$</div>
+
+      <h3>5.1 — La definizione formale</h3>
+      <p>Qui $\varepsilon$ va in pensione: la tolleranza la sostituiamo con $M$ ("Mucho grande").</p>
+      <div class="definition">Si dice che $\lim_{x \to c} f(x) = +\infty$ se:
+        $$\forall M > 0, \; \exists \delta > 0 \;:\; 0 < |x - c| < \delta \;\Longrightarrow\; f(x) > M$$</div>
+      <div class="note">Per $\lim_{x \to c} f(x) = -\infty$ la definizione è simmetrica:
+        $\forall M < 0, \exists \delta > 0 : 0 < |x-c| < \delta \Rightarrow f(x) < M$.</div>
+
+      <h3>5.2 — Gioca con $M$</h3>
+      <p>Prendiamo $f(x) = \dfrac{1}{(x-1)^2}$, asintoto verticale in $x = 1$.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Demo 2: $\lim_{x \to 1} \dfrac{1}{(x-1)^2} = +\infty$ — sposta lo slider di $M$</div>
+        <div class="demo-controls">
+          <label for="demo2-M">$M$:</label>
+          <input type="range" id="demo2-M" min="5" max="500" value="50" step="1">
+          <span class="demo-value" id="demo2-M-value">50</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background: rgba(40,167,69,0.4);"></span>Zona $f(x) &gt; M$</div>
+          <div class="legend-item"><span class="legend-color" style="background: rgba(245,180,0,0.4);"></span>Intorno $|x - c| &lt; \delta$</div>
+          <div class="legend-item"><span class="legend-color" style="background: #ef4444;"></span>$f(x) = \dfrac{1}{(x-1)^2}$</div>
+        </div>
+        <div class="demo-plot" id="demo2-plot"></div>
+        <div class="demo-result">Hai scelto <strong>$M = $<span id="demo2-M-text">50</span></strong>. Basta
+          $\delta = \dfrac{1}{\sqrt{M}} \approx$ <strong><span id="demo2-delta-value">0.141</span></strong> attorno a
+          $c = 1$. <em>Aumenta $M$ e $\delta$ si stringe.</em></div>
+      </div>
+    </section>
+
+    <!-- 6 — LIMITE FINITO ALL'INFINITO -->
+    <section id="sec6">
+      <h2>6. Limite finito all'infinito</h2>
+      <p>La $x$ va all'infinito, $f(x)$ si avvicina a $L$ finito: <strong>asintoto orizzontale</strong> $y = L$.</p>
+      <div class="formula-box">$$\lim_{x \to +\infty} f(x) = L$$</div>
+
+      <h3>6.1 — La definizione formale</h3>
+      <div class="definition">Si dice che $\lim_{x \to +\infty} f(x) = L$ se:
+        $$\forall \varepsilon > 0, \; \exists N > 0 \;:\; x > N \;\Longrightarrow\; |f(x) - L| < \varepsilon$$</div>
+      <div class="note">Per $x \to -\infty$: $\forall \varepsilon > 0, \exists N > 0 : x < -N \Rightarrow |f(x) - L| < \varepsilon$.</div>
+
+      <h3>6.2 — Gioca con $\varepsilon$ (e osserva $N$)</h3>
+      <p>Prendiamo $f(x) = 1 + \dfrac{1}{x}$ e $\lim_{x \to +\infty} f(x) = 1$.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Demo 3: $\lim_{x \to +\infty} \left(1 + \dfrac{1}{x}\right) = 1$ — slider di $\varepsilon$</div>
+        <div class="demo-controls">
+          <label for="demo3-eps">$\varepsilon$:</label>
+          <input type="range" id="demo3-eps" min="0.02" max="0.6" value="0.2" step="0.01">
+          <span class="demo-value" id="demo3-eps-value">0.20</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background: rgba(40,167,69,0.4);"></span>Banda $|f(x) - L| &lt; \varepsilon$</div>
+          <div class="legend-item"><span class="legend-color" style="background: rgba(245,180,0,0.4);"></span>Regione $x &gt; N$</div>
+          <div class="legend-item"><span class="legend-color" style="background: #ef4444;"></span>$f(x) = 1 + 1/x$</div>
+        </div>
+        <div class="demo-plot" id="demo3-plot"></div>
+        <div class="demo-result">Hai scelto <strong>$\varepsilon = $<span id="demo3-eps-text">0.20</span></strong>. La
+          soglia è $N = \dfrac{1}{\varepsilon} = $ <strong><span id="demo3-N-value">5.0</span></strong>. <em>Diminuisci
+          $\varepsilon$ e $N$ aumenta.</em></div>
+      </div>
+    </section>
+
+    <!-- 7 — LIMITE INFINITO ALL'INFINITO -->
+    <section id="sec7">
+      <h2>7. Limite infinito all'infinito</h2>
+      <p>Sia $x$ sia $f(x)$ vanno all'infinito (polinomi di grado dispari, esponenziali, ecc.).</p>
+      <div class="formula-box">$$\lim_{x \to +\infty} f(x) = +\infty$$</div>
+
+      <h3>7.1 — La definizione formale</h3>
+      <div class="definition">Si dice che $\lim_{x \to +\infty} f(x) = +\infty$ se:
+        $$\forall M > 0, \; \exists N > 0 \;:\; x > N \;\Longrightarrow\; f(x) > M$$</div>
+
+      <h3>7.2 — Gioca con $M$ (e osserva $N$)</h3>
+      <p>Prendiamo $f(x) = x^2$ con $x \to +\infty$.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Demo 4: $\lim_{x \to +\infty} x^2 = +\infty$ — sposta lo slider di $M$</div>
+        <div class="demo-controls">
+          <label for="demo4-M">$M$:</label>
+          <input type="range" id="demo4-M" min="4" max="400" value="100" step="1">
+          <span class="demo-value" id="demo4-M-value">100</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background: rgba(40,167,69,0.4);"></span>Zona $f(x) &gt; M$</div>
+          <div class="legend-item"><span class="legend-color" style="background: rgba(245,180,0,0.4);"></span>Regione $x &gt; N$</div>
+          <div class="legend-item"><span class="legend-color" style="background: #ef4444;"></span>$f(x) = x^2$</div>
+        </div>
+        <div class="demo-plot" id="demo4-plot"></div>
+        <div class="demo-result">Hai scelto <strong>$M = $<span id="demo4-M-text">100</span></strong>. Basta $x > N =
+          \sqrt{M} = $ <strong><span id="demo4-N-value">10.0</span></strong>. <em>Aumenta $M$ e $N$ cresce.</em></div>
+      </div>
+    </section>
+
+    <!-- 8 — LIMITI DESTRO E SINISTRO -->
+    <section id="sec8">
+      <h2>8. Limiti destro e sinistro</h2>
+      <div class="definition"><strong>Limite destro:</strong> $\lim_{x \to c^+} f(x) = L$: $x$ si avvicina a $c$ solo da
+        destra ($x > c$).<br><br><strong>Limite sinistro:</strong> $\lim_{x \to c^-} f(x) = L$: solo da sinistra ($x < c$).</div>
+      <div class="rule">Il limite globale <strong>esiste se e solo se</strong> i due limiti laterali esistono e sono
+        uguali: $$\lim_{x \to c} f(x) = L \;\Longleftrightarrow\; \lim_{x \to c^-} f(x) = \lim_{x \to c^+} f(x) = L$$</div>
+
+      <h3>8.1 — Quando servono?</h3>
+      <ol>
+        <li><strong>Funzioni a tratti</strong>: es. $f(x) = x+1$ se $x<0$, $x^2$ se $x \ge 0$. In $x=0$ da sinistra → $1$, da destra → $0$: limite globale inesistente.</li>
+        <li><strong>Asintoti verticali sbilanciati</strong>: $\dfrac{1}{x}$ in $x = 0$ tende a $-\infty$ da sinistra, $+\infty$ da destra.</li>
+        <li><strong>Funzioni definite su un solo lato</strong>: $\sqrt{x}$ in $x = 0$ esiste solo a destra.</li>
+      </ol>
+
+      <h3>8.2 — Esempio: $\frac{1}{x}$ in $x = 0$</h3>
+      <div class="interactive-demo">
+        <div class="demo-title">Demo 5: due storie diverse — $\frac{1}{x}$ in $x = 0$</div>
+        <div class="demo-plot" id="demo5-plot"></div>
+        <div class="demo-result">
+          <p>Per $x \to 0^-$: valori sempre più <strong>negativi</strong>, $\lim_{x \to 0^-} \dfrac{1}{x} = -\infty$.</p>
+          <p>Per $x \to 0^+$: valori sempre più <strong>positivi</strong>, $\lim_{x \to 0^+} \dfrac{1}{x} = +\infty$.</p>
+          <p>I due laterali differiscono $\Rightarrow$ <strong>$\lim_{x \to 0} \dfrac{1}{x}$ non esiste</strong>.</p>
+        </div>
+      </div>
+
+      <div class="joke">I limiti laterali sono come due testimoni: se raccontano la stessa storia, c'è una verità ("il
+        limite esiste"). Se uno dice "a destra" e l'altro "a sinistra", il giudice prende atto: <em>non si può
+        stabilire un'unica versione</em>.</div>
+    </section>
+
+    <!-- 9 — ACCUMULAZIONE -->
+    <section id="sec-accumulazione">
+      <h2>9. Intervalli, estremi e punti di accumulazione</h2>
+      <p>Perché "$x \to c$" abbia senso, vicino a $c$ devono esserci altri punti del dominio. I punti con questa
+        proprietà si chiamano <strong>punti di accumulazione</strong>: sono esattamente quelli in cui ha senso fare un limite.</p>
+
+      <h3>9.1 — Intervalli e intorni</h3>
+      <div class="definition">Si chiama <strong>intorno</strong> di un punto $c$ ogni intervallo aperto che contiene $c$.
+        Il più comune è l'intorno simmetrico di raggio $\delta > 0$: $$I_\delta(c) = (c - \delta,\; c + \delta).$$</div>
+
+      <h3>9.2 — Punti di accumulazione e punti isolati</h3>
+      <p>Scegli un insieme, un punto $x_0$ e un raggio $\delta$, e guarda quanti punti dell'insieme cadono nell'intorno.
+        Poi rimpicciolisci $\delta$.</p>
+      <div class="controls">
+        <div class="control-group"><label>Insieme:</label>
+          <select id="acc-set">
+            <option value="intervallo">Intervallo [0, 4]</option>
+            <option value="successione">Successione 1/n (con 0)</option>
+            <option value="misto">{0} ∪ [1, 2]</option>
+            <option value="interi">Numeri interi</option>
+          </select>
+        </div>
+        <div class="control-group"><label>Punto x₀: <span class="val" id="acc-x0-val">0.00</span></label><input type="range" id="acc-x0" min="-3.5" max="6.5" step="0.1" value="0"></div>
+        <div class="control-group"><label>Raggio δ: <span class="val" id="acc-delta-val">0.80</span></label><input type="range" id="acc-delta" min="0.05" max="1.5" step="0.01" value="0.8"></div>
+      </div>
+      <div class="plot" id="acc-plot" style="min-height:220px;"></div>
+      <p id="acc-verdict" class="verdict"></p>
+      <div class="definition">Un punto $x_0$ è un <strong>punto di accumulazione</strong> per $E$ se ogni intorno di
+        $x_0$ contiene almeno un punto di $E$ <strong>diverso da $x_0$</strong> (e allora infiniti). $x_0$ non deve
+        necessariamente appartenere a $E$.<br><br>Un punto di $E$ che non è di accumulazione è un <strong>punto
+        isolato</strong>.</div>
+      <p>Nella successione $\frac{1}{n}$, ogni termine è isolato, mentre <strong>$0$ è l'unico punto di
+        accumulazione</strong>: i termini gli si accalcano attorno, pur senza che $0$ appartenga all'insieme.</p>
+
+      <h3>9.3 — Estremo superiore ed inferiore</h3>
+      <div class="definition">L'<strong>estremo superiore</strong> $\sup E$ è il più piccolo dei maggioranti;
+        l'<strong>estremo inferiore</strong> $\inf E$ è il più grande dei minoranti. Se $\sup E \in E$ è il
+        <strong>massimo</strong>; se $\inf E \in E$ è il <strong>minimo</strong>.</div>
+      <div class="rule"><strong>Esempio.</strong> Per $\left\{\frac1n\right\}$: $\sup = 1$ (appartiene → massimo);
+        $\inf = 0$ (non appartiene → nessun minimo). Quell'$\inf$ irraggiungibile è proprio il punto di accumulazione.</div>
+    </section>
+
+    <!-- OPZIONALE — INTORNI -->
+    <section id="sec-bonus" class="optional">
+      <h2>Definizione di limite mediante gli intorni</h2>
+      <p>Le quattro definizioni viste raccontano <em>la stessa storia</em>. Esiste una <strong>definizione unica</strong>,
+        più astratta ma elegantissima, basata sulla nozione di <em>intorno</em>. (Approfondimento bonus, non
+        strettamente richiesto, ma è il modo con cui i matematici pensano ai limiti.)</p>
+
+      <h3>1 — Cos'è un intorno?</h3>
+      <div class="definition"><strong>Intorno di un punto finito.</strong> Un intorno di $c \in \mathbb{R}$ è un
+        intervallo $$U_\delta(c) = (c - \delta,\, c + \delta) = \{x \in \mathbb{R} : |x - c| < \delta\}$$ con $\delta > 0$.</div>
+      <div class="definition"><strong>Intorno di $+\infty$.</strong> Una semiretta $$U_M(+\infty) = (M,\, +\infty) =
+        \{x \in \mathbb{R} : x > M\}.$$ Analogamente $U_M(-\infty) = (-\infty,\, M)$.</div>
+
+      <h3>2 — La definizione unificata</h3>
+      <div class="definition"><strong>Definizione (limite via intorni).</strong> Siano $c, L \in \mathbb{R} \cup
+        \{+\infty, -\infty\}$. Si dice che $\lim_{x \to c} f(x) = L$ se, per ogni intorno $V$ di $L$, esiste un intorno
+        $U$ di $c$ tale che $$x \in U \cap D,\; x \neq c \quad \Longrightarrow \quad f(x) \in V.$$</div>
+      <div class="rule">Una <em>sola</em> frase che funziona in ogni caso: $c$ ed $L$ finiti o infiniti. Cambiano solo
+        gli "intorni" che si scelgono.</div>
+
+      <h3>3 — Come si riduce ai quattro casi</h3>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Caso</th><th>Intorno di $c$</th><th>Intorno di $L$</th><th>Condizione</th></tr></thead>
+          <tbody>
+            <tr><td>$c, L$ finiti</td><td>$(c-\delta, c+\delta)$</td><td>$(L-\varepsilon, L+\varepsilon)$</td><td>$0<|x-c|<\delta \Rightarrow |f(x)-L|<\varepsilon$</td></tr>
+            <tr><td>$c$ finito, $L=+\infty$</td><td>$(c-\delta, c+\delta)$</td><td>$(M, +\infty)$</td><td>$0<|x-c|<\delta \Rightarrow f(x)>M$</td></tr>
+            <tr><td>$c=+\infty$, $L$ finito</td><td>$(N, +\infty)$</td><td>$(L-\varepsilon, L+\varepsilon)$</td><td>$x>N \Rightarrow |f(x)-L|<\varepsilon$</td></tr>
+            <tr><td>$c=+\infty$, $L=+\infty$</td><td>$(N, +\infty)$</td><td>$(M, +\infty)$</td><td>$x>N \Rightarrow f(x)>M$</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Non sono quattro idee diverse: è una sola idea, vista da quattro angolazioni.</p>
+
+      <h3>4 — Perché è "più generale"?</h3>
+      <p>Si svincola dalla "distanza con $|\cdot|$" e parla solo di <em>vicinato</em>, estendendosi a spazi metrici,
+        spazi topologici, successioni, analisi funzionale. È il <em>seme universale</em> della teoria del limite.</p>
+    </section>
+
+    <!-- 10 — TEOREMA -->
+    <section id="sec9">
+      <h2>10. Che cos'è un teorema?</h2>
+      <p>Un <strong>teorema</strong> è un'affermazione di cui si garantisce la verità con un ragionamento rigoroso. Ha
+        sempre tre ingredienti:</p>
+      <div class="card-row">
+        <div class="card"><h4>① Ipotesi</h4><p>Ciò che <strong>diamo per vero</strong> di partenza. È il "se".</p></div>
+        <div class="card"><h4>② Tesi</h4><p>Ciò che <strong>vogliamo dimostrare</strong>. È l'"allora".</p></div>
+        <div class="card"><h4>③ Dimostrazione</h4><p>La <strong>catena di passaggi logici</strong> dalle ipotesi alla tesi.</p></div>
+      </div>
+      <div class="formula-box">$$\text{Se }\;\textbf{ipotesi} \quad\Longrightarrow\quad \text{allora }\;\textbf{tesi}$$</div>
+    </section>
+
+    <!-- 11 — UNICITÀ -->
+    <section id="sec10">
+      <h2>11. Teorema dell'unicità del limite</h2>
+      <p>Se cammini verso un muro, non puoi avvicinarti a <em>due muri diversi</em>. Una funzione, in un punto, tende a
+        un solo valore.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Esplora l'impossibilità di avere due limiti</div>
+        <div class="demo-controls">
+          <label>Tolleranza ε =</label>
+          <input type="range" id="demo6-eps" min="0.1" max="1.5" step="0.05" value="1.0">
+          <span class="demo-value" id="demo6-eps-value">1.00</span>
+        </div>
+        <div class="demo-plot" id="demo6-plot"></div>
+        <p style="font-size:0.9rem; margin-top:0.8rem; opacity:0.85;">Se per assurdo ci fossero due limiti $L_1=4$ e
+          $L_2=2$, la funzione dovrebbe cadere contemporaneamente in entrambe le fasce. Riduci $\varepsilon$ sotto a 1:
+          le fasce <strong>si separano</strong> e diventa impossibile!</p>
+      </div>
+      <div class="theorem"><strong>Teorema dell'unicità del limite.</strong> Se per $x \to c$ la funzione $f(x)$ ammette
+        limite $L$ finito, allora tale limite è <strong>unico</strong>.</div>
+      <div class="steps">
+        <p><strong>Dimostrazione (per assurdo)</strong></p>
+        <p><span class="step-num">1</span>Supponiamo per assurdo due limiti diversi $L_1$ e $L_2$ (con $L_1 > L_2$).</p>
+        <p><span class="step-num">2</span>La loro distanza è $d = L_1 - L_2 > 0$.</p>
+        <p><span class="step-num">3</span>La definizione vale per qualsiasi $\varepsilon > 0$: scegliamo $\varepsilon = \frac{d}{2}$.</p>
+        <p><span class="step-num">4</span>Esistono un intorno $U_1$ (per $L_1$) e $U_2$ (per $L_2$) di $c$.</p>
+        <p><span class="step-num">5</span>In $U_1 \cap U_2$ i valori dovrebbero cadere in entrambi gli intorni; ma con
+          $\varepsilon = \frac{d}{2}$ i due intorni sono <strong>disgiunti</strong>: contraddizione. Il limite è unico.</p>
+        <p style="text-align:right; font-weight:700; margin-top:0.5rem;">∎</p>
+      </div>
+    </section>
+
+    <!-- 12 — PERMANENZA DEL SEGNO -->
+    <section id="sec11">
+      <h2>12. Teorema della permanenza del segno</h2>
+      <p>Un aereo che atterra verso un aeroporto a 500 m (il "limite" positivo): anche oscillando, quando è abbastanza
+        vicino sarà <em>per forza</em> sopra il livello del mare.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Esplora la permanenza del segno</div>
+        <div class="demo-controls">
+          <label>Tolleranza ε =</label>
+          <input type="range" id="demo7-eps" min="0.5" max="5.0" step="0.1" value="4.0">
+          <span class="demo-value" id="demo7-eps-value">4.00</span>
+        </div>
+        <div class="demo-plot" id="demo7-plot"></div>
+        <p style="font-size:0.9rem; margin-top:0.8rem; opacity:0.85;">Il limite è $L = 3$. Con $\varepsilon$ troppo
+          grande la fascia scende sotto zero. Riduci $\varepsilon$ sotto a 3: l'intera fascia resta <strong>strettamente
+          positiva</strong>.</p>
+      </div>
+      <div class="theorem"><strong>Teorema della permanenza del segno.</strong> Se per $x \to c$ la funzione $f(x)$
+        ammette limite $L \neq 0$, allora esiste un intorno di $c$ in cui $f(x)$ ha lo stesso segno di $L$.</div>
+      <div class="steps">
+        <p><strong>Dimostrazione (caso $L > 0$)</strong></p>
+        <p><span class="step-num">1</span>Per ipotesi $\lim_{x \to c} f(x) = L > 0$.</p>
+        <p><span class="step-num">2</span>Per ogni $\varepsilon > 0$ esiste un intorno di $c$ in cui $L - \varepsilon < f(x) < L + \varepsilon$.</p>
+        <p><span class="step-num">3</span>Scegliamo $\varepsilon = L$ (positivo, quindi valido).</p>
+        <p><span class="step-num">4</span>Dalla disuguaglianza di sinistra: $L - L < f(x)$, cioè $0 < f(x)$.</p>
+        <p><span class="step-num">5</span>Abbiamo un intorno in cui $f(x) > 0$. Il caso $L < 0$ è identico con $\varepsilon = -L$.</p>
+        <p style="text-align:right; font-weight:700; margin-top:0.5rem;">∎</p>
+      </div>
+      <div class="note"><strong>Il contrario è falso?</strong> Se $f$ è positiva vicino a $c$, il limite potrebbe essere
+        <strong>zero</strong> (es. $x^2$ per $x \to 0$). Il segno si conserva in senso debole ($L \ge 0$).</div>
+    </section>
+
+    <!-- 13 — QUIZ -->
+    <section id="quiz">
+      <h2>13. Quiz finale: dieci domande sui limiti</h2>
+      <p>Difficoltà crescente: dal concetto base alle definizioni formali. Buona fortuna!</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 3 — I Limiti di una Funzione · Matematica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;"><em>"In matematica, l'importante non è arrivare: è avvicinarsi."</em></p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { diff: 'easy', text: 'Quale frase esprime meglio il concetto intuitivo di limite?',
+        options: ['Il valore esatto che una funzione assume in un punto.', 'Il valore a cui una funzione si avvicina quando $x$ si avvicina a un numero.', 'Il valore massimo di una funzione.', 'Il punto in cui una funzione non esiste.'],
+        correct: 1, explain: 'Il limite descrive il comportamento di avvicinamento di $f(x)$, senza per forza coincidere col valore in quel punto.' },
+      { diff: 'easy', text: 'Come si legge $\\lim_{x \\to c} f(x) = L$?',
+        options: ['Il limite di $L$ tende a $c$.', 'La funzione $f(x)$ vale $L$ in $c$.', 'Il limite per $x$ che tende a $c$ di $f(x)$ è uguale a $L$.', '$x$ è uguale a $c$ quando $f(x) = L$.'],
+        correct: 2, explain: '«Il limite, per $x$ che tende a $c$, di $f(x)$ è uguale a $L$». Nota il "tende a", non "uguale a".' },
+      { diff: 'easy', text: 'Nella definizione formale, $\\varepsilon$ rappresenta:',
+        options: ['Un numero positivo arbitrariamente piccolo (la tolleranza sul risultato).', 'L\'errore di calcolo.', 'L\'energia cinetica.', 'Il valore esatto del limite.'],
+        correct: 0, explain: '$\\varepsilon > 0$ è la tolleranza con cui chiediamo che $f(x)$ approssimi $L$. Piccola quanto vogliamo.' },
+      { diff: 'easy', text: 'Calcola $\\lim_{x \\to 2} (3x - 1)$.',
+        options: ['$0$', '$2$', '$5$', '$6$'], correct: 2, explain: 'Polinomiale (continua): basta sostituire. $3 \\cdot 2 - 1 = 5$.' },
+      { diff: 'medium', text: 'Quanto vale $\\lim_{x \\to 2} \\dfrac{x^2 - 4}{x - 2}$?',
+        options: ['Non esiste, perché $f(2)$ non è definita.', '$0$', '$4$', '$\\infty$'],
+        correct: 2, explain: 'Anche se $f(2) = \\frac{0}{0}$, si semplifica: $\\frac{(x-2)(x+2)}{x-2} = x + 2 \\to 4$.' },
+      { diff: 'medium', text: 'Nel limite $\\lim_{x \\to c} f(x) = +\\infty$, la lettera $M$ rappresenta:',
+        options: ['La tolleranza piccola sul risultato.', 'Un numero positivo arbitrariamente grande, da superare con $f(x)$.', 'La massa della funzione.', 'Il punto medio di $[c-\\delta, c+\\delta]$.'],
+        correct: 1, explain: 'Quando $f(x) \\to +\\infty$ chiediamo che $f(x)$ superi $M$ per qualunque $M$ grande.' },
+      { diff: 'medium', text: 'Sia $f(x) = \\dfrac{1}{x}$. Quanto vale $\\lim_{x \\to +\\infty} f(x)$?',
+        options: ['$+\\infty$', '$1$', '$0$', 'Non esiste'], correct: 2, explain: 'All\'aumentare di $x$, $\\frac{1}{x} \\to 0$: asintoto orizzontale $y = 0$.' },
+      { diff: 'medium', text: 'Quando esiste il limite $\\lim_{x \\to c} f(x)$?',
+        options: ['Quando $f(c)$ è definita.', 'Quando il grafico passa per $(c, L)$.', 'Quando i limiti destro e sinistro esistono e sono uguali.', 'Sempre.'],
+        correct: 2, explain: 'Esiste se e solo se $\\lim_{x \\to c^-} f(x) = \\lim_{x \\to c^+} f(x)$. Non c\'entra che $f(c)$ sia definita.' },
+      { diff: 'hard', text: 'Per $f(x) = \\dfrac{1}{x}$, cosa puoi dire di $\\lim_{x \\to 0} f(x)$?',
+        options: ['Vale $0$.', 'Vale $+\\infty$.', 'Vale $-\\infty$.', 'Non esiste: i laterali ($+\\infty$ e $-\\infty$) sono diversi.'],
+        correct: 3, explain: 'Da destra $\\to +\\infty$, da sinistra $\\to -\\infty$: i laterali differiscono, il limite globale non esiste.' },
+      { diff: 'hard', text: 'La definizione $\\forall \\varepsilon > 0, \\exists \\delta > 0 : 0 < |x - c| < \\delta \\Rightarrow |f(x) - L| < \\varepsilon$ ti dice:',
+        options: ['Che esiste un unico $\\delta$ ottimale.', 'Che per ogni tolleranza $\\varepsilon$ si trova un $\\delta$ che la garantisce restringendo $x$ vicino a $c$.', 'Che $f(x) = L$ per ogni $x$ vicino a $c$.', 'Che $\\delta > \\varepsilon$ sempre.'],
+        correct: 1, explain: 'Definizione di Cauchy-Weierstrass: $\\forall \\varepsilon$ = "per ogni tolleranza"; $\\exists \\delta$ = "esiste un raggio attorno a $c$" che la garantisce.' }
+    ];
+  </script>
+
+  <!-- Demo interattive di questa lezione -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { linspace, update, draw, themeColors } = Plt;
+      const G = 'rgba(40,167,69,0.18)', Y = 'rgba(245,180,0,0.18)';
+      const cGreen = '#28a745', cGold = '#f5b400', cRed = '#ef4444', cBlue = '#1e2761', cAcc = '#5c2a9d';
+
+      // ---- Sezione 9: punti di accumulazione ----
+      (function () {
+        const sel = document.getElementById('acc-set'), sx = document.getElementById('acc-x0'), vx = document.getElementById('acc-x0-val');
+        const sd = document.getElementById('acc-delta'), vd = document.getElementById('acc-delta-val'), verdict = document.getElementById('acc-verdict');
+        const sets = {
+          intervallo: { pts: linspace(0, 4, 161), inSet: x => x >= -1e-9 && x <= 4 + 1e-9, isAcc: x => x >= -1e-9 && x <= 4 + 1e-9 },
+          successione: { pts: (function () { const a = [0]; for (let n = 1; n <= 40; n++) a.push(1 / n); return a; })(),
+            inSet: x => Math.abs(x) < 1e-9 || (function () { for (let n = 1; n <= 40; n++) if (Math.abs(x - 1 / n) < 1e-9) return true; return false; })(),
+            isAcc: x => Math.abs(x) < 1e-9 },
+          misto: { pts: [0].concat(linspace(1, 2, 81)), inSet: x => Math.abs(x) < 1e-9 || (x >= 1 - 1e-9 && x <= 2 + 1e-9), isAcc: x => x >= 1 - 1e-9 && x <= 2 + 1e-9 },
+          interi: { pts: [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6], inSet: x => Math.abs(x - Math.round(x)) < 1e-9 && x >= -3 && x <= 6, isAcc: x => false }
+        };
+        function go() {
+          const S = sets[sel.value], x0 = +sx.value, d = +sd.value;
+          vx.textContent = x0.toFixed(2); vd.textContent = d.toFixed(2);
+          let count = 0;
+          for (const p of S.pts) if (Math.abs(p - x0) < d && Math.abs(p - x0) > 1e-7) count++;
+          let txt = S.isAcc(x0) ? '✓ <strong>x₀ è un PUNTO DI ACCUMULAZIONE</strong>: per quanto piccolo sia δ, cadono sempre infiniti punti.'
+            : S.inSet(x0) ? '● <strong>x₀ è un PUNTO ISOLATO</strong>: rimpicciolendo δ trovi un intorno senza altri punti.'
+            : '○ x₀ non appartiene all\'insieme e non è di accumulazione.';
+          verdict.innerHTML = txt + ` <span style="opacity:0.7;font-weight:400;">— in questo intorno: ${count} altri punti.</span>`;
+          update('acc-plot', [
+            { x: S.pts, y: S.pts.map(() => 0), type: 'scatter', mode: 'markers', marker: { color: cAcc, size: 7 }, name: 'insieme' },
+            { x: [x0], y: [0], type: 'scatter', mode: 'markers', marker: { color: '#d73027', size: 13, symbol: 'x' }, name: 'x0' }
+          ], { shapes: [{ type: 'rect', x0: x0 - d, x1: x0 + d, y0: -0.45, y1: 0.45, fillcolor: 'rgba(245,180,0,0.22)', line: { width: 0 } }],
+            xaxis: { range: [-4, 7], title: '', zeroline: false }, yaxis: { range: [-1, 1], visible: false }, height: 220 });
+        }
+        sel.addEventListener('change', go); sx.addEventListener('input', go); sd.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 1: x², c=2, L=4 ----
+      (function () {
+        const slider = document.getElementById('demo1-eps'), t1 = document.getElementById('demo1-eps-value'), t2 = document.getElementById('demo1-eps-text'), dT = document.getElementById('demo1-delta-value');
+        const c = 2, L = 4, xMin = 0, xMax = 4, yMin = -1, yMax = 16;
+        function go() {
+          const eps = +slider.value; t1.textContent = eps.toFixed(2); t2.textContent = eps.toFixed(2);
+          const delta = Math.min(c - Math.sqrt(Math.max(0, L - eps)), Math.sqrt(L + eps) - c); dT.textContent = delta.toFixed(3);
+          const xs = linspace(xMin, xMax, 200);
+          const traces = [
+            { x: xs, y: xs.map(x => x * x), type: 'scatter', mode: 'lines', line: { color: cRed, width: 2.8 }, name: 'f(x) = x²', hoverinfo: 'x+y' },
+            { x: [c], y: [L], type: 'scatter', mode: 'markers', marker: { color: cBlue, size: 11 }, hoverinfo: 'text', hovertext: ['(c=2, L=4)'] }
+          ];
+          const shapes = [
+            { type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: L - eps, y1: L + eps, fillcolor: G, line: { width: 0 }, layer: 'below' },
+            { type: 'rect', x0: c - delta, x1: c + delta, yref: 'paper', y0: 0, y1: 1, fillcolor: Y, line: { width: 0 }, layer: 'below' },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: L + eps, y1: L + eps, line: { color: cGreen, width: 1.5, dash: 'dash' } },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: L - eps, y1: L - eps, line: { color: cGreen, width: 1.5, dash: 'dash' } },
+            { type: 'line', x0: c - delta, x1: c - delta, yref: 'paper', y0: 0, y1: 1, line: { color: cGold, width: 1.5, dash: 'dash' } },
+            { type: 'line', x0: c + delta, x1: c + delta, yref: 'paper', y0: 0, y1: 1, line: { color: cGold, width: 1.5, dash: 'dash' } }
+          ];
+          const annotations = [
+            { x: c, y: yMax - 2, text: 'c=2', showarrow: false, font: { color: cBlue, size: 11 } },
+            { x: xMin + 0.1, y: L, text: 'L=4', showarrow: false, font: { color: cGreen, size: 11 }, xanchor: 'left' }
+          ];
+          update('demo1-plot', traces, { xaxis: { range: [xMin, xMax], title: 'x' }, yaxis: { range: [yMin, yMax], title: 'f(x)' }, shapes, annotations });
+        }
+        slider.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 2: 1/(x-1)², c=1, +∞ ----
+      (function () {
+        const slider = document.getElementById('demo2-M'), t1 = document.getElementById('demo2-M-value'), t2 = document.getElementById('demo2-M-text'), dT = document.getElementById('demo2-delta-value');
+        const c = 1, xMin = -1, xMax = 3, yMax = 600;
+        function go() {
+          const M = +slider.value; t1.textContent = M.toFixed(0); t2.textContent = M.toFixed(0);
+          const delta = 1 / Math.sqrt(M); dT.textContent = delta.toFixed(3);
+          const f = x => 1 / Math.pow(x - c, 2);
+          const xsL = linspace(xMin, c - 0.001, 300), xsR = linspace(c + 0.001, xMax, 300);
+          const traces = [
+            { x: xsL, y: xsL.map(x => Math.min(f(x), yMax * 1.5)), type: 'scatter', mode: 'lines', line: { color: cRed, width: 2.8 }, hoverinfo: 'x+y' },
+            { x: xsR, y: xsR.map(x => Math.min(f(x), yMax * 1.5)), type: 'scatter', mode: 'lines', line: { color: cRed, width: 2.8 }, hoverinfo: 'x+y' }
+          ];
+          const shapes = [
+            { type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: M, y1: yMax, fillcolor: 'rgba(40,167,69,0.16)', line: { width: 0 }, layer: 'below' },
+            { type: 'rect', x0: c - delta, x1: c + delta, yref: 'paper', y0: 0, y1: 1, fillcolor: Y, line: { width: 0 }, layer: 'below' },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: M, y1: M, line: { color: cGreen, width: 2, dash: 'dash' } },
+            { type: 'line', x0: c - delta, x1: c - delta, yref: 'paper', y0: 0, y1: 1, line: { color: cGold, width: 1.5, dash: 'dash' } },
+            { type: 'line', x0: c + delta, x1: c + delta, yref: 'paper', y0: 0, y1: 1, line: { color: cGold, width: 1.5, dash: 'dash' } },
+            { type: 'line', x0: c, x1: c, yref: 'paper', y0: 0, y1: 1, line: { color: '#d93030', width: 1.5, dash: 'dot' } }
+          ];
+          const annotations = [{ x: xMin + 0.15, y: M, text: 'M=' + M.toFixed(0), showarrow: false, font: { color: cGreen, size: 11 }, xanchor: 'left', yshift: 10 }];
+          update('demo2-plot', traces, { xaxis: { range: [xMin, xMax], title: 'x' }, yaxis: { range: [0, yMax], title: 'f(x)' }, shapes, annotations });
+        }
+        slider.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 3: 1+1/x, x→+∞, L=1 ----
+      (function () {
+        const slider = document.getElementById('demo3-eps'), t1 = document.getElementById('demo3-eps-value'), t2 = document.getElementById('demo3-eps-text'), nT = document.getElementById('demo3-N-value');
+        const L = 1, xMin = 0.3, xMax = 60, yMin = 0.4, yMax = 3.2;
+        function go() {
+          const eps = +slider.value; t1.textContent = eps.toFixed(2); t2.textContent = eps.toFixed(2);
+          const N = 1 / eps; nT.textContent = N.toFixed(1);
+          const xs = linspace(xMin, xMax, 400);
+          const traces = [{ x: xs, y: xs.map(x => 1 + 1 / x), type: 'scatter', mode: 'lines', line: { color: cRed, width: 2.8 }, hoverinfo: 'x+y' }];
+          const shapes = [
+            { type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: L - eps, y1: L + eps, fillcolor: G, line: { width: 0 }, layer: 'below' },
+            { type: 'rect', x0: N, x1: xMax, yref: 'paper', y0: 0, y1: 1, fillcolor: Y, line: { width: 0 }, layer: 'below' },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: L, y1: L, line: { color: cGreen, width: 1.5, dash: 'dot' } },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: L + eps, y1: L + eps, line: { color: cGreen, width: 1.5, dash: 'dash' } },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: L - eps, y1: L - eps, line: { color: cGreen, width: 1.5, dash: 'dash' } },
+            { type: 'line', x0: N, x1: N, yref: 'paper', y0: 0, y1: 1, line: { color: cGold, width: 2, dash: 'dash' } }
+          ];
+          const annotations = [
+            { x: xMax - 1, y: L, text: 'L=1', showarrow: false, font: { color: cGreen, size: 11 }, xanchor: 'right', yshift: -10 },
+            { x: N, y: 0.55, text: 'N', showarrow: false, font: { color: cGold, size: 12 }, xshift: 8 }
+          ];
+          update('demo3-plot', traces, { xaxis: { range: [xMin, xMax], title: 'x' }, yaxis: { range: [yMin, yMax], title: 'f(x)' }, shapes, annotations });
+        }
+        slider.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 4: x², x→+∞, +∞ ----
+      (function () {
+        const slider = document.getElementById('demo4-M'), t1 = document.getElementById('demo4-M-value'), t2 = document.getElementById('demo4-M-text'), nT = document.getElementById('demo4-N-value');
+        const xMin = 0, xMax = 22, yMax = 480;
+        function go() {
+          const M = +slider.value; t1.textContent = M.toFixed(0); t2.textContent = M.toFixed(0);
+          const N = Math.sqrt(M); nT.textContent = N.toFixed(1);
+          const xs = linspace(xMin, xMax, 300);
+          const traces = [{ x: xs, y: xs.map(x => x * x), type: 'scatter', mode: 'lines', line: { color: cRed, width: 2.8 }, hoverinfo: 'x+y' }];
+          const shapes = [
+            { type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: M, y1: yMax, fillcolor: 'rgba(40,167,69,0.16)', line: { width: 0 }, layer: 'below' },
+            { type: 'rect', x0: N, x1: xMax, yref: 'paper', y0: 0, y1: 1, fillcolor: Y, line: { width: 0 }, layer: 'below' },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: M, y1: M, line: { color: cGreen, width: 2, dash: 'dash' } },
+            { type: 'line', x0: N, x1: N, yref: 'paper', y0: 0, y1: 1, line: { color: cGold, width: 2, dash: 'dash' } }
+          ];
+          const annotations = [
+            { x: 0.3, y: M, text: 'M=' + M.toFixed(0), showarrow: false, font: { color: cGreen, size: 11 }, xanchor: 'left', yshift: 10 },
+            { x: N, y: 20, text: 'N=√M ≈ ' + N.toFixed(1), showarrow: false, font: { color: cGold, size: 11 }, xshift: 10, xanchor: 'left' }
+          ];
+          update('demo4-plot', traces, { xaxis: { range: [xMin, xMax], title: 'x' }, yaxis: { range: [0, yMax], title: 'f(x)' }, shapes, annotations });
+        }
+        slider.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 5: 1/x, laterali ----
+      (function () {
+        const xMin = -4, xMax = 4, yMin = -8, yMax = 8, f = x => 1 / x;
+        const xsL = linspace(xMin, -0.05, 250), xsR = linspace(0.05, xMax, 250);
+        draw('demo5-plot', [
+          { x: xsL, y: xsL.map(f), type: 'scatter', mode: 'lines', line: { color: '#eab308', width: 2.8 }, name: 'x → 0⁻', hoverinfo: 'x+y' },
+          { x: xsR, y: xsR.map(f), type: 'scatter', mode: 'lines', line: { color: '#d93030', width: 2.8 }, name: 'x → 0⁺', hoverinfo: 'x+y' }
+        ], { xaxis: { range: [xMin, xMax], title: 'x' }, yaxis: { range: [yMin, yMax], title: 'f(x) = 1/x' },
+          shapes: [{ type: 'line', x0: 0, x1: 0, yref: 'paper', y0: 0, y1: 1, line: { color: cRed, width: 1.5, dash: 'dot' } }],
+          annotations: [
+            { x: -1.5, y: -5, text: 'lim x→0⁻ = −∞', showarrow: false, font: { color: '#eab308', size: 13 } },
+            { x: 1.5, y: 5, text: 'lim x→0⁺ = +∞', showarrow: false, font: { color: '#d93030', size: 13 } }
+          ], showlegend: true, legend: { x: 0.02, y: 0.98 } });
+      })();
+
+      // ---- Demo 6: unicità ----
+      (function () {
+        const slider = document.getElementById('demo6-eps'), t1 = document.getElementById('demo6-eps-value');
+        const xMin = 0, xMax = 10, yMin = 0, yMax = 6, L1 = 4, L2 = 2;
+        function go() {
+          const eps = +slider.value; t1.textContent = eps.toFixed(2);
+          const shapes = [
+            { type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: L1 - eps, y1: L1 + eps, fillcolor: G, line: { width: 0 }, layer: 'below' },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: L1, y1: L1, line: { color: cGreen, width: 2, dash: 'dot' } },
+            { type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: L2 - eps, y1: L2 + eps, fillcolor: 'rgba(217,48,48,0.18)', line: { width: 0 }, layer: 'below' },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: L2, y1: L2, line: { color: '#d93030', width: 2, dash: 'dot' } }
+          ];
+          const annotations = [
+            { x: xMax - 0.5, y: L1, text: 'L₁ = 4', showarrow: false, font: { color: cGreen, size: 12 } },
+            { x: xMax - 0.5, y: L2, text: 'L₂ = 2', showarrow: false, font: { color: '#d93030', size: 12 } }
+          ];
+          update('demo6-plot', [], { xaxis: { range: [xMin, xMax], title: 'x' }, yaxis: { range: [yMin, yMax], title: 'f(x)' }, shapes, annotations, margin: { t: 25, b: 40, l: 40, r: 20 } });
+        }
+        slider.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 7: permanenza del segno ----
+      (function () {
+        const slider = document.getElementById('demo7-eps'), t1 = document.getElementById('demo7-eps-value');
+        const xMin = 0, xMax = 10, yMin = -2, yMax = 8, L = 3;
+        function go() {
+          const eps = +slider.value; t1.textContent = eps.toFixed(2);
+          const xs = linspace(xMin, xMax, 300);
+          const traces = [{ x: xs, y: xs.map(x => L + (eps * 0.8) * Math.sin(x * 2.5)), type: 'scatter', mode: 'lines', line: { color: cRed, width: 2.5 }, hoverinfo: 'none' }];
+          const ok = eps < 3;
+          const shapes = [
+            { type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: L - eps, y1: L + eps, fillcolor: ok ? 'rgba(40,167,69,0.20)' : 'rgba(245,180,0,0.20)', line: { width: 0 }, layer: 'below' },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: L, y1: L, line: { color: ok ? cGreen : cGold, width: 2, dash: 'dot' } },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: 0, y1: 0, line: { color: themeColors().zero, width: 2 } }
+          ];
+          const annotations = [{ x: xMax - 0.5, y: L, text: 'L = 3', showarrow: false, font: { color: ok ? cGreen : cGold, size: 12 } }];
+          update('demo7-plot', traces, { xaxis: { range: [xMin, xMax], title: 'x', zeroline: false }, yaxis: { range: [yMin, yMax], title: 'f(x)', zeroline: false }, shapes, annotations, margin: { t: 25, b: 40, l: 40, r: 20 } });
+        }
+        slider.addEventListener('input', go); go();
+      })();
+
+      // ---- Intro: (x²-1)/(x-1) col buco ----
+      (function () {
+        const slider = document.getElementById('intro-x'), valLabel = document.getElementById('intro-x-val');
+        const xMin = -0.5, xMax = 3.5, yMin = -0.5, yMax = 4.5;
+        const xsL = linspace(xMin, 0.99, 200), xsR = linspace(1.01, xMax, 200);
+        function go() {
+          const xv = +slider.value; valLabel.textContent = xv.toFixed(2);
+          const py = Math.abs(xv - 1) < 0.001 ? null : xv + 1;
+          const traces = [
+            { x: xsL, y: xsL.map(x => x + 1), type: 'scatter', mode: 'lines', line: { color: cRed, width: 2.8 }, hoverinfo: 'x+y' },
+            { x: xsR, y: xsR.map(x => x + 1), type: 'scatter', mode: 'lines', line: { color: cRed, width: 2.8 }, hoverinfo: 'x+y' },
+            { x: [1], y: [2], type: 'scatter', mode: 'markers', marker: { color: themeColors().plotBg, size: 12, line: { color: '#d93030', width: 2.5 } }, hovertext: ['Buco: f(1) non esiste'], hoverinfo: 'text' }
+          ];
+          if (py !== null) traces.push({ x: [xv], y: [py], type: 'scatter', mode: 'markers', marker: { color: cGreen, size: 12, line: { color: '#fff', width: 2 } }, hoverinfo: 'x+y' });
+          const shapes = [
+            { type: 'line', x0: 1, x1: 1, yref: 'paper', y0: 0, y1: 1, line: { color: '#d93030', width: 1, dash: 'dot' } },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: 2, y1: 2, line: { color: cGreen, width: 1, dash: 'dot' } }
+          ];
+          const annotations = [
+            { x: 1, y: 2.3, text: '(1, 2)', showarrow: false, font: { color: cGreen, size: 12 }, xshift: 8 },
+            { x: 1.05, y: yMax - 0.2, text: 'x=1', showarrow: false, font: { color: '#d93030', size: 11 } }
+          ];
+          update('intro-plot', traces, { xaxis: { range: [xMin, xMax], title: 'x' }, yaxis: { range: [yMin, yMax], title: 'f(x)' }, shapes, annotations, showlegend: false });
+        }
+        slider.addEventListener('input', go); go();
+      })();
+    });
+  </script>
+</body>
+
+</html>

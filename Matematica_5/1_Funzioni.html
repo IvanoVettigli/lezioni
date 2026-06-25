@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 1 — Le Funzioni</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    /* Stili specifici di questa lezione (theme-aware) */
+    .venn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1rem; margin: 1.2rem 0; }
+    .isb-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; }
+    .isb-card h4 { margin: 0 0 0.25rem; color: var(--accent); font-size: 1rem; }
+    .isb-card .isb-sub { font-size: 0.85rem; margin: 0 0 0.6rem; color: var(--muted); font-style: italic; }
+    .isb-card svg, .venn-svg { display: block; margin: 0 auto; max-width: 100%; }
+    .venn-container { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin: 1rem 0; }
+    .venn-svg { width: 100%; height: auto; max-width: 600px; }
+    .pendolo-stage { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.5rem; }
+    .pendolo-stage .pen-support { stroke: var(--muted); }
+    .pendolo-stage .pen-rope { stroke: var(--primary); }
+    .pendolo-stage .pen-bob { fill: var(--magenta); stroke: var(--primary); }
+    .pendolo-stage .pen-pivot { fill: var(--primary); }
+    .field-svg { width: 100%; height: auto; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; }
+    .table-container { overflow-x: auto; margin: 1rem 0; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <h1>Le Funzioni</h1>
+    <p>La macchina matematica che a ogni ingresso associa una sola uscita</p>
+    <div class="subtitle">Matematica · Quinto anno · Lezione 1</div>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quinto anno</a>
+    <span class="sep">/</span> Le Funzioni
+  </nav>
+
+  <main>
+
+    <!-- 1 — DEFINIZIONE -->
+    <section id="sec1">
+      <h2>1. Cos'è una funzione?</h2>
+      <p>Una <em>funzione</em>, in matematica, è una macchina che a ogni ingresso fa corrispondere <strong>uno e un
+        solo</strong> output. Quel "uno e un solo" è la regola d'oro: se a uno stesso input corrispondessero due output
+        diversi, non sarebbe più una funzione.</p>
+
+      <div class="definition">
+        <p>Una <strong>funzione</strong> \(f: A \to B\) è una relazione tra due insiemi \(A\) e \(B\) che associa a
+          <strong>ogni</strong> elemento \(x \in A\) <strong>uno e un solo</strong> elemento \(y \in B\), che si indica
+          \(y = f(x)\).</p>
+      </div>
+
+      <h3>Il vocabolario fondamentale</h3>
+      <div class="card-row">
+        <div class="card"><h4>Dominio (A)</h4><p>L'insieme degli <strong>input ammessi</strong>: i valori che possiamo dare in pasto alla funzione.</p></div>
+        <div class="card"><h4>Codominio (B)</h4><p>L'insieme degli <strong>output possibili</strong>: il "magazzino" da cui f pesca le risposte.</p></div>
+        <div class="card"><h4>Immagine f(A)</h4><p>Il sottoinsieme di B <strong>effettivamente raggiunto</strong>: quante uscite usa davvero la funzione.</p></div>
+        <div class="card"><h4>Variabili</h4><p><strong>x</strong> è la variabile <em>indipendente</em> (la scegli tu); <strong>y = f(x)</strong> è <em>dipendente</em>.</p></div>
+      </div>
+
+      <h3>Quando NON è una funzione?</h3>
+      <p>Se a uno stesso \(x\) corrispondono <strong>due o più</strong> valori di \(y\). Esempio classico: l'equazione
+        \(x^2 + y^2 = 1\) (la circonferenza unitaria) <em>non</em> è una funzione di x, perché per \(x = 0\) ho sia
+        \(y = +1\) sia \(y = -1\).</p>
+      <p>Quando sei in dubbio puoi usare il <em>"test della retta verticale"</em>: se una retta verticale taglia il
+        grafico in più di un punto, non è una funzione.</p>
+    </section>
+
+    <!-- 2 — INIETTIVE / SURIETTIVE / BIETTIVE -->
+    <section id="sec-isb">
+      <h2>2. Iniettive, suriettive, biettive</h2>
+      <p>Non tutte le funzioni si comportano allo stesso modo nel collegare dominio e codominio. Distinguerne tre tipi
+        speciali ci aiuta anche a capire meglio il concetto di <em>immagine</em>.</p>
+
+      <div class="definition">
+        <p>Una funzione è <strong>iniettiva</strong> se a elementi diversi del dominio corrispondono elementi diversi del
+          codominio: se \(x_1 \neq x_2\), allora \(f(x_1) \neq f(x_2)\). In un diagramma di Venn, <em>nessun pallino del
+          codominio è puntato da due frecce diverse</em>.</p>
+        <p>Una funzione è <strong>suriettiva</strong> se <em>ogni</em> elemento del codominio è raggiunto da almeno una
+          freccia, cioè l'immagine coincide con il codominio: \(f(A) = B\).</p>
+        <p>Una funzione è <strong>biettiva</strong> (o biunivoca) se è <em>sia</em> iniettiva <em>sia</em> suriettiva: una
+          corrispondenza perfetta uno-a-uno.</p>
+      </div>
+
+      <h3>I quattro casi possibili, a colpo d'occhio</h3>
+      <div id="isb-grid" class="venn-grid"></div>
+
+      <div class="note">
+        <strong>Cos'è l'immagine, allora?</strong> L'<em>immagine</em> \(f(A)\) è il sottoinsieme del codominio
+        "effettivamente raggiunto" dalla funzione. Una funzione è suriettiva quando immagine e codominio coincidono.
+        Riducendo il codominio all'immagine, qualunque funzione diventa automaticamente suriettiva.
+      </div>
+
+      <h3>Esempi con funzioni reali</h3>
+      <div class="card-row">
+        <div class="card"><h4>f(x) = 2x + 1, da ℝ a ℝ</h4><p><strong>Biettiva.</strong> A ogni y reale corrisponde un solo x; tutti i valori di y sono raggiunti.</p></div>
+        <div class="card"><h4>f(x) = x², da ℝ a ℝ</h4><p><strong>Né iniettiva né suriettiva.</strong> \(f(2)=f(-2)=4\); nessun y negativo è raggiunto. L'immagine è \([0,+\infty)\).</p></div>
+        <div class="card"><h4>f(x) = x², da ℝ a [0,+∞)</h4><p><strong>Suriettiva ma non iniettiva.</strong> Riducendo il codominio tutti i valori sono raggiunti, ma restano le coppie \(\pm x\).</p></div>
+        <div class="card"><h4>f(x) = eˣ, da ℝ a ℝ</h4><p><strong>Iniettiva ma non suriettiva.</strong> x diversi danno y diversi, ma y ≤ 0 non sono mai raggiunti.</p></div>
+      </div>
+    </section>
+
+    <!-- 3 — QUATTRO RAPPRESENTAZIONI -->
+    <section id="sec2">
+      <h2>3. Le quattro rappresentazioni</h2>
+      <p>Una stessa funzione può essere "raccontata" in quattro modi diversi: ciascuno ha i suoi punti di forza.</p>
+
+      <h3>3.1 — Diagramma di Eulero-Venn</h3>
+      <p>Due "palloni": il dominio a sinistra, il codominio a destra. Una freccia per ogni associazione. Pratico quando
+        il dominio ha pochi elementi.</p>
+      <div class="controls">
+        <div class="control-group">
+          <label>Scegli la regola:</label>
+          <select id="venn-rule">
+            <option value="add1">f(x) = x + 1</option>
+            <option value="square">f(x) = x²</option>
+            <option value="double">f(x) = 2x</option>
+            <option value="abs">f(x) = |x|</option>
+          </select>
+        </div>
+      </div>
+      <div class="venn-container">
+        <svg class="venn-svg" id="venn-svg" viewBox="0 0 600 360" aria-label="Diagramma di Eulero-Venn"></svg>
+      </div>
+      <p><strong>Forza:</strong> visivo, immediato, ottimo per insiemi finiti.<br>
+        <strong>Debolezza:</strong> con un dominio infinito servirebbero infinite frecce.</p>
+
+      <h3>3.2 — Equazione algebrica</h3>
+      <div class="formula-box">$$f(x) = x^2 \quad\text{oppure}\quad y = x^2$$</div>
+      <p>La forma compatta: una sola riga che racchiude tutta la regola. Con un'equazione puoi calcolare
+        \(f(\sqrt{2})\), \(f(1000)\) o \(f(-\pi)\) senza scomodare frecce.</p>
+
+      <h3>3.3 — Tabella</h3>
+      <p>Una colonna di \(x\) e una colonna di \(f(x)\): valori puntuali pronti all'uso.</p>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>x</th><th>f(x) = x²</th></tr></thead>
+          <tbody>
+            <tr><td>−2</td><td>4</td></tr><tr><td>−1</td><td>1</td></tr><tr><td>0</td><td>0</td></tr>
+            <tr><td>1</td><td>1</td></tr><tr><td>2</td><td>4</td></tr><tr><td>3</td><td>9</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>3.4 — Grafico cartesiano</h3>
+      <p>Sul piano cartesiano ogni punto del grafico è una coppia \((x,\,f(x))\).</p>
+      <div class="plot" id="static-parabola"></div>
+      <p><strong>Forza:</strong> a colpo d'occhio vedi crescita, decrescita, massimi, minimi, simmetrie.</p>
+    </section>
+
+    <!-- 4 — EQ → TABELLA → GRAFICO -->
+    <section id="sec3">
+      <h2>4. Equazione, tabella, grafico: tutto in un colpo solo</h2>
+      <p>Cambiando l'equazione si trasformano sia la tabella che il grafico: è la stessa entità matematica in tre forme.</p>
+      <p>Scrivi un'equazione (usa <code>x</code>, <code>^</code> per le potenze, <code>*</code> per il prodotto,
+        <code>sin</code>, <code>cos</code>, <code>sqrt</code>, <code>exp</code>, <code>log</code>…):</p>
+
+      <div class="controls">
+        <div class="control-group" style="flex: 1; min-width: 220px;">
+          <label>f(x) =</label>
+          <input type="text" id="eq-input" class="mono" value="x^2" placeholder="es. x^2 + 2*x - 1">
+        </div>
+        <button id="eq-update">Aggiorna</button>
+        <label class="toggle-row" title="Scala Y fissa: vedi come cambia la FORMA della funzione invece dell'auto-zoom.">
+          <input type="checkbox" id="eq-fixed-scale" checked> Scala Y fissa
+        </label>
+      </div>
+
+      <div class="example-buttons">
+        <span class="lbl">Prova:</span>
+        <button class="chip" data-eq="x^2">x²</button>
+        <button class="chip" data-eq="2*x + 1">2x + 1</button>
+        <button class="chip" data-eq="x^3 - x">x³ − x</button>
+        <button class="chip" data-eq="sin(x)">sin(x)</button>
+        <button class="chip" data-eq="exp(x/3)">eˣ/³</button>
+        <button class="chip" data-eq="1/x">1/x</button>
+        <button class="chip" data-eq="sqrt(x)">√x</button>
+        <button class="chip" data-eq="abs(x)">|x|</button>
+      </div>
+
+      <div class="formula-box" id="eq-render">f(x) = x^2</div>
+      <div class="two-col">
+        <div><h4>Tabella</h4><div class="table-container" id="eq-table"></div></div>
+        <div><h4>Grafico</h4><div class="plot" id="eq-plot"></div></div>
+      </div>
+    </section>
+
+    <!-- 5 — ESEMPI PRATICI -->
+    <section id="sec4">
+      <h2>5. Esempi pratici: dalla fisica alla finanza</h2>
+      <p>Le funzioni descrivono come cambia la realtà nel tempo.</p>
+
+      <h3>5.1 — Moto rettilineo uniforme (MRU)</h3>
+      <p>Un oggetto a velocità costante: quanta strada percorre in un tempo \(t\)?</p>
+      <div class="formula-box">$$s(t) = s_0 + v \cdot t$$</div>
+      <p>La legge oraria è una <strong>retta</strong>; la pendenza è la velocità.</p>
+      <div class="controls">
+        <div class="control-group"><label>Velocità v (m/s): <span class="val" id="mru-v-val">5</span></label><input type="range" id="mru-v" min="-10" max="20" step="0.5" value="5"></div>
+        <div class="control-group"><label>Posizione iniziale s₀ (m): <span class="val" id="mru-s0-val">0</span></label><input type="range" id="mru-s0" min="-20" max="20" step="1" value="0"></div>
+        <label class="toggle-row"><input type="checkbox" id="mru-fixed-scale" checked> Scala Y fissa</label>
+      </div>
+      <div class="plot" id="mru-plot"></div>
+
+      <h3>5.2 — Moto uniformemente accelerato (MRUA)</h3>
+      <p>La <strong>mela di Newton</strong> in caduta libera: l'accelerazione è costante e la velocità cresce nel tempo.</p>
+      <div class="formula-box">$$s(t) = s_0 + v_0 \cdot t + \tfrac{1}{2}\,a\,t^2$$</div>
+      <p>La legge oraria è una <strong>parabola</strong>.</p>
+      <div class="controls">
+        <div class="control-group"><label>Accelerazione a (m/s²): <span class="val" id="mrua-a-val">2</span></label><input type="range" id="mrua-a" min="-10" max="10" step="0.5" value="2"></div>
+        <div class="control-group"><label>Velocità iniziale v₀ (m/s): <span class="val" id="mrua-v0-val">0</span></label><input type="range" id="mrua-v0" min="-10" max="20" step="1" value="0"></div>
+        <div class="control-group"><label>Posizione iniziale s₀ (m): <span class="val" id="mrua-s0-val">0</span></label><input type="range" id="mrua-s0" min="-20" max="20" step="1" value="0"></div>
+        <label class="toggle-row"><input type="checkbox" id="mrua-fixed-scale" checked> Scala Y fissa</label>
+      </div>
+      <div class="plot" id="mrua-plot"></div>
+
+      <h3>5.3 — Interessi composti: la matematica del risparmio</h3>
+      <p>Capitale \(C\) al tasso annuo \(i\), con interessi ricapitalizzati. Montante dopo \(t\) anni:</p>
+      <div class="formula-box">$$M(t) = C \cdot (1 + i)^t$$</div>
+      <p>È una funzione <strong>esponenziale</strong>: cresce piano all'inizio, poi esplode.</p>
+      <div class="controls">
+        <div class="control-group"><label>Capitale C (€): <span class="val" id="inv-C-val">1000</span></label><input type="range" id="inv-C" min="100" max="10000" step="100" value="1000"></div>
+        <div class="control-group"><label>Tasso i (%): <span class="val" id="inv-i-val">5</span></label><input type="range" id="inv-i" min="0" max="20" step="0.5" value="5"></div>
+        <label class="toggle-row"><input type="checkbox" id="inv-fixed-scale" checked> Scala Y fissa</label>
+      </div>
+      <div class="plot" id="inv-plot"></div>
+      <div class="note"><strong>Educazione finanziaria.</strong> Lo stesso meccanismo fa esplodere i debiti: il 18% annuo
+        su 1.000 € diventa, dopo 5 anni, 2.288 €. La stessa matematica che premia il risparmio punisce l'indebitamento.</div>
+
+      <h3>5.4 — Il pendolo: la matematica oscillatoria</h3>
+      <p>Un pendolo che oscilla con piccoli angoli si muove secondo:</p>
+      <div class="formula-box">$$\theta(t) = \theta_0 \cdot \cos\!\left(\sqrt{\tfrac{g}{L}}\,t\right)$$</div>
+      <p>dove \(\theta_0\) è l'ampiezza iniziale, \(L\) la lunghezza, \(g \approx 9{,}81\) m/s² e il coseno è
+        <strong>periodico</strong>.</p>
+      <div class="controls">
+        <div class="control-group"><label>Lunghezza L (m): <span class="val" id="pen-L-val">1</span></label><input type="range" id="pen-L" min="0.2" max="4" step="0.1" value="1"></div>
+        <div class="control-group"><label>Ampiezza θ₀ (°): <span class="val" id="pen-A-val">30</span></label><input type="range" id="pen-A" min="5" max="45" step="1" value="30"></div>
+        <button id="pen-toggle">⏸ Ferma</button>
+        <label class="toggle-row"><input type="checkbox" id="pen-fixed-scale" checked> Scala Y fissa</label>
+      </div>
+      <div class="two-col">
+        <div><h4>Pendolo</h4>
+          <div class="pendolo-stage">
+            <svg id="pendolo-svg" viewBox="0 0 300 280" style="width:100%; height:280px;" aria-label="Pendolo">
+              <line class="pen-support" x1="0" y1="40" x2="300" y2="40" stroke-width="3" />
+              <line id="pen-rope" class="pen-rope" x1="150" y1="40" x2="150" y2="240" stroke-width="2" />
+              <circle id="pen-bob" class="pen-bob" cx="150" cy="240" r="18" stroke-width="2" />
+              <circle class="pen-pivot" cx="150" cy="40" r="4" />
+            </svg>
+          </div>
+        </div>
+        <div><h4>Grafico θ(t)</h4><div class="plot" id="pen-plot"></div></div>
+      </div>
+      <p>Il <strong>periodo</strong> dipende solo dalla lunghezza del filo, non dall'ampiezza (per piccoli angoli). Lo
+        scoprì Galileo nel 1582 guardando un lampadario oscillare nel duomo di Pisa.</p>
+    </section>
+
+    <!-- 6 — FUNZIONI VETTORIALI (approfondimento) -->
+    <section id="sec5" class="optional">
+      <h2>6. Funzioni vettoriali</h2>
+      <p>Approfondimento per i curiosi: le funzioni non restituiscono solo numeri, ma anche <em>vettori</em> — lo
+        strumento principale per descrivere la fisica.</p>
+
+      <div class="definition">
+        Una <strong>funzione vettoriale</strong> restituisce un <strong>vettore</strong>: \(\mathbf{r}(t) = (x(t),\,y(t))\)
+        nel piano. Si parla di <strong>campo vettoriale</strong> quando a ogni punto dello spazio associamo un vettore:
+        \(\mathbf{F}(x,y) = (F_x, F_y)\).
+      </div>
+
+      <h3>6.1 — Moto circolare uniforme</h3>
+      <p>Un punto che gira a velocità angolare costante \(\omega\):</p>
+      <div class="formula-box">$$\mathbf{r}(t) = \big(R\cos(\omega t),\; R\sin(\omega t)\big)$$</div>
+      <div class="controls">
+        <div class="control-group"><label>Raggio R: <span class="val" id="circ-R-val">3</span></label><input type="range" id="circ-R" min="1" max="5" step="0.5" value="3"></div>
+        <div class="control-group"><label>ω (rad/s): <span class="val" id="circ-w-val">1</span></label><input type="range" id="circ-w" min="0.2" max="3" step="0.1" value="1"></div>
+        <button id="circ-toggle">▶ Avvia</button>
+      </div>
+      <div class="plot" id="circ-plot"></div>
+
+      <h3>6.2 — Campo gravitazionale</h3>
+      <p>La <strong>Gravitazione Universale</strong> di Newton crea attorno a una massa \(M\) un campo vettoriale:</p>
+      <div class="formula-box">$$\mathbf{g}(\mathbf{r}) = -\frac{GM}{|\mathbf{r}|^2}\,\hat{\mathbf{r}}$$</div>
+      <svg id="grav-svg" class="field-svg" viewBox="0 0 500 350" aria-label="Campo gravitazionale"></svg>
+
+      <h3>6.3 — Campo elettrico (dipolo)</h3>
+      <p>Una carica positiva e una negativa generano un campo a forma di <em>dipolo</em>:</p>
+      <div class="formula-box">$$\mathbf{E}(\mathbf{r}) = \sum_i \frac{k q_i}{|\mathbf{r} - \mathbf{r}_i|^2}\,\hat{\mathbf{r}}_i$$</div>
+      <svg id="elec-svg" class="field-svg" viewBox="0 0 500 350" aria-label="Dipolo elettrico"></svg>
+      <p>Le frecce escono dalla carica positiva (+) ed entrano in quella negativa (−): è la visualizzazione di una
+        funzione che a ogni posizione associa un vettore.</p>
+    </section>
+
+    <!-- 7 — SIMMETRIE -->
+    <section id="sec6">
+      <h2>7. Simmetrie: funzioni pari e dispari</h2>
+      <div class="definition">
+        <p>Una funzione \(f\) è <strong>pari</strong> se \(f(-x) = f(x)\): grafico <strong>simmetrico rispetto all'asse y</strong>.</p>
+        <p>È <strong>dispari</strong> se \(f(-x) = -f(x)\): grafico <strong>simmetrico rispetto all'origine</strong>.</p>
+      </div>
+      <ul>
+        <li><strong>Pari:</strong> \(x^2\), \(x^4\), \(\cos(x)\), \(|x|\)</li>
+        <li><strong>Dispari:</strong> \(x\), \(x^3\), \(\sin(x)\), \(\tan(x)\)</li>
+        <li><strong>Né pari né dispari:</strong> \(x^2 + x\), \(e^x\)</li>
+      </ul>
+      <div class="controls">
+        <div class="control-group"><label>Scegli la funzione:</label>
+          <select id="sym-func">
+            <option value="x^2">f(x) = x² (pari)</option>
+            <option value="x^4">f(x) = x⁴ (pari)</option>
+            <option value="cos(x)">f(x) = cos(x) (pari)</option>
+            <option value="abs(x)">f(x) = |x| (pari)</option>
+            <option value="x">f(x) = x (dispari)</option>
+            <option value="x^3">f(x) = x³ (dispari)</option>
+            <option value="sin(x)">f(x) = sin(x) (dispari)</option>
+            <option value="x^3 - x">f(x) = x³ − x (dispari)</option>
+            <option value="x^2 + x">f(x) = x² + x (né pari né dispari)</option>
+            <option value="exp(x)">f(x) = eˣ (né pari né dispari)</option>
+          </select>
+        </div>
+      </div>
+      <div class="plot" id="sym-plot"></div>
+      <p id="sym-verdict" class="verdict"></p>
+    </section>
+
+    <!-- 8 — MONOTONIA -->
+    <section id="sec-monotonia">
+      <h2>8. Monotonia: funzioni crescenti e decrescenti</h2>
+      <p>Guardando il grafico da sinistra a destra, a volte "saliamo", a volte "scendiamo": questa è la
+        <strong>monotonia</strong>. Sotto, i tratti in cui la funzione <strong style="color:#1a9850">cresce</strong> sono
+        verdi, quelli in cui <strong style="color:#d73027">decresce</strong> rossi.</p>
+      <div class="controls">
+        <div class="control-group"><label>Scegli la funzione:</label>
+          <select id="mono-func">
+            <option value="2*x - 1">f(x) = 2x − 1 (sempre crescente)</option>
+            <option value="-x + 2">f(x) = −x + 2 (sempre decrescente)</option>
+            <option value="x^2">f(x) = x² (prima scende, poi sale)</option>
+            <option value="x^3">f(x) = x³ (sempre crescente)</option>
+            <option value="x^3 - 3*x">f(x) = x³ − 3x (sali-scendi-sali)</option>
+            <option value="sin(x)">f(x) = sin(x) (oscilla)</option>
+          </select>
+        </div>
+      </div>
+      <div class="plot" id="mono-plot"></div>
+      <p id="mono-verdict" class="verdict"></p>
+      <div class="definition">
+        <p>Una funzione \(f\) è <strong>crescente</strong> in un intervallo \(I\) se, presi \(x_1 < x_2\) di \(I\),
+          risulta \(f(x_1) \le f(x_2)\) (strettamente crescente con \(<\)).</p>
+        <p>È <strong>decrescente</strong> se \(x_1 < x_2 \Rightarrow f(x_1) \ge f(x_2)\).</p>
+      </div>
+      <div class="note"><strong>Legame con l'iniettività.</strong> Una funzione <em>strettamente</em> monotòna è
+        automaticamente <strong>iniettiva</strong>, quindi invertibile: per questo \(x^3\) ha un'inversa, mentre \(x^2\) no.</div>
+    </section>
+
+    <!-- 9 — PERIODICITÀ -->
+    <section id="sec-periodicita">
+      <h2>9. Periodicità: funzioni che si ripetono</h2>
+      <p>La curva piena è \(f(x)\), quella tratteggiata è la stessa spostata di \(T\). Quando \(T\) è un
+        <strong>periodo</strong>, le due coincidono.</p>
+      <div class="controls">
+        <div class="control-group"><label>Funzione:</label>
+          <select id="per-func">
+            <option value="sin(x)">f(x) = sin(x)</option>
+            <option value="cos(x)">f(x) = cos(x)</option>
+            <option value="sin(2*x)">f(x) = sin(2x)</option>
+            <option value="x^2">f(x) = x² (NON periodica)</option>
+          </select>
+        </div>
+        <div class="control-group"><label>Spostamento T: <span class="val" id="per-T-val">3.14</span></label><input type="range" id="per-T" min="0" max="9.42" step="0.01" value="3.14"></div>
+      </div>
+      <div class="plot" id="per-plot"></div>
+      <p id="per-verdict" class="verdict"></p>
+      <div class="definition">
+        Una funzione \(f\) è <strong>periodica</strong> se esiste \(T > 0\) tale che $$f(x + T) = f(x)$$ per ogni x del
+        dominio. Il più piccolo \(T\) positivo è il <strong>periodo</strong>.
+      </div>
+      <p>\(\sin x\) e \(\cos x\) hanno periodo \(2\pi \approx 6{,}28\); \(\sin(2x)\) ha periodo \(\pi\); \(x^2\) non è periodica.</p>
+    </section>
+
+    <!-- 10 — TRASFORMAZIONI -->
+    <section id="sec7">
+      <h2>10. Trasformazioni geometriche</h2>
+      <p>Partendo da una funzione base \(f(x)\), costruiamo:</p>
+      <div class="formula-box">$$g(x) = a \cdot f\big(b \cdot (x - c)\big) + d$$</div>
+      <ul>
+        <li>\(+\,d\) → <strong>traslazione verticale</strong></li>
+        <li>\(-\,c\) → <strong>traslazione orizzontale</strong> (il segno è "contrario")</li>
+        <li>\(a\) → <strong>dilatazione verticale</strong> di \(|a|\); se \(a<0\) anche riflessione sull'asse x</li>
+        <li>\(b\) → <strong>compressione orizzontale</strong> di \(|b|\); se \(b<0\) anche riflessione sull'asse y</li>
+      </ul>
+      <div class="controls">
+        <div class="control-group"><label>Funzione base:</label>
+          <select id="tr-base">
+            <option value="x^2">x²</option><option value="x^3">x³</option><option value="sin(x)">sin(x)</option>
+            <option value="abs(x)">|x|</option><option value="sqrt(abs(x))">√|x|</option><option value="exp(x)">eˣ</option>
+          </select>
+        </div>
+        <div class="control-group"><label>a (dilataz. vert.): <span class="val" id="tr-a-val">1</span></label><input type="range" id="tr-a" min="-3" max="3" step="0.1" value="1"></div>
+        <div class="control-group"><label>b (compress. oriz.): <span class="val" id="tr-b-val">1</span></label><input type="range" id="tr-b" min="-3" max="3" step="0.1" value="1"></div>
+        <div class="control-group"><label>c (traslaz. oriz.): <span class="val" id="tr-c-val">0</span></label><input type="range" id="tr-c" min="-5" max="5" step="0.1" value="0"></div>
+        <div class="control-group"><label>d (traslaz. vert.): <span class="val" id="tr-d-val">0</span></label><input type="range" id="tr-d" min="-5" max="5" step="0.1" value="0"></div>
+        <button id="tr-reset">⟲ Reset</button>
+        <label class="toggle-row"><input type="checkbox" id="tr-fixed-scale" checked> Scala Y fissa</label>
+      </div>
+      <div class="formula-box" id="tr-formula">g(x) = f(x)</div>
+      <div class="plot" id="tr-plot"></div>
+    </section>
+
+    <!-- 11 — FUNZIONE INVERSA -->
+    <section id="sec8">
+      <h2>11. Funzione inversa</h2>
+      <p>Se \(f\) associa a ogni \(x\) un \(y\), la <strong>funzione inversa</strong> \(f^{-1}\) fa il percorso opposto:
+        prende \(y\) e lo riporta a \(x\).</p>
+      <div class="definition">Se \(f(x) = y\), allora \(f^{-1}(y) = x\). Graficamente: riflessione rispetto alla
+        bisettrice \(y = x\).</div>
+      <p><em>Attenzione:</em> una funzione è invertibile solo se è <strong>biettiva</strong>. La parabola \(y = x^2\) non
+        lo è su tutti i reali, perché \(x=2\) e \(x=-2\) danno entrambi \(y=4\).</p>
+      <div class="controls">
+        <div class="control-group"><label>Scegli la funzione:</label>
+          <select id="invf-func">
+            <option value="2*x - 3" data-inv="\frac{x + 3}{2}">f(x) = 2x − 3 (Retta)</option>
+            <option value="x^3" data-inv="\sqrt[3]{x}">f(x) = x³ (Cubica)</option>
+            <option value="exp(x)" data-inv="\ln(x)">f(x) = eˣ (Esponenziale)</option>
+            <option value="1/x" data-inv="\frac{1}{x}" data-note="<strong>Nota:</strong> coincide con la sua inversa!">f(x) = 1/x (Iperbole)</option>
+            <option value="-x" data-inv="-x" data-note="<strong>Nota:</strong> coincide con la sua inversa!">f(x) = −x (Retta decrescente)</option>
+            <option value="-x + 4" data-inv="-x + 4" data-note="<strong>Nota:</strong> coincide con la sua inversa!">f(x) = −x + 4 (Retta traslata)</option>
+            <option value="x^2" data-inv="\pm\sqrt{x}" data-note="<strong>Attenzione:</strong> la parabola non è invertibile su tutto il dominio perché non è biettiva (x=2 e x=−2 danno y=4): ecco perché c'è un ± davanti alla radice.">f(x) = x² (Parabola)</option>
+          </select>
+        </div>
+        <button id="invf-draw">Mostra Inversa</button>
+      </div>
+      <div class="formula-box toggle-target" id="invf-formula"></div>
+      <div class="note toggle-target" id="invf-note"></div>
+      <div class="plot" id="invf-plot"></div>
+    </section>
+
+    <!-- 12 — COMPOSIZIONE -->
+    <section id="sec-composizione">
+      <h2>12. Composizione di funzioni</h2>
+      <p>Possiamo mettere le funzioni <strong>in catena</strong>: l'uscita di una diventa l'ingresso della successiva.</p>
+      <div class="definition">
+        La <strong>funzione composta</strong> \(f \circ g\) è $$(f \circ g)(x) = f\big(g(x)\big).$$ Si applica
+        <strong>prima \(g\), poi \(f\)</strong>. In generale \(f \circ g \neq g \circ f\): l'ordine conta!
+      </div>
+      <p>Il grafico viola è la composta \(f(g(x))\); in grigio tratteggiato \(g(x)\). Con lo slider segui \(x_0\).</p>
+      <div class="controls">
+        <div class="control-group"><label>Interna g(x):</label>
+          <select id="comp-g"><option value="x + 1">g(x) = x + 1</option><option value="2*x">g(x) = 2x</option><option value="x^2">g(x) = x²</option><option value="sin(x)">g(x) = sin(x)</option></select>
+        </div>
+        <div class="control-group"><label>Esterna f(x):</label>
+          <select id="comp-f"><option value="x^2">f(x) = x²</option><option value="sqrt(abs(x))">f(x) = √|x|</option><option value="exp(x)">f(x) = eˣ</option><option value="x + 3">f(x) = x + 3</option></select>
+        </div>
+        <div class="control-group"><label>x₀: <span class="val" id="comp-x0-val">1.0</span></label><input type="range" id="comp-x0" min="-3" max="3" step="0.1" value="1"></div>
+      </div>
+      <div class="formula-box" id="comp-chain"></div>
+      <div class="plot" id="comp-plot"></div>
+      <div class="rule"><strong>L'ordine conta.</strong> Con \(g(x)=x+1\) e \(f(x)=x^2\): \((f\circ g)(x) = (x+1)^2\),
+        mentre \((g\circ f)(x) = x^2 + 1\). Due funzioni diverse.</div>
+    </section>
+
+    <!-- 13 — INVARIANZA -->
+    <section id="sec9">
+      <h2>13. Simmetria = invarianza</h2>
+      <div class="definition">
+        Un oggetto è <strong>simmetrico rispetto a una trasformazione</strong> se resta <strong>uguale a sé stesso</strong>
+        quando la applichiamo. <em>Simmetria = invarianza sotto trasformazione</em>.
+      </div>
+      <div class="controls">
+        <div class="control-group"><label>Funzione f(x):</label>
+          <select id="invar-func">
+            <option value="x^2">x²</option><option value="x^3">x³</option><option value="cos(x)">cos(x)</option>
+            <option value="sin(x)">sin(x)</option><option value="abs(x)">|x|</option><option value="x^2 + 1">x² + 1</option><option value="exp(x)">eˣ</option>
+          </select>
+        </div>
+        <div class="control-group"><label>Trasformazione:</label>
+          <select id="invar-tr">
+            <option value="reflectY">Riflessione asse y: x → −x</option>
+            <option value="reflectX">Riflessione asse x: y → −y</option>
+            <option value="rotate180">Rotazione 180° (origine)</option>
+            <option value="translateX">Traslazione di 2 a destra</option>
+          </select>
+        </div>
+        <button id="invar-check">Verifica invarianza</button>
+      </div>
+      <div class="plot" id="invar-plot"></div>
+      <p id="invar-verdict" class="verdict"></p>
+      <div class="note"><strong>Da sapere.</strong> Nel 1918 <em>Emmy Noether</em> dimostrò che a ogni simmetria continua
+        della natura corrisponde una legge di conservazione: simmetria nel tempo ⇒ energia; nello spazio ⇒ quantità di
+        moto; per rotazione ⇒ momento angolare.</div>
+    </section>
+
+    <!-- 14 — QUIZ -->
+    <section id="quiz">
+      <h2>14. Quiz finale</h2>
+      <p>Dieci domande: <strong>7 a scelta multipla</strong> e <strong>3 a risposta aperta</strong> (valutate per parole chiave).</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 1 — Le Funzioni · Matematica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX, math.js e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', text: 'Quale di queste relazioni È una funzione?',
+        options: ['A ogni numero reale x associo le sue due radici quadrate', 'A ogni studente associo la sua altezza in cm', 'A ogni paese associo TUTTE le sue città', 'A ogni cittadino associo i suoi nomi propri (a volte più di uno)'],
+        correct: 1, explain: 'Solo "altezza dello studente" assegna un solo valore per ciascuno. Le altre assegnano più valori.' },
+      { type: 'mc', text: 'Il grafico di y = x² possiede quale simmetria?',
+        options: ['Rispetto all\'asse x', 'Rispetto all\'asse y (funzione pari)', 'Rispetto all\'origine (funzione dispari)', 'Nessuna simmetria'],
+        correct: 1, explain: 'f(-x) = (-x)² = x² = f(x): funzione pari, simmetrica rispetto all\'asse y.' },
+      { type: 'mc', text: 'Una funzione si dice dispari quando, per ogni x del dominio:',
+        options: ['f(x) = -f(x)', 'f(-x) = f(x)', 'f(-x) = -f(x)', 'f(x + T) = f(x)'],
+        correct: 2, explain: 'La definizione di funzione dispari è f(-x) = -f(x): grafico simmetrico rispetto all\'origine.' },
+      { type: 'mc', text: 'Quale è un esempio di funzione biettiva (corrispondenza 1-a-1)?',
+        options: ['A ogni studente la sua altezza', 'A ogni libro la sua lingua', 'A ogni cittadino italiano il suo codice fiscale', 'A ogni numero reale il suo quadrato'],
+        correct: 2, explain: 'Il codice fiscale è biunivoco: ogni cittadino ne ha uno (iniettiva) e ogni CF identifica un solo cittadino (suriettiva). Negli altri casi più input condividono lo stesso output.' },
+      { type: 'mc', text: 'Nel moto uniformemente accelerato, lo spazio in funzione del tempo è:',
+        options: ['Una retta', 'Una parabola', 'Un\'esponenziale', 'Una funzione trigonometrica'],
+        correct: 1, explain: 's(t) = s₀ + v₀t + ½at² è un polinomio di secondo grado in t: una parabola.' },
+      { type: 'mc', text: 'Nella formula M(t) = C(1+i)ᵗ, la funzione è:',
+        options: ['Lineare', 'Polinomiale di secondo grado', 'Esponenziale', 'Periodica'],
+        correct: 2, explain: 't compare all\'esponente: è la definizione di funzione esponenziale.' },
+      { type: 'mc', text: 'Trasformare f(x) in g(x) = f(x) + 3 corrisponde a:',
+        options: ['Riflessione rispetto all\'asse x', 'Traslazione verticale in alto di 3', 'Traslazione orizzontale a destra di 3', 'Dilatazione verticale di 3'],
+        correct: 1, explain: 'Aggiungere d a f(x) sposta tutto il grafico in alto di d unità.' },
+      { type: 'open', text: 'Definisci con parole tue cos\'è il dominio di una funzione.',
+        keywords: ['insieme', 'valori', 'x', 'input'], requiredMatches: 2,
+        explain: 'Il dominio è l\'insieme dei valori di x (variabile indipendente, input) per cui la funzione è definita.' },
+      { type: 'open', text: 'Spiega perché una funzione dispari è simmetrica rispetto all\'origine.',
+        keywords: ['f(-x)', '-f(x)', 'origine', '180', 'ruot'], requiredMatches: 2,
+        explain: 'Perché f(-x) = -f(x): a ogni punto (x, y) corrisponde (-x, -y), insieme invariante per rotazione di 180° attorno all\'origine.' },
+      { type: 'open', text: 'Cita un esempio di funzione vettoriale dalla fisica e spiega cosa rappresenta.',
+        keywords: ['campo', 'vettore', 'posizione', 'moto', 'gravitazion', 'elettric', 'circolar', 'forza'], requiredMatches: 2,
+        explain: 'Esempi: moto circolare r(t) = (R cos ωt, R sin ωt); campo gravitazionale g(r); campo elettrico E(r). Tutti restituiscono vettori.' }
+    ];
+  </script>
+
+  <!-- Demo interattive di questa lezione -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { linspace, update, draw, themeColors } = Plt;
+
+      // Valuta un'espressione su un array di x (null se non valida/non finita)
+      function evalExpr(expr, xs) {
+        try {
+          const c = math.parse(expr).compile();
+          return xs.map(x => { try { const v = c.evaluate({ x }); return (typeof v === 'number' && isFinite(v)) ? v : null; } catch (e) { return null; } });
+        } catch (e) { return null; }
+      }
+      function exprToLatex(expr) { try { return math.parse(expr).toTex({ implicit: 'hide' }); } catch (e) { return expr; } }
+      function autoRange(ys, cap) {
+        const f = ys.filter(v => v != null && isFinite(v));
+        if (!f.length) return [-10, 10];
+        let lo = Math.min(...f), hi = Math.max(...f);
+        const pad = (hi - lo) * 0.1 || 1; lo -= pad; hi += pad;
+        if (cap && hi - lo > cap) return [-10, 10];
+        return [lo, hi];
+      }
+      const C = { green: '#22c55e', orange: '#f97316', red: '#ef4444', gold: '#f5b400', gray: '#9aa5c0' };
+
+      /* ---- Registro SVG da ridisegnare al cambio tema ---- */
+      const svgRedraw = [];
+      document.addEventListener('themechange', () => svgRedraw.forEach(fn => fn()));
+      const NS = 'http://www.w3.org/2000/svg';
+
+      // ===== 2 — ISB cards =====
+      (function () {
+        const grid = document.getElementById('isb-grid');
+        const examples = [
+          { title: 'Solo iniettiva', sub: 'Frecce distinte, ma "4" non viene raggiunto', dom: ['a','b','c'], cod: ['1','2','3','4'], map: [0,1,2] },
+          { title: 'Solo suriettiva', sub: 'Tutti i pallini di B raggiunti, ma a e d puntano a "1"', dom: ['a','b','c','d'], cod: ['1','2','3'], map: [0,1,2,0] },
+          { title: 'Biettiva (biunivoca)', sub: 'Corrispondenza 1-a-1 perfetta', dom: ['a','b','c'], cod: ['1','2','3'], map: [0,1,2] },
+          { title: 'Né iniettiva né suriettiva', sub: '"1" e "2" raggiunti da più frecce, "3" e "4" mai', dom: ['a','b','c','d'], cod: ['1','2','3','4'], map: [0,0,1,1] }
+        ];
+        let mc = 0;
+        function makeSVG(ex) {
+          const t = themeColors(), W = 280, H = 220, xA = 75, xB = 205, rx = 48, ry = 95, id = 'isb-ah-' + (mc++);
+          const slots = n => n === 1 ? [H/2] : Array.from({length:n}, (_,i) => 50 + i*(H-75)/(n-1));
+          const pA = slots(ex.dom.length), pB = slots(ex.cod.length);
+          let s = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;"><defs><marker id="${id}" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="${t.accent}"/></marker></defs>`;
+          s += `<ellipse cx="${xA}" cy="${H/2}" rx="${rx}" ry="${ry}" fill="${t.primary}" fill-opacity="0.12" stroke="${t.primary}" stroke-width="2"/>`;
+          s += `<ellipse cx="${xB}" cy="${H/2}" rx="${rx}" ry="${ry}" fill="${t.curve}" fill-opacity="0.12" stroke="${t.curve}" stroke-width="2"/>`;
+          s += `<text x="${xA}" y="18" text-anchor="middle" fill="${t.primary}" font-size="13" font-weight="700">A</text>`;
+          s += `<text x="${xB}" y="18" text-anchor="middle" fill="${t.curve}" font-size="13" font-weight="700">B</text>`;
+          ex.dom.forEach((l,i) => { s += `<circle cx="${xA}" cy="${pA[i]}" r="5" fill="${t.primary}"/><text x="${xA-12}" y="${pA[i]+4}" text-anchor="end" font-size="13" font-weight="600" fill="${t.primary}">${l}</text>`; });
+          ex.cod.forEach((l,i) => { s += `<circle cx="${xB}" cy="${pB[i]}" r="5" fill="${t.curve}"/><text x="${xB+12}" y="${pB[i]+4}" text-anchor="start" font-size="13" font-weight="600" fill="${t.curve}">${l}</text>`; });
+          ex.dom.forEach((_,i) => { const j = ex.map[i]; s += `<line x1="${xA+8}" y1="${pA[i]}" x2="${xB-8}" y2="${pB[j]}" stroke="${t.accent}" stroke-width="1.6" marker-end="url(#${id})" opacity="0.85"/>`; });
+          return s + '</svg>';
+        }
+        function render() {
+          mc = 0;
+          grid.innerHTML = examples.map(ex => `<div class="isb-card"><h4>${ex.title}</h4><p class="isb-sub">${ex.sub}</p>${makeSVG(ex)}</div>`).join('');
+        }
+        render(); svgRedraw.push(render);
+      })();
+
+      // ===== 3.1 — Venn interattivo =====
+      (function () {
+        const svg = document.getElementById('venn-svg'), select = document.getElementById('venn-rule');
+        const dominio = [-2,-1,0,1,2];
+        const rules = {
+          add1:  { fn: x => x+1,        codom: [-1,0,1,2,3], label: 'f(x) = x + 1' },
+          square:{ fn: x => x*x,        codom: [0,1,4],      label: 'f(x) = x²' },
+          double:{ fn: x => 2*x,        codom: [-4,-2,0,2,4],label: 'f(x) = 2x' },
+          abs:   { fn: x => Math.abs(x),codom: [0,1,2],      label: 'f(x) = |x|' }
+        };
+        function draw2() {
+          const t = themeColors(), r = rules[select.value];
+          const yA = (n,i) => 70 + i*(310-70)/(n-1);
+          const yB = (n,i) => n>1 ? 70 + i*(310-70)/(n-1) : 180;
+          const posA = {}, posB = {};
+          let s = `<defs><marker id="vah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="${t.accent}"/></marker></defs>`;
+          s += `<ellipse cx="130" cy="180" rx="90" ry="140" fill="${t.primary}" fill-opacity="0.10" stroke="${t.primary}" stroke-width="2"/>`;
+          s += `<ellipse cx="470" cy="180" rx="90" ry="140" fill="${t.curve}" fill-opacity="0.10" stroke="${t.curve}" stroke-width="2"/>`;
+          s += `<text x="130" y="32" text-anchor="middle" font-weight="700" fill="${t.primary}" font-size="18">Dominio A</text>`;
+          s += `<text x="470" y="32" text-anchor="middle" font-weight="700" fill="${t.curve}" font-size="18">Codominio B</text>`;
+          s += `<text x="300" y="340" text-anchor="middle" font-weight="700" fill="${t.accent}" font-size="18">${r.label}</text>`;
+          dominio.forEach((v,i) => { const y = yA(dominio.length,i); posA[v] = y; s += `<circle cx="130" cy="${y}" r="6" fill="${t.primary}"/><text x="95" y="${y+5}" text-anchor="end" font-size="16" font-weight="600" fill="${t.primary}">${v}</text>`; });
+          r.codom.forEach((v,i) => { const y = yB(r.codom.length,i); posB[v] = y; s += `<circle cx="470" cy="${y}" r="6" fill="${t.curve}"/><text x="505" y="${y+5}" text-anchor="start" font-size="16" font-weight="600" fill="${t.curve}">${v}</text>`; });
+          dominio.forEach(x => { const y = r.fn(x); if (posB[y] != null) s += `<line x1="142" y1="${posA[x]}" x2="458" y2="${posB[y]}" stroke="${t.accent}" stroke-width="1.8" marker-end="url(#vah)" opacity="0.8"/>`; });
+          svg.innerHTML = s;
+        }
+        select.addEventListener('change', draw2); draw2(); svgRedraw.push(draw2);
+      })();
+
+      // ===== 3.4 — Parabola statica =====
+      (function () {
+        const xs = linspace(-3, 3, 120);
+        draw('static-parabola', [{ x: xs, y: xs.map(x => x*x), type: 'scatter', mode: 'lines', line: { color: C.red, width: 3 } }],
+          { yaxis: { title: 'f(x) = x²' }, xaxis: { title: 'x' } });
+      })();
+
+      // ===== 4 — Eq → tabella → grafico =====
+      (function () {
+        const input = document.getElementById('eq-input'), fixed = document.getElementById('eq-fixed-scale');
+        const render = document.getElementById('eq-render'), tableDiv = document.getElementById('eq-table'), plot = document.getElementById('eq-plot');
+        function go() {
+          const expr = input.value.trim(); if (!expr) return;
+          render.innerHTML = ''; try { katex.render('f(x) = ' + exprToLatex(expr), render, { throwOnError: false, displayMode: true }); } catch (e) { render.textContent = 'f(x) = ' + expr; }
+          const xT = [-3,-2,-1,0,1,2,3], yT = evalExpr(expr, xT);
+          if (!yT) { tableDiv.innerHTML = '<p style="color:var(--red)">Espressione non valida.</p>'; return; }
+          tableDiv.innerHTML = '<table><thead><tr><th>x</th><th>f(x)</th></tr></thead><tbody>' +
+            xT.map((x,i) => { const y = yT[i]; const s = y == null ? 'n.d.' : (Math.abs(y) > 1e4 ? y.toExponential(2) : (Math.round(y*1000)/1000)); return `<tr><td>${x}</td><td>${s}</td></tr>`; }).join('') + '</tbody></table>';
+          const xG = linspace(-6, 6, 400), yG = evalExpr(expr, xG); if (!yG) return;
+          update(plot, [{ x: xG, y: yG, type: 'scatter', mode: 'lines', line: { color: C.red, width: 3 }, connectgaps: false }],
+            { xaxis: { title: 'x', range: [-6, 6] }, yaxis: { title: 'f(x)', range: fixed.checked ? [-10, 10] : autoRange(yG, 200) } });
+        }
+        document.getElementById('eq-update').addEventListener('click', go);
+        input.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+        fixed.addEventListener('change', go);
+        document.querySelectorAll('[data-eq]').forEach(b => b.addEventListener('click', () => { input.value = b.dataset.eq; go(); }));
+        go();
+      })();
+
+      // ===== Helper per le demo "slider → retta/parabola/esponenziale" =====
+      function sliderDemo(plotId, inputs, compute, layoutFor) {
+        const els = inputs.map(i => ({ el: document.getElementById(i.id), val: document.getElementById(i.val), fmt: i.fmt || (v => v) }));
+        const fixed = document.getElementById(plotId.replace('-plot', '-fixed-scale'));
+        function go() {
+          const vals = els.map(e => { const v = +e.el.value; if (e.val) e.val.textContent = e.fmt(v); return v; });
+          const { traces, range } = compute(vals, fixed && fixed.checked);
+          update(plotId, traces, layoutFor(range));
+        }
+        els.forEach(e => e.el.addEventListener('input', go));
+        if (fixed) fixed.addEventListener('change', go);
+        go();
+      }
+
+      // 5.1 MRU
+      sliderDemo('mru-plot',
+        [{ id: 'mru-v', val: 'mru-v-val' }, { id: 'mru-s0', val: 'mru-s0-val' }],
+        ([v, s0], fix) => { const ts = linspace(0,10,100), ss = ts.map(t => s0 + v*t);
+          return { traces: [{ x: ts, y: ss, type:'scatter', mode:'lines', line:{ color:C.green, width:3 } }], range: fix ? [-150,250] : autoRange(ss.concat(0)) }; },
+        r => ({ xaxis:{ title:'t (s)', range:[0,10] }, yaxis:{ title:'s (m)', range:r } }));
+
+      // 5.2 MRUA
+      sliderDemo('mrua-plot',
+        [{ id:'mrua-a', val:'mrua-a-val' }, { id:'mrua-v0', val:'mrua-v0-val' }, { id:'mrua-s0', val:'mrua-s0-val' }],
+        ([a, v0, s0], fix) => { const ts = linspace(0,10,200), ss = ts.map(t => s0 + v0*t + 0.5*a*t*t);
+          return { traces: [{ x: ts, y: ss, type:'scatter', mode:'lines', line:{ color:C.orange, width:3 } }], range: fix ? [-300,500] : autoRange(ss.concat(0)) }; },
+        r => ({ xaxis:{ title:'t (s)', range:[0,10] }, yaxis:{ title:'s (m)', range:r } }));
+
+      // 5.3 Interessi composti
+      sliderDemo('inv-plot',
+        [{ id:'inv-C', val:'inv-C-val' }, { id:'inv-i', val:'inv-i-val' }],
+        ([Cap, iPct], fix) => { const i = iPct/100, ts = linspace(0,30,100), ms = ts.map(t => Cap*Math.pow(1+i,t));
+          return { traces: [{ x: ts, y: ms, type:'scatter', mode:'lines', line:{ color:C.gold, width:3 } }], range: fix ? [0,30000] : [0, Math.max(...ms)*1.1] }; },
+        r => ({ xaxis:{ title:'anni', range:[0,30] }, yaxis:{ title:'Montante (€)', range:r } }));
+
+      // 5.4 Pendolo (animazione)
+      (function () {
+        const LEl = document.getElementById('pen-L'), AEl = document.getElementById('pen-A');
+        const LVal = document.getElementById('pen-L-val'), AVal = document.getElementById('pen-A-val');
+        const fixed = document.getElementById('pen-fixed-scale'), toggleBtn = document.getElementById('pen-toggle');
+        const rope = document.getElementById('pen-rope'), bob = document.getElementById('pen-bob'), plot = document.getElementById('pen-plot');
+        let animId = null, animStart = null, lastMarker = 0;
+        function setAngle(theta) {
+          const L = +LEl.value, len = L*50, a = theta*Math.PI/180, px = 150 + len*Math.sin(a), py = 40 + len*Math.cos(a);
+          rope.setAttribute('x2', px); rope.setAttribute('y2', py); bob.setAttribute('cx', px); bob.setAttribute('cy', py);
+        }
+        function drawPlot() {
+          const L = +LEl.value, A0 = +AEl.value, w = Math.sqrt(9.81/L);
+          const ts = linspace(0,10,400), th = ts.map(t => A0*Math.cos(w*t));
+          draw(plot, [
+            { x: ts, y: th, type:'scatter', mode:'lines', line:{ color:C.green, width:2.5 }, name:'θ(t)' },
+            { x: [0], y: [A0], type:'scatter', mode:'markers', marker:{ color:C.orange, size:14, line:{ color:'#fff', width:2 } } }
+          ], { xaxis:{ title:'t (s)', range:[0,10] }, yaxis:{ title:'θ (°)', range: fixed.checked ? [-50,50] : [-A0-5, A0+5] } });
+        }
+        function paramsChanged() { LVal.textContent = (+LEl.value).toFixed(1); AVal.textContent = +AEl.value; if (animId === null) setAngle(+AEl.value); drawPlot(); }
+        function frame(ts) {
+          if (animStart === null) animStart = ts;
+          const el = (ts - animStart)/1000, L = +LEl.value, A0 = +AEl.value, w = Math.sqrt(9.81/L);
+          setAngle(A0*Math.cos(w*el));
+          if (ts - lastMarker > 100) { lastMarker = ts; const tm = el % 10; try { Plotly.restyle(plot, { x: [[tm]], y: [[A0*Math.cos(w*tm)]] }, [1]); } catch (e) {} }
+          animId = requestAnimationFrame(frame);
+        }
+        function start() { if (animId !== null) return; animStart = null; lastMarker = 0; animId = requestAnimationFrame(frame); toggleBtn.textContent = '⏸ Ferma'; }
+        function stop() { if (animId === null) return; cancelAnimationFrame(animId); animId = null; toggleBtn.textContent = '▶ Avvia'; setAngle(+AEl.value); drawPlot(); }
+        toggleBtn.addEventListener('click', () => animId === null ? start() : stop());
+        LEl.addEventListener('input', paramsChanged); AEl.addEventListener('input', paramsChanged); fixed.addEventListener('change', paramsChanged);
+        paramsChanged(); start();
+      })();
+
+      // ===== 6.1 — Moto circolare (animazione) =====
+      (function () {
+        const REl = document.getElementById('circ-R'), wEl = document.getElementById('circ-w');
+        const RVal = document.getElementById('circ-R-val'), wVal = document.getElementById('circ-w-val'), toggleBtn = document.getElementById('circ-toggle');
+        const plot = document.getElementById('circ-plot');
+        let animId = null, animStart = null, currT = 0, built = false;
+        function build() {
+          const R = +REl.value, ts = linspace(0, 2*Math.PI, 200);
+          draw(plot, [
+            { x: ts.map(t => R*Math.cos(t)), y: ts.map(t => R*Math.sin(t)), type:'scatter', mode:'lines', line:{ color:C.orange, width:2.5 } },
+            { x: [R], y: [0], type:'scatter', mode:'markers', marker:{ color:C.gold, size:16, line:{ color:'#fff', width:2 } } },
+            { x: [0, R], y: [0, 0], type:'scatter', mode:'lines', line:{ color:C.gold, width:1.5, dash:'dot' } }
+          ], { xaxis:{ title:'x', range:[-6,6] }, yaxis:{ title:'y', range:[-6,6], scaleanchor:'x', scaleratio:1 } });
+          built = true;
+        }
+        function refresh() {
+          const R = +REl.value, w = +wEl.value; RVal.textContent = R; wVal.textContent = w.toFixed(1);
+          if (!built) build();
+          const px = R*Math.cos(w*currT), py = R*Math.sin(w*currT);
+          try { Plotly.restyle(plot, { x: [[px], [0,px]], y: [[py], [0,py]] }, [1, 2]); } catch (e) { build(); }
+        }
+        function frame(ts) { if (animStart === null) animStart = ts; currT = (ts - animStart)/1000; refresh(); animId = requestAnimationFrame(frame); }
+        toggleBtn.addEventListener('click', () => {
+          if (animId === null) { toggleBtn.textContent = '⏸ Ferma'; animStart = null; animId = requestAnimationFrame(frame); }
+          else { cancelAnimationFrame(animId); animId = null; toggleBtn.textContent = '▶ Avvia'; }
+        });
+        REl.addEventListener('input', () => { build(); refresh(); });
+        wEl.addEventListener('input', refresh);
+        build(); refresh();
+      })();
+
+      // ===== 6.2 — Campo gravitazionale (SVG) =====
+      (function () {
+        const svg = document.getElementById('grav-svg');
+        function render() {
+          const t = themeColors(), cx = 250, cy = 175;
+          let s = `<defs><marker id="ga" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="${t.accent}"/></marker></defs>`;
+          s += `<circle cx="${cx}" cy="${cy}" r="22" fill="${t.curve}" stroke="#fff" stroke-width="1.5"/><text x="${cx}" y="${cy+5}" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">M</text>`;
+          for (let i = 50; i <= 450; i += 50) for (let j = 30; j <= 320; j += 50) {
+            const dx = cx-i, dy = cy-j, d = Math.hypot(dx,dy); if (d < 35) continue;
+            const len = Math.min(2000/(d*d)*25, 22), x2 = i + dx/d*len, y2 = j + dy/d*len;
+            s += `<line x1="${i}" y1="${j}" x2="${x2}" y2="${y2}" stroke="${t.accent}" stroke-width="1.4" marker-end="url(#ga)" opacity="0.75"/>`;
+          }
+          svg.innerHTML = s;
+        }
+        render(); svgRedraw.push(render);
+      })();
+
+      // ===== 6.3 — Dipolo elettrico (SVG) =====
+      (function () {
+        const svg = document.getElementById('elec-svg');
+        function render() {
+          const t = themeColors(), xp = 180, xn = 320, cy = 175;
+          let s = `<defs><marker id="ea" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="${t.gold || '#f5b400'}"/></marker></defs>`;
+          s += `<circle cx="${xp}" cy="${cy}" r="18" fill="${t.curve}" stroke="#fff" stroke-width="1.5"/><text x="${xp}" y="${cy+6}" text-anchor="middle" fill="#fff" font-size="20" font-weight="bold">+</text>`;
+          s += `<circle cx="${xn}" cy="${cy}" r="18" fill="${t.primary}" stroke="#fff" stroke-width="1.5"/><text x="${xn}" y="${cy+6}" text-anchor="middle" fill="#fff" font-size="24" font-weight="bold">−</text>`;
+          for (let i = 40; i <= 460; i += 40) for (let j = 30; j <= 320; j += 35) {
+            const dx1 = i-xp, dy1 = j-cy, d1 = Math.hypot(dx1,dy1), dx2 = i-xn, dy2 = j-cy, d2 = Math.hypot(dx2,dy2);
+            if (d1 < 25 || d2 < 25) continue;
+            const ex = dx1/(d1**3) - dx2/(d2**3), ey = dy1/(d1**3) - dy2/(d2**3), mag = Math.hypot(ex,ey);
+            const sc = Math.min(mag*8000, 22), x2 = i + ex/mag*sc, y2 = j + ey/mag*sc;
+            s += `<line x1="${i}" y1="${j}" x2="${x2}" y2="${y2}" stroke="#f5b400" stroke-width="1.3" marker-end="url(#ea)" opacity="0.8"/>`;
+          }
+          svg.innerHTML = s;
+        }
+        render(); svgRedraw.push(render);
+      })();
+
+      // ===== 7 — Simmetrie =====
+      (function () {
+        const sel = document.getElementById('sym-func'), verdict = document.getElementById('sym-verdict');
+        function detect(expr) {
+          const f = math.parse(expr).compile(); let pari = true, disp = true;
+          for (const x of [0.3,0.7,1.2,2.1,3.4]) { const fp = f.evaluate({x}), fm = f.evaluate({x:-x}); if (Math.abs(fp-fm) > 1e-6) pari = false; if (Math.abs(fp+fm) > 1e-6) disp = false; }
+          return pari ? 'pari' : disp ? 'dispari' : 'nessuna';
+        }
+        function go() {
+          const expr = sel.value, xs = linspace(-5,5,300), ys = evalExpr(expr, xs);
+          const neg = xs.filter(x => x <= 0), pos = xs.filter(x => x >= 0);
+          const sym = detect(expr);
+          verdict.innerHTML = sym === 'pari' ? '✓ <strong>FUNZIONE PARI</strong> — simmetrica rispetto all\'asse y.'
+            : sym === 'dispari' ? '✓ <strong>FUNZIONE DISPARI</strong> — simmetrica rispetto all\'origine.'
+            : '✗ <strong>NÉ PARI NÉ DISPARI</strong> — nessuna simmetria rispetto agli assi.';
+          update('sym-plot', [
+            { x: neg, y: neg.map(x => evalExpr(expr,[x])[0]), type:'scatter', mode:'lines', line:{ color:C.orange, width:3 }, name:'x < 0' },
+            { x: pos, y: pos.map(x => evalExpr(expr,[x])[0]), type:'scatter', mode:'lines', line:{ color:C.green, width:3 }, name:'x > 0' }
+          ], { xaxis:{ title:'x', range:[-5,5] }, yaxis:{ title:'f(x)', range: autoRange(ys, 200) }, showlegend:true, legend:{ orientation:'h', x:0.3, y:1.12 } });
+        }
+        sel.addEventListener('change', go); go();
+      })();
+
+      // ===== 8 — Monotonia =====
+      (function () {
+        const sel = document.getElementById('mono-func'), verdict = document.getElementById('mono-verdict');
+        function go() {
+          const expr = sel.value, xs = linspace(-5,5,400), ys = evalExpr(expr, xs), n = xs.length, inc = new Array(n);
+          for (let i = 0; i < n; i++) { const a = i === 0 ? 0 : i-1, b = i === n-1 ? n-1 : i+1; inc[i] = (ys[b]-ys[a]) >= 0; }
+          const up = [], down = [];
+          for (let i = 0; i < n; i++) { const tr = i > 0 && inc[i] !== inc[i-1]; up.push((inc[i]||tr) ? ys[i] : null); down.push((!inc[i]||tr) ? ys[i] : null); }
+          const allUp = inc.every(v => v), allDown = inc.every(v => !v);
+          verdict.innerHTML = allUp ? '↗ <strong>Sempre crescente</strong> (monotòna): iniettiva, quindi invertibile.'
+            : allDown ? '↘ <strong>Sempre decrescente</strong> (monotòna): iniettiva, quindi invertibile.'
+            : '↗↘ <strong>Monotòna solo a tratti</strong>: cresce in alcuni intervalli e decresce in altri.';
+          update('mono-plot', [
+            { x: xs, y: down, type:'scatter', mode:'lines', line:{ color:'#d73027', width:3 }, name:'decresce', connectgaps:false },
+            { x: xs, y: up, type:'scatter', mode:'lines', line:{ color:'#1a9850', width:3 }, name:'cresce', connectgaps:false }
+          ], { xaxis:{ title:'x', range:[-5,5] }, yaxis:{ title:'f(x)', range: autoRange(ys) } });
+        }
+        sel.addEventListener('change', go); go();
+      })();
+
+      // ===== 9 — Periodicità =====
+      (function () {
+        const sel = document.getElementById('per-func'), sT = document.getElementById('per-T'), vT = document.getElementById('per-T-val'), verdict = document.getElementById('per-verdict');
+        function go() {
+          const expr = sel.value, T = +sT.value; vT.textContent = T.toFixed(2);
+          const xs = linspace(-7,7,500), ys = evalExpr(expr, xs), ysS = evalExpr(expr.replace(/x/g, `(x - (${T}))`), xs);
+          let coincide = T > 0.05;
+          if (coincide) for (let i = 0; i < xs.length; i += 5) { if (ys[i] == null || ysS[i] == null || Math.abs(ys[i]-ysS[i]) > 0.02) { coincide = false; break; } }
+          verdict.innerHTML = T <= 0.05 ? 'Scegli uno spostamento T &gt; 0.'
+            : coincide ? `✓ Con T = ${T.toFixed(2)} il grafico si <strong>sovrappone a sé stesso</strong>: è un periodo.`
+            : `✗ Con T = ${T.toFixed(2)} le curve <strong>non coincidono</strong>: non è un periodo.`;
+          update('per-plot', [
+            { x: xs, y: ys, type:'scatter', mode:'lines', line:{ color:C.green, width:3 }, name:'f(x)' },
+            { x: xs, y: ysS, type:'scatter', mode:'lines', line:{ color:C.gold, width:2.5, dash:'dash' }, name:'f spostata di T' }
+          ], { xaxis:{ title:'x', range:[-7,7] }, yaxis:{ title:'f(x)', range: autoRange(ys, 100) }, showlegend:true, legend:{ orientation:'h', x:0.2, y:1.12 } });
+        }
+        sel.addEventListener('change', go); sT.addEventListener('input', go); go();
+      })();
+
+      // ===== 10 — Trasformazioni =====
+      (function () {
+        const baseSel = document.getElementById('tr-base');
+        const aEl = document.getElementById('tr-a'), bEl = document.getElementById('tr-b'), cEl = document.getElementById('tr-c'), dEl = document.getElementById('tr-d');
+        const aVal = document.getElementById('tr-a-val'), bVal = document.getElementById('tr-b-val'), cVal = document.getElementById('tr-c-val'), dVal = document.getElementById('tr-d-val');
+        const formula = document.getElementById('tr-formula'), fixed = document.getElementById('tr-fixed-scale');
+        function go() {
+          const base = baseSel.value, a = +aEl.value, b = +bEl.value, c = +cEl.value, d = +dEl.value;
+          aVal.textContent = a.toFixed(1); bVal.textContent = b.toFixed(1); cVal.textContent = c.toFixed(1); dVal.textContent = d.toFixed(1);
+          const expr = `${a} * (${base.replace(/x/g, `(${b}*(x - (${c})))`)}) + (${d})`;
+          const aStr = a === 1 ? '' : (a === -1 ? '-' : a.toFixed(1) + '\\cdot '), dStr = d === 0 ? '' : (d > 0 ? ' + ' + d.toFixed(1) : ' - ' + (-d).toFixed(1));
+          formula.innerHTML = ''; try { katex.render(`g(x) = ${aStr}f\\left(${b.toFixed(1)}(x - (${c.toFixed(1)}))\\right) ${dStr}`, formula, { throwOnError:false, displayMode:true }); } catch (e) { formula.textContent = `g(x) = ${a}·f(${b}·(x−${c})) + ${d}`; }
+          const xs = linspace(-8,8,400), baseY = evalExpr(base, xs), trY = evalExpr(expr, xs);
+          update('tr-plot', [
+            { x: xs, y: baseY, type:'scatter', mode:'lines', line:{ color:C.gray, width:2, dash:'dot' }, name:'f(x) base' },
+            { x: xs, y: trY, type:'scatter', mode:'lines', line:{ color:C.red, width:3 }, name:'g(x) trasformata' }
+          ], { xaxis:{ title:'x', range:[-8,8] }, yaxis:{ title:'y', range: fixed.checked ? [-10,10] : autoRange(trY, 200) }, showlegend:true, legend:{ orientation:'h', x:0.2, y:1.12 } });
+        }
+        document.getElementById('tr-reset').addEventListener('click', () => { aEl.value = 1; bEl.value = 1; cEl.value = 0; dEl.value = 0; go(); });
+        [baseSel, aEl, bEl, cEl, dEl].forEach(el => el.addEventListener('input', go));
+        fixed.addEventListener('change', go); go();
+      })();
+
+      // ===== 11 — Funzione inversa =====
+      (function () {
+        const fSel = document.getElementById('invf-func'), btn = document.getElementById('invf-draw');
+        const formulaDiv = document.getElementById('invf-formula'), noteDiv = document.getElementById('invf-note');
+        function drawPlot(showInv) {
+          const expr = fSel.value, opt = fSel.options[fSel.selectedIndex];
+          const xs = linspace(-20, 20, 1000), origY = evalExpr(expr, xs);
+          const px = [], py = [];
+          for (let i = 0; i < xs.length; i++) { px.push(xs[i]); py.push((origY[i] != null && Math.abs(origY[i]) <= 20) ? origY[i] : null); }
+          const data = [{ x: px, y: py, type:'scatter', mode:'lines', line:{ color:C.green, width:3 }, name:'f(x)', connectgaps:false }];
+          if (showInv) {
+            data.push({ x: py, y: px, type:'scatter', mode:'lines', line:{ color:C.orange, width:3 }, name:'f⁻¹(x)', connectgaps:false });
+            data.push({ x: [-20,20], y: [-20,20], type:'scatter', mode:'lines', line:{ color:C.gray, width:2, dash:'dot' }, name:'y = x' });
+            const inv = opt.getAttribute('data-inv'), note = opt.getAttribute('data-note');
+            formulaDiv.classList.add('show'); try { katex.render('f^{-1}(x) = ' + inv, formulaDiv, { throwOnError:false, displayMode:true }); } catch (e) { formulaDiv.textContent = 'f⁻¹(x) = ' + inv; }
+            if (note) { noteDiv.classList.add('show'); noteDiv.innerHTML = note; } else noteDiv.classList.remove('show');
+          } else { formulaDiv.classList.remove('show'); noteDiv.classList.remove('show'); }
+          draw('invf-plot', data, { xaxis:{ title:'x', range:[-6,6] }, yaxis:{ title:'y', range:[-6,6], scaleanchor:'x', scaleratio:1 }, showlegend:true, legend:{ orientation:'h', x:0.1, y:1.15 } });
+        }
+        fSel.addEventListener('change', () => drawPlot(false));
+        btn.addEventListener('click', () => drawPlot(true));
+        drawPlot(false);
+      })();
+
+      // ===== 12 — Composizione =====
+      (function () {
+        const gSel = document.getElementById('comp-g'), fSel = document.getElementById('comp-f'), sx = document.getElementById('comp-x0'), vx = document.getElementById('comp-x0-val'), chain = document.getElementById('comp-chain');
+        function go() {
+          const gE = gSel.value, fE = fSel.value, x0 = +sx.value; vx.textContent = x0.toFixed(1);
+          const compE = fE.replace(/x/g, `(${gE})`), xs = linspace(-4,4,400), gY = evalExpr(gE, xs), cY = evalExpr(compE, xs);
+          const g0 = evalExpr(gE,[x0])[0], c0 = (g0 == null || !isFinite(g0)) ? null : evalExpr(fE,[g0])[0];
+          const fmt = v => (v == null || !isFinite(v)) ? 'N.D.' : Math.round(v*100)/100;
+          try { katex.render(`x_0 = ${x0.toFixed(1)} \\;\\xrightarrow{\\,g\\,}\\; ${fmt(g0)} \\;\\xrightarrow{\\,f\\,}\\; f(g(x_0)) = ${fmt(c0)}`, chain, { throwOnError:false, displayMode:true }); } catch (e) { chain.textContent = `x0=${x0.toFixed(1)} → g=${fmt(g0)} → f(g)=${fmt(c0)}`; }
+          const traces = [
+            { x: xs, y: gY, type:'scatter', mode:'lines', line:{ color:C.gray, width:2, dash:'dot' }, name:'g(x)' },
+            { x: xs, y: cY, type:'scatter', mode:'lines', line:{ color:C.red, width:3 }, name:'f(g(x))' }
+          ];
+          if (c0 != null && isFinite(c0)) traces.push({ x:[x0], y:[c0], type:'scatter', mode:'markers', marker:{ color:C.gold, size:11 }, name:'x0' });
+          update('comp-plot', traces, { xaxis:{ title:'x', range:[-4,4] }, yaxis:{ title:'y', range: autoRange(cY.concat(0), 100) }, showlegend:true, legend:{ orientation:'h', x:0.15, y:1.12 } });
+        }
+        [gSel, fSel].forEach(el => el.addEventListener('change', go)); sx.addEventListener('input', go); go();
+      })();
+
+      // ===== 13 — Invarianza =====
+      (function () {
+        const fSel = document.getElementById('invar-func'), tSel = document.getElementById('invar-tr'), btn = document.getElementById('invar-check'), verdict = document.getElementById('invar-verdict');
+        const xVar = /(?<![a-zA-Z])x(?![a-zA-Z])/g;
+        function apply(expr, k) {
+          if (k === 'reflectY') return `(${expr.replace(xVar,'(-x)')})`;
+          if (k === 'reflectX') return `-(${expr})`;
+          if (k === 'rotate180') return `-(${expr.replace(xVar,'(-x)')})`;
+          if (k === 'translateX') return `(${expr.replace(xVar,'(x - 2)')})`;
+          return expr;
+        }
+        const label = { reflectY:'Riflessione asse y', reflectX:'Riflessione asse x', rotate180:'Rotazione 180° (origine)', translateX:'Traslazione di 2 a destra' };
+        function checkInv(o, t) { try { const f = math.parse(o).compile(), g = math.parse(t).compile(); for (const x of [-2.3,-1.5,-0.7,0.4,1.2,2.8]) { const a = f.evaluate({x}), b = g.evaluate({x}); if (!isFinite(a)||!isFinite(b)) continue; if (Math.abs(a-b) > 1e-6) return false; } return true; } catch (e) { return false; } }
+        function drawOriginal() {
+          const xs = linspace(-6,6,300), oY = evalExpr(fSel.value, xs);
+          draw('invar-plot', [{ x: xs, y: oY, type:'scatter', mode:'lines', line:{ color:C.green, width:3 }, name:'f(x) originale' }],
+            { xaxis:{ title:'x', range:[-6,6] }, yaxis:{ title:'y', range: autoRange(oY, 200) }, showlegend:true, legend:{ orientation:'h', x:0.1, y:1.15 } });
+          verdict.innerHTML = '';
+        }
+        function check() {
+          const expr = fSel.value, tr = tSel.value, te = apply(expr, tr), xs = linspace(-6,6,300), oY = evalExpr(expr, xs), tY = evalExpr(te, xs);
+          draw('invar-plot', [
+            { x: xs, y: oY, type:'scatter', mode:'lines', line:{ color:C.green, width:3 }, name:'f(x) originale' },
+            { x: xs, y: tY, type:'scatter', mode:'lines', line:{ color:C.orange, width:3, dash:'dash' }, name: label[tr] }
+          ], { xaxis:{ title:'x', range:[-6,6] }, yaxis:{ title:'y', range: autoRange(oY.concat(tY), 200) }, showlegend:true, legend:{ orientation:'h', x:0.1, y:1.15 } });
+          verdict.innerHTML = checkInv(expr, te)
+            ? '✓ <strong>INVARIANTE!</strong> Resta uguale sotto "' + label[tr] + '": è <em>simmetrica</em>.'
+            : '✗ <strong>NON invariante.</strong> Sotto "' + label[tr] + '" la funzione cambia.';
+        }
+        btn.addEventListener('click', check);
+        fSel.addEventListener('change', drawOriginal); tSel.addEventListener('change', drawOriginal);
+        drawOriginal();
+      })();
+    });
+  </script>
+</body>
+
+</html>

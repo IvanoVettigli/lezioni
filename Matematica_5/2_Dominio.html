@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 2 — Il Dominio di una Funzione</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quinto anno · Lezione 2</div>
+    <h1>Il Dominio di una Funzione</h1>
+    <p>Dove vive una funzione: la ricerca del campo di esistenza</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quinto anno</a>
+    <span class="sep">/</span> Il Dominio
+  </nav>
+
+  <main>
+
+    <!-- 0 — PRELIMINARI -->
+    <section id="sec0">
+      <h2>0. Preliminari: il calcolo dei predicati e i simboli matematici</h2>
+      <p>Prima di tuffarci nel dominio di una funzione, mettiamoci d'accordo sulla <em>lingua</em> della matematica.
+        Quando scriviamo "il dominio è tutto $\mathbb{R}$ tranne $0$" o "esiste un $x$ tale che…", stiamo usando un
+        linguaggio preciso: il <strong>calcolo dei predicati</strong>.</p>
+
+      <h3>0.1 — Che cos'è un predicato</h3>
+      <p>Un <em>predicato</em> è un'affermazione su una o più variabili che diventa <strong>vera o falsa</strong> a
+        seconda dei valori che diamo. Esempi:</p>
+      <ul>
+        <li>$P(x): \; x > 0$ — vero se $x = 5$, falso se $x = -3$.</li>
+        <li>$Q(x): \; x^2 - 1 = 0$ — vero solo per $x = 1$ o $x = -1$.</li>
+        <li>$R(x): \; x \in \mathbb{R}$ — vero per qualunque numero reale.</li>
+      </ul>
+
+      <div class="joke">Un matematico, un fisico e un ingegnere vedono dal treno una pecora nera in Scozia. L'ingegnere:
+        "Le pecore in Scozia sono nere". Il fisico: "Almeno <em>una</em> pecora in Scozia è nera". Il matematico: "Esiste
+        in Scozia almeno una pecora di cui <em>almeno un lato</em> è nero".</div>
+
+      <h3>0.2 — Quantificatori e operatori logici</h3>
+      <div class="symbols-grid">
+        <div class="symbol-card"><span class="symbol">∀</span><div class="symbol-info"><span class="symbol-name">Per ogni (universale)</span><span class="symbol-desc">"Vale per tutti gli elementi": deve essere vera per ciascuno.</span><span class="symbol-example">∀ x ∈ ℝ : x² ≥ 0</span></div></div>
+        <div class="symbol-card"><span class="symbol">∃</span><div class="symbol-info"><span class="symbol-name">Esiste (esistenziale)</span><span class="symbol-desc">"Esiste almeno un elemento" che soddisfa la proprietà.</span><span class="symbol-example">∃ x ∈ ℝ : x² = 4</span></div></div>
+        <div class="symbol-card"><span class="symbol">∃!</span><div class="symbol-info"><span class="symbol-name">Esiste unico</span><span class="symbol-desc">Esiste uno e un solo elemento con quella proprietà.</span><span class="symbol-example">∃! x ∈ ℝ : 2x = 6</span></div></div>
+        <div class="symbol-card"><span class="symbol">¬</span><div class="symbol-info"><span class="symbol-name">Negazione (non)</span><span class="symbol-desc">Inverte il valore di verità di un predicato.</span><span class="symbol-example">¬(x &gt; 0) ⇔ x ≤ 0</span></div></div>
+        <div class="symbol-card"><span class="symbol">∧</span><div class="symbol-info"><span class="symbol-name">E logico (congiunzione)</span><span class="symbol-desc">Entrambe le condizioni devono essere vere.</span><span class="symbol-example">x &gt; 0 ∧ x &lt; 5</span></div></div>
+        <div class="symbol-card"><span class="symbol">∨</span><div class="symbol-info"><span class="symbol-name">O logico (disgiunzione)</span><span class="symbol-desc">Almeno una delle condizioni deve essere vera.</span><span class="symbol-example">x &lt; -2 ∨ x &gt; 2</span></div></div>
+        <div class="symbol-card"><span class="symbol">⇒</span><div class="symbol-info"><span class="symbol-name">Implica</span><span class="symbol-desc">Se la prima è vera, allora anche la seconda lo è.</span><span class="symbol-example">x &gt; 2 ⇒ x² &gt; 4</span></div></div>
+        <div class="symbol-card"><span class="symbol">⇔</span><div class="symbol-info"><span class="symbol-name">Se e solo se (equivalenza)</span><span class="symbol-desc">Le due condizioni sono vere o false insieme.</span><span class="symbol-example">x² = 4 ⇔ x = ±2</span></div></div>
+      </div>
+
+      <h3>0.3 — Gli insiemi numerici</h3>
+      <div class="card-row">
+        <div class="card"><h4>ℕ — Naturali</h4><p>$\{0, 1, 2, 3, 4, \ldots\}$. I numeri per contare.</p></div>
+        <div class="card"><h4>ℤ — Interi (Zahlen)</h4><p>$\{\ldots, -2, -1, 0, 1, 2, \ldots\}$. I naturali con il segno.</p></div>
+        <div class="card"><h4>ℚ — Razionali</h4><p>Tutte le frazioni $\frac{p}{q}$ con $p, q \in \mathbb{Z}$ e $q \neq 0$.</p></div>
+        <div class="card"><h4>ℝ — Reali</h4><p>Razionali + irrazionali ($\sqrt{2}, \pi, e, \ldots$): la <em>retta numerica</em> intera.</p></div>
+      </div>
+      <p>Si ha la catena di inclusioni $\; \mathbb{N} \subset \mathbb{Z} \subset \mathbb{Q} \subset \mathbb{R}$.</p>
+
+      <h3>0.4 — Simboli sugli insiemi</h3>
+      <div class="symbols-grid">
+        <div class="symbol-card"><span class="symbol">∈</span><div class="symbol-info"><span class="symbol-name">Appartiene</span><span class="symbol-desc">L'elemento fa parte dell'insieme.</span><span class="symbol-example">3 ∈ ℕ ; √2 ∈ ℝ</span></div></div>
+        <div class="symbol-card"><span class="symbol">∉</span><div class="symbol-info"><span class="symbol-name">Non appartiene</span><span class="symbol-desc">L'elemento NON fa parte dell'insieme.</span><span class="symbol-example">−5 ∉ ℕ ; √2 ∉ ℚ</span></div></div>
+        <div class="symbol-card"><span class="symbol">⊂</span><div class="symbol-info"><span class="symbol-name">Sottoinsieme (proprio)</span><span class="symbol-desc">Tutti gli elementi del primo sono nel secondo (ma non viceversa).</span><span class="symbol-example">ℕ ⊂ ℝ</span></div></div>
+        <div class="symbol-card"><span class="symbol">∪</span><div class="symbol-info"><span class="symbol-name">Unione</span><span class="symbol-desc">Elementi che stanno in A oppure in B (o in entrambi).</span><span class="symbol-example">(−∞, 0) ∪ (0, +∞)</span></div></div>
+        <div class="symbol-card"><span class="symbol">∩</span><div class="symbol-info"><span class="symbol-name">Intersezione</span><span class="symbol-desc">Elementi che stanno sia in A sia in B.</span><span class="symbol-example">[0; 5] ∩ [3; 8] = [3, 5]</span></div></div>
+        <div class="symbol-card"><span class="symbol">∖</span><div class="symbol-info"><span class="symbol-name">Differenza (escluso)</span><span class="symbol-desc">Elementi di A che NON stanno in B.</span><span class="symbol-example">ℝ ∖ {0} = "ℝ tranne 0"</span></div></div>
+        <div class="symbol-card"><span class="symbol">∅</span><div class="symbol-info"><span class="symbol-name">Insieme vuoto</span><span class="symbol-desc">L'insieme che non contiene alcun elemento.</span><span class="symbol-example">{x ∈ ℝ : x² = −1} = ∅</span></div></div>
+        <div class="symbol-card"><span class="symbol">|</span><div class="symbol-info"><span class="symbol-name">Tale che (anche ":")</span><span class="symbol-desc">Usato nella definizione di un insieme per caratteristica.</span><span class="symbol-example">{x ∈ ℝ | x &gt; 0}</span></div></div>
+      </div>
+
+      <h3>0.5 — Come si rappresenta un insieme</h3>
+      <div class="card-row">
+        <div class="card"><h4>Per elencazione</h4><p>Tutti gli elementi tra graffe: $A = \{1, 2, 3, 4\}$. Si usa quando sono pochi o seguono uno schema: $\mathbb{N} = \{0, 1, 2, 3, \ldots\}$.</p></div>
+        <div class="card"><h4>Per caratteristica</h4><p>Si descrive la proprietà: $A = \{x \in \mathbb{R} \mid x > 0\}$. Si legge: <em>"gli x reali tali che x &gt; 0"</em>.</p></div>
+      </div>
+
+      <h3>0.6 — Gli intervalli sulla retta reale</h3>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Notazione</th><th>Significato</th><th>In simboli</th></tr></thead>
+          <tbody>
+            <tr><td>$[a, b]$</td><td>Chiuso: $a$ e $b$ <strong>compresi</strong></td><td>$\{x \in \mathbb{R} : a \le x \le b\}$</td></tr>
+            <tr><td>$]a, b[$</td><td>Aperto: $a$ e $b$ <strong>esclusi</strong></td><td>$\{x \in \mathbb{R} : a &lt; x &lt; b\}$</td></tr>
+            <tr><td>$[a, b[$</td><td>Semi-aperto a destra: solo $a$ compreso</td><td>$\{x \in \mathbb{R} : a \le x &lt; b\}$</td></tr>
+            <tr><td>$]a, b]$</td><td>Semi-aperto a sinistra: solo $b$ compreso</td><td>$\{x \in \mathbb{R} : a &lt; x \le b\}$</td></tr>
+            <tr><td>$[a, +\infty[$</td><td>Da $a$ in poi (incluso)</td><td>$\{x \in \mathbb{R} : x \ge a\}$</td></tr>
+            <tr><td>$]-\infty, b[$</td><td>Da meno infinito fino a $b$ (escluso)</td><td>$\{x \in \mathbb{R} : x &lt; b\}$</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note"><strong>Attenzione:</strong> verso $\pm\infty$ la parentesi quadra <em>non può mai essere
+        rivolta</em>: $\infty$ non è un numero, è solo un'indicazione che si va "oltre", quindi è impossibile
+        "comprendere" l'infinito.</div>
+    </section>
+
+    <!-- 1 — COS'È IL DOMINIO -->
+    <section id="sec1">
+      <h2>1. Cos'è il dominio di una funzione</h2>
+      <p>Una funzione $f: A \to B$ associa a ogni elemento di $A$ uno e un solo elemento di $B$. Quell'insieme $A$ ha un
+        nome preciso.</p>
+      <div class="definition">Il <strong>dominio</strong> di una funzione $f$, indicato con $D(f)$ o $D$, è l'insieme di
+        tutti i valori $x$ per i quali l'espressione $f(x)$ è ben definita (produce un risultato reale).</div>
+
+      <h3>1.1 — Le tre operazioni "vietate"</h3>
+      <div class="card-row">
+        <div class="card"><h4>🚫 Divisione per zero</h4><p>Per una frazione $\dfrac{N(x)}{D(x)}$ dobbiamo escludere i valori che annullano il denominatore.</p></div>
+        <div class="card"><h4>🚫 Radice pari di negativo</h4><p>In $\mathbb{R}$ non esiste $\sqrt{-1}$. Per $\sqrt[n]{f(x)}$ con $n$ pari, l'argomento deve essere $\ge 0$.</p></div>
+        <div class="card"><h4>🚫 Logaritmo di ≤ 0</h4><p>$\log(x)$ è definito solo per $x > 0$: l'argomento deve essere strettamente positivo.</p></div>
+      </div>
+      <div class="rule">Tutte le altre operazioni (somma, prodotto, potenza naturale, seno, coseno, esponenziale, valore
+        assoluto, radice dispari) <strong>si possono fare su qualunque reale</strong>. Se non c'è nessuna delle tre fonti
+        di guai, il dominio è tutto $\mathbb{R}$.</div>
+
+      <h3>1.2 — La strategia</h3>
+      <ol>
+        <li>Individuo <strong>tutte</strong> le "fonti di guai" presenti.</li>
+        <li>Per ognuna scrivo la <em>condizione di esistenza</em>.</li>
+        <li>Metto a sistema le condizioni (devono valere tutte insieme: <strong>intersezione</strong>).</li>
+        <li>Risolvo: il risultato è il dominio.</li>
+      </ol>
+    </section>
+
+    <!-- 2 — POLINOMIALI -->
+    <section id="sec2">
+      <h2>2. Dominio delle funzioni polinomiali</h2>
+      <div class="formula-box">$$f(x) = a_n x^n + a_{n-1} x^{n-1} + \cdots + a_1 x + a_0$$</div>
+      <p>Somme di potenze di $x$ con coefficienti reali: solo somme, sottrazioni, prodotti e potenze naturali. Niente
+        divisioni, radici o logaritmi.</p>
+      <div class="rule">Per <strong>ogni</strong> funzione polinomiale il dominio è $\mathbb{R}$:
+        $$D = \mathbb{R} = ]-\infty, +\infty[$$</div>
+
+      <h3>2.1 — Esercizi</h3>
+      <div class="exercise" data-expr="2*x + 3" data-xmin="-5" data-xmax="5" data-ymin="-10" data-ymax="15">
+        <div class="ex-header"><span class="ex-title">Esercizio 2.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = 2x + 3$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Tipo:</strong> polinomiale di primo grado (retta).</p>
+          <p><span class="step-num">2</span><strong>Condizioni di esistenza:</strong> nessuna.</p>
+          <p><span class="step-num">3</span>I polinomi sono definiti per ogni $x \in \mathbb{R}$.</p>
+          <div class="domain-result">$D = \mathbb{R} = ]-\infty, +\infty[$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="x^3 - 2*x^2 + x - 1" data-xmin="-3" data-xmax="4" data-ymin="-15" data-ymax="20">
+        <div class="ex-header"><span class="ex-title">Esercizio 2.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = x^3 - 2x^2 + x - 1$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Tipo:</strong> polinomiale di terzo grado (cubica).</p>
+          <p><span class="step-num">2</span>Solo una combinazione di potenze di $x$.</p>
+          <p><span class="step-num">3</span>Nessuna restrizione: definita per ogni $x \in \mathbb{R}$.</p>
+          <div class="domain-result">$D = \mathbb{R}$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="(x^2 + 1)*(x^3 - 4*x + 2)" data-xmin="-3" data-xmax="3" data-ymin="-30" data-ymax="60">
+        <div class="ex-header"><span class="ex-title">Esercizio 2.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = (x^2 + 1)(x^3 - 4x + 2)$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Prodotto di due polinomi $\Rightarrow$ ancora un polinomio (di grado 5).</p>
+          <p><span class="step-num">2</span>Non è fratta: i prodotti tra reali si fanno sempre.</p>
+          <p><span class="step-num">3</span>Nessuna condizione.</p>
+          <div class="domain-result">$D = \mathbb{R}$</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — FRATTE -->
+    <section id="sec3">
+      <h2>3. Dominio delle funzioni fratte (razionali)</h2>
+      <div class="formula-box">$$f(x) = \frac{N(x)}{D(x)}$$</div>
+      <p>Il problema è uno solo: <strong>non si può dividere per zero</strong>. Si escludono i valori che annullano il
+        denominatore.</p>
+      <div class="rule">$$D = \{x \in \mathbb{R} \mid D(x) \neq 0\}$$ cioè $\mathbb{R}$ privato degli zeri del denominatore.</div>
+      <div class="note"><strong>Sottigliezza:</strong> il numeratore può annullarsi senza problemi! Se $N(x_0)=0$ e
+        $D(x_0)\neq 0$, allora $f(x_0)=0$. Solo gli zeri del <em>denominatore</em> creano problemi.</div>
+
+      <h3>3.1 — Esercizi</h3>
+      <div class="exercise" data-expr="1/(x-2)" data-xmin="-3" data-xmax="7" data-ymin="-10" data-ymax="10" data-exclude="2">
+        <div class="ex-header"><span class="ex-title">Esercizio 3.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \frac{1}{x-2}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Denominatore:</strong> $D(x) = x - 2$.</p>
+          <p><span class="step-num">2</span><strong>Condizione:</strong> $x - 2 \neq 0 \Leftrightarrow x \neq 2$.</p>
+          <p><span class="step-num">3</span>Sul grafico noti l'<em>asintoto verticale</em> in $x = 2$.</p>
+          <div class="domain-result">$D = \mathbb{R} \setminus \{2\} = ]-\infty, 2[ \cup ]2, +\infty[$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="(x+1)/(x^2-4)" data-xmin="-5" data-xmax="5" data-ymin="-10" data-ymax="10" data-exclude="-2,2">
+        <div class="ex-header"><span class="ex-title">Esercizio 3.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \frac{x+1}{x^2 - 4}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Denominatore:</strong> $D(x) = x^2 - 4$.</p>
+          <p><span class="step-num">2</span><strong>Condizione:</strong> $x^2 - 4 \neq 0 \Leftrightarrow (x-2)(x+2) \neq 0 \Leftrightarrow x \neq \pm 2$.</p>
+          <p><span class="step-num">3</span>Due asintoti verticali, in $x = -2$ e $x = 2$.</p>
+          <div class="domain-result">$D = \mathbb{R} \setminus \{-2, 2\} = ]-\infty, -2[ \cup ]-2, 2[ \cup ]2, +\infty[$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="(x^2-1)/(x^3-4*x)" data-xmin="-4" data-xmax="4" data-ymin="-8" data-ymax="8" data-exclude="-2,0,2">
+        <div class="ex-header"><span class="ex-title">Esercizio 3.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \frac{x^2 - 1}{x^3 - 4x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Denominatore:</strong> $x^3 - 4x = x(x-2)(x+2)$.</p>
+          <p><span class="step-num">2</span><strong>Condizione:</strong> $x \neq 0,\; x \neq 2,\; x \neq -2$.</p>
+          <p><span class="step-num">3</span>Tre asintoti verticali: $-2, 0, 2$.</p>
+          <div class="domain-result">$D = \mathbb{R} \setminus \{-2, 0, 2\}$</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — TRIGONOMETRICHE -->
+    <section id="sec4">
+      <h2>4. Dominio delle funzioni trigonometriche</h2>
+      <p>$\sin(x)$ e $\cos(x)$ prendono un angolo e restituiscono un valore in $[-1, 1]$: si applicano a
+        <em>qualunque</em> reale.</p>
+      <div class="rule">$$D(\sin) = D(\cos) = \mathbb{R}$$</div>
+
+      <h3>4.1 — La tangente: un caso a parte</h3>
+      <div class="formula-box">$$\tan(x) = \frac{\sin(x)}{\cos(x)}$$</div>
+      <p>È una <strong>frazione</strong>: il denominatore non può essere zero. $\cos(x) = 0$ quando
+        $x = \dfrac{\pi}{2} + k\pi,\; k \in \mathbb{Z}$.</p>
+      <div class="rule">$$D(\tan) = \mathbb{R} \setminus \left\{ \tfrac{\pi}{2} + k\pi \;:\; k \in \mathbb{Z} \right\}$$</div>
+
+      <h3>4.2 — Esercizi</h3>
+      <div class="exercise" data-expr="sin(x) + cos(x)" data-xmin="-6.5" data-xmax="6.5" data-ymin="-2" data-ymax="2">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \sin(x) + \cos(x)$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Somma di seno e coseno.</p>
+          <p><span class="step-num">2</span>Entrambi definiti per ogni $x \in \mathbb{R}$, e la somma anche.</p>
+          <div class="domain-result">$D = \mathbb{R}$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="tan(x)" data-xmin="-6.5" data-xmax="6.5" data-ymin="-6" data-ymax="6">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \tan(x)$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$\tan(x) = \dfrac{\sin(x)}{\cos(x)}$: è una frazione.</p>
+          <p><span class="step-num">2</span><strong>Condizione:</strong> $\cos(x) \neq 0$, cioè $x \neq \tfrac{\pi}{2} + k\pi$.</p>
+          <p><span class="step-num">3</span>Sul grafico, infiniti asintoti verticali.</p>
+          <div class="domain-result">$D = \mathbb{R} \setminus \left\{ \tfrac{\pi}{2} + k\pi : k \in \mathbb{Z} \right\}$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="1/sin(x)" data-xmin="-6.5" data-xmax="6.5" data-ymin="-6" data-ymax="6">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \frac{1}{\sin(x)}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Frazione con denominatore $\sin(x)$.</p>
+          <p><span class="step-num">2</span><strong>Condizione:</strong> $\sin(x) \neq 0$, cioè $x \neq k\pi$.</p>
+          <p><span class="step-num">3</span>Asintoti verticali in tutti i multipli di $\pi$.</p>
+          <div class="domain-result">$D = \mathbb{R} \setminus \left\{ k\pi : k \in \mathbb{Z} \right\}$</div>
+          <p style="font-size:0.9rem; margin-top:0.5rem;"><em>P.S.: questa funzione è la <strong>cosecante</strong>, $\csc(x)$.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — ESPONENZIALI -->
+    <section id="sec5">
+      <h2>5. Dominio delle funzioni esponenziali</h2>
+      <div class="formula-box">$$f(x) = a^x \quad \text{con } a > 0, \; a \neq 1$$</div>
+      <p>La base $a$ è fissa e positiva; l'incognita sta all'esponente. Calcolare $a^x$ è sempre possibile.</p>
+      <div class="rule">$$D(a^x) = \mathbb{R}, \qquad a^x > 0 \text{ sempre.}$$</div>
+
+      <h3>5.1 — Esercizi</h3>
+      <div class="exercise" data-expr="3^x" data-xmin="-4" data-xmax="3" data-ymin="-1" data-ymax="20">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = 3^x$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Tipo:</strong> esponenziale di base $3 > 0$.</p>
+          <p><span class="step-num">2</span>Definita per ogni esponente reale.</p>
+          <div class="domain-result">$D = \mathbb{R}$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="exp(x^2 + 1)" data-xmin="-3" data-xmax="3" data-ymin="-5" data-ymax="100">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = e^{x^2 + 1}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Esponente $g(x) = x^2 + 1$ (un polinomio).</p>
+          <p><span class="step-num">2</span>L'esponente è definito per ogni $x \in \mathbb{R}$.</p>
+          <p><span class="step-num">3</span>L'esponenziale accetta qualunque esponente: nessuna restrizione.</p>
+          <div class="domain-result">$D = \mathbb{R}$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="exp(1/(x-1))" data-xmin="-3" data-xmax="5" data-ymin="-1" data-ymax="20" data-exclude="1">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = e^{\,\frac{1}{x-1}}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Esponente $g(x) = \dfrac{1}{x-1}$, che è <em>fratto</em>.</p>
+          <p><span class="step-num">2</span>L'esponenziale non pone restrizioni, ma l'esponente sì: $x - 1 \neq 0 \Rightarrow x \neq 1$.</p>
+          <p><span class="step-num">3</span>In $x = 1$ l'esponente "esplode".</p>
+          <div class="domain-result">$D = \mathbb{R} \setminus \{1\}$</div>
+          <p style="font-size:0.9rem; margin-top:0.5rem;"><em>Morale: per le funzioni composte, controlla sempre il dominio dell'argomento.</em></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — LOGARITMICHE -->
+    <section id="sec6">
+      <h2>6. Dominio delle funzioni logaritmiche</h2>
+      <div class="formula-box">$$y = \log_a(x) \;\Leftrightarrow\; a^y = x$$</div>
+      <p>Poiché $a^y > 0$ sempre, l'argomento del logaritmo può essere solo positivo.</p>
+      <div class="rule">$$D(\log_a) = ]0, +\infty[ = \{x \in \mathbb{R} \mid x > 0\}$$ Con argomento $g(x)$, la condizione è $g(x) > 0$.</div>
+      <div class="warning"><strong>Attenzione:</strong> <em>strettamente</em> maggiore di zero. $\log(0)$ non esiste.</div>
+
+      <h3>6.1 — Esercizi</h3>
+      <div class="exercise" data-expr="log(x)" data-xmin="-1" data-xmax="6" data-ymin="-4" data-ymax="3">
+        <div class="ex-header"><span class="ex-title">Esercizio 6.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \ln(x)$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Logaritmo naturale (base $e$).</p>
+          <p><span class="step-num">2</span><strong>Condizione:</strong> argomento $> 0$, cioè $x > 0$.</p>
+          <p><span class="step-num">3</span>Asintoto verticale in $x = 0$.</p>
+          <div class="domain-result">$D = ]0, +\infty[$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="log(x + 3)" data-xmin="-4" data-xmax="6" data-ymin="-4" data-ymax="3">
+        <div class="ex-header"><span class="ex-title">Esercizio 6.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \ln(x + 3)$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Argomento $g(x) = x + 3$.</p>
+          <p><span class="step-num">2</span><strong>Condizione:</strong> $x + 3 > 0 \Leftrightarrow x > -3$.</p>
+          <p><span class="step-num">3</span>Asintoto verticale in $x = -3$.</p>
+          <div class="domain-result">$D = ]-3, +\infty[$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="log(x^2 - 9)" data-xmin="-7" data-xmax="7" data-ymin="-2" data-ymax="4">
+        <div class="ex-header"><span class="ex-title">Esercizio 6.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \ln(x^2 - 9)$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Argomento $g(x) = x^2 - 9$.</p>
+          <p><span class="step-num">2</span><strong>Condizione:</strong> $x^2 - 9 > 0 \Leftrightarrow (x-3)(x+3) > 0$.</p>
+          <p><span class="step-num">3</span>Vale per $x < -3$ oppure $x > 3$.</p>
+          <p><span class="step-num">4</span>La funzione esiste in due tratti separati; nel mezzo no.</p>
+          <div class="domain-result">$D = ]-\infty, -3[ \cup ]3, +\infty[$</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — VALORE ASSOLUTO -->
+    <section id="sec7">
+      <h2>7. Dominio delle funzioni con valore assoluto</h2>
+      <div class="formula-box">$$|x| = \begin{cases} x & \text{se } x \ge 0 \\ -x & \text{se } x < 0 \end{cases}$$</div>
+      <p>Il valore assoluto si calcola su qualunque reale: non c'è nulla di "vietato".</p>
+      <div class="rule">$$D(|x|) = \mathbb{R}$$ Da solo, il valore assoluto non introduce mai restrizioni.</div>
+      <p>Le restrizioni, se ci sono, vengono dal contesto (frazioni, radici, logaritmi…).</p>
+
+      <h3>7.1 — Esercizi</h3>
+      <div class="exercise" data-expr="abs(x) + 2" data-xmin="-5" data-xmax="5" data-ymin="-1" data-ymax="8">
+        <div class="ex-header"><span class="ex-title">Esercizio 7.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = |x| + 2$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Il valore assoluto si calcola su qualunque reale.</p>
+          <p><span class="step-num">2</span>Aggiungere 2 non introduce restrizioni.</p>
+          <div class="domain-result">$D = \mathbb{R}$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="1/abs(x-3)" data-xmin="-2" data-xmax="8" data-ymin="-1" data-ymax="10" data-exclude="3">
+        <div class="ex-header"><span class="ex-title">Esercizio 7.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \frac{1}{|x - 3|}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Frazione con denominatore $|x - 3|$.</p>
+          <p><span class="step-num">2</span><strong>Condizione:</strong> $|x - 3| \neq 0 \Leftrightarrow x \neq 3$.</p>
+          <div class="domain-result">$D = \mathbb{R} \setminus \{3\}$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="abs(x^2 - 4)/(x - 1)" data-xmin="-4" data-xmax="4" data-ymin="-15" data-ymax="15" data-exclude="1">
+        <div class="ex-header"><span class="ex-title">Esercizio 7.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \frac{|x^2 - 4|}{x - 1}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Il numeratore $|x^2 - 4|$ esiste per ogni $x$.</p>
+          <p><span class="step-num">2</span>Il denominatore $x - 1$ è il vincolo: $x \neq 1$.</p>
+          <p><span class="step-num">3</span>Asintoto verticale in $x = 1$.</p>
+          <div class="domain-result">$D = \mathbb{R} \setminus \{1\}$</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — RADICI -->
+    <section id="sec8">
+      <h2>8. Dominio delle funzioni con radici</h2>
+      <p>Bisogna distinguere fra radici <strong>pari</strong> e <strong>dispari</strong>.</p>
+
+      <h3>8.1 — Radice quadrata (e tutte le pari)</h3>
+      <div class="rule">Per ogni radice n-esima con $n$ <strong>pari</strong>:
+        $$D = [0, +\infty[ = \{x \in \mathbb{R} \mid x \ge 0\}$$ Con argomento $g(x)$: $g(x) \ge 0$.</div>
+      <div class="note"><strong>📚 Curiosità:</strong> alle elementari si impara che $\sqrt 4 = \pm 2$. Ma una
+        <em>funzione</em> non può dare due risultati: per questo si <strong>restringe</strong> alle immagini non negative,
+        e $\sqrt 4 = 2$ (non $\pm 2$).</div>
+
+      <h3>8.2 — Radice cubica (e tutte le dispari)</h3>
+      <p>Il cubo di un negativo è negativo: $\sqrt[3]{-8} = -2$ è lecito.</p>
+      <div class="rule">Per ogni radice n-esima con $n$ <strong>dispari</strong>: $$D = \mathbb{R}$$ nessuna restrizione.</div>
+
+      <h3>8.3 — Riassunto</h3>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Tipo</th><th>Esempi</th><th>Condizione</th></tr></thead>
+          <tbody>
+            <tr><td>Radice <strong>pari</strong> $\sqrt[2n]{g(x)}$</td><td>$\sqrt{x}, \sqrt[4]{x}, \sqrt[6]{x}$</td><td>$g(x) \ge 0$</td></tr>
+            <tr><td>Radice <strong>dispari</strong> $\sqrt[2n+1]{g(x)}$</td><td>$\sqrt[3]{x}, \sqrt[5]{x}, \sqrt[7]{x}$</td><td>nessuna</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="joke">Una radice pari è una severa madre italiana: <em>"Sotto di me non si va!"</em>. Una radice dispari
+        è il nonno: <em>"Vieni, vieni, anche i negativi sono benvenuti."</em></div>
+
+      <h3>8.4 — Esercizi</h3>
+      <div class="exercise" data-expr="sqrt(x)" data-xmin="-2" data-xmax="9" data-ymin="-1" data-ymax="4">
+        <div class="ex-header"><span class="ex-title">Esercizio 8.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \sqrt{x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Radice quadrata (pari).</p>
+          <p><span class="step-num">2</span><strong>Condizione:</strong> argomento $\ge 0$, cioè $x \ge 0$.</p>
+          <p><span class="step-num">3</span>La curva esiste solo per $x \ge 0$ (parte da $(0,0)$).</p>
+          <div class="domain-result">$D = [0, +\infty[$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="cbrt(x^2 - 8)" data-xmin="-4" data-xmax="4" data-ymin="-3" data-ymax="3">
+        <div class="ex-header"><span class="ex-title">Esercizio 8.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \sqrt[3]{x^2 - 8}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Radice cubica (<em>dispari</em>).</p>
+          <p><span class="step-num">2</span>Definita per qualunque reale, anche negativo.</p>
+          <p><span class="step-num">3</span>L'argomento $x^2 - 8$ è un polinomio: definito su tutto $\mathbb{R}$.</p>
+          <div class="domain-result">$D = \mathbb{R}$</div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="sqrt(x^2 - 5*x + 6)" data-xmin="-2" data-xmax="7" data-ymin="-1" data-ymax="5">
+        <div class="ex-header"><span class="ex-title">Esercizio 8.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Trova il dominio di:</p><div class="formula-box">$$f(x) = \sqrt{x^2 - 5x + 6}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Radice quadrata.</p>
+          <p><span class="step-num">2</span><strong>Condizione:</strong> $x^2 - 5x + 6 \ge 0$.</p>
+          <p><span class="step-num">3</span>Scomponiamo: $(x - 2)(x - 3) \ge 0$.</p>
+          <p><span class="step-num">4</span>Vale per $x \le 2$ oppure $x \ge 3$.</p>
+          <p><span class="step-num">5</span>La funzione esiste in due tratti, con un "buco" in $]2, 3[$.</p>
+          <div class="domain-result">$D = ]-\infty, 2] \cup [3, +\infty[$</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 — QUIZ -->
+    <section id="quiz">
+      <h2>9. Quiz finale: dieci funzioni, dieci domini</h2>
+      <p>Per ciascuna funzione scegli il dominio corretto. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 2 — Il Dominio di una Funzione · Matematica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX, math.js e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { diff: 'easy', text: 'Trova il dominio di $f(x) = 5x^2 - 3x + 7$.',
+        options: ['$\\mathbb{R}$', '$\\mathbb{R} \\setminus \\{0\\}$', '$[0, +\\infty[$', '$\\mathbb{R} \\setminus \\{3, 7\\}$'],
+        correct: 0, explain: 'Polinomiale di secondo grado: definita per ogni $x \\in \\mathbb{R}$.' },
+      { diff: 'easy', text: 'Trova il dominio di $f(x) = \\dfrac{1}{x - 5}$.',
+        options: ['$\\mathbb{R}$', '$\\mathbb{R} \\setminus \\{0\\}$', '$\\mathbb{R} \\setminus \\{5\\}$', '$\\mathbb{R} \\setminus \\{-5\\}$'],
+        correct: 2, explain: 'Fratta: il denominatore $x - 5$ deve essere $\\neq 0$, cioè $x \\neq 5$.' },
+      { diff: 'easy', text: 'Trova il dominio di $f(x) = \\sqrt{x}$.',
+        options: ['$\\mathbb{R}$', '$]0, +\\infty[$', '$[0, +\\infty[$', '$\\mathbb{R} \\setminus \\{0\\}$'],
+        correct: 2, explain: 'Radice pari: argomento $\\ge 0 \\Rightarrow x \\ge 0$. Lo $0$ va incluso.' },
+      { diff: 'easy', text: 'Trova il dominio di $f(x) = \\sin(x) \\cdot \\cos(x)$.',
+        options: ['$[-1; 1]$', '$\\mathbb{R}$', '$]0, +\\infty[$', '$\\mathbb{R} \\setminus \\{0\\}$'],
+        correct: 1, explain: 'Seno e coseno sono definiti su tutto $\\mathbb{R}$, e il loro prodotto pure.' },
+      { diff: 'medium', text: 'Trova il dominio di $f(x) = \\ln(x - 1)$.',
+        options: ['$\\mathbb{R}$', '$]1, +\\infty[$', '$[1, +\\infty[$', '$\\mathbb{R} \\setminus \\{1\\}$'],
+        correct: 1, explain: 'Argomento del log $> 0$: $x - 1 > 0 \\Leftrightarrow x > 1$. Lo $1$ è escluso.' },
+      { diff: 'medium', text: 'Trova il dominio di $f(x) = \\dfrac{\\sqrt{x - 2}}{x - 5}$.',
+        options: ['$[2, +\\infty[$', '$]5, +\\infty[$', '$[2, 5[ \\cup ]5, +\\infty[$', '$\\mathbb{R} \\setminus \\{2, 5\\}$'],
+        correct: 2, explain: '(1) $x - 2 \\ge 0 \\Rightarrow x \\ge 2$; (2) $x \\neq 5$. Intersecando: $[2, 5[ \\cup ]5, +\\infty[$.' },
+      { diff: 'medium', text: 'Trova il dominio di $f(x) = \\tan(x)$.',
+        options: ['$\\mathbb{R}$', '$\\mathbb{R} \\setminus \\{k\\pi : k \\in \\mathbb{Z}\\}$', '$\\mathbb{R} \\setminus \\{\\tfrac{\\pi}{2} + k\\pi : k \\in \\mathbb{Z}\\}$', '$[-\\tfrac{\\pi}{2}; \\tfrac{\\pi}{2}]$'],
+        correct: 2, explain: 'Serve $\\cos(x) \\neq 0$, cioè $x \\neq \\tfrac{\\pi}{2} + k\\pi$.' },
+      { diff: 'hard', text: 'Trova il dominio di $f(x) = \\sqrt{x^2 - 4}$.',
+        options: ['$\\mathbb{R}$', '$[-2; 2]$', '$]-\\infty, -2[ \\cup ]2, +\\infty[$', '$]-\\infty, -2] \\cup [2, +\\infty[$'],
+        correct: 3, explain: '$x^2 - 4 \\ge 0 \\Leftrightarrow x \\le -2 \\lor x \\ge 2$. Gli estremi $\\pm 2$ inclusi.' },
+      { diff: 'hard', text: 'Trova il dominio di $f(x) = \\ln(x^2 - 5x + 6)$.',
+        options: ['$\\mathbb{R}$', '$]-\\infty, 2[ \\cup ]3, +\\infty[$', '$]2; 3[$', '$]-\\infty, 2] \\cup [3, +\\infty[$'],
+        correct: 1, explain: '$x^2 - 5x + 6 > 0 \\Leftrightarrow x < 2 \\lor x > 3$. Estremi esclusi.' },
+      { diff: 'hard', text: 'Trova il dominio di $f(x) = \\sqrt{\\ln(x)}$.',
+        options: ['$]0, +\\infty[$', '$[1, +\\infty[$', '$]1, +\\infty[$', '$[0, +\\infty[$'],
+        correct: 1, explain: '(1) il log esiste se $x > 0$; (2) la radice richiede $\\ln(x) \\ge 0 \\Leftrightarrow x \\ge 1$. Intersezione: $[1, +\\infty[$.' }
+    ];
+  </script>
+</body>
+
+</html>
