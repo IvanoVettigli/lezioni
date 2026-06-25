@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 4 — Le Forme Indeterminate</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quinto anno · Lezione 4</div>
+    <h1>Le Forme Indeterminate</h1>
+    <p>Quando la sostituzione "non dice nulla" e bisogna scavare più a fondo</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quinto anno</a>
+    <span class="sep">/</span> Le Forme Indeterminate
+  </nav>
+
+  <main>
+
+    <!-- 1 — INTRODUZIONE INTUITIVA -->
+    <section id="sec1">
+      <h2>1. Il problema: quando la sostituzione "non dice nulla"</h2>
+      <p>Nella lezione sui limiti abbiamo visto che, quando la funzione è continua, il limite si calcola
+        <strong>sostituendo</strong>: $\lim_{x \to c} f(x) = f(c)$. Ma a volte la sostituzione produce una scrittura
+        <em>priva di significato immediato</em>, come $\dfrac{0}{0}$ o $\dfrac{\infty}{\infty}$.</p>
+      <p>Queste scritture si chiamano <strong>forme indeterminate</strong>. La parola chiave è <em>indeterminata</em>:
+        la forma da sola <strong>non determina</strong> il risultato. Vediamolo dal vivo.</p>
+
+      <h3>1.1 — La "lotteria" del $\frac{0}{0}$</h3>
+      <p>Tutte le funzioni qui sotto, per $x \to 0$, danno la forma $\dfrac{0}{0}$ (numeratore e denominatore tendono
+        entrambi a $0$). Eppure il <strong>risultato cambia ogni volta</strong>: prova a cambiarle.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Stessa forma $\frac{0}{0}$, risultati diversi</div>
+        <div class="controls">
+          <div class="control-group">
+            <label>Funzione (tutte $\to \frac{0}{0}$ per $x \to 0$):</label>
+            <select id="lot0-sel">
+              <option value="sin(x)/x">sin(x) / x</option>
+              <option value="(x^2-2*x)/x">(x² − 2x) / x</option>
+              <option value="(1-cos(x))/x">(1 − cos x) / x</option>
+              <option value="(exp(x)-1)/x">(eˣ − 1) / x</option>
+              <option value="x/(x^2)">x / x²</option>
+            </select>
+          </div>
+        </div>
+        <div class="demo-plot" id="lot0-plot"></div>
+        <p id="lot0-verdict" class="verdict"></p>
+      </div>
+
+      <h3>1.2 — La "lotteria" del $\frac{\infty}{\infty}$</h3>
+      <p>Stessa storia per $x \to +\infty$: numeratore e denominatore "esplodono" entrambi, ma il rapporto può tendere a
+        un numero, a zero o all'infinito.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Stessa forma $\frac{\infty}{\infty}$, risultati diversi</div>
+        <div class="controls">
+          <div class="control-group">
+            <label>Funzione (tutte $\to \frac{\infty}{\infty}$ per $x \to +\infty$):</label>
+            <select id="lotinf-sel">
+              <option value="(2*x)/x">2x / x</option>
+              <option value="(3*x^2+1)/(2*x^2)">(3x² + 1) / 2x²</option>
+              <option value="(x^2)/x">x² / x</option>
+              <option value="x/(x^2)">x / x²</option>
+            </select>
+          </div>
+        </div>
+        <div class="demo-plot" id="lotinf-plot"></div>
+        <p id="lotinf-verdict" class="verdict"></p>
+      </div>
+
+      <div class="note"><strong>Morale.</strong> Sapere che siamo davanti a $\frac{0}{0}$ o $\frac{\infty}{\infty}$
+        <em>non basta</em> a conoscere il limite: dipende da <strong>come</strong> numeratore e denominatore tendono al
+        loro valore (la loro "velocità"). Per scoprirlo dobbiamo <em>trasformare</em> l'espressione.</div>
+    </section>
+
+    <!-- 2 — DEFINIZIONE FORMALE -->
+    <section id="sec2">
+      <h2>2. Forme determinate e forme indeterminate</h2>
+      <p>Molte combinazioni di limiti hanno invece un risultato <strong>certo</strong>: si chiamano <em>forme
+        determinate</em>. L'"algebra dell'infinito" ci dice, ad esempio:</p>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Forma</th><th>Risultato</th><th>Esempio</th></tr></thead>
+          <tbody>
+            <tr><td>$\dfrac{k}{\infty}$</td><td>$0$</td><td>$\dfrac{5}{x} \to 0$</td></tr>
+            <tr><td>$\dfrac{k}{0^+}$ &nbsp;($k>0$)</td><td>$+\infty$</td><td>$\dfrac{1}{x^2} \to +\infty$</td></tr>
+            <tr><td>$\infty + \infty$</td><td>$+\infty$</td><td>$x^2 + x \to +\infty$</td></tr>
+            <tr><td>$k \cdot \infty$ &nbsp;($k \neq 0$)</td><td>$\infty$</td><td>$3x \to +\infty$</td></tr>
+            <tr><td>$\dfrac{\infty}{k}$ &nbsp;($k \neq 0$)</td><td>$\infty$</td><td>$\dfrac{x}{2} \to +\infty$</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="definition">Una <strong>forma indeterminata</strong> è una combinazione di limiti il cui risultato
+        <strong>non è deducibile</strong> dalle sole parti: funzioni diverse con la stessa forma possono dare limiti
+        diversi (finiti, infiniti, oppure inesistenti). Per risolverla bisogna <em>trasformare</em> l'espressione finché
+        sparisce l'indeterminazione.</div>
+      <div class="warning"><strong>Attenzione ai falsi amici.</strong> $\dfrac{0}{0}$ <em>non</em> fa $1$ e $\infty -
+        \infty$ <em>non</em> fa $0$: sono forme indeterminate, non operazioni con numeri. Il segno "$=$" qui significa
+        solo "ottengo questa forma sostituendo", non "il limite vale".</div>
+    </section>
+
+    <!-- 3 — LE SETTE FORME -->
+    <section id="sec3">
+      <h2>3. Le sette forme indeterminate</h2>
+      <p>Esistono esattamente <strong>sette</strong> forme indeterminate. Le prime quattro sono "algebriche", le ultime
+        tre "esponenziali" (si risolvono con i limiti notevoli e i logaritmi).</p>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Forma</th><th>Esempio tipico</th><th>Tecnica risolutiva</th></tr></thead>
+          <tbody>
+            <tr><td>$\dfrac{0}{0}$</td><td>$\lim_{x\to2}\dfrac{x^2-4}{x-2}$</td><td>Scomposizione / razionalizzazione</td></tr>
+            <tr><td>$\dfrac{\infty}{\infty}$</td><td>$\lim_{x\to+\infty}\dfrac{2x^2-x}{x^2+5}$</td><td>Termine di grado massimo</td></tr>
+            <tr><td>$\infty - \infty$</td><td>$\lim_{x\to+\infty}\big(\sqrt{x^2+x}-x\big)$</td><td>Raccoglimento / razionalizzazione</td></tr>
+            <tr><td>$0 \cdot \infty$</td><td>$\lim_{x\to0^+} x\ln x$</td><td>Riscrittura come frazione</td></tr>
+            <tr><td>$1^{\infty}$</td><td>$\lim_{x\to+\infty}\big(1+\tfrac1x\big)^x$</td><td>Limite notevole di $e$</td></tr>
+            <tr><td>$0^0$</td><td>$\lim_{x\to0^+} x^x$</td><td>Logaritmi: $y=f^g \Rightarrow \ln y = g\ln f$</td></tr>
+            <tr><td>$\infty^0$</td><td>$\lim_{x\to+\infty} x^{1/x}$</td><td>Logaritmi</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="rule"><strong>Strategia generale.</strong> Per le esponenziali ($1^\infty$, $0^0$, $\infty^0$) si pone
+        $y = f(x)^{g(x)}$ e si passa al logaritmo: $\ln y = g(x)\cdot\ln f(x)$, che è una forma $0\cdot\infty$ — ci si
+        riconduce così ai casi precedenti.</div>
+    </section>
+
+    <!-- 4 — 0/0 -->
+    <section id="sec4">
+      <h2>4. Forma $\dfrac{0}{0}$</h2>
+      <p>Compare quando numeratore e denominatore tendono entrambi a $0$. Quasi sempre c'è un <strong>fattore
+        comune</strong> che si annulla: scomponendo e semplificando, l'indeterminazione sparisce. Con le radici si usa
+        la <strong>razionalizzazione</strong>.</p>
+      <div class="rule">$$\frac{x^2-4}{x-2} = \frac{(x-2)(x+2)}{x-2} = x+2 \quad (x \neq 2)$$</div>
+
+      <div class="exercise" data-expr="(x^2-4)/(x-2)" data-xmin="-1" data-xmax="5" data-ymin="0" data-ymax="8" data-hole="2,4">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to 2} \frac{x^2 - 4}{x - 2}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Sostituendo $x=2$: $\dfrac{4-4}{2-2} = \dfrac{0}{0}$, forma indeterminata.</p>
+          <p><span class="step-num">2</span>Scomponiamo il numeratore: $x^2 - 4 = (x-2)(x+2)$.</p>
+          <p><span class="step-num">3</span>Semplifichiamo: $\dfrac{(x-2)(x+2)}{x-2} = x+2$ per $x \neq 2$.</p>
+          <p><span class="step-num">4</span>Ora sostituiamo: $\lim_{x \to 2}(x+2) = 4$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to 2}\frac{x^2-4}{x-2} = 4$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="(x^2-5*x+6)/(x-3)" data-xmin="0" data-xmax="6" data-ymin="-3" data-ymax="4" data-hole="3,1">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to 3} \frac{x^2 - 5x + 6}{x - 3}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Sostituendo $x=3$: $\dfrac{9-15+6}{0} = \dfrac{0}{0}$.</p>
+          <p><span class="step-num">2</span>Scomponiamo il trinomio: $x^2 - 5x + 6 = (x-2)(x-3)$.</p>
+          <p><span class="step-num">3</span>Semplifichiamo: $\dfrac{(x-2)(x-3)}{x-3} = x-2$ per $x \neq 3$.</p>
+          <p><span class="step-num">4</span>$\lim_{x \to 3}(x-2) = 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to 3}\frac{x^2-5x+6}{x-3} = 1$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="(sqrt(x+1)-1)/x" data-xmin="-0.9" data-xmax="5" data-ymin="0" data-ymax="1" data-hole="0,0.5">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola (con la razionalizzazione):</p><div class="formula-box">$$\lim_{x \to 0} \frac{\sqrt{x+1} - 1}{x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Sostituendo $x=0$: $\dfrac{\sqrt{1}-1}{0} = \dfrac{0}{0}$.</p>
+          <p><span class="step-num">2</span>Moltiplichiamo numeratore e denominatore per il <em>coniugato</em> $\sqrt{x+1}+1$:</p>
+          <p><span class="step-num">3</span>$\dfrac{(\sqrt{x+1}-1)(\sqrt{x+1}+1)}{x(\sqrt{x+1}+1)} = \dfrac{(x+1)-1}{x(\sqrt{x+1}+1)} = \dfrac{x}{x(\sqrt{x+1}+1)}$.</p>
+          <p><span class="step-num">4</span>Semplifichiamo $x$: $\dfrac{1}{\sqrt{x+1}+1} \to \dfrac{1}{1+1} = \dfrac{1}{2}$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to 0}\frac{\sqrt{x+1}-1}{x} = \frac{1}{2}$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — ∞/∞ -->
+    <section id="sec5">
+      <h2>5. Forma $\dfrac{\infty}{\infty}$</h2>
+      <p>Compare con i rapporti di funzioni che divergono. La tecnica: <strong>raccogliere il termine di grado
+        massimo</strong> (o dividere numeratore e denominatore per la potenza più alta). Per i polinomi conta il
+        confronto fra i gradi.</p>
+      <div class="rule">Per $\dfrac{P(x)}{Q(x)}$ con $x \to \pm\infty$: vince il <strong>grado più alto</strong>.
+        Se $\deg P > \deg Q \Rightarrow \infty$; se $\deg P < \deg Q \Rightarrow 0$; se uguali $\Rightarrow$ rapporto dei
+        coefficienti dei termini di grado massimo.</div>
+
+      <div class="exercise" data-expr="(3*x+1)/(x-2)" data-xmin="3" data-xmax="60" data-ymin="2.5" data-ymax="6" data-asym="3">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} \frac{3x + 1}{x - 2}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Per $x\to+\infty$: $\dfrac{+\infty}{+\infty}$, indeterminata.</p>
+          <p><span class="step-num">2</span>Raccogliamo $x$ sopra e sotto: $\dfrac{x(3 + 1/x)}{x(1 - 2/x)}$.</p>
+          <p><span class="step-num">3</span>Semplifichiamo $x$ e mandiamo $x\to+\infty$: $1/x \to 0$, $2/x \to 0$.</p>
+          <p><span class="step-num">4</span>Resta $\dfrac{3+0}{1-0} = 3$ (stesso grado → rapporto dei coefficienti).</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty}\frac{3x+1}{x-2} = 3$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="(2*x^2-x)/(x^2+5)" data-xmin="0" data-xmax="40" data-ymin="0" data-ymax="2.5" data-asym="2">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} \frac{2x^2 - x}{x^2 + 5}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Forma $\dfrac{\infty}{\infty}$. Grado massimo: $x^2$ sopra e sotto.</p>
+          <p><span class="step-num">2</span>Dividiamo tutto per $x^2$: $\dfrac{2 - 1/x}{1 + 5/x^2}$.</p>
+          <p><span class="step-num">3</span>Per $x\to+\infty$: $1/x \to 0$ e $5/x^2 \to 0$.</p>
+          <p><span class="step-num">4</span>Resta $\dfrac{2}{1} = 2$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty}\frac{2x^2-x}{x^2+5} = 2$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="sqrt(x^2+1)/x" data-xmin="1" data-xmax="50" data-ymin="0.8" data-ymax="3" data-asym="1">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola (con la radice):</p><div class="formula-box">$$\lim_{x \to +\infty} \frac{\sqrt{x^2 + 1}}{x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Forma $\dfrac{\infty}{\infty}$. Portiamo $x^2$ fuori dalla radice: $\sqrt{x^2+1} = |x|\sqrt{1 + 1/x^2}$.</p>
+          <p><span class="step-num">2</span>Per $x\to+\infty$ si ha $|x| = x$, quindi $\dfrac{x\sqrt{1+1/x^2}}{x}$.</p>
+          <p><span class="step-num">3</span>Semplifichiamo $x$: $\sqrt{1 + 1/x^2} \to \sqrt{1+0} = 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty}\frac{\sqrt{x^2+1}}{x} = 1$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — ∞−∞ -->
+    <section id="sec6">
+      <h2>6. Forma $\infty - \infty$</h2>
+      <p>Due quantità che divergono e si "sottraggono". Si <strong>raccoglie</strong> il termine dominante, oppure (con
+        le radici) si <strong>razionalizza</strong> moltiplicando per il coniugato.</p>
+      <div class="rule">$$\sqrt{x^2+x} - x = \frac{(\sqrt{x^2+x}-x)(\sqrt{x^2+x}+x)}{\sqrt{x^2+x}+x} = \frac{x}{\sqrt{x^2+x}+x}$$</div>
+
+      <div class="exercise" data-expr="x^2 - x" data-xmin="0" data-xmax="10" data-ymin="-1" data-ymax="92">
+        <div class="ex-header"><span class="ex-title">Esercizio 6.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} \left(x^2 - x\right)$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Per $x\to+\infty$: $\infty - \infty$, indeterminata.</p>
+          <p><span class="step-num">2</span>Raccogliamo il grado massimo: $x^2 - x = x^2\left(1 - \dfrac{1}{x}\right)$.</p>
+          <p><span class="step-num">3</span>Per $x\to+\infty$: $x^2 \to +\infty$ e $\left(1 - 1/x\right) \to 1$.</p>
+          <p><span class="step-num">4</span>Prodotto $+\infty \cdot 1 = +\infty$ (ora è una forma <em>determinata</em>).</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty}(x^2 - x) = +\infty$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="sqrt(x^2+x) - x" data-xmin="0" data-xmax="50" data-ymin="0" data-ymax="1.5" data-asym="0.5">
+        <div class="ex-header"><span class="ex-title">Esercizio 6.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola (razionalizzazione):</p><div class="formula-box">$$\lim_{x \to +\infty} \left(\sqrt{x^2 + x} - x\right)$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Forma $\infty - \infty$. Moltiplichiamo per il coniugato $\sqrt{x^2+x}+x$.</p>
+          <p><span class="step-num">2</span>Numeratore: $(x^2+x) - x^2 = x$. Resta $\dfrac{x}{\sqrt{x^2+x}+x}$.</p>
+          <p><span class="step-num">3</span>Raccogliamo $x$ (con $\sqrt{x^2+x}=x\sqrt{1+1/x}$): $\dfrac{x}{x\left(\sqrt{1+1/x}+1\right)}$.</p>
+          <p><span class="step-num">4</span>Semplifichiamo: $\dfrac{1}{\sqrt{1+1/x}+1} \to \dfrac{1}{1+1} = \dfrac{1}{2}$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty}\left(\sqrt{x^2+x}-x\right) = \frac{1}{2}$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="sqrt(x^2+1) - sqrt(x^2-1)" data-xmin="1" data-xmax="30" data-ymin="-0.2" data-ymax="1.5" data-asym="0">
+        <div class="ex-header"><span class="ex-title">Esercizio 6.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} \left(\sqrt{x^2 + 1} - \sqrt{x^2 - 1}\right)$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Forma $\infty - \infty$. Coniugato $\sqrt{x^2+1}+\sqrt{x^2-1}$.</p>
+          <p><span class="step-num">2</span>Numeratore: $(x^2+1)-(x^2-1) = 2$. Resta $\dfrac{2}{\sqrt{x^2+1}+\sqrt{x^2-1}}$.</p>
+          <p><span class="step-num">3</span>Il denominatore $\to +\infty$, il numeratore è costante $2$.</p>
+          <p><span class="step-num">4</span>$\dfrac{2}{+\infty} = 0$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty}\left(\sqrt{x^2+1}-\sqrt{x^2-1}\right) = 0$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — 0·∞ -->
+    <section id="sec7">
+      <h2>7. Forma $0 \cdot \infty$</h2>
+      <p>Un fattore tende a $0$, l'altro all'$\infty$. Si <strong>riscrive come frazione</strong> (portando uno dei due
+        a denominatore) per ricondursi a $\dfrac{0}{0}$ o $\dfrac{\infty}{\infty}$. Spesso aiutano i limiti notevoli
+        $\dfrac{\sin t}{t}\to1$ e $\dfrac{e^t-1}{t}\to1$.</p>
+      <div class="rule">$$f \cdot g = \frac{f}{\;1/g\;} \qquad\text{(porta il fattore "infinito" a denominatore)}$$</div>
+
+      <div class="exercise" data-expr="x*sin(1/x)" data-xmin="1" data-xmax="50" data-ymin="0" data-ymax="1.5" data-asym="1">
+        <div class="ex-header"><span class="ex-title">Esercizio 7.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} x \cdot \sin\!\frac{1}{x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Per $x\to+\infty$: $x\to+\infty$ e $\sin(1/x)\to0$: forma $0\cdot\infty$.</p>
+          <p><span class="step-num">2</span>Poniamo $t = \dfrac{1}{x}$ (con $t\to0$): l'espressione diventa $\dfrac{\sin t}{t}$.</p>
+          <p><span class="step-num">3</span>È il limite notevole $\dfrac{\sin t}{t} \to 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty} x\sin\frac{1}{x} = 1$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="x*log(x)" data-xmin="0" data-xmax="2" data-ymin="-0.6" data-ymax="1.5" data-asym="0">
+        <div class="ex-header"><span class="ex-title">Esercizio 7.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to 0^+} x \cdot \ln x$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Per $x\to0^+$: $x\to0$ e $\ln x\to-\infty$: forma $0\cdot\infty$.</p>
+          <p><span class="step-num">2</span>Riscriviamo come frazione: $x\ln x = \dfrac{\ln x}{1/x}$, forma $\dfrac{-\infty}{+\infty}$.</p>
+          <p><span class="step-num">3</span>Il denominatore $1/x$ cresce <em>molto più in fretta</em> di quanto $\ln x$ scenda: il rapporto $\to 0$.</p>
+          <p><span class="step-num">4</span>Lo conferma il grafico: pur partendo verso il basso, la curva torna a $0$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to 0^+} x\ln x = 0$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="x*(exp(1/x)-1)" data-xmin="1" data-xmax="50" data-ymin="0.8" data-ymax="2" data-asym="1">
+        <div class="ex-header"><span class="ex-title">Esercizio 7.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} x \cdot \left(e^{1/x} - 1\right)$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Per $x\to+\infty$: $x\to+\infty$ e $(e^{1/x}-1)\to e^0-1=0$: forma $0\cdot\infty$.</p>
+          <p><span class="step-num">2</span>Poniamo $t = \dfrac{1}{x}$ ($t\to0$): l'espressione diventa $\dfrac{e^t - 1}{t}$.</p>
+          <p><span class="step-num">3</span>È il limite notevole $\dfrac{e^t - 1}{t} \to 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty} x\left(e^{1/x}-1\right) = 1$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — 1^∞ -->
+    <section id="sec8">
+      <h2>8. Forma $1^{\infty}$</h2>
+      <p>Una base che tende a $1$ elevata a un esponente che tende all'$\infty$. <em>Non</em> fa $1$: si risolve con il
+        <strong>limite notevole del numero di Nepero</strong>.</p>
+      <div class="rule">$$\lim_{x \to +\infty}\left(1 + \frac{1}{x}\right)^x = e \approx 2{,}718 \qquad\text{e più in generale}\qquad \lim_{x \to +\infty}\left(1 + \frac{k}{x}\right)^x = e^k$$</div>
+
+      <div class="exercise" data-expr="(1+1/x)^x" data-xmin="1" data-xmax="60" data-ymin="1.5" data-ymax="3" data-asym="2.718">
+        <div class="ex-header"><span class="ex-title">Esercizio 8.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} \left(1 + \frac{1}{x}\right)^x$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>La base $\left(1 + 1/x\right) \to 1$, l'esponente $x \to +\infty$: forma $1^\infty$.</p>
+          <p><span class="step-num">2</span>È <em>esattamente</em> la definizione del numero di Nepero $e$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty}\left(1+\frac1x\right)^x = e$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="(1+2/x)^x" data-xmin="1" data-xmax="60" data-ymin="2" data-ymax="9" data-asym="7.389">
+        <div class="ex-header"><span class="ex-title">Esercizio 8.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} \left(1 + \frac{2}{x}\right)^x$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Forma $1^\infty$. Usiamo $\left(1 + k/x\right)^x \to e^k$ con $k=2$.</p>
+          <p><span class="step-num">2</span>In alternativa: poniamo $t = x/2$ (cioè $x = 2t$), allora $\left(1+1/t\right)^{2t} = \left[\left(1+1/t\right)^t\right]^2 \to e^2$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty}\left(1+\frac2x\right)^x = e^2 \approx 7{,}39$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="((x+1)/x)^(3*x)" data-xmin="1" data-xmax="60" data-ymin="5" data-ymax="25" data-asym="20.09">
+        <div class="ex-header"><span class="ex-title">Esercizio 8.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} \left(\frac{x + 1}{x}\right)^{3x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Riscriviamo la base: $\dfrac{x+1}{x} = 1 + \dfrac{1}{x} \to 1$. Esponente $3x \to +\infty$: forma $1^\infty$.</p>
+          <p><span class="step-num">2</span>$\left(1+\dfrac1x\right)^{3x} = \left[\left(1+\dfrac1x\right)^{x}\right]^{3}$.</p>
+          <p><span class="step-num">3</span>La parentesi quadra $\to e$, dunque il tutto $\to e^3$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty}\left(\frac{x+1}{x}\right)^{3x} = e^3 \approx 20{,}09$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 — 0^0 -->
+    <section id="sec9">
+      <h2>9. Forma $0^0$</h2>
+      <p>Base ed esponente tendono entrambi a $0$. Si usa il <strong>passaggio al logaritmo</strong>: posto
+        $y = f(x)^{g(x)}$, si ha $\ln y = g(x)\ln f(x)$, che è una forma $0\cdot\infty$. Calcolato il limite $\ell$ di
+        $\ln y$, il risultato è $e^{\ell}$.</p>
+      <div class="rule">$$y = f^{g} \;\Rightarrow\; \ln y = g\cdot\ln f \;\Rightarrow\; \lim y = e^{\lim(g\,\ln f)}$$</div>
+
+      <div class="exercise" data-expr="x^x" data-xmin="0" data-xmax="2" data-ymin="0" data-ymax="1.6" data-asym="1">
+        <div class="ex-header"><span class="ex-title">Esercizio 9.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to 0^+} x^{\,x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Base $x\to0^+$, esponente $x\to0$: forma $0^0$.</p>
+          <p><span class="step-num">2</span>Poniamo $y = x^x$, quindi $\ln y = x\ln x$.</p>
+          <p><span class="step-num">3</span>Sappiamo (es. 7.2) che $x\ln x \to 0$.</p>
+          <p><span class="step-num">4</span>Quindi $\ln y \to 0 \Rightarrow y \to e^0 = 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to 0^+} x^x = 1$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="x^(3*x)" data-xmin="0" data-xmax="1.5" data-ymin="0" data-ymax="1.6" data-asym="1">
+        <div class="ex-header"><span class="ex-title">Esercizio 9.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to 0^+} x^{\,3x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Forma $0^0$. Poniamo $y = x^{3x}$, quindi $\ln y = 3x\ln x$.</p>
+          <p><span class="step-num">2</span>$3x\ln x = 3\cdot(x\ln x) \to 3\cdot 0 = 0$.</p>
+          <p><span class="step-num">3</span>Dunque $\ln y \to 0 \Rightarrow y \to e^0 = 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to 0^+} x^{3x} = 1$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="x^(1/log(x))" data-xmin="0.02" data-xmax="0.9" data-ymin="2" data-ymax="3.4" data-asym="2.718">
+        <div class="ex-header"><span class="ex-title">Esercizio 9.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to 0^+} x^{\,\frac{1}{\ln x}}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Base $x\to0^+$, esponente $\dfrac{1}{\ln x}\to 0$: forma $0^0$.</p>
+          <p><span class="step-num">2</span>Poniamo $y = x^{1/\ln x}$, quindi $\ln y = \dfrac{1}{\ln x}\cdot \ln x = 1$.</p>
+          <p><span class="step-num">3</span>Quindi $\ln y = 1$ <em>per ogni</em> $x$, dunque $y = e^1 = e$ (il grafico è una retta orizzontale a $e$!).</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to 0^+} x^{\frac{1}{\ln x}} = e$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 — ∞^0 -->
+    <section id="sec10">
+      <h2>10. Forma $\infty^{0}$</h2>
+      <p>Una base che diverge elevata a un esponente che tende a $0$. Stessa tecnica della forma $0^0$: si passa al
+        <strong>logaritmo</strong> e ci si riconduce a $0\cdot\infty$.</p>
+      <div class="rule">$$y = f^{g} \;\Rightarrow\; \ln y = g\cdot\ln f \;\Rightarrow\; \lim y = e^{\lim(g\,\ln f)}$$</div>
+
+      <div class="exercise" data-expr="x^(1/x)" data-xmin="1" data-xmax="60" data-ymin="0.8" data-ymax="1.6" data-asym="1">
+        <div class="ex-header"><span class="ex-title">Esercizio 10.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} x^{\,1/x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Base $x\to+\infty$, esponente $\dfrac1x\to0$: forma $\infty^0$.</p>
+          <p><span class="step-num">2</span>Poniamo $y = x^{1/x}$, quindi $\ln y = \dfrac{\ln x}{x}$.</p>
+          <p><span class="step-num">3</span>Forma $\dfrac{\infty}{\infty}$: $x$ cresce molto più di $\ln x$, quindi $\dfrac{\ln x}{x} \to 0$.</p>
+          <p><span class="step-num">4</span>$\ln y \to 0 \Rightarrow y \to e^0 = 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty} x^{1/x} = 1$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="(2*x)^(1/x)" data-xmin="1" data-xmax="60" data-ymin="0.8" data-ymax="2.5" data-asym="1">
+        <div class="ex-header"><span class="ex-title">Esercizio 10.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} (2x)^{\,1/x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Forma $\infty^0$. Poniamo $y = (2x)^{1/x}$, quindi $\ln y = \dfrac{\ln(2x)}{x} = \dfrac{\ln 2 + \ln x}{x}$.</p>
+          <p><span class="step-num">2</span>Sia $\dfrac{\ln 2}{x}\to 0$ sia $\dfrac{\ln x}{x}\to 0$.</p>
+          <p><span class="step-num">3</span>$\ln y \to 0 \Rightarrow y \to e^0 = 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty} (2x)^{1/x} = 1$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="(exp(x)+x)^(1/x)" data-xmin="1" data-xmax="60" data-ymin="2.4" data-ymax="4" data-asym="2.718">
+        <div class="ex-header"><span class="ex-title">Esercizio 10.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola:</p><div class="formula-box">$$\lim_{x \to +\infty} \left(e^{x} + x\right)^{1/x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Base $(e^x + x)\to+\infty$, esponente $\dfrac1x\to0$: forma $\infty^0$.</p>
+          <p><span class="step-num">2</span>$\ln y = \dfrac{\ln(e^x + x)}{x}$. Raccogliamo $e^x$: $\ln(e^x(1 + x e^{-x})) = x + \ln(1 + xe^{-x})$.</p>
+          <p><span class="step-num">3</span>Quindi $\ln y = \dfrac{x + \ln(1 + xe^{-x})}{x} = 1 + \dfrac{\ln(1+xe^{-x})}{x} \to 1 + 0 = 1$.</p>
+          <p><span class="step-num">4</span>$\ln y \to 1 \Rightarrow y \to e^1 = e$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\lim_{x \to +\infty}(e^x + x)^{1/x} = e$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 — QUIZ -->
+    <section id="quiz">
+      <h2>11. Quiz finale</h2>
+      <p>Dieci domande sulle forme indeterminate e sulle tecniche per risolverle. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 4 — Le Forme Indeterminate · Matematica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX, math.js e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { diff: 'easy', text: 'Che cosa significa che $\\frac{0}{0}$ è una "forma indeterminata"?',
+        options: ['Che il limite vale sempre 1.', 'Che il limite vale sempre 0.', 'Che la sola forma non basta a stabilire il limite: dipende dalle funzioni.', 'Che il limite non esiste mai.'],
+        correct: 2, explain: 'Funzioni diverse che danno $\\frac{0}{0}$ possono avere limiti diversi: la forma da sola non determina il risultato.' },
+      { diff: 'easy', text: 'Quale di queste NON è una forma indeterminata?',
+        options: ['$\\infty - \\infty$', '$0 \\cdot \\infty$', '$\\dfrac{k}{\\infty}$', '$\\dfrac{\\infty}{\\infty}$'],
+        correct: 2, explain: '$\\frac{k}{\\infty} = 0$ è una forma <em>determinata</em>. Le altre tre sono indeterminate.' },
+      { diff: 'easy', text: 'Quante sono le forme indeterminate?',
+        options: ['3', '5', '7', 'Infinite'], correct: 2, explain: 'Sono sette: $\\frac{0}{0}$, $\\frac{\\infty}{\\infty}$, $\\infty-\\infty$, $0\\cdot\\infty$, $1^\\infty$, $0^0$, $\\infty^0$.' },
+      { diff: 'easy', text: 'Calcola $\\lim_{x \\to 2} \\dfrac{x^2 - 4}{x - 2}$.',
+        options: ['$0$', '$1$', '$4$', 'Non esiste'], correct: 2, explain: 'Forma $\\frac{0}{0}$: si scompone $\\frac{(x-2)(x+2)}{x-2} = x+2 \\to 4$.' },
+      { diff: 'medium', text: 'Per risolvere $\\lim_{x \\to +\\infty} \\dfrac{2x^2 - x}{x^2 + 5}$ (forma $\\frac{\\infty}{\\infty}$) conviene:',
+        options: ['Sostituire direttamente $x = \\infty$.', 'Raccogliere/dividere per il termine di grado massimo $x^2$.', 'Moltiplicare per il coniugato.', 'Passare al logaritmo.'],
+        correct: 1, explain: 'Dividendo per $x^2$: $\\frac{2 - 1/x}{1 + 5/x^2} \\to 2$. Per i polinomi conta il grado massimo.' },
+      { diff: 'medium', text: 'La forma $0 \\cdot \\infty$ si affronta tipicamente:',
+        options: ['Ponendola uguale a 0.', 'Riscrivendola come frazione, per ricondursi a $\\frac{0}{0}$ o $\\frac{\\infty}{\\infty}$.', 'Elevando al quadrato.', 'Derivando subito.'],
+        correct: 1, explain: 'Si porta uno dei due fattori a denominatore: $f \\cdot g = \\frac{f}{1/g}$.' },
+      { diff: 'medium', text: 'Quanto vale $\\lim_{x \\to +\\infty} \\left(1 + \\dfrac{1}{x}\\right)^x$?',
+        options: ['$1$', '$0$', '$e$', '$+\\infty$'], correct: 2, explain: 'È la definizione del numero di Nepero $e \\approx 2{,}718$: forma $1^\\infty$.' },
+      { diff: 'medium', text: 'Per risolvere una forma $0^0$ o $\\infty^0$ del tipo $y = f^g$ si usa:',
+        options: ['La regola $0^0 = 1$.', 'Il passaggio al logaritmo: $\\ln y = g \\ln f$.', 'Il teorema di Pitagora.', 'La sostituzione $g = 0$.'],
+        correct: 1, explain: 'Si pone $\\ln y = g\\ln f$ (una forma $0\\cdot\\infty$); poi $\\lim y = e^{\\lim(g\\ln f)}$.' },
+      { diff: 'hard', text: 'Quanto vale $\\lim_{x \\to +\\infty} \\left(\\sqrt{x^2 + x} - x\\right)$?',
+        options: ['$0$', '$\\dfrac{1}{2}$', '$1$', '$+\\infty$'],
+        correct: 1, explain: 'Forma $\\infty-\\infty$: razionalizzando si ottiene $\\frac{x}{\\sqrt{x^2+x}+x} \\to \\frac{1}{2}$.' },
+      { diff: 'hard', text: 'Quanto vale $\\lim_{x \\to +\\infty} \\left(1 + \\dfrac{2}{x}\\right)^{x}$?',
+        options: ['$e$', '$e^2$', '$2e$', '$2$'], correct: 1, explain: 'Forma $1^\\infty$: $\\left(1 + k/x\\right)^x \\to e^k$, qui $k = 2 \\Rightarrow e^2$.' }
+    ];
+  </script>
+
+  <!-- Demo interattive di questa lezione (le due "lotterie") -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { linspace, update, evalForPlot } = Plt;
+      // Demo "lotteria": un <select> di funzioni con stessa forma ma limiti diversi
+      function lottery(plotId, selectId, verdictId, win, opts) {
+        const sel = document.getElementById(selectId), verdict = document.getElementById(verdictId);
+        const yLimit = Math.max(Math.abs(win.ymin), Math.abs(win.ymax)) * 3;
+        function go() {
+          const o = opts[sel.selectedIndex];
+          const xs = linspace(win.xmin, win.xmax, 700);
+          const traces = [{ x: xs, y: evalForPlot(sel.value, xs, { yLimit }), type: 'scatter', mode: 'lines', line: { color: '#ef4444', width: 2.8 }, connectgaps: false, hoverinfo: 'x+y' }];
+          const shapes = [];
+          if (o.line != null) shapes.push({ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: o.line, y1: o.line, line: { color: Plt.themeColors().accent, width: 1.5, dash: 'dash' } });
+          verdict.innerHTML = o.verdict;
+          if (typeof renderMathIn === 'function') renderMathIn(verdict);
+          update(plotId, traces, { xaxis: { range: [win.xmin, win.xmax], title: 'x' }, yaxis: { range: [win.ymin, win.ymax], title: 'f(x)' }, shapes });
+        }
+        sel.addEventListener('change', go); go();
+      }
+
+      lottery('lot0-plot', 'lot0-sel', 'lot0-verdict', { xmin: -2, xmax: 2, ymin: -3, ymax: 3 }, [
+        { line: 1, verdict: '$\\dfrac{\\sin x}{x} \\to \\mathbf{1}$ &nbsp;— limite notevole.' },
+        { line: -2, verdict: '$\\dfrac{x^2 - 2x}{x} = x - 2 \\to \\mathbf{-2}$.' },
+        { line: 0, verdict: '$\\dfrac{1 - \\cos x}{x} \\to \\mathbf{0}$.' },
+        { line: 1, verdict: '$\\dfrac{e^x - 1}{x} \\to \\mathbf{1}$ &nbsp;— limite notevole.' },
+        { line: null, verdict: '$\\dfrac{x}{x^2} = \\dfrac{1}{x}$: tende a $+\\infty$ da destra e $-\\infty$ da sinistra — il limite <strong>non esiste</strong>!' }
+      ]);
+
+      lottery('lotinf-plot', 'lotinf-sel', 'lotinf-verdict', { xmin: 1, xmax: 40, ymin: 0, ymax: 5 }, [
+        { line: 2, verdict: '$\\dfrac{2x}{x} \\to \\mathbf{2}$ &nbsp;(stesso grado).' },
+        { line: 1.5, verdict: '$\\dfrac{3x^2 + 1}{2x^2} \\to \\mathbf{1{,}5}$ &nbsp;(rapporto dei coefficienti).' },
+        { line: null, verdict: '$\\dfrac{x^2}{x} = x \\to \\mathbf{+\\infty}$ &nbsp;(grado sopra maggiore).' },
+        { line: 0, verdict: '$\\dfrac{x}{x^2} = \\dfrac{1}{x} \\to \\mathbf{0}$ &nbsp;(grado sotto maggiore).' }
+      ]);
+    });
+  </script>
+</body>
+
+</html>

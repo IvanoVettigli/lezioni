@@ -122,7 +122,9 @@
   // Grafico di una funzione descritta dai data-attributes (usato negli esercizi)
   //   data-expr  : espressione in x (sintassi math.js)
   //   data-xmin/xmax/ymin/ymax : finestra
-  //   data-exclude : valori di x esclusi (separati da virgola) → cerchietti vuoti
+  //   data-exclude : valori di x esclusi (virgola) → asintoti verticali tratteggiati
+  //   data-hole  : "x,y" → cerchietto vuoto (discontinuità eliminabile, es. forme 0/0)
+  //   data-asym  : valore L → retta orizzontale tratteggiata (limite / asintoto orizzontale)
   function plotExpr(div, ds) {
     const xMin = parseFloat(ds.xmin != null ? ds.xmin : -6);
     const xMax = parseFloat(ds.xmax != null ? ds.xmax : 6);
@@ -150,6 +152,23 @@
       type: 'line', x0: v, x1: v, y0: yMin, y1: yMax,
       line: { color: c.curve, width: 1.5, dash: 'dash' },
     }));
+
+    // "Buco" di una discontinuità eliminabile (forme 0/0)
+    if (ds.hole) {
+      const h = ds.hole.split(',').map(Number);
+      traces.push({
+        x: [h[0]], y: [h[1]], type: 'scatter', mode: 'markers',
+        marker: { color: c.plotBg, size: 11, line: { color: c.curve, width: 2.5 } },
+        hovertext: [`la funzione non è definita in x = ${h[0]}`], hoverinfo: 'text',
+      });
+    }
+    // Retta orizzontale del limite / asintoto orizzontale
+    if (ds.asym != null && ds.asym !== '') {
+      shapes.push({
+        type: 'line', xref: 'paper', x0: 0, x1: 1, y0: +ds.asym, y1: +ds.asym,
+        line: { color: c.accent, width: 1.5, dash: 'dash' },
+      });
+    }
 
     draw(div, traces, {
       xaxis: { range: [xMin, xMax] },

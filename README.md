@@ -14,11 +14,16 @@ Informatica/            ← lezioni di informatica
 Laboratorio/            ← schede di laboratorio in PDF + index.html con i download
 Style/                  ← tutto il codice condiviso (CSS + JS)
   ├─ theme.css            variabili dei temi, reset, layout
-  ├─ components.css       card, liste, callout, tabelle, formule
+  ├─ components.css       card, liste, callout, tabelle, indice capitoli
+  ├─ interactive.css      esercizi, slider, demo, quiz (solo lezioni)
   ├─ theme.js             tema scuro/chiaro (default: scuro) + pulsante
   ├─ catalog.js           ★ catalogo: l'UNICO file da editare per i contenuti
   ├─ render.js            genera home / indici / laboratorio dal catalogo
-  ├─ math-render.js       rendering formule (KaTeX) per le lezioni
+  ├─ math-render.js       rendering formule (KaTeX)
+  ├─ plot-utils.js        helper Plotly theme-aware (grafici)
+  ├─ interactive.js       toggle soluzioni/grafici negli esercizi
+  ├─ quiz.js              quiz a scelta multipla / risposta aperta
+  ├─ toc.js               indice dei capitoli auto-generato (navigazione)
   └─ _template-lezione.html  modello da copiare per una nuova lezione
 ```
 

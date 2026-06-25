@@ -78,4 +78,17 @@
       }
     }
   });
+
+  // Grafici SEMPRE visibili, dichiarativi: <div class="auto-plot" data-expr="…" …>
+  // Disegnati automaticamente al caricamento (stessi data-attributes di plotExpr).
+  function initAutoPlots() {
+    if (!window.Plt) return;
+    document.querySelectorAll('.auto-plot[data-expr]').forEach((el) => {
+      if (el.dataset.plotted) return;
+      Plt.plotExpr(el, el.dataset);
+      el.dataset.plotted = '1';
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initAutoPlots);
+  else initAutoPlots();
 })();
