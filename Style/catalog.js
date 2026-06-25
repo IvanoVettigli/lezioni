@@ -35,7 +35,6 @@ window.SITE_CATALOG = {
         { file: '4_Indeterminate.html', title: 'Le forme indeterminate', desc: 'Le 7 forme e le tecniche per risolverle, con 21 esercizi svolti' },
         { file: '5_Notevoli_gerarchia_infiniti.html', title: 'Limiti notevoli e gerarchia degli infiniti', desc: 'Limiti goniometrici, numero e, log/esp e ordini di infinito (col fattoriale)' },
       ] },
-      { folder: 'Informatica', year: null, title: 'Informatica', badge: 'Informatica', lessons: [] },
     ],
   },
 
@@ -46,7 +45,7 @@ window.SITE_CATALOG = {
       { folder: 'Fisica_3', year: 3, title: 'Terzo anno',   lessons: [] },
       { folder: 'Fisica_4', year: 4, title: 'Quarto anno',  lessons: [] },
       { folder: 'Fisica_5', year: 5, title: 'Quinto anno',  lessons: [] },
-      { folder: 'Laboratorio', year: null, title: 'Laboratorio', badge: '🧪 Laboratorio', meta: 'Schede PDF', lessons: [] },
+      { folder: 'Laboratorio', year: null, title: '🧪 Laboratorio', meta: 'Schede PDF', lessons: [] },
     ],
   },
 };

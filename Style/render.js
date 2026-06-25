@@ -20,11 +20,8 @@
         const n = y.lessons ? y.lessons.length : 0;
         // y.meta sovrascrive il conteggio lezioni (es. "Schede PDF" per il Laboratorio)
         const meta = y.meta || (n === 0 ? 'In preparazione' : n === 1 ? '1 lezione' : n + ' lezioni');
-        // y.badge sovrascrive l'etichetta della scheda (es. "Informatica", "Laboratorio")
-        const badge = y.badge || (y.year ? esc(subj.label) + ' · ' + y.year + '°' : esc(subj.label));
         return `
           <a class="year-card" href="${esc(y.folder)}/index.html">
-            <span class="yc-badge">${badge}</span>
             <span class="yc-title">${esc(y.title)}</span>
             <span class="yc-meta">${meta}</span>
           </a>`;
