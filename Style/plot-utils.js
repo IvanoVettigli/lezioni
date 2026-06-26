@@ -125,6 +125,7 @@
   //   data-exclude : valori di x esclusi (virgola) → asintoti verticali tratteggiati
   //   data-hole  : "x,y" → cerchietto vuoto (discontinuità eliminabile, es. forme 0/0)
   //   data-asym  : valore L → retta orizzontale tratteggiata (limite / asintoto orizzontale)
+  //   data-oblique : "m,q" → retta tratteggiata y = m·x + q (asintoto obliquo)
   function plotExpr(div, ds) {
     const xMin = parseFloat(ds.xmin != null ? ds.xmin : -6);
     const xMax = parseFloat(ds.xmax != null ? ds.xmax : 6);
@@ -137,9 +138,20 @@
     const ys = evalForPlot(ds.expr, xs, { yLimit: Math.max(Math.abs(yMin), Math.abs(yMax)) * 3 });
 
     const traces = [{
-      x: xs, y: ys, type: 'scatter', mode: 'lines',
+      x: xs, y: ys, type: 'scatter', mode: 'lines', name: 'f(x)',
       line: { color: c.curve, width: 2.5 }, connectgaps: false, hoverinfo: 'x+y',
     }];
+
+    // Curva della derivata f'(x) tratteggiata (data-deriv="espressione in x")
+    let showLegend = false;
+    if (ds.deriv) {
+      const dys = evalForPlot(ds.deriv, xs, { yLimit: Math.max(Math.abs(yMin), Math.abs(yMax)) * 3 });
+      traces.push({
+        x: xs, y: dys, type: 'scatter', mode: 'lines', name: "f '(x)",
+        line: { color: c.accent, width: 2, dash: 'dash' }, connectgaps: false, hoverinfo: 'x+y',
+      });
+      showLegend = true;
+    }
 
     if (excludes.length) {
       traces.push({
@@ -169,11 +181,21 @@
         line: { color: c.accent, width: 1.5, dash: 'dash' },
       });
     }
+    // Asintoto obliquo y = m x + q  (data-oblique="m,q")
+    if (ds.oblique) {
+      const ob = ds.oblique.split(',').map(Number);
+      shapes.push({
+        type: 'line', x0: xMin, x1: xMax, y0: ob[0] * xMin + ob[1], y1: ob[0] * xMax + ob[1],
+        line: { color: c.accent, width: 1.5, dash: 'dash' },
+      });
+    }
 
     draw(div, traces, {
       xaxis: { range: [xMin, xMax] },
       yaxis: { range: [yMin, yMax] },
       shapes,
+      showlegend: showLegend,
+      legend: { x: 0.02, y: 0.98, orientation: 'h' },
     });
   }
 

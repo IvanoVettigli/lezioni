@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 7 — Successioni e Serie</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quinto anno · Lezione 7</div>
+    <h1>Successioni e Serie</h1>
+    <p>Liste infinite di numeri, progressioni, il principio di induzione e le somme infinite</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quinto anno</a>
+    <span class="sep">/</span> Successioni e Serie
+  </nav>
+
+  <main>
+
+    <!-- 1 — PARADOSSO DI ZENONE -->
+    <section id="sec1">
+      <h2>1. Il paradosso di Zenone: l'infinito che converge</h2>
+      <p>Prima di costruire la teoria formale delle successioni e delle serie, partiamo da un enigma vecchio
+        di duemila anni. Al termine della lezione avremo tutti gli strumenti per risolverlo in tre modi diversi —
+        e capire perché l'intuizione di Zenone, pur geniale, era semplicemente sbagliata.</p>
+
+      <h3>1.1 — Il contesto filosofico</h3>
+      <p><strong>Zenone di Elea</strong> (~490–430 a.C.) era un filosofo greco e fedele allievo di
+        <strong>Parmenide</strong>, il quale sosteneva che la realtà è <em>una e immobile</em>: il moto che percepiamo è
+        solo apparenza. Per difendere il maestro, Zenone costruì una serie di paradossi il cui scopo era mostrare che
+        ammettere il moto conduce a contraddizioni. Il più celebre è quello di <strong>Achille e la tartaruga</strong>.</p>
+      <div class="joke"><strong>Il paradosso.</strong> Achille, il guerriero più veloce della Grecia, sfida una tartaruga
+        in una gara. Magnanimo, le concede un vantaggio di $10$ m. Achille corre $10$ volte più in fretta della
+        tartaruga. Eppure — argomenta Zenone — Achille non la raggiungerà <em>mai</em>.
+        <br><br>
+        Il ragionamento: per raggiungere la tartaruga, Achille deve prima arrivare dove lei <em>era</em>. Ma nel tempo
+        che lui impiega a farlo, la tartaruga si è spostata un po' avanti. Achille raggiunge quel nuovo punto; ma la
+        tartaruga è già oltre. E così via, all'infinito: restano sempre un passo da colmare.</div>
+
+      <p>In termini matematici: prima Achille copre $10\,\text{m}$, poi $1\,\text{m}$, poi $0{,}1\,\text{m}$, poi
+        $0{,}01\,\text{m}$, … I tempi impiegati sono $1\,\text{s},\;0{,}1\,\text{s},\;0{,}01\,\text{s},\;\dots$
+        Possono infiniti addendi di tempo sommarsi a un tempo <strong>finito</strong>?</p>
+
+      <h3>1.2 — Segui la gara passo per passo</h3>
+      <p>Dati: Achille parte da $x_A = 0$ a $v_A = 10\,\text{m/s}$; la tartaruga parte da
+        $x_T = 10\,\text{m}$ a $v_T = 1\,\text{m/s}$. Ogni colonna della tabella si compila avanzando di un passo.</p>
+
+      <div class="interactive-demo">
+        <div class="demo-title">Costruisci la gara passo per passo</div>
+        <div class="demo-controls" style="flex-wrap:wrap; gap:0.5rem; align-items:center;">
+          <button class="btn" id="zeno-prev">◀ Indietro</button>
+          <button class="btn btn-primary" id="zeno-next">Passo successivo ▶</button>
+          <label for="zeno-steps" style="margin-left:1rem;">oppure scegli direttamente:</label>
+          <input type="range" id="zeno-steps" min="0" max="9" step="1" value="0">
+          <span class="demo-value" id="zeno-steps-val">0</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span>Achille $x_A(t)=10t$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span>Tartaruga $x_T(t)=10+t$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#f5b400;"></span>checkpoint di Zenone</div>
+        </div>
+        <div class="demo-plot" id="zeno-pos-plot"></div>
+        <div class="table-container" style="margin-top:0.8rem;" id="zeno-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Passo</th>
+                <th>Achille parte da</th>
+                <th>Achille arriva a</th>
+                <th>Durata passo (s)</th>
+                <th>Tempo accumulato (s)</th>
+                <th>Tartaruga ora a</th>
+              </tr>
+            </thead>
+            <tbody id="zeno-tbody"></tbody>
+          </table>
+        </div>
+        <div class="demo-result" style="margin-top:0.6rem;">
+          Passo <strong><span id="zeno-step-n">0</span></strong>/9 —
+          tempo accumulato: <strong><span id="zeno-time-acc">0.0000</span></strong> s
+          (limite esatto: $\dfrac{10}{9} \approx 1{,}\overline{1}$ s,
+          posizione di incontro: $\dfrac{100}{9} \approx 11{,}\overline{1}$ m).
+        </div>
+      </div>
+
+      <h3>1.3 — Primo metodo: la serie geometrica</h3>
+      <p>I tempi dei singoli passi $1,\;\frac{1}{10},\;\frac{1}{100},\;\dots$ formano una progressione geometrica
+        di ragione $q = \tfrac{1}{10}$. La loro somma è una <strong>serie geometrica convergente</strong>:</p>
+      <div class="formula-box">$$T = 1 + \frac{1}{10} + \frac{1}{100} + \dots = \sum_{n=0}^{\infty}\!\left(\frac{1}{10}\right)^{\!n} = \frac{1}{1 - \tfrac{1}{10}} = \frac{10}{9}\,\text{s} \approx 1{,}\overline{1}\,\text{s.}$$</div>
+      <p>Infiniti passi, tempo <strong>finito</strong>. Zenone confondeva "infiniti addendi" con "somma infinita":
+        se gli addendi calano abbastanza in fretta, la loro somma converge a un numero preciso.</p>
+
+      <h3>1.4 — Secondo metodo: geometria analitica (intersezione di rette)</h3>
+      <p>Non serve la serie: basta fissare un sistema di riferimento e scrivere le posizioni come funzioni
+        lineari del tempo.</p>
+      <div class="steps">
+        <p><span class="step-num">1</span><strong>Legge di Achille:</strong> parte dall'origine con $v_A = 10\,\text{m/s}$,
+          quindi la sua posizione è la retta $$x_A(t) = 10\,t.$$</p>
+        <p><span class="step-num">2</span><strong>Legge della tartaruga:</strong> parte da $10\,\text{m}$ con
+          $v_T = 1\,\text{m/s}$, quindi $$x_T(t) = 10 + t.$$</p>
+        <p><span class="step-num">3</span><strong>Condizione di incontro:</strong> i due si trovano nello stesso
+          punto nello stesso istante, cioè quando $x_A = x_T$:
+          $$10\,t = 10 + t.$$</p>
+        <p><span class="step-num">4</span><strong>Risoluzione:</strong>
+          $$10t - t = 10 \;\Longrightarrow\; 9t = 10 \;\Longrightarrow\; \boxed{t^* = \frac{10}{9}\,\text{s}.}$$</p>
+        <p><span class="step-num">5</span><strong>Posizione di incontro:</strong>
+          $$x^* = x_A(t^*) = 10\cdot\frac{10}{9} = \frac{100}{9} \approx 11{,}\overline{1}\,\text{m.}$$
+          (Verifica: $x_T(t^*) = 10 + \frac{10}{9} = \frac{100}{9}$. ✓)</p>
+      </div>
+      <div class="interactive-demo">
+        <div class="demo-title">Le due rette si incontrano in un unico punto — la risposta è immediata</div>
+        <div class="demo-plot" id="zeno-lines-plot"></div>
+        <div class="demo-result">L'incrocio è in
+          $\bigl(\tfrac{10}{9}\,\text{s},\;\tfrac{100}{9}\,\text{m}\bigr) \approx (1{,}111\,\text{s},\;11{,}111\,\text{m})$.
+          La geometria analitica non ha bisogno di infiniti passi: il sistema di due equazioni ha una sola soluzione,
+          trovata in un colpo solo — eppure coincide perfettamente con la serie.</div>
+      </div>
+
+      <h3>1.5 — Terzo metodo: cinematica (velocità relativa)</h3>
+      <p>In fisica l'approccio più diretto è ragionare sulla <strong>velocità relativa</strong> di avvicinamento.</p>
+      <div class="steps">
+        <p><span class="step-num">1</span><strong>Dati nel sistema terra:</strong>
+          $v_A = 10\,\text{m/s}$, $v_T = 1\,\text{m/s}$, distanza iniziale $d_0 = 10\,\text{m}$.</p>
+        <p><span class="step-num">2</span><strong>Velocità relativa di avvicinamento:</strong> ogni secondo Achille
+          guadagna $v_A - v_T = 10 - 1 = 9\,\text{m}$ sulla tartaruga, quindi
+          $$v_{rel} = v_A - v_T = 9\,\text{m/s}.$$</p>
+        <p><span class="step-num">3</span><strong>Tempo di incontro:</strong> il gap si annulla in
+          $$\boxed{t^* = \frac{d_0}{v_{rel}} = \frac{10\,\text{m}}{9\,\text{m/s}} = \frac{10}{9}\,\text{s.}}$$</p>
+        <p><span class="step-num">4</span><strong>Cambio di riferimento (variante):</strong> nel sistema solidale
+          alla tartaruga, quest'ultima è ferma e Achille avanza a $9\,\text{m/s}$ su una distanza di $10\,\text{m}$:
+          stesso conto, risultato identico.</p>
+        <p><span class="step-num">5</span><strong>Posizione:</strong>
+          $x^* = v_A\cdot t^* = 10\cdot\tfrac{10}{9} = \tfrac{100}{9}\,\text{m.}$ ✓</p>
+      </div>
+      <div class="rule"><strong>Tre metodi, un solo risultato: $t^* = \dfrac{10}{9}\,\text{s}$.</strong>
+        La <em>serie geometrica</em> scompone il problema in infiniti passi e li somma;
+        la <em>geometria analitica</em> trova l'intersezione delle rette direttamente;
+        la <em>cinematica</em> usa la velocità relativa per saltare al risultato.
+        Il paradosso di Zenone era un limite dell'intuizione, non della realtà:
+        infiniti addendi decrescenti possono avere somma finita — ed è questa l'idea che guida
+        l'intera lezione sulle successioni e le serie.</div>
+    </section>
+
+    <!-- 2 — COS'È UNA SUCCESSIONE -->
+    <section id="sec2">
+      <h2>2. Che cos'è una successione</h2>
+      <p>Pensa a una fila ordinata e <strong>infinita</strong> di numeri, uno dopo l'altro:</p>
+      <div class="formula-box">$$1,\; \tfrac{1}{2},\; \tfrac{1}{3},\; \tfrac{1}{4},\; \tfrac{1}{5},\; \dots$$</div>
+      <p>Ogni numero ha una <em>posizione</em> precisa: c'è il primo, il secondo, il terzo... A ogni numero naturale
+        $n$ corrisponde un valore. Questo è esattamente il cuore dell'idea di <strong>successione</strong>.</p>
+
+      <div class="definition">
+        Una <strong>successione</strong> (di numeri reali) è una funzione che a ogni numero naturale associa un numero reale:
+        $$a : \mathbb{N} \to \mathbb{R}, \qquad n \longmapsto a_n.$$
+        Il valore $a_n$ si chiama <strong>termine $n$-esimo</strong> (o termine generale). L'intera successione si indica con
+        $(a_n)_{n \in \mathbb{N}}$ oppure semplicemente $(a_n)$.
+      </div>
+
+      <div class="rule">La differenza con una funzione "normale" $f:\mathbb{R}\to\mathbb{R}$ è il <strong>dominio</strong>:
+        una successione è definita <em>solo sugli interi</em>. Per questo il suo grafico non è una curva continua, ma una
+        <strong>nuvola di punti isolati</strong>, uno per ogni $n$.</div>
+
+      <div class="interactive-demo">
+        <div class="demo-title">Visualizza una successione: i suoi termini sono punti</div>
+        <div class="demo-controls">
+          <label for="seqA-pick">successione:</label>
+          <select id="seqA-pick">
+            <option value="inv">aₙ = 1/n</option>
+            <option value="npos">aₙ = n/(n+1)</option>
+            <option value="altinv">aₙ = (−1)ⁿ / n</option>
+            <option value="euler">aₙ = (1 + 1/n)ⁿ</option>
+            <option value="osc">aₙ = (−1)ⁿ</option>
+          </select>
+          <label for="seqA-n" style="margin-left:1rem;">termini mostrati N:</label>
+          <input type="range" id="seqA-n" min="5" max="40" step="1" value="15">
+          <span class="demo-value" id="seqA-n-val">15</span>
+        </div>
+        <div class="demo-plot" id="seqA-plot"></div>
+        <div class="demo-result">Stai osservando <strong><span id="seqA-label">aₙ = 1/n</span></strong>:
+          <span id="seqA-note">converge a 0</span>. I punti si avvicinano alla retta tratteggiata (il limite della
+          successione) man mano che $n$ cresce — esattamente l'idea di limite, ma sugli interi.</div>
+      </div>
+
+      <p>Quando i termini si "stabilizzano" attorno a un valore $L$, scriviamo $\displaystyle\lim_{n \to +\infty} a_n = L$
+        e diciamo che la successione <strong>converge</strong> a $L$. Se invece crescono oltre ogni limite, <em>diverge</em>;
+        se saltellano senza meta (come $(-1)^n$), <em>non ammette limite</em>.</p>
+    </section>
+
+    <!-- 2 — RAPPRESENTARE UNA SUCCESSIONE -->
+    <section id="sec3">
+      <h2>3. Come si rappresenta una successione</h2>
+      <p>Una stessa successione si può descrivere in tre modi complementari.</p>
+
+      <div class="card-row">
+        <div class="card">
+          <h4>① Per elencazione</h4>
+          <p>Si scrivono i primi termini, lasciando intuire la regola: $$2,\,4,\,6,\,8,\,10,\,\dots$$ Comodo per "vedere"
+            l'andamento, ma ambiguo: i puntini vanno interpretati.</p>
+        </div>
+        <div class="card">
+          <h4>② Termine generale (forma esplicita)</h4>
+          <p>Una formula che dà $a_n$ in funzione di $n$: $$a_n = 2n.$$ Permette di calcolare <em>qualunque</em> termine
+            subito, ad es. $a_{100} = 200$, senza conoscere i precedenti.</p>
+        </div>
+        <div class="card">
+          <h4>③ Per ricorrenza</h4>
+          <p>Si dà il primo termine e una regola che lega ogni termine al precedente:
+            $$a_1 = 2,\qquad a_{n} = a_{n-1} + 2.$$ Naturale, ma per avere $a_{100}$ devi calcolare tutti i precedenti.</p>
+        </div>
+      </div>
+
+      <div class="note"><strong>Esplicita vs ricorsiva.</strong> La forma esplicita è una "scorciatoia" che salta
+        direttamente alla posizione $n$; la ricorsiva descrive il <em>meccanismo</em> di costruzione. Spesso il bello della
+        matematica è trovare la formula esplicita partendo da quella ricorsiva (lo faremo con le progressioni).</div>
+    </section>
+
+    <!-- 3 — PROGRESSIONE ARITMETICA -->
+    <section id="sec4">
+      <h2>4. Progressioni aritmetiche</h2>
+      <p>Una <strong>progressione aritmetica</strong> è una successione in cui si passa da un termine al successivo
+        <em>sommando sempre la stessa quantità</em> $d$, detta <strong>ragione</strong>.</p>
+      <div class="definition">
+        $$a_n = a_{n-1} + d \quad\Longleftrightarrow\quad a_n - a_{n-1} = d \;\text{ (costante).}$$
+        Da cui la <strong>forma esplicita</strong>: partendo da $a_1$ e aggiungendo $d$ per $(n-1)$ volte,
+        $$\boxed{\,a_n = a_1 + (n-1)\,d\,}.$$
+      </div>
+      <p>Il grafico dei termini è fatto di punti <strong>allineati</strong>: la successione cresce (o cala) in modo
+        <em>lineare</em>, con "pendenza" $d$.</p>
+
+      <div class="interactive-demo">
+        <div class="demo-title">Costruisci una progressione aritmetica</div>
+        <div class="demo-controls">
+          <label for="ari-a1">primo termine a₁:</label>
+          <input type="range" id="ari-a1" min="-6" max="6" step="1" value="2">
+          <span class="demo-value" id="ari-a1-val">2</span>
+          <label for="ari-d" style="margin-left:1rem;">ragione d:</label>
+          <input type="range" id="ari-d" min="-3" max="3" step="0.5" value="1.5">
+          <span class="demo-value" id="ari-d-val">1.5</span>
+        </div>
+        <div class="demo-plot" id="ari-plot"></div>
+        <div class="demo-result">Formula: $a_n = $ <strong><span id="ari-formula">2 + (n−1)·1.5</span></strong>.
+          Primi termini: <span id="ari-terms">2; 3.5; 5; 6.5; …</span> &nbsp;·&nbsp; i punti stanno tutti su una retta di
+          pendenza $d$.</div>
+      </div>
+
+      <div class="rule"><strong>Determinare i termini noti alcuni elementi.</strong> Da due termini qualsiasi $a_p$ e $a_q$
+        si ricava la ragione: $$d = \frac{a_q - a_p}{q - p},$$ perché $a_q - a_p = (q-p)\,d$. Trovata $d$, si ricava $a_1$ e
+        quindi qualunque altro termine.</div>
+
+      <h3>4.1 — Esercizi</h3>
+
+      <div class="exercise" data-expr="3*x-1" data-xmin="0" data-xmax="12" data-ymin="-2" data-ymax="38">
+        <div class="ex-header"><span class="ex-title">Esercizio 3.1</span><span class="difficulty easy">Facile</span></div>
+        <p>In una progressione aritmetica $a_1 = 2$ e $d = 3$. Scrivi la forma esplicita e calcola $a_{10}$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Forma esplicita:</strong> $a_n = a_1 + (n-1)d = 2 + (n-1)\cdot 3 = 3n - 1$.</p>
+          <p><span class="step-num">2</span><strong>Decimo termine:</strong> $a_{10} = 3\cdot 10 - 1 = 29$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$a_n = 3n - 1$, &nbsp; $a_{10} = 29$.</span></div>
+          <p style="font-size:0.88rem; opacity:0.8;">La retta nel grafico è il "trend" $y = 3x - 1$; i termini veri sono i suoi punti interi $n = 1, 2, 3, \dots$</p>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="3*x-2" data-xmin="0" data-xmax="12" data-ymin="-2" data-ymax="38">
+        <div class="ex-header"><span class="ex-title">Esercizio 3.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Di una progressione aritmetica si sa che $a_3 = 7$ e $a_7 = 19$. Trova $d$, $a_1$ e $a_{10}$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Ragione:</strong> $d = \dfrac{a_7 - a_3}{7 - 3} = \dfrac{19 - 7}{4} = 3$.</p>
+          <p><span class="step-num">2</span><strong>Primo termine:</strong> da $a_3 = a_1 + 2d$ segue $a_1 = 7 - 2\cdot 3 = 1$.</p>
+          <p><span class="step-num">3</span><strong>Formula e termine:</strong> $a_n = 1 + (n-1)\cdot 3 = 3n - 2$, quindi $a_{10} = 28$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$d = 3$, &nbsp; $a_1 = 1$, &nbsp; $a_{10} = 28$.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — PROGRESSIONE GEOMETRICA -->
+    <section id="sec5">
+      <h2>5. Progressioni geometriche</h2>
+      <p>In una <strong>progressione geometrica</strong> si passa da un termine al successivo <em>moltiplicando sempre per
+        la stessa quantità</em> $q$, detta <strong>ragione</strong> (qui $q \neq 0$).</p>
+      <div class="definition">
+        $$a_n = a_{n-1}\cdot q \quad\Longleftrightarrow\quad \frac{a_n}{a_{n-1}} = q \;\text{ (costante).}$$
+        Forma esplicita (moltiplicando $a_1$ per $q$ per $(n-1)$ volte):
+        $$\boxed{\,a_n = a_1 \cdot q^{\,n-1}\,}.$$
+      </div>
+      <p>Qui la crescita non è lineare ma <strong>esponenziale</strong>: se $|q| > 1$ i termini esplodono, se $|q| < 1$
+        si schiacciano verso $0$, se $q < 0$ il segno si alterna a ogni passo.</p>
+
+      <div class="interactive-demo">
+        <div class="demo-title">Costruisci una progressione geometrica</div>
+        <div class="demo-controls">
+          <label for="geo-a1">primo termine a₁:</label>
+          <input type="range" id="geo-a1" min="0.5" max="4" step="0.5" value="1">
+          <span class="demo-value" id="geo-a1-val">1</span>
+          <label for="geo-q" style="margin-left:1rem;">ragione q:</label>
+          <input type="range" id="geo-q" min="-2" max="2.5" step="0.1" value="1.5">
+          <span class="demo-value" id="geo-q-val">1.5</span>
+        </div>
+        <div class="demo-plot" id="geo-plot"></div>
+        <div class="demo-result">Formula: $a_n = $ <strong><span id="geo-formula">1 · 1.5ⁿ⁻¹</span></strong>.
+          Comportamento: <span id="geo-note">cresce (|q| &gt; 1)</span>.</div>
+      </div>
+
+      <div class="rule"><strong>Determinare i termini noti alcuni elementi.</strong> Da due termini $a_p$ e $a_q$ si ricava
+        $$q^{\,q-p} = \frac{a_q}{a_p},$$ perché $a_q = a_p\, q^{\,q-p}$. Estratta la radice si trova $q$, poi $a_1$ e ogni termine.</div>
+
+      <h3>5.1 — Esercizi</h3>
+
+      <div class="exercise" data-expr="3*2^(x-1)" data-xmin="1" data-xmax="7" data-ymin="0" data-ymax="110">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.1</span><span class="difficulty easy">Facile</span></div>
+        <p>In una progressione geometrica $a_1 = 3$ e $q = 2$. Scrivi la forma esplicita e calcola $a_6$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Forma esplicita:</strong> $a_n = a_1\, q^{n-1} = 3\cdot 2^{\,n-1}$.</p>
+          <p><span class="step-num">2</span><strong>Sesto termine:</strong> $a_6 = 3\cdot 2^{5} = 3\cdot 32 = 96$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$a_n = 3\cdot 2^{\,n-1}$, &nbsp; $a_6 = 96$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="3*2^(x-1)" data-xmin="1" data-xmax="9" data-ymin="0" data-ymax="420">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Di una progressione geometrica si sa che $a_2 = 6$ e $a_5 = 48$. Trova $q$, $a_1$ e $a_8$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Ragione:</strong> $q^{5-2} = \dfrac{a_5}{a_2} = \dfrac{48}{6} = 8$, quindi $q^3 = 8 \Rightarrow q = 2$.</p>
+          <p><span class="step-num">2</span><strong>Primo termine:</strong> da $a_2 = a_1\, q$ segue $a_1 = \dfrac{6}{2} = 3$.</p>
+          <p><span class="step-num">3</span><strong>Ottavo termine:</strong> $a_8 = 3\cdot 2^{7} = 3\cdot 128 = 384$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$q = 2$, &nbsp; $a_1 = 3$, &nbsp; $a_8 = 384$.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — SOMMA DEI PRIMI n TERMINI -->
+    <section id="sec6">
+      <h2>6. La somma dei primi $n$ termini</h2>
+      <p>Spesso non interessa il singolo termine, ma la <strong>somma</strong> dei primi $n$:
+        $$S_n = a_1 + a_2 + \dots + a_n.$$ C'è una storia famosa che insegna il trucco.</p>
+
+      <div class="joke"><strong>L'aneddoto di Gauss.</strong> Si racconta che intorno al 1785, in una scuola elementare
+        tedesca, il maestro — per tenere occupata la classe — ordinò di sommare tutti i numeri da $1$ a $100$. Pochi secondi
+        dopo, il piccolo <strong>Carl Friedrich Gauss</strong> (allora circa 9 anni) posò la lavagnetta sul tavolo con un
+        solo numero scritto: <strong>5050</strong>. Aveva capito una cosa geniale.</div>
+
+      <h3>6.1 — Il trucco di Gauss (somma dei primi $n$ naturali)</h3>
+      <p>Gauss non sommò in fila. Accoppiò il primo con l'ultimo, il secondo con il penultimo, e così via:</p>
+      <div class="formula-box">$$\underbrace{(1 + 100)}_{101} + \underbrace{(2 + 99)}_{101} + \underbrace{(3 + 98)}_{101} + \dots = 101 \times 50 = 5050.$$</div>
+      <p>Ci sono $50$ coppie, ognuna vale $101$. In generale, sommando $1 + 2 + \dots + n$ ci sono $\frac{n}{2}$ coppie che
+        valgono $(n+1)$ ciascuna:</p>
+      <div class="definition">Somma dei primi $n$ numeri naturali:
+        $$\boxed{\;1 + 2 + 3 + \dots + n = \frac{n(n+1)}{2}\;}$$</div>
+
+      <div class="interactive-demo">
+        <div class="demo-title">Il trucco di Gauss, visto a blocchi</div>
+        <div class="demo-controls">
+          <label for="gauss-n">n:</label>
+          <input type="range" id="gauss-n" min="2" max="15" step="1" value="6">
+          <span class="demo-value" id="gauss-n-val">6</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span>$1, 2, \dots, n$ (crescente)</div>
+          <div class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span>$n, \dots, 2, 1$ (decrescente)</div>
+        </div>
+        <div class="demo-plot" id="gauss-plot"></div>
+        <div class="demo-result">Affiancando la successione e la sua "specchiata", ogni colonna somma esattamente
+          $n+1 = $<strong><span id="gauss-col">7</span></strong>. Le colonne sono $n = $<span id="gauss-cols">6</span>,
+          quindi il doppio della somma è $n(n+1) = $<span id="gauss-double">42</span> e
+          $S_n = \dfrac{n(n+1)}{2} = $<strong><span id="gauss-sum">21</span></strong>.</div>
+      </div>
+
+      <h3>6.2 — Somma di una progressione aritmetica</h3>
+      <p>Lo stesso trucco "primo + ultimo" funziona per <em>ogni</em> progressione aritmetica:</p>
+      <div class="definition">$$S_n = \frac{(a_1 + a_n)\, n}{2}.$$ "Media tra primo e ultimo termine, moltiplicata per quanti
+        sono". La somma di Gauss è il caso $a_1 = 1$, $a_n = n$.</div>
+
+      <h3>6.3 — Somma di una progressione geometrica</h3>
+      <div class="definition">Per $q \neq 1$:
+        $$S_n = a_1 \cdot \frac{q^{\,n} - 1}{q - 1}.$$</div>
+      <div class="note"><strong>Da dove viene.</strong> Sia $S_n = a_1 + a_1 q + \dots + a_1 q^{n-1}$. Moltiplicando per $q$
+        e sottraendo, quasi tutto si cancella: $\;S_n - q\,S_n = a_1 - a_1 q^{n}$, da cui
+        $S_n(1-q) = a_1(1 - q^{n})$ e la formula. Questo "telescopio" tornerà utile nelle serie.</div>
+
+      <h3>6.4 — Esercizi</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola $1 + 2 + 3 + \dots + 100$ e poi $1 + 2 + \dots + 1000$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Con la formula di Gauss, $S_{100} = \dfrac{100\cdot 101}{2} = 50\cdot 101 = 5050$.</p>
+          <p><span class="step-num">2</span>Analogamente $S_{1000} = \dfrac{1000\cdot 1001}{2} = 500\cdot 1001 = 500500$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$5050$ &nbsp; e &nbsp; $500\,500$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Somma i primi $6$ termini della progressione geometrica con $a_1 = 2$ e $q = 3$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>I termini sono $2,\,6,\,18,\,54,\,162,\,486$.</p>
+          <p><span class="step-num">2</span>Con la formula: $S_6 = a_1\cdot \dfrac{q^6 - 1}{q - 1} = 2\cdot \dfrac{3^6 - 1}{3 - 1} = 2\cdot \dfrac{729 - 1}{2} = 728$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$S_6 = 728$.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — DIMOSTRARE IN MATEMATICA: ASSURDO E INDUZIONE -->
+    <section id="sec7">
+      <h2>7. Dimostrare in matematica: l'assurdo e l'induzione</h2>
+      <p>Nella lezione sui limiti abbiamo già incontrato la parola <strong>teorema</strong>. Riprendiamo il concetto, perché
+        qui ci serve uno strumento di dimostrazione nuovo e potentissimo per le successioni.</p>
+
+      <h3>7.1 — Che cos'è una dimostrazione</h3>
+      <p>Una <strong>dimostrazione</strong> è una catena di passaggi logici che, partendo da cose già accettate come vere
+        (<em>ipotesi</em>, definizioni, teoremi precedenti), conduce con certezza assoluta a una nuova verità (la
+        <em>tesi</em>). In matematica non basta "verificare in molti casi": occorre garantire che valga <strong>sempre</strong>.</p>
+      <div class="warning"><strong>Un esempio della trappola dei casi.</strong> Il polinomio $n^2 + n + 41$ dà numeri primi
+        per $n = 0, 1, 2, \dots, 39$: quaranta successi di fila! Eppure per $n = 40$ vale $40^2 + 40 + 41 = 41^2$, che primo
+        non è. Una congettura "verificata tante volte" può essere falsa: serve la dimostrazione.</div>
+
+      <h3>7.2 — Le principali tecniche di dimostrazione</h3>
+      <div class="card-row">
+        <div class="card"><h4>Diretta</h4><p>Si parte dalle ipotesi e, passo dopo passo, si arriva alla tesi.</p></div>
+        <div class="card"><h4>Per assurdo</h4><p>Si nega la tesi e si mostra che ciò porta a una contraddizione: quindi la tesi è vera.</p></div>
+        <div class="card"><h4>Per induzione</h4><p>Per affermazioni su <em>tutti</em> i naturali: si prova il primo caso e l'"effetto domino".</p></div>
+        <div class="card"><h4>Controesempio</h4><p>Per <em>smentire</em> un'affermazione universale basta un solo caso in cui è falsa.</p></div>
+      </div>
+
+      <h3>7.3 — La dimostrazione per assurdo: $\sqrt{2}$ è irrazionale</h3>
+      <p>È forse la più celebre dimostrazione per assurdo della storia (risale ai Pitagorici).</p>
+      <div class="steps">
+        <p><strong>Tesi:</strong> $\sqrt{2}$ non si può scrivere come frazione di interi.</p>
+        <p><span class="step-num">1</span><strong>Neghiamo la tesi:</strong> supponiamo che $\sqrt{2} = \dfrac{p}{q}$ con
+          $p, q$ interi e la frazione <em>ridotta ai minimi termini</em> (nessun fattore comune).</p>
+        <p><span class="step-num">2</span>Elevando al quadrato: $2 = \dfrac{p^2}{q^2}$, cioè $p^2 = 2q^2$. Allora $p^2$ è
+          pari, quindi anche $p$ è pari: scriviamo $p = 2k$.</p>
+        <p><span class="step-num">3</span>Sostituendo: $(2k)^2 = 2q^2 \Rightarrow 4k^2 = 2q^2 \Rightarrow q^2 = 2k^2$. Allora
+          anche $q^2$ è pari, quindi $q$ è pari.</p>
+        <p><span class="step-num">4</span><strong>Contraddizione:</strong> $p$ e $q$ sono entrambi pari, ma avevamo detto
+          che la frazione era ridotta ai minimi termini! Assurdo.</p>
+        <p><span class="step-num">5</span>L'ipotesi iniziale era falsa: $\sqrt{2}$ <strong>non</strong> è una frazione, cioè
+          è irrazionale.</p>
+        <p style="text-align:right; font-weight:700; margin-top:0.5rem;">∎</p>
+      </div>
+
+      <h3>7.4 — Il principio di induzione: l'effetto domino</h3>
+      <p>Immagina infiniti tessere del domino in fila. Per essere sicuro che <em>tutte</em> cadano basta garantire due cose:</p>
+      <div class="card-row">
+        <div class="card"><h4>① Base</h4><p>La <strong>prima</strong> tessera cade. (L'affermazione $P(1)$ è vera.)</p></div>
+        <div class="card"><h4>② Passo induttivo</h4><p>Ogni tessera che cade <strong>fa cadere la successiva</strong>. (Se vale
+          $P(k)$, allora vale $P(k+1)$.)</p></div>
+      </div>
+      <div class="theorem"><strong>Principio di induzione.</strong> Sia $P(n)$ un'affermazione che dipende dal naturale $n$.
+        Se:
+        <ol>
+          <li><strong>(base)</strong> $P(1)$ è vera, e</li>
+          <li><strong>(passo)</strong> per ogni $k$, da $P(k)$ vera segue $P(k+1)$ vera,</li>
+        </ol>
+        allora $P(n)$ è vera per <strong>ogni</strong> $n \geq 1$.</div>
+      <p>L'ipotesi "$P(k)$ è vera" usata nel passo si chiama <strong>ipotesi induttiva</strong>: è la tessera precedente su
+        cui ci appoggiamo per far cadere la successiva.</p>
+
+      <h3>7.5 — Induzione in azione: la formula di Gauss</h3>
+      <p>Dimostriamo <em>rigorosamente</em> che $P(n): \; 1 + 2 + \dots + n = \dfrac{n(n+1)}{2}$ vale per ogni $n$.</p>
+      <div class="steps">
+        <p><span class="step-num">1</span><strong>Base $P(1)$:</strong> a sinistra $1$; a destra $\dfrac{1\cdot 2}{2} = 1$. Vera. ✓</p>
+        <p><span class="step-num">2</span><strong>Ipotesi induttiva:</strong> supponiamo vera $P(k)$, cioè
+          $1 + 2 + \dots + k = \dfrac{k(k+1)}{2}$.</p>
+        <p><span class="step-num">3</span><strong>Passo $P(k) \Rightarrow P(k+1)$:</strong> aggiungiamo $(k+1)$ a entrambi i membri:
+          $$1 + 2 + \dots + k + (k+1) = \frac{k(k+1)}{2} + (k+1).$$</p>
+        <p><span class="step-num">4</span>Raccogliamo $(k+1)$:
+          $$\frac{k(k+1)}{2} + (k+1) = (k+1)\!\left(\frac{k}{2} + 1\right) = (k+1)\cdot\frac{k+2}{2} = \frac{(k+1)(k+2)}{2}.$$</p>
+        <p><span class="step-num">5</span>Questa è esattamente $P(k+1)$ (la formula con $k+1$ al posto di $n$). Il passo è
+          dimostrato: per induzione $P(n)$ vale per ogni $n$.</p>
+        <p style="text-align:right; font-weight:700; margin-top:0.5rem;">∎</p>
+      </div>
+
+      <div class="interactive-demo">
+        <div class="demo-title">L'induzione, vista: i punti della somma stanno sulla parabola $\frac{n(n+1)}{2}$</div>
+        <div class="demo-controls">
+          <label for="ind-n">verifica fino a n:</label>
+          <input type="range" id="ind-n" min="1" max="20" step="1" value="6">
+          <span class="demo-value" id="ind-n-val">6</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span>somma reale $S_n = 1+2+\dots+n$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>formula $\dfrac{n(n+1)}{2}$</div>
+        </div>
+        <div class="demo-plot" id="ind-plot"></div>
+        <div class="demo-result">Ogni pallino rosso (la somma calcolata a mano) cade <strong>esattamente</strong> sulla
+          curva verde della formula. L'induzione garantisce che sarà così per <em>ogni</em> $n$, non solo per quelli
+          mostrati.</div>
+      </div>
+
+      <h3>7.6 — Esercizi di induzione</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 6.1</span><span class="difficulty medium">Medio</span></div>
+        <p>Dimostra per induzione che la somma dei primi $n$ numeri dispari è $n^2$:
+          $$1 + 3 + 5 + \dots + (2n-1) = n^2.$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Base $P(1)$:</strong> a sinistra $1$; a destra $1^2 = 1$. Vera.</p>
+          <p><span class="step-num">2</span><strong>Ipotesi induttiva:</strong> $1 + 3 + \dots + (2k-1) = k^2$.</p>
+          <p><span class="step-num">3</span><strong>Passo:</strong> il dispari successivo è $2(k+1) - 1 = 2k+1$. Sommandolo:
+            $$1 + 3 + \dots + (2k-1) + (2k+1) = k^2 + (2k+1) = (k+1)^2.$$</p>
+          <p><span class="step-num">4</span>È $P(k+1)$. Per induzione vale per ogni $n$.</p>
+          <div class="result-box"><span class="result-label">Conclusione</span><span class="result-value">$1 + 3 + \dots + (2n-1) = n^2$ per ogni $n \geq 1$. ∎</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 6.2</span><span class="difficulty hard">Difficile</span></div>
+        <p>Dimostra per induzione che $1 + 2 + 4 + \dots + 2^{\,n-1} = 2^{\,n} - 1$ (somma delle potenze di $2$).</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Base $P(1)$:</strong> a sinistra $2^{0} = 1$; a destra $2^{1} - 1 = 1$. Vera.</p>
+          <p><span class="step-num">2</span><strong>Ipotesi induttiva:</strong> $1 + 2 + \dots + 2^{k-1} = 2^{k} - 1$.</p>
+          <p><span class="step-num">3</span><strong>Passo:</strong> aggiungiamo il termine successivo $2^{k}$:
+            $$\big(2^{k} - 1\big) + 2^{k} = 2\cdot 2^{k} - 1 = 2^{\,k+1} - 1.$$</p>
+          <p><span class="step-num">4</span>È $P(k+1)$. Per induzione vale per ogni $n$.</p>
+          <div class="result-box"><span class="result-label">Conclusione</span><span class="result-value">$\displaystyle\sum_{i=0}^{n-1} 2^{i} = 2^{n} - 1$. ∎ &nbsp; (È la somma geometrica con $a_1=1, q=2$.)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — SUCCESSIONI FAMOSE -->
+    <section id="sec8">
+      <h2>8. Successioni famose</h2>
+      <p>Abbiamo già conosciuto due grandi protagoniste — la progressione <strong>aritmetica</strong> (passo additivo
+        costante) e la <strong>geometrica</strong> (passo moltiplicativo costante). Ne manca una leggendaria.</p>
+
+      <h3>8.1 — La successione di Fibonacci</h3>
+      <p>Definita per ricorrenza nel 1202 da <strong>Leonardo Fibonacci</strong> per modellare la crescita di una
+        popolazione di conigli: ogni termine è la <strong>somma dei due precedenti</strong>.</p>
+      <div class="definition">$$F_1 = 1,\quad F_2 = 1,\qquad F_n = F_{n-1} + F_{n-2}.$$
+        Primi termini: $1,\,1,\,2,\,3,\,5,\,8,\,13,\,21,\,34,\,55,\,89,\,\dots$</div>
+      <p>La meraviglia: il <strong>rapporto</strong> tra un termine e il precedente, $\dfrac{F_{n+1}}{F_n}$, si avvicina
+        sempre di più a un numero celebre, la <strong>sezione aurea</strong>
+        $\varphi = \dfrac{1 + \sqrt{5}}{2} \approx 1{,}618$.</p>
+
+      <div class="interactive-demo">
+        <div class="demo-title">Fibonacci: il rapporto tra termini consecutivi tende a $\varphi$</div>
+        <div class="demo-controls">
+          <label for="fib-n">termini:</label>
+          <input type="range" id="fib-n" min="3" max="18" step="1" value="10">
+          <span class="demo-value" id="fib-n-val">10</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span>rapporto $F_{n+1}/F_n$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#f5b400;"></span>sezione aurea $\varphi \approx 1.618$</div>
+        </div>
+        <div class="demo-plot" id="fib-plot"></div>
+        <div class="demo-result">Termini di Fibonacci: <span id="fib-terms">1, 1, 2, 3, 5, 8, 13, 21, 34, 55</span>.
+          Ultimo rapporto calcolato: $F_{n+1}/F_n \approx$ <strong><span id="fib-ratio">1.6180</span></strong>, già
+          vicinissimo a $\varphi \approx 1.6180$.</div>
+      </div>
+
+      <div class="note"><strong>Aritmetica vs geometrica vs Fibonacci.</strong> Tre meccanismi diversi: l'aritmetica somma
+        una costante (crescita lineare), la geometrica moltiplica per una costante (crescita esponenziale), Fibonacci somma
+        i due termini precedenti (crescita "quasi" geometrica, con ragione $\varphi$). Puoi confrontarne l'andamento usando
+        gli slider delle demo precedenti.</div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 7.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Usando la regola $F_n = F_{n-1} + F_{n-2}$ con $F_1 = F_2 = 1$, calcola $F_9$ e $F_{10}$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Costruiamo in fila: $F_3 = 2,\; F_4 = 3,\; F_5 = 5,\; F_6 = 8,\; F_7 = 13,\; F_8 = 21$.</p>
+          <p><span class="step-num">2</span>$F_9 = F_8 + F_7 = 21 + 13 = 34$.</p>
+          <p><span class="step-num">3</span>$F_{10} = F_9 + F_8 = 34 + 21 = 55$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$F_9 = 34$, &nbsp; $F_{10} = 55$.</span></div>
+        </div>
+      </div>
+
+      <h3>8.2 — La sezione aurea nel pentagono</h3>
+      <p>La sezione aurea non vive solo nei conigli di Fibonacci: è nascosta nella geometria del <strong>pentagono
+        regolare</strong>. Tracciando le sue cinque diagonali si forma una stella a cinque punte (il
+        <em>pentagramma</em>), e accade una cosa notevole: il rapporto tra la <strong>diagonale</strong> e il
+        <strong>lato</strong> è esattamente $\varphi$.</p>
+      <div class="formula-box">$$\frac{d}{s} = \frac{\text{diagonale}}{\text{lato}} = \varphi = \frac{1+\sqrt5}{2} \approx 1{,}618.$$</div>
+      <p>Non solo: le diagonali, intersecandosi, disegnano al loro interno un pentagono più piccolo, in cui si può
+        tracciare un nuovo pentagramma, e così via all'infinito. Ogni stella è una copia in scala della precedente,
+        rimpicciolita del fattore $1/\varphi^2$: un'<strong>autosimilarità</strong> governata dalla sezione aurea.</p>
+
+      <div class="interactive-demo">
+        <div class="demo-title">Il pentagramma e i suoi pentagoni annidati</div>
+        <div class="demo-controls">
+          <label for="penta-levels">stelle annidate:</label>
+          <input type="range" id="penta-levels" min="1" max="6" step="1" value="3">
+          <span class="demo-value" id="penta-levels-val">3</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>lato $s$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span>diagonale $d$</div>
+        </div>
+        <div class="demo-plot" id="penta-plot"></div>
+        <div class="demo-result">Il lato verde e la diagonale rossa stanno nel rapporto $d/s = \varphi$. A ogni livello
+          la stella si ripete identica, scalata di $1/\varphi^2 \approx 0{,}382$: la firma della sezione aurea.</div>
+      </div>
+
+      <h3>8.3 — La sezione aurea in natura e architettura</h3>
+      <p>Proprio perché lega crescita e proporzione, la sezione aurea (e i numeri di Fibonacci) ricorre in moltissimi
+        fenomeni naturali e in numerose opere dell'uomo.</p>
+      <div class="card-row">
+        <div class="card"><h4>🌻 In natura</h4><p>I semi del girasole, le squame dell'ananas e le brattee delle pigne si
+          dispongono secondo l'<strong>angolo aureo</strong> ($\approx 137{,}5°$); il numero di spirali è spesso un numero
+          di Fibonacci. Anche la disposizione delle foglie (fillotassi) e molte conchiglie a spirale seguono questo schema.</p></div>
+        <div class="card"><h4>🏛️ Architettura e arte</h4><p>Dal <em>Partenone</em> alle cattedrali gotiche, dal
+          <em>Modulor</em> di Le Corbusier alle proporzioni studiate da Leonardo (l'<em>Uomo Vitruviano</em>): la
+          proporzione aurea è stata usata come canone di armonia ed equilibrio visivo.</p></div>
+      </div>
+
+      <div class="interactive-demo">
+        <div class="demo-title">L'angolo aureo: perché il girasole "impacchetta" così bene i semi</div>
+        <div class="demo-controls">
+          <label for="phyl-ang">angolo tra semi (°):</label>
+          <input type="range" id="phyl-ang" min="130" max="145" step="0.1" value="137.5">
+          <span class="demo-value" id="phyl-ang-val">137.5</span>
+          <label for="phyl-n" style="margin-left:1rem;">numero di semi:</label>
+          <input type="range" id="phyl-n" min="50" max="600" step="10" value="350">
+          <span class="demo-value" id="phyl-n-val">350</span>
+        </div>
+        <div class="demo-plot" id="phyl-plot"></div>
+        <div class="demo-result">Ogni seme è ruotato rispetto al precedente di un angolo fisso. Solo vicino
+          all'<strong>angolo aureo</strong> $\approx 137{,}5° = 360°/\varphi^2$ i semi riempiono lo spazio senza lasciare
+          "raggi" vuoti: spostati di poco e compaiono subito spirali e fessure.</div>
+      </div>
+
+      <div class="warning"><strong>Onestà intellettuale.</strong> Molte attribuzioni famose (il Partenone, la Gioconda, le
+        piramidi) sono <em>affascinanti ma discusse</em>: spesso il rapporto aureo vi è stato "ritrovato" a posteriori, con
+        misure approssimate. In natura, invece, l'angolo aureo nella fillotassi è un fenomeno ben documentato e spiegabile
+        come configurazione che ottimizza lo spazio e l'esposizione alla luce.</div>
+    </section>
+
+    <!-- 9 — (FACOLTATIVO) LE SERIE -->
+    <section id="sec9" class="optional">
+      <h2>9. Le serie: sommare infiniti termini</h2>
+      <p>(Approfondimento facoltativo.) Cosa succede se proviamo a sommare <strong>tutti</strong> gli infiniti termini di
+        una successione? Può sembrare assurdo che una somma infinita dia un numero finito, eppure a volte accade.</p>
+
+      <h3>8.1 — Somme parziali e definizione di serie</h3>
+      <p>Data una successione $(a_n)$, costruiamo le <strong>somme parziali</strong>:
+        $$S_1 = a_1,\quad S_2 = a_1 + a_2,\quad S_3 = a_1 + a_2 + a_3,\quad \dots$$
+        La <strong>serie</strong> $\displaystyle\sum_{n=1}^{\infty} a_n$ è, per definizione, il <em>limite</em> di questa
+        nuova successione di somme parziali.</p>
+      <div class="definition">
+        La serie $\displaystyle\sum_{n=1}^{\infty} a_n$ si dice:
+        <ul>
+          <li><strong>convergente</strong> se $\displaystyle\lim_{n\to\infty} S_n = S$ finito ($S$ è la <em>somma</em> della serie);</li>
+          <li><strong>divergente</strong> se $S_n \to \pm\infty$;</li>
+          <li><strong>indeterminata</strong> se $S_n$ non ammette limite (es. $1 - 1 + 1 - 1 + \dots$).</li>
+        </ul>
+      </div>
+
+      <h3>8.2 — La serie geometrica</h3>
+      <p>La più importante. Sommando $1 + q + q^2 + q^3 + \dots$, dalla formula della somma parziale
+        $S_n = \dfrac{q^{n} - 1}{q - 1}$ si vede che, se $|q| < 1$, allora $q^{n} \to 0$ e quindi:</p>
+      <div class="definition">Per $|q| < 1$: $$\sum_{n=0}^{\infty} q^{n} = \frac{1}{1 - q}.$$
+        Se invece $|q| \geq 1$ la serie geometrica non converge.</div>
+
+      <div class="interactive-demo">
+        <div class="demo-title">Serie geometrica: le somme parziali si stabilizzano su $\frac{1}{1-q}$</div>
+        <div class="demo-controls">
+          <label for="ser-q">ragione q:</label>
+          <input type="range" id="ser-q" min="-0.9" max="0.9" step="0.05" value="0.5">
+          <span class="demo-value" id="ser-q-val">0.50</span>
+          <label for="ser-n" style="margin-left:1rem;">somme parziali:</label>
+          <input type="range" id="ser-n" min="1" max="30" step="1" value="10">
+          <span class="demo-value" id="ser-n-val">10</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span>somma parziale $S_m$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>limite $\frac{1}{1-q}$</div>
+        </div>
+        <div class="demo-plot" id="ser-plot"></div>
+        <div class="demo-result">Con $q = $<span id="ser-qtext">0.50</span> la serie converge a
+          $\dfrac{1}{1-q} = $<strong><span id="ser-lim">2.00</span></strong>. Dopo
+          <span id="ser-ntext">10</span> termini siamo già a $S_m = $<strong><span id="ser-sm">1.998</span></strong>.</div>
+      </div>
+
+      <div class="note"><strong>Il paradosso di Zenone, risolto.</strong> Achille per raggiungere la tartaruga percorre
+        $\frac12 + \frac14 + \frac18 + \dots$ del cammino. È una serie geometrica con $q = \frac12$: la somma vale
+        $\frac{1/2}{1 - 1/2} = 1$. Infiniti passi, distanza <em>finita</em>: la tartaruga è raggiunta.</div>
+
+      <h3>8.3 — Serie di funzioni e convergenza uniforme</h3>
+      <p>Finora i termini erano numeri. Ma possiamo sommare anche <strong>funzioni</strong>: $\sum f_n(x)$, ottenendo una
+        funzione somma $S(x)$. Qui nasce una distinzione sottile ma cruciale tra due modi di convergere.</p>
+      <div class="definition">
+        Sia $(f_n)$ una successione di funzioni con limite $f$.
+        <ul>
+          <li><strong>Convergenza puntuale:</strong> per <em>ogni $x$ fissato</em>, $f_n(x) \to f(x)$. La velocità può
+            dipendere da $x$.</li>
+          <li><strong>Convergenza uniforme:</strong> la convergenza è "alla stessa velocità ovunque", cioè la distanza
+            massima svanisce: $$\sup_x \,\big|f_n(x) - f(x)\big| \;\xrightarrow[n\to\infty]{}\; 0.$$</li>
+        </ul>
+      </div>
+      <p>L'uniforme è più forte della puntuale: è quella che permette di "scambiare" limiti, integrali e derivate con la
+        somma. Il prossimo grafico mostra un caso che converge punto per punto ma <strong>non</strong> uniformemente.</p>
+
+      <div class="interactive-demo">
+        <div class="demo-title">$f_n(x) = x^n$ su $[0,1]$: puntuale ma NON uniforme</div>
+        <div class="demo-controls">
+          <label for="unif-n">n:</label>
+          <input type="range" id="unif-n" min="1" max="60" step="1" value="6">
+          <span class="demo-value" id="unif-n-val">6</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span>$f_n(x) = x^n$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span>limite $f(x)$ (0 fino a 1, poi salto a 1)</div>
+        </div>
+        <div class="demo-plot" id="unif-plot"></div>
+        <div class="demo-result">Per ogni $x < 1$ si ha $x^n \to 0$; ma in $x = 1$ vale sempre $1$. Vicino a $1$ resta un
+          "gradino": la distanza massima $\sup|f_n - f|$ rimane $= 1$ per ogni $n$, quindi la convergenza
+          <strong>non è uniforme</strong>. Esempio: $0{,}9^{n} = $<strong><span id="unif-val">0.531</span></strong>, ancora
+          lontano da 0.</div>
+      </div>
+      <div class="rule">Morale: il limite di funzioni continue, se la convergenza è solo <em>puntuale</em>, può essere
+        <strong>discontinuo</strong> (come qui). Con la convergenza <em>uniforme</em> questo non accade: la continuità si
+        conserva. Ecco perché i matematici tengono tanto all'uniformità.</div>
+    </section>
+
+    <!-- 10 — (FACOLTATIVO) LA SOMMA -1/12 -->
+    <section id="sec10" class="optional">
+      <h2>10. Curiosità: la somma di tutti i naturali "fa" $-\tfrac{1}{12}$?</h2>
+      <p>(Approfondimento facoltativo.) Esiste una delle formule più sconcertanti della matematica, che ogni tanto compare
+        persino nella fisica teorica:</p>
+      <div class="formula-box">$$1 + 2 + 3 + 4 + 5 + \dots \;\;\overset{?}{=}\;\; -\frac{1}{12}.$$</div>
+      <p>Una somma di numeri tutti positivi che dà un risultato negativo <em>e</em> frazionario: com'è possibile? La
+        risposta breve è: <strong>nel senso ordinario, non è possibile</strong>. Vediamo perché va presa con le pinze.</p>
+
+      <h3>9.1 — Nel senso ordinario, la serie diverge</h3>
+      <p>Le somme parziali sono proprio quelle di Gauss, $S_n = \frac{n(n+1)}{2}$, e crescono senza alcun limite:</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Le somme parziali di $1+2+3+\dots$ esplodono verso $+\infty$</div>
+        <div class="demo-controls">
+          <label for="m12-n">n:</label>
+          <input type="range" id="m12-n" min="2" max="60" step="1" value="20">
+          <span class="demo-value" id="m12-n-val">20</span>
+        </div>
+        <div class="demo-plot" id="m12-plot"></div>
+        <div class="demo-result">Dopo $n$ termini la somma vale $S_n = $<strong><span id="m12-sum">210</span></strong>:
+          più termini aggiungi, più cresce. Il limite è $+\infty$, quindi <strong>la serie diverge</strong>. Di certo non
+          tende a $-\frac{1}{12}$.</div>
+      </div>
+
+      <h3>9.2 — Da dove salta fuori $-\tfrac{1}{12}$</h3>
+      <p>Il valore $-\frac{1}{12}$ nasce da una matematica più profonda, la <strong>funzione zeta di Riemann</strong>:
+        $$\zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^{s}},$$ che converge <em>solo</em> per $s > 1$. Esiste però un unico
+        modo "naturale" di estendere $\zeta$ anche dove la serie non converge (la <em>continuazione analitica</em>), e
+        questa estensione assegna $\zeta(-1) = -\frac{1}{12}$. Siccome <em>formalmente</em> $\zeta(-1)$ corrisponderebbe a
+        $\sum n$, nasce la celebre (e fuorviante) scrittura.</p>
+      <div class="warning"><strong>Non è una somma!</strong> Stiamo valutando la funzione $\zeta$ <em>estesa</em> nel punto
+        $s=-1$, non sommando davvero i numeri. È un <strong>valore regolarizzato</strong>: utilissimo in fisica (effetto
+        Casimir, teoria delle stringhe), ma non è il risultato di un'addizione nel senso comune.</div>
+
+      <h3>9.3 — Il trucco "elementare" (e perché non è lecito)</h3>
+      <p>Gira una derivazione veloce che sembra magica. La riportiamo <em>solo</em> come curiosità.</p>
+      <div class="steps">
+        <p><span class="step-num">1</span>Si parte da $A = 1 - 1 + 1 - 1 + \dots$ e gli si attribuisce il valore $\tfrac12$
+          (media di Cesàro della serie di Grandi).</p>
+        <p><span class="step-num">2</span>Si pone $B = 1 - 2 + 3 - 4 + \dots$ e, "sommando $B$ con se stesso sfalsato", si
+          ottiene $2B = A = \tfrac12$, cioè $B = \tfrac14$.</p>
+        <p><span class="step-num">3</span>Sia $S = 1 + 2 + 3 + 4 + \dots$. Allora $S - B = 4 + 8 + 12 + \dots = 4S$, da cui
+          $-B = 3S$ e quindi $S = -\tfrac{B}{3} = -\tfrac{1}{12}$.</p>
+        <p style="text-align:right; font-weight:700; margin-top:0.5rem;">"∎"</p>
+      </div>
+      <div class="warning"><strong>Dov'è l'inganno.</strong> Tutti questi passaggi <em>sommano, sfalsano e riordinano serie
+        divergenti</em> come se fossero convergenti. Ma per le serie divergenti queste operazioni non sono permesse: il
+        <strong>teorema di riordinamento di Riemann</strong> mostra che, riordinando i termini, si può far "venire" quasi
+        qualunque risultato. La scrittura $1+2+3+\dots = -\frac{1}{12}$ ha senso solo come <em>convenzione</em> in contesti
+        precisi, mai come somma ordinaria.</div>
+    </section>
+
+    <!-- 11 — (FACOLTATIVO) MAPPA LOGISTICA -->
+    <section id="sec11" class="optional">
+      <h2>11. La mappa logistica e il caos</h2>
+      <p>(Approfondimento facoltativo.) Una delle successioni più sorprendenti non viene dalla pura matematica ma dalla
+        <strong>biologia delle popolazioni</strong>. Immagina una popolazione (di insetti, pesci, batteri) di cui $x_n$
+        rappresenta la frazione rispetto al massimo sostenibile ($0 \le x_n \le 1$). Da un anno al successivo:</p>
+      <div class="definition">$$x_{n+1} = r\,x_n\,(1 - x_n), \qquad r \in [0, 4].$$
+        Il fattore $r$ è il tasso di crescita; il termine $(1 - x_n)$ frena la crescita quando la popolazione è già grande
+        (risorse limitate). È la <strong>mappa logistica</strong>.</div>
+      <p>È una successione ricorsiva semplicissima, eppure il suo comportamento al crescere di $r$ è incredibilmente ricco:
+        si passa dall'equilibrio al caos.</p>
+
+      <h3>10.1 — La "ragnatela": iterare proiettando sulla parabola</h3>
+      <p>Per seguire l'evoluzione si usa il <strong>diagramma a ragnatela</strong>: si disegnano la parabola
+        $y = r\,x(1-x)$ e la bisettrice $y = x$. Partendo da $x_0$ si sale fino alla parabola (questo dà $x_1$), ci si
+        riflette sulla bisettrice per riportare $x_1$ sull'asse, si risale alla parabola (ottenendo $x_2$), e così via.</p>
+
+      <div class="interactive-demo">
+        <div class="demo-title">Diagramma a ragnatela della mappa logistica</div>
+        <div class="demo-controls">
+          <label for="logi-r">tasso r:</label>
+          <input type="range" id="logi-r" min="0.5" max="4" step="0.005" value="3.2">
+          <span class="demo-value" id="logi-r-val">3.200</span>
+          <label for="logi-x0" style="margin-left:1rem;">x₀:</label>
+          <input type="range" id="logi-x0" min="0.01" max="0.99" step="0.01" value="0.2">
+          <span class="demo-value" id="logi-x0-val">0.20</span>
+          <label for="logi-it" style="margin-left:1rem;">iterazioni:</label>
+          <input type="range" id="logi-it" min="10" max="120" step="1" value="60">
+          <span class="demo-value" id="logi-it-val">60</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span>parabola $r\,x(1-x)$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span>traiettoria (ragnatela)</div>
+        </div>
+        <div class="demo-plot" id="logi-cobweb-plot"></div>
+        <p id="logi-verdict" class="verdict"></p>
+      </div>
+
+      <h3>10.2 — Il diagramma delle biforcazioni</h3>
+      <p>Cosa succede "a lungo termine" per ogni valore di $r$? Si lascia stabilizzare la successione e si registrano i
+        valori su cui si assesta. Riportandoli in funzione di $r$ si ottiene il celebre <strong>diagramma delle
+        biforcazioni</strong>: per ogni $r$, la linea verticale tratteggiata corrisponde allo stato mostrato sopra nella
+        ragnatela (muovi lo slider $r$ e osserva i due grafici insieme).</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Biforcazioni: dal punto fisso al caos (sposta r qui sopra)</div>
+        <div class="demo-plot" id="logi-bif-plot"></div>
+        <div class="demo-result">Per $r < 3$ un solo valore (equilibrio); a $r = 3$ la linea si <strong>biforca</strong> in
+          due (periodo 2), poi in 4, 8, 16… fino a $r \approx 3{,}5699$ dove inizia il <strong>caos</strong>. Dentro il
+          caos restano "finestre" ordinate, come il <strong>periodo 3</strong> attorno a $r \approx 3{,}83$.</div>
+      </div>
+
+      <div class="note"><strong>Universalità (Feigenbaum).</strong> Gli intervalli tra raddoppi successivi si accorciano
+        sempre con lo stesso fattore $\delta \approx 4{,}669$, <em>indipendente</em> dalla formula precisa: lo stesso numero
+        governa innumerevoli sistemi che diventano caotici. È una delle scoperte più profonde della teoria del caos.</div>
+
+      <h3>10.3 — A cosa serve</h3>
+      <ul>
+        <li><strong>Ecologia e biologia:</strong> il modello originale (Robert May, 1976) per popolazioni con risorse limitate.</li>
+        <li><strong>Teoria del caos:</strong> è l'esempio-principe della <em>sensibilità alle condizioni iniziali</em>
+          (l'"effetto farfalla"): nel regime caotico, due valori di $x_0$ vicinissimi danno traiettorie che divergono in fretta.</li>
+        <li><strong>Economia e sistemi dinamici:</strong> modelli di mercati, code, reazioni — ovunque ci sia crescita con un freno.</li>
+        <li><strong>Informatica:</strong> generazione di numeri pseudo-casuali e crittografia basate su mappe caotiche.</li>
+      </ul>
+    </section>
+
+    <!-- 12 — (FACOLTATIVO) FRATTALI -->
+    <section id="sec12" class="optional">
+      <h2>12. Frattali: l'infinito nella ricorsione</h2>
+      <p>(Approfondimento facoltativo.) Abbiamo visto che una regola ricorsiva semplicissima — la mappa logistica — può
+        generare comportamenti complicatissimi. La stessa magia accade in geometria: ripetendo all'infinito una piccola
+        regola di costruzione si ottengono i <strong>frattali</strong>, figure di bellezza ipnotica e complessità infinita.</p>
+      <div class="definition">Un <strong>frattale</strong> è una figura che mostra la stessa struttura a <em>ogni scala</em>
+        di ingrandimento (<strong>autosimilarità</strong>): ingrandendone un pezzetto si ritrova, in piccolo, l'intera
+        figura. Si costruisce tipicamente per <strong>ricorsione</strong>: si parte da una figura semplice e si applica più
+        e più volte una regola di sostituzione.</div>
+      <p>La sequenza delle figure prodotte a ogni passo è, di fatto, una <em>successione</em>: il frattale è il suo limite.
+        Molti frattali hanno persino una <strong>dimensione frazionaria</strong>, a metà strada tra la linea e la superficie.</p>
+
+      <h3>11.1 — Il fiocco di neve di Koch</h3>
+      <p>Si parte da un triangolo equilatero. La <strong>regola</strong>: ogni segmento viene diviso in tre parti uguali e
+        sul terzo centrale si costruisce una punta triangolare, così un segmento diventa <em>quattro</em> segmenti lunghi un
+        terzo. Ripetendo, il bordo si fa sempre più frastagliato.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Il fiocco di neve di Koch — alza il livello di ricorsione</div>
+        <div class="demo-controls">
+          <label for="koch-level">livello:</label>
+          <input type="range" id="koch-level" min="0" max="5" step="1" value="2">
+          <span class="demo-value" id="koch-level-val">2</span>
+        </div>
+        <div class="demo-plot" id="koch-plot"></div>
+        <div class="demo-result">Segmenti del bordo: <strong><span id="koch-seg">48</span></strong>. Il perimetro è
+          <strong><span id="koch-per">1.78</span></strong> volte quello del triangolo iniziale e cresce come $(4/3)^n$:
+          tende a <strong>infinito</strong>, mentre l'area racchiusa resta <strong>finita</strong>. Un bordo infinitamente
+          lungo attorno a un'area limitata!</div>
+      </div>
+
+      <h3>11.2 — Il triangolo di Sierpiński</h3>
+      <p>Si parte da un triangolo pieno. La <strong>regola</strong>: si congiungono i punti medi dei lati e si <em>toglie</em>
+        il triangolo centrale; poi si ripete su ciascuno dei tre triangoli rimasti. All'infinito resta una "polvere"
+        triangolare piena di buchi a ogni scala.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Il triangolo di Sierpiński — alza il livello</div>
+        <div class="demo-controls">
+          <label for="sier-level">livello:</label>
+          <input type="range" id="sier-level" min="0" max="6" step="1" value="3">
+          <span class="demo-value" id="sier-level-val">3</span>
+        </div>
+        <div class="demo-plot" id="sier-plot"></div>
+        <div class="demo-result">Triangolini pieni: <strong><span id="sier-tri">27</span></strong> (sono $3^n$). Ogni
+          triangolo contiene <em>tre</em> copie di sé stesso a metà scala: per questo la sua dimensione frattale è
+          $\dfrac{\log 3}{\log 2} \approx 1{,}585$, a metà tra una linea (dimensione 1) e una superficie (dimensione 2).</div>
+      </div>
+      <div class="note">Come nella mappa logistica, una regola elementare ripetuta genera complessità senza fine: è la
+        firma comune di caos e frattali.</div>
+    </section>
+
+    <!-- 13 — (FACOLTATIVO) INSIEME DI MANDELBROT -->
+    <section id="sec13" class="optional">
+      <h2>13. L'insieme di Mandelbrot</h2>
+      <p>(Approfondimento facoltativo.) È forse il frattale più famoso al mondo: un'immagine di complessità sconfinata che
+        nasce, ancora una volta, da una <strong>successione ricorsiva</strong> elementare — stavolta nel mondo dei numeri
+        complessi.</p>
+
+      <h3>12.1 — Un assaggio di numeri complessi</h3>
+      <p>I numeri reali stanno su una retta. Ma esiste un mondo più ampio, in cui i numeri vivono in un <em>piano</em>.</p>
+      <div class="definition">Un <strong>numero complesso</strong> ha la forma $z = a + b\,i$, dove $a$ (parte reale) e $b$
+        (parte immaginaria) sono numeri reali e $i$ è l'<strong>unità immaginaria</strong>, definita da $i^2 = -1$. Si
+        rappresenta come il punto $(a, b)$ del piano (piano di Argand-Gauss); il suo <strong>modulo</strong>
+        $|z| = \sqrt{a^2 + b^2}$ è la distanza dall'origine.</div>
+      <p>Si possono sommare e moltiplicare come i normali numeri (ricordando che $i^2 = -1$). In particolare $z^2 + c$ è una
+        semplice operazione che trasforma un punto del piano in un altro punto del piano: è tutto ciò che ci serve.</p>
+
+      <h3>12.2 — Come nasce l'insieme</h3>
+      <p>Per ogni numero complesso $c$ si costruisce la successione ricorsiva</p>
+      <div class="formula-box">$$z_0 = 0, \qquad z_{n+1} = z_n^{\,2} + c.$$</div>
+      <p>Due possibilità: o i moduli $|z_n|$ restano <strong>limitati</strong> per sempre, oppure prima o poi
+        <strong>scappano</strong> verso l'infinito (si dimostra che basta superare $|z_n| > 2$). </p>
+      <div class="definition">L'<strong>insieme di Mandelbrot</strong> è l'insieme dei numeri complessi $c$ per cui la
+        successione $z_{n+1} = z_n^2 + c$ (con $z_0 = 0$) <strong>rimane limitata</strong>. I punti dell'insieme si colorano
+        di nero; gli altri con un colore che dipende da <em>quanto in fretta</em> scappano all'infinito.</div>
+
+      <div class="interactive-demo">
+        <div class="demo-title">L'insieme di Mandelbrot — zooma e aumenta il dettaglio</div>
+        <div class="demo-controls">
+          <label for="mandel-zoom">zoom:</label>
+          <input type="range" id="mandel-zoom" min="0" max="8" step="0.1" value="0">
+          <span class="demo-value" id="mandel-zoom-val">1×</span>
+          <label for="mandel-iter" style="margin-left:1rem;">dettaglio (iterazioni):</label>
+          <input type="range" id="mandel-iter" min="30" max="200" step="5" value="80">
+          <span class="demo-value" id="mandel-iter-val">80</span>
+        </div>
+        <div class="demo-plot" id="mandel-plot"></div>
+        <div class="demo-result">La regione <strong>nera</strong> è l'insieme (la successione resta limitata); i colori
+          fuori indicano quanto rapidamente $z_n$ "scappa" all'infinito. Aumentando lo zoom compaiono <strong>copie in
+          miniatura</strong> dell'intero insieme: dettaglio infinito. A zoom elevati alza le iterazioni per più nitidezza.</div>
+      </div>
+      <div class="note"><strong>Un ponte con la mappa logistica.</strong> Lungo l'asse reale, i "bulbi" dell'insieme di
+        Mandelbrot corrispondono esattamente ai cicli (periodo 1, 2, 4, …) e al caos che hai visto nel diagramma delle
+        biforcazioni: è la stessa ricorsione quadratica, osservata nei numeri reali e in quelli complessi.</div>
+    </section>
+
+    <!-- 14 — QUIZ -->
+    <section id="quiz">
+      <h2>14. Quiz finale</h2>
+      <p>Quindici domande su successioni, progressioni, induzione, serie e gli approfondimenti facoltativi. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 7 — Successioni e Serie · Matematica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX, math.js e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { diff: 'easy', text: 'Una successione è, in sostanza:',
+        options: ['Una funzione dai reali ai reali', 'Una funzione dai numeri naturali ai reali', 'Un insieme finito di numeri', 'Un numero molto grande'],
+        correct: 1, explain: 'È una funzione $a:\\mathbb{N}\\to\\mathbb{R}$: a ogni posizione $n$ associa il termine $a_n$. Il dominio sono gli interi.' },
+      { diff: 'easy', text: 'In una progressione aritmetica con $a_1$ e ragione $d$, il termine generale è:',
+        options: ['$a_n = a_1\\cdot d^{\\,n-1}$', '$a_n = a_1 + n\\,d$', '$a_n = a_1 + (n-1)d$', '$a_n = a_1 - (n-1)d$'],
+        correct: 2, explain: 'Si parte da $a_1$ e si aggiunge $d$ per $(n-1)$ volte: $a_n = a_1 + (n-1)d$.' },
+      { diff: 'easy', text: 'In una progressione geometrica di ragione $q$, il termine generale è:',
+        options: ['$a_n = a_1 + (n-1)q$', '$a_n = a_1\\cdot q^{\\,n-1}$', '$a_n = a_1\\cdot q^{\\,n}$', '$a_n = q^{\\,n-1}$'],
+        correct: 1, explain: 'Si moltiplica $a_1$ per $q$ per $(n-1)$ volte: $a_n = a_1\\, q^{\\,n-1}$.' },
+      { diff: 'easy', text: 'Quanto vale $1 + 2 + 3 + \\dots + 100$ (somma di Gauss)?',
+        options: ['$1000$', '$5050$', '$10000$', '$5000$'],
+        correct: 1, explain: 'Con $\\frac{n(n+1)}{2} = \\frac{100\\cdot 101}{2} = 5050$. Gauss accoppiò $1+100, 2+99, \\dots$' },
+      { diff: 'medium', text: 'In una progressione aritmetica $a_3 = 7$ e $a_7 = 19$. Quanto vale la ragione $d$?',
+        options: ['$2$', '$3$', '$4$', '$6$'],
+        correct: 1, explain: '$d = \\frac{a_7 - a_3}{7 - 3} = \\frac{19 - 7}{4} = 3$.' },
+      { diff: 'medium', text: 'Nel principio di induzione, il "passo induttivo" consiste nel dimostrare che:',
+        options: ['$P(1)$ è vera', 'Se $P(k)$ è vera allora lo è $P(k+1)$', '$P(n)$ è vera per un $n$ a caso', 'Esiste almeno un $n$ per cui $P(n)$ è vera'],
+        correct: 1, explain: 'È l\'effetto domino: ogni tessera che cade fa cadere la successiva, cioè $P(k)\\Rightarrow P(k+1)$.' },
+      { diff: 'medium', text: 'La dimostrazione che $\\sqrt{2}$ è irrazionale procede:',
+        options: ['Per induzione', 'Con un controesempio', 'Per assurdo', 'Per calcolo diretto del valore'],
+        correct: 2, explain: 'Si suppone $\\sqrt2 = p/q$ ridotta e si arriva alla contraddizione che $p$ e $q$ sono entrambi pari.' },
+      { diff: 'medium', text: 'Nella successione di Fibonacci, il rapporto $F_{n+1}/F_n$ tende a:',
+        options: ['$1$', '$2$', 'La sezione aurea $\\varphi \\approx 1{,}618$', '$\\pi$'],
+        correct: 2, explain: 'Tende alla sezione aurea $\\varphi = \\frac{1+\\sqrt5}{2} \\approx 1{,}618$.' },
+      { diff: 'hard', text: 'La serie geometrica $\\sum_{n=0}^{\\infty} q^{n}$ converge se e solo se:',
+        options: ['$q > 0$', '$|q| < 1$', '$|q| > 1$', 'Sempre'],
+        correct: 1, explain: 'Per $|q|<1$ converge a $\\frac{1}{1-q}$ (perché $q^n\\to 0$); altrimenti non converge.' },
+      { diff: 'hard', text: 'La successione di funzioni $f_n(x) = x^n$ su $[0,1]$:',
+        options: ['Converge uniformemente alla funzione nulla', 'Converge solo puntualmente, non uniformemente', 'Non converge in nessun punto', 'Converge a una funzione continua'],
+        correct: 1, explain: 'Converge punto per punto (0 se $x<1$, 1 se $x=1$), ma $\\sup|f_n - f| = 1$ resta costante: non è uniforme, e il limite è discontinuo.' },
+      { diff: 'hard', text: 'Nel pentagono regolare, il rapporto fra una diagonale e il lato vale:',
+        options: ['$\\sqrt2$', '$2$', 'La sezione aurea $\\varphi \\approx 1{,}618$', '$\\pi/2$'],
+        correct: 2, explain: 'Diagonale/lato $= \\varphi$: la sezione aurea è "nascosta" nel pentagramma, con autosimilarità di fattore $1/\\varphi^2$.' },
+      { diff: 'hard', text: 'La scrittura $1+2+3+\\dots = -\\frac{1}{12}$:',
+        options: ['È la somma ordinaria della serie', 'È un valore regolarizzato (zeta di Riemann), non la somma ordinaria, che diverge', 'È un banale errore di calcolo', 'Vale solo per pochi termini'],
+        correct: 1, explain: 'Nel senso ordinario la serie diverge a $+\\infty$. Il $-\\frac{1}{12}$ è $\\zeta(-1)$, ottenuto per continuazione analitica: un valore regolarizzato, non una somma.' },
+      { diff: 'hard', text: 'Nella mappa logistica $x_{n+1}=r\\,x_n(1-x_n)$, all\'aumentare di $r$ oltre 3 si osserva:',
+        options: ['Sempre un solo equilibrio stabile', 'Una cascata di raddoppi di periodo (2, 4, 8…) che sfocia nel caos', 'L\'estinzione certa della popolazione', 'Una crescita lineare'],
+        correct: 1, explain: 'A $r=3$ il punto fisso si biforca (periodo 2), poi 4, 8… fino al caos a $r\\approx 3{,}5699$, con finestre periodiche (es. periodo 3 a $r\\approx 3{,}83$).' },
+      { diff: 'hard', text: 'Il fiocco di neve di Koch ha la sorprendente proprietà di avere:',
+        options: ['Perimetro e area entrambi infiniti', 'Perimetro infinito ma area finita', 'Perimetro finito ma area infinita', 'Perimetro e area finiti, calcolabili con la geometria elementare'],
+        correct: 1, explain: 'A ogni passo il perimetro è moltiplicato per $4/3$ (tende a $\\infty$), mentre l\'area racchiusa converge a un valore finito.' },
+      { diff: 'hard', text: 'Un numero complesso $c$ appartiene all\'insieme di Mandelbrot se:',
+        options: ['$|c| < 1$', 'La successione $z_{n+1}=z_n^2+c$ (con $z_0=0$) resta limitata', '$c$ è un numero reale', 'La successione $z_{n+1}=z_n^2+c$ tende a $+\\infty$'],
+        correct: 1, explain: 'Si itera $z_{n+1}=z_n^2+c$ partendo da $z_0=0$: $c$ è nell\'insieme se i moduli $|z_n|$ restano limitati (non sfuggono all\'infinito).' }
+    ];
+  </script>
+
+  <!-- Demo interattive di questa lezione -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { linspace, draw, update, themeColors } = Plt;
+      const cRed = '#ef4444', cGreen = '#22c55e', cBlue = '#3b82f6', cGold = '#f5b400';
+      const PHI = (1 + Math.sqrt(5)) / 2;
+      function range1(n) { const a = []; for (let i = 1; i <= n; i++) a.push(i); return a; }
+
+      // ---- Demo 1: visualizzare una successione ----
+      (function () {
+        const pick = document.getElementById('seqA-pick');
+        const sN = document.getElementById('seqA-n'), vN = document.getElementById('seqA-n-val');
+        const label = document.getElementById('seqA-label'), note = document.getElementById('seqA-note');
+        const SEQS = {
+          inv:    { f: n => 1 / n,                 lim: 0,        label: 'aₙ = 1/n',        note: 'converge a 0' },
+          npos:   { f: n => n / (n + 1),           lim: 1,        label: 'aₙ = n/(n+1)',    note: 'converge a 1' },
+          altinv: { f: n => Math.pow(-1, n) / n,   lim: 0,        label: 'aₙ = (−1)ⁿ/n',    note: 'converge a 0 oscillando' },
+          euler:  { f: n => Math.pow(1 + 1 / n, n), lim: Math.E,  label: 'aₙ = (1 + 1/n)ⁿ', note: 'converge a e ≈ 2.718' },
+          osc:    { f: n => Math.pow(-1, n),       lim: null,     label: 'aₙ = (−1)ⁿ',      note: 'non converge (oscilla tra −1 e 1)' }
+        };
+        function go() {
+          const S = SEQS[pick.value], N = +sN.value;
+          vN.textContent = N; label.textContent = S.label; note.textContent = S.note;
+          const ns = range1(N), ys = ns.map(S.f);
+          const traces = [{ x: ns, y: ys, type: 'scatter', mode: 'markers',
+            marker: { color: cRed, size: 8 }, hoverinfo: 'x+y' }];
+          const shapes = [];
+          if (S.lim !== null) shapes.push({ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: S.lim, y1: S.lim,
+            line: { color: cGreen, width: 1.5, dash: 'dash' } });
+          let ylo = Math.min(...ys), yhi = Math.max(...ys);
+          if (S.lim !== null) { ylo = Math.min(ylo, S.lim); yhi = Math.max(yhi, S.lim); }
+          const pad = (yhi - ylo) * 0.15 || 0.5;
+          update('seqA-plot', traces, { xaxis: { range: [0, N + 1], title: 'n' },
+            yaxis: { range: [ylo - pad, yhi + pad], title: 'aₙ' }, shapes });
+        }
+        pick.addEventListener('change', go); sN.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 2: progressione aritmetica ----
+      (function () {
+        const sA = document.getElementById('ari-a1'), vA = document.getElementById('ari-a1-val');
+        const sD = document.getElementById('ari-d'), vD = document.getElementById('ari-d-val');
+        const fOut = document.getElementById('ari-formula'), tOut = document.getElementById('ari-terms');
+        function go() {
+          const a1 = +sA.value, d = +sD.value; vA.textContent = a1; vD.textContent = d;
+          const ns = range1(12), ys = ns.map(n => a1 + (n - 1) * d);
+          fOut.textContent = a1 + ' + (n−1)·' + d;
+          tOut.textContent = ys.slice(0, 4).map(v => +v.toFixed(2)).join('; ') + '; …';
+          update('ari-plot', [
+            { x: ns, y: ys, type: 'scatter', mode: 'lines', line: { color: cBlue, width: 1, dash: 'dot' }, hoverinfo: 'skip' },
+            { x: ns, y: ys, type: 'scatter', mode: 'markers', marker: { color: cRed, size: 8 }, hoverinfo: 'x+y' }
+          ], { xaxis: { range: [0, 13], title: 'n' }, yaxis: { title: 'aₙ' }, showlegend: false });
+        }
+        sA.addEventListener('input', go); sD.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 3: progressione geometrica ----
+      (function () {
+        const sA = document.getElementById('geo-a1'), vA = document.getElementById('geo-a1-val');
+        const sQ = document.getElementById('geo-q'), vQ = document.getElementById('geo-q-val');
+        const fOut = document.getElementById('geo-formula'), nOut = document.getElementById('geo-note');
+        function go() {
+          const a1 = +sA.value, q = +sQ.value; vA.textContent = a1; vQ.textContent = q.toFixed(1);
+          const ns = range1(10), ys = ns.map(n => a1 * Math.pow(q, n - 1));
+          fOut.textContent = a1 + ' · ' + q.toFixed(1) + 'ⁿ⁻¹';
+          const aq = Math.abs(q);
+          nOut.textContent = aq > 1 ? (q < 0 ? 'oscilla e diverge (q < −1)' : 'cresce esponenzialmente (q > 1)')
+            : aq < 1 ? (q < 0 ? 'oscilla verso 0 (−1 < q < 0)' : 'tende a 0 (0 < q < 1)')
+            : 'costante in modulo (|q| = 1)';
+          // clip per non far esplodere la scala
+          const clip = 200;
+          const yc = ys.map(v => Math.max(-clip, Math.min(clip, v)));
+          update('geo-plot', [
+            { x: ns, y: yc, type: 'scatter', mode: 'lines', line: { color: cBlue, width: 1, dash: 'dot' }, hoverinfo: 'skip' },
+            { x: ns, y: yc, type: 'scatter', mode: 'markers', marker: { color: cRed, size: 8 }, hoverinfo: 'x+y' }
+          ], { xaxis: { range: [0, 11], title: 'n' }, yaxis: { title: 'aₙ' }, showlegend: false });
+        }
+        sA.addEventListener('input', go); sQ.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 4: trucco di Gauss (barre impilate) ----
+      (function () {
+        const sN = document.getElementById('gauss-n'), vN = document.getElementById('gauss-n-val');
+        const col = document.getElementById('gauss-col'), cols = document.getElementById('gauss-cols');
+        const dbl = document.getElementById('gauss-double'), sum = document.getElementById('gauss-sum');
+        function go() {
+          const n = +sN.value; vN.textContent = n;
+          const xs = range1(n);
+          const asc = xs.slice();
+          const desc = xs.map(i => n - i + 1);
+          col.textContent = n + 1; cols.textContent = n;
+          dbl.textContent = n * (n + 1); sum.textContent = n * (n + 1) / 2;
+          update('gauss-plot', [
+            { x: xs, y: asc, type: 'bar', marker: { color: cRed }, name: 'crescente', hoverinfo: 'y' },
+            { x: xs, y: desc, type: 'bar', marker: { color: cBlue }, name: 'decrescente', hoverinfo: 'y' }
+          ], { barmode: 'stack', xaxis: { title: 'posizione', dtick: 1 },
+            yaxis: { range: [0, n + 2], title: 'altezza' }, showlegend: false });
+        }
+        sN.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 5: induzione — somma reale vs formula ----
+      (function () {
+        const sN = document.getElementById('ind-n'), vN = document.getElementById('ind-n-val');
+        function go() {
+          const n = +sN.value; vN.textContent = n;
+          const ns = range1(n);
+          let acc = 0; const sums = ns.map(k => (acc += k));
+          const xc = linspace(1, n, 100), yc = xc.map(x => x * (x + 1) / 2);
+          update('ind-plot', [
+            { x: xc, y: yc, type: 'scatter', mode: 'lines', line: { color: cGreen, width: 2.5 }, hoverinfo: 'skip' },
+            { x: ns, y: sums, type: 'scatter', mode: 'markers', marker: { color: cRed, size: 9 }, hoverinfo: 'x+y' }
+          ], { xaxis: { range: [0, n + 1], title: 'n' }, yaxis: { title: 'Sₙ' }, showlegend: false });
+        }
+        sN.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 6: Fibonacci — rapporti verso phi ----
+      (function () {
+        const sN = document.getElementById('fib-n'), vN = document.getElementById('fib-n-val');
+        const tOut = document.getElementById('fib-terms'), rOut = document.getElementById('fib-ratio');
+        function go() {
+          const n = +sN.value; vN.textContent = n;
+          const F = [1, 1];
+          for (let i = 2; i < n + 1; i++) F.push(F[i - 1] + F[i - 2]);
+          const ks = [], ratios = [];
+          for (let i = 1; i < n; i++) { ks.push(i + 1); ratios.push(F[i] / F[i - 1]); }
+          tOut.textContent = F.slice(0, Math.min(n, 12)).join(', ') + (n > 12 ? ', …' : '');
+          rOut.textContent = ratios[ratios.length - 1].toFixed(4);
+          update('fib-plot', [
+            { x: ks, y: ratios, type: 'scatter', mode: 'lines+markers',
+              line: { color: cRed, width: 1.5 }, marker: { color: cRed, size: 7 }, hoverinfo: 'x+y' }
+          ], { xaxis: { range: [1.5, n + 0.5], title: 'n', dtick: 1 },
+            yaxis: { range: [0.8, 2.2], title: 'Fₙ₊₁ / Fₙ' },
+            shapes: [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: PHI, y1: PHI,
+              line: { color: cGold, width: 1.5, dash: 'dash' } }] });
+        }
+        sN.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 7: serie geometrica (facoltativa) ----
+      (function () {
+        const sQ = document.getElementById('ser-q'), vQ = document.getElementById('ser-q-val');
+        const sN = document.getElementById('ser-n'), vN = document.getElementById('ser-n-val');
+        const qT = document.getElementById('ser-qtext'), nT = document.getElementById('ser-ntext');
+        const limT = document.getElementById('ser-lim'), smT = document.getElementById('ser-sm');
+        if (!sQ) return;
+        function go() {
+          const q = +sQ.value, N = +sN.value;
+          vQ.textContent = q.toFixed(2); vN.textContent = N; qT.textContent = q.toFixed(2); nT.textContent = N;
+          const lim = 1 / (1 - q);
+          const ms = range1(N); let acc = 0; const S = ms.map((m) => (acc += Math.pow(q, m - 1)));
+          limT.textContent = lim.toFixed(3); smT.textContent = S[S.length - 1].toFixed(3);
+          const lo = Math.min(lim, ...S), hi = Math.max(lim, ...S), pad = (hi - lo) * 0.2 || 0.5;
+          update('ser-plot', [
+            { x: ms, y: S, type: 'scatter', mode: 'lines+markers',
+              line: { color: cRed, width: 1.5 }, marker: { color: cRed, size: 7 }, hoverinfo: 'x+y' }
+          ], { xaxis: { range: [0, N + 1], title: 'm (numero di termini)' },
+            yaxis: { range: [lo - pad, hi + pad], title: 'Sₘ' },
+            shapes: [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: lim, y1: lim,
+              line: { color: cGreen, width: 1.5, dash: 'dash' } }] });
+        }
+        sQ.addEventListener('input', go); sN.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 8: convergenza non uniforme x^n (facoltativa) ----
+      (function () {
+        const sN = document.getElementById('unif-n'), vN = document.getElementById('unif-n-val');
+        const vOut = document.getElementById('unif-val');
+        if (!sN) return;
+        const xs = linspace(0, 1, 240);
+        function go() {
+          const n = +sN.value; vN.textContent = n;
+          vOut.textContent = Math.pow(0.9, n).toFixed(3);
+          update('unif-plot', [
+            { x: xs, y: xs.map(x => Math.pow(x, n)), type: 'scatter', mode: 'lines',
+              line: { color: cRed, width: 2.5 }, hoverinfo: 'x+y' },
+            { x: [0, 0.999], y: [0, 0], type: 'scatter', mode: 'lines',
+              line: { color: cBlue, width: 2, dash: 'dash' }, hoverinfo: 'skip' },
+            { x: [1], y: [1], type: 'scatter', mode: 'markers',
+              marker: { color: cBlue, size: 9 }, hoverinfo: 'skip' }
+          ], { xaxis: { range: [0, 1.03], title: 'x' }, yaxis: { range: [-0.05, 1.1], title: 'fₙ(x)' }, showlegend: false });
+        }
+        sN.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo Zenone: pos-time + bottoni prev/next + tabella ----
+      (function () {
+        const sS = document.getElementById('zeno-steps'), vS = document.getElementById('zeno-steps-val');
+        const nOut = document.getElementById('zeno-step-n'), tOut = document.getElementById('zeno-time-acc');
+        const btnNext = document.getElementById('zeno-next'), btnPrev = document.getElementById('zeno-prev');
+        const tbody = document.getElementById('zeno-tbody');
+        if (!sS) return;
+        const vA = 10, vT = 1, gap = 10;
+        const tMeet = gap / (vA - vT); // 10/9
+        const xMeet = vA * tMeet;       // 100/9
+        const tMax = tMeet * 1.25, xMax = xMeet * 1.15;
+        const ts = linspace(0, tMax, 200);
+
+        // Precalcola tutti i 9 passi di Zenone
+        const STEPS = [];
+        let cumT = 0, posA = 0;
+        for (let k = 0; k < 9; k++) {
+          const dt = gap / vA * Math.pow(vT / vA, k);
+          const from = posA;
+          const to = posA + vA * dt;
+          cumT += dt;
+          STEPS.push({ from, to, dt, cumT, turtleAt: gap + vT * cumT });
+          posA = to;
+        }
+
+        // Grafico rette (statico, una sola volta)
+        draw('zeno-lines-plot', [
+          { x: ts, y: ts.map(t => vA * t), type: 'scatter', mode: 'lines',
+            line: { color: cRed, width: 3 }, name: 'Achille x = 10t', hoverinfo: 'x+y' },
+          { x: ts, y: ts.map(t => gap + vT * t), type: 'scatter', mode: 'lines',
+            line: { color: cBlue, width: 3 }, name: 'Tartaruga x = 10 + t', hoverinfo: 'x+y' },
+          { x: [tMeet], y: [xMeet], type: 'scatter', mode: 'markers',
+            marker: { color: cGold, size: 14, symbol: 'star', line: { color: '#fff', width: 2 } },
+            hovertext: ['Incontro: t = 10/9 s, x = 100/9 m'], hoverinfo: 'text', showlegend: false }
+        ], { xaxis: { range: [0, tMax], title: 't (s)' }, yaxis: { range: [0, xMax], title: 'posizione (m)' },
+          showlegend: true, legend: { x: 0.02, y: 0.97 },
+          shapes: [
+            { type: 'line', x0: tMeet, x1: tMeet, y0: 0, y1: xMeet, line: { color: cGold, width: 1.5, dash: 'dot' } },
+            { type: 'line', x0: 0, x1: tMeet, y0: xMeet, y1: xMeet, line: { color: cGold, width: 1.5, dash: 'dot' } }
+          ],
+          annotations: [{ x: tMeet + 0.01, y: xMeet * 0.45,
+            text: 't* = 10/9 s', showarrow: false, xanchor: 'left', font: { color: cGold, size: 11 } }]
+        });
+
+        function go(N) {
+          sS.value = N; vS.textContent = N; nOut.textContent = N;
+          tOut.textContent = N > 0 ? STEPS[N - 1].cumT.toFixed(5) : '0.00000';
+          btnPrev.disabled = N === 0;
+          btnNext.disabled = N === 9;
+
+          // Aggiorna tabella
+          if (tbody) {
+            tbody.innerHTML = '';
+            for (let k = 0; k < N; k++) {
+              const s = STEPS[k];
+              const tr = document.createElement('tr');
+              tr.innerHTML =
+                `<td><strong>${k + 1}</strong></td>` +
+                `<td>${s.from.toFixed(3)} m</td>` +
+                `<td>${s.to.toFixed(3)} m</td>` +
+                `<td>${s.dt.toFixed(5)} s</td>` +
+                `<td><strong>${s.cumT.toFixed(5)} s</strong></td>` +
+                `<td>${s.turtleAt.toFixed(5)} m</td>`;
+              tbody.appendChild(tr);
+            }
+          }
+
+          // Aggiorna grafico posizione-tempo
+          const shapes = [];
+          const stepT = [], stepXA = [], stepXT = [];
+          for (let k = 0; k < N; k++) {
+            const t = STEPS[k].cumT;
+            stepT.push(t); stepXA.push(vA * t); stepXT.push(gap + vT * t);
+            shapes.push({ type: 'line', x0: t, x1: t, y0: 0, y1: vA * t,
+              line: { color: cGold, width: 1, dash: 'dot' } });
+          }
+          const traces = [
+            { x: ts, y: ts.map(t => vA * t), type: 'scatter', mode: 'lines',
+              line: { color: cRed, width: 2.5 }, hoverinfo: 'skip', showlegend: false },
+            { x: ts, y: ts.map(t => gap + vT * t), type: 'scatter', mode: 'lines',
+              line: { color: cBlue, width: 2.5 }, hoverinfo: 'skip', showlegend: false },
+            { x: [tMeet], y: [xMeet], type: 'scatter', mode: 'markers',
+              marker: { color: cGold, size: 14, symbol: 'star', line: { color: '#fff', width: 2 } },
+              hoverinfo: 'skip', showlegend: false }
+          ];
+          if (N > 0) {
+            traces.push({ x: stepT, y: stepXA, type: 'scatter', mode: 'markers',
+              marker: { color: cRed, size: 9 },
+              hovertext: stepT.map((t, k) => `Passo ${k+1}: Achille a ${(vA*t).toFixed(4)} m`),
+              hoverinfo: 'text', showlegend: false });
+            traces.push({ x: stepT, y: stepXT, type: 'scatter', mode: 'markers',
+              marker: { color: cBlue, size: 9, symbol: 'circle-open', line: { color: cBlue, width: 2 } },
+              hovertext: stepT.map((t, k) => `Passo ${k+1}: Tartaruga a ${(gap+vT*t).toFixed(4)} m`),
+              hoverinfo: 'text', showlegend: false });
+          }
+          update('zeno-pos-plot', traces, {
+            xaxis: { range: [0, tMax], title: 't (s)' },
+            yaxis: { range: [0, xMax], title: 'x (m)' },
+            shapes, showlegend: false
+          });
+        }
+
+        sS.addEventListener('input', () => go(+sS.value));
+        if (btnNext) btnNext.addEventListener('click', () => { const n = +sS.value; if (n < 9) go(n + 1); });
+        if (btnPrev) btnPrev.addEventListener('click', () => { const n = +sS.value; if (n > 0) go(n - 1); });
+        go(0);
+      })();
+
+      // ---- Demo 9: sezione aurea nel pentagono (pentagrammi annidati) ----
+      (function () {
+        const sL = document.getElementById('penta-levels'), vL = document.getElementById('penta-levels-val');
+        if (!sL) return;
+        function pentagon(R, rot) {
+          const v = [];
+          for (let k = 0; k < 5; k++) {
+            const a = Math.PI / 2 + rot + k * 2 * Math.PI / 5;
+            v.push([R * Math.cos(a), R * Math.sin(a)]);
+          }
+          return v;
+        }
+        const palette = [cGold, cRed, cBlue, cGreen, '#a855f7', '#14b8a6'];
+        function go() {
+          const levels = +sL.value; vL.textContent = levels;
+          const traces = [], scale = 1 / (PHI * PHI);
+          for (let i = 0; i < levels; i++) {
+            const v = pentagon(Math.pow(scale, i), i * Math.PI / 5);
+            const order = [0, 2, 4, 1, 3, 0];
+            traces.push({ x: order.map(j => v[j][0]), y: order.map(j => v[j][1]),
+              type: 'scatter', mode: 'lines', line: { color: palette[i % palette.length], width: 2 }, hoverinfo: 'skip' });
+            if (i === 0) {
+              const po = [0, 1, 2, 3, 4, 0];
+              traces.push({ x: po.map(j => v[j][0]), y: po.map(j => v[j][1]), type: 'scatter', mode: 'lines',
+                line: { color: themeColors().zero, width: 2 }, hoverinfo: 'skip' });
+              traces.push({ x: [v[0][0], v[1][0]], y: [v[0][1], v[1][1]], type: 'scatter', mode: 'lines',
+                line: { color: cGreen, width: 5 }, hovertext: ['lato s'], hoverinfo: 'text' });
+              traces.push({ x: [v[0][0], v[2][0]], y: [v[0][1], v[2][1]], type: 'scatter', mode: 'lines',
+                line: { color: cRed, width: 5 }, hovertext: ['diagonale d'], hoverinfo: 'text' });
+            }
+          }
+          update('penta-plot', traces, {
+            xaxis: { range: [-1.15, 1.15], visible: false },
+            yaxis: { range: [-1.15, 1.15], visible: false, scaleanchor: 'x', scaleratio: 1 },
+            showlegend: false, margin: { t: 10, b: 10, l: 10, r: 10 }
+          });
+        }
+        sL.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 10: angolo aureo (fillotassi) ----
+      (function () {
+        const sA = document.getElementById('phyl-ang'), vA = document.getElementById('phyl-ang-val');
+        const sN = document.getElementById('phyl-n'), vN = document.getElementById('phyl-n-val');
+        if (!sA) return;
+        function go() {
+          const angDeg = +sA.value, N = +sN.value;
+          vA.textContent = angDeg.toFixed(1); vN.textContent = N;
+          const ang = angDeg * Math.PI / 180, xs = [], ys = [];
+          for (let k = 0; k < N; k++) { const r = Math.sqrt(k); xs.push(r * Math.cos(k * ang)); ys.push(r * Math.sin(k * ang)); }
+          const R = Math.sqrt(N) + 0.6;
+          update('phyl-plot', [{ x: xs, y: ys, type: 'scatter', mode: 'markers',
+            marker: { color: cGold, size: 6 }, hoverinfo: 'skip' }], {
+            xaxis: { range: [-R, R], visible: false },
+            yaxis: { range: [-R, R], visible: false, scaleanchor: 'x', scaleratio: 1 },
+            showlegend: false, margin: { t: 10, b: 10, l: 10, r: 10 }
+          });
+        }
+        sA.addEventListener('input', go); sN.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 11: somma dei naturali (diverge) ----
+      (function () {
+        const sN = document.getElementById('m12-n'), vN = document.getElementById('m12-n-val'), sOut = document.getElementById('m12-sum');
+        if (!sN) return;
+        function go() {
+          const n = +sN.value; vN.textContent = n;
+          const ns = range1(n), ys = ns.map(k => k * (k + 1) / 2);
+          sOut.textContent = (n * (n + 1) / 2).toLocaleString('it-IT');
+          update('m12-plot', [
+            { x: ns, y: ys, type: 'scatter', mode: 'lines+markers', line: { color: cRed, width: 2 }, marker: { color: cRed, size: 5 }, hoverinfo: 'x+y' }
+          ], { xaxis: { range: [0, n + 1], title: 'n' }, yaxis: { title: 'Sₙ' }, showlegend: false });
+        }
+        sN.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 12: mappa logistica (ragnatela + biforcazioni) ----
+      (function () {
+        const sR = document.getElementById('logi-r'), vR = document.getElementById('logi-r-val');
+        const sX = document.getElementById('logi-x0'), vX = document.getElementById('logi-x0-val');
+        const sI = document.getElementById('logi-it'), vI = document.getElementById('logi-it-val');
+        const verdict = document.getElementById('logi-verdict');
+        if (!sR) return;
+
+        // diagramma delle biforcazioni: calcolato una sola volta
+        const bifX = [], bifY = [], rMin = 2.5, rMax = 4.0, steps = 600;
+        for (let i = 0; i <= steps; i++) {
+          const r = rMin + (rMax - rMin) * i / steps;
+          let x = 0.5;
+          for (let k = 0; k < 200; k++) x = r * x * (1 - x);
+          for (let k = 0; k < 60; k++) { x = r * x * (1 - x); bifX.push(r); bifY.push(x); }
+        }
+        draw('logi-bif-plot', [
+          { x: bifX, y: bifY, type: 'scattergl', mode: 'markers', marker: { color: '#14b8a6', size: 1.6, opacity: 0.35 }, hoverinfo: 'skip' }
+        ], { xaxis: { range: [rMin, rMax], title: 'r' }, yaxis: { range: [0, 1], title: 'stato a lungo termine' },
+          shapes: [{ type: 'line', x0: 3.2, x1: 3.2, y0: 0, y1: 1, line: { color: cGold, width: 1.5, dash: 'dash' } }], showlegend: false });
+
+        function classify(r) {
+          if (r < 1) return 'estinzione: la popolazione tende a 0.';
+          if (r < 3) return 'equilibrio stabile: converge al punto fisso x* = 1 − 1/r ≈ ' + (1 - 1 / r).toFixed(3) + '.';
+          if (r < 3.449) return 'ciclo di periodo 2: oscilla fra due valori.';
+          if (r < 3.544) return 'ciclo di periodo 4.';
+          if (r < 3.5699) return 'cascata di raddoppi (periodo 8, 16, …).';
+          if (r >= 3.83 && r < 3.857) return 'finestra periodica: ciclo di periodo 3 dentro il caos.';
+          return 'caos: nessun ciclo e forte sensibilità alle condizioni iniziali.';
+        }
+        function go() {
+          const r = +sR.value, x0 = +sX.value, iters = +sI.value;
+          vR.textContent = r.toFixed(3); vX.textContent = x0.toFixed(2); vI.textContent = iters;
+          const xs = linspace(0, 1, 200), par = xs.map(x => r * x * (1 - x));
+          let x = x0; const cx = [x], cy = [0];
+          for (let i = 0; i < iters; i++) { const y = r * x * (1 - x); cx.push(x); cy.push(y); cx.push(y); cy.push(y); x = y; }
+          update('logi-cobweb-plot', [
+            { x: xs, y: par, type: 'scatter', mode: 'lines', line: { color: cBlue, width: 2.5 }, hoverinfo: 'skip' },
+            { x: [0, 1], y: [0, 1], type: 'scatter', mode: 'lines', line: { color: themeColors().zero, width: 1.5, dash: 'dot' }, hoverinfo: 'skip' },
+            { x: cx, y: cy, type: 'scatter', mode: 'lines', line: { color: cRed, width: 1 }, hoverinfo: 'skip' }
+          ], { xaxis: { range: [0, 1], title: 'xₙ' }, yaxis: { range: [0, 1], title: 'xₙ₊₁' }, showlegend: false });
+          verdict.innerHTML = 'r = <strong>' + r.toFixed(3) + '</strong> → ' + classify(r);
+          if (window.Plotly) Plotly.relayout('logi-bif-plot', { 'shapes[0].x0': r, 'shapes[0].x1': r });
+        }
+        sR.addEventListener('input', go); sX.addEventListener('input', go); sI.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 13: fiocco di neve di Koch ----
+      (function () {
+        const sL = document.getElementById('koch-level'), vL = document.getElementById('koch-level-val');
+        const segOut = document.getElementById('koch-seg'), perOut = document.getElementById('koch-per');
+        if (!sL) return;
+        function koch(p1, p2, depth, out) {
+          if (depth === 0) { out.push(p1); return; }
+          const dx = (p2[0] - p1[0]) / 3, dy = (p2[1] - p1[1]) / 3;
+          const a = [p1[0] + dx, p1[1] + dy], b = [p1[0] + 2 * dx, p1[1] + 2 * dy];
+          const ang = -Math.PI / 3, c = Math.cos(ang), s = Math.sin(ang);
+          const ux = b[0] - a[0], uy = b[1] - a[1];
+          const peak = [a[0] + ux * c - uy * s, a[1] + ux * s + uy * c];
+          koch(p1, a, depth - 1, out);
+          koch(a, peak, depth - 1, out);
+          koch(peak, b, depth - 1, out);
+          koch(b, p2, depth - 1, out);
+        }
+        const A = [-1, -0.5774], B = [1, -0.5774], C = [0, 1.1547];
+        function go() {
+          const L = +sL.value; vL.textContent = L;
+          const pts = [];
+          koch(A, B, L, pts); koch(B, C, L, pts); koch(C, A, L, pts); pts.push(A);
+          segOut.textContent = (3 * Math.pow(4, L)).toLocaleString('it-IT');
+          perOut.textContent = Math.pow(4 / 3, L).toFixed(2);
+          update('koch-plot', [{ x: pts.map(p => p[0]), y: pts.map(p => p[1]), type: 'scatter', mode: 'lines',
+            fill: 'toself', fillcolor: 'rgba(59,130,246,0.15)', line: { color: cBlue, width: 1.6 }, hoverinfo: 'skip' }], {
+            xaxis: { range: [-1.6, 1.6], visible: false },
+            yaxis: { range: [-1.4, 1.7], visible: false, scaleanchor: 'x', scaleratio: 1 },
+            showlegend: false, margin: { t: 10, b: 10, l: 10, r: 10 }
+          });
+        }
+        sL.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 14: triangolo di Sierpiński ----
+      (function () {
+        const sL = document.getElementById('sier-level'), vL = document.getElementById('sier-level-val');
+        const triOut = document.getElementById('sier-tri');
+        if (!sL) return;
+        const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+        function sierp(p1, p2, p3, depth, out) {
+          if (depth === 0) { out.push([p1, p2, p3]); return; }
+          const a = mid(p1, p2), b = mid(p2, p3), c = mid(p1, p3);
+          sierp(p1, a, c, depth - 1, out);
+          sierp(a, p2, b, depth - 1, out);
+          sierp(c, b, p3, depth - 1, out);
+        }
+        const T = [0, 1.1547], L = [-1, -0.5774], R = [1, -0.5774];
+        function go() {
+          const lv = +sL.value; vL.textContent = lv;
+          const tris = []; sierp(T, L, R, lv, tris);
+          triOut.textContent = Math.pow(3, lv).toLocaleString('it-IT');
+          const xs = [], ys = [];
+          tris.forEach(t => {
+            xs.push(t[0][0], t[1][0], t[2][0], t[0][0], null);
+            ys.push(t[0][1], t[1][1], t[2][1], t[0][1], null);
+          });
+          update('sier-plot', [{ x: xs, y: ys, type: 'scatter', mode: 'lines', fill: 'toself',
+            fillcolor: 'rgba(168,85,247,0.55)', line: { color: '#a855f7', width: 0.5 }, hoverinfo: 'skip' }], {
+            xaxis: { range: [-1.2, 1.2], visible: false },
+            yaxis: { range: [-0.8, 1.3], visible: false, scaleanchor: 'x', scaleratio: 1 },
+            showlegend: false, margin: { t: 10, b: 10, l: 10, r: 10 }
+          });
+        }
+        sL.addEventListener('input', go); go();
+      })();
+
+      // ---- Demo 15: insieme di Mandelbrot ----
+      (function () {
+        const sZ = document.getElementById('mandel-zoom'), vZ = document.getElementById('mandel-zoom-val');
+        const sIt = document.getElementById('mandel-iter'), vIt = document.getElementById('mandel-iter-val');
+        if (!sZ) return;
+        const W = 220, H = 160, aspect = W / H;
+        const MSCALE = [[0, '#05010f'], [0.04, '#0b1d4f'], [0.12, '#1e3a8a'], [0.25, '#2563eb'],
+          [0.45, '#06b6d4'], [0.65, '#22c55e'], [0.82, '#fde047'], [1, '#fff7ed']];
+        let cx = -0.5, cy = 0, halfW = 1.6, maxIter = 80, pending = false;
+        function render() {
+          const x0 = cx - halfW * aspect, x1 = cx + halfW * aspect, y0 = cy - halfW, y1 = cy + halfW;
+          const xc = new Array(W), yc = new Array(H);
+          for (let i = 0; i < W; i++) xc[i] = x0 + (x1 - x0) * i / (W - 1);
+          for (let j = 0; j < H; j++) yc[j] = y0 + (y1 - y0) * j / (H - 1);
+          const z = new Array(H);
+          for (let j = 0; j < H; j++) {
+            const row = new Array(W), b = yc[j];
+            for (let i = 0; i < W; i++) {
+              const a = xc[i]; let zr = 0, zi = 0, k = 0;
+              for (; k < maxIter; k++) {
+                const t = zr * zr - zi * zi + a; zi = 2 * zr * zi + b; zr = t;
+                if (zr * zr + zi * zi > 4) break;
+              }
+              row[i] = (k >= maxIter) ? 0 : k;
+            }
+            z[j] = row;
+          }
+          update('mandel-plot', [{ z: z, x: xc, y: yc, type: 'heatmap', colorscale: MSCALE,
+            showscale: false, zsmooth: 'best', hoverinfo: 'skip' }], {
+            xaxis: { range: [x0, x1], title: 'Re(c)' },
+            yaxis: { range: [y0, y1], title: 'Im(c)', scaleanchor: 'x', scaleratio: 1 },
+            margin: { t: 10, b: 40, l: 50, r: 10 }
+          });
+        }
+        function schedule() { if (pending) return; pending = true; requestAnimationFrame(() => { pending = false; render(); }); }
+        function controls() {
+          const zz = +sZ.value, t = zz / 8, sm = t * t * (3 - 2 * t);
+          cx = -0.5 + (-0.245) * sm; cy = 0.113 * sm; halfW = 1.6 * Math.pow(0.5, zz);
+          maxIter = +sIt.value;
+          vZ.textContent = Math.round(Math.pow(2, zz)) + '×'; vIt.textContent = maxIter;
+        }
+        sZ.addEventListener('input', () => { controls(); schedule(); });
+        sIt.addEventListener('input', () => { controls(); schedule(); });
+        controls(); render();
+      })();
+    });
+  </script>
+</body>
+
+</html>

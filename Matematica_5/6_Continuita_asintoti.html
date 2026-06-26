@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 6 — Continuità e Asintoti</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quinto anno · Lezione 6</div>
+    <h1>Continuità e Asintoti</h1>
+    <p>Quando una funzione "non si spezza" — e come si comporta ai bordi del suo dominio</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quinto anno</a>
+    <span class="sep">/</span> Continuità e Asintoti
+  </nav>
+
+  <main>
+
+    <!-- 1 — CONTINUITÀ INTUITIVA -->
+    <section id="sec1">
+      <h2>1. Continuità: l'idea intuitiva</h2>
+      <p>Cosa significa che una funzione è <strong>continua</strong>? L'immagine più immediata è questa:</p>
+      <div class="rule">Una funzione è continua se puoi disegnarne il grafico <strong>senza mai staccare la penna dal
+        foglio</strong>: nessun salto, nessun buco, nessuna interruzione.</div>
+      <p>Una retta, una parabola, $\sin x$, $e^x$: si disegnano tutte "di un fiato". Al contrario, la funzione "scalino"
+        (che vale $0$ fino a un certo punto e poi salta a $1$) ti costringe a <em>sollevare la penna</em>: ha un salto.
+        Anche $\dfrac{1}{x}$ ti obbliga a staccare la penna in $x=0$, dove "esplode".</p>
+      <div class="note">Questa immagine è ottima per cominciare, ma — come vedremo subito — è troppo vaga per essere una
+        vera definizione matematica. Serve qualcosa di più preciso.</div>
+    </section>
+
+    <!-- 2 — IL CASO sin(1/x) -->
+    <section id="sec-sinc">
+      <h2>2. Un caso che manda in crisi l'intuizione: $\sin\dfrac{1}{x}$</h2>
+      <p>Consideriamo $f(x) = \sin\dfrac{1}{x}$. Per ogni $x \neq 0$ questa funzione è perfettamente <strong>continua</strong>
+        (è composizione di funzioni continue). Eppure, avvicinandosi a $0$, accade qualcosa di sconcertante: l'argomento
+        $\dfrac{1}{x}$ diventa enorme, e il seno <strong>oscilla sempre più in fretta</strong>, infinite volte, fra
+        $-1$ e $+1$.</p>
+
+      <div class="interactive-demo">
+        <div class="demo-title">$\sin\dfrac{1}{x}$ — zooma verso $x=0$ e guarda le oscillazioni</div>
+        <div class="demo-controls">
+          <label for="sinc-zoom">zoom (semi-finestra W):</label>
+          <input type="range" id="sinc-zoom" min="-1.5" max="0.5" step="0.02" value="0.3">
+          <span class="demo-value" id="sinc-zoom-val">2.00</span>
+        </div>
+        <div class="demo-plot" id="sinc-plot"></div>
+        <p style="font-size:0.9rem; opacity:0.85; margin:0.2rem 0 0;">Per quanto tu zoomi verso lo zero, il disegno
+          <strong>non si calma mai</strong>: si ripresenta sempre uguale, fitto di oscillazioni. È impossibile da
+          disegnare "senza staccare la penna" vicino a $0$.</p>
+      </div>
+
+      <p>Qui l'intuizione della penna fa acqua: la funzione <em>è</em> continua (ovunque sia definita), ma <em>non</em> si
+        può disegnare vicino a $0$. E in $x=0$? Lì non è nemmeno definita, e il limite $\lim_{x\to0}\sin\frac1x$
+        <strong>non esiste</strong> (la funzione non si avvicina ad alcun valore: continua a oscillare). Per dire con
+        precisione cosa succede ci serve una definizione <strong>formale</strong>, basata sui limiti.</p>
+    </section>
+
+    <!-- 3 — DEFINIZIONE FORMALE -->
+    <section id="sec-formale">
+      <h2>3. La definizione formale di continuità</h2>
+      <p>La continuità si definisce <strong>punto per punto</strong>, usando il concetto di limite che già conosciamo.</p>
+      <div class="definition">
+        Una funzione $f$ è <strong>continua nel punto $x_0$</strong> se valgono <em>tutte e tre</em> queste condizioni:
+        <ol>
+          <li>$f(x_0)$ è <strong>definita</strong> (cioè $x_0$ appartiene al dominio);</li>
+          <li>il limite $\displaystyle\lim_{x \to x_0} f(x)$ <strong>esiste ed è finito</strong>;</li>
+          <li>i due valori <strong>coincidono</strong>: $\displaystyle\lim_{x \to x_0} f(x) = f(x_0)$.</li>
+        </ol>
+      </div>
+      <div class="rule"><strong>Proprietà locale e proprietà globale.</strong> La continuità è una
+        <strong>proprietà locale</strong>: si verifica <em>punto per punto</em>. Dire "la funzione è continua in $x_0$"
+        riguarda il comportamento <em>vicino a quel singolo punto</em> e non dice nulla del resto. Se però $f$ è continua
+        in <em>ogni</em> punto di un intervallo $[a, b]$ (o aperto, o del dominio intero), si dice semplicemente che
+        $f$ è <strong>continua sull'intervallo</strong> (o <strong>continua</strong> tout court). La distinzione conta:
+        $f(x)=\frac{1}{x}$ è continua in ogni punto del suo dominio — ma non è continua <em>su</em> $\mathbb{R}$, perché
+        in $x=0$ non è neanche definita.</div>
+      <div class="rule">In pratica la condizione 3 racchiude tutto: <em>il limite deve esistere e valere esattamente quanto
+        la funzione</em>. Se anche una sola delle tre condizioni salta, in $x_0$ c'è una <strong>discontinuità</strong>.</div>
+      <div class="note">Ora si capisce $\sin\frac1x$: in $x=0$ fallisce già la condizione 1 (non è definita) e pure la 2
+        (il limite non esiste). Negli altri punti, invece, tutte e tre valgono: è continua. La definizione formale dice
+        ciò che la "penna" non sapeva esprimere.</div>
+    </section>
+
+    <!-- 4 — TIPOLOGIE DI DISCONTINUITÀ -->
+    <section id="sec-discont">
+      <h2>4. Le tipologie di discontinuità</h2>
+      <p>Quando in un punto $x_0$ la continuità fallisce, si classifica il "tipo" di discontinuità in base a come si
+        comportano i <strong>limiti laterali</strong> $\ell^- = \lim_{x\to x_0^-} f(x)$ e $\ell^+ = \lim_{x\to x_0^+} f(x)$.</p>
+
+      <div class="card-row">
+        <div class="card">
+          <h4>Terza specie (eliminabile)</h4>
+          <p>$\ell^-$ e $\ell^+$ esistono, finiti e <strong>uguali</strong>, ma $f(x_0)$ non è definita (o vale altro).
+            C'è solo un "buco": basterebbe ridefinire $f(x_0)$ per renderla continua.</p>
+        </div>
+        <div class="card">
+          <h4>Prima specie (salto)</h4>
+          <p>$\ell^-$ e $\ell^+$ esistono, finiti, ma <strong>diversi</strong>. Il grafico "salta". La differenza
+            $|\ell^+ - \ell^-|$ è l'<em>ampiezza del salto</em>.</p>
+        </div>
+        <div class="card">
+          <h4>Seconda specie (essenziale)</h4>
+          <p>Almeno uno dei due limiti laterali è <strong>infinito</strong> oppure <strong>non esiste</strong>
+            (es. $\frac1x$ in $0$, oppure $\sin\frac1x$ che oscilla). È il caso "grave".</p>
+        </div>
+      </div>
+
+      <h3>4.1 — Esercizi: studia i punti di discontinuità</h3>
+
+      <div class="exercise" data-expr="(x^2-4)/(x-2)" data-xmin="-2" data-xmax="6" data-ymin="-1" data-ymax="9" data-hole="2,4">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Classifica la discontinuità di:</p><div class="formula-box">$$f(x) = \frac{x^2 - 4}{x - 2}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Punto critico:</strong> il denominatore si annulla in $x_0 = 2$, dove $f$ non è definita.</p>
+          <p><span class="step-num">2</span><strong>Limite:</strong> $\dfrac{x^2-4}{x-2} = \dfrac{(x-2)(x+2)}{x-2} = x+2$ per $x\neq2$, quindi $\lim_{x\to2} f(x) = 4$ (uguale da destra e da sinistra).</p>
+          <p><span class="step-num">3</span>Il limite esiste finito ma $f(2)$ non è definita: c'è un solo "buco" in $(2,4)$.</p>
+          <div class="result-box"><span class="result-label">Conclusione</span><span class="result-value">Discontinuità di <strong>terza specie</strong> (eliminabile) in $x=2$: basta porre $f(2)=4$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="abs(x-1)/(x-1)" data-xmin="-2" data-xmax="4" data-ymin="-2" data-ymax="2">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Classifica la discontinuità di:</p><div class="formula-box">$$f(x) = \frac{|x-1|}{x-1}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Punto critico:</strong> $x_0 = 1$ (denominatore nullo).</p>
+          <p><span class="step-num">2</span>Per $x>1$: $|x-1| = x-1$, quindi $f(x) = +1$. Per $x<1$: $|x-1| = -(x-1)$, quindi $f(x) = -1$.</p>
+          <p><span class="step-num">3</span><strong>Limiti laterali:</strong> $\ell^- = -1$ e $\ell^+ = +1$: esistono, finiti, ma diversi.</p>
+          <div class="result-box"><span class="result-label">Conclusione</span><span class="result-value">Discontinuità di <strong>prima specie</strong> (salto) in $x=1$, ampiezza $|{+1}-({-1})| = 2$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="1/(x-2)" data-xmin="-3" data-xmax="7" data-ymin="-10" data-ymax="10" data-exclude="2">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Classifica la discontinuità di:</p><div class="formula-box">$$f(x) = \frac{1}{x - 2}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Punto critico:</strong> $x_0 = 2$.</p>
+          <p><span class="step-num">2</span><strong>Limiti laterali:</strong> da sinistra il denominatore è $0^-$, quindi $\ell^- = -\infty$; da destra è $0^+$, quindi $\ell^+ = +\infty$.</p>
+          <p><span class="step-num">3</span>Almeno un limite laterale è infinito $\Rightarrow$ discontinuità essenziale; geometricamente è un <em>asintoto verticale</em>.</p>
+          <div class="result-box"><span class="result-label">Conclusione</span><span class="result-value">Discontinuità di <strong>seconda specie</strong> (essenziale) in $x=2$ — asintoto verticale.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — ASINTOTI -->
+    <section id="sec-asintoti">
+      <h2>5. Gli asintoti</h2>
+      <p>Un <strong>asintoto</strong> è una retta a cui il grafico della funzione si <em>avvicina indefinitamente</em>.
+        Descrive il comportamento della funzione "ai bordi": vicino ai punti che fanno esplodere la funzione, o quando
+        $x$ va all'infinito. Ci sono tre tipi.</p>
+
+      <div class="definition">
+        <p><strong>Asintoto verticale</strong> $x = c$: se $\displaystyle\lim_{x \to c} f(x) = \pm\infty$ (anche solo da un lato).</p>
+        <p><strong>Asintoto orizzontale</strong> $y = L$: se $\displaystyle\lim_{x \to \pm\infty} f(x) = L$ (finito).</p>
+        <p><strong>Asintoto obliquo</strong> $y = mx + q$: se $\displaystyle m = \lim_{x \to \pm\infty} \frac{f(x)}{x}$ è
+          finito e non nullo, e $\displaystyle q = \lim_{x \to \pm\infty} \big(f(x) - mx\big)$ è finito.</p>
+      </div>
+      <div class="rule"><strong>Attenzione.</strong> Orizzontale e obliquo si <em>escludono a vicenda</em> dalla stessa
+        parte: se c'è l'orizzontale non c'è l'obliquo (e viceversa). L'obliquo si cerca solo quando il limite
+        all'infinito è $\pm\infty$ e il grado del numeratore supera di <em>uno</em> quello del denominatore.</div>
+
+      <div class="note">
+        <strong>La curva può toccare l'asintoto.</strong>
+        L'asintoto descrive il comportamento <em>all'infinito</em>: la distanza $|f(x)-(mx+q)| \to 0$ per
+        $x \to \pm\infty$. Questo <strong>non esclude</strong> che curva e retta si incontrino a valori finiti di $x$.
+        <ul style="margin-top:0.5rem; padding-left:1.3rem;">
+          <li style="margin-bottom:0.4rem;"><strong>Asintoto orizzontale:</strong> per le frazioni razionali più comuni
+            la curva non raggiunge mai la retta $y=L$ (es. $\frac{2x+1}{x-1}$ non vale mai $2$).
+            Tuttavia non è una legge assoluta: $f(x)=\dfrac{x^2+x}{x^2+1}$ ha asintoto orizzontale $y=1$
+            e ci passa esattamente per $x=1$.</li>
+          <li><strong>Asintoto obliquo:</strong> il grafico può attraversare la retta asintotica.
+            Un esempio tipico è $f(x) = \dfrac{x^3-x}{x^2+1}$: dividendo si ottiene $f(x) = x - \dfrac{2x}{x^2+1}$,
+            quindi l'asintoto è $y = x$. La curva taglia la retta in $x=0$ (entrambe valgono $0$),
+            poi se ne allontana, e infine vi si riavvicina all'infinito.</li>
+        </ul>
+      </div>
+      <figure style="max-width:520px; margin:0.8rem auto 1.4rem;">
+        <div class="auto-plot" style="height:240px;"
+             data-expr="(x^3-x)/(x^2+1)"
+             data-xmin="-6" data-xmax="6" data-ymin="-6" data-ymax="6"
+             data-oblique="1,0">
+        </div>
+        <figcaption style="text-align:center; font-size:0.85rem; opacity:0.75; margin-top:0.4rem;">
+          $f(x) = \dfrac{x^3-x}{x^2+1}$ (curva rossa) e il suo asintoto obliquo $y=x$ (tratteggiato viola).
+          Si incontrano in $x=0$, poi si separano, poi si riavvicinano all'infinito.
+        </figcaption>
+      </figure>
+
+      <h3>5.1 — Esercizi: studia gli asintoti</h3>
+
+      <div class="exercise" data-expr="(2*x+1)/(x-1)" data-xmin="-8" data-xmax="10" data-ymin="-8" data-ymax="12" data-exclude="1" data-asym="2">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Trova tutti gli asintoti di:</p><div class="formula-box">$$f(x) = \frac{2x + 1}{x - 1}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Verticale:</strong> il denominatore si annulla in $x=1$; lì $\lim_{x\to1} f = \pm\infty$. Asintoto verticale $x = 1$.</p>
+          <p><span class="step-num">2</span><strong>Orizzontale:</strong> $\lim_{x\to\pm\infty} \dfrac{2x+1}{x-1} = \dfrac{2}{1} = 2$ (rapporto dei coefficienti di grado massimo). Asintoto orizzontale $y = 2$.</p>
+          <p><span class="step-num">3</span>C'è l'orizzontale $\Rightarrow$ niente obliquo.</p>
+          <div class="result-box"><span class="result-label">Asintoti</span><span class="result-value">Verticale $x=1$ &nbsp;·&nbsp; Orizzontale $y=2$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="x/(x^2-1)" data-xmin="-4" data-xmax="4" data-ymin="-6" data-ymax="6" data-exclude="-1,1" data-asym="0">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Trova tutti gli asintoti di:</p><div class="formula-box">$$f(x) = \frac{x}{x^2 - 1}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Verticali:</strong> $x^2 - 1 = 0 \Rightarrow x = -1$ e $x = 1$. In entrambi $f \to \pm\infty$: due asintoti verticali.</p>
+          <p><span class="step-num">2</span><strong>Orizzontale:</strong> il grado del numeratore ($1$) è minore di quello del denominatore ($2$), quindi $\lim_{x\to\pm\infty} f = 0$. Asintoto orizzontale $y = 0$.</p>
+          <p><span class="step-num">3</span>C'è l'orizzontale $\Rightarrow$ niente obliquo.</p>
+          <div class="result-box"><span class="result-label">Asintoti</span><span class="result-value">Verticali $x=-1$ e $x=1$ &nbsp;·&nbsp; Orizzontale $y=0$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise" data-expr="(x^2+1)/x" data-xmin="-6" data-xmax="6" data-ymin="-10" data-ymax="10" data-exclude="0" data-oblique="1,0">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Trova tutti gli asintoti di:</p><div class="formula-box">$$f(x) = \frac{x^2 + 1}{x}$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-graph">📈 Mostra grafico</button><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Verticale:</strong> $x = 0$ annulla il denominatore; $\lim_{x\to0} f = \pm\infty$. Asintoto verticale $x = 0$.</p>
+          <p><span class="step-num">2</span><strong>Orizzontale?</strong> $\lim_{x\to\pm\infty} f = \pm\infty$: non c'è asintoto orizzontale. Il grado sopra ($2$) supera di $1$ quello sotto ($1$): cerchiamo l'obliquo.</p>
+          <p><span class="step-num">3</span><strong>Coefficiente angolare:</strong> $m = \lim_{x\to\pm\infty} \dfrac{f(x)}{x} = \lim \dfrac{x^2+1}{x^2} = 1$.</p>
+          <p><span class="step-num">4</span><strong>Termine noto:</strong> $q = \lim_{x\to\pm\infty}\big(f(x) - 1\cdot x\big) = \lim\Big(\dfrac{x^2+1}{x} - x\Big) = \lim \dfrac{1}{x} = 0$.</p>
+          <div class="result-box"><span class="result-label">Asintoti</span><span class="result-value">Verticale $x=0$ &nbsp;·&nbsp; Obliquo $y = x$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — QUIZ -->
+    <section id="quiz">
+      <h2>6. Quiz finale</h2>
+      <p>Dieci domande su continuità, discontinuità e asintoti. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 6 — Continuità e Asintoti · Matematica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX, math.js e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { diff: 'easy', text: 'L\'idea "disegnare senza staccare la penna dal foglio" come definizione di continuità è:',
+        options: ['Perfettamente rigorosa', 'Una buona intuizione, ma non rigorosa', 'Sbagliata', 'Valida solo per le rette'],
+        correct: 1, explain: 'È un\'ottima immagine iniziale ma troppo vaga: serve la definizione formale con i limiti (vedi $\\sin\\frac1x$).' },
+      { diff: 'easy', text: 'Perché $f$ sia continua in $x_0$ devono valere:',
+        options: ['Solo che $f(x_0)$ esista', 'Solo che il limite esista', 'Che $f(x_0)$ esista, il limite esista finito e i due coincidano', 'Che la funzione sia una retta'],
+        correct: 2, explain: 'Le tre condizioni insieme: dominio, limite finito esistente, e $\\lim_{x\\to x_0} f(x) = f(x_0)$.' },
+      { diff: 'easy', text: 'La funzione $\\sin\\frac1x$ vicino a $x=0$:',
+        options: ['Tende a 0', 'Tende a 1', 'Oscilla infinitamente: il limite non esiste', 'È costante'],
+        correct: 2, explain: 'L\'argomento $1/x$ esplode e il seno oscilla sempre più fitto fra $-1$ e $+1$: il limite in $0$ non esiste.' },
+      { diff: 'easy', text: 'La funzione $f(x)=\\dfrac{x^2-4}{x-2}$ in $x=2$ ha una discontinuità:',
+        options: ['Di prima specie (salto)', 'Di seconda specie', 'Di terza specie (eliminabile)', 'Nessuna, è continua'],
+        correct: 2, explain: 'Il limite vale $4$ ma $f(2)$ non è definita: è un "buco" eliminabile ponendo $f(2)=4$.' },
+      { diff: 'medium', text: 'Se $\\lim_{x\\to x_0^-} f = -1$ e $\\lim_{x\\to x_0^+} f = +1$, in $x_0$ c\'è una discontinuità:',
+        options: ['Eliminabile', 'Di prima specie (salto)', 'Di seconda specie', 'Nessuna'],
+        correct: 1, explain: 'I due limiti laterali sono finiti ma diversi: salto di ampiezza $|{+1}-({-1})|=2$.' },
+      { diff: 'medium', text: 'In $x=2$ la funzione $\\dfrac{1}{x-2}$ ha:',
+        options: ['Una discontinuità eliminabile', 'Una discontinuità di seconda specie (asintoto verticale)', 'Un salto finito', 'Nessuna discontinuità'],
+        correct: 1, explain: 'I limiti laterali sono $-\\infty$ e $+\\infty$: discontinuità essenziale, cioè un asintoto verticale.' },
+      { diff: 'medium', text: 'Una funzione ha asintoto orizzontale $y=L$ quando:',
+        options: ['$\\lim_{x\\to c} f = \\pm\\infty$', '$\\lim_{x\\to\\pm\\infty} f = L$ finito', '$f(0)=L$', 'La funzione è costante'],
+        correct: 1, explain: 'L\'asintoto orizzontale descrive il valore a cui $f$ tende quando $x\\to\\pm\\infty$.' },
+      { diff: 'medium', text: 'Qual è l\'asintoto orizzontale di $f(x)=\\dfrac{2x+1}{x-1}$?',
+        options: ['$y=0$', '$y=1$', '$y=2$', 'Non c\'è'],
+        correct: 2, explain: 'Stesso grado sopra e sotto: il limite all\'infinito è il rapporto dei coefficienti, $\\frac{2}{1}=2$.' },
+      { diff: 'hard', text: 'Per l\'asintoto obliquo $y=mx+q$, il coefficiente $m$ si calcola come:',
+        options: ['$\\lim_{x\\to\\pm\\infty} f(x)$', '$\\lim_{x\\to\\pm\\infty} \\dfrac{f(x)}{x}$', '$f(1)-f(0)$', '$\\lim_{x\\to0} f(x)$'],
+        correct: 1, explain: 'Prima $m=\\lim \\frac{f(x)}{x}$ (finito e non nullo), poi $q=\\lim (f(x)-mx)$.' },
+      { diff: 'hard', text: 'Quali asintoti ha $f(x)=\\dfrac{x^2+1}{x}$?',
+        options: ['Solo orizzontale $y=0$', 'Verticale $x=0$ e orizzontale $y=1$', 'Verticale $x=0$ e obliquo $y=x$', 'Nessun asintoto'],
+        correct: 2, explain: 'Verticale in $x=0$; all\'infinito $f\\to\\pm\\infty$, e con $m=1$, $q=0$ si trova l\'obliquo $y=x$.' }
+    ];
+  </script>
+
+  <!-- Demo interattiva: zoom su sin(1/x) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { linspace, update } = Plt;
+      const slider = document.getElementById('sinc-zoom'), val = document.getElementById('sinc-zoom-val');
+      function go() {
+        const W = Math.pow(10, +slider.value);     // semi-finestra
+        val.textContent = W < 0.1 ? W.toFixed(3) : W.toFixed(2);
+        const gap = W / 50;                          // saltiamo l'intorno immediato di 0
+        const left = linspace(-W, -gap, 1600), right = linspace(gap, W, 1600);
+        const f = x => Math.sin(1 / x);
+        update('sinc-plot', [
+          { x: left, y: left.map(f), type: 'scatter', mode: 'lines', line: { color: '#ef4444', width: 1.4 }, hoverinfo: 'skip' },
+          { x: right, y: right.map(f), type: 'scatter', mode: 'lines', line: { color: '#ef4444', width: 1.4 }, hoverinfo: 'skip' }
+        ], { xaxis: { range: [-W, W], title: 'x' }, yaxis: { range: [-1.3, 1.3], title: 'sin(1/x)' } });
+      }
+      slider.addEventListener('input', go); go();
+    });
+  </script>
+</body>
+
+</html>

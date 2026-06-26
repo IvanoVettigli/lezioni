@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 8 — Il rapporto incrementale e la derivata</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quinto anno · Lezione 8</div>
+    <h1>Il rapporto incrementale e la derivata</h1>
+    <p>Dalla velocità media a quella istantanea: come si misura il cambiamento in un istante</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quinto anno</a>
+    <span class="sep">/</span> Il rapporto incrementale
+  </nav>
+
+  <main>
+
+    <!-- 1 — COS'È UN RAPPORTO INCREMENTALE -->
+    <section id="sec1">
+      <h2>1. Che cos'è un rapporto incrementale</h2>
+      <p>Immagina di partire in auto e di percorrere $150$ km in $2$ ore. La tua <strong>velocità media</strong> è
+        $\dfrac{150\,\text{km}}{2\,\text{h}} = 75$ km/h. Ma il tachimetro, durante il viaggio, ha segnato di tutto: $0$ in
+        coda, $130$ in autostrada, $50$ in città. La media nasconde ciò che succede istante per istante.</p>
+      <p>Quel calcolo — <em>quanto è cambiata una grandezza diviso quanto è cambiata l'altra</em> — è un
+        <strong>rapporto incrementale</strong>. Non riguarda solo la fisica: è la stessa idea quando calcoli di quanto
+        aumenta il costo all'aumentare dei pezzi prodotti, o di quanto sale la temperatura ogni ora.</p>
+
+      <div class="definition">
+        Data una funzione $f$ e due punti $x_0$ e $x_0 + h$ del suo dominio (con $h \neq 0$ l'<strong>incremento</strong>),
+        il <strong>rapporto incrementale</strong> di $f$ tra questi due punti è
+        $$R = \frac{\Delta y}{\Delta x} = \frac{f(x_0 + h) - f(x_0)}{h}.$$
+        Misura la <em>variazione media</em> di $f$ sull'intervallo, cioè di quanto cresce $f$ in media per ogni unità di $x$.
+      </div>
+
+      <p>Geometricamente, $\dfrac{\Delta y}{\Delta x}$ è il <strong>coefficiente angolare della retta secante</strong> che
+        passa per i due punti $A = \big(x_0,\, f(x_0)\big)$ e $B = \big(x_0 + h,\, f(x_0 + h)\big)$ del grafico.</p>
+
+      <div class="interactive-demo">
+        <div class="demo-title">Il rapporto incrementale come pendenza della secante</div>
+        <div class="demo-controls">
+          <label for="intro-h">incremento h:</label>
+          <input type="range" id="intro-h" min="0.1" max="2.5" step="0.05" value="1.5">
+          <span class="demo-value" id="intro-h-val">1.50</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#f5b400;"></span>retta secante per $A$ e $B$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span>$\Delta x$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>$\Delta y$</div>
+        </div>
+        <div class="demo-plot" id="intro-plot"></div>
+        <div class="demo-result">Funzione $f(x) = x^2$, punto fisso $x_0 = 1$. Rapporto incrementale
+          $\dfrac{\Delta y}{\Delta x} = $ <strong><span id="intro-dq">2.50</span></strong>. Riducendo $h$ il triangolo
+          $\Delta x$–$\Delta y$ si rimpicciolisce e la secante cambia inclinazione: dove andrà a finire?</div>
+      </div>
+
+      <div class="note">Il rapporto incrementale dipende da <em>due</em> punti. La domanda interessante — quella che apre
+        il calcolo differenziale — è: cosa succede quando i due punti si avvicinano fino a <strong>coincidere</strong>?</div>
+    </section>
+
+    <!-- 2 — DEFINIZIONE FORMALE E DERIVATA -->
+    <section id="sec2">
+      <h2>2. Il limite per $h \to 0$: la derivata</h2>
+      <p>Facciamo tendere l'incremento $h$ a zero: i due punti $A$ e $B$ si avvicinano sempre di più, finché si fondono in
+        uno solo. Il rapporto incrementale tende (quando il limite esiste) a un numero ben preciso, che misura la
+        variazione <strong>istantanea</strong> di $f$ in $x_0$. Questo numero si chiama <strong>derivata</strong>.</p>
+
+      <div class="definition">
+        La <strong>derivata</strong> di $f$ nel punto $x_0$ è il limite del rapporto incrementale per $h \to 0$:
+        $$f'(x_0) = \lim_{h \to 0} \frac{f(x_0 + h) - f(x_0)}{h},$$
+        quando tale limite esiste ed è finito. In questo caso $f$ si dice <strong>derivabile</strong> in $x_0$.
+      </div>
+
+      <p>Ponendo $x = x_0 + h$ (cioè $h = x - x_0$), la stessa definizione si scrive nella forma equivalente</p>
+      <div class="formula-box">$$f'(x_0) = \lim_{x \to x_0} \frac{f(x) - f(x_0)}{x - x_0}.$$</div>
+
+      <h3>2.1 — Le tre notazioni</h3>
+      <div class="card-row">
+        <div class="card"><h4>Lagrange</h4><p>$f'(x)$ — la più usata a scuola. La derivata seconda è $f''(x)$, la terza
+          $f'''(x)$, poi $f^{(4)}(x)$, $f^{(5)}(x)$, …</p></div>
+        <div class="card"><h4>Leibniz</h4><p>$\dfrac{df}{dx}$ — ricorda che è un "rapporto" tra incrementi infinitesimi
+          $df$ e $dx$. Ottima per la fisica e per il calcolo.</p></div>
+        <div class="card"><h4>Newton</h4><p>$\dot{f}$ (un punto) — usata soprattutto in fisica per le derivate rispetto al
+          <em>tempo</em>: $\dot{x}$ è la velocità, $\ddot{x}$ l'accelerazione.</p></div>
+      </div>
+
+      <div class="note"><strong>Derivabile ⇒ continua.</strong> Se una funzione è derivabile in $x_0$ allora è anche
+        continua in $x_0$ (perché il numeratore $f(x)-f(x_0)$ deve tendere a $0$). Il viceversa è falso: $f(x)=|x|$ è
+        continua in $0$ ma <em>non</em> derivabile (la secante a sinistra ha pendenza $-1$, a destra $+1$: il limite non
+        esiste). Un "angolo" nel grafico è un punto di non derivabilità.</div>
+
+      <div class="rule"><strong>Proprietà locale e proprietà globale.</strong> La derivabilità è una
+        <strong>proprietà locale</strong>: si verifica punto per punto. Dire "$f$ è derivabile in $x_0$" riguarda solo
+        il comportamento di $f$ <em>vicino a quel singolo punto</em>. Se però il limite del rapporto incrementale esiste
+        in <em>ogni</em> punto di un intervallo $I$, si dice che $f$ è <strong>derivabile in $I$</strong>, e la funzione
+        $$x \;\longmapsto\; f'(x)$$
+        che associa a ogni punto la sua derivata si chiama <strong>funzione derivata</strong>. Se $f$ è derivabile in
+        tutto il dominio, si dice semplicemente che $f$ <em>è derivabile</em>.</div>
+
+      <p>Esistono dunque <strong>due grandi letture</strong> di questo limite, nate quasi contemporaneamente nel XVII
+        secolo da due giganti: la lettura <em>fisica</em> di Newton e quella <em>geometrica</em> di Leibniz.</p>
+    </section>
+
+    <!-- 3 — DERIVABILITÀ E CONTINUITÀ -->
+    <section id="sec3">
+      <h2>3. Derivabilità e continuità: un'implicazione a senso unico</h2>
+      <p>Nella sezione precedente abbiamo anticipato un fatto importante: la derivabilità <em>implica</em> la continuità.
+        Ma questa implicazione funziona in una sola direzione. Per capire perché conta la direzione, facciamo prima
+        un passo indietro sulla logica matematica.</p>
+
+      <h3>3.1 — Implicazioni unidirezionali e bidirezionali</h3>
+      <p>In matematica, due proprietà possono essere legate in due modi fondamentalmente diversi.</p>
+      <div class="card-row">
+        <div class="card">
+          <h4>Implicazione $A \Rightarrow B$</h4>
+          <p>"Se vale $A$, allora vale $B$" — il verso <em>opposto</em> non è garantito. Potrebbe valere
+            $B \Rightarrow A$ o potrebbe no: vanno verificati separatamente.</p>
+        </div>
+        <div class="card">
+          <h4>Doppia implicazione $A \Leftrightarrow B$</h4>
+          <p>"$A$ <em>se e solo se</em> $B$" (in inglese <em>iff</em>). Entrambe le direzioni valgono:
+            $A \Rightarrow B$ <strong>e</strong> $B \Rightarrow A$. Le due proprietà si equivalgono
+            completamente.</p>
+        </div>
+      </div>
+      <div class="note"><strong>Esempio geometrico.</strong> "È un quadrato" $\Rightarrow$ "è un rettangolo":
+        vero, ogni quadrato è un rettangolo. Ma "è un rettangolo" $\Rightarrow$ "è un quadrato" è falso:
+        un rettangolo $3 \times 5$ non è un quadrato. L'implicazione è a senso unico. Solo le affermazioni
+        "è un quadrato" $\Leftrightarrow$ "è un rettangolo con lati uguali" sono equivalenti
+        (doppia implicazione).</div>
+      <p>Per derivabilità e continuità vale esattamente la stessa situazione:
+        $$\text{derivabile in } x_0 \;\Longrightarrow\; \text{continua in } x_0,
+        \qquad\text{ma}\qquad
+        \text{continua in } x_0 \;\not\Rightarrow\; \text{derivabile in } x_0.$$
+      </p>
+
+      <h3>3.2 — Dimostrazione formale: derivabile $\Rightarrow$ continua</h3>
+      <p>Dimostriamo rigorosamente la freccia che funziona, usando un piccolo ma potente trucco algebrico.</p>
+      <div class="steps">
+        <p><strong>Ipotesi:</strong> $f$ è derivabile in $x_0$, cioè
+          $f'(x_0) = \displaystyle\lim_{h \to 0} \dfrac{f(x_0+h)-f(x_0)}{h}$ esiste finito.</p>
+        <p><strong>Tesi:</strong> $f$ è continua in $x_0$, ovvero
+          $\displaystyle\lim_{h \to 0}\bigl[f(x_0+h)-f(x_0)\bigr] = 0$.</p>
+        <p><span class="step-num">1</span><strong>Il trucco: moltiplica e dividi per $h$.</strong>
+          Per ogni $h \neq 0$ vale l'identità algebrica:
+          $$f(x_0 + h) - f(x_0) = \frac{f(x_0+h)-f(x_0)}{h} \cdot h.$$</p>
+        <p><span class="step-num">2</span><strong>Applica il teorema del prodotto dei limiti.</strong>
+          $$\lim_{h \to 0}\bigl[f(x_0+h)-f(x_0)\bigr]
+            = \lim_{h \to 0}\frac{f(x_0+h)-f(x_0)}{h} \cdot \lim_{h \to 0} h
+            = f'(x_0) \cdot 0 = 0.$$</p>
+        <p><span class="step-num">3</span>Dunque $\lim_{h \to 0} f(x_0+h) = f(x_0)$: $f$ è continua in $x_0$.</p>
+        <p style="text-align:right; font-weight:700; margin-top:0.5rem;">∎</p>
+      </div>
+      <div class="rule"><strong>Perché la finitezza della derivata è essenziale.</strong> Il passo decisivo è
+        $f'(x_0) \cdot 0 = 0$: funziona perché $f'(x_0)$ è un <em>numero finito</em>. Se la derivata fosse
+        infinita (come nei controesempi che vedremo), il prodotto diventerebbe $\infty \cdot 0$, cioè una forma
+        indeterminata — e la continuità resterebbe, ma la derivabilità no.</div>
+
+      <h3>3.3 — Il viceversa è falso: tre controesempi</h3>
+      <p>Per ciascuna funzione qui sotto, la continuità in $x_0 = 0$ è verificata (il limite esiste e vale $f(0)$), ma
+        la derivabilità <em>no</em>. Usa lo slider per avvicinare $h$ a zero: osserva come la secante <span
+        style="color:#ef4444; font-weight:600;">destra (rossa)</span> e quella
+        <span style="color:#3b82f6; font-weight:600;">sinistra (blu)</span> si comportano — se le due pendenze
+        non convergono allo stesso valore finito, la derivata non esiste.</p>
+
+      <!-- Controesempio 1 -->
+      <h4 style="margin-top:1.2rem; margin-bottom:0.4rem;">Controesempio 1 — $f(x) = |x|$ &nbsp;<span class="chip">Punto angoloso</span></h4>
+      <div class="interactive-demo">
+        <div class="demo-controls" style="flex-wrap:wrap; gap:0.5rem; align-items:center;">
+          <label for="cex1-h">h:</label>
+          <input type="range" id="cex1-h" min="0.05" max="2" step="0.05" value="1">
+          <span class="demo-value" id="cex1-h-val">1.00</span>
+          &emsp; Pendenza destra: <strong id="cex1-right">…</strong>
+          &emsp; Pendenza sinistra: <strong id="cex1-left">…</strong>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span>secante destra</div>
+          <div class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span>secante sinistra</div>
+        </div>
+        <div class="demo-plot" id="cex1-plot"></div>
+        <div class="demo-result">La pendenza da destra vale sempre $+1$, da sinistra sempre $-1$: i due limiti
+          <strong>esistono entrambi finiti ma differiscono</strong>. Il limite globale non esiste → $f$ <strong>non è
+          derivabile</strong> in $0$. La derivata destra e sinistra esistono ma non coincidono: il grafico ha
+          un <em>punto angoloso</em>.</div>
+      </div>
+      <div class="steps" style="margin-top:0.4rem;">
+        <p><span class="step-num">▸</span><strong>Continuità in $0$:</strong>
+          $\lim_{x \to 0}|x| = 0 = f(0)$ ✓</p>
+        <p><span class="step-num">▸</span><strong>Rapporto incrementale da destra ($h>0$):</strong>
+          $\dfrac{|h|-0}{h} = \dfrac{h}{h} = 1 \xrightarrow{h\to0^+} 1$.</p>
+        <p><span class="step-num">▸</span><strong>Rapporto incrementale da sinistra ($h<0$, cioè $h = -t$, $t>0$):</strong>
+          $\dfrac{|-t|-0}{-t} = \dfrac{t}{-t} = -1 \xrightarrow{t\to0^+} -1$.</p>
+        <p><span class="step-num">▸</span>$1 \neq -1$, quindi $\nexists f'(0)$. &nbsp;∎</p>
+      </div>
+
+      <!-- Controesempio 2 -->
+      <h4 style="margin-top:1.4rem; margin-bottom:0.4rem;">Controesempio 2 — $f(x) = x^{2/3}$ &nbsp;<span class="chip">Cuspide</span></h4>
+      <div class="interactive-demo">
+        <div class="demo-controls" style="flex-wrap:wrap; gap:0.5rem; align-items:center;">
+          <label for="cex2-h">h:</label>
+          <input type="range" id="cex2-h" min="0.05" max="2" step="0.05" value="1">
+          <span class="demo-value" id="cex2-h-val">1.00</span>
+          &emsp; Pendenza destra: <strong id="cex2-right">…</strong>
+          &emsp; Pendenza sinistra: <strong id="cex2-left">…</strong>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span>secante destra → $+\infty$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span>secante sinistra → $-\infty$</div>
+        </div>
+        <div class="demo-plot" id="cex2-plot"></div>
+        <div class="demo-result">La pendenza destra cresce verso $+\infty$ e quella sinistra verso $-\infty$: la
+          funzione ha un <em>punto a punta</em> con tangente che "ruota" di 180°. Tipo: <strong>cuspide</strong>.</div>
+      </div>
+      <div class="steps" style="margin-top:0.4rem;">
+        <p><span class="step-num">▸</span><strong>Continuità in $0$:</strong>
+          $\lim_{x \to 0} x^{2/3} = 0 = f(0)$ ✓</p>
+        <p><span class="step-num">▸</span><strong>Da destra ($h>0$):</strong>
+          $\dfrac{h^{2/3}}{h} = h^{-1/3} \xrightarrow{h\to0^+} +\infty$.</p>
+        <p><span class="step-num">▸</span><strong>Da sinistra ($h \to 0^-$):</strong>
+          $\dfrac{(-h)^{2/3}}{-h} = \dfrac{h^{2/3}}{-h} = -h^{-1/3} \xrightarrow{h\to0^+} -\infty$.</p>
+        <p><span class="step-num">▸</span>Entrambi i limiti laterali sono infiniti (con segno opposto): $\nexists f'(0)$. &nbsp;∎</p>
+      </div>
+
+      <!-- Controesempio 3 -->
+      <h4 style="margin-top:1.4rem; margin-bottom:0.4rem;">Controesempio 3 — $f(x) = \sqrt[3]{x}$ &nbsp;<span class="chip">Tangente verticale</span></h4>
+      <div class="interactive-demo">
+        <div class="demo-controls" style="flex-wrap:wrap; gap:0.5rem; align-items:center;">
+          <label for="cex3-h">h:</label>
+          <input type="range" id="cex3-h" min="0.05" max="2" step="0.05" value="1">
+          <span class="demo-value" id="cex3-h-val">1.00</span>
+          &emsp; Pendenza destra: <strong id="cex3-right">…</strong>
+          &emsp; Pendenza sinistra: <strong id="cex3-left">…</strong>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#ef4444;"></span>secante destra → $+\infty$</div>
+          <div class="legend-item"><span class="legend-color" style="background:#3b82f6;"></span>secante sinistra → $+\infty$</div>
+        </div>
+        <div class="demo-plot" id="cex3-plot"></div>
+        <div class="demo-result">Entrambe le pendenze tendono a $+\infty$ ma <em>concordano sul segno</em>:
+          il grafico è regolare e "sale" da entrambe le parti. In $0$ la tangente è <strong>verticale</strong>.
+          Tipo: <strong>punto a tangente verticale</strong>.</div>
+      </div>
+      <div class="steps" style="margin-top:0.4rem;">
+        <p><span class="step-num">▸</span><strong>Continuità in $0$:</strong>
+          $\lim_{x \to 0} \sqrt[3]{x} = 0 = f(0)$ ✓</p>
+        <p><span class="step-num">▸</span><strong>Da destra ($h>0$):</strong>
+          $\dfrac{h^{1/3}}{h} = h^{-2/3} \xrightarrow{h\to0^+} +\infty$.</p>
+        <p><span class="step-num">▸</span><strong>Da sinistra ($h \to 0^-$):</strong>
+          $\dfrac{(-h)^{1/3}}{-h} = \dfrac{-h^{1/3}}{-h} = h^{-2/3} \xrightarrow{h\to0^+} +\infty$.</p>
+        <p><span class="step-num">▸</span>Il limite esiste ma è $+\infty$ (non finito): per definizione $\nexists f'(0)$. &nbsp;∎</p>
+      </div>
+
+      <h3>3.4 — Riepilogo: schema logico e tipologie</h3>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Tipo di punto</th><th>Lim. da destra</th><th>Lim. da sinistra</th><th>Esempio</th><th>Derivabile?</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Punto angoloso</strong></td><td>finito $\ell^+$</td><td>finito $\ell^-$, $\ell^- \neq \ell^+$</td><td>$|x|$ in $0$</td><td>No</td></tr>
+            <tr><td><strong>Cuspide</strong></td><td>$+\infty$ (o $-\infty$)</td><td>segno opposto</td><td>$x^{2/3}$ in $0$</td><td>No</td></tr>
+            <tr><td><strong>Tang. verticale</strong></td><td>$+\infty$ (o $-\infty$)</td><td>stesso segno</td><td>$\sqrt[3]{x}$ in $0$</td><td>No</td></tr>
+            <tr><td><strong>Oscillazione</strong></td><td>non esiste</td><td>non esiste</td><td>$x\sin\!\tfrac{1}{x}$ in $0$</td><td>No</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="definition">Schema logico definitivo:
+        $$\boxed{\;\text{derivabile in }x_0 \;\Longrightarrow\; \text{continua in }x_0\;},
+        \qquad\text{ma}\qquad
+        \text{continua in }x_0 \;\not\Rightarrow\; \text{derivabile in }x_0.$$
+        La derivabilità è una condizione più <strong>forte</strong> della continuità: richiede non solo che
+        la funzione non "salti", ma anche che il grafico abbia una <strong>tangente non verticale e ben definita</strong>
+        in ogni punto.</div>
+    </section>
+
+    <!-- 4 — NEWTON: VELOCITÀ ISTANTANEA -->
+    <section id="sec4">
+      <h2>4. L'interpretazione di Newton: la velocità istantanea</h2>
+      <p>Isaac Newton arrivò alla derivata studiando il <strong>moto</strong>. Se $s(t)$ è la posizione di un corpo al
+        tempo $t$, il rapporto incrementale</p>
+      <div class="formula-box">$$\frac{s(t_0 + \Delta t) - s(t_0)}{\Delta t} = \frac{\Delta s}{\Delta t}$$</div>
+      <p>è la <strong>velocità media</strong> nell'intervallo $\Delta t$. Facendo tendere $\Delta t \to 0$ si ottiene la
+        <strong>velocità istantanea</strong>, cioè ciò che segna il tachimetro <em>in quell'istante</em>:</p>
+      <div class="formula-box">$$v(t_0) = \lim_{\Delta t \to 0} \frac{\Delta s}{\Delta t} = s'(t_0) = \dot{s}(t_0).$$</div>
+
+      <div class="interactive-demo">
+        <div class="demo-title">La velocità media diventa istantanea quando $\Delta t \to 0$</div>
+        <div class="demo-controls">
+          <label for="newton-h">intervallo Δt (s):</label>
+          <input type="range" id="newton-h" min="0.05" max="3" step="0.05" value="2">
+          <span class="demo-value" id="newton-h-val">2.00</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#f5b400;"></span>velocità media (secante)</div>
+          <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>velocità istantanea (tangente)</div>
+        </div>
+        <div class="demo-plot" id="newton-plot"></div>
+        <div class="demo-result">Legge oraria $s(t) = t^2$. Tra $t_0 = 2$ s e $t_0 + \Delta t$ la velocità media è
+          <strong><span id="newton-dq">6.00</span></strong> m/s; man mano che $\Delta t \to 0$ tende alla velocità
+          istantanea $v(2) = s'(2) = $ <strong><span id="newton-der">4.0000</span></strong> m/s.</div>
+      </div>
+
+      <h3>3.1 — Le derivate successive: velocità, accelerazione, jerk…</h3>
+      <p>Se deriviamo la posizione otteniamo la velocità; derivando ancora otteniamo l'accelerazione; e si può continuare.
+        Ogni derivata successiva descrive "quanto cambia" la grandezza precedente.</p>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Ordine</th><th>Grandezza</th><th>Notazione</th><th>Unità (SI)</th><th>Significato</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>Posizione</td><td>$s(t)$</td><td>m</td><td>dove si trova il corpo</td></tr>
+            <tr><td>1</td><td>Velocità</td><td>$\dot{s}$</td><td>m/s</td><td>quanto cambia la posizione</td></tr>
+            <tr><td>2</td><td>Accelerazione</td><td>$\ddot{s}$</td><td>m/s²</td><td>quanto cambia la velocità</td></tr>
+            <tr><td>3</td><td><strong>Jerk</strong> (strappo)</td><td>$s^{(3)}$</td><td>m/s³</td><td>quanto cambia l'accelerazione (lo "strattone")</td></tr>
+            <tr><td>4</td><td>Snap (o <em>jounce</em>)</td><td>$s^{(4)}$</td><td>m/s⁴</td><td>quanto cambia il jerk</td></tr>
+            <tr><td>5</td><td>Crackle</td><td>$s^{(5)}$</td><td>m/s⁵</td><td>quanto cambia lo snap</td></tr>
+            <tr><td>6</td><td>Pop</td><td>$s^{(6)}$</td><td>m/s⁶</td><td>quanto cambia il crackle</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="joke">I nomi <strong>snap, crackle e pop</strong> (4ª, 5ª e 6ª derivata) sono una citazione semiseria dei
+        tre folletti di una famosa pubblicità di cereali. Dal <strong>settimo ordine in poi non esiste un nome
+        ufficiale</strong>: la comunità scientifica non si è messa d'accordo. In altre parole, se ti serve la settima
+        derivata per una ricerca… <em>puoi sceglierle un nome tu!</em></div>
+      <div class="note">Il <strong>jerk</strong> non è solo curiosità: gli ingegneri lo limitano nel progettare ascensori,
+        montagne russe e treni, perché è lo strattone improvviso — non la velocità né l'accelerazione in sé — a darci la
+        sensazione sgradevole di scossa.</div>
+    </section>
+
+    <!-- 4 — LEIBNIZ: RETTA TANGENTE -->
+    <section id="sec5">
+      <h2>5. L'interpretazione di Leibniz: la retta tangente</h2>
+      <p>Gottfried Wilhelm Leibniz arrivò allo stesso limite per via <strong>geometrica</strong>. Abbiamo visto che il
+        rapporto incrementale è la pendenza della <em>secante</em> per $A$ e $B$. Quando $h \to 0$, il punto $B$ scivola
+        lungo la curva fino a $A$: la secante ruota e si adagia sulla curva, diventando la <strong>retta tangente</strong>
+        nel punto $A$.</p>
+      <div class="definition">La derivata $f'(x_0)$ è il <strong>coefficiente angolare della retta tangente</strong> al
+        grafico di $f$ nel punto $\big(x_0, f(x_0)\big)$. L'equazione della tangente è quindi
+        $$y = f(x_0) + f'(x_0)\,(x - x_0).$$</div>
+
+      <div class="interactive-demo">
+        <div class="demo-title">La secante diventa tangente quando $h \to 0$</div>
+        <div class="demo-controls">
+          <label for="leib-h">incremento h:</label>
+          <input type="range" id="leib-h" min="0.05" max="3" step="0.05" value="2">
+          <span class="demo-value" id="leib-h-val">2.00</span>
+        </div>
+        <div class="demo-legend">
+          <div class="legend-item"><span class="legend-color" style="background:#f5b400;"></span>secante (pendenza $=\Delta y/\Delta x$)</div>
+          <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>tangente in $x_0$</div>
+        </div>
+        <div class="demo-plot" id="leib-plot"></div>
+        <div class="demo-result">Funzione $f(x) = \sin x$ nel punto $x_0 = 1$. Pendenza della secante =
+          <strong><span id="leib-dq">…</span></strong>; pendenza della tangente $f'(1) = \cos 1 \approx$
+          <strong><span id="leib-der">0.5403</span></strong>. Riduci $h$: la riga gialla si sovrappone a quella verde.</div>
+      </div>
+
+      <div class="rule"><strong>Due volti, una sola idea.</strong> Velocità istantanea (Newton) e pendenza della tangente
+        (Leibniz) sono lo <em>stesso</em> limite del rapporto incrementale. La fisica e la geometria si incontrano nella
+        derivata: è questo che rende il calcolo differenziale così potente.</div>
+
+      <div class="joke"><strong>La disputa del secolo.</strong> Newton e Leibniz arrivarono al calcolo differenziale
+        in modo <em>indipendente</em>, quasi contemporaneamente: Newton tra il 1665 e il 1666 (durante la Grande Peste
+        che lo costrinse in isolamento a Woolsthorpe), Leibniz circa dieci anni dopo, pubblicando nel 1684.
+        <br><br>
+        Quando la pubblicazione di Leibniz divenne nota in Inghilterra, scoppiò una <strong>guerra accademica feroce</strong>.
+        I sostenitori inglesi di Newton accusarono Leibniz di plagio; i matematici continentali ribatterono.
+        La stessa <em>Royal Society</em> istituì una commissione di indagine nel 1712 — poi si scoprì che Newton ne aveva
+        scritto le conclusioni lui stesso, non proprio il massimo dell'imparzialità.
+        <br><br>
+        La disputa avvelenò i rapporti tra matematici inglesi e continentali per decenni. I britannici rimasero fedeli
+        alla notazione di Newton ($\dot{x}$, $\ddot{x}$…), meno flessibile per calcoli complessi. L'Europa continentale
+        adottò quella di Leibniz ($\dfrac{dy}{dx}$, $\dfrac{d^2y}{dx^2}$…), che si rivelò molto più potente — ed è
+        quella che usiamo ancora oggi. <strong>Morale:</strong> a volte chi arriva primo non è chi vince nel lungo periodo;
+        vince chi propone la notazione migliore.</div>
+    </section>
+
+    <!-- 5 — ESERCIZI -->
+    <section id="sec6">
+      <h2>6. Calcolare il rapporto incrementale: quattro famiglie di funzioni</h2>
+      <p>Per ciascuna funzione scriviamo il rapporto incrementale $\dfrac{f(x_0+h)-f(x_0)}{h}$, lo
+        <strong>semplifichiamo</strong> finché possiamo cancellare la $h$ al denominatore, e infine ne calcoliamo il
+        <strong>limite per $h \to 0$</strong> in tre punti diversi. Ogni esercizio ha un grafico interattivo: scegli il
+        punto e riduci $h$ per vedere la secante avvicinarsi alla tangente.</p>
+
+      <!-- 5.1 POLINOMIALE -->
+      <h3>5.1 — Funzione polinomiale: $f(x) = x^2 - 3x$</h3>
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.1</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola il rapporto incrementale e la derivata di $f(x) = x^2 - 3x$ nei punti $x_0 = 0,\; 2,\; 4$.</p>
+        <div class="interactive-demo">
+          <div class="demo-title">Rapporto incrementale di $x^2 - 3x$</div>
+          <div class="demo-controls" style="flex-wrap:wrap;">
+            <span>punto x₀:</span>
+            <button class="btn" id="ex1-p0">x₀ = 0</button>
+            <button class="btn" id="ex1-p1">x₀ = 2</button>
+            <button class="btn" id="ex1-p2">x₀ = 4</button>
+            <label for="ex1-h" style="margin-left:1rem;">incremento h:</label>
+            <input type="range" id="ex1-h" min="0.05" max="3" step="0.05" value="1.5">
+            <span class="demo-value" id="ex1-h-val">1.50</span>
+          </div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#f5b400;"></span>secante</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>tangente</div>
+          </div>
+          <div class="demo-plot" id="ex1-plot"></div>
+          <div class="demo-result">In $x_0 = $ <strong><span id="ex1-pt">0</span></strong>: rapporto incrementale =
+            <strong><span id="ex1-dq">…</span></strong>; derivata esatta $f'(x_0) = $
+            <strong><span id="ex1-der">…</span></strong>.</div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Rapporto incrementale generale:</strong>
+            $$\frac{f(x_0+h)-f(x_0)}{h} = \frac{(x_0+h)^2 - 3(x_0+h) - (x_0^2 - 3x_0)}{h}.$$</p>
+          <p><span class="step-num">2</span><strong>Sviluppo del numeratore:</strong>
+            $x_0^2 + 2x_0 h + h^2 - 3x_0 - 3h - x_0^2 + 3x_0 = 2x_0 h + h^2 - 3h$.</p>
+          <p><span class="step-num">3</span><strong>Semplifico $h$:</strong>
+            $$\frac{2x_0 h + h^2 - 3h}{h} = 2x_0 + h - 3.$$</p>
+          <p><span class="step-num">4</span><strong>Limite per $h \to 0$:</strong>
+            $f'(x_0) = \lim_{h\to0}(2x_0 + h - 3) = 2x_0 - 3$.</p>
+          <div class="result-box"><span class="result-label">Nei tre punti</span><span class="result-value">$f'(0) = -3$
+            &nbsp;·&nbsp; $f'(2) = 1$ &nbsp;·&nbsp; $f'(4) = 5$.</span></div>
+        </div>
+      </div>
+
+      <!-- 5.2 FRATTA -->
+      <h3>5.2 — Funzione fratta: $f(x) = \dfrac{1}{x}$</h3>
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.2</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola il rapporto incrementale e la derivata di $f(x) = \dfrac{1}{x}$ nei punti $x_0 = 1,\; 2,\; 3$.</p>
+        <div class="interactive-demo">
+          <div class="demo-title">Rapporto incrementale di $1/x$</div>
+          <div class="demo-controls" style="flex-wrap:wrap;">
+            <span>punto x₀:</span>
+            <button class="btn" id="ex2-p0">x₀ = 1</button>
+            <button class="btn" id="ex2-p1">x₀ = 2</button>
+            <button class="btn" id="ex2-p2">x₀ = 3</button>
+            <label for="ex2-h" style="margin-left:1rem;">incremento h:</label>
+            <input type="range" id="ex2-h" min="0.05" max="3" step="0.05" value="1.5">
+            <span class="demo-value" id="ex2-h-val">1.50</span>
+          </div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#f5b400;"></span>secante</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>tangente</div>
+          </div>
+          <div class="demo-plot" id="ex2-plot"></div>
+          <div class="demo-result">In $x_0 = $ <strong><span id="ex2-pt">1</span></strong>: rapporto incrementale =
+            <strong><span id="ex2-dq">…</span></strong>; derivata esatta $f'(x_0) = $
+            <strong><span id="ex2-der">…</span></strong>.</div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Rapporto incrementale:</strong>
+            $$\frac{1}{h}\left(\frac{1}{x_0+h} - \frac{1}{x_0}\right).$$</p>
+          <p><span class="step-num">2</span><strong>Denominatore comune</strong> nella parentesi:
+            $\dfrac{1}{x_0+h} - \dfrac{1}{x_0} = \dfrac{x_0 - (x_0+h)}{x_0(x_0+h)} = \dfrac{-h}{x_0(x_0+h)}$.</p>
+          <p><span class="step-num">3</span><strong>Semplifico $h$:</strong>
+            $$\frac{1}{h}\cdot\frac{-h}{x_0(x_0+h)} = \frac{-1}{x_0(x_0+h)}.$$</p>
+          <p><span class="step-num">4</span><strong>Limite per $h \to 0$:</strong>
+            $f'(x_0) = \dfrac{-1}{x_0 \cdot x_0} = -\dfrac{1}{x_0^2}$.</p>
+          <div class="result-box"><span class="result-label">Nei tre punti</span><span class="result-value">$f'(1) = -1$
+            &nbsp;·&nbsp; $f'(2) = -\tfrac{1}{4}$ &nbsp;·&nbsp; $f'(3) = -\tfrac{1}{9}$.</span></div>
+        </div>
+      </div>
+
+      <!-- 5.3 GONIOMETRICA -->
+      <h3>5.3 — Funzione goniometrica: $f(x) = \sin x$</h3>
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola il rapporto incrementale e la derivata di $f(x) = \sin x$ nei punti
+          $x_0 = 0,\; \tfrac{\pi}{6},\; \tfrac{\pi}{2}$.</p>
+        <div class="interactive-demo">
+          <div class="demo-title">Rapporto incrementale di $\sin x$</div>
+          <div class="demo-controls" style="flex-wrap:wrap;">
+            <span>punto x₀:</span>
+            <button class="btn" id="ex3-p0">x₀ = 0</button>
+            <button class="btn" id="ex3-p1">x₀ = π/6</button>
+            <button class="btn" id="ex3-p2">x₀ = π/2</button>
+            <label for="ex3-h" style="margin-left:1rem;">incremento h:</label>
+            <input type="range" id="ex3-h" min="0.05" max="2" step="0.05" value="1.2">
+            <span class="demo-value" id="ex3-h-val">1.20</span>
+          </div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#f5b400;"></span>secante</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>tangente</div>
+          </div>
+          <div class="demo-plot" id="ex3-plot"></div>
+          <div class="demo-result">In $x_0 = $ <strong><span id="ex3-pt">0</span></strong>: rapporto incrementale =
+            <strong><span id="ex3-dq">…</span></strong>; derivata esatta $f'(x_0) = \cos x_0 = $
+            <strong><span id="ex3-der">…</span></strong>.</div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Rapporto incrementale:</strong>
+            $\dfrac{\sin(x_0+h) - \sin x_0}{h}$.</p>
+          <p><span class="step-num">2</span><strong>Formula di addizione</strong>
+            $\sin(x_0+h) = \sin x_0 \cos h + \cos x_0 \sin h$, quindi il numeratore diventa
+            $\sin x_0(\cos h - 1) + \cos x_0 \sin h$:
+            $$\frac{\sin(x_0+h)-\sin x_0}{h} = \sin x_0 \cdot \frac{\cos h - 1}{h} + \cos x_0 \cdot \frac{\sin h}{h}.$$</p>
+          <p><span class="step-num">3</span><strong>Limiti notevoli</strong> (lezione 5):
+            $\displaystyle\lim_{h\to0}\frac{\sin h}{h} = 1$ e $\displaystyle\lim_{h\to0}\frac{\cos h - 1}{h} = 0$.</p>
+          <p><span class="step-num">4</span><strong>Limite per $h \to 0$:</strong>
+            $f'(x_0) = \sin x_0 \cdot 0 + \cos x_0 \cdot 1 = \cos x_0$.</p>
+          <div class="result-box"><span class="result-label">Nei tre punti</span><span class="result-value">$f'(0) = 1$
+            &nbsp;·&nbsp; $f'\!\left(\tfrac{\pi}{6}\right) = \tfrac{\sqrt3}{2} \approx 0{,}866$ &nbsp;·&nbsp;
+            $f'\!\left(\tfrac{\pi}{2}\right) = 0$.</span></div>
+        </div>
+      </div>
+
+      <!-- 5.4 RADICE -->
+      <h3>5.4 — Funzione con radice: $f(x) = \sqrt{x}$</h3>
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.4</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola il rapporto incrementale e la derivata di $f(x) = \sqrt{x}$ nei punti $x_0 = 1,\; 4,\; 9$.</p>
+        <div class="interactive-demo">
+          <div class="demo-title">Rapporto incrementale di $\sqrt{x}$</div>
+          <div class="demo-controls" style="flex-wrap:wrap;">
+            <span>punto x₀:</span>
+            <button class="btn" id="ex4-p0">x₀ = 1</button>
+            <button class="btn" id="ex4-p1">x₀ = 4</button>
+            <button class="btn" id="ex4-p2">x₀ = 9</button>
+            <label for="ex4-h" style="margin-left:1rem;">incremento h:</label>
+            <input type="range" id="ex4-h" min="0.05" max="4" step="0.05" value="2">
+            <span class="demo-value" id="ex4-h-val">2.00</span>
+          </div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#f5b400;"></span>secante</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>tangente</div>
+          </div>
+          <div class="demo-plot" id="ex4-plot"></div>
+          <div class="demo-result">In $x_0 = $ <strong><span id="ex4-pt">1</span></strong>: rapporto incrementale =
+            <strong><span id="ex4-dq">…</span></strong>; derivata esatta $f'(x_0) = \dfrac{1}{2\sqrt{x_0}} = $
+            <strong><span id="ex4-der">…</span></strong>.</div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Rapporto incrementale:</strong>
+            $\dfrac{\sqrt{x_0+h} - \sqrt{x_0}}{h}$.</p>
+          <p><span class="step-num">2</span><strong>Razionalizzo</strong> moltiplicando per il coniugato
+            $\big(\sqrt{x_0+h} + \sqrt{x_0}\big)$:
+            $$\frac{\big(\sqrt{x_0+h}-\sqrt{x_0}\big)\big(\sqrt{x_0+h}+\sqrt{x_0}\big)}{h\big(\sqrt{x_0+h}+\sqrt{x_0}\big)}
+            = \frac{(x_0+h) - x_0}{h\big(\sqrt{x_0+h}+\sqrt{x_0}\big)}.$$</p>
+          <p><span class="step-num">3</span><strong>Semplifico $h$:</strong>
+            $$\frac{h}{h\big(\sqrt{x_0+h}+\sqrt{x_0}\big)} = \frac{1}{\sqrt{x_0+h}+\sqrt{x_0}}.$$</p>
+          <p><span class="step-num">4</span><strong>Limite per $h \to 0$:</strong>
+            $f'(x_0) = \dfrac{1}{\sqrt{x_0}+\sqrt{x_0}} = \dfrac{1}{2\sqrt{x_0}}$.</p>
+          <div class="result-box"><span class="result-label">Nei tre punti</span><span class="result-value">$f'(1) = \tfrac{1}{2}$
+            &nbsp;·&nbsp; $f'(4) = \tfrac{1}{4}$ &nbsp;·&nbsp; $f'(9) = \tfrac{1}{6}$.</span></div>
+        </div>
+      </div>
+
+      <div class="note">Hai notato lo schema? In tutti i casi la chiave è <strong>far sparire la $h$ al denominatore</strong>
+        prima di passare al limite (sviluppando, mettendo a denominatore comune, usando i limiti notevoli o
+        razionalizzando). Solo dopo la semplificazione il limite $h \to 0$ si calcola per sostituzione.</div>
+    </section>
+
+    <!-- 6 — IL DIFFERENZIALE -->
+    <section id="sec7">
+      <h2>7. Il differenziale di una funzione</h2>
+      <p>La derivata risponde alla domanda "con quale <em>velocità</em> cambia $f$?". Il
+        <strong>differenziale</strong> risponde a una domanda pratica e complementare: "se $x$ cambia di una piccola
+        quantità $\Delta x$, <em>di quanto cambia approssimativamente</em> $f(x)$?"</p>
+      <p>L'idea è semplice: la retta tangente in $x_0$ approssima il grafico di $f$ vicino a quel punto. Lungo la
+        tangente, a una variazione $\Delta x$ di $x$ corrisponde una variazione esatta pari a $f'(x_0)\,\Delta x$ di $y$.
+        Chiameremo questa la variazione <strong>lineare</strong> di $f$.</p>
+
+      <div class="definition">
+        Dato un incremento $dx$ (un piccolo spostamento di $x$), il <strong>differenziale</strong> di $f$ in $x_0$ è:
+        $$df = f'(x_0)\, dx.$$
+        Mentre la variazione reale è $\Delta f = f(x_0 + dx) - f(x_0)$, il differenziale $df$ ne è l'approssimazione
+        lineare: $\Delta f \approx df$ per $dx$ piccolo.
+      </div>
+
+      <p>Nella notazione di Leibniz si scrive $\dfrac{df}{dx} = f'(x)$, e ora si vede il perché: $\dfrac{df}{dx}$ è
+        letteralmente il rapporto tra il differenziale di $f$ e il differenziale di $x$.</p>
+
+      <h3>6.1 — Esempi concreti</h3>
+
+      <div class="card-row">
+        <div class="card">
+          <h4>Anello di un cerchio</h4>
+          <p>Area $A = \pi r^2$, derivata $\dfrac{dA}{dr} = 2\pi r$. Il differenziale è
+            $dA = 2\pi r\, dr$: se ingrandiamo il raggio di $dr$, l'area aumenta di circa la
+            <em>circonferenza</em> $\times dr$ — geometricamente è il "bordo stretto" che aggiungiamo.</p>
+        </div>
+        <div class="card">
+          <h4>Volume di un cubo</h4>
+          <p>$V = s^3$, $\dfrac{dV}{ds} = 3s^2$. Differenziale: $dV = 3s^2\, ds$.
+            Ingrandire il lato di $ds$ aggiunge tre "facce" sottili di spessore $ds$ e area $s^2$ ciascuna.</p>
+        </div>
+        <div class="card">
+          <h4>Costo marginale</h4>
+          <p>Se $C(q)$ è il costo di produrre $q$ unità, il <em>costo marginale</em> è $C'(q)$. Il differenziale
+            $dC = C'(q)\, dq$ stima di quanto aumenta il costo producendo $dq$ unità in più — la risposta che
+            interessa all'imprenditore.</p>
+        </div>
+      </div>
+
+      <h3>6.2 — Usare il differenziale per approssimare</h3>
+      <p>Il differenziale permette di calcolare in modo rapido <em>valori difficili</em> vicini a valori noti.</p>
+
+      <div class="steps">
+        <p><strong>Esempio: stimare $\sqrt{4{,}04}$ senza calcolatrice.</strong></p>
+        <p><span class="step-num">1</span>Scegliamo $f(x) = \sqrt{x}$ e il punto "comodo" più vicino: $x_0 = 4$,
+          perché $\sqrt{4} = 2$ lo conosciamo a memoria. L'incremento è $dx = 0{,}04$.</p>
+        <p><span class="step-num">2</span>Derivata: $f'(x) = \dfrac{1}{2\sqrt{x}}$, quindi $f'(4) = \dfrac{1}{4}$.</p>
+        <p><span class="step-num">3</span>Differenziale: $df = f'(4)\cdot dx = \dfrac{1}{4}\cdot 0{,}04 = 0{,}01$.</p>
+        <p><span class="step-num">4</span>Approssimazione: $\sqrt{4{,}04} \approx \sqrt{4} + 0{,}01 = 2{,}01$.</p>
+        <p><span class="step-num">5</span>Valore esatto (con calcolatrice): $\sqrt{4{,}04} \approx 2{,}00998\ldots$
+          L'errore è meno di $0{,}00002$: ottimo per un conto a mente.</p>
+      </div>
+      <div class="result-box" style="margin-top:0.6rem;"><span class="result-label">Regola pratica</span>
+        <span class="result-value">$f(x_0 + dx) \approx f(x_0) + f'(x_0)\,dx$ — la <em>formula di linearizzazione</em>.
+        Valida per $dx$ piccolo; l'errore è dell'ordine di $(dx)^2$.</span></div>
+    </section>
+
+    <!-- 7 — APPLICAZIONI DELLA DERIVATA -->
+    <section id="sec8">
+      <h2>8. La derivata nel mondo reale</h2>
+      <p>La derivata si usa ogni volta che vogliamo sapere <strong>quanto velocemente</strong> una grandezza cambia
+        rispetto a un'altra. Ecco una mappa di campi dove è fondamentale.</p>
+
+      <div class="card-row">
+        <div class="card">
+          <h4>⚛️ Fisica</h4>
+          <p><em>Velocità e accelerazione</em> da una legge oraria; <em>campo elettrico</em> come gradiente del potenziale
+            ($E = -\frac{dV}{dx}$); <em>potenza</em> come derivata dell'energia rispetto al tempo.</p>
+        </div>
+        <div class="card">
+          <h4>💰 Economia</h4>
+          <p><em>Costo marginale</em> $C'(q)$: quanto costa produrre un'unità in più.
+            <em>Ricavo marginale</em> $R'(q)$: quanto si guadagna vendendo un'unità in più. Il profitto è massimo
+            quando $R'(q) = C'(q)$.</p>
+        </div>
+        <div class="card">
+          <h4>🧬 Biologia e medicina</h4>
+          <p><em>Tasso di crescita</em> di una popolazione batterica o di un tumore: $P'(t)$ misura quanti nuovi
+            individui compaiono per unità di tempo. <em>Farmacocinetica</em>: la derivata della concentrazione di un
+            farmaco nel sangue descrive quanto rapidamente viene eliminato.</p>
+        </div>
+        <div class="card">
+          <h4>🤖 Informatica e AI</h4>
+          <p>Il <em>gradient descent</em> nelle reti neurali è letteralmente una discesa lungo le derivate parziali della
+            funzione di errore: la rete impara seguendo la direzione in cui l'errore cala più in fretta.</p>
+        </div>
+      </div>
+
+      <div class="card-row">
+        <div class="card">
+          <h4>🌡️ Chimica</h4>
+          <p><em>Velocità di reazione</em>: la derivata della concentrazione di un reagente rispetto al tempo, $-\frac{d[A]}{dt}$,
+            misura quanto in fretta si consuma il reagente. Le equazioni cinetiche sono tutte scritte in termini di derivate.</p>
+        </div>
+        <div class="card">
+          <h4>🏗️ Ingegneria</h4>
+          <p><em>Flessione delle travi</em>: la curvatura di una trave caricata dipende dalla derivata seconda dello
+            spostamento verticale. <em>Controllo automatico</em>: i regolatori PID usano la derivata dell'errore per
+            anticipare e correggere in anticipo.</p>
+        </div>
+        <div class="card">
+          <h4>📈 Statistica e ML</h4>
+          <p><em>Stima di massima verosimiglianza</em>: si trovano i parametri ottimi dove la derivata della log-verosimiglianza
+            si annulla. <em>Regressione</em>: la derivata indica come cambia la previsione al variare di una variabile.</p>
+        </div>
+      </div>
+
+      <div class="rule">Il tema comune è sempre lo stesso: <strong>tasso di cambiamento</strong>. Ogni volta che una
+        grandezza dipende da un'altra e ti chiedi "quanto velocemente cambia?", stai chiedendo la derivata. Il calcolo
+        differenziale è il linguaggio universale del <em>cambiamento</em>.</div>
+    </section>
+
+    <!-- 8 — QUIZ -->
+    <section id="quiz">
+      <h2>9. Quiz finale</h2>
+      <p>Dodici domande su rapporto incrementale, derivata, differenziale e applicazioni. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 8 — Il rapporto incrementale e la derivata · Matematica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX, math.js e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { diff: 'easy', text: 'Il rapporto incrementale $\\dfrac{f(x_0+h)-f(x_0)}{h}$ rappresenta:',
+        options: ['Il valore della funzione in $x_0$', 'La variazione media di $f$ tra $x_0$ e $x_0+h$', 'L\'area sotto il grafico', 'Il massimo di $f$'],
+        correct: 1, explain: 'È la variazione $\\Delta y$ divisa per $\\Delta x = h$: di quanto cresce in media $f$ per unità di $x$.' },
+      { diff: 'easy', text: 'Geometricamente, il rapporto incrementale è:',
+        options: ['La pendenza della retta tangente', 'La pendenza della retta secante per $A$ e $B$', 'L\'ordinata di $A$', 'La distanza tra $A$ e $B$'],
+        correct: 1, explain: 'È il coefficiente angolare della secante che unisce $A=(x_0,f(x_0))$ e $B=(x_0+h,f(x_0+h))$.' },
+      { diff: 'easy', text: 'La derivata $f\'(x_0)$ è definita come:',
+        options: ['$\\lim_{h\\to0} \\dfrac{f(x_0+h)-f(x_0)}{h}$', '$f(x_0+h)-f(x_0)$', '$\\dfrac{f(x_0)}{x_0}$', '$\\lim_{x\\to\\infty} f(x)$'],
+        correct: 0, explain: 'È il limite del rapporto incrementale per $h\\to0$, quando esiste finito.' },
+      { diff: 'easy', text: 'Per Newton, il limite del rapporto incrementale di $s(t)$ rappresenta:',
+        options: ['Lo spazio percorso', 'La velocità istantanea', 'L\'accelerazione media', 'Il tempo'],
+        correct: 1, explain: '$v(t_0)=\\lim_{\\Delta t\\to0}\\frac{\\Delta s}{\\Delta t}=s\'(t_0)$: la velocità istantanea.' },
+      { diff: 'medium', text: 'Per Leibniz, la derivata $f\'(x_0)$ è:',
+        options: ['L\'area della regione tangente', 'Il coefficiente angolare della retta tangente in $(x_0,f(x_0))$', 'Il valore minimo di $f$', 'La lunghezza della secante'],
+        correct: 1, explain: 'Quando $h\\to0$ la secante diventa la tangente: la sua pendenza è $f\'(x_0)$.' },
+      { diff: 'medium', text: 'La derivata terza della posizione rispetto al tempo si chiama:',
+        options: ['Accelerazione', 'Jerk (strappo)', 'Velocità', 'Snap'],
+        correct: 1, explain: 'Posizione → velocità → accelerazione → jerk. Il jerk misura quanto cambia l\'accelerazione.' },
+      { diff: 'medium', text: 'Calcolando il rapporto incrementale di $f(x)=x^2$, quanto vale $f\'(3)$?',
+        options: ['$3$', '$6$', '$9$', '$0$'],
+        correct: 1, explain: '$\\frac{(3+h)^2-9}{h}=6+h\\to6$. In generale $f\'(x)=2x$, quindi $f\'(3)=6$.' },
+      { diff: 'medium', text: 'Una funzione derivabile in $x_0$ è necessariamente:',
+        options: ['Costante', 'Continua in $x_0$', 'Polinomiale', 'Pari'],
+        correct: 1, explain: 'Derivabile ⇒ continua. Il viceversa è falso: $|x|$ è continua ma non derivabile in $0$.' },
+      { diff: 'hard', text: 'Per $f(x)=\\dfrac{1}{x}$, la derivata $f\'(x_0)$ vale:',
+        options: ['$\\dfrac{1}{x_0}$', '$-\\dfrac{1}{x_0^2}$', '$\\dfrac{1}{x_0^2}$', '$-\\dfrac{1}{x_0}$'],
+        correct: 1, explain: 'Il rapporto incrementale si semplifica in $\\frac{-1}{x_0(x_0+h)}\\to-\\frac{1}{x_0^2}$.' },
+      { diff: 'hard', text: 'Per $f(x)=\\sqrt{x}$, il rapporto incrementale si semplifica razionalizzando e dà come limite:',
+        options: ['$\\dfrac{1}{\\sqrt{x_0}}$', '$2\\sqrt{x_0}$', '$\\dfrac{1}{2\\sqrt{x_0}}$', '$\\sqrt{x_0}$'],
+        correct: 2, explain: 'Razionalizzando si ottiene $\\frac{1}{\\sqrt{x_0+h}+\\sqrt{x_0}}\\to\\frac{1}{2\\sqrt{x_0}}$.' },
+      { diff: 'medium', text: 'Il differenziale $df = f\'(x_0)\\,dx$ rappresenta:',
+        options: ['La variazione esatta di $f$', 'La variazione lineare (approssimata) di $f$ per un piccolo spostamento $dx$', 'Il limite del rapporto incrementale', 'L\'area sotto la curva'],
+        correct: 1, explain: 'È l\'approssimazione lineare: $\\Delta f \\approx f\'(x_0)\\,dx$. Lungo la tangente, a $dx$ corrisponde esattamente $f\'(x_0)\\,dx$.' },
+      { diff: 'hard', text: 'Perché nel gradient descent delle reti neurali si usano le derivate?',
+        options: ['Per calcolare l\'area sotto la curva di errore', 'Per trovare la direzione in cui l\'errore decresce più rapidamente', 'Per contare i parametri del modello', 'Per disegnare il grafico della rete'],
+        correct: 1, explain: 'Il gradient descent segue le derivate parziali della funzione di errore: la rete si sposta nella direzione opposta al gradiente, dove l\'errore cala più in fretta.' }
+    ];
+  </script>
+
+  <!-- Demo interattive di questa lezione -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { linspace, draw, update, themeColors } = Plt;
+      const tc = themeColors();
+      const cCurve = tc.curve, cRed = '#ef4444', cGold = '#f5b400', cGreen = '#22c55e', cBlue = '#3b82f6';
+
+      // Helper riutilizzabile: visualizza il rapporto incrementale (secante) + tangente
+      function setupIncr(cfg) {
+        const sH = document.getElementById(cfg.hId), vH = document.getElementById(cfg.hValId);
+        if (!sH) return;
+        const dqOut = cfg.dqId ? document.getElementById(cfg.dqId) : null;
+        const derOut = cfg.derId ? document.getElementById(cfg.derId) : null;
+        const ptOut = cfg.ptId ? document.getElementById(cfg.ptId) : null;
+        const btns = (cfg.btnIds || []).map(id => document.getElementById(id));
+        const f = cfg.f, fp = cfg.fp, pts = cfg.points;
+        const xs = linspace(cfg.xmin, cfg.xmax, 320);
+        let idx = cfg.startIdx || 0;
+        function go() {
+          const x0 = pts[idx].x, h = +sH.value;
+          vH.textContent = h.toFixed(2);
+          const y0 = f(x0), x1 = x0 + h, y1 = f(x1);
+          const m = (y1 - y0) / h, q = y0 - m * x0;
+          if (dqOut) dqOut.textContent = m.toFixed(4);
+          if (derOut) derOut.textContent = fp(x0).toFixed(4);
+          if (ptOut) ptOut.textContent = pts[idx].label;
+          const traces = [
+            { x: xs, y: xs.map(f), type: 'scatter', mode: 'lines', line: { color: cCurve, width: 2.5 }, hoverinfo: 'skip' }
+          ];
+          if (cfg.showTangent !== false) {
+            const tm = fp(x0), tq = y0 - tm * x0;
+            traces.push({ x: [cfg.xmin, cfg.xmax], y: [tm * cfg.xmin + tq, tm * cfg.xmax + tq],
+              type: 'scatter', mode: 'lines', line: { color: cGreen, width: 1.5, dash: 'dash' }, hoverinfo: 'skip' });
+          }
+          traces.push({ x: [cfg.xmin, cfg.xmax], y: [m * cfg.xmin + q, m * cfg.xmax + q],
+            type: 'scatter', mode: 'lines', line: { color: cGold, width: 2 }, hoverinfo: 'skip' });
+          traces.push({ x: [x0, x1], y: [y0, y1], type: 'scatter', mode: 'markers',
+            marker: { color: cRed, size: 9 }, hoverinfo: 'x+y' });
+          update(cfg.plot, traces, {
+            xaxis: { range: [cfg.xmin, cfg.xmax], title: cfg.xlabel || 'x' },
+            yaxis: { range: [cfg.ymin, cfg.ymax], title: cfg.ylabel || 'f(x)' }, showlegend: false
+          });
+        }
+        sH.addEventListener('input', go);
+        btns.forEach((b, i) => {
+          if (b) b.addEventListener('click', () => {
+            idx = i; btns.forEach(x => x && x.classList.remove('btn-primary')); b.classList.add('btn-primary'); go();
+          });
+        });
+        if (btns[idx]) btns[idx].classList.add('btn-primary');
+        go();
+      }
+
+      // ---- Sezione 3: controesempi di non derivabilità ----
+      (function () {
+        // Ritorna {x:[a,b],y:[c,d]} della retta y=slope*(x-px)+py, clippata al box
+        function secLine(slope, px, py, xmin, xmax, ymin, ymax) {
+          if (!isFinite(slope) || Math.abs(slope) > 5e4) return null;
+          const pts = [];
+          const tryX = (x) => {
+            const y = py + slope * (x - px);
+            if (y >= ymin - 1e-9 && y <= ymax + 1e-9)
+              pts.push([x, Math.max(ymin, Math.min(ymax, y))]);
+          };
+          const tryY = (y) => {
+            const x = px + (y - py) / slope;
+            if (x >= xmin - 1e-9 && x <= xmax + 1e-9)
+              pts.push([Math.max(xmin, Math.min(xmax, x)), y]);
+          };
+          tryX(xmin); tryX(xmax); tryY(ymin); tryY(ymax);
+          const uniq = pts.filter((p, i, a) =>
+            !a.slice(0, i).some(q => Math.abs(q[0]-p[0]) + Math.abs(q[1]-p[1]) < 1e-6));
+          if (uniq.length < 2) return null;
+          return { x: [uniq[0][0], uniq[1][0]], y: [uniq[0][1], uniq[1][1]] };
+        }
+
+        function setupCex(cfg) {
+          const sH = document.getElementById(cfg.hId), vH = document.getElementById(cfg.hValId);
+          const rOut = document.getElementById(cfg.rId), lOut = document.getElementById(cfg.lId);
+          if (!sH) return;
+          const xs = linspace(cfg.xmin, cfg.xmax, 600);
+          const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+          const fmt = (m) => !isFinite(m) ? (m > 0 ? '+∞' : '−∞') : m.toFixed(3);
+
+          function go() {
+            const c = themeColors();
+            const h = +sH.value; vH.textContent = h.toFixed(2);
+            const f0 = cfg.f(0), fh = cfg.f(h), fnh = cfg.f(-h);
+            const rSlope = (fh - f0) / h, lSlope = (fnh - f0) / (-h);
+            rOut.textContent = fmt(rSlope); lOut.textContent = fmt(lSlope);
+
+            const ys = xs.map(x => { const v = cfg.f(x); return (isFinite(v) && Math.abs(v) <= Math.abs(cfg.ymax)*2) ? v : null; });
+            const traces = [{ x: xs, y: ys, type: 'scatter', mode: 'lines',
+              line: { color: c.curve, width: 2.5 }, connectgaps: false, hoverinfo: 'skip' }];
+
+            const rSeg = secLine(rSlope, 0, f0, cfg.xmin, cfg.xmax, cfg.ymin, cfg.ymax);
+            const lSeg = secLine(lSlope, 0, f0, cfg.xmin, cfg.xmax, cfg.ymin, cfg.ymax);
+            if (rSeg) traces.push({ x: rSeg.x, y: rSeg.y, type: 'scatter', mode: 'lines',
+              line: { color: cRed, width: 2, dash: 'dash' }, hoverinfo: 'skip' });
+            if (lSeg) traces.push({ x: lSeg.x, y: lSeg.y, type: 'scatter', mode: 'lines',
+              line: { color: cBlue, width: 2, dash: 'dash' }, hoverinfo: 'skip' });
+
+            traces.push({ x: [h, 0, -h],
+              y: [clamp(fh, cfg.ymin, cfg.ymax), f0, clamp(fnh, cfg.ymin, cfg.ymax)],
+              type: 'scatter', mode: 'markers',
+              marker: { color: [cRed, '#888', cBlue], size: 9, line: { color: ['#ef4444', '#aaa', '#3b82f6'], width: 2 } },
+              hoverinfo: 'x+y' });
+
+            update(cfg.plot, traces, { xaxis: { range: [cfg.xmin, cfg.xmax], title: 'x' },
+              yaxis: { range: [cfg.ymin, cfg.ymax], title: 'f(x)' }, showlegend: false });
+          }
+          sH.addEventListener('input', go); go();
+        }
+
+        setupCex({ plot: 'cex1-plot', f: x => Math.abs(x),
+          hId: 'cex1-h', hValId: 'cex1-h-val', rId: 'cex1-right', lId: 'cex1-left',
+          xmin: -2.5, xmax: 2.5, ymin: -0.4, ymax: 2.5 });
+
+        setupCex({ plot: 'cex2-plot', f: x => Math.pow(Math.abs(x), 2/3),
+          hId: 'cex2-h', hValId: 'cex2-h-val', rId: 'cex2-right', lId: 'cex2-left',
+          xmin: -2.5, xmax: 2.5, ymin: -0.3, ymax: 2 });
+
+        setupCex({ plot: 'cex3-plot', f: x => (x >= 0 ? 1 : -1) * Math.pow(Math.abs(x), 1/3),
+          hId: 'cex3-h', hValId: 'cex3-h-val', rId: 'cex3-right', lId: 'cex3-left',
+          xmin: -2.5, xmax: 2.5, ymin: -1.5, ymax: 1.5 });
+      })();
+
+      // ---- Sez. 1: secante + triangolo Δx/Δy (niente tangente) ----
+      (function () {
+        const sH = document.getElementById('intro-h'), vH = document.getElementById('intro-h-val'), dq = document.getElementById('intro-dq');
+        if (!sH) return;
+        const f = x => x * x, x0 = 1, xmin = -0.5, xmax = 4, ymin = -1, ymax = 12;
+        const xs = linspace(xmin, xmax, 300);
+        function go() {
+          const h = +sH.value; vH.textContent = h.toFixed(2);
+          const y0 = f(x0), x1 = x0 + h, y1 = f(x1);
+          const m = (y1 - y0) / h, q = y0 - m * x0;
+          dq.textContent = m.toFixed(3);
+          const traces = [
+            { x: xs, y: xs.map(f), type: 'scatter', mode: 'lines', line: { color: cCurve, width: 2.5 }, hoverinfo: 'skip' },
+            { x: [xmin, xmax], y: [m * xmin + q, m * xmax + q], type: 'scatter', mode: 'lines', line: { color: cGold, width: 2 }, hoverinfo: 'skip' },
+            { x: [x0, x1], y: [y0, y0], type: 'scatter', mode: 'lines', line: { color: cBlue, width: 2, dash: 'dot' }, hoverinfo: 'skip' },
+            { x: [x1, x1], y: [y0, y1], type: 'scatter', mode: 'lines', line: { color: cGreen, width: 2, dash: 'dot' }, hoverinfo: 'skip' },
+            { x: [x0, x1], y: [y0, y1], type: 'scatter', mode: 'markers', marker: { color: cRed, size: 9 }, hoverinfo: 'x+y' }
+          ];
+          const ann = [
+            { x: (x0 + x1) / 2, y: y0, text: 'Δx = ' + h.toFixed(2), showarrow: false, yshift: -12, font: { color: cBlue, size: 11 } },
+            { x: x1, y: (y0 + y1) / 2, text: 'Δy = ' + (y1 - y0).toFixed(2), showarrow: false, xshift: 32, font: { color: cGreen, size: 11 } }
+          ];
+          update('intro-plot', traces, { xaxis: { range: [xmin, xmax], title: 'x' }, yaxis: { range: [ymin, ymax], title: 'f(x)' }, showlegend: false, annotations: ann });
+        }
+        sH.addEventListener('input', go); go();
+      })();
+
+      // ---- Sez. 3: Newton (velocità media → istantanea) ----
+      setupIncr({
+        plot: 'newton-plot', f: t => t * t, fp: t => 2 * t,
+        points: [{ x: 2, label: '2' }], btnIds: [],
+        hId: 'newton-h', hValId: 'newton-h-val', dqId: 'newton-dq', derId: 'newton-der',
+        xmin: 0, xmax: 5.2, ymin: 0, ymax: 28, xlabel: 't (s)', ylabel: 's (m)', showTangent: true
+      });
+
+      // ---- Sez. 4: Leibniz (secante → tangente) ----
+      setupIncr({
+        plot: 'leib-plot', f: Math.sin, fp: Math.cos,
+        points: [{ x: 1, label: '1' }], btnIds: [],
+        hId: 'leib-h', hValId: 'leib-h-val', dqId: 'leib-dq', derId: 'leib-der',
+        xmin: -0.5, xmax: 4, ymin: -1.3, ymax: 1.6, showTangent: true
+      });
+
+      // ---- Esercizio 5.1: polinomiale x² - 3x ----
+      setupIncr({
+        plot: 'ex1-plot', f: x => x * x - 3 * x, fp: x => 2 * x - 3,
+        points: [{ x: 0, label: '0' }, { x: 2, label: '2' }, { x: 4, label: '4' }],
+        btnIds: ['ex1-p0', 'ex1-p1', 'ex1-p2'],
+        hId: 'ex1-h', hValId: 'ex1-h-val', dqId: 'ex1-dq', derId: 'ex1-der', ptId: 'ex1-pt',
+        xmin: -1, xmax: 6, ymin: -3, ymax: 12
+      });
+
+      // ---- Esercizio 5.2: fratta 1/x ----
+      setupIncr({
+        plot: 'ex2-plot', f: x => 1 / x, fp: x => -1 / (x * x),
+        points: [{ x: 1, label: '1' }, { x: 2, label: '2' }, { x: 3, label: '3' }],
+        btnIds: ['ex2-p0', 'ex2-p1', 'ex2-p2'],
+        hId: 'ex2-h', hValId: 'ex2-h-val', dqId: 'ex2-dq', derId: 'ex2-der', ptId: 'ex2-pt',
+        xmin: 0.2, xmax: 6.5, ymin: 0, ymax: 4.5
+      });
+
+      // ---- Esercizio 5.3: goniometrica sin(x) ----
+      setupIncr({
+        plot: 'ex3-plot', f: Math.sin, fp: Math.cos,
+        points: [{ x: 0, label: '0' }, { x: Math.PI / 6, label: 'π/6' }, { x: Math.PI / 2, label: 'π/2' }],
+        btnIds: ['ex3-p0', 'ex3-p1', 'ex3-p2'],
+        hId: 'ex3-h', hValId: 'ex3-h-val', dqId: 'ex3-dq', derId: 'ex3-der', ptId: 'ex3-pt',
+        xmin: -0.5, xmax: 4.2, ymin: -1.3, ymax: 1.3
+      });
+
+      // ---- Esercizio 5.4: radice sqrt(x) ----
+      setupIncr({
+        plot: 'ex4-plot', f: Math.sqrt, fp: x => 1 / (2 * Math.sqrt(x)),
+        points: [{ x: 1, label: '1' }, { x: 4, label: '4' }, { x: 9, label: '9' }],
+        btnIds: ['ex4-p0', 'ex4-p1', 'ex4-p2'],
+        hId: 'ex4-h', hValId: 'ex4-h-val', dqId: 'ex4-dq', derId: 'ex4-der', ptId: 'ex4-pt',
+        xmin: 0, xmax: 13, ymin: 0, ymax: 4
+      });
+    });
+  </script>
+</body>
+
+</html>
