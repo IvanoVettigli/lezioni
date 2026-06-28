@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 11 — Tecniche di calcolo degli integrali</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quinto anno · Lezione 11</div>
+    <h1>Tecniche di calcolo degli integrali</h1>
+    <p>Integrazione per parti e per sostituzione — più qualche trucco e due meraviglie</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quinto anno</a>
+    <span class="sep">/</span> Tecniche di calcolo
+  </nav>
+
+  <main>
+
+    <!-- 0 — INTRO -->
+    <section id="sec0">
+      <h2>1. Oltre la tabella</h2>
+      <p>Nella lezione 10 abbiamo imparato gli integrali <em>immediati</em>, quelli che si leggono direttamente dalla
+        tabella fondamentale. Ma la maggior parte degli integrali non è così docile: occorrono tecniche per
+        <strong>trasformarli</strong> in qualcosa di riconoscibile. Le due principali sono l'integrazione <strong>per
+        parti</strong> e <strong>per sostituzione</strong>.</p>
+      <div class="note"><strong>Come leggere i grafici.</strong> In ogni esercizio puoi muovere lo slider dell'estremo $t$:
+        la zona azzurra è l'<strong>area accumulata</strong> fino a $t$, e la curva verde tratteggiata è la
+        <strong>primitiva</strong> $F(t)$, la cui altezza <em>è</em> quell'area. Per gli integrali definiti, portando $t$
+        all'estremo destro si legge il risultato.</div>
+    </section>
+
+    <!-- 2 — PER PARTI -->
+    <section id="sec2">
+      <h2>2. Integrazione per parti</h2>
+      <p>Quando l'integranda è un <strong>prodotto</strong> di funzioni di tipo diverso (es. un polinomio per un'esponenziale),
+        si usa l'integrazione <em>per parti</em>, che nasce dalla regola del prodotto delle derivate.</p>
+      <div class="definition">$$\int u\,dv = u\,v - \int v\,du,$$
+        ovvero $\displaystyle\int u(x)\,v'(x)\,dx = u(x)v(x) - \int u'(x)\,v(x)\,dx.$</div>
+      <div class="steps">
+        <p><strong>Da dove viene.</strong></p>
+        <p><span class="step-num">1</span>Regola del prodotto: $(uv)' = u'v + uv'$.</p>
+        <p><span class="step-num">2</span>Integro entrambi i membri: $uv = \int u'v\,dx + \int uv'\,dx$.</p>
+        <p><span class="step-num">3</span>Isolo l'integrale cercato: $\int uv'\,dx = uv - \int u'v\,dx$.</p>
+        <p style="text-align:right; font-weight:700;">∎</p>
+      </div>
+      <div class="rule"><strong>Come scegliere $u$.</strong> Si sceglie come $u$ la funzione che <em>si semplifica
+        derivando</em> (un polinomio, o $\ln x$). Regola mnemonica <strong>LIATE</strong>: Logaritmiche, Inverse trig.,
+        Algebriche, Trig., Esponenziali (priorità a $u$).</div>
+
+      <h3>2.1 — Esercizi per parti</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2.1 — indefinito</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola $\displaystyle\int x\,e^x\,dx$.</p>
+        <div class="interactive-demo">
+          <div class="demo-controls"><label for="i1-s">estremo t:</label>
+            <input type="range" id="i1-s" min="-3.5" max="1.9" step="0.05" value="1"><span class="demo-value" id="i1-sval">1.00</span></div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#7ca0ff;"></span>area accumulata</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>primitiva $F$</div>
+          </div>
+          <div class="demo-plot" id="i1-plot"></div>
+          <div class="demo-result" id="i1-cap"></div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$u = x$, $dv = e^x dx \Rightarrow du = dx$, $v = e^x$.</p>
+          <p><span class="step-num">2</span>$\int x e^x dx = x e^x - \int e^x\,dx = x e^x - e^x$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$(x-1)e^x + C$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2.2 — indefinito</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola $\displaystyle\int x\cos x\,dx$.</p>
+        <div class="interactive-demo">
+          <div class="demo-controls"><label for="i2-s">estremo t:</label>
+            <input type="range" id="i2-s" min="-6.2" max="6.2" step="0.05" value="3"><span class="demo-value" id="i2-sval">3.00</span></div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#7ca0ff;"></span>area accumulata</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>primitiva $F$</div>
+          </div>
+          <div class="demo-plot" id="i2-plot"></div>
+          <div class="demo-result" id="i2-cap"></div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$u = x$, $dv = \cos x\,dx \Rightarrow du = dx$, $v = \sin x$.</p>
+          <p><span class="step-num">2</span>$\int x\cos x\,dx = x\sin x - \int \sin x\,dx = x\sin x + \cos x$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$x\sin x + \cos x + C$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2.3 — definito</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola $\displaystyle\int_1^{e} \ln x\,dx$ (porta $t$ fino a $e\approx2{,}72$).</p>
+        <div class="interactive-demo">
+          <div class="demo-controls"><label for="i3-s">estremo t:</label>
+            <input type="range" id="i3-s" min="1" max="2.718" step="0.02" value="1.8"><span class="demo-value" id="i3-sval">1.80</span></div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#7ca0ff;"></span>area accumulata</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>primitiva $F$</div>
+          </div>
+          <div class="demo-plot" id="i3-plot"></div>
+          <div class="demo-result" id="i3-cap"></div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Scrivo $\ln x = 1\cdot\ln x$ con $u = \ln x$, $dv = dx \Rightarrow du = \tfrac1x dx$, $v = x$.</p>
+          <p><span class="step-num">2</span>$\int \ln x\,dx = x\ln x - \int 1\,dx = x\ln x - x$.</p>
+          <p><span class="step-num">3</span>$\big[x\ln x - x\big]_1^{e} = (e - e) - (0 - 1) = 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$1$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2.4 — definito</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola $\displaystyle\int_0^{\pi} x\sin x\,dx$ (porta $t$ fino a $\pi$).</p>
+        <div class="interactive-demo">
+          <div class="demo-controls"><label for="i4-s">estremo t:</label>
+            <input type="range" id="i4-s" min="0" max="3.14159" step="0.02" value="1.5"><span class="demo-value" id="i4-sval">1.50</span></div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#7ca0ff;"></span>area accumulata</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>primitiva $F$</div>
+          </div>
+          <div class="demo-plot" id="i4-plot"></div>
+          <div class="demo-result" id="i4-cap"></div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$u = x$, $dv = \sin x\,dx \Rightarrow du = dx$, $v = -\cos x$.</p>
+          <p><span class="step-num">2</span>$\int x\sin x\,dx = -x\cos x + \int\cos x\,dx = -x\cos x + \sin x$.</p>
+          <p><span class="step-num">3</span>$\big[-x\cos x + \sin x\big]_0^{\pi} = (\pi + 0) - 0 = \pi$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\pi \approx 3{,}14$.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — PER SOSTITUZIONE -->
+    <section id="sec3">
+      <h2>3. Integrazione per sostituzione</h2>
+      <p>È la "regola della catena letta al contrario". Quando compare una funzione $g(x)$ <em>insieme alla sua derivata</em>
+        $g'(x)$, si "ribattezza" $u = g(x)$.</p>
+      <div class="definition">$$\int f\big(g(x)\big)\,g'(x)\,dx = \int f(u)\,du, \qquad u = g(x),\ du = g'(x)\,dx.$$
+        Negli integrali <strong>definiti</strong> si cambiano anche gli estremi: $x:a\to b$ diventa $u:g(a)\to g(b)$.</div>
+
+      <h3>3.1 — Esercizi per sostituzione</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3.1 — indefinito</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola $\displaystyle\int 2x\cos(x^2)\,dx$.</p>
+        <div class="interactive-demo">
+          <div class="demo-controls"><label for="i5-s">estremo t:</label>
+            <input type="range" id="i5-s" min="-2.9" max="2.9" step="0.05" value="1.5"><span class="demo-value" id="i5-sval">1.50</span></div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#7ca0ff;"></span>area accumulata</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>primitiva $F$</div>
+          </div>
+          <div class="demo-plot" id="i5-plot"></div>
+          <div class="demo-result" id="i5-cap"></div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$u = x^2$, $du = 2x\,dx$: proprio il fattore presente.</p>
+          <p><span class="step-num">2</span>$\int 2x\cos(x^2)\,dx = \int \cos u\,du = \sin u$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\sin(x^2) + C$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3.2 — indefinito</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola $\displaystyle\int \dfrac{2x}{x^2+1}\,dx$.</p>
+        <div class="interactive-demo">
+          <div class="demo-controls"><label for="i6-s">estremo t:</label>
+            <input type="range" id="i6-s" min="-4.8" max="4.8" step="0.05" value="2"><span class="demo-value" id="i6-sval">2.00</span></div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#7ca0ff;"></span>area accumulata</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>primitiva $F$</div>
+          </div>
+          <div class="demo-plot" id="i6-plot"></div>
+          <div class="demo-result" id="i6-cap"></div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$u = x^2+1$, $du = 2x\,dx$ (il numeratore).</p>
+          <p><span class="step-num">2</span>$\int \dfrac{2x}{x^2+1}\,dx = \int \dfrac{1}{u}\,du = \ln|u|$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\ln(x^2+1) + C$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3.3 — indefinito</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola $\displaystyle\int x\sqrt{x^2+1}\,dx$.</p>
+        <div class="interactive-demo">
+          <div class="demo-controls"><label for="i7-s">estremo t:</label>
+            <input type="range" id="i7-s" min="-2.9" max="2.9" step="0.05" value="1.5"><span class="demo-value" id="i7-sval">1.50</span></div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#7ca0ff;"></span>area accumulata</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>primitiva $F$</div>
+          </div>
+          <div class="demo-plot" id="i7-plot"></div>
+          <div class="demo-result" id="i7-cap"></div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$u = x^2+1$, $du = 2x\,dx \Rightarrow x\,dx = \tfrac12 du$.</p>
+          <p><span class="step-num">2</span>$\int x\sqrt{x^2+1}\,dx = \tfrac12\int \sqrt{u}\,du = \tfrac12\cdot\dfrac{u^{3/2}}{3/2} = \tfrac13 u^{3/2}$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\dfrac{1}{3}(x^2+1)^{3/2} + C$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3.4 — definito</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola $\displaystyle\int_0^1 2x\,e^{x^2}\,dx$.</p>
+        <div class="interactive-demo">
+          <div class="demo-controls"><label for="i8-s">estremo t:</label>
+            <input type="range" id="i8-s" min="0" max="1" step="0.02" value="0.5"><span class="demo-value" id="i8-sval">0.50</span></div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#7ca0ff;"></span>area accumulata</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>primitiva $F$</div>
+          </div>
+          <div class="demo-plot" id="i8-plot"></div>
+          <div class="demo-result" id="i8-cap"></div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$u = x^2$, $du = 2x\,dx$. Estremi: $x=0\Rightarrow u=0$; $x=1\Rightarrow u=1$.</p>
+          <p><span class="step-num">2</span>$\int_0^1 2x e^{x^2}\,dx = \int_0^1 e^u\,du = \big[e^u\big]_0^1 = e - 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$e - 1 \approx 1{,}718$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3.5 — definito</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola $\displaystyle\int_0^1 \dfrac{x}{\sqrt{x^2+1}}\,dx$.</p>
+        <div class="interactive-demo">
+          <div class="demo-controls"><label for="i9-s">estremo t:</label>
+            <input type="range" id="i9-s" min="0" max="1" step="0.02" value="0.5"><span class="demo-value" id="i9-sval">0.50</span></div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#7ca0ff;"></span>area accumulata</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>primitiva $F$</div>
+          </div>
+          <div class="demo-plot" id="i9-plot"></div>
+          <div class="demo-result" id="i9-cap"></div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$u = x^2+1$, $x\,dx = \tfrac12 du$. Estremi: $x=0\Rightarrow u=1$; $x=1\Rightarrow u=2$.</p>
+          <p><span class="step-num">2</span>$\tfrac12\int u^{-1/2}\,du = \sqrt{u}$, quindi $\big[\sqrt{u}\big]_1^2 = \sqrt2 - 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\sqrt2 - 1 \approx 0{,}414$.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — COMBINATO -->
+    <section id="sec4">
+      <h2>4. Quando servono più tecniche insieme</h2>
+      <p>Gli integrali "veri" spesso combinano gli strumenti: prima una sostituzione, poi le parti.</p>
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 4.1 — sostituzione + parti</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola $\displaystyle\int e^{\sqrt{x}}\,dx$.</p>
+        <div class="interactive-demo">
+          <div class="demo-controls"><label for="i10-s">estremo t:</label>
+            <input type="range" id="i10-s" min="0" max="6" step="0.05" value="3"><span class="demo-value" id="i10-sval">3.00</span></div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#7ca0ff;"></span>area accumulata</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>primitiva $F$</div>
+          </div>
+          <div class="demo-plot" id="i10-plot"></div>
+          <div class="demo-result" id="i10-cap"></div>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Sostituzione:</strong> $t = \sqrt{x}$, $x = t^2$, $dx = 2t\,dt$.</p>
+          <p><span class="step-num">2</span>$\int e^{\sqrt{x}}\,dx = \int e^{t}\cdot 2t\,dt = 2\int t\,e^{t}\,dt$.</p>
+          <p><span class="step-num">3</span><strong>Per parti</strong>: $\int t e^t dt = t e^t - e^t$. Quindi $2(t e^t - e^t)$, con $t=\sqrt{x}$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$2e^{\sqrt{x}}\big(\sqrt{x} - 1\big) + C$.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — SIMMETRIA + GAG -->
+    <section id="sec5">
+      <h2>5. Casi particolari: la simmetria che semplifica tutto</h2>
+      <p>A volte un integrale mostruoso si risolve in una riga riconoscendo una <strong>simmetria</strong>. Ricordiamo: $f$
+        è <em>pari</em> se $f(-x)=f(x)$, <em>dispari</em> se $f(-x)=-f(x)$.</p>
+      <div class="rule">Su un intervallo <strong>simmetrico</strong> $[-a, a]$:
+        $$\int_{-a}^{a} f\,dx = 0 \ \text{ se } f \text{ è dispari}, \qquad
+          \int_{-a}^{a} f\,dx = 2\!\int_0^a f\,dx \ \text{ se } f \text{ è pari}.$$
+        Per una funzione dispari, l'area sopra l'asse e quella sotto si <em>cancellano</em>.</div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 5.1 — la sfida reale</span><span class="difficulty hard">Difficilissimo</span></div>
+        <div class="joke"><strong>👑 Sfida ufficiale.</strong> Chiunque calcoli questo integrale sarà proclamato
+          <strong>Re (o Regina) d'Inghilterra</strong>:
+          $$\int_{-3}^{3} \Big(x^7 - 5x^3 + \frac{\sin x}{1+x^2} + x\cos(x^2)\Big)\,e^{-x^2}\,dx = \,?$$
+          Compare persino $e^{-x^2}$, che <em>non</em> ha primitiva elementare. Sembra impossibile…</div>
+        <div class="interactive-demo">
+          <div class="demo-controls"><label for="i11-s">estremo t:</label>
+            <input type="range" id="i11-s" min="-3" max="3" step="0.05" value="0"><span class="demo-value" id="i11-sval">0.00</span></div>
+          <div class="demo-legend">
+            <div class="legend-item"><span class="legend-color" style="background:#7ca0ff;"></span>area accumulata da −3</div>
+            <div class="legend-item"><span class="legend-color" style="background:#22c55e;"></span>primitiva $F$</div>
+          </div>
+          <div class="demo-plot" id="i11-plot"></div>
+          <div class="demo-result" id="i11-cap"></div>
+        </div>
+        <div class="ex-actions">
+          <button class="btn btn-toggle" data-target="#king-hint" data-label-show="🔎 Primo suggerimento" data-label-hide="🙈 Nascondi suggerimento">🔎 Primo suggerimento</button>
+          <button class="btn btn-toggle" data-target="#king-sol" data-label-show="💡 Mostra soluzione" data-label-hide="🙈 Nascondi soluzione">💡 Mostra soluzione</button>
+        </div>
+        <div id="king-hint" class="solution">
+          <div class="note"><strong>Suggerimento.</strong> Prima di calcolare, osserva la <em>parità</em> dell'integranda e
+            l'intervallo. Se accetti l'aiuto e poi risolvi, però, non potrai più ambire al trono d'Inghilterra: sarai solo
+            <strong>Re (o Regina) di Giugliano</strong>. 😄 (Nel grafico: porta $t$ fino a $3$ e guarda dove finisce l'area.)</div>
+        </div>
+        <div id="king-sol" class="solution">
+          <p><span class="step-num">1</span>Ogni addendo della parentesi è <em>dispari</em>; il fattore $e^{-x^2}$ è
+            <em>pari</em>. Dispari $\times$ pari $=$ <strong>dispari</strong>: $f(-x)=-f(x)$.</p>
+          <p><span class="step-num">2</span>L'intervallo $[-3,3]$ è simmetrico: l'integrale di una funzione dispari su un
+            intervallo simmetrico è $0$ — senza calcolare alcuna primitiva.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$0$. 👑 <em>Lunga vita al Re/alla Regina di Giugliano!</em></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — CORNO DI GABRIELE (FACOLTATIVO) -->
+    <section id="sec6" class="optional">
+      <h2>6. Il paradosso del corno di Gabriele</h2>
+      <p>(Approfondimento facoltativo — usa gli <em>integrali impropri</em>, fino a $+\infty$.) Prendiamo $y = \dfrac{1}{x}$
+        per $x \ge 1$ e facciamola ruotare attorno all'asse $x$: una tromba infinitamente lunga, il <strong>corno di
+        Gabriele</strong>.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">Allunga il corno: il volume si stabilizza, l'area no</div>
+        <div class="demo-controls">
+          <label for="horn-b">lunghezza fino a b:</label>
+          <input type="range" id="horn-b" min="2" max="60" step="1" value="6">
+          <span class="demo-value" id="horn-b-val">6</span>
+        </div>
+        <div class="demo-plot" id="horn-plot"></div>
+        <div class="demo-result">Fino a $x=b$: <strong>area</strong> sotto la curva $\displaystyle\int_1^b \frac1x\,dx = \ln b = $
+          <strong><span id="horn-area">…</span></strong> (cresce senza limite); <strong>volume</strong> del solido
+          $\displaystyle\pi\!\int_1^b \frac{1}{x^2}\,dx = \pi\Big(1-\frac1b\Big) = $ <strong><span id="horn-vol">…</span></strong>
+          (tende a $\pi$).</div>
+      </div>
+      <h3>6.1 — Come si calcolano volume e superficie di rotazione</h3>
+      <p>Facendo ruotare il grafico di $f$ attorno all'asse $x$, tra $a$ e $b$, si usano due integrali generali:</p>
+      <div class="definition">
+        <strong>Volume</strong> — si affetta il solido in <em>dischi</em> di raggio $f(x)$ e spessore $dx$; ogni disco ha
+        area $\pi f(x)^2$, quindi
+        $$V = \pi\int_a^b \big[f(x)\big]^2\,dx.$$
+        <strong>Superficie laterale</strong> — si somma la superficie di tanti <em>anelli</em> di raggio $f(x)$, larghi
+        $\sqrt{1+f'(x)^2}\,dx$ (un pezzetto di curva, non di asse):
+        $$S = 2\pi\int_a^b f(x)\,\sqrt{1+f'(x)^2}\,dx.$$
+      </div>
+      <p>Per il corno $f(x)=\dfrac1x$ (con $f'(x)=-\dfrac{1}{x^2}$) la differenza decisiva è <em>l'esponente</em> di $x$
+        che finisce sotto integrale:</p>
+      <div class="steps">
+        <p><span class="step-num">1</span><strong>Volume:</strong> usa $f^2 = \dfrac{1}{x^2}$:
+          $$V = \pi\int_1^{b}\frac{1}{x^2}\,dx = \pi\Big[-\frac1x\Big]_1^{b} = \pi\Big(1-\frac1b\Big)\xrightarrow[b\to\infty]{}\pi.$$
+          <em>Converge</em> perché $\dfrac{1}{x^2}$ decresce in fretta (esponente $2>1$).</p>
+        <p><span class="step-num">2</span><strong>Superficie:</strong> contiene $f = \dfrac1x$ e un fattore
+          $\sqrt{1+\frac{1}{x^4}}\ge 1$. Quindi
+          $$S = 2\pi\int_1^{b}\frac1x\sqrt{1+\frac{1}{x^4}}\,dx \;\ge\; 2\pi\int_1^{b}\frac1x\,dx = 2\pi\ln b \xrightarrow[b\to\infty]{}+\infty.$$
+          <em>Diverge</em> perché contiene $\dfrac1x$ (esponente $1$).</p>
+      </div>
+      <div class="rule"><strong>La regola che decide tutto.</strong> L'integrale improprio $\displaystyle\int_1^{\infty} x^{-p}\,dx$
+        <em>converge se $p>1$, diverge se $p\le1$</em>. Il volume "vede" $x^{-2}$ ($p=2$, converge → finito); la superficie
+        "vede" $x^{-1}$ ($p=1$, diverge → infinita). Ecco, in una riga, perché un volume finito può avere superficie infinita.</div>
+
+      <div class="definition">In sintesi, per $b \to +\infty$: $V = \pi\displaystyle\int_1^{\infty}\frac{dx}{x^2} = \pi$ (finito!),
+        mentre $S \ge 2\pi\displaystyle\int_1^{\infty}\frac{dx}{x} = +\infty$ (infinita!).</div>
+      <div class="joke"><strong>Il paradosso.</strong> Potresti <em>riempire</em> il corno con vernice finita (volume $\pi$),
+        ma quella vernice non basterebbe a <em>dipingerne</em> la superficie, infinita!</div>
+      <div class="rule"><strong>Come si "risolve".</strong> È un paradosso apparente: confonde oggetti ideali con vernice
+        fisica. "Riempire" usa il volume vero (finito); "dipingere" significherebbe stendere uno strato di spessore
+        <em>costante</em> su area infinita (volume infinito). Sono quantità diverse, area e volume non si confrontano
+        direttamente. Nessuna contraddizione, solo intuizione mal riposta.</div>
+    </section>
+
+    <!-- 7 — INTEGRALE DI GAUSS (FACOLTATIVO) -->
+    <section id="sec7" class="optional">
+      <h2>7. L'integrale di Gauss: $\displaystyle\int_{-\infty}^{\infty} e^{-x^2}\,dx$</h2>
+      <p>(Approfondimento facoltativo — usa gli <em>integrali doppi</em> e le <em>coordinate polari</em>.) La funzione
+        $e^{-x^2}$ è la base della <strong>curva gaussiana</strong>, regina di statistica e fisica.</p>
+      <div class="interactive-demo">
+        <div class="demo-title">L'area totale sotto la campana $e^{-x^2}$ vale $\sqrt{\pi}$</div>
+        <div class="demo-controls">
+          <label for="gauss-a">larghezza ±a:</label>
+          <input type="range" id="gauss-a" min="0.3" max="4" step="0.1" value="1.5">
+          <span class="demo-value" id="gauss-a-val">1.5</span>
+        </div>
+        <div class="demo-plot" id="gauss-plot"></div>
+        <div class="demo-result">Area su $[-a, a]$: <strong><span id="gauss-area">…</span></strong>. Allargando, tende a
+          $\sqrt{\pi} \approx 1{,}7725$. Eppure $e^{-x^2}$ <strong>non ha primitiva elementare</strong>!</div>
+      </div>
+      <h3>7.1 — Perché è importante e difficile</h3>
+      <p>L'area sotto la gaussiana dà la <strong>probabilità</strong> in statistica. È difficile perché manca il fattore $x$
+        che permetterebbe la sostituzione: nessuna tecnica elementare funziona.</p>
+      <h3>7.2 — Il trucco geniale (di Poisson)</h3>
+      <div class="steps">
+        <p><span class="step-num">1</span>Sia $I = \displaystyle\int_{-\infty}^{\infty} e^{-x^2}\,dx$. Invece di $I$, calcoliamo $I^2$.</p>
+        <p><span class="step-num">2</span>$I^2 = \displaystyle\iint_{\mathbb{R}^2} e^{-(x^2+y^2)}\,dx\,dy$ (prodotto di due copie, in $x$ e $y$).</p>
+        <p><span class="step-num">3</span><strong>Coordinate polari:</strong> $x^2+y^2=r^2$, $dx\,dy = r\,dr\,d\theta$. Compare il fattore $r$ che mancava!
+          $$I^2 = \int_0^{2\pi}\!\!\int_0^{\infty} e^{-r^2}\,r\,dr\,d\theta.$$</p>
+        <p><span class="step-num">4</span>$\displaystyle\int_0^{\infty} e^{-r^2} r\,dr = \tfrac12$, quindi $I^2 = 2\pi\cdot\tfrac12 = \pi$.</p>
+        <p><span class="step-num">5</span>Dunque $I = \sqrt{\pi}$.</p>
+        <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\displaystyle\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}$.</span></div>
+      </div>
+      <div class="rule"><strong>Perché è elegante.</strong> Un integrale impossibile in una dimensione diventa facile in
+        due: il "cambio di prospettiva" fa comparire il fattore $r$ mancante. La stessa lezione di Zenone: a volte il
+        problema si risolve guardandolo da un'altra angolazione.</div>
+    </section>
+
+    <!-- 8 — QUIZ -->
+    <section id="quiz">
+      <h2>8. Quiz finale</h2>
+      <p>Otto domande su parti, sostituzione, simmetrie e le due meraviglie.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 11 — Tecniche di calcolo degli integrali · Matematica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX, math.js e Plotly.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    window.quizData = [
+      { diff: 'easy', text: 'La formula di integrazione per parti è:',
+        options: ['$\\int u\\,dv = uv - \\int v\\,du$', '$\\int u\\,dv = u\\,v$', '$\\int u\\,dv = \\int u\\int dv$', '$\\int u\\,dv = u\'v\'$'],
+        correct: 0, explain: 'Nasce dalla regola del prodotto: $\\int u\\,dv = uv - \\int v\\,du$.' },
+      { diff: 'easy', text: 'Per $\\int x e^x dx$ per parti, conviene scegliere $u$ uguale a:',
+        options: ['$e^x$', '$x$', '$x e^x$', '$1$'],
+        correct: 1, explain: 'Si sceglie $u=x$, che derivando si semplifica (diventa $1$); $dv=e^x dx$.' },
+      { diff: 'medium', text: 'Per $\\int \\ln x\\,dx$ il trucco è scegliere:',
+        options: ['$u=1,\\ dv=\\ln x\\,dx$', '$u=\\ln x,\\ dv=dx$', 'una sostituzione $u=\\ln x$', 'la regola del quoziente'],
+        correct: 1, explain: 'Con $u=\\ln x$ e $dv=dx$ si ottiene $x\\ln x - x + C$.' },
+      { diff: 'medium', text: 'Nell\'integrazione per sostituzione di un integrale definito si deve:',
+        options: ['Lasciare gli estremi invariati', 'Cambiare anche gli estremi secondo $u=g(x)$', 'Aggiungere $+C$', 'Derivare gli estremi'],
+        correct: 1, explain: 'Cambiando variabile cambiano anche gli estremi: $x:a\\to b$ diventa $u:g(a)\\to g(b)$.' },
+      { diff: 'medium', text: '$\\displaystyle\\int 2x\\cos(x^2)\\,dx$ si risolve ponendo:',
+        options: ['$u = \\cos x$', '$u = 2x$', '$u = x^2$', 'per parti'],
+        correct: 2, explain: 'Con $u=x^2$ si ha $du=2x\\,dx$: resta $\\int\\cos u\\,du=\\sin(x^2)+C$.' },
+      { diff: 'medium', text: 'Se $f$ è dispari, $\\displaystyle\\int_{-a}^{a} f(x)\\,dx$ vale:',
+        options: ['$2\\int_0^a f$', '$0$', '$+\\infty$', '$f(a)-f(-a)$'],
+        correct: 1, explain: 'Le aree sopra e sotto l\'asse si cancellano: per una funzione dispari l\'integrale simmetrico è 0.' },
+      { diff: 'hard', text: 'Perché $\\int e^{-x^2}dx$ è "difficile"?',
+        options: ['Perché vale infinito', 'Perché non ha primitiva elementare', 'Perché è discontinua', 'Perché è dispari'],
+        correct: 1, explain: 'Non esiste una formula elementare per la sua primitiva; l\'area totale però vale $\\sqrt\\pi$.' },
+      { diff: 'hard', text: 'Nel corno di Gabriele, volume e superficie valgono:',
+        options: ['Entrambi finiti', 'Volume finito ($\\pi$), superficie infinita', 'Volume infinito, superficie finita', 'Entrambi infiniti'],
+        correct: 1, explain: 'Il volume converge a $\\pi$, ma la superficie diverge: un volume finito "racchiude" una superficie infinita.' }
+    ];
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { linspace, update, themeColors } = Plt;
+      const cCurve = themeColors().curve, cGreen = '#22c55e';
+
+      // Demo riutilizzabile: f + area accumulata da a + primitiva F(t)
+      function integralDemo(cfg) {
+        const sX = document.getElementById(cfg.slider), vX = document.getElementById(cfg.sliderVal);
+        const capEl = document.getElementById(cfg.cap);
+        if (!sX) return;
+        const f = cfg.f, a = cfg.a;
+        const xs = linspace(cfg.xmin, cfg.xmax, 500), fvals = xs.map(f);
+        const Fg = new Array(xs.length); Fg[0] = 0;
+        for (let i = 1; i < xs.length; i++) {
+          let d = (fvals[i] + fvals[i - 1]) / 2 * (xs[i] - xs[i - 1]);
+          if (!isFinite(d)) d = 0;
+          Fg[i] = Fg[i - 1] + d;
+        }
+        let ia = 0, best = 1e9;
+        for (let i = 0; i < xs.length; i++) { const d = Math.abs(xs[i] - a); if (d < best) { best = d; ia = i; } }
+        const sh = Fg[ia]; for (let i = 0; i < xs.length; i++) Fg[i] -= sh;
+        const idxOf = t => { let i0 = 0, b = 1e9; for (let i = 0; i < xs.length; i++) { const d = Math.abs(xs[i] - t); if (d < b) { b = d; i0 = i; } } return i0; };
+        function go() {
+          const t = +sX.value; vX.textContent = t.toFixed(2);
+          const it = idxOf(t), area = Fg[it];
+          const lo = Math.min(a, t), hi = Math.max(a, t);
+          const axs = [], ays = [];
+          for (let i = 0; i < xs.length; i++) if (xs[i] >= lo - 1e-9 && xs[i] <= hi + 1e-9) { axs.push(xs[i]); ays.push(fvals[i]); }
+          const fI = Math.min(ia, it), tI = Math.max(ia, it);
+          const traces = [
+            { x: axs, y: ays, type: 'scatter', mode: 'lines', fill: 'tozeroy', fillcolor: 'rgba(124,160,255,0.3)', line: { width: 0 }, hoverinfo: 'skip' },
+            { x: xs, y: fvals, type: 'scatter', mode: 'lines', line: { color: cCurve, width: 3 }, name: 'f(x)', hoverinfo: 'skip' },
+            { x: xs.slice(fI, tI + 1), y: Fg.slice(fI, tI + 1), type: 'scatter', mode: 'lines', line: { color: cGreen, width: 2.5, dash: 'dash' }, name: 'F (area)', hoverinfo: 'skip' },
+            { x: [t], y: [area], type: 'scatter', mode: 'markers', marker: { color: cGreen, size: 10 }, hoverinfo: 'skip' }
+          ];
+          capEl.innerHTML = 'Area accumulata da ' + cfg.aLabel + ' a t = <strong>' + area.toFixed(3) + '</strong>'
+            + (cfg.note ? ' ' + cfg.note : '') + '.';
+          update(cfg.plot, traces, { xaxis: { range: [cfg.xmin, cfg.xmax], title: 'x' },
+            yaxis: { range: [cfg.ymin, cfg.ymax], title: '' }, showlegend: true, legend: { x: 0.02, y: 0.98, orientation: 'h' } });
+        }
+        sX.addEventListener('input', go); go();
+      }
+
+      integralDemo({ f: x => x * Math.exp(x), a: 0, aLabel: '0', slider: 'i1-s', sliderVal: 'i1-sval', plot: 'i1-plot', cap: 'i1-cap', xmin: -4, xmax: 2, ymin: -2, ymax: 16 });
+      integralDemo({ f: x => x * Math.cos(x), a: 0, aLabel: '0', slider: 'i2-s', sliderVal: 'i2-sval', plot: 'i2-plot', cap: 'i2-cap', xmin: -6.5, xmax: 6.5, ymin: -7, ymax: 7 });
+      integralDemo({ f: Math.log, a: 1, aLabel: '1', slider: 'i3-s', sliderVal: 'i3-sval', plot: 'i3-plot', cap: 'i3-cap', xmin: 0.2, xmax: 3.2, ymin: -1.8, ymax: 1.6, note: '(a t=e vale 1)' });
+      integralDemo({ f: x => x * Math.sin(x), a: 0, aLabel: '0', slider: 'i4-s', sliderVal: 'i4-sval', plot: 'i4-plot', cap: 'i4-cap', xmin: 0, xmax: 3.3, ymin: -0.6, ymax: 3.6, note: '(a t=π vale π)' });
+      integralDemo({ f: x => 2 * x * Math.cos(x * x), a: 0, aLabel: '0', slider: 'i5-s', sliderVal: 'i5-sval', plot: 'i5-plot', cap: 'i5-cap', xmin: -3, xmax: 3, ymin: -6, ymax: 6 });
+      integralDemo({ f: x => 2 * x / (x * x + 1), a: 0, aLabel: '0', slider: 'i6-s', sliderVal: 'i6-sval', plot: 'i6-plot', cap: 'i6-cap', xmin: -5, xmax: 5, ymin: -2, ymax: 3.6 });
+      integralDemo({ f: x => x * Math.sqrt(x * x + 1), a: 0, aLabel: '0', slider: 'i7-s', sliderVal: 'i7-sval', plot: 'i7-plot', cap: 'i7-cap', xmin: -3, xmax: 3, ymin: -11, ymax: 11 });
+      integralDemo({ f: x => 2 * x * Math.exp(x * x), a: 0, aLabel: '0', slider: 'i8-s', sliderVal: 'i8-sval', plot: 'i8-plot', cap: 'i8-cap', xmin: 0, xmax: 1.4, ymin: 0, ymax: 9, note: '(a t=1 vale e−1)' });
+      integralDemo({ f: x => x / Math.sqrt(x * x + 1), a: 0, aLabel: '0', slider: 'i9-s', sliderVal: 'i9-sval', plot: 'i9-plot', cap: 'i9-cap', xmin: 0, xmax: 3, ymin: 0, ymax: 1.3, note: '(a t=1 vale √2−1)' });
+      integralDemo({ f: x => Math.exp(Math.sqrt(Math.max(0, x))), a: 0, aLabel: '0', slider: 'i10-s', sliderVal: 'i10-sval', plot: 'i10-plot', cap: 'i10-cap', xmin: 0, xmax: 6, ymin: 0, ymax: 13 });
+      integralDemo({ f: x => (Math.pow(x, 7) - 5 * Math.pow(x, 3) + Math.sin(x) / (1 + x * x) + x * Math.cos(x * x)) * Math.exp(-x * x),
+        a: -3, aLabel: '−3', slider: 'i11-s', sliderVal: 'i11-sval', plot: 'i11-plot', cap: 'i11-cap', xmin: -3, xmax: 3, ymin: -2, ymax: 2, note: '— porta t a 3: l\'area torna a 0!' });
+
+      // 6 — Corno di Gabriele
+      (function () {
+        const sB = document.getElementById('horn-b'), vB = document.getElementById('horn-b-val');
+        const aOut = document.getElementById('horn-area'), vOut = document.getElementById('horn-vol');
+        if (!sB) return;
+        function go() {
+          const b = +sB.value; vB.textContent = b;
+          aOut.textContent = Math.log(b).toFixed(3); vOut.textContent = (Math.PI * (1 - 1 / b)).toFixed(4);
+          const xs = linspace(1, b, 300);
+          update('horn-plot', [
+            { x: xs, y: xs.map(x => 1 / x), type: 'scatter', mode: 'lines', fill: 'tozeroy', fillcolor: 'rgba(124,160,255,0.3)', line: { color: cCurve, width: 2.5 }, hoverinfo: 'skip' },
+            { x: xs, y: xs.map(x => -1 / x), type: 'scatter', mode: 'lines', line: { color: cCurve, width: 1.5, dash: 'dot' }, hoverinfo: 'skip' }
+          ], { xaxis: { range: [0, Math.max(8, b)], title: 'x' }, yaxis: { range: [-1.2, 1.2], title: 'y = 1/x' }, showlegend: false });
+        }
+        sB.addEventListener('input', go); go();
+      })();
+
+      // 7 — Integrale di Gauss
+      (function () {
+        const sA = document.getElementById('gauss-a'), vA = document.getElementById('gauss-a-val');
+        const aOut = document.getElementById('gauss-area');
+        if (!sA) return;
+        const f = x => Math.exp(-x * x);
+        function area(a) { const n = 600, dx = (2 * a) / n; let s = 0; for (let i = 0; i < n; i++) s += f(-a + (i + 0.5) * dx) * dx; return s; }
+        const xs = linspace(-4, 4, 300);
+        function go() {
+          const a = +sA.value; vA.textContent = a.toFixed(1); aOut.textContent = area(a).toFixed(4);
+          const fxs = linspace(-a, a, 200);
+          update('gauss-plot', [
+            { x: fxs, y: fxs.map(f), type: 'scatter', mode: 'lines', fill: 'tozeroy', fillcolor: 'rgba(34,197,94,0.3)', line: { width: 0 }, hoverinfo: 'skip' },
+            { x: xs, y: xs.map(f), type: 'scatter', mode: 'lines', line: { color: cCurve, width: 3 }, hoverinfo: 'skip' }
+          ], { xaxis: { range: [-4, 4], title: 'x' }, yaxis: { range: [0, 1.1], title: 'e^(-x²)' }, showlegend: false });
+        }
+        sA.addEventListener('input', go); go();
+      })();
+    });
+  </script>
+</body>
+
+</html>

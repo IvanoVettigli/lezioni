@@ -142,6 +142,17 @@
       line: { color: c.curve, width: 2.5 }, connectgaps: false, hoverinfo: 'x+y',
     }];
 
+    // Area ombreggiata sotto la curva tra a e b (data-fill="a,b") — per gli integrali definiti
+    if (ds.fill) {
+      const fb = ds.fill.split(',').map(Number);
+      const fxs = linspace(fb[0], fb[1], 240);
+      const fys = evalForPlot(ds.expr, fxs, { yLimit: Math.max(Math.abs(yMin), Math.abs(yMax)) * 3 });
+      traces.unshift({
+        x: fxs, y: fys, type: 'scatter', mode: 'lines', fill: 'tozeroy',
+        fillcolor: 'rgba(124,160,255,0.28)', line: { width: 0 }, hoverinfo: 'skip',
+      });
+    }
+
     // Curva della derivata f'(x) tratteggiata (data-deriv="espressione in x")
     let showLegend = false;
     if (ds.deriv) {
@@ -149,6 +160,16 @@
       traces.push({
         x: xs, y: dys, type: 'scatter', mode: 'lines', name: "f '(x)",
         line: { color: c.accent, width: 2, dash: 'dash' }, connectgaps: false, hoverinfo: 'x+y',
+      });
+      showLegend = true;
+    }
+
+    // Curva della primitiva F(x) tratteggiata (data-prim="espressione in x")
+    if (ds.prim) {
+      const pys = evalForPlot(ds.prim, xs, { yLimit: Math.max(Math.abs(yMin), Math.abs(yMax)) * 3 });
+      traces.push({
+        x: xs, y: pys, type: 'scatter', mode: 'lines', name: 'F(x) (primitiva)',
+        line: { color: '#22c55e', width: 2, dash: 'dash' }, connectgaps: false, hoverinfo: 'x+y',
       });
       showLegend = true;
     }
