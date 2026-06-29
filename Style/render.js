@@ -12,12 +12,14 @@
   const esc = (s) => String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+  function isLesson(item) { return !item.type || item.type === 'lesson'; }
+
   function renderHome(root) {
     const cat = window.SITE_CATALOG || {};
     root.innerHTML = Object.keys(cat).map((key) => {
       const subj = cat[key];
       const cards = subj.years.map((y) => {
-        const n = y.lessons ? y.lessons.length : 0;
+        const n = y.lessons ? y.lessons.filter(isLesson).length : 0;
         // y.meta sovrascrive il conteggio lezioni (es. "Schede PDF" per il Laboratorio)
         const meta = y.meta || (n === 0 ? 'In preparazione' : n === 1 ? '1 lezione' : n + ' lezioni');
         return `
@@ -40,9 +42,9 @@
     const folder = document.body.dataset.folder;
     const subj = cat[sectionKey];
     const entry = subj && subj.years.find((y) => y.folder === folder);
-    const lessons = (entry && entry.lessons) || [];
+    const allItems = (entry && entry.lessons) || [];
 
-    if (!lessons.length) {
+    if (!allItems.length) {
       root.innerHTML = `
         <div class="empty-state">
           <span class="es-emoji">🚧</span>
@@ -52,16 +54,50 @@
       return;
     }
 
-    root.innerHTML = `<ol class="lesson-list">` + lessons.map((l, i) => `
-      <li class="lesson-item">
-        <a href="${esc(l.file)}">
-          <span class="li-num">${i + 1}</span>
-          <span class="li-body">
-            <span class="li-title">${esc(l.title)}</span>
-            ${l.desc ? `<span class="li-desc">${esc(l.desc)}</span>` : ''}
-          </span>
-        </a>
-      </li>`).join('') + `</ol>`;
+    // Raggruppa: le lezioni ordinarie vanno in gruppi; riepilogo/verifica
+    // appaiono come card companion dopo il loro gruppo di 3 lezioni.
+    const groups = [];
+    let cur = { lessons: [], extras: [] };
+    for (const item of allItems) {
+      if (isLesson(item)) {
+        if (cur.extras.length) { groups.push(cur); cur = { lessons: [], extras: [] }; }
+        cur.lessons.push(item);
+      } else {
+        cur.extras.push(item);
+      }
+    }
+    if (cur.lessons.length || cur.extras.length) groups.push(cur);
+
+    let lessonNum = 0;
+    root.innerHTML = groups.map((g) => {
+      const lessonsHtml = `<ol class="lesson-list">` + g.lessons.map((l) => {
+        lessonNum++;
+        return `
+          <li class="lesson-item">
+            <a href="${esc(l.file)}">
+              <span class="li-num">${lessonNum}</span>
+              <span class="li-body">
+                <span class="li-title">${esc(l.title)}</span>
+                ${l.desc ? `<span class="li-desc">${esc(l.desc)}</span>` : ''}
+              </span>
+            </a>
+          </li>`;
+      }).join('') + `</ol>`;
+
+      const extrasHtml = g.extras.length
+        ? `<ul class="extras-list">` + g.extras.map((e) => `
+          <li class="extra-item ${esc(e.type || '')}">
+            <a href="${esc(e.file)}">
+              <span class="li-body">
+                <span class="li-title">${esc(e.title)}</span>
+                ${e.desc ? `<span class="li-desc">${esc(e.desc)}</span>` : ''}
+              </span>
+            </a>
+          </li>`).join('') + `</ul>`
+        : '';
+
+      return `<div class="lesson-group">${lessonsHtml}${extrasHtml}</div>`;
+    }).join('');
   }
 
   function renderLab(root) {
