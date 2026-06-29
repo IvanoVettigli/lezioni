@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifica di prova — Funzioni, Dominio e Limiti</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    /* Stili specifici della verifica */
+    .exam-meta { background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1.4rem; margin: 1.2rem 0; }
+    .exam-meta h2 { margin-top: 0; }
+    .meta-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem 1.4rem; margin-top: 0.8rem; }
+    .meta-field { display: flex; align-items: baseline; gap: 0.5rem; }
+    .meta-field label { font-weight: 600; white-space: nowrap; color: var(--muted); }
+    .meta-field .line { flex: 1; border-bottom: 1.6px dotted var(--muted); height: 1.3rem; }
+    .rules-box ol { margin: 0.4rem 0 0; padding-left: 1.3rem; }
+    .rules-box li { margin: 0.35rem 0; }
+    .pill { display: inline-block; font-weight: 700; font-size: 0.78rem; padding: 0.12rem 0.6rem; border-radius: 999px; background: color-mix(in srgb, var(--gold) 22%, transparent); color: var(--gold); border: 1px solid var(--gold); }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .part-banner { margin: 2.2rem 0 0.6rem; padding: 0.6rem 1rem; border-radius: 10px; background: color-mix(in srgb, var(--accent) 14%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); font-weight: 700; color: var(--accent); }
+    /* Figure INVALSI: sempre su sfondo chiaro per leggibilità e stampa a colori */
+    .fig { background: #ffffff; border: 1px solid #d9dbe6; border-radius: 12px; padding: 0.8rem; margin: 0.9rem 0; text-align: center; }
+    .fig svg { max-width: 100%; height: auto; }
+    .fig-cap { display: block; margin-top: 0.4rem; font-size: 0.82rem; color: #555; }
+    .opts-inline { list-style: none; padding: 0; margin: 0.6rem 0 0; display: grid; gap: 0.35rem; }
+    .opts-inline li { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 0.4rem 0.7rem; }
+    .opts-inline .lett { font-weight: 700; color: var(--accent); margin-right: 0.4rem; }
+    /* Nascondi badge difficoltà */
+    .difficulty { display: none; }
+    .q-diff     { display: none; }
+    /* In stampa: nascondi soluzioni e pulsanti → si stampa solo la prova */
+    @media print {
+      .solution, .btn-solution, .ex-actions,
+      .quiz-actions, .quiz-score { display: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quinto anno · Verifica di prova</div>
+    <h1>Funzioni, Dominio e Limiti</h1>
+    <p>Una verifica completa per allenarti: correzione automatica dei test e soluzioni guidate</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quinto anno</a>
+    <span class="sep">/</span> Verifica di prova
+  </nav>
+
+  <main>
+
+    <!-- INTESTAZIONE -->
+    <section id="intestazione">
+      <div class="exam-meta">
+        <h2 style="border:0; padding:0; margin:0;">📝 Verifica di Matematica — Funzioni, Dominio e Limiti</h2>
+        <p style="margin:0.4rem 0 0; color:var(--muted);">Lezioni 1-3 · Quinto anno</p>
+        <div class="meta-fields">
+          <div class="meta-field"><label>Cognome e nome:</label><span class="line"></span></div>
+          <div class="meta-field"><label>Classe:</label><span class="line"></span></div>
+          <div class="meta-field"><label>Data:</label><span class="line"></span></div>
+          <div class="meta-field"><label>Voto:</label><span class="line"></span></div>
+        </div>
+      </div>
+
+      <div class="exam-meta rules-box">
+        <h3 style="margin-top:0;">Come si svolge e come si valuta</h3>
+        <ol>
+          <li>La verifica ha <strong>20 quesiti</strong>. Ogni risposta corretta vale <strong>1 punto</strong>: il massimo è <strong>20 punti</strong>.</li>
+          <li><strong>Ogni 2 punti vale un voto</strong> (voto massimo 10): in pratica <em>voto = punteggio diviso 2</em>.</li>
+          <li>I <strong>quesiti 1-10</strong> sono a <strong>scelta multipla</strong> (5 alternative, una sola corretta). Una risposta <strong>errata</strong> comporta una <strong>penalità di 0,25 punti</strong>. Se il punteggio totale diventa <strong>negativo</strong>, il voto è <strong>0</strong>.</li>
+          <li>I <strong>quesiti 11-15</strong> sono a <strong>risposta aperta</strong>: devi esplicitare <strong>tutti i passaggi</strong>. Un errore in un passaggio <strong>invalida l'intero esercizio</strong>, ma <strong>non</strong> ci sono penalità.</li>
+          <li>I <strong>quesiti 16-20</strong> sono <strong>domande di ragionamento</strong> (analisi di grafici, tabelle e figure): nessuna penalità.</li>
+          <li>Tempo a disposizione: <strong>1 ora</strong>.</li>
+        </ol>
+        <div class="warnbox">
+          <strong>⚠ Avvertenza.</strong> Chi viene sorpreso a <strong>copiare</strong> o a <strong>usare il cellulare</strong> avrà
+          il compito <strong>annullato</strong>, riceverà una <strong>nota disciplinare</strong> e dovrà svolgere, nel tempo
+          che resta, una <strong>verifica diversa</strong>.
+        </div>
+        <p style="margin-bottom:0;"><span class="pill">Modalità prova interattiva</span> &nbsp;Qui le 10 domande a scelta
+          multipla sono corrette in automatico (1 punto l'una, senza applicare la penalità). Per i quesiti 11-20 trovi il
+          pulsante <em>«Mostra soluzione»</em> per controllarti dopo aver provato da solo.</p>
+      </div>
+    </section>
+
+    <!-- PARTE A — SCELTA MULTIPLA -->
+    <section id="parte-a">
+      <div class="part-banner">Parte A · Quesiti 1-10 — Scelta multipla (1 punto l'uno)</div>
+      <p>Seleziona una sola risposta per ogni domanda, poi premi <strong>«Calcola punteggio»</strong> in fondo.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+    <!-- PARTE B — RISPOSTA APERTA -->
+    <section id="parte-b">
+      <div class="part-banner">Parte B · Quesiti 11-15 — Risposta aperta (mostra tutti i passaggi)</div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quesito 11</span><span class="difficulty medium">Medio</span></div>
+        <p>Determina il dominio della funzione</p>
+        <div class="formula-box">$$f(x) = \frac{\sqrt{x+1}}{x-2}.$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Radice pari</strong> (numeratore): l'argomento deve essere $\ge 0$, cioè $x+1 \ge 0 \Rightarrow x \ge -1$.</p>
+          <p><span class="step-num">2</span><strong>Denominatore</strong> diverso da zero: $x-2 \ne 0 \Rightarrow x \ne 2$.</p>
+          <p><span class="step-num">3</span><strong>Sistema</strong> (entrambe le condizioni): $x \ge -1 \ \wedge \ x \ne 2$.</p>
+          <div class="domain-result">$D = [-1,\,2[ \ \cup \ ]2,\,+\infty[$</div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quesito 12</span><span class="difficulty medium">Medio</span></div>
+        <p>Date $f(x) = x^2$ e $g(x) = x - 3$, calcola $(f \circ g)(x)$ e $(g \circ f)(x)$. Sono uguali? Motiva.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$(f \circ g)(x) = f\big(g(x)\big) = (x-3)^2 = x^2 - 6x + 9$.</p>
+          <p><span class="step-num">2</span>$(g \circ f)(x) = g\big(f(x)\big) = x^2 - 3$.</p>
+          <p><span class="step-num">3</span>$x^2 - 6x + 9 \ne x^2 - 3$: le due composte sono <strong>diverse</strong>. La composizione <strong>non è commutativa</strong>: l'ordine conta.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quesito 13</span></div>
+        <p>Studia la funzione $f(x) = \dfrac{|x|}{x}$, definita per $x \ne 0$. Determina: (a) il dominio, (b) se è pari, dispari o nessuna delle due, (c) i limiti laterali $\lim_{x\to 0^-}f(x)$ e $\lim_{x\to 0^+}f(x)$, (d) se $\lim_{x\to 0}f(x)$ esiste, (e) $\lim_{x\to +\infty}f(x)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">a</span><strong>Dominio:</strong> $\mathbb{R}\setminus\{0\}$ (il denominatore non può essere zero).</p>
+          <p><span class="step-num">b</span><strong>Parità:</strong> $f(-x)=\dfrac{|-x|}{-x}=\dfrac{|x|}{-x}=-\dfrac{|x|}{x}=-f(x)$ → la funzione è <strong>dispari</strong>.</p>
+          <p><span class="step-num">c</span><strong>Limiti laterali:</strong><br>
+            Per $x\to 0^-$: $x\lt 0$, quindi $|x|=-x$ → $f(x)=\dfrac{-x}{x}=-1$ → $\lim_{x\to 0^-}f(x)=-1$.<br>
+            Per $x\to 0^+$: $x\gt 0$, quindi $|x|=x$ → $f(x)=\dfrac{x}{x}=1$ → $\lim_{x\to 0^+}f(x)=1$.</p>
+          <p><span class="step-num">d</span>I limiti laterali sono diversi ($-1\ne 1$): il <strong>limite globale non esiste</strong>.</p>
+          <p><span class="step-num">e</span>Per $x\to +\infty$: $f(x)=1$ costante → $\lim_{x\to +\infty}f(x)=1$.</p>
+          <div class="result-box"><span class="result-label">Grafico</span><span class="result-value">La funzione vale $-1$ per $x\lt 0$ e $+1$ per $x\gt 0$: è la funzione <em>segno</em>.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quesito 14</span><span class="difficulty hard">Difficile</span></div>
+        <p>Determina il dominio della funzione</p>
+        <div class="formula-box">$$f(x) = \ln\!\big(x^2 - x - 6\big).$$</div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Logaritmo</strong>: l'argomento deve essere $\gt 0$, cioè $x^2 - x - 6 \gt 0$.</p>
+          <p><span class="step-num">2</span><strong>Scomposizione</strong>: $x^2 - x - 6 = (x-3)(x+2)$.</p>
+          <p><span class="step-num">3</span>Una parabola con concavità verso l'alto è positiva <em>all'esterno</em> delle radici $-2$ e $3$: $x \lt -2 \ \vee \ x \gt 3$.</p>
+          <div class="domain-result">$D = \,]-\infty,\,-2[ \ \cup \ ]3,\,+\infty[$</div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quesito 15</span><span class="difficulty hard">Molto difficile</span></div>
+        <p>Di una funzione $f$ si sa <strong>soltanto</strong> che $\;2x \le f(x) \le x^2 + 1\;$ per ogni $x$ reale. Quanto vale $\displaystyle\lim_{x \to 1} f(x)$? Giustifica la risposta.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$f$ è "stretta" fra $g(x) = 2x$ (pavimento) e $h(x) = x^2 + 1$ (tetto).</p>
+          <p><span class="step-num">2</span>Calcolo i due limiti agli estremi: $\displaystyle\lim_{x\to1} 2x = 2$ e $\displaystyle\lim_{x\to1}(x^2+1) = 2$. <strong>Coincidono.</strong></p>
+          <p><span class="step-num">3</span>Poiché $g(x) \le f(x) \le h(x)$ con $\lim g = \lim h = 2$, per il <strong>teorema del confronto (dei carabinieri)</strong> anche $f$ è costretta a tendere a $2$.</p>
+          <div class="result-box"><span class="result-label">Conclusione</span><span class="result-value">$\displaystyle\lim_{x \to 1} f(x) = 2$.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PARTE C — RAGIONAMENTO -->
+    <section id="parte-c">
+      <div class="part-banner">Parte C · Quesiti 16-20 — Domande di ragionamento</div>
+
+<!-- Q16: tabella tariffaria -->
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quesito 16</span></div>
+        <p>Un gestore telefonico propone il seguente piano tariffario (canone base: <strong>10 €/mese</strong>):</p>
+        <div class="table-container">
+          <table>
+            <thead><tr><th>Minuti al mese</th><th>0 – 100</th><th>101 – 300</th><th>oltre 300</th></tr></thead>
+            <tbody><tr><td>Costo aggiuntivo</td><td>0 €</td><td>5 €</td><td>12 €</td></tr></tbody>
+          </table>
+        </div>
+        <p>Sergio ha telefonato per <strong>250 minuti</strong>. Quanto ha pagato in totale?</p>
+        <ul class="opts-inline">
+          <li><span class="lett">A</span>5 €</li>
+          <li><span class="lett">B</span>10 €</li>
+          <li><span class="lett">C</span>12 €</li>
+          <li><span class="lett">D</span>15 €</li>
+          <li><span class="lett">E</span>22 €</li>
+        </ul>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>250 minuti rientra nella fascia 101–300 → costo extra 5 €. Totale: $10 + 5 = 15$ €.</p>
+          <div class="result-box"><span class="result-label">Risposta</span><span class="result-value">D) 15 €</span></div>
+        </div>
+      </div>
+
+      <!-- Q17: intersezione di due funzioni -->
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quesito 17</span></div>
+        <p>Il grafico mostra due funzioni $f$ (blu) e $g$ (rossa). Nel punto $P$ in cui le curve <strong>si incontrano</strong>, quale affermazione è vera?</p>
+        <div class="fig">
+          <svg viewBox="0 0 300 220" role="img" aria-label="Due funzioni che si incontrano in P">
+            <line x1="30" y1="190" x2="280" y2="190" stroke="#333" stroke-width="1.5"/>
+            <line x1="30" y1="190" x2="30" y2="20" stroke="#333" stroke-width="1.5"/>
+            <text x="284" y="194" font-size="12" fill="#333">x</text>
+            <text x="20" y="18" font-size="12" fill="#333">y</text>
+            <!-- f crescente (blu) -->
+            <line x1="40" y1="170" x2="260" y2="50" stroke="#1e3a8a" stroke-width="2.5"/>
+            <text x="255" y="46" font-size="11" fill="#1e3a8a">f</text>
+            <!-- g decrescente (rossa) -->
+            <line x1="40" y1="60" x2="260" y2="160" stroke="#c62828" stroke-width="2.5"/>
+            <text x="255" y="164" font-size="11" fill="#c62828">g</text>
+            <!-- punto P -->
+            <circle cx="150" cy="110" r="5" fill="#111"/>
+            <text x="156" y="108" font-size="12" fill="#111" font-weight="700">P</text>
+            <line x1="150" y1="110" x2="150" y2="190" stroke="#999" stroke-dasharray="4 3" stroke-width="1"/>
+            <text x="144" y="204" font-size="11" fill="#333">x₀</text>
+          </svg>
+          <span class="fig-cap">$f$ è crescente, $g$ è decrescente; si incontrano in $P(x_0,\,y_0)$.</span>
+        </div>
+        <ul class="opts-inline">
+          <li><span class="lett">A</span>$f(x_0) \gt g(x_0)$</li>
+          <li><span class="lett">B</span>$f(x_0) = g(x_0)$</li>
+          <li><span class="lett">C</span>$f(x_0) + g(x_0) = 0$</li>
+          <li><span class="lett">D</span>$f(x_0) \cdot g(x_0) = 1$</li>
+          <li><span class="lett">E</span>$\displaystyle\lim_{x \to x_0}[f(x) - g(x)] = +\infty$</li>
+        </ul>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>In $P$ i due grafici <em>si incontrano</em>: hanno lo stesso valore, quindi $f(x_0) = g(x_0)$. Le altre affermazioni non seguono dall'incontro dei grafici.</p>
+          <div class="result-box"><span class="result-label">Risposta</span><span class="result-value">B) $f(x_0) = g(x_0)$</span></div>
+        </div>
+      </div>
+
+      <!-- Q18: quale relazione è una funzione? -->
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quesito 18</span></div>
+        <p>Quale delle seguenti relazioni definisce <strong>$y$ come funzione di $x$</strong> (cioè, supera il test della retta verticale)?</p>
+        <ul class="opts-inline">
+          <li><span class="lett">A</span>$x^2 + y^2 = 4$</li>
+          <li><span class="lett">B</span>$|y| = x$</li>
+          <li><span class="lett">C</span>$y = \sqrt{x^2 + 1}$</li>
+          <li><span class="lett">D</span>$x = y^2$</li>
+          <li><span class="lett">E</span>$y^2 = 4$</li>
+        </ul>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>A</strong>: circonferenza, una retta verticale taglia in 2 punti → NO.</p>
+          <p><strong>B</strong>: $|y| = x$ dà $y = \pm x$ → due valori → NO.</p>
+          <p><strong>C</strong>: $\sqrt{x^2+1}$ è sempre definita e dà un solo valore positivo → <strong>SÌ</strong>.</p>
+          <p><strong>D</strong>: $x = y^2$ dà $y = \pm\sqrt{x}$ → NO.</p>
+          <p><strong>E</strong>: $y^2 = 4$ dà $y = \pm 2$ per qualsiasi $x$ → NO.</p>
+          <div class="result-box"><span class="result-label">Risposta</span><span class="result-value">C) $y = \sqrt{x^2 + 1}$</span></div>
+        </div>
+      </div>
+
+      <!-- Q19: area triangolo da funzione lineare -->
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quesito 19</span></div>
+        <p>La retta $y = 2x + 4$ interseca l'asse $y$ nel punto $A$ e l'asse $x$ nel punto $B$ (vedi figura). Qual è l'<strong>area del triangolo $OAB$</strong>, dove $O$ è l'origine?</p>
+        <div class="fig">
+          <svg viewBox="0 0 260 220" role="img" aria-label="Triangolo OAB formato dalla retta y=2x+4 con gli assi">
+            <!-- Griglia leggera -->
+            <g stroke="#eee" stroke-width="1">
+              <line x1="80" y1="20" x2="80" y2="200"/><line x1="120" y1="20" x2="120" y2="200"/>
+              <line x1="160" y1="20" x2="160" y2="200"/><line x1="200" y1="20" x2="200" y2="200"/>
+              <line x1="40" y1="60" x2="240" y2="60"/><line x1="40" y1="100" x2="240" y2="100"/>
+              <line x1="40" y1="140" x2="240" y2="140"/><line x1="40" y1="180" x2="240" y2="180"/>
+            </g>
+            <!-- Assi -->
+            <line x1="40" y1="200" x2="240" y2="200" stroke="#333" stroke-width="1.8"/>
+            <line x1="40" y1="200" x2="40" y2="20" stroke="#333" stroke-width="1.8"/>
+            <text x="244" y="204" font-size="12" fill="#333">x</text>
+            <text x="28" y="18" font-size="12" fill="#333">y</text>
+            <!-- Triangolo OAB ombreggiato -->
+            <polygon points="40,200 40,120 80,200" fill="rgba(30,58,138,0.15)" stroke="none"/>
+            <!-- Retta y=2x+4: A=(0,4)→pixel(40,120), B=(-2,0)→pixel(80,200) -->
+            <line x1="20" y1="140" x2="100" y2="180" stroke="#1e3a8a" stroke-width="2.5"/>
+            <!-- Punti -->
+            <circle cx="40" cy="120" r="4" fill="#1e3a8a"/>
+            <text x="46" y="118" font-size="11" fill="#1e3a8a">A(0, 4)</text>
+            <circle cx="80" cy="200" r="4" fill="#1e3a8a"/>
+            <text x="84" y="196" font-size="11" fill="#1e3a8a">B(−2, 0)</text>
+            <circle cx="40" cy="200" r="4" fill="#111"/>
+            <text x="28" y="214" font-size="11" fill="#111">O</text>
+          </svg>
+          <span class="fig-cap">La retta $y = 2x+4$ con il triangolo $OAB$ evidenziato.</span>
+        </div>
+        <ul class="opts-inline">
+          <li><span class="lett">A</span>$2$</li>
+          <li><span class="lett">B</span>$4$</li>
+          <li><span class="lett">C</span>$6$</li>
+          <li><span class="lett">D</span>$8$</li>
+          <li><span class="lett">E</span>$16$</li>
+        </ul>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Intersezione con asse $y$: $x = 0 \Rightarrow y = 4$ → $A = (0, 4)$.</p>
+          <p><span class="step-num">2</span>Intersezione con asse $x$: $0 = 2x + 4 \Rightarrow x = -2$ → $B = (-2, 0)$.</p>
+          <p><span class="step-num">3</span>Il triangolo $OAB$ ha la base $|OB| = 2$ sull'asse $x$ e l'altezza $|OA| = 4$ sull'asse $y$.</p>
+          <p><span class="step-num">4</span>$\text{Area} = \dfrac{1}{2} \cdot 2 \cdot 4 = 4$.</p>
+          <div class="result-box"><span class="result-label">Risposta</span><span class="result-value">B) $4$</span></div>
+        </div>
+      </div>
+
+      <!-- Q20: asintoto orizzontale da grafico -->
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quesito 20</span></div>
+        <p>Il grafico mostra una funzione $f$ che decresce e si avvicina sempre di più a una retta orizzontale tratteggiata. Verso quale valore tende $f(x)$ per $x \to +\infty$?</p>
+        <div class="fig">
+          <svg viewBox="0 0 300 200" role="img" aria-label="Funzione con asintoto orizzontale y=1">
+            <line x1="30" y1="170" x2="280" y2="170" stroke="#333" stroke-width="1.5"/>
+            <line x1="30" y1="170" x2="30" y2="20" stroke="#333" stroke-width="1.5"/>
+            <text x="284" y="174" font-size="12" fill="#333">x</text>
+            <text x="18" y="18" font-size="12" fill="#333">y</text>
+            <!-- Asintoto y=1 tratteggiato -->
+            <line x1="30" y1="120" x2="280" y2="120" stroke="#888" stroke-dasharray="6 4" stroke-width="1.5"/>
+            <text x="260" y="115" font-size="11" fill="#888">y = 1</text>
+            <!-- Curva tipo 1/x + 1 (discendente, si avvicina a y=1) -->
+            <path d="M45,30 Q70,60 100,90 Q140,115 190,120 Q230,122 270,122" fill="none" stroke="#1e3a8a" stroke-width="2.5"/>
+            <!-- Valore sull'asse y -->
+            <circle cx="30" cy="120" r="3.5" fill="#888"/>
+            <text x="8" y="124" font-size="11" fill="#888">1</text>
+          </svg>
+          <span class="fig-cap">La funzione $f$ si avvicina alla retta tratteggiata (asintoto orizzontale) senza mai toccarla.</span>
+        </div>
+        <ul class="opts-inline">
+          <li><span class="lett">A</span>$0$</li>
+          <li><span class="lett">B</span>$1$</li>
+          <li><span class="lett">C</span>$+\infty$</li>
+          <li><span class="lett">D</span>$-1$</li>
+          <li><span class="lett">E</span>Non si può stabilire dal grafico</li>
+        </ul>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>La retta tratteggiata è l'<strong>asintoto orizzontale</strong>: la funzione gli si avvicina indefinitamente per $x \to +\infty$. Dal grafico si legge che l'asintoto ha equazione $y = 1$, quindi $\displaystyle\lim_{x \to +\infty} f(x) = 1$.</p>
+          <div class="result-box"><span class="result-label">Risposta</span><span class="result-value">B) $1$</span></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Verifica di prova — Funzioni, Dominio e Limiti · Matematica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Versione di allenamento. Le versioni somministrate in classe non sono pubblicate.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Dati del quiz: i 10 quesiti a scelta multipla (Parte A) -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Quale delle seguenti relazioni È una funzione $f:\\mathbb{R}\\to\\mathbb{R}$?',
+        options: [
+          'A ogni $x$ associa i due numeri il cui quadrato è $x$',
+          'A ogni $x$ associa il suo doppio aumentato di $1$',
+          'A ogni $x \\ge 0$ associa $\\pm\\sqrt{x}$',
+          'La circonferenza $x^2 + y^2 = 4$',
+          'A ogni $x$ associa tutti i numeri minori di $x$'],
+        correct: 1, explain: 'Una funzione assegna <strong>un solo</strong> output a ogni input. Solo $x \\mapsto 2x+1$ lo fa; le altre danno due o infiniti valori.' },
+
+      { type: 'mc', diff: 'easy', text: 'Il grafico di $f(x) = x^4$ è simmetrico rispetto:',
+        options: [
+          'all\'origine (funzione dispari)',
+          'all\'asse $y$ (funzione pari)',
+          'all\'asse $x$',
+          'alla bisettrice $y = x$',
+          'non ha simmetrie'],
+        correct: 1, explain: '$f(-x) = (-x)^4 = x^4 = f(x)$: funzione pari, simmetrica rispetto all\'asse $y$.' },
+
+      { type: 'mc', diff: 'easy', text: 'Qual è il dominio di $f(x) = 3x^2 - 2x + 5$?',
+        options: ['$\\mathbb{R}$', '$\\mathbb{R} \\setminus \\{0\\}$', '$[0, +\\infty[$', '$\\mathbb{R} \\setminus \\{5\\}$', '$]0, +\\infty[$'],
+        correct: 0, explain: 'È un polinomio: definito per ogni $x \\in \\mathbb{R}$.' },
+
+      { type: 'mc', diff: 'easy', text: 'Qual è il dominio di $f(x) = \\ln x$?',
+        options: ['$\\mathbb{R}$', '$[0, +\\infty[$', '$]0, +\\infty[$', '$\\mathbb{R} \\setminus \\{0\\}$', '$]-\\infty, 0[$'],
+        correct: 2, explain: 'Il logaritmo esiste solo per argomento $\\gt 0$, cioè $x \\gt 0$. Lo zero è escluso.' },
+
+      { type: 'mc', diff: 'easy', text: 'Quanto vale $\\displaystyle\\lim_{x \\to 2}(3x - 1)$?',
+        options: ['$0$', '$5$', '$6$', '$2$', 'non esiste'],
+        correct: 1, explain: 'La funzione è continua: si sostituisce, $3 \\cdot 2 - 1 = 5$.' },
+
+      { type: 'mc', diff: 'medium', text: 'Qual è il dominio di $f(x) = \\sqrt{x - 3}$?',
+        options: ['$\\mathbb{R}$', '$]3, +\\infty[$', '$[3, +\\infty[$', '$]-\\infty, 3]$', '$\\mathbb{R} \\setminus \\{3\\}$'],
+        correct: 2, explain: 'Radice pari: argomento $\\ge 0$, cioè $x - 3 \\ge 0 \\Rightarrow x \\ge 3$ (il $3$ è incluso).' },
+
+      { type: 'mc', diff: 'medium', text: 'Considera $f(x) = x^2$ da $\\mathbb{R}$ a $\\mathbb{R}$. Quale affermazione è corretta?',
+        options: [
+          'È biettiva',
+          'È iniettiva ma non suriettiva',
+          'È suriettiva ma non iniettiva',
+          'Non è né iniettiva né suriettiva',
+          'È strettamente crescente su tutto $\\mathbb{R}$'],
+        correct: 3, explain: 'Non è iniettiva ($f(2) = f(-2) = 4$) e non è suriettiva (nessun $y \\lt 0$ è raggiunto).' },
+
+      { type: 'mc', diff: 'medium', text: 'Quanto vale $\\displaystyle\\lim_{x \\to 3}\\frac{x^2 - 9}{x - 3}$?',
+        options: ['$0$', '$6$', 'non esiste, perché $f(3)$ non è definita', '$+\\infty$', '$3$'],
+        correct: 1, explain: 'Forma $0/0$: si semplifica $\\frac{(x-3)(x+3)}{x-3} = x + 3 \\to 6$.' },
+
+      { type: 'mc', diff: 'hard', text: 'Cosa si può dire di $\\displaystyle\\lim_{x \\to 0}\\frac{1}{x}$?',
+        options: [
+          'Vale $+\\infty$',
+          'Vale $-\\infty$',
+          'Vale $0$',
+          'Non esiste: i limiti laterali valgono $+\\infty$ e $-\\infty$',
+          'Vale $1$'],
+        correct: 3, explain: 'Da destra $\\frac1x \\to +\\infty$, da sinistra $\\to -\\infty$: i laterali differiscono, quindi il limite non esiste.' },
+
+      { type: 'mc', text: 'Nella definizione ε-δ del limite $\\displaystyle\\lim_{x\\to 0}(2x+3)=3$, quale valore di $\\delta$ (in funzione di $\\varepsilon$) è sufficiente a garantire $|f(x)-3|\\lt\\varepsilon$?',
+        options: ['$\\delta = \\varepsilon$', '$\\delta = \\dfrac{\\varepsilon}{2}$', '$\\delta = \\dfrac{\\varepsilon}{4}$', '$\\delta = 2\\varepsilon$', '$\\delta = \\dfrac{\\varepsilon}{3}$'],
+        correct: 1, explain: '$|f(x)-3|=|(2x+3)-3|=2|x|\\lt\\varepsilon \\Leftrightarrow |x|\\lt\\dfrac{\\varepsilon}{2}$. Basta scegliere $\\delta=\\varepsilon/2$.' }
+    ];
+  </script>
+</body>
+
+</html>
