@@ -59,7 +59,9 @@ window.SITE_CATALOG = {
     years: [
       { folder: 'Fisica_3', year: 3, title: 'Terzo anno',   lessons: [] },
       { folder: 'Fisica_4', year: 4, title: 'Quarto anno',  lessons: [] },
-      { folder: 'Fisica_5', year: 5, title: 'Quinto anno',  lessons: [] },
+      { folder: 'Fisica_5', year: 5, title: 'Quinto anno',  lessons: [
+        { file: '1_Corrente_elettrica.html', title: 'La corrente elettrica', desc: 'Corrente continua, elementi circuitali, le due leggi di Ohm, condensatori e capacità, collegamenti in serie e in parallelo, il multimetro' },
+      ] },
       { folder: 'Laboratorio', year: null, title: '🧪 Laboratorio', meta: 'Schede PDF', lessons: [] },
     ],
   },

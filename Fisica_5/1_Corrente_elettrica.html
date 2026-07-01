@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 1 — La Corrente Elettrica</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    /* --- Circuiti e componenti (SVG theme-aware tramite classi) --- */
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .wire { stroke: var(--text-soft); stroke-width: 2.5; fill: none; }
+    .ckt .comp { stroke: var(--primary); stroke-width: 2.5; fill: var(--surface); }
+    .ckt .plate { stroke: var(--primary); stroke-width: 3.5; }
+    .ckt .hot { stroke: var(--magenta); stroke-width: 2.5; fill: none; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .ckt .plus { fill: var(--red); font-size: 16px; font-weight: 700; }
+    .ckt .minus { fill: var(--primary); font-size: 16px; font-weight: 700; }
+    .electron { fill: var(--primary); }
+    .ion { fill: var(--muted); }
+
+    .comp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin: 1.2rem 0; }
+    .comp-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
+    .comp-card h4 { margin: 0.2rem 0 0.4rem; color: var(--accent); }
+    .comp-card .sym { height: 62px; display: grid; place-items: center; margin-bottom: 0.4rem; }
+    .comp-card .sym svg { height: 56px; }
+    .comp-card p { font-size: 0.86rem; margin: 0; color: var(--text-soft); }
+
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quinto anno · Lezione 1</div>
+    <h1>La Corrente Elettrica</h1>
+    <p>Cariche in movimento: resistenze, condensatori e come si misurano</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quinto anno</a>
+    <span class="sep">/</span> La corrente elettrica
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Prerequisiti.</strong> Da questa lezione diamo per note la <em>carica elettrica</em> $q$ (misurata in
+      coulomb, C) e la <em>differenza di potenziale</em> $V$ (o "tensione", misurata in volt, V), che è l'energia che il
+      campo elettrico può dare a ogni unità di carica. Qui vediamo cosa succede quando le cariche si <strong>muovono</strong>.
+    </div>
+
+    <!-- 1 — COS'È LA CORRENTE -->
+    <section id="sec1">
+      <h2>1. Che cos'è la corrente elettrica</h2>
+      <p>In un filo di rame ci sono miliardi di miliardi di <strong>elettroni liberi</strong> che, di solito, si muovono in
+        tutte le direzioni in modo disordinato: mediamente non vanno da nessuna parte. Se però colleghiamo il filo a un
+        <strong>generatore</strong> (per esempio una pila), si crea una differenza di potenziale che spinge gli elettroni a
+        muoversi <em>tutti nella stessa direzione</em>: nasce la <strong>corrente elettrica</strong>.</p>
+
+      <div class="definition">
+        L'<strong>intensità di corrente</strong> $I$ è la quantità di carica $\Delta q$ che attraversa una sezione del
+        conduttore nell'unità di tempo $\Delta t$:
+        $$I = \frac{\Delta q}{\Delta t}.$$
+        Si misura in <strong>ampere</strong> (A): $1\ \text{A} = 1\ \text{C}/\text{s}$ (un coulomb al secondo).
+      </div>
+
+      <p>Muovi lo slider e osserva gli elettroni scorrere nel filo: più sono veloci (o più sono numerosi), maggiore è la
+        corrente.</p>
+      <div class="controls">
+        <div class="control-group"><label>Velocità di deriva: <span class="val" id="drift-v-val">medio</span></label>
+          <input type="range" id="drift-v" min="0" max="100" step="1" value="45"></div>
+        <div class="control-group"><label>Portatori di carica: <span class="val" id="drift-n-val">medio</span></label>
+          <input type="range" id="drift-n" min="4" max="26" step="1" value="14"></div>
+      </div>
+      <div class="ckt">
+        <svg id="drift-svg" viewBox="0 0 640 170" aria-label="Elettroni che scorrono in un conduttore"></svg>
+      </div>
+      <p id="drift-out" class="verdict"></p>
+
+      <div class="rule">
+        <strong>Verso convenzionale.</strong> Per ragioni storiche (prima di scoprire l'elettrone) si è scelto di indicare
+        la corrente con il verso in cui si muoverebbero le cariche <em>positive</em>: dal $+$ al $-$ nel circuito esterno.
+        Gli elettroni, negativi, si muovono in realtà nel verso opposto. La freccia rossa qui sopra mostra il
+        <strong>verso convenzionale</strong>; i pallini blu sono gli elettroni reali.
+      </div>
+
+      <div class="curiosita"><strong>Curiosità.</strong> Gli elettroni nel filo sono lentissimi: avanzano meno di
+        un millimetro al secondo (velocità di deriva). Ma il "comando" di partire — il campo elettrico — si propaga quasi
+        alla velocità della luce: per questo la lampadina si accende <em>istantaneamente</em> quando premi l'interruttore,
+        anche se i singoli elettroni sono delle lumache.</div>
+
+      <h3>1.1 — Il modello microscopico</h3>
+      <p>Se in ogni metro cubo ci sono $n$ portatori, ciascuno con carica $e$, in un filo di sezione $A$ che si muovono con
+        velocità di deriva $v_d$, si dimostra che</p>
+      <div class="formula-box">$$I = n\,e\,A\,v_d.$$</div>
+      <p>È esattamente ciò che hai visto: la corrente cresce se aumentano il numero di portatori $n$ o la loro velocità $v_d$.</p>
+    </section>
+
+    <!-- 2 — CORRENTE CONTINUA -->
+    <section id="sec2">
+      <h2>2. La corrente continua (DC)</h2>
+      <p>Una pila mantiene una tensione costante nel tempo: la corrente che ne risulta scorre <strong>sempre nello stesso
+        verso</strong> e (a circuito fermo) con intensità costante. Si chiama <strong>corrente continua</strong> — in
+        inglese <em>DC</em>, <em>Direct Current</em>. È la corrente delle pile, delle batterie, dei pannelli solari,
+        dell'elettronica.</p>
+      <div class="two-col">
+        <div>
+          <div class="controls">
+            <div class="control-group"><label>Intensità I (A): <span class="val" id="dc-i-val">2.0</span></label>
+              <input type="range" id="dc-i" min="0.2" max="5" step="0.1" value="2"></div>
+            <label class="toggle-row"><input type="checkbox" id="dc-ac"> Mostra confronto con l'alternata (AC)</label>
+          </div>
+          <p style="font-size:0.9rem; opacity:0.85;">Nella corrente continua il grafico $I(t)$ è una <strong>retta
+            orizzontale</strong>: l'intensità non cambia. La corrente <em>alternata</em> (AC), tipica delle prese di casa,
+            oscilla invece nel tempo: la studieremo in una lezione successiva.</p>
+        </div>
+        <div><div class="plot" id="dc-plot"></div></div>
+      </div>
+    </section>
+
+    <!-- 3 — GLI ELEMENTI DEL CIRCUITO -->
+    <section id="sec3">
+      <h2>3. Il circuito e i suoi elementi</h2>
+      <p>Un <strong>circuito elettrico</strong> è un percorso chiuso in cui la corrente può scorrere. Serve almeno un
+        <strong>generatore</strong> (che fornisce l'energia), dei <strong>conduttori</strong> (i fili) e uno o più
+        <strong>elementi circuitali</strong> (o "utilizzatori") che usano o controllano quell'energia. Ecco i più importanti.</p>
+
+      <div class="comp-grid">
+        <div class="comp-card">
+          <div class="sym"><svg viewBox="0 0 90 40" class="ckt-inline"><line x1="0" y1="20" x2="18" y2="20" stroke="currentColor" stroke-width="2.5"/><rect x="18" y="9" width="54" height="22" fill="none" stroke="var(--primary)" stroke-width="2.5"/><line x1="72" y1="20" x2="90" y2="20" stroke="currentColor" stroke-width="2.5"/></svg></div>
+          <h4>Resistenza</h4>
+          <p>Si oppone al passaggio della corrente e dissipa energia in calore. Si misura in <strong>ohm</strong> (Ω).</p>
+        </div>
+        <div class="comp-card">
+          <div class="sym"><svg viewBox="0 0 90 40"><line x1="0" y1="20" x2="40" y2="20" stroke="currentColor" stroke-width="2.5"/><line x1="40" y1="4" x2="40" y2="36" stroke="var(--primary)" stroke-width="3.5"/><line x1="50" y1="4" x2="50" y2="36" stroke="var(--primary)" stroke-width="3.5"/><line x1="50" y1="20" x2="90" y2="20" stroke="currentColor" stroke-width="2.5"/></svg></div>
+          <h4>Condensatore</h4>
+          <p>Accumula carica ed energia nel campo elettrico. La sua grandezza è la <strong>capacità</strong>, in <strong>farad</strong> (F).</p>
+        </div>
+        <div class="comp-card">
+          <div class="sym"><svg viewBox="0 0 90 40"><line x1="0" y1="20" x2="30" y2="20" stroke="currentColor" stroke-width="2.5"/><polygon points="30,8 30,32 52,20" fill="none" stroke="var(--primary)" stroke-width="2.5"/><line x1="52" y1="8" x2="52" y2="32" stroke="var(--primary)" stroke-width="2.5"/><line x1="52" y1="20" x2="90" y2="20" stroke="currentColor" stroke-width="2.5"/><line x1="55" y1="6" x2="63" y2="0" stroke="var(--gold)" stroke-width="2"/><line x1="61" y1="8" x2="69" y2="2" stroke="var(--gold)" stroke-width="2"/></svg></div>
+          <h4>LED</h4>
+          <p>Un diodo che emette luce: fa passare la corrente in <strong>un solo verso</strong> e si illumina. È alla base di schermi e illuminazione.</p>
+        </div>
+        <div class="comp-card">
+          <div class="sym"><svg viewBox="0 0 90 40"><circle cx="45" cy="20" r="17" fill="none" stroke="var(--accent)" stroke-width="2"/><line x1="20" y1="20" x2="38" y2="20" stroke="currentColor" stroke-width="2.5"/><line x1="38" y1="10" x2="38" y2="30" stroke="var(--primary)" stroke-width="3"/><line x1="38" y1="15" x2="56" y2="6" stroke="var(--primary)" stroke-width="2.5"/><line x1="38" y1="25" x2="56" y2="34" stroke="var(--primary)" stroke-width="2.5"/><line x1="56" y1="6" x2="56" y2="0" stroke="currentColor" stroke-width="2.5"/><line x1="56" y1="34" x2="56" y2="40" stroke="currentColor" stroke-width="2.5"/></svg></div>
+          <h4>Transistor</h4>
+          <p>Un "interruttore/amplificatore" comandato elettricamente: è il mattone dei computer. Un chip ne contiene miliardi.</p>
+        </div>
+      </div>
+      <div class="note">In questa lezione approfondiamo <strong>resistenze</strong> e <strong>condensatori</strong>, i due
+        componenti passivi fondamentali. LED e transistor (componenti a semiconduttore) li incontreremo più avanti.</div>
+    </section>
+
+    <!-- 4 — PRIMA LEGGE DI OHM -->
+    <section id="sec4">
+      <h2>4. La resistenza — Prima legge di Ohm</h2>
+      <p>Se applichiamo una tensione $V$ ai capi di un conduttore, vi scorre una corrente $I$. Georg <strong>Ohm</strong>
+        scoprì che, per molti materiali (i conduttori "ohmici", come i metalli a temperatura costante), tensione e corrente
+        sono <strong>direttamente proporzionali</strong>.</p>
+      <div class="definition">
+        <strong>Prima legge di Ohm:</strong> $$V = R \cdot I \qquad\Longleftrightarrow\qquad R = \frac{V}{I}.$$
+        La costante di proporzionalità $R$ è la <strong>resistenza</strong> del conduttore, misurata in
+        <strong>ohm</strong>: $1\ \Omega = 1\ \text{V}/\text{A}$.</p>
+
+      <p>Nel grafico $V$–$I$ un conduttore ohmico è una <strong>retta</strong> che passa per l'origine: la sua pendenza è
+        proprio $R$. Cambia $R$ con lo slider e osserva come cambia l'inclinazione. Attiva il confronto con un LED per
+        vedere un componente <em>non</em> ohmico (la sua curva non è una retta).</p>
+      <div class="two-col">
+        <div>
+          <div class="controls">
+            <div class="control-group"><label>Resistenza R (Ω): <span class="val" id="ohm-r-val">10</span></label>
+              <input type="range" id="ohm-r" min="1" max="40" step="1" value="10"></div>
+            <label class="toggle-row"><input type="checkbox" id="ohm-led"> Confronta con un LED (non ohmico)</label>
+          </div>
+          <p id="ohm-out" class="eq-out"></p>
+        </div>
+        <div><div class="plot" id="ohm-plot"></div></div>
+      </div>
+      <div class="rule"><strong>Effetto Joule.</strong> Una resistenza percorsa da corrente si scalda: dissipa una potenza
+        $P = V\,I = R\,I^2$. È il principio di stufette, phon, tostapane e del filamento delle vecchie lampadine.</div>
+    </section>
+
+    <!-- 5 — SECONDA LEGGE DI OHM -->
+    <section id="sec5">
+      <h2>5. La resistenza — Seconda legge di Ohm</h2>
+      <p>Da cosa dipende il valore di $R$? Dalla <em>forma</em> del conduttore e dal <em>materiale</em> di cui è fatto. Un
+        filo lungo e sottile resiste di più; un filo corto e grosso resiste di meno. Il materiale entra tramite la
+        <strong>resistività</strong> $\rho$.</p>
+      <div class="definition">
+        <strong>Seconda legge di Ohm:</strong> $$R = \rho\,\frac{L}{A},$$
+        dove $L$ è la lunghezza del conduttore, $A$ l'area della sua sezione e $\rho$ (rho) la <strong>resistività</strong>
+        del materiale (in $\Omega\cdot\text{m}$), una sua proprietà caratteristica.</p>
+
+      <p>Prova a variare lunghezza, sezione e materiale: guarda come cambia la resistenza (e come si "assottiglia" o
+        "allunga" il filo nel disegno).</p>
+      <div class="controls">
+        <div class="control-group"><label>Materiale:</label>
+          <select id="rho-mat">
+            <option value="1.68e-8">Rame (ottimo conduttore)</option>
+            <option value="1.59e-8">Argento</option>
+            <option value="2.82e-8">Alluminio</option>
+            <option value="9.7e-8">Ferro</option>
+            <option value="1.10e-6">Nichel-cromo (resistenze)</option>
+          </select>
+        </div>
+        <div class="control-group"><label>Lunghezza L (m): <span class="val" id="rho-l-val">2.0</span></label>
+          <input type="range" id="rho-l" min="0.5" max="10" step="0.5" value="2"></div>
+        <div class="control-group"><label>Sezione A (mm²): <span class="val" id="rho-a-val">1.0</span></label>
+          <input type="range" id="rho-a" min="0.2" max="5" step="0.1" value="1"></div>
+      </div>
+      <div class="ckt"><svg id="rho-svg" viewBox="0 0 640 120" aria-label="Filo conduttore"></svg></div>
+      <p id="rho-out" class="eq-out"></p>
+      <div class="note">Il nichel-cromo ha resistività quasi <strong>100 volte</strong> quella del rame: per questo si usa
+        per fabbricare le resistenze che devono scaldare (stufe, forni), mentre il rame — che resiste pochissimo — è
+        perfetto per i cavi che devono <em>trasportare</em> corrente senza sprecarla.</div>
+
+      <h3>5.1 — Com'è fatta una resistenza</h3>
+      <p>Una resistenza commerciale è spesso un cilindretto di <strong>film di carbone</strong> o di <strong>film
+        metallico</strong> depositato su un supporto ceramico, con due terminali. Il valore in ohm è indicato da un
+        <strong>codice a bande colorate</strong>: ogni colore è una cifra.</p>
+      <div class="ckt"><svg viewBox="0 0 380 120" aria-label="Resistore con bande colorate">
+        <line x1="10" y1="60" x2="90" y2="60" class="wire"/>
+        <line x1="290" y1="60" x2="370" y2="60" class="wire"/>
+        <rect x="90" y="35" width="200" height="50" rx="16" fill="var(--surface)" stroke="var(--muted)" stroke-width="2"/>
+        <rect x="120" y="35" width="14" height="50" fill="#8B4513"/>
+        <rect x="150" y="35" width="14" height="50" fill="#000000"/>
+        <rect x="180" y="35" width="14" height="50" fill="#ff2a2a"/>
+        <rect x="250" y="35" width="14" height="50" fill="#d4af37"/>
+        <text x="190" y="108" text-anchor="middle" class="lbl-s" fill="var(--muted)">bande del codice colori</text>
+      </svg></div>
+      <p>Esistono anche le <strong>resistenze variabili</strong> (potenziometri e reostati): girando una manopola si cambia
+        la lunghezza di conduttore "in gioco", quindi la resistenza — è così che funziona la manopola del volume o del
+        dimmer delle luci.</p>
+    </section>
+
+    <!-- 6 — CONDENSATORE / CAPACITÀ -->
+    <section id="sec6">
+      <h2>6. Il condensatore e la capacità</h2>
+      <p>Un <strong>condensatore</strong> è formato da due armature conduttrici affacciate e separate da un isolante (il
+        <strong>dielettrico</strong>). Collegandolo a un generatore, un'armatura si carica $+$ e l'altra $-$: il
+        condensatore <strong>immagazzina carica</strong> e, con essa, <strong>energia</strong> nel campo elettrico tra le
+        armature.</p>
+      <div class="definition">
+        La <strong>capacità</strong> $C$ misura quanta carica il condensatore accumula per ogni volt applicato:
+        $$C = \frac{Q}{V}.$$
+        Si misura in <strong>farad</strong> (F): $1\ \text{F} = 1\ \text{C}/\text{V}$. Il farad è enorme: in pratica si usano
+        microfarad ($\mu$F), nanofarad (nF) e picofarad (pF).</p>
+
+      <div class="ckt"><svg viewBox="0 0 420 190" aria-label="Condensatore a facce piane parallele">
+        <line x1="30" y1="95" x2="170" y2="95" class="wire"/>
+        <line x1="250" y1="95" x2="390" y2="95" class="wire"/>
+        <line x1="170" y1="35" x2="170" y2="155" class="plate"/>
+        <line x1="250" y1="35" x2="250" y2="155" class="plate"/>
+        <text x="150" y="30" class="plus">+</text>
+        <text x="262" y="30" class="minus">–</text>
+        <text x="210" y="180" text-anchor="middle" class="lbl-s" fill="var(--muted)">dielettrico (distanza d)</text>
+        <text x="120" y="130" text-anchor="middle" class="lbl-s" fill="var(--muted)">armatura</text>
+        <line x1="205" y1="50" x2="205" y2="140" stroke="var(--gold)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="215" y1="50" x2="215" y2="140" stroke="var(--gold)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      </svg></div>
+
+      <p>Per un condensatore <em>a facce piane parallele</em> la capacità dipende dalla geometria e dal dielettrico:</p>
+      <div class="formula-box">$$C = \varepsilon\,\frac{A}{d}$$</div>
+      <p>dove $A$ è l'area delle armature, $d$ la loro distanza ed $\varepsilon$ la costante dielettrica del materiale
+        isolante. Armature grandi e vicine ⇒ più capacità. Prova:</p>
+      <div class="controls">
+        <div class="control-group"><label>Area armature A (cm²): <span class="val" id="cap-a-val">50</span></label>
+          <input type="range" id="cap-a" min="5" max="200" step="5" value="50"></div>
+        <div class="control-group"><label>Distanza d (mm): <span class="val" id="cap-d-val">1.0</span></label>
+          <input type="range" id="cap-d" min="0.1" max="5" step="0.1" value="1"></div>
+        <div class="control-group"><label>Dielettrico:</label>
+          <select id="cap-eps">
+            <option value="1">Aria/vuoto (εᵣ ≈ 1)</option>
+            <option value="5">Mica (εᵣ ≈ 5)</option>
+            <option value="80">Acqua (εᵣ ≈ 80)</option>
+            <option value="1000">Ceramica speciale (εᵣ ≈ 1000)</option>
+          </select>
+        </div>
+      </div>
+      <p id="cap-out" class="eq-out"></p>
+
+      <h3>6.1 — Perché i condensatori sono così importanti</h3>
+      <ul>
+        <li><strong>Immagazzinano energia</strong> ($E = \tfrac12 C V^2$) e la rilasciano in un lampo: è il flash della
+          macchina fotografica, o il defibrillatore che dà la scarica.</li>
+        <li><strong>Livellano le tensioni</strong>: fanno da "serbatoio" che riempie i vuoti, trasformando una tensione
+          traballante in una liscia (alimentatori di ogni dispositivo).</li>
+        <li><strong>Filtrano i segnali</strong>: lasciano passare le variazioni veloci e bloccano quelle lente (audio, radio).</li>
+        <li><strong>Misurano il tempo</strong>: caricandosi e scaricandosi con tempi precisi (lampeggiatori, timer, tastiere touch).</li>
+      </ul>
+
+      <h3>6.2 — Carica e scarica: il circuito RC</h3>
+      <p>Se colleghi un condensatore $C$ a una pila attraverso una resistenza $R$, la tensione sul condensatore non salta
+        di colpo: sale <strong>gradualmente</strong> secondo una curva esponenziale. Il prodotto $\tau = R\,C$
+        (la <strong>costante di tempo</strong>) dice "quanto è lento" il processo.</p>
+      <div class="formula-box">$$\text{carica:}\quad V_C(t) = V_0\left(1 - e^{-t/\tau}\right) \qquad
+        \text{scarica:}\quad V_C(t) = V_0\,e^{-t/\tau}, \qquad \tau = R\,C.$$</div>
+      <div class="two-col">
+        <div>
+          <div class="controls">
+            <div class="control-group"><label>Resistenza R (kΩ): <span class="val" id="rc-r-val">10</span></label>
+              <input type="range" id="rc-r" min="1" max="50" step="1" value="10"></div>
+            <div class="control-group"><label>Capacità C (µF): <span class="val" id="rc-c-val">100</span></label>
+              <input type="range" id="rc-c" min="10" max="500" step="10" value="100"></div>
+            <label class="toggle-row"><input type="checkbox" id="rc-dis"> Mostra la scarica</label>
+          </div>
+          <p id="rc-out" class="eq-out"></p>
+        </div>
+        <div><div class="plot" id="rc-plot"></div></div>
+      </div>
+      <div class="rule">Dopo un tempo $\tau$ il condensatore ha raggiunto circa il <strong>63%</strong> della carica finale;
+        dopo $5\tau$ è praticamente carico (99%). Aumentare $R$ o $C$ rende tutto più lento.</div>
+
+      <h3>6.3 — Com'è fatto un condensatore</h3>
+      <p>I condensatori reali "impacchettano" tanta superficie in poco spazio. In quelli <strong>a film</strong> due
+        lunghe strisce metalliche separate da un film plastico vengono <em>arrotolate</em> a cilindro. Quelli
+        <strong>ceramici</strong> usano un dielettrico ad alta $\varepsilon$ per essere piccolissimi. Quelli
+        <strong>elettrolitici</strong> raggiungono capacità enormi ma hanno una polarità ($+$ e $-$ da rispettare).</p>
+    </section>
+
+    <!-- 7 — SERIE E PARALLELO -->
+    <section id="sec7">
+      <h2>7. Collegamenti in serie e in parallelo</h2>
+      <p>Gli elementi si possono collegare in due modi fondamentali. In <strong>serie</strong> sono uno di seguito
+        all'altro (un unico percorso); in <strong>parallelo</strong> sono affiancati tra gli stessi due nodi (più percorsi).
+        Le regole per combinare i valori sono... sorprendentemente "specchiate" tra resistenze e condensatori.</p>
+
+      <h3>7.1 — Resistenze</h3>
+      <div class="sp-cols">
+        <div class="ckt"><svg viewBox="0 0 300 120" aria-label="Resistenze in serie">
+          <text x="150" y="18" text-anchor="middle" class="lbl">Serie</text>
+          <line x1="20" y1="70" x2="55" y2="70" class="wire"/>
+          <rect x="55" y="59" width="55" height="22" class="comp"/>
+          <line x1="110" y1="70" x2="150" y2="70" class="wire"/>
+          <rect x="150" y="59" width="55" height="22" class="comp"/>
+          <line x1="205" y1="70" x2="280" y2="70" class="wire"/>
+          <text x="82" y="102" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₁</text>
+          <text x="177" y="102" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₂</text>
+        </svg></div>
+        <div class="ckt"><svg viewBox="0 0 300 150" aria-label="Resistenze in parallelo">
+          <text x="150" y="18" text-anchor="middle" class="lbl">Parallelo</text>
+          <line x1="20" y1="85" x2="80" y2="85" class="wire"/>
+          <line x1="80" y1="45" x2="80" y2="125" class="wire"/>
+          <line x1="220" y1="45" x2="220" y2="125" class="wire"/>
+          <line x1="220" y1="85" x2="280" y2="85" class="wire"/>
+          <line x1="80" y1="55" x2="120" y2="55" class="wire"/><rect x="120" y="44" width="55" height="22" class="comp"/><line x1="175" y1="55" x2="220" y2="55" class="wire"/>
+          <line x1="80" y1="115" x2="120" y2="115" class="wire"/><rect x="120" y="104" width="55" height="22" class="comp"/><line x1="175" y1="115" x2="220" y2="115" class="wire"/>
+          <text x="147" y="40" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₁</text>
+          <text x="147" y="142" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₂</text>
+        </svg></div>
+      </div>
+      <div class="rule">
+        <strong>Serie:</strong> $R_{eq} = R_1 + R_2 + \dots$ (la resistenza <em>aumenta</em>).<br>
+        <strong>Parallelo:</strong> $\dfrac{1}{R_{eq}} = \dfrac{1}{R_1} + \dfrac{1}{R_2} + \dots$ (la resistenza
+        <em>diminuisce</em>: più strade, più corrente passa).</div>
+
+      <div class="controls">
+        <div class="control-group"><label>R₁ (Ω): <span class="val" id="rs-1-val">10</span></label><input type="range" id="rs-1" min="1" max="100" step="1" value="10"></div>
+        <div class="control-group"><label>R₂ (Ω): <span class="val" id="rs-2-val">20</span></label><input type="range" id="rs-2" min="1" max="100" step="1" value="20"></div>
+        <div class="control-group"><label>R₃ (Ω): <span class="val" id="rs-3-val">30</span></label><input type="range" id="rs-3" min="1" max="100" step="1" value="30"></div>
+      </div>
+      <p id="rs-out" class="eq-out"></p>
+
+      <h3>7.2 — Condensatori</h3>
+      <p>Per i condensatori le regole si <strong>invertono</strong> rispetto alle resistenze: si sommano direttamente in
+        <em>parallelo</em> (le armature affiancate fanno più superficie), mentre in <em>serie</em> si combinano con i
+        reciproci.</p>
+      <div class="sp-cols">
+        <div class="ckt"><svg viewBox="0 0 300 120" aria-label="Condensatori in serie">
+          <text x="150" y="18" text-anchor="middle" class="lbl">Serie</text>
+          <line x1="20" y1="70" x2="90" y2="70" class="wire"/>
+          <line x1="90" y1="52" x2="90" y2="88" class="plate"/><line x1="100" y1="52" x2="100" y2="88" class="plate"/>
+          <line x1="100" y1="70" x2="190" y2="70" class="wire"/>
+          <line x1="190" y1="52" x2="190" y2="88" class="plate"/><line x1="200" y1="52" x2="200" y2="88" class="plate"/>
+          <line x1="200" y1="70" x2="280" y2="70" class="wire"/>
+          <text x="95" y="106" text-anchor="middle" class="lbl-s" fill="var(--muted)">C₁</text>
+          <text x="195" y="106" text-anchor="middle" class="lbl-s" fill="var(--muted)">C₂</text>
+        </svg></div>
+        <div class="ckt"><svg viewBox="0 0 300 150" aria-label="Condensatori in parallelo">
+          <text x="150" y="18" text-anchor="middle" class="lbl">Parallelo</text>
+          <line x1="20" y1="85" x2="80" y2="85" class="wire"/>
+          <line x1="80" y1="45" x2="80" y2="125" class="wire"/>
+          <line x1="220" y1="45" x2="220" y2="125" class="wire"/>
+          <line x1="220" y1="85" x2="280" y2="85" class="wire"/>
+          <line x1="80" y1="55" x2="140" y2="55" class="wire"/><line x1="140" y1="42" x2="140" y2="68" class="plate"/><line x1="150" y1="42" x2="150" y2="68" class="plate"/><line x1="150" y1="55" x2="220" y2="55" class="wire"/>
+          <line x1="80" y1="115" x2="140" y2="115" class="wire"/><line x1="140" y1="102" x2="140" y2="128" class="plate"/><line x1="150" y1="102" x2="150" y2="128" class="plate"/><line x1="150" y1="115" x2="220" y2="115" class="wire"/>
+          <text x="130" y="38" text-anchor="middle" class="lbl-s" fill="var(--muted)">C₁</text>
+          <text x="130" y="146" text-anchor="middle" class="lbl-s" fill="var(--muted)">C₂</text>
+        </svg></div>
+      </div>
+      <div class="rule">
+        <strong>Parallelo:</strong> $C_{eq} = C_1 + C_2 + \dots$ (la capacità <em>aumenta</em>).<br>
+        <strong>Serie:</strong> $\dfrac{1}{C_{eq}} = \dfrac{1}{C_1} + \dfrac{1}{C_2} + \dots$ (la capacità
+        <em>diminuisce</em>). Esattamente al contrario delle resistenze!</div>
+
+      <div class="controls">
+        <div class="control-group"><label>C₁ (µF): <span class="val" id="cs-1-val">10</span></label><input type="range" id="cs-1" min="1" max="100" step="1" value="10"></div>
+        <div class="control-group"><label>C₂ (µF): <span class="val" id="cs-2-val">20</span></label><input type="range" id="cs-2" min="1" max="100" step="1" value="20"></div>
+        <div class="control-group"><label>C₃ (µF): <span class="val" id="cs-3-val">30</span></label><input type="range" id="cs-3" min="1" max="100" step="1" value="30"></div>
+      </div>
+      <p id="cs-out" class="eq-out"></p>
+    </section>
+
+    <!-- 8 — MULTIMETRO -->
+    <section id="sec8">
+      <h2>8. Misurare: il multimetro</h2>
+      <p>Il <strong>multimetro</strong> (o tester) è lo strumento universale del laboratorio: con una manopola si può usare
+        come <strong>voltmetro</strong> (per misurare una differenza di potenziale), come <strong>amperometro</strong> (per
+        misurare una corrente) e in molte altre modalità (ohmmetro, ecc.). Ma <em>come</em> lo si collega cambia a seconda
+        della misura — ed è un punto in cui è facilissimo sbagliare.</p>
+
+      <div class="sp-cols">
+        <div>
+          <div class="ckt"><svg viewBox="0 0 320 180" aria-label="Voltmetro in parallelo">
+            <text x="160" y="18" text-anchor="middle" class="lbl">Voltmetro — in parallelo</text>
+            <line x1="30" y1="60" x2="90" y2="60" class="wire"/>
+            <rect x="90" y="49" width="70" height="22" class="comp"/>
+            <line x1="160" y1="60" x2="290" y2="60" class="wire"/>
+            <text x="125" y="44" text-anchor="middle" class="lbl-s" fill="var(--muted)">R</text>
+            <line x1="90" y1="60" x2="90" y2="120" class="hot"/>
+            <line x1="160" y1="60" x2="160" y2="120" class="hot"/>
+            <circle cx="125" cy="135" r="22" fill="var(--surface)" stroke="var(--magenta)" stroke-width="2.5"/>
+            <text x="125" y="142" text-anchor="middle" class="em">V</text>
+            <line x1="90" y1="120" x2="103" y2="135" class="hot"/>
+            <line x1="160" y1="120" x2="147" y2="135" class="hot"/>
+          </svg></div>
+          <p style="font-size:0.9rem;">Si collega <strong>in parallelo</strong> all'elemento di cui vuoi la tensione (in
+            mezzo ai suoi due estremi). Perché non "rubi" corrente al circuito, deve avere una resistenza interna
+            <strong>altissima</strong> (idealmente infinita).</p>
+        </div>
+        <div>
+          <div class="ckt"><svg viewBox="0 0 320 180" aria-label="Amperometro in serie">
+            <text x="160" y="18" text-anchor="middle" class="lbl">Amperometro — in serie</text>
+            <line x1="20" y1="70" x2="70" y2="70" class="wire"/>
+            <circle cx="95" cy="70" r="22" fill="var(--surface)" stroke="var(--magenta)" stroke-width="2.5"/>
+            <text x="95" y="77" text-anchor="middle" class="em">A</text>
+            <line x1="117" y1="70" x2="160" y2="70" class="wire"/>
+            <rect x="160" y="59" width="70" height="22" class="comp"/>
+            <line x1="230" y1="70" x2="300" y2="70" class="wire"/>
+            <text x="195" y="54" text-anchor="middle" class="lbl-s" fill="var(--muted)">R</text>
+          </svg></div>
+          <p style="font-size:0.9rem;">Si collega <strong>in serie</strong>, "tagliando" il filo e inserendosi nel percorso,
+            così tutta la corrente lo attraversa. Per non disturbare il circuito deve avere una resistenza interna
+            <strong>bassissima</strong> (idealmente nulla).</p>
+        </div>
+      </div>
+
+      <div class="warning">
+        <strong>Attenzione!</strong> Collegare l'amperometro (bassa resistenza) <em>in parallelo</em> a un generatore
+        equivale quasi a un cortocircuito: passa una corrente enorme e si può bruciare lo strumento (o il fusibile). Ecco
+        perché ricordare "<strong>voltmetro in parallelo, amperometro in serie</strong>" è una regola di sicurezza, non solo
+        di misura.</div>
+
+      <table style="margin-top:1rem;">
+        <thead><tr><th>Modalità</th><th>Cosa misura</th><th>Come si collega</th><th>Resistenza interna ideale</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Voltmetro</strong></td><td>differenza di potenziale $V$</td><td>in <strong>parallelo</strong></td><td>infinita ($\to \infty$)</td></tr>
+          <tr><td><strong>Amperometro</strong></td><td>intensità di corrente $I$</td><td>in <strong>serie</strong></td><td>nulla ($\to 0$)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>8.1 — Perché la resistenza interna conta: l'errore di misura</h3>
+      <p>Uno strumento reale non è ideale. Un voltmetro con resistenza interna finita "ruba" un po' di corrente e fa
+        leggere una tensione leggermente più bassa del vero. Nel modello qui sotto misuriamo la tensione su una resistenza
+        $R = 1000\ \Omega$: sposta la resistenza interna del voltmetro e guarda quanto la misura si avvicina (o si allontana)
+        dal valore vero.</p>
+      <div class="two-col">
+        <div>
+          <div class="controls">
+            <div class="control-group"><label>Resistenza interna del voltmetro (kΩ): <span class="val" id="mm-rv-val">100</span></label>
+              <input type="range" id="mm-rv" min="1" max="1000" step="1" value="100"></div>
+          </div>
+          <p id="mm-out" class="eq-out"></p>
+        </div>
+        <div><div class="plot" id="mm-plot"></div></div>
+      </div>
+      <div class="note">Più alta è la resistenza interna del voltmetro, più la lettura si avvicina al valore vero: per
+        questo un buon voltmetro ne ha una enorme (megaohm). Specularmente, un buon amperometro ne ha una minuscola.</div>
+    </section>
+
+    <!-- 9 — QUIZ -->
+    <section id="quiz">
+      <h2>9. Quiz finale</h2>
+      <p>Dieci domande su corrente, resistenze, condensatori e misure. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 1 — La Corrente Elettrica · Fisica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: "L'intensità di corrente elettrica è definita come:",
+        options: ['La carica per unità di tempo, $I=\\Delta q/\\Delta t$', 'La tensione per la resistenza', "L'energia per unità di carica", 'La carica per la tensione'],
+        correct: 0, explain: '$I=\\Delta q/\\Delta t$: quanta carica attraversa una sezione ogni secondo. Si misura in ampere (C/s).' },
+      { type: 'mc', diff: 'easy', text: 'La prima legge di Ohm afferma che, in un conduttore ohmico:',
+        options: ['$V$ e $I$ sono inversamente proporzionali', '$V = R\\,I$ (proporzionalità diretta)', 'La resistenza dipende dal tempo', '$V = R/I$'],
+        correct: 1, explain: 'Tensione e corrente sono direttamente proporzionali: $V=R\\,I$. Nel grafico $V$–$I$ è una retta per l\'origine.' },
+      { type: 'mc', diff: 'easy', text: "L'unità di misura della capacità è:",
+        options: ["L'ohm (Ω)", 'Il volt (V)', 'Il farad (F)', "L'ampere (A)"],
+        correct: 2, explain: 'La capacità si misura in farad: $1\\,\\text{F}=1\\,\\text{C}/\\text{V}$.' },
+      { type: 'mc', diff: 'easy', text: 'Il verso convenzionale della corrente è quello:',
+        options: ['degli elettroni', 'delle cariche positive (dal + al − nel circuito esterno)', 'sempre da sinistra a destra', 'del campo magnetico'],
+        correct: 1, explain: 'Per convenzione storica la corrente ha il verso delle cariche positive; gli elettroni si muovono in verso opposto.' },
+      { type: 'mc', diff: 'medium', text: 'Secondo la seconda legge di Ohm $R=\\rho L/A$, se raddoppio la sezione $A$ del filo (a parità del resto), la resistenza:',
+        options: ['raddoppia', 'si dimezza', 'non cambia', 'quadruplica'],
+        correct: 1, explain: '$R$ è inversamente proporzionale ad $A$: raddoppiando la sezione, $R$ si dimezza.' },
+      { type: 'mc', diff: 'medium', text: 'Due resistenze uguali da $10\\ \\Omega$ collegate in parallelo danno una resistenza equivalente di:',
+        options: ['$20\\ \\Omega$', '$10\\ \\Omega$', '$5\\ \\Omega$', '$0\\ \\Omega$'],
+        correct: 2, explain: 'In parallelo $1/R_{eq}=1/10+1/10=2/10$, quindi $R_{eq}=5\\ \\Omega$: due strade uguali dimezzano la resistenza.' },
+      { type: 'mc', diff: 'medium', text: 'Due condensatori collegati in parallelo danno una capacità equivalente:',
+        options: ['pari alla somma $C_1+C_2$', 'con la regola dei reciproci', 'sempre minore di ciascuno', 'nulla'],
+        correct: 0, explain: 'Per i condensatori il parallelo si somma: $C_{eq}=C_1+C_2$ (al contrario delle resistenze).' },
+      { type: 'mc', diff: 'medium', text: 'Nella costante di tempo $\\tau=RC$ di un circuito, dopo un tempo $\\tau$ il condensatore si è caricato circa al:',
+        options: ['100%', '63%', '50%', '10%'],
+        correct: 1, explain: 'Dopo $t=\\tau$: $V=V_0(1-e^{-1})\\approx 0{,}63\\,V_0$, cioè il 63%. Dopo $5\\tau$ è praticamente carico.' },
+      { type: 'mc', diff: 'hard', text: 'Un amperometro va inserito nel circuito:',
+        options: ['in parallelo, con resistenza interna altissima', 'in serie, con resistenza interna bassissima', 'in parallelo, con resistenza interna nulla', 'in serie, con resistenza interna infinita'],
+        correct: 1, explain: 'In serie (tutta la corrente lo attraversa) e con resistenza interna quasi nulla, per non alterare il circuito. In parallelo rischierebbe un cortocircuito.' },
+      { type: 'open', diff: 'hard', text: 'Spiega perché un voltmetro deve avere una resistenza interna molto grande.',
+        keywords: ['parallelo', 'corrente', 'non', 'ruba', 'alta', 'grande', 'infinit', 'disturb'], requiredMatches: 2,
+        explain: 'Il voltmetro si collega in parallelo: se la sua resistenza fosse bassa, devierebbe (ruberebbe) parte della corrente, alterando il circuito e facendo leggere una tensione più bassa del vero. Con resistenza altissima assorbe una corrente trascurabile e misura correttamente.' }
+    ];
+  </script>
+
+  <!-- Demo interattive di questa lezione -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { linspace, update, themeColors } = Plt;
+      const C = { blue: '#3b82f6', green: '#22c55e', red: '#ef4444', gold: '#f5b400', magenta: '#f06ab8', gray: '#9aa5c0' };
+
+      // ===== 1 — Deriva degli elettroni =====
+      (function () {
+        const svg = document.getElementById('drift-svg');
+        if (!svg) return;
+        const NS = 'http://www.w3.org/2000/svg';
+        const sV = document.getElementById('drift-v'), sN = document.getElementById('drift-n');
+        const vV = document.getElementById('drift-v-val'), vN = document.getElementById('drift-n-val');
+        const out = document.getElementById('drift-out');
+        const W = 640, H = 170, x0 = 60, x1 = 580, yc = 85;
+        // filo
+        let base = `<rect x="${x0}" y="${yc-34}" width="${x1-x0}" height="68" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>`;
+        base += `<line x1="20" y1="${yc}" x2="${x0}" y2="${yc}" class="wire"/><line x1="${x1}" y1="${yc}" x2="620" y2="${yc}" class="wire"/>`;
+        // freccia verso convenzionale
+        base += `<line x1="${x0+40}" y1="30" x2="${x1-40}" y2="30" stroke="${C.red}" stroke-width="2"/>`;
+        base += `<polygon points="${x1-40},30 ${x1-52},25 ${x1-52},35" fill="${C.red}"/>`;
+        base += `<text x="${(x0+x1)/2}" y="22" text-anchor="middle" fill="${C.red}" font-size="12" font-weight="700">verso convenzionale (I)</text>`;
+        svg.innerHTML = base;
+        let electrons = [];
+        function build(n) {
+          document.querySelectorAll('#drift-svg .el').forEach(e => e.remove());
+          electrons = [];
+          for (let i = 0; i < n; i++) {
+            const c = document.createElementNS(NS, 'circle');
+            c.setAttribute('class', 'el electron'); c.setAttribute('r', '6');
+            const x = x0 + Math.random() * (x1 - x0), y = yc - 24 + Math.random() * 48;
+            c.setAttribute('cx', x); c.setAttribute('cy', y);
+            svg.appendChild(c); electrons.push({ el: c, x, y });
+          }
+        }
+        function fmt(p, arr) { const i = Math.round((arr.length - 1) * p); return arr[i]; }
+        let raf;
+        function loop() {
+          const v = +sV.value, speed = 0.15 + v / 100 * 1.9;      // px per frame
+          const jitter = 0.6;                                     // moto termico
+          electrons.forEach(o => {
+            o.x += speed + (Math.random() - 0.5) * jitter * 3;    // deriva verso sinistra (elettroni ← )
+            o.y += (Math.random() - 0.5) * jitter;
+            if (o.y < yc - 26) o.y = yc - 26; if (o.y > yc + 26) o.y = yc + 26;
+            if (o.x > x1 - 4) o.x = x0 + 4;
+            o.el.setAttribute('cx', o.x); o.el.setAttribute('cy', o.y);
+          });
+          raf = requestAnimationFrame(loop);
+        }
+        function refresh() {
+          const v = +sV.value, n = +sN.value;
+          vV.textContent = fmt(v / 100, ['nulla', 'bassa', 'media', 'alta']);
+          vN.textContent = fmt((n - 4) / 22, ['pochi', 'medi', 'molti']);
+          // corrente qualitativa proporzionale a n·v
+          const I = (n * v) / 260;
+          out.innerHTML = `Corrente (qualitativa): <span class="val-badge">I ≈ ${I.toFixed(1)} A</span> — cresce con la velocità di deriva <em>e</em> con il numero di portatori: $I = n\\,e\\,A\\,v_d$.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sN.addEventListener('input', () => { build(+sN.value); refresh(); });
+        sV.addEventListener('input', refresh);
+        build(+sN.value); refresh();
+        loop();
+      })();
+
+      // ===== 2 — Corrente continua =====
+      (function () {
+        const sI = document.getElementById('dc-i'), vI = document.getElementById('dc-i-val'), cb = document.getElementById('dc-ac');
+        if (!sI) return;
+        function go() {
+          const I = +sI.value; vI.textContent = I.toFixed(1);
+          const ts = linspace(0, 10, 240);
+          const traces = [{ x: ts, y: ts.map(() => I), type: 'scatter', mode: 'lines', name: 'DC', line: { color: C.blue, width: 3 } }];
+          if (cb.checked) traces.push({ x: ts, y: ts.map(t => I * Math.sin(2 * Math.PI * t / 2.5)), type: 'scatter', mode: 'lines', name: 'AC (esempio)', line: { color: C.magenta, width: 2, dash: 'dot' } });
+          update('dc-plot', traces, { xaxis: { title: 't (s)', range: [0, 10] }, yaxis: { title: 'I (A)', range: [cb.checked ? -5.2 : 0, 5.2] }, showlegend: true, legend: { orientation: 'h', y: 1.15 } });
+        }
+        sI.addEventListener('input', go); cb.addEventListener('change', go); go();
+      })();
+
+      // ===== 4 — Prima legge di Ohm =====
+      (function () {
+        const sR = document.getElementById('ohm-r'), vR = document.getElementById('ohm-r-val'), cb = document.getElementById('ohm-led');
+        const out = document.getElementById('ohm-out');
+        if (!sR) return;
+        function go() {
+          const R = +sR.value; vR.textContent = R;
+          const Is = linspace(0, 2, 120);
+          const traces = [{ x: Is, y: Is.map(i => R * i), type: 'scatter', mode: 'lines', name: `R = ${R} Ω`, line: { color: C.blue, width: 3 } }];
+          if (cb.checked) {
+            // curva "LED": corrente quasi nulla fino a ~1.8 V poi cresce ripida (V in ascissa qui invertiamo: mostriamo V(I))
+            traces.push({ x: Is, y: Is.map(i => 1.8 + 0.15 * Math.log(1 + 50 * i)), type: 'scatter', mode: 'lines', name: 'LED (non ohmico)', line: { color: C.gold, width: 2.5, dash: 'dash' } });
+          }
+          const Vp = R * 1;
+          out.innerHTML = `A $I = 1$ A: $V = R\\,I = ${R}\\times 1 = $ <span class="val-badge">${Vp} V</span>. La pendenza della retta è la resistenza.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+          update('ohm-plot', traces, { xaxis: { title: 'I (A)', range: [0, 2] }, yaxis: { title: 'V (V)', range: [0, 45] }, showlegend: true, legend: { orientation: 'h', y: 1.15 } });
+        }
+        sR.addEventListener('input', go); cb.addEventListener('change', go); go();
+      })();
+
+      // ===== 5 — Seconda legge di Ohm =====
+      (function () {
+        const mat = document.getElementById('rho-mat'), sL = document.getElementById('rho-l'), sA = document.getElementById('rho-a');
+        const vL = document.getElementById('rho-l-val'), vA = document.getElementById('rho-a-val'), out = document.getElementById('rho-out');
+        const svg = document.getElementById('rho-svg');
+        if (!sL) return;
+        function go() {
+          const rho = parseFloat(mat.value), L = +sL.value, A = +sA.value;
+          vL.textContent = L.toFixed(1); vA.textContent = A.toFixed(1);
+          const R = rho * L / (A * 1e-6);   // A da mm² a m²
+          out.innerHTML = `$R = \\rho\\dfrac{L}{A} = ${rho.toExponential(2)}\\cdot\\dfrac{${L.toFixed(1)}}{${A.toFixed(1)}\\times10^{-6}} = $ <span class="val-badge">${R < 1 ? R.toFixed(3) : R.toFixed(2)} Ω</span>`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+          // filo: lunghezza ∝ L, spessore ∝ A
+          const wLen = 120 + (L - 0.5) / 9.5 * 400;   // 120..520
+          const th = 6 + (A - 0.2) / 4.8 * 48;         // 6..54
+          const x0 = 40, yc = 60;
+          svg.innerHTML =
+            `<line x1="0" y1="${yc}" x2="${x0}" y2="${yc}" class="wire"/>` +
+            `<rect x="${x0}" y="${yc - th / 2}" width="${wLen}" height="${th}" rx="${Math.min(th / 2, 10)}" fill="var(--surface)" stroke="var(--primary)" stroke-width="2"/>` +
+            `<line x1="${x0 + wLen}" y1="${yc}" x2="640" y2="${yc}" class="wire"/>` +
+            `<text x="${x0 + wLen / 2}" y="${yc - th / 2 - 8}" text-anchor="middle" class="lbl-s" fill="var(--muted)">L = ${L.toFixed(1)} m</text>` +
+            `<text x="${x0 + wLen + 12}" y="${yc + 4}" class="lbl-s" fill="var(--muted)">A = ${A.toFixed(1)} mm²</text>`;
+        }
+        mat.addEventListener('change', go); sL.addEventListener('input', go); sA.addEventListener('input', go); go();
+      })();
+
+      // ===== 6 — Capacità piane parallele =====
+      (function () {
+        const sA = document.getElementById('cap-a'), sD = document.getElementById('cap-d'), eps = document.getElementById('cap-eps');
+        const vA = document.getElementById('cap-a-val'), vD = document.getElementById('cap-d-val'), out = document.getElementById('cap-out');
+        if (!sA) return;
+        const e0 = 8.854e-12;
+        function go() {
+          const A = +sA.value, d = +sD.value, er = parseFloat(eps.value);
+          vA.textContent = A; vD.textContent = d.toFixed(1);
+          const Cf = er * e0 * (A * 1e-4) / (d * 1e-3);   // A cm²→m², d mm→m, in farad
+          const pF = Cf * 1e12;
+          const disp = pF > 1000 ? (pF / 1000).toFixed(1) + ' nF' : pF.toFixed(1) + ' pF';
+          out.innerHTML = `$C = \\varepsilon_r\\,\\varepsilon_0\\dfrac{A}{d} = $ <span class="val-badge">${disp}</span> &nbsp; (armature più grandi o più vicine ⇒ più capacità)`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sA.addEventListener('input', go); sD.addEventListener('input', go); eps.addEventListener('change', go); go();
+      })();
+
+      // ===== 6.2 — Circuito RC =====
+      (function () {
+        const sR = document.getElementById('rc-r'), sC = document.getElementById('rc-c'), cb = document.getElementById('rc-dis');
+        const vR = document.getElementById('rc-r-val'), vC = document.getElementById('rc-c-val'), out = document.getElementById('rc-out');
+        if (!sR) return;
+        const V0 = 5;
+        function go() {
+          const R = +sR.value, Cc = +sC.value; vR.textContent = R; vC.textContent = Cc;
+          const tau = R * Cc;               // kΩ·µF = ms
+          const tmax = 5 * tau;
+          const ts = linspace(0, tmax, 240);
+          const dis = cb.checked;
+          const ys = ts.map(t => dis ? V0 * Math.exp(-t / tau) : V0 * (1 - Math.exp(-t / tau)));
+          const traces = [{ x: ts, y: ys, type: 'scatter', mode: 'lines', name: dis ? 'scarica' : 'carica', line: { color: dis ? C.red : C.green, width: 3 } }];
+          const shapes = [
+            { type: 'line', x0: tau, x1: tau, y0: 0, y1: V0, line: { color: C.gold, width: 1.5, dash: 'dash' } },
+            { type: 'line', xref: 'paper', x0: 0, x1: 1, y0: dis ? V0 * 0.37 : V0 * 0.63, y1: dis ? V0 * 0.37 : V0 * 0.63, line: { color: C.gray, width: 1, dash: 'dot' } }
+          ];
+          out.innerHTML = `Costante di tempo $\\tau = R\\,C = ${R}\\times ${Cc} = $ <span class="val-badge">${tau} ms</span>. ` +
+            (dis ? `Dopo $\\tau$ è sceso al 37%.` : `Dopo $\\tau$ ha raggiunto il 63%; dopo $5\\tau ≈ ${tmax}$ ms è quasi carico.`);
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+          update('rc-plot', traces, { xaxis: { title: 't (ms)', range: [0, tmax] }, yaxis: { title: 'V_C (V)', range: [0, V0 * 1.08] }, shapes });
+        }
+        sR.addEventListener('input', go); sC.addEventListener('input', go); cb.addEventListener('change', go); go();
+      })();
+
+      // ===== 7.1 — Serie/parallelo resistenze =====
+      (function () {
+        const s1 = document.getElementById('rs-1'), s2 = document.getElementById('rs-2'), s3 = document.getElementById('rs-3');
+        const v1 = document.getElementById('rs-1-val'), v2 = document.getElementById('rs-2-val'), v3 = document.getElementById('rs-3-val'), out = document.getElementById('rs-out');
+        if (!s1) return;
+        function go() {
+          const a = +s1.value, b = +s2.value, c = +s3.value;
+          v1.textContent = a; v2.textContent = b; v3.textContent = c;
+          const serie = a + b + c;
+          const par = 1 / (1 / a + 1 / b + 1 / c);
+          out.innerHTML = `In <strong>serie</strong>: $R_{eq} = ${a}+${b}+${c} = $ <span class="val-badge">${serie} Ω</span> &nbsp;·&nbsp; ` +
+            `In <strong>parallelo</strong>: <span class="val-badge">${par.toFixed(2)} Ω</span> (minore della più piccola).`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        [s1, s2, s3].forEach(s => s.addEventListener('input', go)); go();
+      })();
+
+      // ===== 7.2 — Serie/parallelo condensatori =====
+      (function () {
+        const s1 = document.getElementById('cs-1'), s2 = document.getElementById('cs-2'), s3 = document.getElementById('cs-3');
+        const v1 = document.getElementById('cs-1-val'), v2 = document.getElementById('cs-2-val'), v3 = document.getElementById('cs-3-val'), out = document.getElementById('cs-out');
+        if (!s1) return;
+        function go() {
+          const a = +s1.value, b = +s2.value, c = +s3.value;
+          v1.textContent = a; v2.textContent = b; v3.textContent = c;
+          const par = a + b + c;
+          const serie = 1 / (1 / a + 1 / b + 1 / c);
+          out.innerHTML = `In <strong>parallelo</strong>: $C_{eq} = ${a}+${b}+${c} = $ <span class="val-badge">${par} µF</span> &nbsp;·&nbsp; ` +
+            `In <strong>serie</strong>: <span class="val-badge">${serie.toFixed(2)} µF</span> (minore della più piccola). Regole invertite rispetto alle resistenze!`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        [s1, s2, s3].forEach(s => s.addEventListener('input', go)); go();
+      })();
+
+      // ===== 8.1 — Errore del voltmetro reale =====
+      (function () {
+        const sRv = document.getElementById('mm-rv'), vRv = document.getElementById('mm-rv-val'), out = document.getElementById('mm-out');
+        if (!sRv) return;
+        const R = 1000, Vvera = 5;   // misuriamo su R=1kΩ, tensione vera 5 V (rete ideale)
+        function go() {
+          const Rv = +sRv.value * 1000; vRv.textContent = +sRv.value;
+          // parallelo tra R e Rv → la tensione letta scende un po' (modello con resistenza di sorgente = R)
+          const Rpar = (R * Rv) / (R + Rv);
+          const Vmis = Vvera * Rpar / ((R) /*sorgente*/ * 0 + Rpar) ; // vedi modello sotto
+          // modello: sorgente ideale 5V con resistenza serie Rs=R; misuro ai capi di un carico R.
+          const Rs = R;
+          const letto = Vvera * ( (R*Rv/(R+Rv)) ) / ( Rs + (R*Rv/(R+Rv)) );
+          const err = (Vvera - letto) / Vvera * 100;
+          const Rvals = linspace(1, 1000, 120);
+          const ys = Rvals.map(rk => { const rv = rk * 1000; const rp = R * rv / (R + rv); return Vvera * rp / (Rs + rp); });
+          out.innerHTML = `Valore vero: <span class="val-badge">${Vvera.toFixed(2)} V</span> &nbsp;→&nbsp; letto: <span class="val-badge">${letto.toFixed(2)} V</span> (errore ${err.toFixed(1)}%). Con $R_v$ grande l'errore sparisce.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+          update('mm-plot', [
+            { x: Rvals, y: ys, type: 'scatter', mode: 'lines', line: { color: C.blue, width: 3 }, name: 'letto' },
+            { x: [+sRv.value], y: [letto], type: 'scatter', mode: 'markers', marker: { color: C.magenta, size: 11 }, name: 'ora' }
+          ], { xaxis: { title: 'Resistenza interna voltmetro (kΩ)', range: [0, 1000] }, yaxis: { title: 'Tensione letta (V)', range: [Vvera * 0.45, Vvera * 1.02] }, shapes: [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: Vvera, y1: Vvera, line: { color: C.green, width: 1.5, dash: 'dash' } }] });
+        }
+        sRv.addEventListener('input', go); go();
+      })();
+
+    });
+  </script>
+</body>
+
+</html>
