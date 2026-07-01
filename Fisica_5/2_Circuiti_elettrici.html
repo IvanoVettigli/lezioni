@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 2 — Circuiti elettrici</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    /* --- Circuiti e componenti (SVG theme-aware tramite classi) --- */
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 560px; margin: 0 auto; }
+    .ckt .wire { stroke: var(--text-soft); stroke-width: 2.5; fill: none; }
+    .ckt .comp { stroke: var(--primary); stroke-width: 2.5; fill: none; }
+    .ckt .res { stroke: var(--primary); stroke-width: 2.5; fill: none; stroke-linejoin: round; }
+    .ckt .plate { stroke: var(--primary); stroke-width: 3.5; }
+    .ckt .hot { stroke: var(--magenta); stroke-width: 2.5; fill: none; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .ckt .plus { fill: var(--red); font-size: 16px; font-weight: 700; }
+    .ckt .minus { fill: var(--primary); font-size: 16px; font-weight: 700; }
+    .ckt .cur { stroke: var(--green); stroke-width: 2.5; fill: none; }
+    .ckt .cur-fill { fill: var(--green); }
+    .ckt .ind { stroke: var(--accent); stroke-width: 2.5; fill: none; }
+
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+
+    /* --- Risolutore di circuiti passo-passo --- */
+    .circuit-solver { background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.1rem; margin: 1.4rem 0; }
+    .cs-title { font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; }
+    .cs-step { display: none; border-top: 1px dashed var(--border); padding: 0.8rem 0 0.2rem; }
+    .cs-step.show { display: block; animation: csfade 0.35s ease; }
+    .cs-step .cs-num { display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.85rem; margin-right: 0.5rem; }
+    @keyframes csfade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .cs-controls { display: flex; align-items: center; gap: 0.8rem; margin-top: 1rem; flex-wrap: wrap; }
+    .cs-progress { font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .cs-final { font-weight: 700; }
+
+    /* --- Confronto AC/DC --- */
+    .vs-box { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0.8rem; align-items: center; margin: 1.2rem 0; }
+    .vs-side { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem 1.2rem; text-align: center; }
+    .vs-side h4 { margin: 0 0 0.5rem; }
+    .vs-vs { font-weight: 800; font-size: 1.5rem; color: var(--gold); }
+    @media (max-width: 640px) { .vs-box { grid-template-columns: 1fr; } .vs-vs { text-align: center; } }
+
+    /* --- Tabella bolletta --- */
+    .bill-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
+    .bill-row:last-child { border-bottom: none; font-weight: 700; }
+    .bill-label { color: var(--text-soft); }
+    .bill-val { color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    /* --- Calcolatori energia --- */
+    .energy-calc { background: color-mix(in srgb, var(--green) 8%, var(--surface)); border: 1.5px solid var(--green); border-radius: var(--radius); padding: 1.2rem; margin: 1.2rem 0; }
+    .energy-calc .ec-title { font-weight: 700; color: var(--green); font-size: 1.05rem; margin-bottom: 0.5rem; }
+    .energy-calc .ec-title::before { content: '⚡ '; }
+
+    /* --- Produzione energia --- */
+    .source-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; margin: 1rem 0; }
+    .source-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem; text-align: center; transition: transform 0.18s; }
+    .source-card:hover { transform: translateY(-3px); }
+    .source-card .sc-icon { font-size: 2rem; margin-bottom: 0.3rem; }
+    .source-card .sc-name { font-weight: 700; color: var(--text); font-size: 0.95rem; }
+    .source-card .sc-pct { font-size: 1.4rem; font-weight: 800; color: var(--accent); margin: 0.3rem 0; }
+    .source-card .sc-desc { font-size: 0.82rem; color: var(--muted); }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quinto anno · Lezione 2</div>
+    <h1>Circuiti elettrici</h1>
+    <p>Dalle leggi di Kirchhoff alla bolletta: risolvere, capire e pagare la corrente</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quinto anno</a>
+    <span class="sep">/</span> Circuiti elettrici
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Da dove veniamo.</strong> Nella lezione precedente abbiamo incontrato la corrente, la prima e la seconda
+      legge di Ohm, i condensatori e i collegamenti in serie e in parallelo. Ora mettiamo tutto al lavoro: impariamo a
+      <strong>risolvere un circuito</strong> — cioè a trovare le correnti e le tensioni in ogni suo ramo — e poi scopriamo
+      la corrente che arriva davvero nelle nostre case e quanto ci costa.
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- 1 — LE LEGGI DI KIRCHHOFF                                       -->
+    <!-- ================================================================ -->
+    <section id="sec1">
+      <h2>1. Le leggi di Kirchhoff</h2>
+      <p>La legge di Ohm da sola basta per un singolo resistore, ma i circuiti reali hanno tanti componenti collegati in
+        modi intricati. Per districarsi servono due principi generali, formulati dal fisico tedesco Gustav
+        <strong>Kirchhoff</strong> a metà Ottocento. Sono in fondo due leggi di <em>conservazione</em>: una per la carica,
+        una per l'energia.</p>
+
+      <p>Prima due parole di vocabolario: un <strong>nodo</strong> è un punto in cui si incontrano tre o più fili; un
+        <strong>ramo</strong> è il tratto di circuito tra due nodi; una <strong>maglia</strong> è un qualsiasi percorso
+        chiuso che si può seguire nel circuito tornando al punto di partenza.</p>
+
+      <h3>1.1 — Prima legge (legge dei nodi)</h3>
+      <div class="definition">
+        <strong>Legge dei nodi (o delle correnti).</strong> In ogni nodo, la somma delle correnti che <em>entrano</em> è
+        uguale alla somma delle correnti che <em>escono</em>:
+        $$\sum I_{\text{entranti}} = \sum I_{\text{uscenti}}.$$
+      </div>
+      <p>È semplice buon senso: la carica non si accumula né sparisce in un nodo, quindi tutta quella che arriva deve anche
+        andarsene. È come uno svincolo stradale: tutte le auto che entrano nell'incrocio devono anche uscirne.</p>
+
+      <div class="ckt"><svg viewBox="0 0 360 200" aria-label="Legge dei nodi: correnti entranti e uscenti">
+        <text x="180" y="20" text-anchor="middle" class="lbl">Legge dei nodi</text>
+        <circle cx="180" cy="110" r="6" fill="var(--accent)"/>
+        <line x1="30" y1="110" x2="174" y2="110" class="cur"/>
+        <polygon points="140,110 128,104 128,116" class="cur-fill"/>
+        <text x="70" y="100" class="lbl-s" fill="var(--green)">I₁ = 5 A (entra)</text>
+        <line x1="180" y1="40" x2="180" y2="104" class="cur"/>
+        <polygon points="180,90 174,78 186,78" class="cur-fill"/>
+        <text x="190" y="55" class="lbl-s" fill="var(--green)">I₂ = 2 A (entra)</text>
+        <line x1="186" y1="110" x2="330" y2="110" class="cur"/>
+        <polygon points="330,110 318,104 318,116" class="cur-fill"/>
+        <text x="250" y="100" class="lbl-s" fill="var(--green)">I₃ = ? (esce)</text>
+        <line x1="180" y1="116" x2="180" y2="180" class="cur"/>
+        <polygon points="180,180 174,168 186,168" class="cur-fill"/>
+        <text x="190" y="165" class="lbl-s" fill="var(--green)">I₄ = 3 A (esce)</text>
+      </svg></div>
+      <p>Nell'esempio entrano $5 + 2 = 7$ A ed esce già $3$ A verso il basso: nel ramo di destra deve quindi uscire
+        $I_3 = 7 - 3 = 4$ A. Prova tu a cambiare i valori:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>I₁ entrante (A): <span class="val" id="kn-1-val">5</span></label>
+          <input type="range" id="kn-1" min="0" max="10" step="1" value="5"></div>
+        <div class="control-group"><label>I₂ entrante (A): <span class="val" id="kn-2-val">2</span></label>
+          <input type="range" id="kn-2" min="0" max="10" step="1" value="2"></div>
+        <div class="control-group"><label>I₄ uscente (A): <span class="val" id="kn-4-val">3</span></label>
+          <input type="range" id="kn-4" min="0" max="10" step="1" value="3"></div>
+      </div>
+      <p id="kn-out" class="eq-out"></p>
+
+      <h3>1.2 — Seconda legge (legge delle maglie)</h3>
+      <div class="definition">
+        <strong>Legge delle maglie (o delle tensioni).</strong> Percorrendo una maglia qualsiasi e tornando al punto di
+        partenza, la somma algebrica delle differenze di potenziale è nulla:
+        $$\sum V = 0.$$
+        In pratica: la tensione fornita dai generatori è uguale alla somma delle tensioni "consumate" sui resistori.
+      </div>
+      <p>Anche questa è conservazione: il potenziale elettrico è come la quota di un sentiero di montagna. Se parti da un
+        punto e ci ritorni dopo un giro completo, il dislivello totale è zero — sei tornato alla stessa altezza. Il
+        generatore ti "solleva" (guadagni potenziale), i resistori ti "fanno scendere" (lo consumi), e alla fine del giro
+        i conti tornano.</p>
+
+      <div class="ckt"><svg viewBox="0 0 360 200" aria-label="Legge delle maglie in un circuito a una maglia">
+        <text x="180" y="20" text-anchor="middle" class="lbl">Legge delle maglie</text>
+        <line x1="60" y1="60" x2="60" y2="140" class="wire"/>
+        <line x1="48" y1="96" x2="72" y2="96" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="54" y1="104" x2="66" y2="104" stroke="var(--primary)" stroke-width="5"/>
+        <text x="30" y="92" class="plus">+</text>
+        <text x="30" y="118" class="minus">–</text>
+        <text x="24" y="145" class="lbl-s" fill="var(--muted)">ε</text>
+        <line x1="60" y1="60" x2="150" y2="60" class="wire"/>
+        <polyline points="150,60 158,48 170,72 182,48 194,72 206,48 218,72 226,60" class="res"/>
+        <line x1="226" y1="60" x2="300" y2="60" class="wire"/>
+        <text x="188" y="42" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₁</text>
+        <line x1="300" y1="60" x2="300" y2="140" class="wire"/>
+        <polyline points="300,86 288,94 312,106 288,118 312,130 300,138" class="res"/>
+        <text x="322" y="112" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₂</text>
+        <line x1="300" y1="140" x2="60" y2="140" class="wire"/>
+        <text x="180" y="165" text-anchor="middle" class="lbl-s" fill="var(--green)">ε = V(R₁) + V(R₂)</text>
+      </svg></div>
+      <p>In questa maglia unica: $\varepsilon = R_1 I + R_2 I$. Da qui, conoscendo $\varepsilon$, $R_1$ e $R_2$, si ricava
+        subito la corrente $I$. Con circuiti più complessi le due leggi di Kirchhoff, messe a sistema, permettono di
+        trovare <em>tutte</em> le correnti e le tensioni. Nella pratica, però, quando i componenti sono solo in serie e in
+        parallelo, conviene prima <strong>semplificare</strong> il circuito — ed è ciò che vediamo ora.</p>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 2 — RESISTENZA E CAPACITÀ EQUIVALENTE                            -->
+    <!-- ================================================================ -->
+    <section id="sec2">
+      <h2>2. Resistenza e capacità equivalente</h2>
+      <p>L'idea chiave per risolvere un circuito è la <strong>sostituzione</strong>: un gruppo di componenti collegati tra
+        loro può essere rimpiazzato da un <em>unico</em> componente che, "visto da fuori", si comporta esattamente allo
+        stesso modo. Quel componente unico è la resistenza (o la capacità) <strong>equivalente</strong>.</p>
+
+      <div class="definition">
+        La <strong>resistenza equivalente</strong> $R_{eq}$ di un gruppo di resistori è il valore della singola resistenza
+        che, sottoposta alla <em>stessa</em> tensione, farebbe passare la <em>stessa</em> corrente del gruppo intero. Il
+        resto del circuito non "si accorge" della sostituzione.
+      </div>
+
+      <p>Analogamente si definisce la <strong>capacità equivalente</strong> $C_{eq}$ di un gruppo di condensatori: il
+        condensatore singolo che accumula la stessa carica sotto la stessa tensione. Le regole, già viste nella lezione
+        precedente, sono queste (e per i condensatori sono "specchiate" rispetto ai resistori):</p>
+
+      <div class="sp-cols">
+        <div class="rule">
+          <strong>Resistori</strong><br>
+          Serie: $R_{eq} = R_1 + R_2 + \dots$ (aumenta)<br>
+          Parallelo: $\dfrac{1}{R_{eq}} = \dfrac{1}{R_1} + \dfrac{1}{R_2} + \dots$ (diminuisce)
+        </div>
+        <div class="rule">
+          <strong>Condensatori</strong><br>
+          Parallelo: $C_{eq} = C_1 + C_2 + \dots$ (aumenta)<br>
+          Serie: $\dfrac{1}{C_{eq}} = \dfrac{1}{C_1} + \dfrac{1}{C_2} + \dots$ (diminuisce)
+        </div>
+      </div>
+
+      <div class="note"><strong>Perché in serie i resistori si sommano?</strong> In serie la corrente attraversa un
+        resistore dopo l'altro: gli "ostacoli" si accumulano, come allungare un tubo stretto. In parallelo, invece, la
+        corrente trova più strade in cui dividersi: è come aprire più corsie: la resistenza complessiva
+        <em>diminuisce</em> ed è sempre minore della più piccola del gruppo. Per i condensatori vale il ragionamento
+        opposto, perché mettere due condensatori in parallelo equivale ad allargare le armature (più superficie ⇒ più
+        capacità).</div>
+
+      <p>Con due sole resistenze in parallelo è comodissima la formula "prodotto su somma":</p>
+      <div class="formula-box">$$R_{eq} = \frac{R_1 \cdot R_2}{R_1 + R_2}.$$</div>
+      <p>Verifichiamola: due resistenze uguali da $R$ in parallelo danno $\dfrac{R\cdot R}{R+R} = \dfrac{R^2}{2R} =
+        \dfrac{R}{2}$, cioè la metà — proprio ciò che ci si aspetta raddoppiando le corsie.</p>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 3 — RISOLUZIONE GUIDATA DI CIRCUITI                              -->
+    <!-- ================================================================ -->
+    <section id="sec3">
+      <h2>3. Risolvere un circuito passo dopo passo</h2>
+      <p>Risolvere un circuito di soli resistori (o soli condensatori) in serie e parallelo segue sempre la stessa
+        strategia: <strong>individuare</strong> i gruppi in serie o in parallelo, <strong>sostituirli</strong> con
+        l'equivalente, e <strong>ripetere</strong> finché resta un solo componente. Poi, se serve, si torna indietro per
+        trovare le correnti nei singoli rami. Vediamo alcuni casi a difficoltà crescente: premi
+        <em>«Prossimo passo»</em> per svelare un passaggio alla volta e guarda come il circuito si semplifica.</p>
+
+      <!-- Circuito A: due resistenze in serie -->
+      <div class="circuit-solver" id="csA">
+        <div class="cs-title">Circuito 1 — Due resistori in serie</div>
+        <p>Un generatore da $\varepsilon = 12$ V alimenta due resistori in serie, $R_1 = 4\ \Omega$ e $R_2 = 8\ \Omega$.
+          Trova la resistenza equivalente e la corrente erogata.</p>
+
+        <div class="ckt"><svg viewBox="0 0 360 160" aria-label="Circuito 1: due resistori in serie">
+          <line x1="40" y1="60" x2="40" y2="110" class="wire"/>
+          <line x1="28" y1="76" x2="52" y2="76" stroke="var(--primary)" stroke-width="2"/>
+          <line x1="34" y1="84" x2="46" y2="84" stroke="var(--primary)" stroke-width="5"/>
+          <text x="18" y="80" class="plus">+</text>
+          <text x="14" y="118" class="lbl-s" fill="var(--muted)">12 V</text>
+          <line x1="40" y1="60" x2="110" y2="60" class="wire"/>
+          <polyline points="110,60 118,48 130,72 142,48 154,72 166,48 178,72 186,60" class="res"/>
+          <text x="148" y="42" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₁ = 4 Ω</text>
+          <line x1="186" y1="60" x2="230" y2="60" class="wire"/>
+          <polyline points="230,60 238,48 250,72 262,48 274,72 286,48 298,72 306,60" class="res"/>
+          <text x="268" y="42" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₂ = 8 Ω</text>
+          <line x1="306" y1="60" x2="320" y2="60" class="wire"/>
+          <line x1="320" y1="60" x2="320" y2="110" class="wire"/>
+          <line x1="320" y1="110" x2="40" y2="110" class="wire"/>
+        </svg></div>
+
+        <div class="cs-step">
+          <p><span class="cs-num">1</span>I due resistori sono <strong>in serie</strong> (uno di seguito all'altro, stessa
+            corrente). Si sommano: $R_{eq} = R_1 + R_2 = 4 + 8 = 12\ \Omega$.</p>
+          <div class="ckt"><svg viewBox="0 0 360 160" aria-label="Circuito 1 semplificato: resistenza equivalente">
+            <line x1="40" y1="60" x2="40" y2="110" class="wire"/>
+            <line x1="28" y1="76" x2="52" y2="76" stroke="var(--primary)" stroke-width="2"/>
+            <line x1="34" y1="84" x2="46" y2="84" stroke="var(--primary)" stroke-width="5"/>
+            <text x="18" y="80" class="plus">+</text>
+            <text x="14" y="118" class="lbl-s" fill="var(--muted)">12 V</text>
+            <line x1="40" y1="60" x2="150" y2="60" class="wire"/>
+            <polyline points="150,60 158,48 170,72 182,48 194,72 206,48 218,72 226,60" class="res"/>
+            <text x="188" y="42" text-anchor="middle" class="lbl-s" fill="var(--accent)">R_eq = 12 Ω</text>
+            <line x1="226" y1="60" x2="320" y2="60" class="wire"/>
+            <line x1="320" y1="60" x2="320" y2="110" class="wire"/>
+            <line x1="320" y1="110" x2="40" y2="110" class="wire"/>
+          </svg></div>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">2</span>Applico la legge di Ohm al circuito ridotto: $I = \dfrac{\varepsilon}{R_{eq}} =
+            \dfrac{12}{12} = 1\ \text{A}$.</p>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">3</span>Essendo in serie, la stessa corrente attraversa entrambi. Le tensioni sui due
+            resistori sono $V_1 = R_1 I = 4\cdot 1 = 4$ V e $V_2 = R_2 I = 8\cdot 1 = 8$ V. Verifica con Kirchhoff:
+            $V_1 + V_2 = 4 + 8 = 12$ V $= \varepsilon$. ✓</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$R_{eq} = 12\ \Omega$, $I = 1\ \text{A}$, con $V_1 = 4$ V e $V_2 = 8$ V.</span></div>
+        </div>
+
+        <div class="cs-controls">
+          <button class="btn cs-prev" type="button">◀ Indietro</button>
+          <span class="cs-progress"></span>
+          <button class="btn cs-next" type="button">Prossimo passo ▶</button>
+        </div>
+      </div>
+
+      <!-- Circuito B: partitore serie + parallelo -->
+      <div class="circuit-solver" id="csB">
+        <div class="cs-title">Circuito 2 — Un resistore in serie con due in parallelo</div>
+        <p>Un generatore da $\varepsilon = 12$ V alimenta $R_1 = 2\ \Omega$ in serie con il parallelo di
+          $R_2 = 6\ \Omega$ e $R_3 = 3\ \Omega$. Trova la corrente totale.</p>
+
+        <div class="ckt"><svg viewBox="0 0 380 200" aria-label="Circuito 2: R1 in serie con R2 parallelo R3">
+          <line x1="30" y1="70" x2="30" y2="150" class="wire"/>
+          <line x1="18" y1="96" x2="42" y2="96" stroke="var(--primary)" stroke-width="2"/>
+          <line x1="24" y1="104" x2="36" y2="104" stroke="var(--primary)" stroke-width="5"/>
+          <text x="8" y="100" class="plus">+</text>
+          <text x="6" y="128" class="lbl-s" fill="var(--muted)">12 V</text>
+          <line x1="30" y1="70" x2="70" y2="70" class="wire"/>
+          <polyline points="70,70 78,58 90,82 102,58 114,82 126,58 138,82 146,70" class="res"/>
+          <text x="108" y="52" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₁ = 2 Ω</text>
+          <line x1="146" y1="70" x2="210" y2="70" class="wire"/>
+          <line x1="210" y1="40" x2="210" y2="120" class="wire"/>
+          <line x1="330" y1="40" x2="330" y2="120" class="wire"/>
+          <line x1="210" y1="50" x2="240" y2="50" class="wire"/>
+          <polyline points="240,50 246,40 256,60 266,40 276,60 286,40 296,60 300,50" class="res"/>
+          <line x1="300" y1="50" x2="330" y2="50" class="wire"/>
+          <text x="270" y="34" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₂ = 6 Ω</text>
+          <line x1="210" y1="110" x2="240" y2="110" class="wire"/>
+          <polyline points="240,110 246,100 256,120 266,100 276,120 286,100 296,120 300,110" class="res"/>
+          <line x1="300" y1="110" x2="330" y2="110" class="wire"/>
+          <text x="270" y="138" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₃ = 3 Ω</text>
+          <line x1="330" y1="70" x2="350" y2="70" class="wire"/>
+          <line x1="350" y1="70" x2="350" y2="150" class="wire"/>
+          <line x1="350" y1="150" x2="30" y2="150" class="wire"/>
+        </svg></div>
+
+        <div class="cs-step">
+          <p><span class="cs-num">1</span>Prima il <strong>parallelo</strong> $R_2 \parallel R_3$ (prodotto su somma):
+            $R_{23} = \dfrac{6\cdot 3}{6+3} = \dfrac{18}{9} = 2\ \Omega$.</p>
+          <div class="ckt"><svg viewBox="0 0 360 160" aria-label="Circuito 2 dopo il parallelo">
+            <line x1="30" y1="60" x2="30" y2="120" class="wire"/>
+            <line x1="18" y1="78" x2="42" y2="78" stroke="var(--primary)" stroke-width="2"/>
+            <line x1="24" y1="86" x2="36" y2="86" stroke="var(--primary)" stroke-width="5"/>
+            <text x="8" y="82" class="plus">+</text>
+            <line x1="30" y1="60" x2="70" y2="60" class="wire"/>
+            <polyline points="70,60 78,48 90,72 102,48 114,72 126,48 138,72 146,60" class="res"/>
+            <text x="108" y="42" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₁ = 2 Ω</text>
+            <line x1="146" y1="60" x2="210" y2="60" class="wire"/>
+            <polyline points="210,60 218,48 230,72 242,48 254,72 266,48 278,72 286,60" class="res"/>
+            <text x="248" y="42" text-anchor="middle" class="lbl-s" fill="var(--accent)">R₂₃ = 2 Ω</text>
+            <line x1="286" y1="60" x2="320" y2="60" class="wire"/>
+            <line x1="320" y1="60" x2="320" y2="120" class="wire"/>
+            <line x1="320" y1="120" x2="30" y2="120" class="wire"/>
+          </svg></div>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">2</span>Ora $R_1$ e $R_{23}$ sono <strong>in serie</strong>: $R_{eq} = 2 + 2 =
+            4\ \Omega$.</p>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">3</span>Corrente totale erogata: $I = \dfrac{\varepsilon}{R_{eq}} = \dfrac{12}{4} =
+            3\ \text{A}$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$R_{eq} = 4\ \Omega$, corrente totale $I = 3\ \text{A}$.</span></div>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">4</span><strong>Facoltativo — le correnti nei rami.</strong> Sul parallelo cade
+            $V_{23} = R_{23}\,I = 2\cdot 3 = 6$ V. Quindi $I_2 = \dfrac{6}{6} = 1$ A e $I_3 = \dfrac{6}{3} = 2$ A. Verifica
+            col nodo: $I_2 + I_3 = 1 + 2 = 3$ A $= I$. ✓</p>
+        </div>
+
+        <div class="cs-controls">
+          <button class="btn cs-prev" type="button">◀ Indietro</button>
+          <span class="cs-progress"></span>
+          <button class="btn cs-next" type="button">Prossimo passo ▶</button>
+        </div>
+      </div>
+
+      <!-- Circuito C: condensatori serie + parallelo -->
+      <div class="circuit-solver" id="csC">
+        <div class="cs-title">Circuito 3 — Condensatori in serie e in parallelo</div>
+        <p>Tre condensatori: $C_1 = 2\ \mu\text{F}$ in serie con il parallelo di $C_2 = 3\ \mu\text{F}$ e
+          $C_3 = 3\ \mu\text{F}$. Trova la capacità equivalente. <em>Attenzione: per i condensatori le regole sono
+          invertite rispetto ai resistori!</em></p>
+
+        <div class="ckt"><svg viewBox="0 0 380 200" aria-label="Circuito 3: condensatori serie e parallelo">
+          <line x1="30" y1="70" x2="30" y2="150" class="wire"/>
+          <line x1="18" y1="96" x2="42" y2="96" stroke="var(--primary)" stroke-width="2"/>
+          <line x1="24" y1="104" x2="36" y2="104" stroke="var(--primary)" stroke-width="5"/>
+          <text x="8" y="100" class="plus">+</text>
+          <line x1="30" y1="70" x2="90" y2="70" class="wire"/>
+          <line x1="90" y1="56" x2="90" y2="84" class="plate"/>
+          <line x1="102" y1="56" x2="102" y2="84" class="plate"/>
+          <text x="96" y="46" text-anchor="middle" class="lbl-s" fill="var(--muted)">C₁ = 2 µF</text>
+          <line x1="102" y1="70" x2="210" y2="70" class="wire"/>
+          <line x1="210" y1="40" x2="210" y2="120" class="wire"/>
+          <line x1="330" y1="40" x2="330" y2="120" class="wire"/>
+          <line x1="210" y1="50" x2="258" y2="50" class="wire"/>
+          <line x1="258" y1="38" x2="258" y2="62" class="plate"/>
+          <line x1="270" y1="38" x2="270" y2="62" class="plate"/>
+          <line x1="270" y1="50" x2="330" y2="50" class="wire"/>
+          <text x="264" y="30" text-anchor="middle" class="lbl-s" fill="var(--muted)">C₂ = 3 µF</text>
+          <line x1="210" y1="110" x2="258" y2="110" class="wire"/>
+          <line x1="258" y1="98" x2="258" y2="122" class="plate"/>
+          <line x1="270" y1="98" x2="270" y2="122" class="plate"/>
+          <line x1="270" y1="110" x2="330" y2="110" class="wire"/>
+          <text x="264" y="140" text-anchor="middle" class="lbl-s" fill="var(--muted)">C₃ = 3 µF</text>
+          <line x1="330" y1="70" x2="350" y2="70" class="wire"/>
+          <line x1="350" y1="70" x2="350" y2="150" class="wire"/>
+          <line x1="350" y1="150" x2="30" y2="150" class="wire"/>
+        </svg></div>
+
+        <div class="cs-step">
+          <p><span class="cs-num">1</span>I condensatori in <strong>parallelo</strong> si sommano: $C_{23} = C_2 + C_3 =
+            3 + 3 = 6\ \mu\text{F}$.</p>
+          <div class="ckt"><svg viewBox="0 0 360 160" aria-label="Circuito 3 semplificato dopo parallelo">
+            <line x1="30" y1="60" x2="30" y2="120" class="wire"/>
+            <line x1="18" y1="78" x2="42" y2="78" stroke="var(--primary)" stroke-width="2"/>
+            <line x1="24" y1="86" x2="36" y2="86" stroke="var(--primary)" stroke-width="5"/>
+            <text x="8" y="82" class="plus">+</text>
+            <line x1="30" y1="60" x2="130" y2="60" class="wire"/>
+            <line x1="130" y1="46" x2="130" y2="74" class="plate"/>
+            <line x1="142" y1="46" x2="142" y2="74" class="plate"/>
+            <text x="136" y="38" text-anchor="middle" class="lbl-s" fill="var(--muted)">C₁ = 2 µF</text>
+            <line x1="142" y1="60" x2="220" y2="60" class="wire"/>
+            <line x1="220" y1="46" x2="220" y2="74" class="plate"/>
+            <line x1="232" y1="46" x2="232" y2="74" class="plate"/>
+            <text x="226" y="38" text-anchor="middle" class="lbl-s" fill="var(--accent)">C₂₃ = 6 µF</text>
+            <line x1="232" y1="60" x2="320" y2="60" class="wire"/>
+            <line x1="320" y1="60" x2="320" y2="120" class="wire"/>
+            <line x1="320" y1="120" x2="30" y2="120" class="wire"/>
+          </svg></div>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">2</span>Ora $C_1$ e $C_{23}$ sono in <strong>serie</strong>: si combinano con i
+            reciproci. $\dfrac{1}{C_{eq}} = \dfrac{1}{2} + \dfrac{1}{6} = \dfrac{3}{6} + \dfrac{1}{6} = \dfrac{4}{6} =
+            \dfrac{2}{3}$.</p>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">3</span>Quindi $C_{eq} = \dfrac{3}{2} = 1{,}5\ \mu\text{F}$: minore del più piccolo
+            dei condensatori in serie, come deve essere.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$C_{23} = 6\ \mu\text{F}$, $C_{eq} = 1{,}5\ \mu\text{F}$.</span></div>
+        </div>
+
+        <div class="cs-controls">
+          <button class="btn cs-prev" type="button">◀ Indietro</button>
+          <span class="cs-progress"></span>
+          <button class="btn cs-next" type="button">Prossimo passo ▶</button>
+        </div>
+      </div>
+
+      <!-- Circuito D: circuito misto più complesso -->
+      <div class="circuit-solver" id="csD">
+        <div class="cs-title">Circuito 4 — Circuito misto a tre passi</div>
+        <p>Un generatore da $\varepsilon = 24$ V alimenta: $R_1 = 4\ \Omega$ in serie col parallelo di $R_2 = 12\ \Omega$
+          e ($R_3 = 6\ \Omega$ in serie con $R_4 = 6\ \Omega$). Trova $R_{eq}$ e la corrente totale.</p>
+
+        <div class="ckt"><svg viewBox="0 0 420 220" aria-label="Circuito 4: circuito misto complesso">
+          <line x1="30" y1="70" x2="30" y2="170" class="wire"/>
+          <line x1="18" y1="106" x2="42" y2="106" stroke="var(--primary)" stroke-width="2"/>
+          <line x1="24" y1="114" x2="36" y2="114" stroke="var(--primary)" stroke-width="5"/>
+          <text x="8" y="110" class="plus">+</text>
+          <text x="6" y="138" class="lbl-s" fill="var(--muted)">24 V</text>
+          <!-- R1 in alto -->
+          <line x1="30" y1="70" x2="70" y2="70" class="wire"/>
+          <polyline points="70,70 78,58 90,82 102,58 114,82 126,58 138,82 146,70" class="res"/>
+          <text x="108" y="52" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₁ = 4 Ω</text>
+          <line x1="146" y1="70" x2="200" y2="70" class="wire"/>
+          <!-- parallelo -->
+          <line x1="200" y1="40" x2="200" y2="140" class="wire"/>
+          <line x1="370" y1="40" x2="370" y2="140" class="wire"/>
+          <!-- R2 ramo alto -->
+          <line x1="200" y1="50" x2="240" y2="50" class="wire"/>
+          <polyline points="240,50 246,40 256,60 266,40 276,60 286,40 296,60 300,50" class="res"/>
+          <line x1="300" y1="50" x2="370" y2="50" class="wire"/>
+          <text x="270" y="34" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₂ = 12 Ω</text>
+          <!-- R3 + R4 ramo basso -->
+          <line x1="200" y1="130" x2="230" y2="130" class="wire"/>
+          <polyline points="230,130 236,120 246,140 256,120 266,140 270,130" class="res"/>
+          <text x="250" y="154" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₃ = 6 Ω</text>
+          <line x1="270" y1="130" x2="300" y2="130" class="wire"/>
+          <polyline points="300,130 306,120 316,140 326,120 336,140 340,130" class="res"/>
+          <text x="320" y="154" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₄ = 6 Ω</text>
+          <line x1="340" y1="130" x2="370" y2="130" class="wire"/>
+          <!-- chiusura -->
+          <line x1="370" y1="70" x2="390" y2="70" class="wire"/>
+          <line x1="390" y1="70" x2="390" y2="170" class="wire"/>
+          <line x1="390" y1="170" x2="30" y2="170" class="wire"/>
+        </svg></div>
+
+        <div class="cs-step">
+          <p><span class="cs-num">1</span>Nel ramo basso, $R_3$ e $R_4$ sono <strong>in serie</strong>:
+            $R_{34} = 6 + 6 = 12\ \Omega$.</p>
+          <div class="ckt"><svg viewBox="0 0 400 200" aria-label="Circuito 4 dopo serie R3-R4">
+            <line x1="30" y1="60" x2="30" y2="150" class="wire"/>
+            <line x1="18" y1="94" x2="42" y2="94" stroke="var(--primary)" stroke-width="2"/>
+            <line x1="24" y1="102" x2="36" y2="102" stroke="var(--primary)" stroke-width="5"/>
+            <text x="8" y="98" class="plus">+</text>
+            <line x1="30" y1="60" x2="70" y2="60" class="wire"/>
+            <polyline points="70,60 78,48 90,72 102,48 114,72 126,48 138,72 146,60" class="res"/>
+            <text x="108" y="42" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₁ = 4 Ω</text>
+            <line x1="146" y1="60" x2="200" y2="60" class="wire"/>
+            <line x1="200" y1="40" x2="200" y2="120" class="wire"/>
+            <line x1="340" y1="40" x2="340" y2="120" class="wire"/>
+            <!-- R2 -->
+            <line x1="200" y1="46" x2="230" y2="46" class="wire"/>
+            <polyline points="230,46 236,36 246,56 256,36 266,56 276,36 286,56 290,46" class="res"/>
+            <line x1="290" y1="46" x2="340" y2="46" class="wire"/>
+            <text x="260" y="30" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₂ = 12 Ω</text>
+            <!-- R34 -->
+            <line x1="200" y1="114" x2="230" y2="114" class="wire"/>
+            <polyline points="230,114 236,104 246,124 256,104 266,124 276,104 286,124 290,114" class="res"/>
+            <line x1="290" y1="114" x2="340" y2="114" class="wire"/>
+            <text x="260" y="140" text-anchor="middle" class="lbl-s" fill="var(--accent)">R₃₄ = 12 Ω</text>
+            <line x1="340" y1="60" x2="360" y2="60" class="wire"/>
+            <line x1="360" y1="60" x2="360" y2="150" class="wire"/>
+            <line x1="360" y1="150" x2="30" y2="150" class="wire"/>
+          </svg></div>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">2</span>Ora $R_2 \parallel R_{34}$: entrambi 12 Ω, quindi (prodotto su somma)
+            $R_{234} = \dfrac{12\cdot 12}{12+12} = 6\ \Omega$.</p>
+          <div class="ckt"><svg viewBox="0 0 360 140" aria-label="Circuito 4 dopo parallelo">
+            <line x1="30" y1="50" x2="30" y2="110" class="wire"/>
+            <line x1="18" y1="70" x2="42" y2="70" stroke="var(--primary)" stroke-width="2"/>
+            <line x1="24" y1="78" x2="36" y2="78" stroke="var(--primary)" stroke-width="5"/>
+            <text x="8" y="74" class="plus">+</text>
+            <line x1="30" y1="50" x2="70" y2="50" class="wire"/>
+            <polyline points="70,50 78,38 90,62 102,38 114,62 126,38 138,62 146,50" class="res"/>
+            <text x="108" y="32" text-anchor="middle" class="lbl-s" fill="var(--muted)">R₁ = 4 Ω</text>
+            <line x1="146" y1="50" x2="210" y2="50" class="wire"/>
+            <polyline points="210,50 218,38 230,62 242,38 254,62 266,38 278,62 286,50" class="res"/>
+            <text x="248" y="32" text-anchor="middle" class="lbl-s" fill="var(--accent)">R₂₃₄ = 6 Ω</text>
+            <line x1="286" y1="50" x2="320" y2="50" class="wire"/>
+            <line x1="320" y1="50" x2="320" y2="110" class="wire"/>
+            <line x1="320" y1="110" x2="30" y2="110" class="wire"/>
+          </svg></div>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">3</span>Infine $R_1 + R_{234} = 4 + 6 = 10\ \Omega$. Corrente totale:
+            $I = \dfrac{24}{10} = 2{,}4\ \text{A}$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$R_{eq} = 10\ \Omega$, $I = 2{,}4\ \text{A}$.</span></div>
+        </div>
+
+        <div class="cs-controls">
+          <button class="btn cs-prev" type="button">◀ Indietro</button>
+          <span class="cs-progress"></span>
+          <button class="btn cs-next" type="button">Prossimo passo ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 4 — L'INDUTTANZA                                                 -->
+    <!-- ================================================================ -->
+    <section id="sec4">
+      <h2>4. L'induttanza</h2>
+      <p>Finora abbiamo visto resistori (che "frenano" la corrente dissipando calore) e condensatori (che accumulano
+        carica). Ma esiste un terzo protagonista fondamentale: l'<strong>induttore</strong>, un componente formato da una
+        bobina di filo conduttore avvolto su se stesso.</p>
+
+      <div class="definition">
+        L'<strong>induttanza</strong> $L$ (misurata in <strong>henry</strong>, H) è la grandezza che misura la capacità di
+        una bobina di opporsi alle <em>variazioni</em> di corrente. Quando la corrente cambia, la bobina genera una tensione
+        (forza elettromotrice) che si oppone al cambiamento:
+        $$V_L = L \frac{dI}{dt}.$$
+      </div>
+
+      <p>L'analogia meccanica è l'<strong>inerzia</strong>: così come un oggetto pesante resiste alle variazioni di
+        velocità, un induttore resiste alle variazioni di corrente. In un circuito con corrente costante (DC), un induttore
+        ideale si comporta come un semplice filo (resistenza nulla). Ma quando la corrente cambia, lui "si oppone".</p>
+
+      <div class="ckt"><svg viewBox="0 0 360 120" aria-label="Simbolo di un induttore">
+        <text x="180" y="20" text-anchor="middle" class="lbl">Simbolo dell'induttore</text>
+        <line x1="40" y1="70" x2="110" y2="70" class="wire"/>
+        <!-- bobina: semicerchi -->
+        <path d="M110,70 C110,50 130,50 130,70 C130,50 150,50 150,70 C150,50 170,50 170,70 C170,50 190,50 190,70 C190,50 210,50 210,70 C210,50 230,50 230,70" class="ind"/>
+        <line x1="230" y1="70" x2="320" y2="70" class="wire"/>
+        <text x="170" y="100" text-anchor="middle" class="lbl-s" fill="var(--accent)">L</text>
+      </svg></div>
+
+      <h3>4.1 — L'induzione elettromagnetica: dai fornelli alle centrali</h3>
+      <p>Il principio fisico alla base dell'induttanza è la <strong>legge di Faraday</strong>: un campo magnetico che
+        varia nel tempo genera una forza elettromotrice (e quindi corrente) in un circuito. Questo principio funziona anche
+        al contrario: una corrente variabile in una bobina genera un campo magnetico variabile che può indurre correnti
+        in oggetti vicini.</p>
+
+      <h3>4.2 — I fornelli a induzione</h3>
+      <p>Ecco un'applicazione brillante dell'induttanza che probabilmente hai in cucina. In un fornello a induzione,
+        sotto il piano in vetroceramica c'è una bobina percorsa da corrente alternata ad alta frequenza. Questa
+        genera un campo magnetico rapidamente variabile che penetra nel fondo della pentola (che deve essere di materiale
+        <strong>ferromagnetico</strong> — ghisa, acciaio). Nel fondo della pentola si generano delle
+        <strong>correnti parassite</strong> (correnti di Foucault): è la pentola stessa che si scalda, non il piano!</p>
+
+      <div class="curiosita">
+        <strong>🍳 Resistenze elettriche vs. Induzione.</strong> Riscaldare con una resistenza elettrica (come nei
+        vecchi fornelli a piastra o negli scaldabagni) è poco efficiente: la resistenza si scalda, poi cede calore
+        all'aria/acqua/pentola — con tante perdite lungo il percorso. L'efficienza è intorno al 60-70%.
+        Con l'induzione, invece, l'energia viene trasferita direttamente al fondo della pentola per via elettromagnetica:
+        l'efficienza di trasferimento arriva all'<strong>85-90%</strong>, il piano resta relativamente freddo, e l'acqua bolle in metà tempo.
+        <br><br>
+        <em>Attenzione però:</em> questa è solo l'efficienza <strong>locale</strong> del fornello. Per valutare l'efficienza reale bisogna considerare <em>come è stata prodotta l'energia elettrica</em> che lo alimenta. Se l'elettricità proviene da una centrale termoelettrica che brucia gas (con un'efficienza del 40-50%), l'efficienza globale dell'intero processo (dal gas all'acqua che bolle) è persino inferiore rispetto a bruciare il gas direttamente sotto la pentola! L'induzione diventa davvero ecologica ed efficiente solo se l'elettricità è prodotta da fonti pulite e rinnovabili.
+        <br><br>
+        Il prezzo? Le pentole devono essere compatibili (calamita attratta dal fondo = ok!).
+      </div>
+
+      <h4>Confronto efficienza dei metodi di cottura</h4>
+      <div class="plot" id="plot-cooking" style="height: 340px;"></div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 5 — CORRENTE ALTERNATA vs CORRENTE CONTINUA                      -->
+    <!-- ================================================================ -->
+    <section id="sec5">
+      <h2>5. Corrente alternata e corrente continua</h2>
+      <p>Finora nei nostri circuiti il generatore forniva una tensione costante: è la <strong>corrente continua</strong>
+        (DC, <em>Direct Current</em>). Ma la corrente che arriva nelle prese di casa è <strong>alternata</strong>
+        (AC, <em>Alternating Current</em>): la tensione oscilla come un'onda sinusoidale, e con lei la corrente
+        cambia continuamente verso.</p>
+
+      <div class="formula-box">
+        $$V(t) = V_0 \sin(2\pi f\, t) \qquad \text{dove } V_0 = \text{ampiezza di picco}, \quad f = \text{frequenza (Hz)}$$
+      </div>
+
+      <div class="vs-box">
+        <div class="vs-side">
+          <h4 style="color: var(--green);">DC — Corrente Continua</h4>
+          <p>Tensione costante nel tempo. La corrente scorre sempre nello stesso verso.</p>
+          <p><em>Fonti:</em> pile, batterie, pannelli solari, caricatori USB.</p>
+        </div>
+        <div class="vs-vs">VS</div>
+        <div class="vs-side">
+          <h4 style="color: var(--magenta);">AC — Corrente Alternata</h4>
+          <p>Tensione sinusoidale. La corrente cambia verso $f$ volte al secondo.</p>
+          <p><em>Fonti:</em> centrali elettriche, prese di casa, rete elettrica.</p>
+        </div>
+      </div>
+
+      <h4>Grafico interattivo: DC vs AC</h4>
+      <div class="controls">
+        <div class="control-group"><label>Frequenza AC (Hz): <span class="val" id="ac-f-val">50</span></label>
+          <input type="range" id="ac-f" min="10" max="100" step="5" value="50"></div>
+        <div class="control-group"><label>V₀ picco (V): <span class="val" id="ac-v-val">325</span></label>
+          <input type="range" id="ac-v" min="100" max="500" step="25" value="325"></div>
+        <label class="toggle-row" title="Blocca la scala degli assi per confrontare visivamente i cambiamenti">
+          <input type="checkbox" id="ac-fixed-scale" checked> Scala fissa
+        </label>
+      </div>
+      <div class="plot" id="plot-acdc" style="height: 400px;"></div>
+      <p id="ac-rms-out" class="eq-out"></p>
+
+      <h3>5.1 — La guerra delle correnti: Tesla vs Edison</h3>
+      <div class="curiosita">
+        <strong>⚡ Una rivalità leggendaria.</strong> Alla fine dell'Ottocento, <strong>Thomas Edison</strong> aveva
+        costruito le prime reti elettriche a corrente continua (DC) per illuminare New York. Ma la DC aveva un grosso
+        limite: non si poteva trasportare a lunga distanza senza enormi perdite, serviva una centrale ogni pochi isolati.
+        <br><br>
+        <strong>Nikola Tesla</strong>, ingegnere serbo-americano geniale e visionario, propose la corrente alternata (AC):
+        grazie ai <strong>trasformatori</strong> si poteva innalzare la tensione per il trasporto (riducendo le perdite) e
+        poi riabbassarla per l'uso domestico. Edison, per proteggere i suoi investimenti in DC, condusse una campagna
+        diffamatoria contro la AC, arrivando a elettrocutare animali in pubblico per "dimostrarne" la pericolosità.
+        <br><br>
+        Alla fine vinse Tesla (e il suo finanziatore George Westinghouse): la corrente alternata è lo standard mondiale
+        ancora oggi. La famosa band rock <strong>AC/DC</strong> deve il suo nome proprio a questa storica contesa!
+      </div>
+
+      <h3>5.2 — Ma allora perché AC?</h3>
+      <p>Il motivo è semplice: con i <strong>trasformatori</strong> (che funzionano <em>solo</em> con AC) si può alzare
+        la tensione per il trasporto. Le perdite nei cavi sono $P = R \cdot I^2$: se alzo la tensione, a parità di potenza
+        trasportata la corrente $I$ diminuisce, e le perdite crollano col quadrato. Una linea ad alta tensione (380 kV)
+        perde solo il 3-5% su centinaia di km.</p>
+
+      <h3>5.3 — Non tutto il mondo è uguale</h3>
+      <table>
+        <thead>
+          <tr><th>Regione</th><th>Tensione nominale</th><th>Frequenza</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Europa, Italia, Asia, Africa</td><td>230 V</td><td>50 Hz</td></tr>
+          <tr><td>USA, Canada, Messico</td><td>120 V</td><td>60 Hz</td></tr>
+          <tr><td>Giappone (est)</td><td>100 V</td><td>50 Hz</td></tr>
+          <tr><td>Giappone (ovest)</td><td>100 V</td><td>60 Hz</td></tr>
+          <tr><td>Brasile</td><td>127/220 V</td><td>60 Hz</td></tr>
+        </tbody>
+      </table>
+      <div class="note">
+        <strong>Doppia frequenza in Giappone!</strong> Il Giappone ha due frequenze diverse perché la parte est fu
+        elettrificata con generatori tedeschi (50 Hz) e la parte ovest con quelli americani (60 Hz). Ancora oggi non hanno
+        unificato: servono costose stazioni di conversione al confine.<br><br>
+        Per questo le apparecchiature elettroniche moderne sono progettate per funzionare in un range di frequenze e
+        tensioni: il caricatore del tuo telefono probabilmente riporta "100-240 V, 50-60 Hz" — funziona in tutto il mondo.
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 6 — IL KILOWATTORA E LA BOLLETTA                                 -->
+    <!-- ================================================================ -->
+    <section id="sec6">
+      <h2>6. Il kilowattora e la bolletta</h2>
+      <p>In fisica l'energia si misura in <strong>joule</strong> (J), ma sulla bolletta elettrica trovi una unità più
+        pratica: il <strong>kilowattora</strong> (kWh).</p>
+
+      <div class="definition">
+        Un <strong>kilowattora</strong> è l'energia consumata da un dispositivo che assorbe una potenza di 1 kW
+        per un'ora:
+        $$1\ \text{kWh} = 1000\ \text{W} \times 3600\ \text{s} = 3\,600\,000\ \text{J} = 3{,}6\ \text{MJ}.$$
+      </div>
+
+      <p>Per calcolare l'energia consumata da un elettrodomestico basta moltiplicare la sua potenza (in kW) per il
+        tempo di utilizzo (in ore):</p>
+      <div class="formula-box">$$E\ (\text{kWh}) = P\ (\text{kW}) \times t\ (\text{h})$$</div>
+
+      <h3>6.1 — Quanto costa un kWh in Italia?</h3>
+      <p>In Italia (2024-2025) il costo medio dell'energia elettrica per un'utenza domestica è composto da varie voci:</p>
+
+      <div style="max-width: 480px; margin: 1rem 0; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem;">
+        <div class="bill-row"><span class="bill-label">Materia energia (prezzo al kWh)</span><span class="bill-val">~0,12 €</span></div>
+        <div class="bill-row"><span class="bill-label">Trasporto e gestione contatore</span><span class="bill-val">~0,03 €</span></div>
+        <div class="bill-row"><span class="bill-label">Oneri di sistema</span><span class="bill-val">~0,04 €</span></div>
+        <div class="bill-row"><span class="bill-label">Accise (imposte sul consumo)</span><span class="bill-val">~0,02 €</span></div>
+        <div class="bill-row"><span class="bill-label">IVA (10% su usi domestici)</span><span class="bill-val">~0,02 €</span></div>
+        <div class="bill-row"><span class="bill-label">Totale indicativo per kWh</span><span class="bill-val">~0,25 €</span></div>
+      </div>
+
+      <p>In Europa l'Italia è tra i paesi con l'energia più costosa. In Francia (grazie al nucleare) il costo è inferiore;
+        in Germania e Danimarca (per le tasse sulle rinnovabili) è simile o superiore. Nel 2022-2023, con la crisi
+        energetica post-pandemia e la guerra in Ucraina, i prezzi hanno raggiunto picchi di 0,50-0,60 €/kWh.</p>
+
+      <h3>6.2 — Come si produce l'energia in Italia</h3>
+      <p>L'Italia non ha centrali nucleari attive (chiuse con il referendum del 1987 e quello confermativo del 2011).
+        Il mix energetico italiano è diversificato:</p>
+
+      <div class="source-cards">
+        <div class="source-card">
+          <div class="sc-icon">🔥</div>
+          <div class="sc-name">Gas naturale</div>
+          <div class="sc-pct">~42%</div>
+          <div class="sc-desc">Centrali termoelettriche a ciclo combinato. Flessibili ma dipendenti dalle importazioni.</div>
+        </div>
+        <div class="source-card">
+          <div class="sc-icon">💧</div>
+          <div class="sc-name">Idroelettrico</div>
+          <div class="sc-pct">~17%</div>
+          <div class="sc-desc">Dighe e centrali lungo i fiumi alpini. Pulita, rinnovabile, ma stagionale.</div>
+        </div>
+        <div class="source-card">
+          <div class="sc-icon">☀️</div>
+          <div class="sc-name">Solare</div>
+          <div class="sc-pct">~12%</div>
+          <div class="sc-desc">Pannelli fotovoltaici. In forte crescita, ma produce solo di giorno.</div>
+        </div>
+        <div class="source-card">
+          <div class="sc-icon">🌬️</div>
+          <div class="sc-name">Eolico</div>
+          <div class="sc-pct">~10%</div>
+          <div class="sc-desc">Pale eoliche, soprattutto al Sud. Intermittente: dipende dal vento.</div>
+        </div>
+        <div class="source-card">
+          <div class="sc-icon">⬛</div>
+          <div class="sc-name">Carbone</div>
+          <div class="sc-pct">~5%</div>
+          <div class="sc-desc">In via di dismissione. Molto inquinante: le ultime centrali chiuderanno entro il 2030.</div>
+        </div>
+        <div class="source-card">
+          <div class="sc-icon">🔌</div>
+          <div class="sc-name">Import netto</div>
+          <div class="sc-pct">~14%</div>
+          <div class="sc-desc">Importata dalla Francia (nucleare), Svizzera, Slovenia, Austria.</div>
+        </div>
+      </div>
+      <p class="note"><strong>Il nucleare in Italia.</strong> Sebbene l'Italia abbia rinunciato alle proprie centrali
+        nucleari, importa una quota significativa di energia nucleare dalla Francia. Il dibattito sul ritorno al nucleare
+        (con nuove tecnologie più sicure e piccole, gli SMR — Small Modular Reactors) è tornato d'attualità e sarà
+        trattato in una lezione dedicata.</p>
+
+      <div class="plot" id="plot-mix" style="height: 360px;"></div>
+
+      <h3>6.3 — Dal movimento all'elettricità: motori e generatori</h3>
+      <p>Hai notato che quasi tutte le fonti energetiche (tranne il solare fotovoltaico) funzionano in modo simile? 
+      Sia che si tratti di gas naturale o carbone (che scaldano l'acqua per creare vapore in pressione), sia che si tratti della forza dell'acqua (idroelettrico) o del vento (eolico), il principio base è sempre lo stesso: <strong>far ruotare una turbina</strong>.</p>
+      
+      <p>Questa turbina è collegata a un <strong>alternatore (o generatore)</strong>. Ma come fa la rotazione a trasformarsi in elettricità? Tutto si basa sui concetti di magnetismo e induttanza:</p>
+
+      <div class="vs-box" style="margin-top: 1rem;">
+        <div class="vs-side">
+          <h4 style="color: var(--blue);">Motore Elettrico</h4>
+          <p>Se fornisci corrente elettrica a una spira di filo (una <strong>bobina</strong>) immersa in un campo magnetico (un magnete), questa subisce una forza e inizia a ruotare.</p>
+          <p>Stiamo trasformando <em>energia elettrica in energia meccanica (movimento)</em>.</p>
+        </div>
+        <div class="vs-vs">🔄</div>
+        <div class="vs-side">
+          <h4 style="color: var(--gold);">Generatore (Alternatore)</h4>
+          <p>Se invece <em>costringi</em> meccanicamente una bobina a ruotare all'interno di un campo magnetico (usando, appunto, una turbina), la variazione del campo magnetico attraverso la bobina <strong>induce</strong> una corrente elettrica al suo interno (Legge di Faraday).</p>
+          <p>Stiamo trasformando <em>energia meccanica in energia elettrica</em>.</p>
+        </div>
+      </div>
+
+      <p>Un generatore e un motore elettrico sono, nella loro forma più elementare, <strong>la stessa identica macchina usata al contrario!</strong> Ed è proprio perché queste turbine ruotano con un ritmo costante che producono <em>corrente alternata</em>: a ogni mezzo giro della bobina, la corrente indotta inverte il suo verso.</p>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 7 — ESERCIZI GUIDATI: QUANTO COSTA?                              -->
+    <!-- ================================================================ -->
+    <section id="sec7">
+      <h2>7. Quanto costa? — Esercizi guidati</h2>
+      <p>Mettiamo in pratica la formula $E = P \times t$ per capire quanto ci costano le attività quotidiane.
+        Modifica i parametri e guarda il risultato aggiornarsi!</p>
+
+      <!-- Esercizio 1: phon -->
+      <div class="energy-calc" id="calc-phon">
+        <div class="ec-title">Quanto costa asciugarsi i capelli?</div>
+        <p>Un phon ha una potenza tipica di 1800 W. Supponiamo di usarlo 10 minuti al giorno.</p>
+        <div class="controls">
+          <div class="control-group"><label>Potenza (W): <span class="val" id="phon-p-val">1800</span></label>
+            <input type="range" id="phon-p" min="800" max="2400" step="100" value="1800"></div>
+          <div class="control-group"><label>Minuti al giorno: <span class="val" id="phon-t-val">10</span></label>
+            <input type="range" id="phon-t" min="2" max="30" step="1" value="10"></div>
+          <div class="control-group"><label>Costo €/kWh: <span class="val" id="phon-c-val">0.25</span></label>
+            <input type="range" id="phon-c" min="0.10" max="0.50" step="0.01" value="0.25"></div>
+        </div>
+        <p id="phon-out" class="eq-out"></p>
+      </div>
+
+      <!-- Esercizio 2: condizionatore -->
+      <div class="energy-calc" id="calc-ac">
+        <div class="ec-title">Quanto costa tenere acceso il condizionatore?</div>
+        <p>Un condizionatore split da 9000 BTU assorbe circa 900 W. In estate lo teniamo acceso 8 ore al giorno.</p>
+        <div class="controls">
+          <div class="control-group"><label>Potenza (W): <span class="val" id="ac-p-val">900</span></label>
+            <input type="range" id="ac-p" min="500" max="2500" step="50" value="900"></div>
+          <div class="control-group"><label>Ore al giorno: <span class="val" id="ac-t-val">8</span></label>
+            <input type="range" id="ac-t" min="1" max="24" step="1" value="8"></div>
+          <div class="control-group"><label>Giorni al mese: <span class="val" id="ac-d-val">30</span></label>
+            <input type="range" id="ac-d" min="10" max="31" step="1" value="30"></div>
+          <div class="control-group"><label>Costo €/kWh: <span class="val" id="ac-c-val">0.25</span></label>
+            <input type="range" id="ac-c" min="0.10" max="0.50" step="0.01" value="0.25"></div>
+        </div>
+        <p id="ac-out" class="eq-out"></p>
+      </div>
+
+      <!-- Esercizio 3: lampadina dimenticata -->
+      <div class="energy-calc" id="calc-lamp">
+        <div class="ec-title">Quanto risparmi spegnendo una lampadina?</div>
+        <p>Una lampadina LED da 10 W lasciata accesa inutilmente per 5 ore al giorno: quanto costa in un anno?
+          E se fosse una vecchia lampadina a incandescenza da 60 W?</p>
+        <div class="controls">
+          <div class="control-group"><label>Potenza LED (W): <span class="val" id="led-p-val">10</span></label>
+            <input type="range" id="led-p" min="3" max="20" step="1" value="10"></div>
+          <div class="control-group"><label>Potenza vecchia (W): <span class="val" id="old-p-val">60</span></label>
+            <input type="range" id="old-p" min="40" max="100" step="5" value="60"></div>
+          <div class="control-group"><label>Ore/giorno dimenticate: <span class="val" id="lamp-t-val">5</span></label>
+            <input type="range" id="lamp-t" min="1" max="12" step="1" value="5"></div>
+          <div class="control-group"><label>Costo €/kWh: <span class="val" id="lamp-c-val">0.25</span></label>
+            <input type="range" id="lamp-c" min="0.10" max="0.50" step="0.01" value="0.25"></div>
+        </div>
+        <p id="lamp-out" class="eq-out"></p>
+      </div>
+
+      <!-- Calcolatore generico -->
+      <div class="energy-calc" id="calc-custom">
+        <div class="ec-title">Calcolatore di consumo personalizzato</div>
+        <p>Inserisci la potenza di qualsiasi apparecchio e scopri quanto costa usarlo.</p>
+        <div class="controls">
+          <div class="control-group"><label>Potenza (W): <span class="val" id="cust-p-val">100</span></label>
+            <input type="range" id="cust-p" min="10" max="3000" step="10" value="100"></div>
+          <div class="control-group"><label>Ore al giorno: <span class="val" id="cust-t-val">4</span></label>
+            <input type="range" id="cust-t" min="0.5" max="24" step="0.5" value="4"></div>
+          <div class="control-group"><label>Costo €/kWh: <span class="val" id="cust-c-val">0.25</span></label>
+            <input type="range" id="cust-c" min="0.10" max="0.50" step="0.01" value="0.25"></div>
+        </div>
+        <p id="cust-out" class="eq-out"></p>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- 8 — SEZIONE OPZIONALE: IMPEDENZA E NUMERI COMPLESSI              -->
+    <!-- ================================================================ -->
+    <section id="sec8" class="optional">
+      <h2>L'impedenza e i numeri complessi</h2>
+      <p>Questa sezione è un <strong>approfondimento facoltativo</strong> per chi vuole andare oltre. Scopriremo che la
+        matematica "astratta" dei numeri complessi non è un gioco fine a se stesso: è lo strumento perfetto per descrivere
+        i circuiti in corrente alternata.</p>
+
+      <h3>8.1 — Il problema: resistori, condensatori e induttori insieme in AC</h3>
+      <p>Con la corrente continua, solo i resistori contano (condensatori e induttori hanno effetti solo transitori). Ma
+        con la corrente alternata:</p>
+      <ul>
+        <li>Il <strong>resistore</strong> si oppone alla corrente proporzionalmente alla sua resistenza $R$.</li>
+        <li>Il <strong>condensatore</strong> offre una "resistenza" che dipende dalla frequenza: $X_C = \dfrac{1}{2\pi f C}$.
+          A frequenze alte, lascia passare facilmente; a frequenze basse, blocca.</li>
+        <li>L'<strong>induttore</strong> offre: $X_L = 2\pi f L$. All'opposto: a frequenze alte blocca, a basse lascia passare.</li>
+      </ul>
+      <p>$X_C$ e $X_L$ si chiamano <strong>reattanze</strong>. Ma attenzione: non si sommano come normali resistenze,
+        perché le tensioni su C e L sono <em>sfasate</em> rispetto alla corrente — una è in anticipo, l'altra in ritardo
+        di 90°. Come tenerne conto in modo elegante?</p>
+
+      <h3>8.2 — I numeri complessi in soccorso</h3>
+      <p>Ecco dove la matematica "inutile" diventa potentissima. Rappresentiamo ogni componente con un numero complesso
+        chiamato <strong>impedenza</strong> $Z$:</p>
+
+      <div class="formula-box">
+        $$Z_R = R, \qquad Z_C = \frac{1}{j\omega C} = -\frac{j}{\omega C}, \qquad Z_L = j\omega L$$
+        $$\text{dove } j = \sqrt{-1} \text{ (l'unità immaginaria)} \text{ e } \omega = 2\pi f.$$
+      </div>
+
+      <p>Il genio di questa rappresentazione: le regole di serie e parallelo che già conosciamo funzionano
+        <strong>identicamente</strong> anche con i numeri complessi!</p>
+
+      <div class="sp-cols">
+        <div class="rule">
+          <strong>Serie (complessa)</strong><br>
+          $Z_{eq} = Z_1 + Z_2 + \dots$<br>
+          <em>Stessa formula dei resistori!</em>
+        </div>
+        <div class="rule">
+          <strong>Parallelo (complesso)</strong><br>
+          $\dfrac{1}{Z_{eq}} = \dfrac{1}{Z_1} + \dfrac{1}{Z_2} + \dots$<br>
+          <em>Stessa formula dei resistori!</em>
+        </div>
+      </div>
+
+      <h3>8.3 — Un esempio concreto</h3>
+      <p>Un resistore $R = 100\ \Omega$ in serie con un condensatore $C = 10\ \mu\text{F}$, alimentati a $f = 50$ Hz.
+        Qual è l'impedenza totale?</p>
+
+      <div class="circuit-solver" id="csZ">
+        <div class="cs-title">Calcolo dell'impedenza in serie</div>
+        <div class="cs-step">
+          <p><span class="cs-num">1</span>Calcolo $\omega = 2\pi f = 2\pi \cdot 50 = 314{,}16$ rad/s.</p>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">2</span>Reattanza capacitiva: $X_C = \dfrac{1}{\omega C} = \dfrac{1}{314{,}16 \cdot 10 \times 10^{-6}} = 318{,}3\ \Omega$.
+            <br>Impedenza del condensatore: $Z_C = -j \cdot 318{,}3\ \Omega$.</p>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">3</span>Impedenza totale (serie):
+            $Z = Z_R + Z_C = 100 - j\,318{,}3\ \Omega$.</p>
+        </div>
+        <div class="cs-step">
+          <p><span class="cs-num">4</span>Il <strong>modulo</strong> dell'impedenza (che ci dice "quanto si oppone" alla corrente):
+            $|Z| = \sqrt{100^2 + 318{,}3^2} = \sqrt{10000 + 101315} = 333{,}6\ \Omega$.</p>
+          <p>L'<strong>angolo di fase</strong>: $\varphi = \arctan\left(\dfrac{-318{,}3}{100}\right) = -72{,}6°$.
+            La corrente è in <em>anticipo</em> di 72,6° rispetto alla tensione — tipico dei circuiti capacitivi.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$Z = 100 - j\,318\ \Omega$, $|Z| = 334\ \Omega$, $\varphi = -73°$.</span></div>
+        </div>
+        <div class="cs-controls">
+          <button class="btn cs-prev" type="button">◀ Indietro</button>
+          <span class="cs-progress"></span>
+          <button class="btn cs-next" type="button">Prossimo passo ▶</button>
+        </div>
+      </div>
+
+      <h3>8.4 — Esplora l'impedenza interattivamente</h3>
+      <p>Cambia i parametri e osserva come varia l'impedenza nel piano complesso (il <em>diagramma di Argand</em>):</p>
+      <div class="controls">
+        <div class="control-group"><label>R (Ω): <span class="val" id="imp-r-val">100</span></label>
+          <input type="range" id="imp-r" min="10" max="500" step="10" value="100"></div>
+        <div class="control-group"><label>C (µF): <span class="val" id="imp-c-val">10</span></label>
+          <input type="range" id="imp-c" min="1" max="100" step="1" value="10"></div>
+        <div class="control-group"><label>L (mH): <span class="val" id="imp-l-val">0</span></label>
+          <input type="range" id="imp-l" min="0" max="500" step="10" value="0"></div>
+        <div class="control-group"><label>f (Hz): <span class="val" id="imp-f-val">50</span></label>
+          <input type="range" id="imp-f" min="10" max="1000" step="10" value="50"></div>
+      </div>
+      <div class="plot" id="plot-impedance" style="height: 400px;"></div>
+      <p id="imp-out" class="eq-out"></p>
+
+      <div class="curiosita">
+        <strong>La lezione nascosta.</strong> I numeri complessi sembravano un'invenzione dei matematici, slegata dalla
+        realtà. Eppure sono lo strumento naturale per descrivere qualsiasi fenomeno oscillatorio — dalla corrente
+        alternata alla meccanica quantistica, dalle telecomunicazioni all'elaborazione dei segnali. Quando senti che
+        la matematica è "inutile", ricorda che quasi ogni tecnologia che usi quotidianamente — dallo smartphone al WiFi,
+        dalla risonanza magnetica ai filtri audio — si basa su calcoli con numeri complessi.
+        La matematica astratta di oggi è la tecnologia concreta di domani.
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- QUIZ DI RIEPILOGO                                                -->
+    <!-- ================================================================ -->
+    <section id="quiz">
+      <h2>Quiz di riepilogo</h2>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 2 — Circuiti elettrici · Fisica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'La legge dei nodi di Kirchhoff esprime la conservazione:',
+        options: ['della carica elettrica', "dell'energia", 'della massa', 'del potenziale'],
+        correct: 0, explain: 'In un nodo la carica non si accumula: la somma delle correnti entranti è uguale a quella delle uscenti.' },
+      { type: 'mc', diff: 'medium', text: 'Due resistori uguali da $10\\ \\Omega$ in parallelo danno una resistenza equivalente di:',
+        options: ['$20\\ \\Omega$', '$10\\ \\Omega$', '$5\\ \\Omega$', '$0\\ \\Omega$'],
+        correct: 2, explain: 'Prodotto su somma: $\\frac{10\\cdot10}{20}=5\\ \\Omega$, la metà.' },
+      { type: 'mc', diff: 'easy', text: 'La corrente che arriva nelle prese di casa è:',
+        options: ['continua (DC)', 'alternata (AC)', 'pulsata', 'nessuna delle precedenti'],
+        correct: 1, explain: 'In Italia (e quasi ovunque nel mondo) la rete domestica fornisce corrente alternata a 230 V, 50 Hz.' },
+      { type: 'mc', diff: 'medium', text: 'In Italia la frequenza della rete elettrica è:',
+        options: ['60 Hz', '50 Hz', '100 Hz', '25 Hz'],
+        correct: 1, explain: 'In Europa (e quindi in Italia) la frequenza è 50 Hz; negli USA e in parte del Giappone è 60 Hz.' },
+      { type: 'mc', diff: 'easy', text: 'Un kilowattora (1 kWh) equivale a:',
+        options: ['1000 J', '3 600 000 J', '1 000 000 J', '360 J'],
+        correct: 1, explain: '$1\\ \\text{kWh} = 1000\\text{ W} \\times 3600\\text{ s} = 3\\,600\\,000\\text{ J}.$' },
+      { type: 'mc', diff: 'medium', text: 'Perché la corrente alternata è preferita per il trasporto su lunga distanza?',
+        options: ['Perché è più sicura', 'Perché si può trasformare facilmente (alzando la tensione si riducono le perdite)', 'Perché costa meno produrla', 'Perché Edison la preferiva'],
+        correct: 1, explain: 'Con i trasformatori (che funzionano solo con AC) si alza la tensione, riducendo la corrente e quindi le perdite $P = R I^2$ nei cavi.' },
+      { type: 'mc', diff: 'hard', text: 'Un induttore ideale in un circuito a corrente continua stazionaria si comporta come:',
+        options: ['un circuito aperto (blocca la corrente)', 'un cortocircuito (filo ideale)', 'una resistenza da 1 Ω', 'un condensatore'],
+        correct: 1, explain: 'In DC stazionaria $dI/dt = 0$, quindi $V_L = L\\frac{dI}{dt} = 0$: l\'induttore è come un filo senza resistenza.' },
+      { type: 'mc', diff: 'medium', text: 'Un fornello a induzione scalda direttamente:',
+        options: ['l\'aria sopra il piano', 'la superficie in vetroceramica', 'il fondo della pentola', 'la bobina interna'],
+        correct: 2, explain: 'Il campo magnetico variabile genera correnti parassite nel fondo ferromagnetico della pentola: è la pentola che si scalda, non il piano.' },
+      { type: 'mc', diff: 'easy', text: 'Nella \"guerra delle correnti\" chi vinse?',
+        options: ['Edison con la DC', 'Tesla con la AC', 'Entrambi: si usa sia DC che AC in egual misura', 'Nessuno dei due: si usa ancora la corrente galvanica'],
+        correct: 1, explain: 'Tesla (e Westinghouse) vinsero: la corrente alternata è lo standard mondiale per la distribuzione dell\'energia.' },
+      { type: 'mc', diff: 'hard', text: 'La reattanza capacitiva $X_C$ al crescere della frequenza:',
+        options: ['aumenta', 'diminuisce', 'resta costante', 'diventa negativa'],
+        correct: 1, explain: '$X_C = \\frac{1}{2\\pi f C}$: al crescere di $f$ il denominatore cresce, quindi $X_C$ diminuisce. Un condensatore \"lascia passare\" meglio le alte frequenze.' }
+    ];
+  </script>
+
+  <!-- Demo interattive di questa lezione -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { linspace, update, draw, themeColors } = Plt;
+      const C = { blue: '#3b82f6', green: '#22c55e', red: '#ef4444', gold: '#f5b400', magenta: '#f06ab8', gray: '#9aa5c0' };
+
+      // ===== 1 — Legge dei nodi =====
+      (function () {
+        const s1 = document.getElementById('kn-1'), s2 = document.getElementById('kn-2'), s4 = document.getElementById('kn-4');
+        const v1 = document.getElementById('kn-1-val'), v2 = document.getElementById('kn-2-val'), v4 = document.getElementById('kn-4-val');
+        const out = document.getElementById('kn-out');
+        if (!s1) return;
+        function go() {
+          const i1 = +s1.value, i2 = +s2.value, i4 = +s4.value;
+          v1.textContent = i1; v2.textContent = i2; v4.textContent = i4;
+          const i3 = i1 + i2 - i4;
+          const ok = i3 >= 0;
+          out.innerHTML = `Entrano $I_1+I_2 = ${i1}+${i2} = ${i1 + i2}$ A; esce già $I_4 = ${i4}$ A. ` +
+            `Nel ramo di destra: $I_3 = ${i1}+${i2}-${i4} = $ <span class="val-badge">${i3} A</span>. ` +
+            (ok ? '' : ' <em>(negativo: significa che in realtà quella corrente entra invece di uscire!)</em>');
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        [s1, s2, s4].forEach(s => s.addEventListener('input', go)); go();
+      })();
+
+      // ===== Risolutore di circuiti passo-passo (generico) =====
+      document.querySelectorAll('.circuit-solver').forEach(function (solver) {
+        const steps = Array.from(solver.querySelectorAll('.cs-step'));
+        const prev = solver.querySelector('.cs-prev');
+        const next = solver.querySelector('.cs-next');
+        const prog = solver.querySelector('.cs-progress');
+        let shown = 0;
+        function render() {
+          steps.forEach((st, i) => st.classList.toggle('show', i < shown));
+          prev.disabled = shown === 0;
+          next.disabled = shown >= steps.length;
+          next.textContent = shown >= steps.length ? '✓ Completato' : 'Prossimo passo ▶';
+          prog.textContent = `Passo ${shown} / ${steps.length}`;
+          if (shown > 0 && typeof renderMathIn === 'function') renderMathIn(steps[shown - 1]);
+        }
+        next.addEventListener('click', () => { if (shown < steps.length) { shown++; render(); } });
+        prev.addEventListener('click', () => { if (shown > 0) { shown--; render(); } });
+        render();
+      });
+
+      // ===== 4 — Grafico efficienza cottura =====
+      (function () {
+        const el = document.getElementById('plot-cooking');
+        if (!el) return;
+        draw(el, [{
+          x: ['Gas', 'Piastra elettrica', 'Alogeno', 'Induzione'],
+          y: [40, 65, 70, 88],
+          type: 'bar',
+          marker: {
+            color: ['#f5b400', '#ef4444', '#f06ab8', '#22c55e'],
+            line: { width: 0 }
+          },
+          text: ['40%', '65%', '70%', '88%'],
+          textposition: 'outside',
+          textfont: { color: themeColors().font, size: 14, family: 'Inter' },
+          hoverinfo: 'x+y'
+        }], {
+          yaxis: { title: 'Efficienza energetica (%)', range: [0, 105] },
+          margin: { t: 20, b: 60, l: 55, r: 20 }
+        });
+      })();
+
+      // ===== 5 — Grafico AC vs DC =====
+      (function () {
+        const sF = document.getElementById('ac-f'), sV = document.getElementById('ac-v');
+        const vF = document.getElementById('ac-f-val'), vV = document.getElementById('ac-v-val');
+        const sFixed = document.getElementById('ac-fixed-scale');
+        const out = document.getElementById('ac-rms-out');
+        if (!sF) return;
+        function go() {
+          const f = +sF.value, V0 = +sV.value, fixed = sFixed && sFixed.checked;
+          vF.textContent = f; vV.textContent = V0;
+          const Vrms = V0 / Math.sqrt(2);
+          const tMax = 3 / f;
+          const ts = linspace(0, tMax, 600);
+          const ac = ts.map(t => V0 * Math.sin(2 * Math.PI * f * t));
+          const dc = ts.map(() => Vrms);
+          update('plot-acdc', [
+            { x: ts.map(t => t * 1000), y: ac, type: 'scatter', mode: 'lines', name: 'AC', line: { color: C.magenta, width: 2.5 } },
+            { x: ts.map(t => t * 1000), y: dc, type: 'scatter', mode: 'lines', name: 'DC (V_rms)', line: { color: C.green, width: 2, dash: 'dash' } },
+            { x: ts.map(t => t * 1000), y: dc.map(v => -v), type: 'scatter', mode: 'lines', name: '-V_rms', line: { color: C.green, width: 1, dash: 'dot' }, showlegend: false }
+          ], {
+            xaxis: { title: 'Tempo (ms)', range: fixed ? [0, 300] : undefined },
+            yaxis: { title: 'Tensione (V)', range: fixed ? [-550, 550] : undefined },
+            showlegend: true,
+            legend: { x: 0.02, y: 0.98, orientation: 'h' }
+          });
+          out.innerHTML = `In Italia: $V_0 = 325$ V (picco), ma il valore "efficace" (rms) è $V_{rms} = \\dfrac{V_0}{\\sqrt{2}} = $ <span class="val-badge">${Vrms.toFixed(0)} V</span> — i 230 V che leggi sulla presa.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        [sF, sV].forEach(s => s.addEventListener('input', go));
+        if (sFixed) sFixed.addEventListener('change', go);
+        go();
+      })();
+
+      // ===== 6 — Mix energetico (pie chart) =====
+      (function () {
+        const el = document.getElementById('plot-mix');
+        if (!el) return;
+        draw(el, [{
+          labels: ['Gas naturale', 'Idroelettrico', 'Solare', 'Eolico', 'Carbone', 'Biomasse', 'Import'],
+          values: [42, 17, 12, 10, 5, 3, 11],
+          type: 'pie',
+          hole: 0.45,
+          marker: {
+            colors: ['#ef4444', '#3b82f6', '#f5b400', '#22c55e', '#6b7280', '#84cc16', '#a78bfa']
+          },
+          textfont: { color: '#fff', size: 13 },
+          textinfo: 'label+percent',
+          hoverinfo: 'label+value+percent'
+        }], {
+          margin: { t: 30, b: 20, l: 20, r: 20 },
+          showlegend: false,
+          annotations: [{
+            text: 'Italia<br>2024',
+            showarrow: false,
+            font: { size: 16, color: themeColors().font, family: 'Inter' },
+            x: 0.5, y: 0.5
+          }]
+        });
+      })();
+
+      // ===== 7 — Calcolatori energia =====
+      // Phon
+      (function () {
+        const sP = document.getElementById('phon-p'), sT = document.getElementById('phon-t'), sC = document.getElementById('phon-c');
+        const vP = document.getElementById('phon-p-val'), vT = document.getElementById('phon-t-val'), vC = document.getElementById('phon-c-val');
+        const out = document.getElementById('phon-out');
+        if (!sP) return;
+        function go() {
+          const P = +sP.value, t = +sT.value, c = +sC.value;
+          vP.textContent = P; vT.textContent = t; vC.textContent = c.toFixed(2);
+          const kWhDay = (P / 1000) * (t / 60);
+          const costDay = kWhDay * c;
+          const costYear = costDay * 365;
+          out.innerHTML = `Energia giornaliera: $${(P/1000).toFixed(2)}\\text{ kW} \\times ${(t/60).toFixed(3)}\\text{ h} = $ <span class="val-badge">${kWhDay.toFixed(3)} kWh</span>. ` +
+            `Costo al giorno: <span class="val-badge">${costDay.toFixed(3)} €</span>. ` +
+            `Costo annuo: <span class="val-badge">${costYear.toFixed(2)} €</span>.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        [sP, sT, sC].forEach(s => s.addEventListener('input', go)); go();
+      })();
+
+      // Condizionatore
+      (function () {
+        const sP = document.getElementById('ac-p'), sT = document.getElementById('ac-t'), sD = document.getElementById('ac-d'), sC = document.getElementById('ac-c');
+        const vP = document.getElementById('ac-p-val'), vT = document.getElementById('ac-t-val'), vD = document.getElementById('ac-d-val'), vC = document.getElementById('ac-c-val');
+        const out = document.getElementById('ac-out');
+        if (!sP) return;
+        function go() {
+          const P = +sP.value, t = +sT.value, d = +sD.value, c = +sC.value;
+          vP.textContent = P; vT.textContent = t; vD.textContent = d; vC.textContent = c.toFixed(2);
+          const kWhMonth = (P / 1000) * t * d;
+          const costMonth = kWhMonth * c;
+          const costSummer = costMonth * 3;
+          out.innerHTML = `Energia mensile: <span class="val-badge">${kWhMonth.toFixed(1)} kWh</span>. ` +
+            `Costo al mese: <span class="val-badge">${costMonth.toFixed(2)} €</span>. ` +
+            `Costo per 3 mesi estivi: <span class="val-badge">${costSummer.toFixed(2)} €</span>.`;
+        }
+        [sP, sT, sD, sC].forEach(s => s.addEventListener('input', go)); go();
+      })();
+
+      // Lampadina
+      (function () {
+        const sLed = document.getElementById('led-p'), sOld = document.getElementById('old-p'), sT = document.getElementById('lamp-t'), sC = document.getElementById('lamp-c');
+        const vLed = document.getElementById('led-p-val'), vOld = document.getElementById('old-p-val'), vT = document.getElementById('lamp-t-val'), vC = document.getElementById('lamp-c-val');
+        const out = document.getElementById('lamp-out');
+        if (!sLed) return;
+        function go() {
+          const pLed = +sLed.value, pOld = +sOld.value, t = +sT.value, c = +sC.value;
+          vLed.textContent = pLed; vOld.textContent = pOld; vT.textContent = t; vC.textContent = c.toFixed(2);
+          const kWhLed = (pLed / 1000) * t * 365;
+          const kWhOld = (pOld / 1000) * t * 365;
+          const costLed = kWhLed * c;
+          const costOld = kWhOld * c;
+          const saving = costOld - costLed;
+          out.innerHTML = `LED: <span class="val-badge">${kWhLed.toFixed(1)} kWh/anno</span> → <span class="val-badge">${costLed.toFixed(2)} €/anno</span>. ` +
+            `Incandescenza: <span class="val-badge">${kWhOld.toFixed(1)} kWh/anno</span> → <span class="val-badge">${costOld.toFixed(2)} €/anno</span>. ` +
+            `<strong>Risparmio annuo con LED: <span class="val-badge" style="background: color-mix(in srgb, var(--green) 20%, transparent); color: var(--green); border-color: var(--green);">${saving.toFixed(2)} €</span></strong>`;
+        }
+        [sLed, sOld, sT, sC].forEach(s => s.addEventListener('input', go)); go();
+      })();
+
+      // Calcolatore personalizzato
+      (function () {
+        const sP = document.getElementById('cust-p'), sT = document.getElementById('cust-t'), sC = document.getElementById('cust-c');
+        const vP = document.getElementById('cust-p-val'), vT = document.getElementById('cust-t-val'), vC = document.getElementById('cust-c-val');
+        const out = document.getElementById('cust-out');
+        if (!sP) return;
+        function go() {
+          const P = +sP.value, t = +sT.value, c = +sC.value;
+          vP.textContent = P; vT.textContent = t; vC.textContent = c.toFixed(2);
+          const kWhDay = (P / 1000) * t;
+          const costDay = kWhDay * c;
+          const costMonth = costDay * 30;
+          const costYear = costDay * 365;
+          out.innerHTML = `Consumo giornaliero: <span class="val-badge">${kWhDay.toFixed(2)} kWh</span>. ` +
+            `Costo: <span class="val-badge">${costDay.toFixed(3)} €/giorno</span> · ` +
+            `<span class="val-badge">${costMonth.toFixed(2)} €/mese</span> · ` +
+            `<span class="val-badge">${costYear.toFixed(2)} €/anno</span>.`;
+        }
+        [sP, sT, sC].forEach(s => s.addEventListener('input', go)); go();
+      })();
+
+      // ===== 8 — Impedenza interattiva (sezione opzionale) =====
+      (function () {
+        const sR = document.getElementById('imp-r'), sCap = document.getElementById('imp-c');
+        const sL = document.getElementById('imp-l'), sF = document.getElementById('imp-f');
+        const vR = document.getElementById('imp-r-val'), vC = document.getElementById('imp-c-val');
+        const vL = document.getElementById('imp-l-val'), vF = document.getElementById('imp-f-val');
+        const out = document.getElementById('imp-out');
+        if (!sR) return;
+        function go() {
+          const R = +sR.value, Cval = +sCap.value, Lval = +sL.value, f = +sF.value;
+          vR.textContent = R; vC.textContent = Cval; vL.textContent = Lval; vF.textContent = f;
+          const w = 2 * Math.PI * f;
+          const XL = w * Lval / 1000;   // mH to H
+          const XC = Cval > 0 ? 1 / (w * Cval * 1e-6) : 0;
+          const Xtot = XL - XC;
+          const Zmod = Math.sqrt(R * R + Xtot * Xtot);
+          const phi = Math.atan2(Xtot, R) * 180 / Math.PI;
+
+          // Diagramma di Argand
+          const maxAx = Math.max(Zmod * 1.3, R * 1.3, Math.abs(Xtot) * 1.3, 100);
+          update('plot-impedance', [
+            // Vettore Z
+            { x: [0, R], y: [0, Xtot], type: 'scatter', mode: 'lines+markers',
+              line: { color: C.magenta, width: 3 }, marker: { size: [0, 10], color: C.magenta },
+              name: 'Z' },
+            // Componente R (asse reale)
+            { x: [0, R], y: [0, 0], type: 'scatter', mode: 'lines',
+              line: { color: C.green, width: 2, dash: 'dash' }, name: 'R (reale)' },
+            // Componente X (asse immaginario)
+            { x: [R, R], y: [0, Xtot], type: 'scatter', mode: 'lines',
+              line: { color: C.blue, width: 2, dash: 'dash' }, name: 'X (immaginario)' }
+          ], {
+            xaxis: { title: 'Parte reale (Ω)', range: [-maxAx * 0.1, maxAx] },
+            yaxis: { title: 'Parte immaginaria (Ω)', range: [-maxAx, maxAx], scaleanchor: 'x' },
+            showlegend: true,
+            legend: { x: 0.02, y: 0.98, orientation: 'h' },
+            shapes: [
+              { type: 'line', x0: -maxAx * 0.1, x1: maxAx, y0: 0, y1: 0, line: { color: C.gray, width: 1, dash: 'dot' } },
+              { type: 'line', x0: 0, x1: 0, y0: -maxAx, y1: maxAx, line: { color: C.gray, width: 1, dash: 'dot' } }
+            ]
+          });
+
+          const sign = Xtot >= 0 ? '+' : '-';
+          const tipo = Xtot > 1 ? '(induttivo: corrente in ritardo)' : Xtot < -1 ? '(capacitivo: corrente in anticipo)' : '(resistivo puro)';
+          out.innerHTML = `$Z = ${R} ${sign} j\\,${Math.abs(Xtot).toFixed(1)}\\ \\Omega$, &nbsp; $|Z| = $ <span class="val-badge">${Zmod.toFixed(1)} Ω</span>, &nbsp; $\\varphi = $ <span class="val-badge">${phi.toFixed(1)}°</span> ${tipo}`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        [sR, sCap, sL, sF].forEach(s => s.addEventListener('input', go)); go();
+      })();
+
+    });
+  </script>
+</body>
+
+</html>
