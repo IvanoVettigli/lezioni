@@ -68,35 +68,35 @@ window.SITE_CATALOG = {
   },
 };
 
-/* Schede di laboratorio (solo link di download ai PDF in Laboratorio/) */
+/* Schede di laboratorio (link di download ai PDF in Laboratorio/PDF/) */
 window.SITE_LAB = [
   {
     title: 'Misure dirette e indirette e propagazione delle incertezze',
-    pdf: 'Misure_dirette_indirette_propagazione.pdf',
-    desc: 'Strumenti di misura, cifre significative, errore assoluto e relativo, propagazione delle incertezze',
+    pdf: 'PDF/Misure_dirette_indirette_propagazione.pdf',
+    desc: 'Strumenti di misura, cifre significative, errore assoluto e relativo, propagazione delle incertezze, istogrammi',
     tags: ['Fisica 1°'],
   },
   {
     title: 'Misura dell\'accelerazione di gravità con il pendolo semplice',
-    pdf: 'Misura_accelerazione_gravita_pendolo.pdf',
+    pdf: 'PDF/Misura_accelerazione_gravita_pendolo.pdf',
     desc: 'Periodo del pendolo, regressione lineare, stima sperimentale di g con analisi degli errori',
     tags: ['Fisica 1°'],
   },
   {
     title: 'Verifica sperimentale della legge di Hooke',
-    pdf: 'Verifica_legge_di_Hooke.pdf',
+    pdf: 'PDF/Verifica_legge_di_Hooke.pdf',
     desc: 'Allungamento di una molla in funzione del carico, misura della costante elastica k',
     tags: ['Fisica 1°'],
   },
   {
     title: 'Verifica sperimentale della legge di Ohm',
-    pdf: 'Legge_di_Ohm.pdf',
+    pdf: 'PDF/Legge_di_Ohm.pdf',
     desc: 'Circuiti in serie e parallelo, misura di tensione e corrente, calcolo della resistenza',
     tags: ['Fisica 3°'],
   },
   {
     title: 'Simulare un semaforo con Arduino',
-    pdf: 'Semaforo_Arduino.pdf',
+    pdf: 'PDF/Semaforo_Arduino.pdf',
     desc: 'Programmazione di un microcontrollore, LED, temporizzazione e logica di controllo',
     tags: ['Fisica 3°', 'Informatica'],
   },
