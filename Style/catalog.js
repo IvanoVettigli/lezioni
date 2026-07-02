@@ -95,9 +95,21 @@ window.SITE_LAB = [
     tags: ['Fisica 3°'],
   },
   {
+    title: 'Verifica della legge di Ohm con la simulazione PhET',
+    pdf: 'PDF/Legge_di_Ohm_Simulata.pdf',
+    desc: 'Laboratorio virtuale con il Circuit Construction Kit: costruzione del circuito, misure di V e I a scalini di 5 volt, retta sperimentale e confronto con il valore della simulazione',
+    tags: ['Fisica 3°'],
+  },
+  {
     title: 'Simulare un semaforo con Arduino',
     pdf: 'PDF/Semaforo_Arduino.pdf',
     desc: 'Programmazione di un microcontrollore, LED, temporizzazione e logica di controllo',
     tags: ['Fisica 3°', 'Informatica'],
+  },
+  {
+    title: 'Misura della costante di Planck con i LED',
+    pdf: 'PDF/Misura_costante_di_Planck.pdf',
+    desc: 'Effetto fotoelettrico "inverso" nei LED: tensione di soglia di LED di colori diversi con Arduino e stima della costante di Planck',
+    tags: ['Fisica 5°', 'Informatica'],
   },
 ];
