@@ -118,4 +118,10 @@ window.SITE_LAB = [
     desc: 'Laboratorio virtuale con Bending Light: legge della riflessione, angoli a passi di 10°, retta di Snell e misura dell\'indice di rifrazione dell\'acqua, riflessione totale',
     tags: ['Fisica 4°'],
   },
+  {
+    title: 'Sistemi ottici: specchi e lenti con la simulazione PhET',
+    pdf: 'PDF/Sistemi_ottici_Simulata.pdf',
+    desc: 'Laboratorio virtuale con Geometric Optics: costruzione delle immagini con i raggi principali, verifica della legge dei punti coniugati per specchio concavo e lente convergente, ingrandimento, immagini reali e virtuali',
+    tags: ['Fisica 4°'],
+  },
 ];
