@@ -270,7 +270,7 @@ cursore alimenta un capo del resistore e, in parallelo, il pin **A0** di Arduino
 che misura la tensione. L'altro capo del resistore è collegato a GND attraverso
 il **multimetro in modalità amperometro** (collegamento in serie).
 
-![Schema del circuito: Arduino UNO, potenziometro, resistore e multimetro come amperometro in serie.](Ohm.jpg){width=82%}
+![Schema del circuito: Arduino UNO, potenziometro, resistore e multimetro come amperometro in serie.](Immagini/Ohm.jpg){width=82%}
 
 ## Il codice Arduino
 

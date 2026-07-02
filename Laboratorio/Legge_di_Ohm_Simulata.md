@@ -29,7 +29,7 @@ Apri il terminale in questa cartella (Laboratorio) e lancia:
     pandoc "Legge_di_Ohm_Simulata.md" -o "PDF/Legge_di_Ohm_Simulata.pdf"
 
 Richiede pandoc + MiKTeX (pdflatex). L'immagine
-"Legge_di_Ohm_Simulata_circuito.jpg" deve trovarsi in questa cartella.
+"Immagini/Legge_di_Ohm_Simulata_circuito.jpg" deve trovarsi in questa cartella.
 ============================================================================
 -->
 
@@ -311,7 +311,7 @@ L'interfaccia è organizzata così:
 
 Costruite un circuito **identico a quello in figura**:
 
-![Il circuito da realizzare nella simulazione: batteria, resistore e amperometro in serie; il voltmetro misura la tensione ai capi del resistore.](Legge_di_Ohm_Simulata_circuito.jpg){width=100%}
+![Il circuito da realizzare nella simulazione: batteria, resistore e amperometro in serie; il voltmetro misura la tensione ai capi del resistore.](Immagini/Legge_di_Ohm_Simulata_circuito.jpg){width=100%}
 
 Procedete così:
 

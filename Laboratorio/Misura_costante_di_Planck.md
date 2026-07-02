@@ -39,7 +39,7 @@ Un LED è un componente **polarizzato**, ovvero permette il passaggio della corr
 * il piedino **lungo** è l'**anodo** (polo positivo, da collegare alla tensione più alta);
 * il piedino **corto** è il **catodo** (polo negativo, da collegare a terra o GND).
 
-![Schema LED](Led.jpg)
+![Schema LED](Immagini/Led.jpg)
 
 Se un LED viene collegato direttamente a una tensione troppo alta, viene attraversato da una corrente eccessiva e si brucia istantaneamente. Per questo motivo è **necessario inserire una resistenza di protezione in serie** al LED. Il valore della resistenza ($R$) si calcola con la Legge di Ohm ($R = \frac{\Delta V}{I}$), in modo da limitare la corrente a valori sicuri (in genere intorno ai $10 \text{ mA}$ o $20 \text{ mA}$). Il valore della resistenza commerciale si può identificare tramite il codice dei colori stampato su di essa.
 
