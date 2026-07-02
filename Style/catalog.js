@@ -112,4 +112,10 @@ window.SITE_LAB = [
     desc: 'Effetto fotoelettrico "inverso" nei LED: tensione di soglia di LED di colori diversi con Arduino e stima della costante di Planck',
     tags: ['Fisica 5°', 'Informatica'],
   },
+  {
+    title: 'Riflessione e rifrazione: la legge di Snell con la simulazione PhET',
+    pdf: 'PDF/Legge_di_Snell_Simulata.pdf',
+    desc: 'Laboratorio virtuale con Bending Light: legge della riflessione, angoli a passi di 10°, retta di Snell e misura dell\'indice di rifrazione dell\'acqua, riflessione totale',
+    tags: ['Fisica 4°'],
+  },
 ];
