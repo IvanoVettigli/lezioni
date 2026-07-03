@@ -63,6 +63,7 @@ window.SITE_CATALOG = {
         { file: '1_Corrente_elettrica.html', title: 'La corrente elettrica', desc: 'Corrente continua, elementi circuitali, le due leggi di Ohm, condensatori e capacità, collegamenti in serie e in parallelo, il multimetro' },
         { file: '2_Circuiti_elettrici.html', title: 'I circuiti elettrici', desc: 'Leggi di Kirchhoff, risoluzione circuiti, induttanza, corrente alternata vs continua, bolletta elettrica, motori e generatori' },
         { file: '3_Costruire_circuiti.html', title: '🎮 Costruire circuiti — il gioco', desc: 'Sette livelli per imparare giocando: monta i circuiti, scopri la resistenza misteriosa, supera Kirchhoff e sconfiggi il boss della corrente alternata' },
+        { file: 'Verifica_1_Circuiti_elettrici.html', title: '📝 Verifica di prova · Circuiti elettrici', desc: 'Allenati con una verifica completa (lez. 1-3): 10 quesiti a scelta multipla a correzione automatica, 5 a risposta aperta e 5 di ragionamento con soluzioni guidate', type: 'verifica' },
       ] },
       { folder: 'Laboratorio', year: null, title: '🧪 Laboratorio', meta: 'Schede PDF', lessons: [] },
     ],
