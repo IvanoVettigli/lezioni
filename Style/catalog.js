@@ -124,4 +124,10 @@ window.SITE_LAB = [
     desc: 'Laboratorio virtuale con Geometric Optics: costruzione delle immagini con i raggi principali, verifica della legge dei punti coniugati per specchio concavo e lente convergente, ingrandimento, immagini reali e virtuali',
     tags: ['Fisica 4°'],
   },
+  {
+    title: 'Le leggi dei gas e l\'equazione di stato con la simulazione PhET',
+    pdf: 'PDF/Gas_perfetti_Simulata.pdf',
+    desc: 'Laboratorio virtuale con Gas Properties: modello microscopico del gas perfetto, legge di Boyle, seconda legge di Gay-Lussac, pressione e numero di particelle, verifica dell\'equazione di stato PV=nRT',
+    tags: ['Fisica 4°'],
+  },
 ];
