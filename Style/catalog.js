@@ -62,6 +62,7 @@ window.SITE_CATALOG = {
       { folder: 'Fisica_5', year: 5, title: 'Quinto anno',  lessons: [
         { file: '1_Corrente_elettrica.html', title: 'La corrente elettrica', desc: 'Corrente continua, elementi circuitali, le due leggi di Ohm, condensatori e capacità, collegamenti in serie e in parallelo, il multimetro' },
         { file: '2_Circuiti_elettrici.html', title: 'I circuiti elettrici', desc: 'Leggi di Kirchhoff, risoluzione circuiti, induttanza, corrente alternata vs continua, bolletta elettrica, motori e generatori' },
+        { file: '3_Costruire_circuiti.html', title: '🎮 Costruire circuiti — il gioco', desc: 'Sette livelli per imparare giocando: monta i circuiti, scopri la resistenza misteriosa, supera Kirchhoff e sconfiggi il boss della corrente alternata' },
       ] },
       { folder: 'Laboratorio', year: null, title: '🧪 Laboratorio', meta: 'Schede PDF', lessons: [] },
     ],

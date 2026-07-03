@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 3 — Costruire circuiti (il gioco)</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    /* --- SVG circuiti (theme-aware) --- */
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .wire { stroke: var(--text-soft); stroke-width: 2.5; fill: none; }
+    .ckt .probe { stroke: var(--magenta); stroke-width: 2; fill: none; stroke-dasharray: 5 4; }
+    .ckt .res { stroke: var(--primary); stroke-width: 2.5; fill: none; stroke-linejoin: round; }
+    .ckt .plate { stroke: var(--primary); stroke-width: 3.5; }
+    .ckt .ind { stroke: var(--accent); stroke-width: 2.5; fill: none; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .ckt .glass { fill: var(--surface); stroke: var(--primary); stroke-width: 2.5; }
+
+    /* corrente animata */
+    .flow { stroke: var(--green); stroke-width: 3; fill: none; stroke-dasharray: 3 11; stroke-linecap: round;
+            animation: flowmove 0.9s linear infinite; opacity: 0.95; }
+    @keyframes flowmove { to { stroke-dashoffset: -14; } }
+
+    /* --- HUD del gioco --- */
+    .hud { position: sticky; top: 8px; z-index: 40; background: color-mix(in srgb, var(--surface) 88%, transparent);
+           backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 14px;
+           padding: 0.55rem 0.9rem; margin: 1rem 0 1.4rem; display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; }
+    .hud-title { font-weight: 800; color: var(--gold); letter-spacing: 0.02em; }
+    .hud-badges { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+    .badge-lv { width: 2.1rem; height: 2.1rem; border-radius: 50%; display: grid; place-items: center;
+                font-weight: 800; font-size: 0.95rem; border: 2px solid var(--border); background: var(--surface-2);
+                color: var(--muted); cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; user-select: none; }
+    .badge-lv:hover { transform: translateY(-2px); }
+    .badge-lv.open { border-color: var(--primary); color: var(--primary); }
+    .badge-lv.done { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 22%, var(--surface-2)); color: var(--gold); }
+    .badge-lv.locked { opacity: 0.45; cursor: not-allowed; }
+    .hud-right { margin-left: auto; display: flex; align-items: center; gap: 0.7rem; font-size: 0.85rem; color: var(--muted); }
+    .hud-right button { font-size: 0.8rem; }
+
+    /* --- livelli bloccati --- */
+    .level-wrap { position: relative; }
+    .level-lock { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center;
+                  background: color-mix(in srgb, var(--surface) 72%, transparent); backdrop-filter: blur(5px);
+                  border-radius: 14px; text-align: center; }
+    .level-lock .lk { font-size: 1.05rem; font-weight: 700; color: var(--muted); padding: 1rem; }
+
+    /* --- CircuitBot (messaggi) --- */
+    .coach { display: flex; gap: 0.6rem; align-items: flex-start; background: color-mix(in srgb, var(--primary) 9%, var(--surface));
+             border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent); border-radius: 12px;
+             padding: 0.6rem 0.9rem; margin: 0.8rem 0; min-height: 2.6rem; }
+    .coach .bot { font-size: 1.4rem; line-height: 1; }
+    .coach .say { font-size: 0.95rem; }
+    .coach.ok { border-color: var(--green); background: color-mix(in srgb, var(--green) 10%, var(--surface)); }
+    .coach.err { border-color: var(--red); background: color-mix(in srgb, var(--red) 10%, var(--surface)); animation: shake 0.3s; }
+    @keyframes shake { 25% { transform: translateX(-4px);} 75% { transform: translateX(4px);} }
+
+    /* --- cassetta dei componenti --- */
+    .palette { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 0.8rem 0; }
+    .pal-btn { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; padding: 0.45rem 0.6rem;
+               background: var(--surface-2); border: 2px solid var(--border); border-radius: 10px; cursor: pointer;
+               transition: transform 0.12s, border-color 0.12s; }
+    .pal-btn:hover { transform: translateY(-2px); }
+    .pal-btn.sel { border-color: var(--gold); box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 35%, transparent); }
+    .pal-btn.used { opacity: 0.35; pointer-events: none; }
+    .pal-btn svg { width: 74px; height: 38px; display: block; }
+    .pal-btn .pn { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+
+    .slot-rect { fill: color-mix(in srgb, var(--gold) 7%, transparent); stroke: var(--muted); stroke-width: 1.6;
+                 stroke-dasharray: 6 5; rx: 7; cursor: pointer; }
+    .slot-q { fill: var(--muted); font-size: 15px; font-weight: 800; pointer-events: none; }
+    .slot-g:hover .slot-rect { stroke: var(--gold); }
+
+    /* --- pulsanti di gioco --- */
+    .btn-game { display: inline-block; background: var(--primary); color: #0b1020; font-weight: 700; border: none;
+                border-radius: 10px; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.95rem;
+                transition: transform 0.12s, filter 0.12s; }
+    .btn-game:hover { transform: translateY(-1px); filter: brightness(1.1); }
+    .btn-game:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-game.gold { background: var(--gold); }
+    .btn-read { font-variant-numeric: tabular-nums; background: var(--surface-2); color: var(--green);
+                border: 2px solid var(--green); border-radius: 10px; padding: 0.5rem 1rem; font-weight: 800;
+                font-size: 1.05rem; cursor: pointer; }
+    .btn-read:hover { background: color-mix(in srgb, var(--green) 14%, var(--surface-2)); }
+
+    .done-banner { display: none; border: 2px solid var(--gold); background: color-mix(in srgb, var(--gold) 12%, var(--surface));
+                   border-radius: 12px; padding: 0.8rem 1rem; margin: 1rem 0; font-weight: 700; }
+    .done-banner.show { display: block; animation: pop 0.4s; }
+    @keyframes pop { 0% { transform: scale(0.92); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* --- carte resistenza/condensatore --- */
+    .cards-row { display: flex; gap: 0.6rem; flex-wrap: wrap; margin: 0.7rem 0; }
+    .rcard { background: var(--surface-2); border: 2px solid var(--border); border-radius: 10px; padding: 0.45rem 0.7rem;
+             cursor: pointer; text-align: center; transition: transform 0.12s, border-color 0.12s; }
+    .rcard:hover { transform: translateY(-2px); border-color: var(--primary); }
+    .rcard.sel { border-color: var(--gold); }
+    .rcard.win { border-color: var(--green); background: color-mix(in srgb, var(--green) 14%, var(--surface-2)); }
+    .rcard .rv { font-weight: 800; font-size: 1.05rem; color: var(--accent); }
+    .rcard .ru { font-size: 0.72rem; color: var(--muted); }
+    .rcard.mo { text-align: left; font-size: 0.88rem; max-width: 100%; flex: 1 1 240px; }
+    .rcard.mo.wrong { border-color: var(--red); animation: shake 0.3s; }
+    .mot-q { margin: 0.9rem 0; }
+
+    /* --- costellazione di Hokuto (gioco completato) --- */
+    .hokuto { display: block; }
+    .hokuto svg { width: 250px; height: 74px; display: block; }
+    .hokuto .cline { stroke: color-mix(in srgb, var(--gold) 45%, transparent); stroke-width: 1.3; }
+    .hokuto .st { fill: var(--gold); font-size: 17px; cursor: pointer;
+                  filter: drop-shadow(0 0 4px var(--gold)); animation: twinkle 1.8s ease-in-out infinite; }
+    .hokuto .st:hover { filter: drop-shadow(0 0 8px var(--gold)); }
+    @keyframes twinkle { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+    /* --- livello 2: calore --- */
+    .thermo-wrap { margin: 0.8rem 0; }
+    .thermo { position: relative; height: 26px; border-radius: 999px; background: var(--surface-2);
+              border: 1px solid var(--border); overflow: hidden; }
+    .thermo .fill { position: absolute; inset: 0 auto 0 0; width: 0%; border-radius: 999px;
+                    background: linear-gradient(90deg, #3b82f6, #f5b400, #ef4444); transition: width 0.2s; }
+    .thermo-marks { position: relative; height: 1.4rem; font-size: 0.72rem; color: var(--muted); }
+    .thermo-marks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+    .mission { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.6rem; border-radius: 8px;
+               background: var(--surface-2); border: 1px solid var(--border); margin: 0.3rem 0; font-size: 0.92rem; }
+    .mission.done { border-color: var(--green); }
+    .mission .mk { font-weight: 800; }
+
+    /* --- livello 7: boss --- */
+    .boss-bar-wrap { margin: 0.8rem 0; }
+    .boss-bar { height: 22px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; }
+    .boss-bar .hp { height: 100%; width: 100%; background: linear-gradient(90deg, var(--red), var(--magenta)); transition: width 0.6s; }
+    .app-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.6rem; margin: 0.8rem 0; }
+    .app-card { background: var(--surface-2); border: 2px solid var(--border); border-radius: 12px; padding: 0.7rem 0.4rem;
+                text-align: center; cursor: pointer; transition: transform 0.12s, border-color 0.12s; user-select: none; }
+    .app-card:hover { transform: translateY(-2px); }
+    .app-card.sel { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 12%, var(--surface-2)); }
+    .app-card.right { border-color: var(--green); }
+    .app-card.wrong { border-color: var(--red); animation: shake 0.3s; }
+    .app-card .ae { font-size: 1.7rem; }
+    .app-card .an { font-size: 0.82rem; font-weight: 600; margin-top: 0.2rem; }
+
+    .victory { display: none; text-align: center; border: 2px solid var(--gold); border-radius: 16px;
+               background: color-mix(in srgb, var(--gold) 10%, var(--surface)); padding: 1.4rem; margin: 1.2rem 0; }
+    .victory.show { display: block; animation: pop 0.5s; }
+    .victory h3 { margin: 0.2rem 0 0.6rem; color: var(--gold); }
+
+    .controls-inline { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin: 0.6rem 0; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent);
+                 border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px;
+                 padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.02rem; margin-top: 0.5rem; }
+    .briefing { border-left: 4px solid var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+                border-radius: 8px; padding: 0.7rem 1rem; margin: 0.9rem 0; }
+    .hold-btn { touch-action: none; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quinto anno · Lezione 3</div>
+    <h1>Costruire circuiti</h1>
+    <p>Sette livelli, un laboratorio virtuale e un boss finale: impara l'elettricità giocando</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quinto anno</a>
+    <span class="sep">/</span> Costruire circuiti
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Come si gioca.</strong> Questa lezione è un videogioco: si parte dal <strong>Livello 1</strong> e si
+      avanza completando le missioni; ogni livello superato sblocca il successivo, fino al <strong>boss finale</strong>.
+      Per costruire un circuito: <strong>clicca un componente</strong> nella cassetta, poi <strong>clicca lo slot
+      tratteggiato</strong> dove vuoi montarlo. Se sbagli posto, CircuitBot 🤖 te lo dirà (con garbo). I progressi
+      restano salvati su questo computer.
+    </div>
+
+    <!-- HUD -->
+    <div class="hud" id="hud">
+      <span class="hud-title">⚡ CIRCUIT QUEST</span>
+      <div class="hud-badges" id="hud-badges"></div>
+      <div class="hud-right">
+        <label class="toggle-row" style="display:inline-flex; align-items:center; gap:0.3rem;">
+          <input type="checkbox" id="free-mode"> modalità libera
+        </label>
+        <button class="btn-game" id="reset-game" style="background: var(--surface-2); color: var(--red); border: 1px solid var(--red);">↺ Ricomincia</button>
+      </div>
+    </div>
+
+    <!-- ================================================================ -->
+    <!-- LIVELLO 1 — LEGGE DI OHM                                          -->
+    <!-- ================================================================ -->
+    <section id="lv1">
+      <h2>Livello 1 — La resistenza misteriosa</h2>
+      <div class="level-wrap" id="wrap-1">
+      <div class="briefing">
+        <strong>Briefing.</strong> Il laboratorio ti ha consegnato una <strong>resistenza misteriosa</strong>: nessuno
+        sa quanto vale. Per scoprirlo userai la <strong>prima legge di Ohm</strong>: $V = R\,I$. Se misuri la corrente
+        $I$ per diverse tensioni $V$ e metti i punti su un grafico, otterrai una retta la cui <strong>pendenza è
+        proprio $R$</strong>.
+      </div>
+
+      <h3>1.1 — Monta il circuito</h3>
+      <p>Ti servono: il <strong>generatore</strong>, la <strong>resistenza misteriosa</strong>, l'<strong>amperometro
+        in serie</strong> e il <strong>voltmetro in parallelo</strong> alla resistenza.</p>
+
+      <div class="palette" id="l1-pal"></div>
+      <div class="ckt"><svg id="l1-svg" viewBox="0 0 640 300" aria-label="Circuito da montare per la legge di Ohm"></svg></div>
+      <div class="coach" id="l1-msg"><span class="bot">🤖</span><span class="say">Scegli un componente dalla cassetta, poi clicca uno slot tratteggiato.</span></div>
+
+      <div id="l1-lab" style="display:none;">
+        <h3>1.2 — Caccia alla resistenza</h3>
+        <p>Muovi la tensione, poi <strong>clicca sul display dell'amperometro</strong> per registrare il punto
+          $(I;\,V)$ sul grafico. Servono <strong>5 punti</strong> con tensioni ben diverse tra loro.</p>
+        <div class="controls-inline">
+          <div class="control-group"><label>Tensione del generatore: <span class="val" id="l1-v-val">10</span> V</label>
+            <input type="range" id="l1-v" min="0" max="30" step="1" value="10"></div>
+          <button class="btn-read" id="l1-read">📟 I = — A · clicca per registrare</button>
+          <span class="val-badge" id="l1-count">punti: 0/5</span>
+        </div>
+        <div class="plot" id="l1-plot" style="height: 360px;"></div>
+        <p class="eq-out" id="l1-fit"></p>
+      </div>
+
+      <div id="l1-b" style="display:none;">
+        <h3>1.3 — Costruisci la TUA resistenza (seconda legge di Ohm)</h3>
+        <div class="briefing">
+          Ora che sai leggere la pendenza, progetta un filo su misura. La <strong>seconda legge di Ohm</strong> dice che
+          $R = \rho\,\dfrac{L}{A}$: conta il <strong>materiale</strong> (la resistività $\rho$), la
+          <strong>lunghezza</strong> $L$ e la <strong>sezione</strong> $A$. Guarda come cambia la retta sul grafico!
+        </div>
+        <div class="controls-inline">
+          <div class="control-group"><label>Materiale:</label>
+            <select id="l1-mat">
+              <option value="1.68e-8">Rame</option>
+              <option value="2.82e-8">Alluminio</option>
+              <option value="9.7e-8">Ferro</option>
+              <option value="1.10e-6" selected>Nichel-cromo</option>
+            </select>
+          </div>
+          <div class="control-group"><label>Lunghezza L: <span class="val" id="l1-len-val">5.0</span> m</label>
+            <input type="range" id="l1-len" min="1" max="20" step="0.5" value="5"></div>
+          <div class="control-group"><label>Sezione A: <span class="val" id="l1-sez-val">1.00</span> mm²</label>
+            <input type="range" id="l1-sez" min="0.1" max="2" step="0.05" value="1"></div>
+        </div>
+        <p class="eq-out" id="l1-rwire"></p>
+        <div class="mission" id="l1-mission"><span class="mk">🎯</span><span>Missione: costruisci una resistenza da stufetta, tra <strong>8 Ω e 12 Ω</strong>.</span></div>
+      </div>
+
+      <div class="done-banner" id="done-1">🏅 Livello 1 completato! La legge di Ohm non ha più segreti. Livello 2 sbloccato.</div>
+      <div class="level-lock" id="lock-1" style="display:none;"><div class="lk">🔒 Completa il livello precedente</div></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- LIVELLO 2 — EFFETTO JOULE                                         -->
+    <!-- ================================================================ -->
+    <section id="lv2">
+      <h2>Livello 2 — Fuoco alle polveri (effetto Joule)</h2>
+      <div class="level-wrap" id="wrap-2">
+      <div class="briefing">
+        <strong>Briefing.</strong> Ogni resistenza attraversata da corrente si scalda: è l'<strong>effetto
+        Joule</strong>. La potenza dissipata in calore è
+        $P = V I = R I^2 = \dfrac{V^2}{R}$. Regola tensione e resistenza e osserva quanto calore produci.
+      </div>
+
+      <div class="ckt"><svg viewBox="0 0 640 190" aria-label="Resistenza che scalda">
+        <line x1="60" y1="60" x2="240" y2="60" class="wire"/>
+        <rect id="l2-hot" x="240" y="42" width="160" height="36" rx="8" fill="#3b82f6" stroke="var(--border)"/>
+        <text x="320" y="65" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">R</text>
+        <line x1="400" y1="60" x2="580" y2="60" class="wire"/>
+        <line x1="580" y1="60" x2="580" y2="150" class="wire"/>
+        <line x1="580" y1="150" x2="60" y2="150" class="wire"/>
+        <line x1="60" y1="150" x2="60" y2="60" class="wire"/>
+        <line x1="300" y1="150" x2="324" y2="150" stroke="var(--surface-2)" stroke-width="8"/>
+        <line x1="304" y1="136" x2="304" y2="164" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="316" y1="141" x2="316" y2="159" stroke="var(--primary)" stroke-width="5"/>
+        <g id="l2-waves" opacity="0">
+          <path d="M270,36 q4,-8 0,-16" fill="none" stroke="var(--red)" stroke-width="2"/>
+          <path d="M320,36 q4,-8 0,-16" fill="none" stroke="var(--red)" stroke-width="2"/>
+          <path d="M370,36 q4,-8 0,-16" fill="none" stroke="var(--red)" stroke-width="2"/>
+        </g>
+      </svg></div>
+
+      <div class="controls-inline">
+        <div class="control-group"><label>Tensione V: <span class="val" id="l2-v-val">230</span> V</label>
+          <input type="range" id="l2-v" min="10" max="250" step="5" value="230"></div>
+        <div class="control-group"><label>Resistenza R: <span class="val" id="l2-r-val">100</span> Ω</label>
+          <input type="range" id="l2-r" min="5" max="1000" step="5" value="100"></div>
+      </div>
+      <p class="eq-out" id="l2-out"></p>
+
+      <div class="thermo-wrap">
+        <div class="thermo"><div class="fill" id="l2-fill"></div></div>
+        <div class="thermo-marks">
+          <span style="left: 5.8%">💡 LED 10 W</span>
+          <span style="left: 14%">🔆 lampadina 60 W</span>
+          <span style="left: 81.6%">💨 phon 2000 W</span>
+        </div>
+      </div>
+
+      <div class="mission" id="l2-m1"><span class="mk">🎯</span><span>Missione 1: raggiungi la potenza di un <strong>phon</strong> (2000 ± 100 W).</span></div>
+      <div class="mission" id="l2-m2"><span class="mk">🎯</span><span>Missione 2: scendi alla potenza di una <strong>vecchia lampadina</strong> (60 ± 5 W).</span></div>
+
+      <div class="done-banner" id="done-2">🏅 Livello 2 completato! Ora sai perché i cavi sottili si scaldano. Livello 3 sbloccato.</div>
+      <div class="level-lock" id="lock-2"><div class="lk">🔒 Completa il livello precedente</div></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- LIVELLO 3 — SERIE E PARALLELO                                     -->
+    <!-- ================================================================ -->
+    <section id="lv3">
+      <h2>Livello 3 — L'arte dell'equivalenza</h2>
+      <div class="level-wrap" id="wrap-3">
+      <div class="briefing">
+        <strong>Briefing.</strong> Due resistenze si possono sostituire con <strong>una sola</strong> — la resistenza
+        <strong>equivalente</strong> — senza che il generatore se ne accorga: stessa tensione, stessa corrente.
+        In <strong>serie</strong>: $R_{eq} = R_1 + R_2$. In <strong>parallelo</strong>:
+        $\dfrac{1}{R_{eq}} = \dfrac{1}{R_1} + \dfrac{1}{R_2}$. Ma non fidarti: verifichiamolo!
+      </div>
+
+      <h3>3.1 — Il circuito in serie</h3>
+      <p>Monta $R_1 = 10\ \Omega$, $R_2 = 20\ \Omega$ e l'amperometro, in serie con il generatore da 12 V.</p>
+      <div class="palette" id="l3s-pal"></div>
+      <div class="ckt"><svg id="l3s-svg" viewBox="0 0 640 240" aria-label="Circuito serie da montare"></svg></div>
+      <div class="coach" id="l3s-msg"><span class="bot">🤖</span><span class="say">Monta le due resistenze e l'amperometro negli slot.</span></div>
+
+      <div id="l3s-eq" style="display:none;">
+        <p><strong>Corrente misurata: <span class="val-badge" id="l3s-i">—</span></strong></p>
+        <p>Ora la sfida: costruisci il circuito <strong>equivalente</strong> — stessa pila da 12 V, ma con
+          <strong>una sola resistenza</strong> che faccia passare <em>esattamente la stessa corrente</em>. Scegli
+          la resistenza giusta dalla cassetta:</p>
+        <div class="cards-row" id="l3s-cards"></div>
+        <div class="ckt"><svg id="l3s-svg2" viewBox="0 0 640 200" aria-label="Circuito equivalente serie"></svg></div>
+        <div class="coach" id="l3s-msg2"><span class="bot">🤖</span><span class="say">Scegli una carta-resistenza e guarda l'amperometro del secondo circuito.</span></div>
+      </div>
+
+      <div id="l3p-part" style="display:none;">
+        <h3>3.2 — Il circuito in parallelo</h3>
+        <p>Ora monta $R_1 = 20\ \Omega$ e $R_2 = 30\ \Omega$ <strong>in parallelo</strong> (una per ramo), con
+          l'amperometro sulla linea principale.</p>
+        <div class="palette" id="l3p-pal"></div>
+        <div class="ckt"><svg id="l3p-svg" viewBox="0 0 640 300" aria-label="Circuito parallelo da montare"></svg></div>
+        <div class="coach" id="l3p-msg"><span class="bot">🤖</span><span class="say">Una resistenza per ramo, amperometro sulla linea principale.</span></div>
+        <div id="l3p-eq" style="display:none;">
+          <p><strong>Corrente misurata: <span class="val-badge" id="l3p-i">—</span></strong></p>
+          <p>Stessa sfida: trova l'<strong>unica</strong> resistenza che, con la stessa pila da 12 V, assorbe la stessa
+            corrente del parallelo:</p>
+          <div class="cards-row" id="l3p-cards"></div>
+          <div class="ckt"><svg id="l3p-svg2" viewBox="0 0 640 200" aria-label="Circuito equivalente parallelo"></svg></div>
+          <div class="coach" id="l3p-msg2"><span class="bot">🤖</span><span class="say">Occhio: in parallelo le resistenze NON si sommano...</span></div>
+        </div>
+      </div>
+
+      <div class="done-banner" id="done-3">🏅 Livello 3 completato! Serie: si somma. Parallelo: reciproci. Livello 4 sbloccato.</div>
+      <div class="level-lock" id="lock-3"><div class="lk">🔒 Completa il livello precedente</div></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- LIVELLO 4 — LEGGI DI KIRCHHOFF                                    -->
+    <!-- ================================================================ -->
+    <section id="lv4">
+      <h2>Livello 4 — Il guardiano dei nodi (Kirchhoff)</h2>
+      <div class="level-wrap" id="wrap-4">
+      <div class="briefing">
+        <strong>Briefing.</strong> Due regole governano ogni circuito. <strong>Legge dei nodi:</strong> la corrente che
+        entra in un nodo è uguale a quella che esce ($\sum I_{in} = \sum I_{out}$: la carica non sparisce).
+        <strong>Legge delle maglie:</strong> lungo un giro chiuso, la tensione del generatore si ripartisce tutta sui
+        componenti ($\varepsilon = V_1 + V_2 + \dots$). Supera le tre prove del guardiano!
+      </div>
+
+      <p class="eq-out" id="l4-round" style="font-weight:700;"></p>
+
+      <div class="ckt" id="l4-node-box"><svg viewBox="0 0 460 220" aria-label="Nodo con correnti entranti e uscenti">
+        <circle cx="230" cy="110" r="7" fill="var(--accent)"/>
+        <line x1="40" y1="110" x2="222" y2="110" class="wire"/>
+        <polygon points="150,110 136,103 136,117" fill="var(--green)"/>
+        <text x="80" y="98" class="lbl-s" id="l4-lab1" fill="var(--green)">I₁ = ? (entra)</text>
+        <line x1="230" y1="20" x2="230" y2="102" class="wire"/>
+        <polygon points="230,80 223,66 237,66" fill="var(--green)"/>
+        <text x="240" y="45" class="lbl-s" id="l4-lab2" fill="var(--green)">I₂ = ? (entra)</text>
+        <line x1="238" y1="110" x2="420" y2="110" class="wire"/>
+        <polygon points="420,110 406,103 406,117" fill="var(--green)"/>
+        <text x="300" y="98" class="lbl-s" id="l4-lab3" fill="var(--green)">I₃ = ? (esce)</text>
+        <line x1="230" y1="118" x2="230" y2="200" class="wire"/>
+        <polygon points="230,200 223,186 237,186" fill="var(--green)"/>
+        <text x="240" y="175" class="lbl-s" id="l4-lab4" fill="var(--green)">I₄ = ? (esce)</text>
+      </svg></div>
+
+      <div class="ckt" id="l4-loop-box" style="display:none;"><svg viewBox="0 0 460 210" aria-label="Maglia con generatore e due resistenze">
+        <line x1="80" y1="50" x2="80" y2="160" class="wire"/>
+        <line x1="66" y1="92" x2="94" y2="92" stroke="var(--primary)" stroke-width="2"/>
+        <line x1="73" y1="102" x2="87" y2="102" stroke="var(--primary)" stroke-width="5"/>
+        <text x="46" y="100" class="lbl-s" id="l4-eps" fill="var(--muted)">ε = 12 V</text>
+        <line x1="80" y1="50" x2="150" y2="50" class="wire"/>
+        <polyline points="150,50 158,38 170,62 182,38 194,62 206,38 218,62 226,50" class="res"/>
+        <text x="188" y="30" text-anchor="middle" class="lbl-s" id="l4-v1" fill="var(--muted)">V₁ = 7,5 V</text>
+        <line x1="226" y1="50" x2="300" y2="50" class="wire"/>
+        <polyline points="300,50 308,38 320,62 332,38 344,62 356,38 368,62 376,50" class="res"/>
+        <text x="338" y="30" text-anchor="middle" class="lbl-s" fill="var(--magenta)">V₂ = ?</text>
+        <line x1="376" y1="50" x2="420" y2="50" class="wire"/>
+        <line x1="420" y1="50" x2="420" y2="160" class="wire"/>
+        <line x1="420" y1="160" x2="80" y2="160" class="wire"/>
+      </svg></div>
+
+      <div class="controls-inline">
+        <div class="control-group" style="min-width: 280px;"><label>La tua risposta: <span class="val" id="l4-ans-val">0</span> <span id="l4-unit">A</span></label>
+          <input type="range" id="l4-ans" min="0" max="20" step="0.5" value="0"></div>
+        <button class="btn-game" id="l4-check">Verifica</button>
+        <span class="val-badge" id="l4-score">prova 1 di 3</span>
+      </div>
+      <div class="coach" id="l4-msg"><span class="bot">🛡️</span><span class="say">«Nessuna corrente passa senza il mio permesso. Bilancia il nodo!»</span></div>
+
+      <div class="done-banner" id="done-4">🏅 Livello 4 completato! Il guardiano dei nodi si inchina. Livello 5 sbloccato.</div>
+      <div class="level-lock" id="lock-4"><div class="lk">🔒 Completa il livello precedente</div></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- LIVELLO 5 — CONDENSATORI                                          -->
+    <!-- ================================================================ -->
+    <section id="lv5">
+      <h2>Livello 5 — I serbatoi di carica (condensatori)</h2>
+      <div class="level-wrap" id="wrap-5">
+      <div class="briefing">
+        <strong>Briefing.</strong> Un condensatore accumula carica: $Q = C\,V$. Anche i condensatori hanno le loro
+        regole di squadra — ma <strong>invertite</strong> rispetto alle resistenze: in <strong>parallelo</strong> si
+        sommano ($C_{eq} = C_1 + C_2$), in <strong>serie</strong> valgono i reciproci
+        ($\frac{1}{C_{eq}} = \frac{1}{C_1} + \frac{1}{C_2}$).
+      </div>
+
+      <h3>5.1 — Riscaldamento: carica un condensatore</h3>
+      <p>Condensatore da $C = 100\ \mu\text{F}$. Muovi la tensione e osserva la carica accumulata $Q = C\,V$:</p>
+      <div class="controls-inline">
+        <div class="control-group"><label>Tensione: <span class="val" id="l5-v-val">5</span> V</label>
+          <input type="range" id="l5-v" min="0" max="10" step="0.5" value="5"></div>
+        <span class="val-badge" id="l5-q">Q = 500 µC</span>
+      </div>
+      <div class="ckt"><svg viewBox="0 0 640 130" aria-label="Condensatore che si carica">
+        <line x1="80" y1="65" x2="290" y2="65" class="wire"/>
+        <line x1="290" y1="30" x2="290" y2="100" class="plate"/>
+        <line x1="310" y1="30" x2="310" y2="100" class="plate"/>
+        <line x1="310" y1="65" x2="540" y2="65" class="wire"/>
+        <g id="l5-plus"></g>
+        <g id="l5-minus"></g>
+      </svg></div>
+
+      <h3>5.2 — Condensatori in serie</h3>
+      <p>Monta $C_1 = 6\ \mu\text{F}$ e $C_2 = 12\ \mu\text{F}$ in serie con la pila da 12 V (il
+        <strong>coulombmetro</strong> misura la carica sulle armature).</p>
+      <div class="palette" id="l5s-pal"></div>
+      <div class="ckt"><svg id="l5s-svg" viewBox="0 0 640 220" aria-label="Condensatori in serie da montare"></svg></div>
+      <div class="coach" id="l5s-msg"><span class="bot">🤖</span><span class="say">Due condensatori, uno dopo l'altro sullo stesso filo.</span></div>
+      <div id="l5s-eq" style="display:none;">
+        <p><strong>Carica misurata: <span class="val-badge" id="l5s-qm">—</span></strong></p>
+        <p>Trova l'<strong>unico condensatore</strong> che, con la stessa pila da 12 V, accumula la stessa carica:</p>
+        <div class="cards-row" id="l5s-cards"></div>
+        <div class="coach" id="l5s-msg2"><span class="bot">🤖</span><span class="say">Attento alla trappola: per i condensatori le regole sono invertite!</span></div>
+      </div>
+
+      <div id="l5p-part" style="display:none;">
+        <h3>5.3 — Condensatori in parallelo</h3>
+        <p>Ora gli stessi condensatori ($6\ \mu\text{F}$ e $12\ \mu\text{F}$) <strong>in parallelo</strong>:</p>
+        <div class="palette" id="l5p-pal"></div>
+        <div class="ckt"><svg id="l5p-svg" viewBox="0 0 640 280" aria-label="Condensatori in parallelo da montare"></svg></div>
+        <div class="coach" id="l5p-msg"><span class="bot">🤖</span><span class="say">Un condensatore per ramo.</span></div>
+        <div id="l5p-eq" style="display:none;">
+          <p><strong>Carica totale misurata: <span class="val-badge" id="l5p-qm">—</span></strong></p>
+          <p>E ora l'equivalente:</p>
+          <div class="cards-row" id="l5p-cards"></div>
+          <div class="coach" id="l5p-msg2"><span class="bot">🤖</span><span class="say">Più armature affiancate = più superficie...</span></div>
+        </div>
+      </div>
+
+      <div class="done-banner" id="done-5">🏅 Livello 5 completato! Regole invertite, missione compiuta. Livello 6 sbloccato.</div>
+      <div class="level-lock" id="lock-5"><div class="lk">🔒 Completa il livello precedente</div></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- LIVELLO 6 — SOLENOIDE E INDUZIONE                                 -->
+    <!-- ================================================================ -->
+    <section id="lv6">
+      <h2>Livello 6 — Il solenoide incantato</h2>
+      <div class="level-wrap" id="wrap-6">
+      <div class="briefing">
+        <strong>Briefing.</strong> Un <strong>solenoide</strong> (una bobina di $N$ spire) collegato a un galvanometro
+        non dà corrente... finché non muovi un <strong>magnete</strong> vicino a lui. È l'<strong>induzione
+        elettromagnetica</strong>: la tensione indotta cresce con le spire e con la velocità,
+        $\varepsilon \propto N\,v$, e cambia segno se inverti il movimento. Magnete fermo = zero!
+      </div>
+
+      <div class="ckt"><svg viewBox="0 0 640 250" aria-label="Magnete mobile e solenoide con galvanometro">
+        <rect x="252" y="52" width="196" height="76" rx="8" fill="none" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <path d="M260,110 C260,74 270,74 270,110 C270,74 290,74 290,110 C290,74 310,74 310,110 C310,74 330,74 330,110 C330,74 350,74 350,110 C350,74 370,74 370,110 C370,74 390,74 390,110 C390,74 410,74 410,110 C410,74 430,74 430,110 C430,74 440,74 440,110" class="ind"/>
+        <text x="350" y="145" text-anchor="middle" class="lbl-s" fill="var(--muted)">solenoide (N spire)</text>
+        <g id="l6-mag" transform="translate(60,0)">
+          <rect x="0" y="76" width="36" height="34" fill="var(--red)" rx="3"/>
+          <rect x="36" y="76" width="36" height="34" fill="var(--primary)" rx="3"/>
+          <text x="18" y="99" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">N</text>
+          <text x="54" y="99" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">S</text>
+        </g>
+        <line x1="260" y1="128" x2="260" y2="195" class="wire"/>
+        <line x1="440" y1="128" x2="440" y2="195" class="wire"/>
+        <line x1="260" y1="195" x2="310" y2="195" class="wire"/>
+        <line x1="390" y1="195" x2="440" y2="195" class="wire"/>
+        <circle cx="350" cy="195" r="34" fill="var(--surface)" stroke="var(--magenta)" stroke-width="2.5"/>
+        <line id="l6-needle" x1="350" y1="215" x2="350" y2="172" stroke="var(--magenta)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="350" cy="215" r="3.5" fill="var(--magenta)"/>
+        <text x="350" y="242" text-anchor="middle" class="lbl-s" fill="var(--muted)">galvanometro</text>
+      </svg></div>
+
+      <div class="controls-inline">
+        <div class="control-group"><label>Spire N: <span class="val" id="l6-n-val">50</span></label>
+          <input type="range" id="l6-n" min="10" max="150" step="5" value="50"></div>
+        <div class="control-group"><label>Velocità del magnete: <span class="val" id="l6-vel-val">20</span> cm/s</label>
+          <input type="range" id="l6-vel" min="5" max="40" step="1" value="20"></div>
+        <button class="btn-game hold-btn" id="l6-in">▶ Avvicina (tieni premuto)</button>
+        <button class="btn-game hold-btn" id="l6-out-btn" style="background: var(--magenta);">◀ Allontana (tieni premuto)</button>
+      </div>
+      <p class="eq-out">Tensione indotta: <span class="val-badge" id="l6-eps">ε = 0 mV</span></p>
+
+      <div class="mission" id="l6-m1"><span class="mk">🎯</span><span>Missione 1: genera una tensione di almeno <strong>+80 mV</strong> avvicinando il magnete.</span></div>
+      <div class="mission" id="l6-m2"><span class="mk">🎯</span><span>Missione 2: genera una tensione di almeno <strong>−80 mV</strong> allontanandolo (corrente invertita!).</span></div>
+
+      <div class="note"><strong>E il motore elettrico?</strong> È lo stesso incantesimo letto al contrario: invece di
+        muovere il magnete per creare corrente, <em>mandi corrente</em> nel solenoide e ottieni <em>movimento</em>.
+        Nel boss finale lo vedrai in azione.</div>
+
+      <div class="done-banner" id="done-6">🏅 Livello 6 completato! Hai generato elettricità con le tue mani. Il BOSS ti aspetta…</div>
+      <div class="level-lock" id="lock-6"><div class="lk">🔒 Completa il livello precedente</div></div>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- LIVELLO 7 — BOSS: LA CORRENTE ALTERNATA                           -->
+    <!-- ================================================================ -->
+    <section id="lv7">
+      <h2>Livello 7 — BOSS FINALE: Generale Blackout ⚡</h2>
+      <div class="level-wrap" id="wrap-7">
+      <div class="briefing">
+        <strong>Briefing.</strong> Il Generale Blackout vuole lasciare la città al buio. Per sconfiggerlo devi
+        padroneggiare la <strong>corrente alternata</strong>: 4 prove, 4 colpi da 25 HP ciascuno. La barra qui sotto è
+        la sua energia: portala a <strong>zero</strong>.
+      </div>
+      <div class="boss-bar-wrap">
+        <div style="display:flex; justify-content:space-between; font-size:0.85rem; color:var(--muted);">
+          <span>👹 Generale Blackout</span><span id="l7-hp-txt">HP 100/100</span>
+        </div>
+        <div class="boss-bar"><div class="hp" id="l7-hp"></div></div>
+      </div>
+
+      <h3>7.1 — Prova 1: porta la corrente al villaggio</h3>
+      <p>Un villaggio a 100 km ha bisogno di $P = 100$ kW. La linea elettrica ha resistenza $R = 50\ \Omega$, e le
+        perdite sono $P_{\text{persa}} = R\,I^2$ con $I = P/V$. <strong>Scegli la tensione di trasmissione</strong>:
+        se le perdite scendono sotto il <strong>5%</strong>, il primo colpo è tuo.</p>
+      <div class="cards-row">
+        <button class="btn-game" data-volt="230">230 V (presa di casa)</button>
+        <button class="btn-game" data-volt="4000">4 kV</button>
+        <button class="btn-game" data-volt="40000">40 kV</button>
+        <button class="btn-game" data-volt="380000">380 kV (alta tensione)</button>
+      </div>
+      <div class="coach" id="l7a-msg"><span class="bot">👹</span><span class="say">«Prova pure, umano. La tua energia si perderà per strada… hahaha!»</span></div>
+      <div class="table-container"><table id="l7a-tab" style="display:none;">
+        <thead><tr><th>Tensione scelta</th><th>Corrente in linea</th><th>Potenza persa</th><th>Perdite</th><th>Esito</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <div class="note" id="l7a-note" style="display:none;"><strong>Ecco perché l'alternata!</strong> Per alzare e
+        riabbassare la tensione servono i <strong>trasformatori</strong>, che funzionano <em>solo con la corrente
+        alternata</em> (sfruttano l'induzione del Livello 6: serve una corrente che <em>varia</em>!). È per questo che
+        Tesla vinse la guerra delle correnti: l'AC viaggia ad alta tensione con perdite minime, la DC di Edison no.</div>
+
+      <h3>7.2 — Prova 2: l'alternatore (e il motore)</h3>
+      <p>Fai ruotare la spira tra i poli del magnete e osserva la tensione che esce: una <strong>sinusoide</strong>!
+        È così che le centrali generano l'AC — ed è così, al contrario, che un motore trasforma l'AC in rotazione.</p>
+      <div class="controls-inline">
+        <button class="btn-game" id="l7b-run">⚡ Avvia l'alternatore</button>
+        <div class="control-group"><label>Velocità di rotazione: <span class="val" id="l7b-f-val">1.0</span> giri/s</label>
+          <input type="range" id="l7b-f" min="0.3" max="3" step="0.1" value="1"></div>
+        <button class="btn-game gold" id="l7b-go" style="display:none;">Ho capito: secondo colpo! 👊</button>
+      </div>
+      <div class="ckt"><svg viewBox="0 0 640 190" aria-label="Alternatore: spira rotante e sinusoide generata">
+        <rect x="150" y="30" width="26" height="130" fill="var(--red)" rx="4"/>
+        <text x="163" y="102" text-anchor="middle" fill="#fff" font-weight="700">N</text>
+        <rect x="294" y="30" width="26" height="130" fill="var(--primary)" rx="4"/>
+        <text x="307" y="102" text-anchor="middle" fill="#fff" font-weight="700">S</text>
+        <rect id="l7b-coil" x="197" y="87" width="76" height="16" rx="6" fill="var(--gold)" opacity="0.95"/>
+        <text x="235" y="178" text-anchor="middle" class="lbl-s" fill="var(--muted)">spira vista dall'alto</text>
+        <line x1="360" y1="95" x2="620" y2="95" stroke="var(--border)" stroke-width="1"/>
+        <polyline id="l7b-wave" points="" fill="none" stroke="var(--green)" stroke-width="2.5"/>
+        <text x="490" y="178" text-anchor="middle" class="lbl-s" fill="var(--muted)">tensione generata nel tempo</text>
+      </svg></div>
+
+      <h3>7.3 — Prova 3: costruisci il motore elettrico</h3>
+      <p>Il Generale sogghigna: «Sai far girare una spira… ma sapresti costruire un <strong>vero motore</strong>?»
+        Rispondi alle tre domande (scegli una risposta per ciascuna, poi Verifica):</p>
+
+      <div id="l7m-quiz">
+        <div class="mot-q">
+          <p><strong>M1.</strong> Quali ingredienti servono, come minimo, per costruire un motore elettrico?</p>
+          <div class="cards-row">
+            <div class="rcard mo" data-ok="0">Due magneti e una lampadina</div>
+            <div class="rcard mo" data-ok="1">Un <strong>magnete</strong>, un <strong>solenoide</strong> (bobina) e un <strong>circuito</strong> che gli fornisce corrente</div>
+            <div class="rcard mo" data-ok="0">Un condensatore e una resistenza</div>
+            <div class="rcard mo" data-ok="0">Solo un solenoide: il magnete non serve</div>
+          </div>
+        </div>
+        <div class="mot-q">
+          <p><strong>M2.</strong> Nel motore, il solenoide percorso da corrente vicino al magnete si mette a girare. E
+            se invece sono <em>io</em> a far girare il solenoide vicino al magnete, che cosa ottengo?</p>
+          <div class="cards-row">
+            <div class="rcard mo" data-ok="1">Una corrente indotta nel solenoide: il motore è diventato un <strong>generatore</strong></div>
+            <div class="rcard mo" data-ok="0">Niente: senza pila non succede nulla</div>
+            <div class="rcard mo" data-ok="0">Il magnete si smagnetizza</div>
+            <div class="rcard mo" data-ok="0">Solo calore per effetto Joule</div>
+          </div>
+        </div>
+        <div class="mot-q">
+          <p><strong>M3.</strong> Le automobili usano sempre più spesso motori elettrici. Qual è il vero vantaggio
+            rispetto al motore a scoppio?</p>
+          <div class="cards-row">
+            <div class="rcard mo" data-ok="0">È più rumoroso, e il rumore fa vendere</div>
+            <div class="rcard mo" data-ok="0">Non ha bisogno di energia per funzionare</div>
+            <div class="rcard mo" data-ok="1">Converte in movimento quasi tutta l'energia (rendimento ~90% contro ~30%), non produce gas di scarico e in frenata può <strong>recuperare energia</strong> funzionando da generatore</div>
+            <div class="rcard mo" data-ok="0">Funziona solo in discesa, dove non serve potenza</div>
+          </div>
+        </div>
+      </div>
+      <div class="controls-inline"><button class="btn-game" id="l7m-check">Verifica 🔧</button></div>
+      <div class="coach" id="l7m-msg"><span class="bot">👹</span><span class="say">«Magneti, bobine… dettagli per elettricisti!»</span></div>
+      <div class="note" id="l7m-note" style="display:none;"><strong>Il motore è ovunque, anche in autostrada.</strong>
+        In un'auto elettrica la batteria fornisce corrente continua; un circuito chiamato <strong>inverter</strong> la
+        trasforma in <strong>corrente alternata</strong> per il motore (magnete + solenoidi, proprio come hai detto).
+        E quando freni, il motore lavora al contrario — da <strong>generatore</strong>, come nel Livello 6 — e ricarica
+        la batteria: si chiama <em>frenata rigenerativa</em>.</div>
+
+      <h3>7.4 — Prova 4: i motori nascosti in casa tua</h3>
+      <p>L'ultimo colpo: dimostra di sapere <strong>dove vivono i motori elettrici</strong>. Seleziona <em>tutti e
+        soli</em> gli oggetti che contengono un motore, poi premi Verifica.</p>
+      <div class="app-cards" id="l7c-cards"></div>
+      <div class="controls-inline"><button class="btn-game" id="l7c-check">Verifica ⚔️</button></div>
+      <div class="coach" id="l7c-msg"><span class="bot">👹</span><span class="say">«Non distinguerai mai un motore da una resistenza!»</span></div>
+
+      <div class="victory" id="l7-victory">
+        <div style="font-size:3rem;">🏆</div>
+        <h3>HAI SCONFITTO IL GENERALE BLACKOUT!</h3>
+        <p>HP a zero. Il Generale sussurra: «Omae wa mou… sconfitto.» E in alto, nel tuo Circuit Quest, si accendono le
+          <strong>sette stelle di Hokuto</strong> ✨ — una per ogni livello superato. Guarda l'HUD!</p>
+        <p>La città è illuminata, le lavatrici girano, i ventilatori soffiano. Sette livelli, sette leggi
+          dell'elettricità che ora sono tue:</p>
+        <p style="font-size:0.95rem;">⭐ Legge di Ohm · ⭐ Seconda legge di Ohm · ⭐ Effetto Joule · ⭐ Serie e parallelo ·
+          ⭐ Kirchhoff · ⭐ Condensatori · ⭐ Induzione · ⭐ Corrente alternata</p>
+        <p style="color: var(--muted); font-size: 0.9rem;">La corrente alternata è ovunque nella tua giornata: la
+          <strong>lavatrice</strong> che centrifuga, il <strong>ventilatore</strong> d'estate, il
+          <strong>frullatore</strong>, il <strong>trapano</strong>, la pompa della <strong>lavastoviglie</strong>, il
+          motorino del <strong>phon</strong>… ogni volta che qualcosa <em>gira</em> attaccato a una presa, dentro c'è
+          un motore che balla al ritmo dei 50 Hz.</p>
+      </div>
+
+      <div class="done-banner" id="done-7">🏅 GIOCO COMPLETATO! Sei ufficialmente un Ingegnere di Circuiti di 1ª classe.</div>
+      <div class="level-lock" id="lock-7"><div class="lk">🔒 Completa il livello precedente</div></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 3 — Costruire circuiti · Fisica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- ============================ IL GIOCO ============================ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const $ = (id) => document.getElementById(id);
+      const C = { blue: '#3b82f6', green: '#22c55e', red: '#ef4444', gold: '#f5b400', magenta: '#f06ab8', gray: '#9aa5c0' };
+
+      /* ============ STATO E HUD ============ */
+      const KEY = 'fisica5-costruire-circuiti';
+      let state = { done: {}, free: false };
+      try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.done) state = s; } catch (e) {}
+      function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+      const NLEV = 7;
+      function isUnlocked(n) { return n === 1 || state.free || !!state.done[n - 1]; }
+
+      function renderHud() {
+        const box = $('hud-badges'); box.innerHTML = '';
+        const allDone = (() => { for (let n = 1; n <= NLEV; n++) if (!state.done[n]) return false; return true; })();
+
+        if (allDone) {
+          // Le sette stelle di Hokuto: una stella per livello, disposte come il Grande Carro
+          const P = [ // [x, y] — dal manico (livello 1) alla coppa (livello 7)
+            [16, 30], [50, 16], [86, 22], [120, 30], [130, 62], [188, 66], [198, 26],
+          ];
+          const seg = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 3]];
+          const wrap = document.createElement('div');
+          wrap.className = 'hokuto';
+          wrap.title = 'Le sette stelle di Hokuto: gioco completato!';
+          let svg = '<svg viewBox="0 0 240 80" role="img" aria-label="Costellazione delle sette stelle: gioco completato">';
+          seg.forEach(([a, b]) => {
+            svg += `<line class="cline" x1="${P[a][0]}" y1="${P[a][1]}" x2="${P[b][0]}" y2="${P[b][1]}"/>`;
+          });
+          P.forEach(([x, y], i) => {
+            svg += `<text class="st" data-lv="${i + 1}" x="${x}" y="${y + 6}" text-anchor="middle" ` +
+              `style="animation-delay:${(i * 0.25).toFixed(2)}s"><title>Livello ${i + 1} — completato</title>★</text>`;
+          });
+          svg += '</svg>';
+          wrap.innerHTML = svg;
+          wrap.querySelectorAll('.st').forEach(st => {
+            st.addEventListener('click', () => {
+              const sec = $('lv' + st.dataset.lv); if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+            });
+          });
+          box.appendChild(wrap);
+          return;
+        }
+
+        for (let n = 1; n <= NLEV; n++) {
+          const b = document.createElement('div');
+          b.className = 'badge-lv ' + (state.done[n] ? 'done' : (isUnlocked(n) ? 'open' : 'locked'));
+          b.textContent = state.done[n] ? '★' : n;
+          b.title = 'Livello ' + n + (state.done[n] ? ' — completato!' : (isUnlocked(n) ? '' : ' — bloccato'));
+          b.addEventListener('click', () => {
+            if (!isUnlocked(n)) return;
+            const sec = $('lv' + n); if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+          });
+          box.appendChild(b);
+        }
+      }
+      function applyLocks() {
+        for (let n = 1; n <= NLEV; n++) {
+          const lock = $('lock-' + n);
+          if (lock) lock.style.display = isUnlocked(n) ? 'none' : 'grid';
+          const done = $('done-' + n);
+          if (done) done.classList.toggle('show', !!state.done[n]);
+        }
+        renderHud();
+      }
+      function completeLevel(n) {
+        if (state.done[n]) return;
+        state.done[n] = true; save(); applyLocks();
+        const done = $('done-' + n); if (done) done.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      $('free-mode').checked = !!state.free;
+      $('free-mode').addEventListener('change', (e) => { state.free = e.target.checked; save(); applyLocks(); });
+      $('reset-game').addEventListener('click', () => {
+        if (confirm('Ricominciare il gioco da capo? I progressi salvati andranno persi.')) {
+          localStorage.removeItem(KEY); location.reload();
+        }
+      });
+      applyLocks();
+
+      /* ============ COACH ============ */
+      function say(id, txt, mood) {
+        const box = $(id); if (!box) return;
+        box.querySelector('.say').innerHTML = txt;
+        box.classList.remove('ok', 'err');
+        if (mood) { void box.offsetWidth; box.classList.add(mood); }
+      }
+
+      /* ============ GLIFI DEI COMPONENTI (70×36, filo a y=18) ============ */
+      const G = {
+        battery: () => `<line x1="0" y1="18" x2="28" y2="18" class="wire"/>
+          <line x1="30" y1="4" x2="30" y2="32" stroke="var(--primary)" stroke-width="2"/>
+          <line x1="40" y1="10" x2="40" y2="26" stroke="var(--primary)" stroke-width="5"/>
+          <line x1="42" y1="18" x2="70" y2="18" class="wire"/>
+          <text x="24" y="10" font-size="9" fill="var(--red)" font-weight="700">+</text>`,
+        resistor: (lab) => `<line x1="0" y1="18" x2="8" y2="18" class="wire"/>
+          <polyline points="8,18 13,7 21,29 29,7 37,29 45,7 53,29 58,18" class="res"/>
+          <line x1="58" y1="18" x2="70" y2="18" class="wire"/>
+          <text x="35" y="35" text-anchor="middle" font-size="9.5" fill="var(--muted)" font-weight="600">${lab || ''}</text>`,
+        ammeter: () => `<line x1="0" y1="18" x2="21" y2="18" class="wire"/>
+          <circle cx="35" cy="18" r="14" class="glass"/>
+          <text x="35" y="23" text-anchor="middle" font-size="13" font-weight="800" fill="var(--magenta)">A</text>
+          <line x1="49" y1="18" x2="70" y2="18" class="wire"/>`,
+        voltmeter: () => `<line x1="0" y1="18" x2="21" y2="18" class="probe"/>
+          <circle cx="35" cy="18" r="14" class="glass"/>
+          <text x="35" y="23" text-anchor="middle" font-size="13" font-weight="800" fill="var(--magenta)">V</text>
+          <line x1="49" y1="18" x2="70" y2="18" class="probe"/>`,
+        capacitor: (lab) => `<line x1="0" y1="18" x2="30" y2="18" class="wire"/>
+          <line x1="31" y1="4" x2="31" y2="32" class="plate"/>
+          <line x1="39" y1="4" x2="39" y2="32" class="plate"/>
+          <line x1="40" y1="18" x2="70" y2="18" class="wire"/>
+          <text x="35" y="35" text-anchor="middle" font-size="9.5" fill="var(--muted)" font-weight="600">${lab || ''}</text>`,
+        lamp: () => `<line x1="0" y1="18" x2="21" y2="18" class="wire"/>
+          <circle cx="35" cy="18" r="14" class="glass"/>
+          <line x1="26" y1="9" x2="44" y2="27" stroke="var(--gold)" stroke-width="2"/>
+          <line x1="44" y1="9" x2="26" y2="27" stroke="var(--gold)" stroke-width="2"/>
+          <line x1="49" y1="18" x2="70" y2="18" class="wire"/>`,
+        led: () => `<line x1="0" y1="18" x2="22" y2="18" class="wire"/>
+          <polygon points="22,7 22,29 44,18" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+          <line x1="44" y1="7" x2="44" y2="29" stroke="var(--primary)" stroke-width="2.5"/>
+          <line x1="44" y1="18" x2="70" y2="18" class="wire"/>`,
+      };
+
+      /* ============ COSTRUTTORE DI CIRCUITI A SLOT ============ */
+      function makeBuilder(cfg) {
+        // cfg: svgId, palId, msgId, base (stringa svg), slots [{x,y,accept,label,hints{type:msg}}],
+        //      palette [{type,name,glyph}], onBuilt()
+        const svg = $(cfg.svgId), pal = $(cfg.palId);
+        let selected = null, builtFired = false;
+        svg.innerHTML = cfg.base;
+        const slotEls = [];
+
+        cfg.slots.forEach((s, idx) => {
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          g.setAttribute('class', 'slot-g');
+          g.setAttribute('transform', `translate(${s.x},${s.y})`);
+          g.innerHTML = `<rect class="slot-rect" x="0" y="0" width="70" height="36" rx="7"></rect>
+            <text class="slot-q" x="35" y="23" text-anchor="middle">?</text>
+            <text x="35" y="52" text-anchor="middle" font-size="10.5" fill="var(--muted)">${s.label || ''}</text>`;
+          svg.appendChild(g);
+          const rec = { cfg: s, g, filled: null };
+          g.addEventListener('click', () => {
+            if (builtFired) return;
+            if (rec.filled) { // rimuovi
+              const t = rec.filled; rec.filled = null;
+              g.innerHTML = `<rect class="slot-rect" x="0" y="0" width="70" height="36" rx="7"></rect>
+                <text class="slot-q" x="35" y="23" text-anchor="middle">?</text>
+                <text x="35" y="52" text-anchor="middle" font-size="10.5" fill="var(--muted)">${s.label || ''}</text>`;
+              const pb = pal.querySelector(`[data-type="${t}"]`); if (pb) pb.classList.remove('used');
+              say(cfg.msgId, 'Componente rimesso nella cassetta.');
+              return;
+            }
+            if (!selected) { say(cfg.msgId, 'Prima scegli un componente dalla cassetta! 👇', 'err'); return; }
+            if (selected !== s.accept) {
+              const hint = (s.hints && s.hints[selected]) || cfg.wrongDefault || 'Mmm, questo componente qui non ci va…';
+              say(cfg.msgId, hint, 'err'); return;
+            }
+            // piazzalo
+            const p = cfg.palette.find(x => x.type === selected);
+            rec.filled = selected;
+            g.innerHTML = `<rect x="-2" y="-2" width="74" height="40" rx="8" fill="var(--surface)" stroke="none"></rect>` + p.glyph;
+            const pb = pal.querySelector(`[data-type="${selected}"]`); if (pb) { pb.classList.add('used'); pb.classList.remove('sel'); }
+            selected = null;
+            if (slotEls.every(r => r.filled)) {
+              builtFired = true;
+              say(cfg.msgId, '✔ <strong>Circuito montato!</strong> La corrente inizia a scorrere…', 'ok');
+              if (cfg.flowPath) {
+                const f = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                f.setAttribute('d', cfg.flowPath); f.setAttribute('class', 'flow');
+                svg.appendChild(f);
+              }
+              if (cfg.onBuilt) cfg.onBuilt();
+            } else {
+              say(cfg.msgId, 'Perfetto, continua a montare!', 'ok');
+            }
+          });
+          slotEls.push(rec);
+        });
+
+        cfg.palette.forEach(p => {
+          const b = document.createElement('div');
+          b.className = 'pal-btn'; b.dataset.type = p.type;
+          b.innerHTML = `<svg viewBox="0 0 70 36">${p.glyph}</svg><span class="pn">${p.name}</span>`;
+          b.addEventListener('click', () => {
+            if (b.classList.contains('used')) return;
+            pal.querySelectorAll('.pal-btn').forEach(x => x.classList.remove('sel'));
+            selected = (selected === p.type) ? null : p.type;
+            if (selected) b.classList.add('sel');
+          });
+          pal.appendChild(b);
+        });
+      }
+
+      /* ================================================================
+         LIVELLO 1 — Prima e seconda legge di Ohm
+         ================================================================ */
+      (function () {
+        if (!$('l1-svg')) return;
+        const Rpool = [40, 60, 100, 150];
+        const Rtrue = Rpool[Math.floor(Math.random() * Rpool.length)];
+        let partA = false, partB = false;
+        const points = []; // {I,V}
+
+        makeBuilder({
+          svgId: 'l1-svg', palId: 'l1-pal', msgId: 'l1-msg',
+          base: `<line x1="60" y1="60" x2="140" y2="60" class="wire"/>
+            <line x1="210" y1="60" x2="380" y2="60" class="wire"/>
+            <line x1="450" y1="60" x2="580" y2="60" class="wire"/>
+            <line x1="580" y1="60" x2="580" y2="230" class="wire"/>
+            <line x1="580" y1="230" x2="350" y2="230" class="wire"/>
+            <line x1="280" y1="230" x2="60" y2="230" class="wire"/>
+            <line x1="60" y1="230" x2="60" y2="60" class="wire"/>
+            <line x1="150" y1="96" x2="150" y2="138" class="probe"/>
+            <line x1="220" y1="96" x2="220" y2="138" class="probe"/>
+            <line x1="150" y1="96" x2="150" y2="78" class="probe"/>
+            <line x1="220" y1="96" x2="220" y2="78" class="probe"/>`,
+          slots: [
+            { x: 140, y: 42, accept: 'mystery', label: 'resistenza', hints: {
+                battery: 'Il generatore va sul filo in basso, non qui!',
+                ammeter: 'Qui va la resistenza misteriosa: l’amperometro mettilo nell’altro slot in serie.',
+                voltmeter: 'Il voltmetro non va sul filo: va in parallelo, nello slot qui sotto!',
+                lamp: 'La lampadina è simpatica ma oggi cerchiamo R…' } },
+            { x: 380, y: 42, accept: 'ammeter', label: 'amperometro (in serie)', hints: {
+                voltmeter: 'Mai il voltmetro in serie: bloccherebbe la corrente (resistenza interna enorme)!',
+                mystery: 'La resistenza va nel primo slot, tra i puntali del voltmetro.',
+                battery: 'Il generatore va in basso!',
+                lamp: 'Niente lampadine nel percorso di misura…' } },
+            { x: 280, y: 212, accept: 'battery', label: 'generatore', hints: {
+                ammeter: 'L’amperometro va in alto, in serie alla resistenza.',
+                voltmeter: 'Il voltmetro in parallelo alla resistenza, non al posto della pila!',
+                mystery: 'Qui serve chi spinge la corrente: il generatore.',
+                lamp: 'Una lampadina non alimenta niente…' } },
+            { x: 150, y: 138, accept: 'voltmeter', label: 'voltmetro (in parallelo)', hints: {
+                ammeter: 'NO! L’amperometro in parallelo è quasi un cortocircuito: si brucia!',
+                mystery: 'La resistenza sta sul filo principale.',
+                battery: 'La pila qui non serve.',
+                lamp: 'Ancora la lampadina?! 😄' } },
+          ],
+          palette: [
+            { type: 'battery', name: 'generatore', glyph: G.battery() },
+            { type: 'mystery', name: 'resistenza R?', glyph: G.resistor('R = ?') },
+            { type: 'ammeter', name: 'amperometro', glyph: G.ammeter() },
+            { type: 'voltmeter', name: 'voltmetro', glyph: G.voltmeter() },
+            { type: 'lamp', name: 'lampadina', glyph: G.lamp() },
+          ],
+          flowPath: 'M60,60 L580,60 L580,230 L60,230 Z',
+          onBuilt: () => { $('l1-lab').style.display = 'block'; refresh(); drawPlot(); },
+        });
+
+        // --- misura ---
+        let reading = 0;
+        function refresh() {
+          const V = +$('l1-v').value;
+          $('l1-v-val').textContent = V;
+          const I = V / Rtrue;
+          reading = I * (1 + (Math.random() * 2 - 1) * 0.015);
+          $('l1-read').textContent = `📟 I = ${reading.toFixed(3)} A · clicca per registrare`;
+        }
+        $('l1-v').addEventListener('input', refresh);
+
+        function drawPlot() {
+          if (!window.Plt) return;
+          const traces = [{
+            x: points.map(p => p.I), y: points.map(p => p.V), type: 'scatter', mode: 'markers',
+            name: 'misure', marker: { color: C.gold, size: 10, line: { color: C.magenta, width: 1.5 } },
+          }];
+          if (partA) {
+            const Imax = Math.max(...points.map(p => p.I)) * 1.15;
+            const Rfit = fitR();
+            traces.push({ x: [0, Imax], y: [0, Rfit * Imax], type: 'scatter', mode: 'lines',
+              name: 'retta trovata', line: { color: C.magenta, width: 2.5 } });
+          }
+          if (partBLineR > 0) {
+            const Im = 30 / partBLineR;
+            traces.push({ x: [0, Im], y: [0, 30], type: 'scatter', mode: 'lines',
+              name: 'il tuo filo', line: { color: C.green, width: 2.5, dash: 'dash' } });
+          }
+          Plt.update('l1-plot', traces, {
+            xaxis: { title: 'I (A)', rangemode: 'tozero' },
+            yaxis: { title: 'V (V)', rangemode: 'tozero' },
+            showlegend: true, legend: { orientation: 'h', y: 1.12 },
+          });
+        }
+        function fitR() {
+          let num = 0, den = 0;
+          points.forEach(p => { num += p.I * p.V; den += p.I * p.I; });
+          return den > 0 ? num / den : 0;
+        }
+
+        $('l1-read').addEventListener('click', () => {
+          if (partA) return;
+          const V = +$('l1-v').value;
+          if (V === 0) { say('l1-msg', 'Con 0 V non passa corrente: il punto (0;0) lo sappiamo già! Alza la tensione.', 'err'); return; }
+          if (points.some(p => Math.abs(p.V - V) < 3)) {
+            say('l1-msg', 'Hai già un punto con una tensione troppo simile: cambia V di almeno 3 volt.', 'err'); return;
+          }
+          points.push({ I: reading, V });
+          $('l1-count').textContent = `punti: ${points.length}/5`;
+          drawPlot();
+          if (points.length >= 5) {
+            partA = true;
+            const Rfit = fitR();
+            drawPlot();
+            const err = Math.abs(Rfit - Rtrue) / Rtrue * 100;
+            $('l1-fit').innerHTML = `La retta è servita! Pendenza = <span class="val-badge">${Rfit.toFixed(1)} Ω</span>. ` +
+              `Il laboratorio conferma: la resistenza misteriosa era <span class="val-badge">R = ${Rtrue} Ω</span> ` +
+              `(scarto della tua misura: ${err.toFixed(1)}%). 🎉`;
+            say('l1-msg', '🔎 Pendenza = resistenza. Hai smascherato la resistenza misteriosa! Ora tocca alla seconda legge di Ohm…', 'ok');
+            $('l1-b').style.display = 'block';
+            wire();
+          } else {
+            say('l1-msg', `Punto registrato (${points.length}/5): V = ${V} V, I = ${reading.toFixed(3)} A. Cambia tensione e continua!`, 'ok');
+          }
+          refresh();
+        });
+
+        // --- parte B: seconda legge ---
+        let partBLineR = 0;
+        function wire() {
+          const rho = parseFloat($('l1-mat').value);
+          const L = +$('l1-len').value, A = +$('l1-sez').value;
+          $('l1-len-val').textContent = L.toFixed(1);
+          $('l1-sez-val').textContent = A.toFixed(2);
+          const R = rho * L / (A * 1e-6);
+          partBLineR = R;
+          $('l1-rwire').innerHTML = `R = ρ·L/A = <span class="val-badge">${R < 1 ? R.toFixed(3) : R.toFixed(2)} Ω</span> — guarda la pendenza della retta verde!`;
+          drawPlot();
+          if (!partB && R >= 8 && R <= 12) {
+            partB = true;
+            $('l1-mission').classList.add('done');
+            $('l1-mission').querySelector('.mk').textContent = '✅';
+            completeLevel(1);
+          }
+        }
+        ['l1-mat', 'l1-len', 'l1-sez'].forEach(id => {
+          $(id).addEventListener('input', wire);
+          $(id).addEventListener('change', wire);
+        });
+      })();
+
+      /* ================================================================
+         LIVELLO 2 — Effetto Joule
+         ================================================================ */
+      (function () {
+        if (!$('l2-v')) return;
+        let m1 = false, m2 = false;
+        function go() {
+          const V = +$('l2-v').value, R = +$('l2-r').value;
+          $('l2-v-val').textContent = V; $('l2-r-val').textContent = R;
+          const P = V * V / R, I = V / R;
+          $('l2-out').innerHTML = `I = V/R = <span class="val-badge">${I.toFixed(2)} A</span> &nbsp; → &nbsp; ` +
+            `P = V²/R = <span class="val-badge">${P >= 1000 ? (P / 1000).toFixed(2) + ' kW' : P.toFixed(1) + ' W'}</span> dissipati in calore`;
+          const t = Math.min(P / 3000, 1);
+          $('l2-fill').style.width = (Math.sqrt(t) * 100).toFixed(1) + '%';
+          // colore resistenza: blu → rosso → quasi bianco
+          let r, g, b;
+          if (t < 0.5) { const u = t * 2; r = 59 + (239 - 59) * u; g = 130 + (68 - 130) * u; b = 246 + (68 - 246) * u; }
+          else { const u = (t - 0.5) * 2; r = 239 + (255 - 239) * u; g = 68 + (225 - 68) * u; b = 68 + (150 - 68) * u; }
+          $('l2-hot').setAttribute('fill', `rgb(${r | 0},${g | 0},${b | 0})`);
+          $('l2-waves').setAttribute('opacity', (t * 1.4).toFixed(2));
+          if (!m1 && Math.abs(P - 2000) <= 100) { m1 = true; $('l2-m1').classList.add('done'); $('l2-m1').querySelector('.mk').textContent = '✅'; }
+          if (!m2 && Math.abs(P - 60) <= 5) { m2 = true; $('l2-m2').classList.add('done'); $('l2-m2').querySelector('.mk').textContent = '✅'; }
+          if (m1 && m2) completeLevel(2);
+        }
+        ['l2-v', 'l2-r'].forEach(id => $(id).addEventListener('input', go));
+        go();
+      })();
+
+      /* ================================================================
+         LIVELLO 3 — Serie e parallelo (resistenze)
+         ================================================================ */
+      (function () {
+        if (!$('l3s-svg')) return;
+        const Vb = 12;
+        let serieOk = false, parOk = false;
+
+        function equivalentGame(svg2Id, cardsId, msg2Id, target, cards, unit, onWin, trapMsgs) {
+          const svg2 = $(svg2Id);
+          svg2.innerHTML = `<line x1="80" y1="50" x2="230" y2="50" class="wire"/>
+            <g id="${svg2Id}-slot"></g>
+            <line x1="300" y1="50" x2="400" y2="50" class="wire"/>
+            <circle cx="430" cy="50" r="16" class="glass"/>
+            <text x="430" y="55" text-anchor="middle" font-size="13" font-weight="800" fill="var(--magenta)">A</text>
+            <line x1="446" y1="50" x2="560" y2="50" class="wire"/>
+            <line x1="560" y1="50" x2="560" y2="150" class="wire"/>
+            <line x1="560" y1="150" x2="330" y2="150" class="wire"/>
+            <line x1="260" y1="150" x2="80" y2="150" class="wire"/>
+            <line x1="80" y1="150" x2="80" y2="50" class="wire"/>
+            <g transform="translate(260,132)">${G.battery()}</g>
+            <text x="295" y="185" text-anchor="middle" class="lbl-s" fill="var(--muted)">12 V</text>
+            <text x="430" y="90" text-anchor="middle" class="lbl-s" id="${svg2Id}-read" fill="var(--green)">I = —</text>`;
+          const slotG = $(svg2Id + '-slot');
+          slotG.setAttribute('transform', 'translate(230,32)');
+          slotG.innerHTML = `<rect class="slot-rect" x="0" y="0" width="70" height="36" rx="7"></rect>
+            <text class="slot-q" x="35" y="23" text-anchor="middle">?</text>`;
+          const row = $(cardsId);
+          cards.forEach(v => {
+            const c = document.createElement('div');
+            c.className = 'rcard';
+            c.innerHTML = `<div class="rv">${v}</div><div class="ru">${unit}</div>`;
+            c.addEventListener('click', () => {
+              row.querySelectorAll('.rcard').forEach(x => x.classList.remove('sel', 'win'));
+              c.classList.add('sel');
+              slotG.innerHTML = `<rect x="-2" y="-2" width="74" height="40" rx="8" fill="var(--surface)"></rect>` +
+                (unit === 'µF' ? G.capacitor(v + ' µF') : G.resistor(v + ' Ω'));
+              let readTxt, matched;
+              if (unit === 'µF') { const Q = v * Vb; readTxt = `Q = ${Q} µC`; matched = (v === target); }
+              else { const I = Vb / v; readTxt = `I = ${I.toFixed(3)} A`; matched = (v === target); }
+              $(svg2Id + '-read').textContent = readTxt;
+              if (matched) {
+                c.classList.add('win');
+                say(msg2Id, '🎯 <strong>PERFETTO!</strong> Stessa pila, stessa misura: hai trovato l’equivalente!', 'ok');
+                onWin();
+              } else {
+                const key = v > target ? 'high' : 'low';
+                say(msg2Id, (trapMsgs && trapMsgs[v]) || (key === 'high'
+                  ? 'Misura troppo piccola: il tuo valore è troppo grande. Riprova!'
+                  : 'Misura troppo grande: il tuo valore è troppo piccolo. Riprova!'), 'err');
+              }
+            });
+            row.appendChild(c);
+          });
+        }
+
+        // --- 3.1 serie ---
+        makeBuilder({
+          svgId: 'l3s-svg', palId: 'l3s-pal', msgId: 'l3s-msg',
+          base: `<line x1="60" y1="60" x2="120" y2="60" class="wire"/>
+            <line x1="190" y1="60" x2="290" y2="60" class="wire"/>
+            <line x1="360" y1="60" x2="440" y2="60" class="wire"/>
+            <line x1="510" y1="60" x2="580" y2="60" class="wire"/>
+            <line x1="580" y1="60" x2="580" y2="180" class="wire"/>
+            <line x1="580" y1="180" x2="350" y2="180" class="wire"/>
+            <line x1="280" y1="180" x2="60" y2="180" class="wire"/>
+            <line x1="60" y1="180" x2="60" y2="60" class="wire"/>
+            <g transform="translate(280,162)">${G.battery()}</g>
+            <text x="315" y="215" text-anchor="middle" class="lbl-s" fill="var(--muted)">12 V</text>`,
+          slots: [
+            { x: 120, y: 42, accept: 'r10', label: 'R₁ = 10 Ω', hints: { r20: 'Quello è R₂ = 20 Ω: leggile bene!', ammeter: 'L’amperometro ha il suo slot dedicato.', lamp: 'Niente lampadine!' } },
+            { x: 290, y: 42, accept: 'r20', label: 'R₂ = 20 Ω', hints: { r10: 'Quello è R₁ = 10 Ω: qui va la 20 Ω.', ammeter: 'L’amperometro va nell’ultimo slot.', lamp: 'Ancora?! 😄' } },
+            { x: 440, y: 42, accept: 'ammeter', label: 'amperometro', hints: { r10: 'Qui serve lo strumento di misura.', r20: 'Qui serve lo strumento di misura.', lamp: 'Su, concentrati! 😄' } },
+          ],
+          palette: [
+            { type: 'r10', name: 'R 10 Ω', glyph: G.resistor('10 Ω') },
+            { type: 'r20', name: 'R 20 Ω', glyph: G.resistor('20 Ω') },
+            { type: 'ammeter', name: 'amperometro', glyph: G.ammeter() },
+            { type: 'lamp', name: 'lampadina', glyph: G.lamp() },
+          ],
+          flowPath: 'M60,60 L580,60 L580,180 L60,180 Z',
+          onBuilt: () => {
+            $('l3s-eq').style.display = 'block';
+            $('l3s-i').textContent = 'I = ' + (Vb / 30).toFixed(3) + ' A';
+            equivalentGame('l3s-svg2', 'l3s-cards', 'l3s-msg2', 30, [12, 15, 25, 30, 60], 'Ω', () => {
+              if (!serieOk) {
+                serieOk = true;
+                say('l3s-msg2', '🎯 R<sub>eq</sub> = 30 Ω = 10 + 20: <strong>in serie le resistenze si sommano!</strong> Ora il parallelo…', 'ok');
+                $('l3p-part').style.display = 'block';
+                buildParallel();
+              }
+            }, { 15: 'La “media”? Bel tentativo, ma la corrente non è d’accordo…', 60: 'Troppa resistenza: qui passa metà della corrente giusta.' });
+          },
+        });
+
+        // --- 3.2 parallelo ---
+        function buildParallel() {
+          makeBuilder({
+            svgId: 'l3p-svg', palId: 'l3p-pal', msgId: 'l3p-msg',
+            base: `<line x1="60" y1="60" x2="180" y2="60" class="wire"/>
+              <line x1="440" y1="60" x2="460" y2="60" class="wire"/>
+              <line x1="530" y1="60" x2="580" y2="60" class="wire"/>
+              <line x1="580" y1="60" x2="580" y2="240" class="wire"/>
+              <line x1="580" y1="240" x2="350" y2="240" class="wire"/>
+              <line x1="280" y1="240" x2="60" y2="240" class="wire"/>
+              <line x1="60" y1="240" x2="60" y2="60" class="wire"/>
+              <line x1="180" y1="60" x2="180" y2="170" class="wire"/>
+              <line x1="440" y1="60" x2="440" y2="170" class="wire"/>
+              <line x1="180" y1="110" x2="270" y2="110" class="wire"/>
+              <line x1="340" y1="110" x2="440" y2="110" class="wire"/>
+              <line x1="180" y1="170" x2="270" y2="170" class="wire"/>
+              <line x1="340" y1="170" x2="440" y2="170" class="wire"/>
+              <g transform="translate(280,222)">${G.battery()}</g>
+              <text x="315" y="275" text-anchor="middle" class="lbl-s" fill="var(--muted)">12 V</text>`,
+            slots: [
+              { x: 270, y: 92, accept: 'r20', label: 'ramo 1: R₁ = 20 Ω', hints: { r30: 'Quella è la 30 Ω: mettila nell’altro ramo.', ammeter: 'L’amperometro va sulla linea principale in alto.' } },
+              { x: 270, y: 152, accept: 'r30', label: 'ramo 2: R₂ = 30 Ω', hints: { r20: 'La 20 Ω va nel primo ramo.', ammeter: 'L’amperometro va sulla linea principale in alto.' } },
+              { x: 460, y: 42, accept: 'ammeter', label: 'amperometro', hints: { r20: 'Qui serve lo strumento!', r30: 'Qui serve lo strumento!' } },
+            ],
+            palette: [
+              { type: 'r20', name: 'R 20 Ω', glyph: G.resistor('20 Ω') },
+              { type: 'r30', name: 'R 30 Ω', glyph: G.resistor('30 Ω') },
+              { type: 'ammeter', name: 'amperometro', glyph: G.ammeter() },
+              { type: 'voltmeter', name: 'voltmetro', glyph: G.voltmeter() },
+            ],
+            wrongDefault: 'Qui no! Guarda le etichette degli slot.',
+            flowPath: 'M60,60 L180,60 L180,110 L440,110 L440,60 L580,60 L580,240 L60,240 Z',
+            onBuilt: () => {
+              $('l3p-eq').style.display = 'block';
+              $('l3p-i').textContent = 'I = ' + (Vb / 12).toFixed(3) + ' A';
+              equivalentGame('l3p-svg2', 'l3p-cards', 'l3p-msg2', 12, [8, 10, 12, 25, 50], 'Ω', () => {
+                if (!parOk) {
+                  parOk = true;
+                  say('l3p-msg2', '🎯 R<sub>eq</sub> = 12 Ω, MENO della più piccola! In parallelo: 1/R<sub>eq</sub> = 1/20 + 1/30. Livello superato!', 'ok');
+                  if (serieOk) completeLevel(3);
+                }
+              }, { 50: '50 = 20 + 30? La somma vale per la SERIE! In parallelo la resistenza DIMINUISCE.', 25: 'La media non funziona nemmeno qui… pensaci: più strade = meno resistenza.' });
+            },
+          });
+        }
+      })();
+
+      /* ================================================================
+         LIVELLO 4 — Kirchhoff
+         ================================================================ */
+      (function () {
+        if (!$('l4-ans')) return;
+        const rounds = [
+          { type: 'node', vals: { I1: 5, I2: 2, I4: 3 }, ans: 4, txt: 'Prova 1 — Il nodo: entrano I₁ = 5 A e I₂ = 2 A; esce in basso I₄ = 3 A. Quanto vale I₃ (a destra)?' },
+          { type: 'node', vals: { I1: 8, I2: 4, I4: 5 }, ans: 7, txt: 'Prova 2 — Il nodo si complica: entrano I₁ = 8 A e I₂ = 4 A; esce in basso I₄ = 5 A. Quanto vale I₃?' },
+          { type: 'loop', eps: 12, v1: 7.5, ans: 4.5, txt: 'Prova 3 — La maglia: ε = 12 V, sulla prima resistenza cadono V₁ = 7,5 V. Quanto vale V₂?' },
+        ];
+        let idx = 0;
+        function show() {
+          const r = rounds[idx];
+          $('l4-round').textContent = r.txt;
+          $('l4-score').textContent = `prova ${idx + 1} di 3`;
+          if (r.type === 'node') {
+            $('l4-node-box').style.display = '';
+            $('l4-loop-box').style.display = 'none';
+            $('l4-lab1').textContent = `I₁ = ${r.vals.I1} A (entra)`;
+            $('l4-lab2').textContent = `I₂ = ${r.vals.I2} A (entra)`;
+            $('l4-lab3').textContent = 'I₃ = ? (esce)';
+            $('l4-lab4').textContent = `I₄ = ${r.vals.I4} A (esce)`;
+            $('l4-unit').textContent = 'A';
+          } else {
+            $('l4-node-box').style.display = 'none';
+            $('l4-loop-box').style.display = '';
+            $('l4-eps').textContent = `ε = ${r.eps} V`;
+            $('l4-v1').textContent = `V₁ = ${String(r.v1).replace('.', ',')} V`;
+            $('l4-unit').textContent = 'V';
+          }
+          $('l4-ans').value = 0; $('l4-ans-val').textContent = '0';
+        }
+        $('l4-ans').addEventListener('input', () => { $('l4-ans-val').textContent = $('l4-ans').value; });
+        $('l4-check').addEventListener('click', () => {
+          const r = rounds[idx], got = +$('l4-ans').value;
+          if (Math.abs(got - r.ans) < 0.001) {
+            idx++;
+            if (idx >= rounds.length) {
+              say('l4-msg', '⚔️ «Impossibile… conosci le mie leggi meglio di me!» — <strong>Guardiano sconfitto.</strong>', 'ok');
+              $('l4-check').disabled = true;
+              completeLevel(4);
+            } else {
+              say('l4-msg', `✔ Esatto! ${idx === 2 ? 'Ultima prova: la maglia.' : 'Prossima prova…'}`, 'ok');
+              show();
+            }
+          } else if (got > r.ans) {
+            say('l4-msg', '«Troppa! Da dove verrebbe tutta questa corrente/tensione in più? Riprova.»', 'err');
+          } else {
+            say('l4-msg', '«Troppo poca! Nel mio regno nulla si perde: ricontrolla il bilancio.»', 'err');
+          }
+        });
+        show();
+      })();
+
+      /* ================================================================
+         LIVELLO 5 — Condensatori
+         ================================================================ */
+      (function () {
+        if (!$('l5-v')) return;
+        const Vb = 12;
+        let serieOk = false, parOk = false;
+
+        // 5.1 carica singola
+        function charge() {
+          const V = +$('l5-v').value;
+          $('l5-v-val').textContent = V;
+          const Q = 100 * V; // µC
+          $('l5-q').textContent = `Q = ${Q.toFixed(0)} µC`;
+          const n = Math.round(V * 1.2);
+          let plus = '', minus = '';
+          for (let i = 0; i < n; i++) {
+            const y = 36 + (i % 6) * 11, dx = Math.floor(i / 6) * 13;
+            plus += `<text x="${272 - dx}" y="${y}" font-size="11" fill="var(--red)" font-weight="700">+</text>`;
+            minus += `<text x="${322 + dx}" y="${y}" font-size="12" fill="var(--primary)" font-weight="700">−</text>`;
+          }
+          $('l5-plus').innerHTML = plus; $('l5-minus').innerHTML = minus;
+        }
+        $('l5-v').addEventListener('input', charge);
+        charge();
+
+        // riuso del mini-gioco equivalente del livello 3 (qui ridefinito per le carte µF)
+        function capEquivalent(cardsId, msgId, target, cards, qmId, onWin, traps) {
+          const row = $(cardsId);
+          cards.forEach(v => {
+            const c = document.createElement('div');
+            c.className = 'rcard';
+            c.innerHTML = `<div class="rv">${v}</div><div class="ru">µF</div>`;
+            c.addEventListener('click', () => {
+              row.querySelectorAll('.rcard').forEach(x => x.classList.remove('sel', 'win'));
+              c.classList.add('sel');
+              const Q = v * Vb;
+              if (v === target) {
+                c.classList.add('win');
+                say(msgId, `🎯 <strong>PERFETTO!</strong> Il tuo condensatore accumula Q = ${Q} µC: identico al circuito originale!`, 'ok');
+                onWin();
+              } else {
+                say(msgId, (traps && traps[v]) || `Il tuo condensatore accumula Q = ${Q} µC: non coincide. Riprova!`, 'err');
+              }
+            });
+            row.appendChild(c);
+          });
+        }
+
+        // 5.2 serie
+        makeBuilder({
+          svgId: 'l5s-svg', palId: 'l5s-pal', msgId: 'l5s-msg',
+          base: `<line x1="60" y1="60" x2="160" y2="60" class="wire"/>
+            <line x1="230" y1="60" x2="330" y2="60" class="wire"/>
+            <line x1="400" y1="60" x2="580" y2="60" class="wire"/>
+            <line x1="580" y1="60" x2="580" y2="170" class="wire"/>
+            <line x1="580" y1="170" x2="350" y2="170" class="wire"/>
+            <line x1="280" y1="170" x2="60" y2="170" class="wire"/>
+            <line x1="60" y1="170" x2="60" y2="60" class="wire"/>
+            <g transform="translate(280,152)">${G.battery()}</g>
+            <text x="315" y="205" text-anchor="middle" class="lbl-s" fill="var(--muted)">12 V</text>`,
+          slots: [
+            { x: 160, y: 42, accept: 'c6', label: 'C₁ = 6 µF', hints: { c12: 'Quello è il 12 µF: leggile bene!', battery: 'La pila c’è già!' } },
+            { x: 330, y: 42, accept: 'c12', label: 'C₂ = 12 µF', hints: { c6: 'Quello è il 6 µF: qui va il 12.', battery: 'La pila c’è già!' } },
+          ],
+          palette: [
+            { type: 'c6', name: 'C 6 µF', glyph: G.capacitor('6 µF') },
+            { type: 'c12', name: 'C 12 µF', glyph: G.capacitor('12 µF') },
+            { type: 'lamp', name: 'lampadina', glyph: G.lamp() },
+          ],
+          wrongDefault: 'Qui vanno solo i condensatori indicati!',
+          onBuilt: () => {
+            $('l5s-eq').style.display = 'block';
+            $('l5s-qm').textContent = 'Q = 48 µC';   // Ceq = 4 µF × 12 V
+            capEquivalent('l5s-cards', 'l5s-msg2', 4, [3, 4, 9, 18], 'l5s-qm', () => {
+              if (!serieOk) {
+                serieOk = true;
+                say('l5s-msg2', '🎯 C<sub>eq</sub> = 4 µF: 1/C<sub>eq</sub> = 1/6 + 1/12. <strong>In serie la capacità DIMINUISCE!</strong> Ora il parallelo…', 'ok');
+                $('l5p-part').style.display = 'block';
+                buildPar();
+              }
+            }, { 18: '18 = 6 + 12? La somma vale per il PARALLELO: qui sono in serie!', 9: 'La media… di nuovo? I condensatori non fanno la media. 😄' });
+          },
+        });
+
+        // 5.3 parallelo
+        function buildPar() {
+          makeBuilder({
+            svgId: 'l5p-svg', palId: 'l5p-pal', msgId: 'l5p-msg',
+            base: `<line x1="60" y1="60" x2="180" y2="60" class="wire"/>
+              <line x1="440" y1="60" x2="580" y2="60" class="wire"/>
+              <line x1="580" y1="60" x2="580" y2="230" class="wire"/>
+              <line x1="580" y1="230" x2="350" y2="230" class="wire"/>
+              <line x1="280" y1="230" x2="60" y2="230" class="wire"/>
+              <line x1="60" y1="230" x2="60" y2="60" class="wire"/>
+              <line x1="180" y1="60" x2="180" y2="165" class="wire"/>
+              <line x1="440" y1="60" x2="440" y2="165" class="wire"/>
+              <line x1="180" y1="105" x2="270" y2="105" class="wire"/>
+              <line x1="340" y1="105" x2="440" y2="105" class="wire"/>
+              <line x1="180" y1="165" x2="270" y2="165" class="wire"/>
+              <line x1="340" y1="165" x2="440" y2="165" class="wire"/>
+              <g transform="translate(280,212)">${G.battery()}</g>
+              <text x="315" y="265" text-anchor="middle" class="lbl-s" fill="var(--muted)">12 V</text>`,
+            slots: [
+              { x: 270, y: 87, accept: 'c6', label: 'ramo 1: C₁ = 6 µF', hints: { c12: 'Il 12 µF va nell’altro ramo!' } },
+              { x: 270, y: 147, accept: 'c12', label: 'ramo 2: C₂ = 12 µF', hints: { c6: 'Il 6 µF va nel primo ramo!' } },
+            ],
+            palette: [
+              { type: 'c6', name: 'C 6 µF', glyph: G.capacitor('6 µF') },
+              { type: 'c12', name: 'C 12 µF', glyph: G.capacitor('12 µF') },
+            ],
+            wrongDefault: 'Un condensatore per ramo, come da etichetta!',
+            onBuilt: () => {
+              $('l5p-eq').style.display = 'block';
+              $('l5p-qm').textContent = 'Q = 216 µC';  // Ceq = 18 µF × 12 V
+              capEquivalent('l5p-cards', 'l5p-msg2', 18, [4, 7, 9, 18], 'l5p-qm', () => {
+                if (!parOk) {
+                  parOk = true;
+                  say('l5p-msg2', '🎯 C<sub>eq</sub> = 18 µF = 6 + 12: <strong>in parallelo le capacità si sommano</strong> — regole opposte alle resistenze!', 'ok');
+                  if (serieOk) completeLevel(5);
+                }
+              }, { 4: '4 µF era la SERIE! In parallelo le armature si affiancano: la capacità cresce.' });
+            },
+          });
+        }
+      })();
+
+      /* ================================================================
+         LIVELLO 6 — Solenoide e induzione
+         ================================================================ */
+      (function () {
+        if (!$('l6-mag')) return;
+        let x = 60, dir = 0, last = null, raf = null;
+        let m1 = false, m2 = false;
+        const XMIN = 20, XMAX = 240;
+
+        function frame(ts) {
+          if (last == null) last = ts;
+          const dt = Math.min((ts - last) / 1000, 0.05); last = ts;
+          const v = +$('l6-vel').value, N = +$('l6-n').value;
+          let eps = 0;
+          if (dir !== 0) {
+            const nx = x + dir * v * 4.2 * dt;
+            if (nx <= XMIN || nx >= XMAX) {
+              x = Math.max(XMIN, Math.min(XMAX, nx));
+              eps = 0; // magnete a fine corsa: fermo, niente induzione
+            } else {
+              x = nx;
+              eps = 0.02 * N * v * dir;
+            }
+          }
+          $('l6-mag').setAttribute('transform', `translate(${x.toFixed(1)},0)`);
+          const ang = Math.max(-65, Math.min(65, eps * 0.5));
+          $('l6-needle').setAttribute('transform', `rotate(${ang.toFixed(1)} 350 215)`);
+          $('l6-eps').textContent = `ε = ${eps.toFixed(0)} mV`;
+          if (!m1 && eps >= 80) { m1 = true; $('l6-m1').classList.add('done'); $('l6-m1').querySelector('.mk').textContent = '✅'; }
+          if (!m2 && eps <= -80) { m2 = true; $('l6-m2').classList.add('done'); $('l6-m2').querySelector('.mk').textContent = '✅'; }
+          if (m1 && m2) completeLevel(6);
+          raf = requestAnimationFrame(frame);
+        }
+        raf = requestAnimationFrame(frame);
+
+        $('l6-n').addEventListener('input', () => $('l6-n-val').textContent = $('l6-n').value);
+        $('l6-vel').addEventListener('input', () => $('l6-vel-val').textContent = $('l6-vel').value);
+
+        function hold(btnId, d) {
+          const b = $(btnId);
+          const on = (e) => { e.preventDefault(); dir = d; };
+          const off = () => { if (dir === d) dir = 0; };
+          b.addEventListener('pointerdown', on);
+          b.addEventListener('pointerup', off);
+          b.addEventListener('pointerleave', off);
+          b.addEventListener('pointercancel', off);
+        }
+        hold('l6-in', +1);
+        hold('l6-out-btn', -1);
+      })();
+
+      /* ================================================================
+         LIVELLO 7 — BOSS: corrente alternata
+         ================================================================ */
+      (function () {
+        if (!$('l7-hp')) return;
+        let hp = 100;
+        const phases = { a: false, b: false, m: false, c: false }; // 4 prove × 25 HP = 100
+        function hit(phase) {
+          if (phases[phase]) return;
+          phases[phase] = true;
+          hp = Math.max(0, hp - 25);
+          const allDone = phases.a && phases.b && phases.m && phases.c;
+          if (allDone) hp = 0; // garanzia: tutte le prove superate ⇒ zero assoluto
+          $('l7-hp').style.width = hp + '%';
+          $('l7-hp-txt').textContent = allDone ? 'HP 0/100 — SCONFITTO ☠️' : `HP ${hp}/100`;
+          if (allDone) {
+            $('l7-victory').classList.add('show');
+            completeLevel(7);
+          }
+        }
+
+        // --- 7.1 trasmissione ---
+        const P = 100000, Rl = 50;
+        document.querySelectorAll('[data-volt]').forEach(b => {
+          b.addEventListener('click', () => {
+            const V = +b.dataset.volt;
+            const I = P / V;
+            const Ploss = Rl * I * I;
+            const pct = Ploss / P * 100;
+            const tab = $('l7a-tab'); tab.style.display = '';
+            const tr = document.createElement('tr');
+            const lossTxt = Ploss >= 1e6 ? (Ploss / 1e6).toFixed(1) + ' MW' : Ploss >= 1000 ? (Ploss / 1000).toFixed(1) + ' kW' : Ploss.toFixed(0) + ' W';
+            const pctTxt = pct > 100 ? 'oltre il 100%! 🔥' : pct.toFixed(pct < 1 ? 2 : 1) + '%';
+            const esito = pct <= 5 ? '✅ villaggio illuminato!' : (pct > 100 ? '💀 blackout totale' : '❌ troppe perdite');
+            tr.innerHTML = `<td>${V >= 1000 ? (V / 1000) + ' kV' : V + ' V'}</td><td>${I.toFixed(I < 1 ? 2 : 1)} A</td><td>${lossTxt}</td><td>${pctTxt}</td><td>${esito}</td>`;
+            tab.querySelector('tbody').appendChild(tr);
+            if (pct <= 5) {
+              say('l7a-msg', '⚡ <strong>COLPO ANDATO A SEGNO!</strong> «Nooo, l’alta tensione! Le mie amate perdite!» — Alta tensione ⇒ corrente piccola ⇒ perdite R·I² minuscole.', 'ok');
+              $('l7a-note').style.display = '';
+              hit('a');
+            } else if (pct > 100) {
+              say('l7a-msg', '👹 «HAHAHA! A 230 V la corrente è enorme e la linea brucia TUTTO. Il villaggio resta al buio!»', 'err');
+            } else {
+              say('l7a-msg', `👹 «${pct.toFixed(0)}% di perdite… ancora troppo! Ti serve una tensione più alta.»`, 'err');
+            }
+          });
+        });
+
+        // --- 7.2 alternatore ---
+        let running = false, theta = 0, lastT = null, runTime = 0;
+        const wavePts = [];
+        function loop(ts) {
+          if (!running) { lastT = null; return; }
+          if (lastT == null) lastT = ts;
+          const dt = Math.min((ts - lastT) / 1000, 0.05); lastT = ts;
+          const rps = +$('l7b-f').value;
+          theta += 2 * Math.PI * rps * dt;
+          runTime += dt;
+          const s = Math.sin(theta);
+          const w = 6 + 70 * Math.abs(Math.cos(theta));
+          const coil = $('l7b-coil');
+          coil.setAttribute('x', (235 - w / 2).toFixed(1));
+          coil.setAttribute('width', w.toFixed(1));
+          coil.setAttribute('fill', s >= 0 ? 'var(--gold)' : 'var(--accent-2)');
+          wavePts.push(s);
+          if (wavePts.length > 250) wavePts.shift();
+          $('l7b-wave').setAttribute('points', wavePts.map((v, i) => `${370 + i},${(95 - v * 55).toFixed(1)}`).join(' '));
+          if (runTime > 3) $('l7b-go').style.display = '';
+          requestAnimationFrame(loop);
+        }
+        $('l7b-run').addEventListener('click', () => {
+          running = !running;
+          $('l7b-run').textContent = running ? '⏸ Ferma' : '⚡ Avvia l’alternatore';
+          if (running) requestAnimationFrame(loop);
+        });
+        $('l7b-f').addEventListener('input', () => $('l7b-f-val').textContent = (+$('l7b-f').value).toFixed(1));
+        $('l7b-go').addEventListener('click', () => {
+          say('l7m-msg', '👹 «Due colpi… ma costruire un motore è un\'altra storia, umano!»', null);
+          hit('b');
+        });
+
+        // --- 7.3 quiz: costruire il motore elettrico ---
+        (function () {
+          const quiz = $('l7m-quiz');
+          if (!quiz) return;
+          quiz.querySelectorAll('.mot-q').forEach(q => {
+            q.querySelectorAll('.rcard.mo').forEach(opt => {
+              opt.addEventListener('click', () => {
+                q.querySelectorAll('.rcard.mo').forEach(x => x.classList.remove('sel', 'wrong', 'win'));
+                opt.classList.add('sel');
+              });
+            });
+          });
+          $('l7m-check').addEventListener('click', () => {
+            let allAnswered = true, allRight = true;
+            quiz.querySelectorAll('.mot-q').forEach(q => {
+              const sel = q.querySelector('.rcard.mo.sel');
+              q.querySelectorAll('.rcard.mo').forEach(x => x.classList.remove('wrong', 'win'));
+              if (!sel) { allAnswered = false; return; }
+              if (sel.dataset.ok === '1') sel.classList.add('win');
+              else { sel.classList.add('wrong'); allRight = false; }
+            });
+            if (!allAnswered) {
+              say('l7m-msg', '👹 «Non hai nemmeno risposto a tutto! Scegli una risposta per ogni domanda.»', 'err');
+              return;
+            }
+            if (allRight) {
+              say('l7m-msg', '🔧 <strong>TERZO COLPO!</strong> Magnete + solenoide + circuito: sai costruire un motore. «No! Presto guiderete tutti auto elettriche…»', 'ok');
+              $('l7m-note').style.display = '';
+              $('l7m-check').disabled = true;
+              hit('m');
+            } else {
+              say('l7m-msg', '👹 «Sbagliato! Ripassa il Livello 6: cosa serviva per trasformare corrente in movimento… e movimento in corrente?» (correggi le risposte rosse)', 'err');
+            }
+          });
+        })();
+
+        // --- 7.4 motori in casa ---
+        const apps = [
+          { n: 'Lavatrice', e: '🧺', m: true, why: 'il cestello gira: motore!' },
+          { n: 'Ventilatore', e: '🌀', m: true, why: 'le pale girano: motore!' },
+          { n: 'Frullatore', e: '🥤', m: true, why: 'le lame girano: motore!' },
+          { n: 'Trapano', e: '🛠️', m: true, why: 'la punta gira: motore!' },
+          { n: 'Phon', e: '💨', m: true, why: 'resistenza + ventolina: c’è un motorino!' },
+          { n: 'Lavastoviglie', e: '🍽️', m: true, why: 'la pompa dell’acqua è un motore!' },
+          { n: 'Lampadina LED', e: '💡', m: false, why: 'niente parti che girano: solo elettronica.' },
+          { n: 'Tostapane', e: '🍞', m: false, why: 'solo resistenze che scaldano (effetto Joule).' },
+          { n: 'Ferro da stiro', e: '♨️', m: false, why: 'solo una resistenza che scalda.' },
+          { n: 'Caricabatterie', e: '🔌', m: false, why: 'trasformatore ed elettronica: nulla gira.' },
+        ];
+        const box = $('l7c-cards');
+        apps.forEach((a, i) => {
+          const d = document.createElement('div');
+          d.className = 'app-card'; d.dataset.i = i;
+          d.innerHTML = `<div class="ae">${a.e}</div><div class="an">${a.n}</div>`;
+          d.addEventListener('click', () => d.classList.toggle('sel'));
+          box.appendChild(d);
+        });
+        $('l7c-check').addEventListener('click', () => {
+          let allRight = true;
+          box.querySelectorAll('.app-card').forEach(d => {
+            const a = apps[+d.dataset.i];
+            const sel = d.classList.contains('sel');
+            d.classList.remove('right', 'wrong');
+            if (sel === a.m) { if (a.m) d.classList.add('right'); }
+            else { d.classList.add('wrong'); allRight = false; }
+          });
+          if (allRight) {
+            say('l7c-msg', '⚔️ <strong>COLPO FINALE!</strong> Li hai trovati tutti: ' +
+              apps.filter(a => a.m).map(a => a.n.toLowerCase()).join(', ') +
+              '. E il phon ti ha quasi fregato, eh? (resistenza <em>e</em> motorino!)', 'ok');
+            hit('c');
+          } else {
+            say('l7c-msg', '👹 «Sbagliato! Ricorda: se qualcosa GIRA, lì dentro c’è un motore. Se scalda soltanto… è solo effetto Joule.» (le carte rosse sono da correggere)', 'err');
+          }
+        });
+      })();
+
+    });
+  </script>
+</body>
+
+</html>
