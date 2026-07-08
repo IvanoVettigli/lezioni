@@ -215,14 +215,7 @@ microscopicamente, la **pressione** che il manometro misura?
 $\quad 27\ ^\circ$C $= \underline{\hspace{1.6cm}}$ K;
 $\quad 600$ K $= \underline{\hspace{1.6cm}}\ ^\circ$C.
 
-**D3.** *Previsione:* se comprimete il gas (recipiente più stretto) senza
-cambiarne la temperatura, la pressione aumenterà o diminuirà? Spiegatelo
-**contando gli urti**: nello spazio più piccolo le particelle colpiscono le
-pareti più spesso o più raramente?
-
-\vspace{1.5cm}
-
-**D4.** La simulazione mostra la larghezza $L$ e non il volume $V$: perché
+**D3.** La simulazione mostra la larghezza $L$ e non il volume $V$: perché
 per verificare le leggi dei gas possiamo usare $L$ al posto di $V$?
 
 \vspace{1.2cm}
@@ -231,6 +224,13 @@ per verificare le leggi dei gas possiamo usare $L$ al posto di $V$?
 
 Nel pannello **Hold Constant** selezionate **Temperature (T)**: d'ora in poi
 la simulazione manterrà la temperatura fissa, qualunque cosa facciate.
+
+**Domanda preparatoria (previsione, prima di misurare).** Se comprimete il gas
+(recipiente più stretto) senza cambiarne la temperatura, la pressione aumenterà
+o diminuirà? Spiegatelo **contando gli urti**: nello spazio più piccolo le
+particelle colpiscono le pareti più spesso o più raramente?
+
+\vspace{1.5cm}
 
 Annotate: $T = \underline{\hspace{2cm}}$ K \quad (resterà questa per tutto
 l'esperimento).
@@ -251,8 +251,7 @@ Media dei prodotti: $\overline{P L} = \underline{\hspace{2.5cm}}$
 $\delta_{\max}\% = \underline{\hspace{2cm}}\%$
 
 **Domanda A1.** *(Rispondete mentre misurate.)* Restringendo il recipiente,
-la pressione è aumentata o diminuita? È andata come avevate previsto nella
-domanda D3?
+la pressione è aumentata o diminuita? È andata come avevate previsto qui sopra?
 
 \vspace{1.2cm}
 
@@ -277,6 +276,12 @@ Verificatelo con due righe della vostra tabella.
 Riportate la larghezza a un valore comodo e **non toccate più la maniglia**.
 Nel pannello **Hold Constant** selezionate **Volume (V)**.
 
+**Domanda preparatoria (previsione, prima di misurare).** Scaldando il gas,
+come cambierà la **velocità media** delle particelle? E quindi che cosa
+accadrà alla **pressione** del gas?
+
+\vspace{1.5cm}
+
 Annotate: $L = \underline{\hspace{2cm}}$ nm \quad (resterà questa per tutto
 l'esperimento).
 
@@ -295,9 +300,9 @@ Media dei rapporti: $\overline{P/T} = \underline{\hspace{2.5cm}}$
 \quad Scarto percentuale massimo:
 $\delta_{\max}\% = \underline{\hspace{2cm}}\%$
 
-**Domanda B1.** Scaldando il gas, le particelle si muovono più velocemente o
-più lentamente? Di conseguenza gli urti sulle pareti diventano più frequenti
-e più violenti, o il contrario?
+**Domanda B1.** *(Rispondete mentre misurate.)* La pressione è cresciuta
+scaldando, come avevate previsto? Collegate il risultato al moto delle
+particelle: urti più frequenti e più violenti significano più pressione.
 
 \vspace{1.2cm}
 
@@ -317,6 +322,12 @@ anche usando i gradi Celsius al posto dei kelvin?
 Tenete **Hold Constant = Temperature (T)** e non toccate la maniglia: così
 restano bloccati sia $T$ sia $V$.
 
+**Domanda preparatoria (previsione, prima di misurare).** Aumentando il
+**numero di particelle** (a temperatura e volume costanti), come cambierà la
+**pressione** del gas?
+
+\vspace{1.5cm}
+
 1. Annotate lo stato di partenza: $N_1 = \underline{\hspace{2cm}}$
    particelle, $P_1 = \underline{\hspace{2cm}}$ atm.
 2. Con la pompa (o le freccette del pannello *Particles*) **raddoppiate** il
@@ -325,8 +336,9 @@ restano bloccati sia $T$ sia $V$.
 
 $$\frac{P_2}{P_1} = \underline{\hspace{2cm}}$$
 
-**Domanda C1.** Raddoppiando le particelle la pressione è (circa)
-raddoppiata? Spiegate perché con il modello degli urti.
+**Domanda C1.** *(Rispondete mentre misurate.)* Raddoppiando le particelle la
+pressione è (circa) raddoppiata, come avevate previsto? Spiegate perché con il
+modello degli urti.
 
 \vspace{1.2cm}
 
