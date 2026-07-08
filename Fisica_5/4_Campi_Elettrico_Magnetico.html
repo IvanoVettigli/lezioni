@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 4 — Campi elettrico e magnetico</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    /* --- SVG fisici (theme-aware) --- */
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .wire { stroke: var(--text-soft); stroke-width: 2.5; fill: none; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .fieldline { stroke: var(--primary); stroke-width: 1.6; fill: none; opacity: 0.85; }
+    .bline { stroke: var(--accent); stroke-width: 1.6; fill: none; opacity: 0.85; }
+    .qplus { fill: var(--red); }
+    .qminus { fill: var(--primary); }
+
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .maxwell-box { border: 2px solid var(--accent); border-radius: 14px; background: color-mix(in srgb, var(--accent) 8%, var(--surface)); padding: 1rem 1.2rem; margin: 1.2rem 0; }
+    .maxwell-box h4 { margin: 0 0 0.5rem; color: var(--accent); }
+    .unit-box { display: flex; align-items: center; gap: 0.9rem; border: 2px solid var(--green); border-radius: 12px;
+                background: color-mix(in srgb, var(--green) 8%, var(--surface)); padding: 0.8rem 1.1rem; margin: 1rem 0; }
+    .unit-box .unit-icon { font-size: 1.6rem; flex: 0 0 auto; }
+    .unit-box .unit-big { display: inline-block; font-weight: 800; font-size: 1.15rem; color: var(--green);
+                           background: color-mix(in srgb, var(--green) 16%, transparent); border: 1px solid color-mix(in srgb, var(--green) 45%, transparent);
+                           border-radius: 8px; padding: 0.15rem 0.7rem; margin: 0 0.15rem; font-variant-numeric: tabular-nums; }
+    .unit-box p { margin: 0; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quinto anno · Lezione 4</div>
+    <h1>Campi elettrico e magnetico</h1>
+    <p>Come fanno due cariche a "sentirsi" a distanza? Il concetto più potente della fisica</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quinto anno</a>
+    <span class="sep">/</span> Campi elettrico e magnetico
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Nuovo modulo!</strong> Con questa lezione lasciamo i circuiti e iniziamo il modulo sui <strong>campi</strong>:
+      studieremo il campo elettrico e il campo magnetico <em>statici</em>, cioè che non cambiano nel tempo. Nelle prossime
+      lezioni li vedremo variare e scopriremo che, insieme, sanno fare cose straordinarie (tipo: la luce).
+    </div>
+
+    <!-- 1 — IL CONCETTO DI CAMPO -->
+    <section id="sec1">
+      <h2>1. Che cos'è un campo?</h2>
+      <p>C'è una domanda che abbiamo lasciato in sospeso fin da quando abbiamo studiato la gravità: come fa la Terra ad
+        attirare la Luna <strong>senza toccarla</strong>? Come fa una massa a "sapere" che dall'altra parte dello spazio
+        c'è un'altra massa? Le forze che conoscevamo prima (spinte, funi, attriti) richiedono il <em>contatto</em>; la
+        gravità no. Questa "azione a distanza" inquietava gli stessi fisici che la usavano, Newton per primo.</p>
+
+      <p>La risposta moderna è il concetto di <strong>campo</strong>:</p>
+      <div class="definition">
+        Un <strong>campo</strong> è una grandezza fisica definita <strong>in ogni punto dello spazio</strong> (e, in
+        generale, in ogni istante). Una massa non attira "direttamente" un'altra massa: <strong>modifica lo spazio
+        intorno a sé</strong>, creando il campo gravitazionale; l'altra massa, ovunque si trovi, interagisce con il campo
+        <em>nel punto in cui sta</em>, e da esso riceve la forza.
+      </div>
+
+      <p>Lo schema mentale è sempre lo stesso, e vale anche per le cariche elettriche e per i magneti:</p>
+      <div class="formula-box">
+        $$\text{sorgente} \;\longrightarrow\; \text{campo nello spazio} \;\longrightarrow\; \text{forza su chi ci si trova dentro}$$
+      </div>
+
+      <p>Attenzione però: il campo <strong>non è solo un trucco matematico</strong> per non dire "azione a distanza". È
+        un oggetto fisico <em>tangibile</em>: contiene e <strong>trasporta energia</strong>. La luce del Sole che ti
+        scalda la faccia è energia che ha viaggiato per 150 milioni di chilometri <em>dentro un campo</em>, senza alcun
+        supporto materiale. Più avanti in questa lezione lo toccheremo con mano: accenderemo una lampadina
+        <strong>senza collegarla a niente</strong>.</p>
+
+      <div class="curiosita"><strong>Curiosità.</strong> Il concetto di campo nasce con Michael <strong>Faraday</strong>
+        (lo stesso dell'induzione elettromagnetica!), che non essendo un matematico "vedeva" lo spazio riempito di linee
+        di forza. Fu poi <strong>Maxwell</strong> a tradurre quelle visioni in equazioni — le incontreremo a fine
+        lezione. Oggi la fisica fondamentale descrive <em>tutto</em> in termini di campi: anche le particelle come
+        l'elettrone sono increspature di un campo.</div>
+    </section>
+
+    <!-- 2 — CARICHE ED ELETTRIZZAZIONE -->
+    <section id="sec2">
+      <h2>2. Corpi carichi: i tre modi di elettrizzare</h2>
+
+      <p>Un corpo è <strong>carico elettricamente</strong> quando possiede un <em>eccesso</em> o un <em>difetto</em> di
+        elettroni rispetto ai protoni: la sua carica netta è $Q = N_{\text{protoni}}\,e - N_{\text{elettroni}}\,e \neq 0$.
+        La carica si misura in <strong>coulomb</strong> (C) ed esiste in due segni, positivo e negativo: cariche di segno
+        <strong>uguale si respingono</strong>, di segno <strong>opposto si attraggono</strong>.</p>
+
+      <p>Ricordi la distinzione tra <strong>conduttori</strong> e <strong>isolanti</strong> della prima lezione? Nei
+        conduttori (metalli) gli elettroni esterni sono liberi di muoversi nel "mare" del legame metallico; negli
+        isolanti (vetro, plastica, ambra...) sono legati saldamente ai loro atomi. Questa differenza decide <em>come</em>
+        un corpo si può caricare.</p>
+
+      <div class="curiosita"><strong>Un po' di storia.</strong> Già <strong>Talete</strong> (VI secolo a.C.) notò che
+        l'<strong>ambra</strong> strofinata con la lana attira pagliuzze e capelli. In greco ambra si dice
+        <em>élektron</em>: è da lì che vengono le parole "elettricità" ed "elettrone". Quanto ai <em>segni</em> delle
+        cariche, ricordi la lezione sulla corrente? Fu Benjamin <strong>Franklin</strong>, a metà Settecento, a decidere
+        per convenzione quale carica chiamare positiva — con il 50% di probabilità di dare il segno "comodo" agli
+        elettroni... e lo mancò. 🎲</div>
+
+      <h3>2.1 — Elettrizzazione per strofinio</h3>
+      <p>Strofinando tra loro due <strong>isolanti</strong> (ambra e lana, plastica e capelli, palloncino e maglione),
+        alcuni elettroni vengono <strong>strappati</strong> dal materiale che li trattiene più debolmente e passano
+        all'altro. <em>Vista microscopica:</em> il contatto intimo dello strofinio avvicina gli atomi delle due
+        superfici; il materiale più "avido" di elettroni (più elettronegativo) ne cattura alcuni. Chi li perde resta
+        <strong>positivo</strong>, chi li acquista diventa <strong>negativo</strong>. Funziona con gli isolanti proprio
+        perché le cariche strappate <strong>restano dove sono</strong>: non possono ridistribuirsi né fuggire.</p>
+
+      <p><strong>Prova tu:</strong> tieni premuto il pulsante per strofinare la bacchetta sul panno e guarda gli
+        elettroni cambiare casa.</p>
+      <div class="controls">
+        <button class="btn" id="st-rub" type="button" style="touch-action:none;">🧦 Strofina! (tieni premuto)</button>
+        <button class="btn" id="st-reset" type="button">↺ Ricomincia</button>
+      </div>
+      <div class="ckt"><svg id="st-svg" viewBox="0 0 640 250" aria-label="Simulazione dell'elettrizzazione per strofinio"></svg></div>
+      <p class="eq-out" id="st-out"></p>
+
+      <h3>2.2 — Elettrizzazione per contatto</h3>
+      <p>Se un corpo carico <strong>tocca</strong> un conduttore neutro, parte della carica <strong>passa</strong> al
+        conduttore: i due corpi restano carichi con lo <strong>stesso segno</strong> (e infatti dopo il contatto si
+        respingono). <em>Vista microscopica:</em> nel conduttore gli elettroni sono liberi; se il corpo carico è
+        negativo, l'eccesso di elettroni "trabocca" nel conduttore; se è positivo, risucchia elettroni liberi dal
+        conduttore, lasciandolo positivo. La carica si ripartisce tra i due corpi.</p>
+
+      <p><strong>Prova tu:</strong> avvicina la bacchetta carica (negativa) fino a toccare la sfera metallica, poi
+        allontanala e osserva che cosa è successo.</p>
+      <div class="controls">
+        <div class="control-group"><label>Avvicina la bacchetta: <span class="val" id="ct-d-val">0</span>%</label>
+          <input type="range" id="ct-d" min="0" max="100" step="1" value="0"></div>
+        <button class="btn" id="ct-reset" type="button">↺ Ricomincia</button>
+      </div>
+      <div class="ckt"><svg id="ct-svg" viewBox="0 0 640 260" aria-label="Simulazione dell'elettrizzazione per contatto"></svg></div>
+      <p class="eq-out" id="ct-out"></p>
+
+      <h3>2.3 — Elettrizzazione per induzione</h3>
+      <p>Qui il bello: si può caricare un conduttore <strong>senza toccarlo</strong>. Avvicinando (senza contatto) un
+        corpo carico a un conduttore neutro, gli elettroni liberi del conduttore <strong>si spostano</strong>: se il
+        corpo è negativo li respinge sul lato lontano, se è positivo li attira sul lato vicino. Il conduttore resta
+        globalmente neutro ma con le cariche <strong>separate</strong> (polarizzato). Se a questo punto colleghiamo a
+        terra il lato "affollato" e poi togliamo il collegamento, il conduttore resta carico per davvero.
+        <em>Vista microscopica:</em> è il campo elettrico del corpo carico (eccolo, il campo!) che, penetrando nel
+        conduttore, spinge gli elettroni liberi finché la loro nuova disposizione non lo annulla all'interno.</p>
+
+      <p><strong>Prova tu</strong> — carica la sfera <em>senza mai toccarla</em>, seguendo la ricetta nell'ordine
+        giusto: ① avvicina la bacchetta, ② collega la sfera a terra, ③ stacca la terra, ④ solo ora allontana la
+        bacchetta. (Se sbagli ordine, gli elettroni tornano indietro!)</p>
+      <div class="controls">
+        <div class="control-group"><label>Avvicina la bacchetta: <span class="val" id="in-d-val">0</span>%</label>
+          <input type="range" id="in-d" min="0" max="100" step="1" value="0"></div>
+        <button class="btn" id="in-gnd" type="button" disabled>🔌 Collega a terra</button>
+        <button class="btn" id="in-reset" type="button">↺ Ricomincia</button>
+      </div>
+      <div class="ckt"><svg id="in-svg" viewBox="0 0 640 290" aria-label="Simulazione dell'elettrizzazione per induzione"></svg></div>
+      <p class="eq-out" id="in-out"></p>
+
+      <div class="note"><strong>E l'isolante?</strong> Anche un isolante viene attirato da un corpo carico (l'ambra e le
+        pagliuzze!): i suoi elettroni non possono migrare, ma ogni molecola si <em>deforma</em> un poco, orientandosi col
+        campo. È la <strong>polarizzazione</strong>: il lato vicino al corpo carico presenta sempre la carica opposta,
+        e l'attrazione vince sulla repulsione perché agisce a distanza minore.</div>
+    </section>
+
+    <!-- 3 — FORZA DI COULOMB -->
+    <section id="sec3">
+      <h2>3. La forza di Coulomb</h2>
+      <p>Nel 1785 Charles-Augustin de <strong>Coulomb</strong>, con una bilancia di torsione, misurò la forza tra due
+        cariche puntiformi. Il risultato somiglia in modo impressionante alla gravitazione universale:</p>
+
+      <div class="definition">
+        <strong>Legge di Coulomb.</strong> Due cariche puntiformi $q_1$ e $q_2$ poste a distanza $r$ si scambiano una
+        forza diretta lungo la loro congiungente, di modulo
+        $$F = k\,\frac{|q_1|\,|q_2|}{r^2} \qquad\text{con}\qquad k \approx 8{,}99 \times 10^9\ \frac{\text{N}\cdot\text{m}^2}{\text{C}^2},$$
+        <strong>repulsiva</strong> per cariche dello stesso segno, <strong>attrattiva</strong> per segni opposti.
+      </div>
+
+      <p>Come la gravità, decresce con il <strong>quadrato della distanza</strong>: a distanza doppia, forza quattro
+        volte più piccola. A differenza della gravità, però, può anche <strong>respingere</strong> — ed è
+        <em>immensamente</em> più intensa: tra due protoni la repulsione elettrica è circa $10^{36}$ volte più forte
+        della loro attrazione gravitazionale.</p>
+
+      <h3>3.1 — Lo strumento di Coulomb: la bilancia a torsione</h3>
+      <p>Come si misura una forza così piccola? Coulomb appese un'asticella leggera a un <strong>filo sottile</strong>:
+        a un'estremità una sferetta carica, all'altra un contrappeso. Avvicinando una seconda sferetta carica, la
+        repulsione fa <strong>ruotare</strong> l'asticella e il filo si <strong>torce</strong>, finché la sua reazione
+        elastica non bilancia la forza elettrica. L'angolo di torsione è proporzionale alla forza: leggere l'angolo
+        significa <em>leggere la forza</em>. Prova (vista dall'alto):</p>
+      <div class="controls">
+        <div class="control-group"><label>Avvicina la sfera esterna: <span class="val" id="ts-d-val">50</span>%</label>
+          <input type="range" id="ts-d" min="0" max="100" step="1" value="50"></div>
+      </div>
+      <div class="ckt"><svg id="ts-svg" viewBox="0 0 640 300" aria-label="Bilancia a torsione vista dall'alto"></svg></div>
+      <p class="eq-out" id="ts-out"></p>
+      <div class="curiosita"><strong>Un attrezzo, due leggi.</strong> Pochi anni dopo, <strong>Cavendish</strong> usò
+        una bilancia a torsione identica (con sfere di piombo al posto delle cariche) per misurare l'attrazione
+        <em>gravitazionale</em> tra due masse — e "pesare la Terra". Lo stesso strumento funziona per entrambe le
+        forze... il che è già un indizio: le due leggi devono somigliarsi parecchio.</div>
+
+      <h3>3.2 — Esplora la legge di Coulomb (e confrontala con Newton)</h3>
+      <p>Qui il grafico mostra la forza <strong>con il segno</strong>: la curva sta <strong>sopra lo zero</strong>
+        quando la forza è repulsiva ($q_1 q_2 \gt 0$) e si ribalta <strong>sotto lo zero</strong> quando è attrattiva
+        ($q_1 q_2 \lt 0$) — prova a cambiare il segno di una carica! Con <strong>«blocca la scala»</strong> attivo il
+        grafico non si riadatta da solo e i cambiamenti si vedono davvero. Attiva poi il <strong>confronto con
+        Newton</strong>: la gravità tra due masse di 1 kg (curva verde, asse di destra) ha la <em>stessa identica
+        forma</em> $1/r^2$, ma vive <strong>sempre sotto lo zero</strong> — attrae e basta.</p>
+      <div class="two-col">
+        <div>
+          <div class="controls">
+            <div class="control-group"><label>Carica q₁ (µC): <span class="val" id="cb-q1-val">2</span></label>
+              <input type="range" id="cb-q1" min="-5" max="5" step="1" value="2"></div>
+            <div class="control-group"><label>Carica q₂ (µC): <span class="val" id="cb-q2-val">-3</span></label>
+              <input type="range" id="cb-q2" min="-5" max="5" step="1" value="-3"></div>
+            <div class="control-group"><label>Distanza r (m): <span class="val" id="cb-r-val">0.30</span></label>
+              <input type="range" id="cb-r" min="0.1" max="1" step="0.05" value="0.3"></div>
+            <label class="toggle-row" title="Blocca gli assi per confrontare visivamente i cambiamenti"><input type="checkbox" id="cb-lock" checked> 🔒 blocca la scala</label>
+            <label class="toggle-row"><input type="checkbox" id="cb-newton"> ⚖️ confronta con Newton (2 masse da 1 kg)</label>
+          </div>
+          <p id="cb-out" class="eq-out"></p>
+        </div>
+        <div><div class="plot" id="cb-plot" style="height: 320px;"></div></div>
+      </div>
+
+      <h3>3.3 — Le due leggi a confronto: gemelle, ma non troppo</h3>
+      <p>Mettiamo le due leggi una accanto all'altra, scritte "con il segno": si prende come positivo il verso che
+        <em>allontana</em> i due corpi. <strong>Attenzione alla convenzione</strong> (è facile confondersi): forza
+        <strong>positiva = repulsiva</strong>, forza <strong>negativa = attrattiva</strong>.</p>
+
+      <div class="table-container">
+        <table>
+          <thead><tr><th></th><th>Coulomb (elettrica)</th><th>Newton (gravitazionale)</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Legge (con segno)</strong></td><td>$F = k\,\dfrac{q_1\,q_2}{r^2}$</td><td>$F = -\,G\,\dfrac{m_1\,m_2}{r^2}$</td></tr>
+            <tr><td><strong>Sorgente</strong></td><td>la carica elettrica (due segni)</td><td>la massa (un solo "segno")</td></tr>
+            <tr><td><strong>Costante</strong></td><td>$k \approx 8{,}99 \times 10^{9}$ N·m²/C²</td><td>$G \approx 6{,}67 \times 10^{-11}$ N·m²/kg²</td></tr>
+            <tr><td><strong>Segno della forza</strong></td><td>può essere $+$ o $-$: lo decide il prodotto $q_1 q_2$</td><td>sempre $-$: il segno meno è scritto nella legge</td></tr>
+            <tr><td><strong>Andamento</strong></td><td>$\propto 1/r^2$</td><td>$\propto 1/r^2$ (identico!)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ul>
+        <li><strong>Perché Newton ha il meno "di fabbrica"?</strong> Perché la gravità è <em>sempre</em> attrattiva:
+          non esistono masse negative, quindi il prodotto $m_1 m_2$ è sempre positivo e il segno attrattivo va imposto
+          a mano, con il $-$ nella formula.</li>
+        <li><strong>E Coulomb?</strong> Non ha bisogno del meno: il segno lo produce da sé il prodotto delle cariche.
+          Cariche di segno opposto → $q_1 q_2 \lt 0$ → forza negativa → <strong>attrazione</strong>; cariche dello
+          stesso segno → prodotto positivo → <strong>repulsione</strong>. (È esattamente ciò che vedi nel grafico qui
+          sopra: la curva di Coulomb salta sopra o sotto lo zero, quella di Newton non lascia mai il "sotto".)</li>
+        <li><strong>Quanto sono diverse le costanti?</strong> Come numeri, $\dfrac{k}{G} = \dfrac{8{,}99\times10^{9}}{6{,}67\times10^{-11}}
+          \approx 1{,}3 \times 10^{20}$: venti ordini di grandezza. Il confronto fisicamente onesto, però, si fa sulla
+          stessa coppia di oggetti: tra <strong>due protoni</strong>, $\dfrac{F_{\text{el}}}{F_{\text{grav}}} =
+          \dfrac{k\,e^2}{G\,m_p^2} \approx 10^{36}$ — la repulsione elettrica vince di trentasei ordini di grandezza.</li>
+      </ul>
+
+      <div class="curiosita"><strong>Ma allora perché l'universo sembra governato dalla gravità?</strong> Se
+        l'elettricità è $10^{36}$ volte più forte, perché i pianeti orbitano per gravità e non per elettricità? Perché
+        la materia è <strong>neutra</strong>: cariche + e − si compensano quasi perfettamente e le loro forze si
+        annullano. La massa invece non si compensa mai — ha un solo segno — e sommandosi granello su granello, su scala
+        astronomica, la debolissima gravità resta l'unica in gioco.</div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato — la forza di Coulomb</span></div>
+        <p>Due cariche $q_1 = 2\ \mu$C e $q_2 = -3\ \mu$C si trovano a distanza $r = 0{,}3$ m. Calcola modulo e natura
+          (attrattiva o repulsiva) della forza tra di esse.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Converto in coulomb: $q_1 = 2\times10^{-6}$ C, $q_2 = -3\times10^{-6}$ C.</p>
+          <p><span class="step-num">2</span>Applico la legge di Coulomb (con i moduli): $F = k\,\dfrac{|q_1||q_2|}{r^2} =
+            8{,}99\times10^9 \cdot \dfrac{2\times10^{-6}\cdot 3\times10^{-6}}{(0{,}3)^2}$.</p>
+          <p><span class="step-num">3</span>Numeratore: $8{,}99\times10^9 \times 6\times10^{-12} = 5{,}39\times10^{-2}$;
+            divido per $0{,}09$: $F \approx 0{,}60$ N.</p>
+          <p><span class="step-num">4</span>I segni sono opposti ($+$ e $-$): la forza è <strong>attrattiva</strong>.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$F \approx 0{,}60$ N, attrattiva.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — CAMPO ELETTRICO -->
+    <section id="sec4">
+      <h2>4. Il campo elettrico</h2>
+      <p>Applichiamo alle cariche l'idea della sezione 1. Una carica $Q$ (la <em>sorgente</em>) modifica lo spazio
+        intorno a sé; per "sondare" questa modifica usiamo una piccola <strong>carica di prova</strong> $q$ positiva:
+        in ogni punto misuriamo la forza che subisce e definiamo:</p>
+
+      <div class="definition">
+        Il <strong>campo elettrico</strong> in un punto è la forza per unità di carica di prova:
+        $$\vec{E} = \frac{\vec{F}}{q} \qquad \big[E\big] = \frac{\text{N}}{\text{C}} = \frac{\text{V}}{\text{m}}$$
+        Nota bene: $\vec E$ dipende solo dalla sorgente e dal punto, <strong>non</strong> dalla carica di prova.
+        Conoscendo il campo, la forza su qualunque carica $q$ è $\vec F = q\,\vec E$.
+      </div>
+
+      <div class="unit-box">
+        <span class="unit-icon">📏</span>
+        <p>L'<strong>unità di misura del campo elettrico</strong> è il <span class="unit-big">newton/coulomb (N/C)</span>,
+          che equivale esattamente al <span class="unit-big">volt/metro (V/m)</span> — le due scritture convivono, e la
+          seconda tornerà utilissima tra poco, quando parleremo di potenziale.</p>
+      </div>
+
+      <p>Per una carica puntiforme $Q$, combinando con la legge di Coulomb:</p>
+      <div class="formula-box">$$E = k\,\frac{|Q|}{r^2}$$</div>
+      <p>diretto <strong>via dalla carica</strong> se $Q \gt 0$ (il campo "esce"), <strong>verso la carica</strong> se
+        $Q \lt 0$ (il campo "entra").</p>
+
+      <h3>4.1 — Le linee di campo</h3>
+      <p>Per visualizzare il campo usiamo le <strong>linee di campo</strong> di Faraday: curve tangenti in ogni punto a
+        $\vec E$, che escono dalle cariche positive ed entrano in quelle negative; dove sono più fitte il campo è più
+        intenso. Prova le configurazioni:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Configurazione:</label>
+          <select id="fl-config">
+            <option value="single">una sola carica +</option>
+            <option value="dip">dipolo: + e −</option>
+            <option value="pp">due cariche + e +</option>
+            <option value="quad">quadrupolo: quattro cariche alternate</option>
+          </select>
+        </div>
+      </div>
+      <div class="ckt"><svg id="fl-svg" viewBox="0 0 640 340" aria-label="Linee di campo elettrico di due cariche"></svg></div>
+      <p class="eq-out" id="fl-out"></p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato — il campo di una carica puntiforme</span></div>
+        <p>Una carica $Q = 5\ \mu$C genera un campo elettrico. Calcola il campo a distanza $r = 0{,}5$ m e la forza che
+          subirebbe lì una carica di prova $q = 1$ nC $= 10^{-9}$ C.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$E = k\,\dfrac{|Q|}{r^2} = 8{,}99\times10^9 \cdot \dfrac{5\times10^{-6}}{(0{,}5)^2}
+            = 8{,}99\times10^9 \cdot \dfrac{5\times10^{-6}}{0{,}25}$.</p>
+          <p><span class="step-num">2</span>$E \approx 1{,}8\times10^{5}$ N/C, diretto via da $Q$ (che è positiva).</p>
+          <p><span class="step-num">3</span>Forza sulla carica di prova: $F = q\,E = 10^{-9} \times 1{,}8\times10^{5} =
+            1{,}8\times10^{-4}$ N.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$E \approx 1{,}8\times10^5$ N/C, $F \approx 1{,}8\times10^{-4}$ N.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — POTENZIALE -->
+    <section id="sec5">
+      <h2>5. Potenziale e differenza di potenziale</h2>
+      <p>Il campo elettrico dice quale <em>forza</em> agisce in ogni punto. Ma spesso è più comodo ragionare in termini
+        di <em>energia</em>: da quanto "in alto" cade una carica? Come per la gravità parliamo di quota, per
+        l'elettricità parliamo di <strong>potenziale</strong>.</p>
+
+      <h3>5.1 — Prima di tutto: il lavoro è forza per spostamento</h3>
+      <p>Ricordiamo dalla meccanica: quando una forza $F$ accompagna un oggetto per un tratto $s$, compie un
+        <strong>lavoro</strong></p>
+      <div class="formula-box">$$W = F \cdot s \qquad [\,W\,] = \text{joule (J)}$$</div>
+      <p>con un'avvertenza: questa formula vale quando la forza è <strong>parallela allo spostamento</strong>. In
+        generale conta solo la <em>componente</em> della forza lungo lo spostamento: una forza perpendicolare al moto
+        non compie alcun lavoro (lo abbiamo già visto con la forza di Lorentz... anzi, lo vedremo tra poche sezioni!).</p>
+
+      <p>Ora mettiamo una carica $q$ in un campo elettrico uniforme $E$: la forza sulla carica è $F = q\,E$. Se la
+        carica si sposta di un tratto $d$ <em>nella direzione del campo</em>, il lavoro compiuto dal campo è</p>
+      <div class="formula-box">$$W = F \cdot d = q\,E\,d$$</div>
+      <p>In che senso "campo per spostamento"? Dividi per la carica: $\dfrac{W}{q} = E \cdot d$. Il campo elettrico è
+        <em>forza per unità di carica</em>, quindi $E \cdot d$ è <em>lavoro per unità di carica</em> — si misura in
+        joule/coulomb, cioè in <strong>volt</strong>. Ecco da dove nasce il potenziale: non è altro che il "conto del
+        lavoro", già diviso per la carica che lo subisce.</p>
+
+      <div class="rule"><strong>Il potenziale è un lavoro (per unità di carica).</strong> La differenza di potenziale
+        tra due punti A e B è il lavoro che <strong>si deve compiere</strong>, per ogni coulomb, per portare una carica
+        positiva da A a B:
+        $$W_{\text{da fare}} = q\,(V_B - V_A)$$
+        Due casi:
+        <br>• se questo lavoro è <strong>positivo</strong> (verso il potenziale più alto), tocca a te farlo: stai
+        spingendo la carica "in salita", come la pila che risolleva le cariche dal $-$ al $+$;
+        <br>• se è <strong>negativo</strong>, non serve nessuno: il campo lo compie da sé e il movimento avviene
+        <strong>spontaneamente</strong>, "in discesa". È esattamente il <strong>circuito elettrico</strong>: chiuso
+        l'interruttore, le cariche corrono da sole dal morsetto $+$ al $-$ attraverso la lampadina, cedendo strada
+        facendo l'energia che il campo regala loro.</div>
+
+      <div class="note"><strong>Da dove si parte a contare? Dall'infinito.</strong> Il potenziale, come la quota in
+        montagna, ha bisogno di uno <strong>zero di riferimento</strong> (il "livello del mare"). La scelta più comoda
+        — e più usata — è mettere lo zero <strong>a distanza infinita</strong> dalle cariche, dove il campo non arriva
+        più: $V(\infty) = 0$. Con questa convenzione, il potenziale in un punto è il lavoro per unità di carica
+        necessario per portare la carica <em>dall'infinito fino a lì</em>; per una carica puntiforme $Q$ si ottiene
+        $V = k\,\dfrac{Q}{r}$. (Nei circuiti, invece, lo zero si mette di solito nel collegamento a
+        <strong>terra</strong> — ricordi la lezione sulla corrente?)</div>
+
+      <div class="definition">
+        Il <strong>potenziale elettrico</strong> $V$ in un punto è l'energia potenziale per unità di carica:
+        $V = \dfrac{U}{q}$, misurato in <strong>volt</strong> ($1$ V $= 1$ J/C). La <strong>differenza di
+        potenziale</strong> (d.d.p.) $\Delta V = V_B - V_A$ è il "dislivello elettrico" tra due punti: una carica
+        positiva si muove spontaneamente dal potenziale alto verso quello basso, come una pallina che scende.
+      </div>
+
+      <div class="unit-box">
+        <span class="unit-icon">🔋</span>
+        <p>L'<strong>unità di misura del potenziale</strong> (e della differenza di potenziale) è il
+          <span class="unit-big">volt (V)</span> — la stessa "tensione" dei circuiti! E infatti si misura con lo stesso
+          strumento già incontrato: il <strong>voltmetro</strong> (una delle funzioni del <strong>multimetro</strong>),
+          collegato <em>in parallelo</em> ai due punti di cui si vuole la d.d.p.</p>
+      </div>
+
+      <p>È la stessa "tensione" che conosci dai circuiti! Campo e potenziale sono due descrizioni dello stesso oggetto,
+        legate come <em>pendenza</em> e <em>quota</em> di un sentiero. Per un campo uniforme lungo l'asse $x$:</p>
+
+      <div class="formula-box">
+        $$E_x = -\,\frac{\Delta V}{\Delta x} \qquad\Longleftrightarrow\qquad \Delta V = -\,E_x\,\Delta x$$
+      </div>
+
+      <div class="rule"><strong>Il dizionario campo ↔ potenziale.</strong> Il campo è la <strong>pendenza</strong>
+        (cambiata di segno) del grafico di $V$: dove $V$ scende ripido, $E$ è intenso; dove $V$ è piatto, $E = 0$.
+        Viceversa, la d.d.p. tra due punti è l'<strong>area sotto il grafico</strong> di $E(x)$ (con segno meno). Vi
+        ricorda qualcosa? È esattamente il legame <em>derivata ↔ integrale</em> che avete studiato in matematica!</div>
+
+      <h3>5.2 — Esplora: dal potenziale al campo, punto per punto</h3>
+      <p>Scegli un profilo di potenziale $V(x)$ (curva gialla) e trascina $x_0$: la tangente mostra la pendenza e, come
+        facevamo in matematica costruendo la derivata, il grafico del <strong>campo</strong> $E_x = -$pendenza (curva
+        magenta, asse di destra) viene <strong>disegnato passo passo</strong> fino a $x_0$. Tieni «blocca la scala»
+        attivo per vedere le curve crescere senza che gli assi ballino.</p>
+      <div class="two-col">
+        <div>
+          <div class="controls">
+            <div class="control-group"><label>Profilo di potenziale:</label>
+              <select id="pv-prof">
+                <option value="lin">condensatore: V lineare</option>
+                <option value="punt">carica puntiforme: V ∝ 1/x</option>
+                <option value="tratti">spezzata: due pendenze</option>
+              </select>
+            </div>
+            <div class="control-group"><label>Disegna fino a x₀ (cm): <span class="val" id="pv-x-val">5.0</span></label>
+              <input type="range" id="pv-x" min="1" max="19" step="0.5" value="5"></div>
+            <label class="toggle-row" title="Blocca gli assi per confrontare visivamente i cambiamenti"><input type="checkbox" id="pv-lock" checked> 🔒 blocca la scala</label>
+          </div>
+          <p id="pv-out" class="eq-out"></p>
+        </div>
+        <div><div class="plot" id="pv-plot" style="height: 330px;"></div></div>
+      </div>
+
+      <div class="exercise" data-expr="100-500*x" data-xmin="0" data-xmax="0.24" data-ymin="-20" data-ymax="120">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato — dal grafico di V al campo (la "derivata grafica")</span></div>
+        <p>Tra le armature di un condensatore, il potenziale scende <strong>linearmente</strong> da $V = 100$ V (in
+          $x = 0$) a $V = 0$ V (in $x = 0{,}2$ m). Ricava dal grafico il campo elettrico $E_x$ tra le armature.</p>
+        <div class="ex-actions">
+          <button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button>
+          <button class="btn btn-toggle btn-graph">📈 Mostra grafico</button>
+        </div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Il grafico di $V(x)$ è una retta: la pendenza è la stessa in ogni punto
+            (proprio come nelle lezioni sulle derivate: per una retta non serve nemmeno la tangente!).</p>
+          <p><span class="step-num">2</span>Pendenza $= \dfrac{\Delta V}{\Delta x} = \dfrac{0 - 100}{0{,}2 - 0} = -500$ V/m.</p>
+          <p><span class="step-num">3</span>Campo: $E_x = -\dfrac{\Delta V}{\Delta x} = +500$ V/m, diretto nel verso
+            delle $x$ crescenti (dal potenziale alto verso quello basso).</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$E_x = 500$ V/m, verso le $x$ crescenti.</span></div>
+        </div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+      </div>
+
+      <div class="exercise" data-expr="200" data-xmin="0" data-xmax="0.15" data-ymin="0" data-ymax="260" data-fill="0,0.1">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato — dal grafico di E alla d.d.p. (l'"integrale grafico")</span></div>
+        <p>In una regione, il campo elettrico è <strong>uniforme</strong>: $E_x = 200$ V/m. Usando il grafico di
+          $E_x(x)$, calcola la differenza di potenziale tra $x = 0$ e $x = 0{,}1$ m.</p>
+        <div class="ex-actions">
+          <button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button>
+          <button class="btn btn-toggle btn-graph">📈 Mostra grafico</button>
+        </div>
+        <div class="solution">
+          <p><span class="step-num">1</span>La d.d.p. è (meno) l'<strong>area sotto il grafico</strong> di $E_x(x)$ tra i
+            due punti — come l'integrale definito visto in matematica.</p>
+          <p><span class="step-num">2</span>Il grafico è una retta orizzontale: l'area è un rettangolo di base
+            $0{,}1$ m e altezza $200$ V/m: area $= 200 \times 0{,}1 = 20$ V.</p>
+          <p><span class="step-num">3</span>Quindi $\Delta V = V(0{,}1) - V(0) = -\,20$ V: il potenziale <strong>cala</strong>
+            di 20 volt nel verso del campo.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$|\Delta V| = 20$ V (il potenziale diminuisce lungo il campo).</span></div>
+        </div>
+        <div class="plot-wrap"><div class="plot"></div></div>
+      </div>
+    </section>
+
+    <!-- 6 — TEOREMA DI GAUSS -->
+    <section id="sec6">
+      <h2>6. Il teorema di Gauss</h2>
+      <p>Immagina di racchiudere una carica dentro una superficie chiusa qualsiasi (una "bolla") e di contare quante
+        linee di campo la <strong>attraversano verso l'esterno</strong>. Questo "conteggio" si chiama <strong>flusso</strong>
+        del campo elettrico attraverso la superficie, $\Phi_E$. Il teorema di Gauss dice una cosa sorprendentemente
+        semplice:</p>
+
+      <div class="definition">
+        <strong>Teorema di Gauss (flusso di $\vec E$).</strong> Il flusso del campo elettrico attraverso una qualunque
+        superficie <strong>chiusa</strong> dipende solo dalla carica racchiusa al suo interno:
+        $$\Phi_E = \frac{Q_{\text{int}}}{\varepsilon_0}$$
+        dove $\varepsilon_0 = 8{,}85\times10^{-12}$ C²/(N·m²) è la costante dielettrica del vuoto. Non importa la forma
+        né la dimensione della bolla: conta solo <strong>quanta carica c'è dentro</strong>.
+      </div>
+
+      <p>L'intuizione con le linee di campo: ogni carica interna "emette" (o "assorbe") un numero fisso di linee, e ogni
+        linea deve pur uscire dalla bolla, prima o poi. Se invece la carica è <strong>fuori</strong>, ogni linea che
+        entra poi <strong>riesce</strong>: il bilancio netto è zero. Prova:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Raggio della superficie (bolla): <span class="val" id="gs-r-val">100</span> px</label>
+          <input type="range" id="gs-r" min="50" max="150" step="5" value="100"></div>
+        <div class="control-group"><label>Posizione della carica: <span class="val" id="gs-x-val">0</span> px dal centro</label>
+          <input type="range" id="gs-x" min="0" max="240" step="10" value="0"></div>
+        <button class="btn" id="gs-shape" type="button">🥔 Prova con una patata</button>
+      </div>
+      <div class="ckt"><svg id="gs-svg" viewBox="0 0 640 320" aria-label="Flusso del campo elettrico attraverso una superficie chiusa"></svg></div>
+      <p class="eq-out" id="gs-out"></p>
+
+      <div class="curiosita"><strong>La "forma a patata".</strong> Nel gergo dei fisici, una superficie (o un volume)
+        del tutto generica, senza alcuna simmetria, si chiama affettuosamente <strong>a forma di patata</strong>. Il
+        teorema di Gauss è potente proprio per questo: sfera, cubo o patata bitorzoluta, il flusso è <em>sempre e solo</em>
+        $Q_{\text{int}}/\varepsilon_0$. La forma della superficie è irrilevante — provalo con il pulsante qui sopra!</div>
+
+      <div class="maxwell-box">
+        <h4>🏛️ La prima di quattro colonne</h4>
+        <p style="margin:0.2rem 0;">Il teorema di Gauss è la <strong>prima delle equazioni di Maxwell</strong>, il
+          gruppo di quattro equazioni che governa <em>tutta</em> l'elettricità, il magnetismo e la luce. Le
+          incontreremo una alla volta:</p>
+        <ol style="margin:0.5rem 0 0.3rem;">
+          <li><strong>Gauss per $\vec E$</strong>: $\Phi_E = Q_{\text{int}}/\varepsilon_0$ — le cariche generano il campo elettrico ✅ <em>(oggi!)</em></li>
+          <li><strong>Gauss per $\vec B$</strong>: $\Phi_B = 0$ — non esistono "cariche magnetiche" <em>(oggi, tra poco!)</em></li>
+          <li><strong>Faraday</strong>: un campo magnetico che varia genera un campo elettrico <em>(prossime lezioni)</em></li>
+          <li><strong>Ampère–Maxwell</strong>: correnti e campi elettrici variabili generano campi magnetici <em>(prossime lezioni)</em></li>
+        </ol>
+        <p style="margin:0.3rem 0 0;">A queste si aggiunge l'<strong>equazione di continuità della carica</strong> — la
+          carica non si crea né si distrugge, può solo spostarsi (l'hai già usata: è la legge dei nodi di Kirchhoff!).
+          Con queste cinque relazioni si spiega dal fulmine al Wi-Fi.</p>
+      </div>
+    </section>
+
+    <!-- 7 — ESPERIMENTO LAMPADA AL PLASMA -->
+    <section id="sec7">
+      <h2>7. Esperimento: la lampadina che si accende da sola</h2>
+      <p>Il campo elettrico trasporta energia? Verifichiamolo. Una <strong>lampada al plasma</strong> è una sfera di
+        vetro con un elettrodo centrale ad alta tensione alternata: intorno alla sfera il campo elettrico è intenso e
+        oscilla rapidamente. Se avvicini una lampadina — <strong>senza alcun filo</strong> — il campo mette in moto le
+        cariche al suo interno... e la lampadina si accende!</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Distanza della lampadina dalla sfera: <span class="val" id="pl-d-val">40</span> cm</label>
+          <input type="range" id="pl-d" min="2" max="60" step="1" value="40"></div>
+        <label class="toggle-row"><input type="checkbox" id="pl-on" checked> Lampada al plasma accesa</label>
+      </div>
+      <div class="ckt"><svg id="pl-svg" viewBox="0 0 640 300" aria-label="Lampada al plasma con lampadina che si accende a distanza"></svg></div>
+      <p class="eq-out" id="pl-out"></p>
+
+      <div class="note"><strong>Che cosa sta succedendo?</strong> Nessun elettrone viaggia dalla sfera alla lampadina:
+        a trasferirsi è l'<strong>energia</strong>, trasportata dal campo elettrico oscillante che riempie lo spazio tra
+        i due oggetti. Il campo, nel punto in cui si trova la lampadina, spinge avanti e indietro gli elettroni del suo
+        filamento/elettrodo: è un minuscolo generatore a distanza. Il campo non è un artificio matematico: <strong>è lì,
+        e fa lavoro</strong>. (Se hai una lampada al plasma e una vecchia lampadina a risparmio energetico o un LED,
+        provalo davvero: funziona!)</div>
+    </section>
+
+    <!-- 8 — CAMPO MAGNETICO -->
+    <section id="sec8">
+      <h2>8. Il campo magnetico</h2>
+
+      <div class="curiosita"><strong>La bussola: mille anni di navigazione.</strong> I cinesi conoscevano la magnetite
+        (una pietra che attira il ferro) fin dall'antichità e già in epoca Han usavano "cucchiai indicatori" per la
+        geomanzia; lo studioso <strong>Shen Kuo</strong> (1088) descrive per primo l'ago magnetizzato che indica il sud.
+        La bussola arriva nel Mediterraneo attorno al XII secolo — la tradizione italiana la lega ad
+        <strong>Amalfi</strong> e al leggendario Flavio Gioia — e cambia per sempre la navigazione: per la prima volta si
+        può far rotta senza stelle né sole. Il motivo per cui funziona? La Terra stessa è un gigantesco magnete, e l'ago
+        non fa che allinearsi al suo <strong>campo magnetico</strong>.</div>
+
+      <p>Il <strong>campo magnetico</strong> $\vec B$ è generato dai magneti — e, come scopriremo, dalle correnti
+        elettriche. Come per $\vec E$ lo visualizziamo con linee di campo: per convenzione <strong>escono dal polo
+        Nord</strong> ed <strong>entrano nel polo Sud</strong>. Sposta il magnete e osserva il suo campo; poi prova a
+        <strong>spezzarlo</strong>...</p>
+
+      <div class="unit-box">
+        <span class="unit-icon">🧲</span>
+        <p>L'<strong>unità di misura del campo magnetico</strong> è il <span class="unit-big">tesla (T)</span> — ma è
+          un'unità <em>enorme</em>: un solo tesla è già un campo fortissimo. Nella pratica si preferisce quasi sempre
+          usare i <strong>sottomultipli</strong>: il campo magnetico terrestre è circa $50\ \mu\text{T}$ (microtesla), un
+          magnete da frigorifero circa $5\ \text{mT}$ (millitesla), un potente elettromagnete da laboratorio o una
+          risonanza magnetica ospedaliera arriva a $1$–$3\ \text{T}$. Il tesla "nudo" compare solo nei casi più
+          estremi.</p>
+      </div>
+
+      <div class="controls">
+        <div class="control-group"><label>Posizione del magnete: <span class="val" id="mg-x-val">0</span></label>
+          <input type="range" id="mg-x" min="-160" max="160" step="5" value="0"></div>
+        <button class="btn" id="mg-break" type="button">🔨 Spezza il magnete</button>
+      </div>
+      <div class="ckt"><svg id="mg-svg" viewBox="0 0 640 300" aria-label="Campo magnetico di un magnete a barra"></svg></div>
+      <p class="eq-out" id="mg-out"></p>
+
+      <div class="definition">
+        <strong>Seconda equazione di Maxwell (flusso di $\vec B$).</strong> Il flusso del campo magnetico attraverso
+        <em>qualunque</em> superficie chiusa è <strong>sempre nullo</strong>:
+        $$\Phi_B = 0$$
+        Tradotto: tante linee entrano nella bolla, altrettante escono, <em>sempre</em>. Non esiste una "carica
+        magnetica" isolata da cui le linee solo escano: <strong>non esistono monopòli magnetici</strong>. Nord e Sud
+        vivono solo in coppia — per questo spezzando un magnete si ottengono <em>due</em> magneti, non un polo Nord e un
+        polo Sud separati.
+      </div>
+
+      <div class="curiosita"><strong>Approfondimento — a caccia di monopòli.</strong> Eppure i fisici i monopòli li
+        cercano sul serio! Nel 1931 <strong>Dirac</strong> mostrò che basterebbe un solo monopolo nell'universo per
+        spiegare perché la carica elettrica è "quantizzata" (sempre multipla di $e$); molte teorie di grande
+        unificazione ne prevedono l'esistenza, come particelle pesantissime nate nel Big Bang. Esperimenti dedicati
+        (oggi <em>MoEDAL</em> al CERN) li cercano da decenni: finora, nemmeno uno. Se ne trovassi uno, la seconda
+        equazione di Maxwell andrebbe corretta... e il Nobel sarebbe tuo.</div>
+    </section>
+
+    <!-- 9 — FORZA DI LORENTZ -->
+    <section id="sec9">
+      <h2>9. La forza di Lorentz</h2>
+      <p>Il campo magnetico non spinge le cariche ferme: agisce solo su cariche <strong>in movimento</strong>, e in un
+        modo tutto suo — la forza non è parallela al campo, ma <strong>perpendicolare</strong> sia alla velocità sia al
+        campo:</p>
+
+      <div class="definition">
+        <strong>Forza di Lorentz.</strong> Su una carica $q$ che si muove con velocità $\vec v$ in un campo $\vec B$
+        agisce la forza
+        $$\vec F = q\,\vec v \times \vec B \qquad\quad F = |q|\,v\,B\,\sin\theta$$
+        dove $\theta$ è l'angolo tra $\vec v$ e $\vec B$. È massima quando $\vec v \perp \vec B$, nulla quando sono
+        paralleli.
+      </div>
+
+      <h3>9.1 — Ripasso lampo: il prodotto vettoriale</h3>
+      <p>Il simbolo $\times$ è il <strong>prodotto vettoriale</strong>: da due vettori $\vec a$ e $\vec b$ produce un
+        terzo vettore $\vec a \times \vec b$ che è <strong>perpendicolare a entrambi</strong>, ha modulo
+        $a\,b\,\sin\theta$ (l'area del parallelogramma che formano) e verso dato dalla <strong>regola della mano
+        destra</strong>: dita che ruotano da $\vec a$ verso $\vec b$, il pollice indica $\vec a \times \vec b$. Se
+        preferisci, c'è anche la <strong>regola della vite</strong>: immagina di avvitare una vite (destrorsa, quelle
+        normali) ruotandola da $\vec a$ verso $\vec b$: il verso in cui la vite <em>avanza</em> è il verso di
+        $\vec a \times \vec b$.</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 250" aria-label="Regola della mano destra e regola della vite per il prodotto vettoriale">
+        <line x1="150" y1="180" x2="320" y2="180" stroke="var(--primary)" stroke-width="3"/>
+        <polygon points="330,180 312,173 312,187" fill="var(--primary)"/>
+        <text x="338" y="186" class="lbl" font-style="italic" fill="var(--primary)">v</text>
+        <line x1="337" y1="168" x2="349" y2="168" stroke="var(--primary)" stroke-width="1.8"/>
+        <polygon points="353,168 346,165 346,171" fill="var(--primary)"/>
+        <line x1="150" y1="180" x2="150" y2="60" stroke="var(--accent)" stroke-width="3"/>
+        <polygon points="150,50 143,68 157,68" fill="var(--accent)"/>
+        <text x="128" y="46" class="lbl" font-style="italic" fill="var(--accent)">B</text>
+        <line x1="126" y1="28" x2="138" y2="28" stroke="var(--accent)" stroke-width="1.8"/>
+        <polygon points="142,28 135,25 135,31" fill="var(--accent)"/>
+        <circle cx="150" cy="180" r="10" fill="none" stroke="var(--magenta)" stroke-width="2.5"/>
+        <circle cx="150" cy="180" r="2.5" fill="var(--magenta)"/>
+        <text x="118" y="214" class="em" font-style="italic">F</text>
+        <line x1="116" y1="198" x2="126" y2="198" stroke="var(--magenta)" stroke-width="1.8"/>
+        <polygon points="130,198 123,195 123,201" fill="var(--magenta)"/>
+        <text x="130" y="214" class="em"> (esce dallo schermo)</text>
+        <path d="M 240,150 A 60 60 0 0 0 178 112" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-dasharray="5 4"/>
+        <polygon points="175,110 190,109 184,122" fill="var(--muted)"/>
+        <text x="235" y="135" class="lbl-s" fill="var(--muted)">da <tspan font-style="italic">v</tspan> a <tspan font-style="italic">B</tspan></text>
+        <text x="420" y="60" class="lbl-s" fill="var(--muted)" font-weight="700">Mano destra:</text>
+        <text x="420" y="82" class="lbl-s" fill="var(--muted)">• dita che ruotano da <tspan font-style="italic">v</tspan> verso <tspan font-style="italic">B</tspan></text>
+        <text x="420" y="104" class="lbl-s" fill="var(--muted)">• il pollice dà <tspan font-style="italic">F</tspan> (per q positiva)</text>
+        <text x="420" y="126" class="lbl-s" fill="var(--muted)">• se q è negativa: verso opposto</text>
+        <text x="420" y="162" class="lbl-s" fill="var(--muted)" font-weight="700">🔩 Regola della vite:</text>
+        <text x="420" y="184" class="lbl-s" fill="var(--muted)">• avvita da <tspan font-style="italic">v</tspan> verso <tspan font-style="italic">B</tspan>:</text>
+        <text x="420" y="206" class="lbl-s" fill="var(--muted)">la vite avanza nel verso di <tspan font-style="italic">F</tspan></text>
+      </svg></div>
+
+      <div class="curiosita"><strong>Nota per veri intenditori — lo pseudovettore.</strong> A rigore, il risultato di un
+        prodotto vettoriale non è un vettore "vero" ma uno <strong>pseudovettore</strong>. L'idea intuitiva: mettiti
+        davanti a uno <strong>specchio</strong>. Una freccia che punta verso destra si riflette in una freccia che punta
+        verso sinistra: i vettori veri (velocità, forza) si riflettono "come ti aspetti". Ma una rotazione
+        <em>oraria</em> allo specchio diventa <em>antioraria</em>: il vettore che la rappresenta (costruito con la mano
+        destra) nello specchio punta dal lato <strong>sbagliato</strong> — l'immagine riflessa sembra costruita con la
+        mano <em>sinistra</em>! Gli pseudovettori sono proprio questo: oggetti che nascono da una rotazione o da una
+        regola della mano destra ($\vec B$ stesso lo è) e che allo specchio si comportano "al contrario". Finché non
+        si usano specchi, la differenza non si nota — ma alla natura ogni tanto importa, e la fisica delle particelle
+        se n'è accorta!</div>
+
+      <h3>9.2 — Il moto circolare: esplora</h3>
+      <p>Se $\vec v \perp \vec B$, la forza di Lorentz è sempre perpendicolare alla velocità: non cambia il modulo di
+        $v$, solo la direzione. Risultato: la carica percorre una <strong>circonferenza</strong> di raggio</p>
+      <div class="formula-box">$$r = \frac{m\,v}{|q|\,B}$$</div>
+      <p>Nella simulazione un <strong>protone</strong> entra in una regione dove $\vec B$ è uniforme e punta
+        <em>dentro lo schermo</em> (simboli ×):</p>
+
+      <div class="two-col">
+        <div>
+          <div class="controls">
+            <div class="control-group"><label>Velocità v (×10⁵ m/s): <span class="val" id="lz-v-val">2.0</span></label>
+              <input type="range" id="lz-v" min="0.5" max="5" step="0.1" value="2"></div>
+            <div class="control-group"><label>Campo B (T): <span class="val" id="lz-b-val">0.50</span></label>
+              <input type="range" id="lz-b" min="0.1" max="1" step="0.05" value="0.5"></div>
+            <label class="toggle-row"><input type="checkbox" id="lz-neg"> Carica negativa (antiprotone)</label>
+          </div>
+          <p id="lz-out" class="eq-out"></p>
+        </div>
+        <div>
+          <div class="ckt"><svg id="lz-svg" viewBox="0 0 320 320" aria-label="Moto circolare di una carica in campo magnetico"></svg></div>
+        </div>
+      </div>
+
+      <div class="rule"><strong>Un dettaglio importante.</strong> La forza di Lorentz è sempre perpendicolare allo
+        spostamento: quindi <strong>non compie lavoro</strong> e non cambia l'energia cinetica della carica. Il campo
+        magnetico è un "volante", non un "motore": curva le traiettorie, non accelera in modulo.</div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato — il raggio di curvatura</span></div>
+        <p>Un protone ($m = 1{,}67\times10^{-27}$ kg, $q = 1{,}6\times10^{-19}$ C) entra con velocità
+          $v = 2\times10^{5}$ m/s, perpendicolare al campo, in una regione con $B = 0{,}5$ T. Calcola il raggio della
+          sua traiettoria circolare.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$r = \dfrac{m\,v}{q\,B} = \dfrac{1{,}67\times10^{-27} \times 2\times10^{5}}{1{,}6\times10^{-19} \times 0{,}5}$.</p>
+          <p><span class="step-num">2</span>Numeratore: $3{,}34\times10^{-22}$; denominatore: $8{,}0\times10^{-20}$.</p>
+          <p><span class="step-num">3</span>$r = \dfrac{3{,}34\times10^{-22}}{8{,}0\times10^{-20}} \approx 4{,}2\times10^{-3}$ m.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$r \approx 4{,}2$ mm.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 — SPETTROMETRO DI MASSA -->
+    <section id="sec10">
+      <h2>10. Lo spettrometro di massa</h2>
+      <p>Mettiamo tutto insieme — campo elettrico, campo magnetico, forza di Lorentz — e otteniamo uno degli strumenti
+        più utili mai costruiti: lo <strong>spettrometro di massa</strong>, la "bilancia" capace di pesare atomi e
+        molecole. Funziona in due stadi:</p>
+
+      <div class="steps">
+        <p><strong>1) Il selettore di velocità.</strong> Gli ioni prodotti dalla sorgente entrano in una regione con un
+          campo elettrico $\vec E$ e un campo magnetico $\vec B_1$ <strong>incrociati</strong> (perpendicolari tra loro
+          e alla velocità). La forza elettrica $qE$ spinge da una parte, quella magnetica $qvB_1$ dall'altra: passano
+          <em>dritti</em> solo gli ioni per cui le due forze si bilanciano, cioè con velocità
+          $$v = \frac{E}{B_1}$$ Tutti gli altri finiscono contro le pareti: all'uscita il fascio ha una sola velocità.</p>
+        <p><strong>2) La camera di deflessione.</strong> Gli ioni selezionati entrano in un secondo campo magnetico
+          $B_2$, perpendicolare alla velocità: percorrono una <strong>semicirconferenza</strong> di raggio
+          $r = \dfrac{m\,v}{q\,B_2}$ e colpiscono un rivelatore. A parità di carica e velocità, <strong>più lo ione è
+          massiccio, più largo è il cerchio</strong>: misurando dove atterra, si legge la massa.</p>
+      </div>
+
+      <h3>10.1 — Esplora lo spettrometro</h3>
+      <p>Il selettore è regolato su $E = 1000$ V/m e $B_1 = 0{,}01$ T (quindi $v = 10^5$ m/s). Cambia la massa dello
+        ione (in unità di massa atomica, con carica $+e$) e il campo $B_2$: osserva dove colpisce il rivelatore.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Massa dello ione (u): <span class="val" id="sp-m-val">12</span></label>
+          <input type="range" id="sp-m" min="1" max="40" step="1" value="12"></div>
+        <div class="control-group"><label>Campo B₂ (T): <span class="val" id="sp-b-val">0.20</span></label>
+          <input type="range" id="sp-b" min="0.1" max="0.5" step="0.01" value="0.2"></div>
+      </div>
+      <div class="ckt"><svg id="sp-svg" viewBox="0 0 640 330" aria-label="Schema dello spettrometro di massa"></svg></div>
+      <p class="eq-out" id="sp-out"></p>
+
+      <h3>10.2 — A che cosa serve?</h3>
+      <ul>
+        <li><strong>Riconoscere gli isotopi:</strong> atomi dello stesso elemento ma con massa diversa (es. carbonio-12
+          e carbonio-14) atterrano in punti diversi: è così che si misura la loro abbondanza per la
+          <strong>datazione al radiocarbonio</strong> dei reperti archeologici.</li>
+        <li><strong>Chimica e farmaci:</strong> identificare molecole sconosciute "pesandole" (controllo qualità,
+          scoperta di nuove sostanze).</li>
+        <li><strong>Antidoping e tossicologia:</strong> rivelare tracce minime di sostanze proibite nei campioni.</li>
+        <li><strong>Spazio:</strong> le sonde (da Apollo a Rosetta) portano spettrometri per analizzare atmosfere e
+          suoli di altri mondi.</li>
+      </ul>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato — separare due isotopi del carbonio</span></div>
+        <p>In uno spettrometro, il selettore ha $E = 1000$ V/m e $B_1 = 0{,}01$ T; la camera ha $B_2 = 0{,}2$ T. Ioni di
+          carbonio-12 ($m_{12} = 12\,\text{u} = 1{,}99\times10^{-26}$ kg) e carbonio-14
+          ($m_{14} = 14\,\text{u} = 2{,}32\times10^{-26}$ kg), entrambi con carica $q = +e = 1{,}6\times10^{-19}$ C,
+          attraversano lo strumento. Calcola: <strong>(a)</strong> la velocità selezionata; <strong>(b)</strong> i raggi
+          delle due traiettorie; <strong>(c)</strong> la distanza tra i due punti di impatto sul rivelatore.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>(a)</strong> Selettore: $v = \dfrac{E}{B_1} = \dfrac{1000}{0{,}01} =
+            10^{5}$ m/s (per entrambi gli isotopi: il selettore non guarda la massa).</p>
+          <p><span class="step-num">2</span><strong>(b)</strong> Carbonio-12: $r_{12} = \dfrac{m_{12}\,v}{q\,B_2} =
+            \dfrac{1{,}99\times10^{-26} \times 10^{5}}{1{,}6\times10^{-19} \times 0{,}2} =
+            \dfrac{1{,}99\times10^{-21}}{3{,}2\times10^{-20}} \approx 6{,}2\times10^{-2}$ m $= 6{,}2$ cm.</p>
+          <p><span class="step-num">3</span>Carbonio-14: $r_{14} = \dfrac{2{,}32\times10^{-26} \times 10^{5}}{3{,}2\times10^{-20}}
+            \approx 7{,}3\times10^{-2}$ m $= 7{,}3$ cm.</p>
+          <p><span class="step-num">4</span><strong>(c)</strong> Dopo mezza circonferenza, ogni ione atterra a distanza
+            $2r$ dalla fenditura: gli impatti distano $2r_{14} - 2r_{12} = 2\,(7{,}3 - 6{,}2) \approx 2{,}2$ cm. I due
+            isotopi sono nettamente separati: lo spettrometro li "pesa" uno per uno.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$v = 10^5$ m/s; $r_{12} \approx 6{,}2$ cm, $r_{14} \approx 7{,}3$ cm; impatti separati di $\approx 2{,}2$ cm.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 — QUIZ -->
+    <section id="quiz">
+      <h2>11. Quiz finale</h2>
+      <p>Dieci domande su campi, cariche, Gauss e Lorentz. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 4 — Campi elettrico e magnetico · Fisica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'In fisica, un <strong>campo</strong> è:',
+        options: ['una grandezza definita in ogni punto dello spazio', 'una forza di contatto', 'un tipo di energia chimica', 'una particella molto piccola'],
+        correct: 0, explain: 'Il campo assegna un valore (per noi: un vettore) a ogni punto dello spazio: è così che la sorgente "comunica" la forza a distanza.' },
+      { type: 'mc', diff: 'easy', text: 'Strofinando una bacchetta di plastica con un panno di lana, la bacchetta si carica perché:',
+        options: ['si creano nuove cariche dal nulla', 'alcuni elettroni passano da un materiale all\'altro', 'i protoni migrano nella lana', 'la plastica diventa un conduttore'],
+        correct: 1, explain: 'Nell\'elettrizzazione per strofinio si trasferiscono elettroni: la carica totale si conserva sempre.' },
+      { type: 'mc', diff: 'easy', text: 'Secondo la legge di Coulomb, se la distanza tra due cariche <strong>raddoppia</strong>, la forza:',
+        options: ['si dimezza', 'raddoppia', 'diventa un quarto', 'non cambia'],
+        correct: 2, explain: '$F \\propto 1/r^2$: a distanza doppia, forza quattro volte più piccola.' },
+      { type: 'mc', diff: 'medium', text: 'Il campo elettrico si definisce come $\\vec E = \\vec F / q$. Le sue unità sono:',
+        options: ['N·C', 'N/C (equivalenti a V/m)', 'J/C', 'C/s'],
+        correct: 1, explain: 'Forza per unità di carica: newton su coulomb, che coincide con volt su metro.' },
+      { type: 'mc', diff: 'medium', text: 'Una carica positiva, lasciata libera, si muove spontaneamente:',
+        options: ['dal potenziale basso verso quello alto', 'dal potenziale alto verso quello basso', 'sempre in cerchio', 'solo se il potenziale è nullo'],
+        correct: 1, explain: 'Come una pallina che scende: la carica positiva "cade" verso i potenziali più bassi, nel verso del campo.' },
+      { type: 'mc', diff: 'medium', text: 'Nel grafico di $V(x)$, il campo elettrico $E_x$ è:',
+        options: ['l\'area sotto la curva', 'il valore massimo di V', 'la pendenza cambiata di segno', 'sempre uguale a V'],
+        correct: 2, explain: '$E_x = -\\Delta V/\\Delta x$: il campo è la "discesa" del potenziale, come la derivata in matematica.' },
+      { type: 'mc', diff: 'medium', text: 'Il teorema di Gauss dice che il flusso di $\\vec E$ attraverso una superficie chiusa dipende:',
+        options: ['dalla forma della superficie', 'solo dalla carica racchiusa all\'interno', 'dalla velocità delle cariche', 'dal materiale della superficie'],
+        correct: 1, explain: '$\\Phi_E = Q_{int}/\\varepsilon_0$: forma e dimensione della "bolla" non contano, conta solo la carica dentro.' },
+      { type: 'mc', diff: 'hard', text: 'Il flusso del campo magnetico attraverso qualunque superficie chiusa è sempre zero. Questo significa che:',
+        options: ['il campo magnetico non esiste davvero', 'non esistono poli magnetici isolati (monopòli)', 'i magneti non hanno poli', 'il campo magnetico non ha linee di campo'],
+        correct: 1, explain: 'Le linee di B sono sempre chiuse: tante ne entrano, tante ne escono. Spezzando un magnete si ottengono due magneti, mai un polo isolato.' },
+      { type: 'mc', diff: 'hard', text: 'La forza di Lorentz su una carica in moto in un campo magnetico:',
+        options: ['è parallela alla velocità e la accelera', 'è perpendicolare alla velocità e non compie lavoro', 'agisce anche sulle cariche ferme', 'è sempre nulla'],
+        correct: 1, explain: '$\\vec F = q\\vec v \\times \\vec B$ è perpendicolare a $\\vec v$: curva la traiettoria senza cambiare il modulo della velocità.' },
+      { type: 'open', diff: 'hard', text: 'Spiega a che cosa serve il selettore di velocità in uno spettrometro di massa e perché funziona.',
+        keywords: ['velocit', 'uguale', 'bilanc', 'elettric', 'magnetic', 'forz', 'E/B', 'stessa'], requiredMatches: 3,
+        explain: 'Nel selettore i campi E e B incrociati esercitano forze opposte (qE contro qvB): passano dritti solo gli ioni con v = E/B. Serve perché nella camera successiva il raggio r = mv/(qB2) dipende anche dalla velocità: per "pesare" gli ioni confrontando i raggi, tutti devono entrare con la stessa velocità.' }
+    ];
+  </script>
+
+  <!-- Demo interattive di questa lezione -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { linspace, update, themeColors } = Plt;
+      const C = { blue: '#3b82f6', green: '#22c55e', red: '#ef4444', gold: '#f5b400', magenta: '#f06ab8', gray: '#9aa5c0' };
+      const NS = 'http://www.w3.org/2000/svg';
+
+      // ===== 2.1 — Elettrizzazione per strofinio =====
+      (function () {
+        const svg = document.getElementById('st-svg');
+        if (!svg) return;
+        const btn = document.getElementById('st-rub'), reset = document.getElementById('st-reset');
+        const out = document.getElementById('st-out');
+        const MAX = 8;
+        let n = 0, hold = false, ph = 0, prev = 0;
+        function draw() {
+          const rodX = 320 + (hold ? 72 * Math.sin(ph) : 0);
+          let h = '';
+          // panno di lana
+          h += `<rect x="185" y="170" width="270" height="52" rx="14" fill="color-mix(in srgb, var(--gold) 28%, var(--surface))" stroke="var(--gold)" stroke-width="2"/>`;
+          h += `<text x="320" y="243" text-anchor="middle" class="lbl-s" fill="var(--muted)">panno di lana ${n > 0 ? `(+${n}) — ha perso elettroni` : '(neutro)'}</text>`;
+          for (let i = 0; i < n; i++)
+            h += `<text x="${205 + i * 32}" y="192" fill="var(--red)" font-size="16" font-weight="800">+</text>`;
+          // bacchetta di plastica
+          h += `<rect x="${rodX - 120}" y="112" width="240" height="26" rx="13" fill="var(--accent-2)" opacity="0.92"/>`;
+          h += `<text x="${rodX}" y="100" text-anchor="middle" class="lbl-s" fill="var(--muted)">bacchetta di plastica ${n > 0 ? `(−${n})` : '(neutra)'}</text>`;
+          for (let i = 0; i < n; i++)
+            h += `<text x="${rodX - 112 + i * 31}" y="158" fill="var(--primary)" font-size="17" font-weight="800">−</text>`;
+          // pagliuzze attratte quando la carica è alta
+          if (n >= 6 && !hold) {
+            for (let i = 0; i < 3; i++)
+              h += `<rect x="${rodX - 50 + i * 42}" y="165" width="4" height="16" rx="2" fill="var(--muted)" transform="rotate(${-14 + i * 14} ${rodX - 48 + i * 42} 173)"/>`;
+          }
+          svg.innerHTML = h;
+          out.innerHTML = n === 0
+            ? 'Tutto neutro: in ogni sfregamento qualche elettrone passerà dalla lana alla plastica.'
+            : `Bacchetta: <span class="val-badge">−${n} e</span> · panno: <span class="val-badge">+${n} e</span> · totale: <span class="val-badge">0</span> — gli elettroni sono solo <strong>traslocati</strong>: la carica si conserva!` +
+              (n >= 6 ? ' La bacchetta ora attira le pagliuzze ✨' : '') + (n >= MAX ? ' (superfici sature: più di così non si strappa)' : '');
+        }
+        function loop() {
+          if (hold) {
+            ph += 0.17;
+            const s = Math.sin(ph);
+            if (prev < 0 && s >= 0 && n < MAX) n++;
+            prev = s;
+            draw();
+          }
+          requestAnimationFrame(loop);
+        }
+        const on = (e) => { e.preventDefault(); hold = true; };
+        const off = () => { if (hold) { hold = false; draw(); } };
+        btn.addEventListener('pointerdown', on);
+        btn.addEventListener('pointerup', off);
+        btn.addEventListener('pointerleave', off);
+        btn.addEventListener('pointercancel', off);
+        reset.addEventListener('click', () => { n = 0; ph = 0; prev = 0; draw(); });
+        draw(); requestAnimationFrame(loop);
+      })();
+
+      // ===== 2.2 — Elettrizzazione per contatto =====
+      (function () {
+        const svg = document.getElementById('ct-svg');
+        if (!svg) return;
+        const sl = document.getElementById('ct-d'), vd = document.getElementById('ct-d-val');
+        const reset = document.getElementById('ct-reset'), out = document.getElementById('ct-out');
+        let transferred = false;
+        const SX = 480, SY = 130, SR = 46;   // sfera
+        function go() {
+          const t = +sl.value / 100; vd.textContent = sl.value;
+          const tipX = 128 + t * 300;        // punta della bacchetta (contatto a ~428)
+          if (t >= 0.99 && !transferred) transferred = true;
+          const rodN = transferred ? 3 : 6, sphN = transferred ? 3 : 0;
+          let h = '';
+          // piedistallo + sfera
+          h += `<rect x="${SX - 10}" y="${SY + SR}" width="20" height="55" fill="var(--muted)" opacity="0.6"/>`;
+          h += `<rect x="${SX - 42}" y="${SY + SR + 55}" width="84" height="12" rx="4" fill="var(--muted)" opacity="0.6"/>`;
+          h += `<circle cx="${SX}" cy="${SY}" r="${SR}" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2.5"/>`;
+          h += `<text x="${SX}" y="${SY + SR + 85}" text-anchor="middle" class="lbl-s" fill="var(--muted)">sfera metallica ${sphN ? `(−${sphN})` : '(neutra)'}</text>`;
+          // cariche sulla superficie della sfera (i conduttori le portano in superficie!)
+          for (let i = 0; i < sphN; i++) {
+            const a = -0.8 + i * 0.8;
+            h += `<text x="${SX + (SR - 11) * Math.cos(a)}" y="${SY + (SR - 11) * Math.sin(a) + 5}" text-anchor="middle" fill="var(--primary)" font-size="16" font-weight="800">−</text>`;
+          }
+          // bacchetta carica
+          h += `<rect x="${tipX - 240}" y="${SY - 13}" width="240" height="26" rx="13" fill="var(--accent-2)" opacity="0.92"/>`;
+          h += `<text x="${tipX - 120}" y="${SY - 24}" text-anchor="middle" class="lbl-s" fill="var(--muted)">bacchetta carica (−${rodN})</text>`;
+          for (let i = 0; i < rodN; i++)
+            h += `<text x="${tipX - 218 + i * (rodN === 6 ? 38 : 76)}" y="${SY + 6}" fill="var(--primary)" font-size="16" font-weight="800">−</text>`;
+          // scintilla al contatto / repulsione dopo
+          if (t >= 0.99) h += `<text x="${tipX + 6}" y="${SY - 28}" fill="var(--gold)" font-size="18">⚡</text>`;
+          if (transferred && t < 0.85 && t > 0.15) {
+            h += `<line x1="${tipX + 8}" y1="${SY + 30}" x2="${tipX - 26}" y2="${SY + 30}" stroke="var(--red)" stroke-width="2.5"/><polygon points="${tipX - 30},${SY + 30} ${tipX - 16},${SY + 24} ${tipX - 16},${SY + 36}" fill="var(--red)"/>`;
+            h += `<line x1="${SX - SR - 8}" y1="${SY + 30}" x2="${SX - SR + 26}" y2="${SY + 30}" stroke="var(--red)" stroke-width="2.5"/><polygon points="${SX - SR + 30},${SY + 30} ${SX - SR + 16},${SY + 24} ${SX - SR + 16},${SY + 36}" fill="var(--red)"/>`;
+          }
+          svg.innerHTML = h;
+          out.innerHTML = !transferred
+            ? (t < 0.99 ? 'Avvicina fino a <strong>toccare</strong>: per ora non succede nulla (niente contatto, niente travaso).'
+                        : '⚡ Contatto!')
+            : (t >= 0.99 ? '⚡ <strong>Contatto!</strong> Metà degli elettroni in eccesso è "traboccata" nella sfera: ora la carica è ripartita.'
+                         : 'Dopo il contatto la sfera resta carica <strong>negativa</strong> come la bacchetta: stesso segno → ora si <strong style="color:var(--red)">respingono</strong>.');
+        }
+        sl.addEventListener('input', go);
+        reset.addEventListener('click', () => { transferred = false; sl.value = 0; go(); });
+        go();
+      })();
+
+      // ===== 2.3 — Elettrizzazione per induzione =====
+      (function () {
+        const svg = document.getElementById('in-svg');
+        if (!svg) return;
+        const sl = document.getElementById('in-d'), vd = document.getElementById('in-d-val');
+        const gnd = document.getElementById('in-gnd'), reset = document.getElementById('in-reset');
+        const out = document.getElementById('in-out');
+        const SX = 450, SY = 130, SR = 56;
+        // 4 elettroni liberi: angoli "riposo" e angoli "spinti a destra" (lato lontano dalla bacchetta)
+        const restA = [45, 135, 225, 315].map(d => d * Math.PI / 180);
+        const farA  = [-36, -13, 13, 36].map(d => d * Math.PI / 180);
+        const plusA = [80, 160, 200, 280].map(d => d * Math.PI / 180);
+        let removed = 0, grounded = false, cut = false, done = false;
+        function msg(t) { out.innerHTML = t; }
+        function go() {
+          const t = +sl.value / 100; vd.textContent = sl.value;
+          const tipX = 90 + t * 275;      // bacchetta arriva a ~365 (bordo sfera a 394)
+          // regole del gioco
+          if (grounded && t < 0.55) {     // errore: allontanata prima di staccare la terra
+            grounded = false; removed = 0;
+            gnd.textContent = '🔌 Collega a terra';
+            msg('😅 Troppo presto! Con la terra ancora collegata, allontanando la bacchetta gli elettroni sono <strong>risaliti</strong>: la sfera è di nuovo neutra. Ordine giusto: terra, <em>stacca</em>, poi allontana.');
+          }
+          if (cut && !done && t <= 0.15) {
+            done = true;
+            msg('🎉 <strong>Carica per induzione riuscita!</strong> La sfera è rimasta con 2 elettroni in meno: carica <span class="val-badge">+2 e</span>… e non l\'hai mai toccata. Le cariche ora si ridistribuiscono uniformemente sulla superficie.');
+          }
+          gnd.disabled = done || (!grounded && (t < 0.65 || cut));
+          const shift = done ? 0 : t;      // quanto gli elettroni sono spinti sul lato lontano
+          let h = '';
+          // piedistallo + sfera
+          h += `<rect x="${SX - 10}" y="${SY + SR}" width="20" height="52" fill="var(--muted)" opacity="0.6"/>`;
+          h += `<rect x="${SX - 44}" y="${SY + SR + 52}" width="88" height="12" rx="4" fill="var(--muted)" opacity="0.6"/>`;
+          h += `<circle cx="${SX}" cy="${SY}" r="${SR}" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2.5"/>`;
+          // filo di terra
+          if (grounded) {
+            h += `<line x1="${SX + SR - 8}" y1="${SY + 28}" x2="${SX + 90}" y2="${SY + 118}" class="wire"/>`;
+            h += `<line x1="${SX + 70}" y1="${SY + 118}" x2="${SX + 110}" y2="${SY + 118}" class="wire"/>`;
+            h += `<line x1="${SX + 78}" y1="${SY + 126}" x2="${SX + 102}" y2="${SY + 126}" class="wire"/>`;
+            h += `<line x1="${SX + 86}" y1="${SY + 134}" x2="${SX + 94}" y2="${SY + 134}" class="wire"/>`;
+            h += `<text x="${SX + 118}" y="${SY + 122}" class="lbl-s" fill="var(--muted)">terra</text>`;
+          }
+          // reticolo positivo (fisso)
+          plusA.forEach(a => {
+            h += `<text x="${SX + 34 * Math.cos(a)}" y="${SY + 34 * Math.sin(a) + 5}" text-anchor="middle" fill="var(--red)" font-size="15" font-weight="800" opacity="0.9">+</text>`;
+          });
+          // elettroni liberi (i primi "removed" sono scappati a terra)
+          for (let i = removed; i < 4; i++) {
+            const a0 = restA[i], a1 = farA[i];
+            const a = a0 + (a1 - a0) * shift;
+            h += `<text x="${SX + 38 * Math.cos(a)}" y="${SY + 38 * Math.sin(a) + 5}" text-anchor="middle" fill="var(--primary)" font-size="16" font-weight="800">−</text>`;
+          }
+          // bacchetta carica negativa
+          h += `<rect x="${tipX - 240}" y="${SY - 13}" width="240" height="26" rx="13" fill="var(--accent-2)" opacity="0.92"/>`;
+          h += `<text x="${tipX - 120}" y="${SY - 24}" text-anchor="middle" class="lbl-s" fill="var(--muted)">bacchetta carica (−)</text>`;
+          for (let i = 0; i < 5; i++)
+            h += `<text x="${tipX - 215 + i * 46}" y="${SY + 6}" fill="var(--primary)" font-size="16" font-weight="800">−</text>`;
+          // etichetta stato sfera
+          const net = removed > 0 ? `+${removed}` : '0';
+          h += `<text x="${SX}" y="${SY + SR + 86}" text-anchor="middle" class="lbl-s" fill="var(--muted)">sfera: carica netta ${net}${done ? ' — MAI TOCCATA!' : ''}</text>`;
+          svg.innerHTML = h;
+          if (!grounded && !cut && !done) {
+            if (t < 0.2) msg('Sfera neutra: 4 elettroni liberi (−) e il reticolo positivo (+). Avvicina la bacchetta…');
+            else if (t < 0.65) msg('Gli elettroni liberi <strong>scappano</strong> dal lato lontano (la bacchetta negativa li respinge): la sfera si sta polarizzando.');
+            else msg('Sfera ben polarizzata: lato vicino +, lato lontano −. Ora <strong>collega a terra</strong> per far fuggire gli elettroni!');
+          } else if (grounded) {
+            msg('💧 Collegata a terra: 2 elettroni sono <strong>scappati</strong> lungo il filo! Ora <strong>stacca il collegamento</strong> (non allontanare prima la bacchetta!).');
+          } else if (cut && !done) {
+            msg('✂️ Terra staccata: gli elettroni fuggiti non possono più tornare. Ora <strong>allontana la bacchetta</strong>.');
+          }
+        }
+        gnd.addEventListener('click', () => {
+          if (!grounded && !cut) {
+            grounded = true; removed = 2;
+            gnd.textContent = '✂️ Stacca il collegamento';
+          } else if (grounded) {
+            grounded = false; cut = true;
+            gnd.textContent = '🔌 Collega a terra';
+          }
+          go();
+        });
+        sl.addEventListener('input', go);
+        reset.addEventListener('click', () => {
+          removed = 0; grounded = false; cut = false; done = false;
+          gnd.textContent = '🔌 Collega a terra'; sl.value = 0; go();
+        });
+        go();
+      })();
+
+      // ===== 3.1 — Bilancia a torsione =====
+      (function () {
+        const svg = document.getElementById('ts-svg');
+        if (!svg) return;
+        const sd = document.getElementById('ts-d'), vd = document.getElementById('ts-d-val');
+        const out = document.getElementById('ts-out');
+        const PX = 320, PY = 160, L = 115;   // perno e semilunghezza dell'asticella
+        function go() {
+          const t = +sd.value / 100; vd.textContent = sd.value;
+          const gap = 160 - t * 135;                        // distanza sfera esterna (px): 160 → 25
+          const th = 5200 / Math.pow(gap + 25, 1.35);       // angolo di torsione (gradi), ∝ "forza"
+          const a = -th * Math.PI / 180;                    // l'asticella ruota via dalla sfera esterna
+          const ax = PX + L * Math.cos(a), ay = PY + L * Math.sin(a);      // sferetta carica
+          const cx2 = PX - L * Math.cos(a), cy2 = PY - L * Math.sin(a);    // contrappeso
+          const bx = PX + L + 26 + gap;                     // sfera esterna sul binario
+          let h = '';
+          // posizione di riposo (fantasma) e binario
+          h += `<line x1="${PX}" y1="${PY}" x2="${PX + L}" y2="${PY}" stroke="var(--border)" stroke-width="2" stroke-dasharray="5 5"/>`;
+          h += `<text x="${PX + L - 8}" y="${PY + 22}" class="lbl-s" fill="var(--muted)">posizione di riposo</text>`;
+          // asticella ruotata
+          h += `<line x1="${cx2}" y1="${cy2}" x2="${ax}" y2="${ay}" stroke="var(--text-soft)" stroke-width="4" stroke-linecap="round"/>`;
+          h += `<circle cx="${PX}" cy="${PY}" r="7" fill="var(--gold)"/>`;
+          h += `<text x="${PX - 10}" y="${PY - 14}" text-anchor="end" class="lbl-s" fill="var(--gold)">filo di torsione (visto dall'alto)</text>`;
+          h += `<circle cx="${cx2}" cy="${cy2}" r="10" fill="var(--muted)"/>`;
+          h += `<text x="${cx2 - 14}" y="${cy2 - 14}" text-anchor="end" class="lbl-s" fill="var(--muted)">contrappeso</text>`;
+          h += `<circle cx="${ax}" cy="${ay}" r="12" class="qplus"/><text x="${ax}" y="${ay + 5}" text-anchor="middle" fill="#fff" font-weight="800">+</text>`;
+          // sfera esterna
+          h += `<circle cx="${bx}" cy="${PY}" r="12" class="qplus"/><text x="${bx}" y="${PY + 5}" text-anchor="middle" fill="#fff" font-weight="800">+</text>`;
+          h += `<text x="${bx}" y="${PY + 30}" text-anchor="middle" class="lbl-s" fill="var(--muted)">sfera esterna</text>`;
+          // arco dell'angolo di torsione
+          if (th > 1.5) {
+            const r0 = 55;
+            h += `<path d="M ${PX + r0} ${PY} A ${r0} ${r0} 0 0 0 ${PX + r0 * Math.cos(a)} ${PY + r0 * Math.sin(a)}" fill="none" stroke="var(--magenta)" stroke-width="2"/>`;
+            h += `<text x="${PX + r0 + 10}" y="${PY - 12}" class="em">θ</text>`;
+          }
+          svg.innerHTML = h;
+          out.innerHTML = `Angolo di torsione: <span class="val-badge">θ ≈ ${th.toFixed(1)}°</span> — il filo si torce finché ` +
+            `la sua reazione elastica non bilancia la repulsione: <strong>θ ∝ F</strong>. Avvicinando la sfera, θ cresce come 1/r²: ` +
+            `è così che Coulomb "lesse" la sua legge.`;
+        }
+        sd.addEventListener('input', go); go();
+      })();
+
+      // ===== 3.2 — Legge di Coulomb vs Newton =====
+      (function () {
+        const s1 = document.getElementById('cb-q1'), s2 = document.getElementById('cb-q2'), sr = document.getElementById('cb-r');
+        if (!s1) return;
+        const v1 = document.getElementById('cb-q1-val'), v2 = document.getElementById('cb-q2-val'), vr = document.getElementById('cb-r-val');
+        const lock = document.getElementById('cb-lock'), newton = document.getElementById('cb-newton');
+        const out = document.getElementById('cb-out');
+        const k = 8.99e9, G = 6.67e-11;
+        function go() {
+          const q1 = +s1.value, q2 = +s2.value, r = +sr.value;
+          const locked = lock.checked, cmp = newton.checked;
+          v1.textContent = q1; v2.textContent = q2; vr.textContent = r.toFixed(2);
+          const rs = linspace(0.08, 1, 200);
+          // forza CON SEGNO: >0 repulsiva, <0 attrattiva (Newton: sempre negativa)
+          const pq = q1 * q2 * 1e-12;
+          // asse destro scalato del rapporto tra le costanti: così le due curve 1/r² si sovrappongono esattamente
+          const y2max = pq !== 0 ? 24 * G / (k * Math.abs(pq)) : 1.1e-8;
+          const layout = {
+            xaxis: { title: 'r (m)', range: [0, 1.02] },
+            yaxis: { title: 'F elettrica (N)', range: locked ? [-24, 24] : undefined },
+            margin: { t: 34, b: 42, l: 55, r: cmp ? 74 : 20 },
+            showlegend: cmp, legend: { orientation: 'h', x: 0, y: 1.18 },
+            annotations: locked ? [
+              { xref: 'paper', x: 0.03, y: 21, text: 'repulsione (F > 0)', showarrow: false, font: { size: 11, color: C.red }, xanchor: 'left' },
+              { xref: 'paper', x: 0.03, y: -21, text: 'attrazione (F < 0)', showarrow: false, font: { size: 11, color: C.magenta }, xanchor: 'left' },
+            ] : [],
+          };
+          if (cmp) layout.yaxis2 = { overlaying: 'y', side: 'right', title: 'F gravitazionale (N)', showgrid: false,
+                                     zeroline: false, color: themeColors().font, exponentformat: 'e',
+                                     range: locked ? [-y2max, y2max] : undefined };
+          const newtonTrace = { x: rs, y: rs.map(x => -G / (x * x)), type: 'scatter', mode: 'lines',
+                                name: 'Newton (gravità)', yaxis: 'y2', line: { color: C.green, width: 2.5, dash: 'dash' } };
+          if (q1 === 0 || q2 === 0) {
+            out.innerHTML = 'Una delle cariche è nulla: <span class="val-badge">F = 0</span>. Niente carica, niente forza!';
+            update('cb-plot', cmp ? [newtonTrace] : [], layout);
+            return;
+          }
+          const F = k * pq / (r * r);
+          const attr = F < 0;
+          const traces = [
+            { x: rs, y: rs.map(x => k * pq / (x * x)), type: 'scatter', mode: 'lines', name: 'Coulomb (elettrica)', line: { color: C.blue, width: 2.5 } },
+            { x: [r], y: [F], type: 'scatter', mode: 'markers', marker: { color: attr ? C.magenta : C.red, size: 11 }, name: 'ora', showlegend: false },
+          ];
+          if (cmp) traces.push(newtonTrace);
+          update('cb-plot', traces, layout);
+          const Fa = Math.abs(F);
+          out.innerHTML = `F = k·q₁q₂/r² = <span class="val-badge">${attr ? '−' : '+'}${Fa < 0.01 ? Fa.toExponential(2) : Fa.toFixed(2)} N</span> — ` +
+            (attr ? 'segno negativo: <strong style="color:var(--magenta)">attrattiva</strong> 🧲 (curva sotto lo zero)' : 'segno positivo: <strong style="color:var(--red)">repulsiva</strong> 💥 (curva sopra lo zero)') +
+            (cmp ? `<br>Stessa forma 1/r², scala diversa: come numeri, k/G ≈ <span class="val-badge">1,3×10²⁰</span> (asse destro in miliardesimi di newton). E Newton non sale mai sopra lo zero: la gravità attrae e basta.` : '');
+        }
+        [s1, s2, sr].forEach(s => s.addEventListener('input', go));
+        [lock, newton].forEach(c => c.addEventListener('change', go));
+        go();
+      })();
+
+      // ===== 4.1 — Linee di campo =====
+      (function () {
+        const svg = document.getElementById('fl-svg'), sel = document.getElementById('fl-config');
+        if (!svg) return;
+        const out = document.getElementById('fl-out');
+        const W = 640, H = 340;
+        function draw() {
+          const cfg = sel.value;
+          const charges = cfg === 'single'
+            ? [{ x: 320, y: 170, q: 1 }]
+            : cfg === 'quad'
+              ? [{ x: 230, y: 105, q: 1 }, { x: 410, y: 105, q: -1 }, { x: 230, y: 235, q: -1 }, { x: 410, y: 235, q: 1 }]
+              : [{ x: 210, y: 170, q: 1 }, { x: 430, y: 170, q: cfg === 'dip' ? -1 : 1 }];
+          let html = '';
+          // integrazione delle linee di campo (uscenti dalle cariche positive)
+          const step = 4, maxSteps = 420;
+          charges.filter(c => c.q > 0).forEach(c => {
+            const nLines = 14;
+            for (let i = 0; i < nLines; i++) {
+              const a = (2 * Math.PI * i) / nLines;
+              let x = c.x + 14 * Math.cos(a), y = c.y + 14 * Math.sin(a);
+              const pts = [`${x.toFixed(1)},${y.toFixed(1)}`];
+              let arrow = null;
+              for (let s = 0; s < maxSteps; s++) {
+                let ex = 0, ey = 0, stop = false;
+                for (const ch of charges) {
+                  const dx = x - ch.x, dy = y - ch.y;
+                  const d2 = dx * dx + dy * dy, d = Math.sqrt(d2);
+                  if (ch.q < 0 && d < 13) { stop = true; break; }
+                  const f = ch.q / (d2 * d);
+                  ex += f * dx; ey += f * dy;
+                }
+                if (stop) break;
+                const m = Math.sqrt(ex * ex + ey * ey);
+                if (m === 0) break;
+                x += (ex / m) * step; y += (ey / m) * step;
+                pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+                if (s === 26) arrow = { x, y, ux: ex / m, uy: ey / m };
+                if (x < -20 || x > W + 20 || y < -20 || y > H + 20) break;
+              }
+              html += `<polyline class="fieldline" points="${pts.join(' ')}"/>`;
+              if (arrow) {
+                const { x: ax, y: ay, ux, uy } = arrow;
+                const px = -uy, py = ux;
+                html += `<polygon fill="var(--primary)" points="${(ax + ux * 7).toFixed(1)},${(ay + uy * 7).toFixed(1)} ${(ax - ux * 3 + px * 4).toFixed(1)},${(ay - uy * 3 + py * 4).toFixed(1)} ${(ax - ux * 3 - px * 4).toFixed(1)},${(ay - uy * 3 - py * 4).toFixed(1)}"/>`;
+              }
+            }
+          });
+          // cariche sopra le linee
+          charges.forEach(ch => {
+            html += `<circle cx="${ch.x}" cy="${ch.y}" r="13" class="${ch.q > 0 ? 'qplus' : 'qminus'}"/>` +
+              `<text x="${ch.x}" y="${ch.y + 5}" text-anchor="middle" fill="#fff" font-size="16" font-weight="800">${ch.q > 0 ? '+' : '−'}</text>`;
+          });
+          svg.innerHTML = html;
+          out.innerHTML = cfg === 'dip'
+            ? 'Il <strong>dipolo</strong>: le linee escono dalla carica + ed entrano nella −. Tra le cariche il campo è intenso (linee fitte).'
+            : cfg === 'pp'
+              ? 'Due cariche uguali: le linee si <strong>respingono</strong> — al centro esatto il campo è nullo (nessuna linea ci passa).'
+              : cfg === 'quad'
+                ? 'Il <strong>quadrupolo</strong>: ogni + "consegna" le sue linee ai − vicini. I contributi quasi si cancellano: lontano dal gruppo il campo muore molto più in fretta di quello del dipolo.'
+                : 'Una carica isolata: campo <strong>radiale</strong>, che si dirada come $1/r^2$ allontanandosi.';
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sel.addEventListener('change', draw); draw();
+      })();
+
+      // ===== 5.1 — Potenziale → campo (costruzione progressiva) =====
+      (function () {
+        const prof = document.getElementById('pv-prof'), sx = document.getElementById('pv-x');
+        if (!prof) return;
+        const vx = document.getElementById('pv-x-val'), lock = document.getElementById('pv-lock');
+        const out = document.getElementById('pv-out');
+        // rangeV/rangeE: scale bloccate per ciascun profilo (così lo slider non fa "ballare" gli assi)
+        const profiles = {
+          lin:    { f: x => 100 - 5 * x, rangeV: [0, 115], rangeE: [0, 650] },
+          punt:   { f: x => 180 / x, rangeV: [0, 195], rangeE: [0, 19500] },
+          tratti: { f: x => (x < 10 ? 100 - 8 * x : 20 - 0.5 * (x - 10)), rangeV: [0, 115], rangeE: [0, 950] },
+        };
+        const h = 0.01;
+        function Efield(f, x) { return -((f(x + h) - f(x - h)) / (2 * h)) * 100; }   // V/m (x in cm)
+        function go() {
+          const p = profiles[prof.value];
+          const x0 = +sx.value; vx.textContent = x0.toFixed(1);
+          const locked = lock.checked;
+          const xs = linspace(1, 20, 300);
+          const Vs = xs.map(p.f);
+          const slope = (p.f(x0 + h) - p.f(x0 - h)) / (2 * h);   // V per cm
+          const E0 = -slope * 100;                                // V/m
+          const tx = [x0 - 3, x0 + 3];
+          const ty = tx.map(x => p.f(x0) + slope * (x - x0));
+          // campo disegnato progressivamente fino a x0 (la "derivata costruita a mano")
+          const xe = xs.filter(x => x <= x0);
+          const Es = xe.map(x => Efield(p.f, x));
+          update('pv-plot', [
+            { x: xs, y: Vs, type: 'scatter', mode: 'lines', name: 'V(x) — potenziale', line: { color: C.gold, width: 3 } },
+            { x: tx, y: ty, type: 'scatter', mode: 'lines', name: 'tangente', line: { color: C.magenta, width: 1.6, dash: 'dot' }, showlegend: false },
+            { x: [x0], y: [p.f(x0)], type: 'scatter', mode: 'markers', marker: { color: C.gold, size: 9 }, showlegend: false },
+            { x: xe, y: Es, type: 'scatter', mode: 'lines', name: 'Eₓ(x) — campo (asse dx)', yaxis: 'y2', line: { color: C.magenta, width: 3 } },
+            { x: [x0], y: [E0], type: 'scatter', mode: 'markers', yaxis: 'y2', marker: { color: C.magenta, size: 10, symbol: 'diamond' }, showlegend: false },
+          ], {
+            xaxis: { title: 'x (cm)', range: [0, 20.5] },
+            yaxis: { title: 'V (volt)', rangemode: 'tozero', range: locked ? p.rangeV : undefined },
+            yaxis2: { overlaying: 'y', side: 'right', title: 'Eₓ (V/m)', showgrid: false, zeroline: false,
+                      color: themeColors().font, rangemode: 'tozero', range: locked ? p.rangeE : undefined },
+            showlegend: true, legend: { orientation: 'h', y: 1.16 },
+          });
+          out.innerHTML = `Pendenza di $V$ in $x_0$: <span class="val-badge">${slope.toFixed(1)} V/cm</span> &nbsp;→&nbsp; ` +
+            `campo $E_x = -\\,\\text{pendenza}$ = <span class="val-badge">${E0.toFixed(0)} V/m</span>` +
+            (Math.abs(slope) < 0.6 ? ' — potenziale quasi piatto: campo quasi nullo!' : '');
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        prof.addEventListener('change', go); sx.addEventListener('input', go);
+        lock.addEventListener('change', go); go();
+      })();
+
+      // ===== 6 — Teorema di Gauss =====
+      (function () {
+        const svg = document.getElementById('gs-svg');
+        if (!svg) return;
+        const sr = document.getElementById('gs-r'), sx = document.getElementById('gs-x');
+        const vr = document.getElementById('gs-r-val'), vx = document.getElementById('gs-x-val');
+        const shapeBtn = document.getElementById('gs-shape');
+        const out = document.getElementById('gs-out');
+        const CX = 320, CY = 160;   // centro della bolla
+        let potato = false;
+        // raggio della "patata" in funzione dell'angolo (per disegno e per il test dentro/fuori)
+        function potatoR(R, a) { return R * (1 + 0.22 * Math.sin(3 * a + 1.2) + 0.12 * Math.cos(2 * a - 0.5)); }
+        function potatoPath(R) {
+          const pts = [];
+          for (let i = 0; i <= 72; i++) {
+            const a = (2 * Math.PI * i) / 72;
+            const rr = potatoR(R, a);
+            pts.push(`${(CX + rr * Math.cos(a)).toFixed(1)},${(CY + rr * Math.sin(a)).toFixed(1)}`);
+          }
+          return 'M ' + pts.join(' L ') + ' Z';
+        }
+        function go() {
+          const R = +sr.value, off = +sx.value;
+          vr.textContent = R; vx.textContent = off;
+          const qx = CX + off, qy = CY;
+          const inside = potato ? off < potatoR(R, 0) : off < R;
+          const fillStroke = `fill="color-mix(in srgb, var(--gold) 10%, transparent)" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="8 5"`;
+          let html = potato
+            ? `<path d="${potatoPath(R)}" ${fillStroke}/>`
+            : `<circle cx="${CX}" cy="${CY}" r="${R}" ${fillStroke}/>`;
+          html += `<text x="${CX}" y="${CY - R * (potato ? 1.36 : 1) - 8}" text-anchor="middle" class="lbl-s" fill="var(--gold)">superficie chiusa (${potato ? 'a patata 🥔' : 'sfera'})</text>`;
+          // 12 linee radiali dalla carica
+          const n = 12;
+          for (let i = 0; i < n; i++) {
+            const a = (2 * Math.PI * i) / n;
+            const x2 = qx + 400 * Math.cos(a), y2 = qy + 400 * Math.sin(a);
+            html += `<line x1="${qx + 13 * Math.cos(a)}" y1="${qy + 13 * Math.sin(a)}" x2="${x2}" y2="${y2}" class="fieldline"/>`;
+            const ax = qx + 42 * Math.cos(a), ay = qy + 42 * Math.sin(a);
+            const px = -Math.sin(a), py = Math.cos(a);
+            html += `<polygon fill="var(--primary)" points="${ax + 7 * Math.cos(a)},${ay + 7 * Math.sin(a)} ${ax - 3 * Math.cos(a) + 4 * px},${ay - 3 * Math.sin(a) + 4 * py} ${ax - 3 * Math.cos(a) - 4 * px},${ay - 3 * Math.sin(a) - 4 * py}"/>`;
+          }
+          html += `<circle cx="${qx}" cy="${qy}" r="13" class="qplus"/><text x="${qx}" y="${qy + 5}" text-anchor="middle" fill="#fff" font-size="16" font-weight="800">+</text>`;
+          svg.innerHTML = html;
+          out.innerHTML = inside
+            ? `La carica è <strong>dentro</strong>: tutte le ${n} linee escono dalla superficie — ${potato ? 'anche se è una <strong>patata</strong> senza alcuna simmetria!' : 'qualunque sia il suo raggio.'} → <span class="val-badge">Φ = Q/ε₀</span> (il flusso non dipende né dalla forma né dalla dimensione!)`
+            : `La carica è <strong>fuori</strong>: ogni linea che entra poi riesce → bilancio netto <span class="val-badge">Φ = 0</span>${potato ? ' — vale anche per la patata!' : ''}`;
+        }
+        shapeBtn.addEventListener('click', () => {
+          potato = !potato;
+          shapeBtn.textContent = potato ? '⭕ Torna alla sfera' : '🥔 Prova con una patata';
+          go();
+        });
+        sr.addEventListener('input', go); sx.addEventListener('input', go); go();
+      })();
+
+      // ===== 7 — Lampada al plasma =====
+      (function () {
+        const svg = document.getElementById('pl-svg');
+        if (!svg) return;
+        const sd = document.getElementById('pl-d'), von = document.getElementById('pl-on');
+        const vd = document.getElementById('pl-d-val'), out = document.getElementById('pl-out');
+        let phase = 0;
+        function build() {
+          const d = +sd.value, on = von.checked;
+          vd.textContent = d;
+          const bx = 190 + d * 5.2;                       // posizione lampadina
+          const glow = on ? Math.max(0, Math.min(1, Math.pow(14 / d, 1.5))) : 0;
+          let html = '';
+          // base + sfera al plasma
+          html += `<rect x="90" y="230" width="120" height="46" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>`;
+          html += `<circle cx="150" cy="150" r="80" fill="color-mix(in srgb, var(--accent) 12%, transparent)" stroke="var(--accent)" stroke-width="2.5"/>`;
+          html += `<circle cx="150" cy="150" r="14" fill="var(--magenta)"/>`;
+          if (on) {
+            for (let i = 0; i < 7; i++) {
+              const a = phase + (2 * Math.PI * i) / 7;
+              const mx = 150 + 45 * Math.cos(a + 0.5 * Math.sin(phase * 2 + i));
+              const my = 150 + 45 * Math.sin(a - 0.4 * Math.cos(phase * 3 + i));
+              const ex2 = 150 + 76 * Math.cos(a), ey2 = 150 + 76 * Math.sin(a);
+              html += `<path d="M150,150 Q${mx},${my} ${ex2},${ey2}" fill="none" stroke="var(--magenta)" stroke-width="1.7" opacity="${0.45 + 0.4 * Math.sin(phase * 4 + i)}"/>`;
+            }
+            // aloni del campo oscillante
+            for (let ri = 1; ri <= 3; ri++) {
+              const rr = 80 + ri * 34 + 8 * Math.sin(phase * 3 + ri);
+              html += `<circle cx="150" cy="150" r="${rr}" fill="none" stroke="var(--accent)" stroke-width="1" opacity="${0.35 - ri * 0.09}" stroke-dasharray="4 7"/>`;
+            }
+          }
+          html += `<text x="150" y="292" text-anchor="middle" class="lbl-s" fill="var(--muted)">lampada al plasma</text>`;
+          // lampadina LED (senza fili!)
+          const bulbGlow = glow > 0.12;
+          html += `<g transform="translate(${bx},150)">`;
+          if (bulbGlow) html += `<circle cx="0" cy="-20" r="${26 + glow * 22}" fill="var(--gold)" opacity="${0.16 + glow * 0.3}"/>`;
+          html += `<circle cx="0" cy="-20" r="20" fill="${bulbGlow ? 'var(--gold)' : 'var(--surface)'}" stroke="var(--text-soft)" stroke-width="2" opacity="${bulbGlow ? (0.55 + glow * 0.45) : 1}"/>`;
+          html += `<rect x="-7" y="0" width="14" height="16" rx="2" fill="var(--muted)"/>`;
+          html += `<text x="0" y="42" text-anchor="middle" class="lbl-s" fill="var(--muted)">lampadina (nessun filo!)</text></g>`;
+          svg.innerHTML = html;
+          out.innerHTML = !on
+            ? 'Lampada al plasma spenta: niente campo, lampadina spenta.'
+            : glow > 0.5 ? `A ${d} cm il campo è intenso: la lampadina <strong style="color:var(--gold)">brilla</strong> senza alcun contatto! ✨`
+            : glow > 0.12 ? `A ${d} cm la lampadina si accende <strong>debolmente</strong>: il campo (e la sua energia) si affievolisce con la distanza.`
+            : `A ${d} cm il campo è troppo debole: avvicina la lampadina.`;
+        }
+        function loop() { if (von.checked) { phase += 0.09; build(); } requestAnimationFrame(loop); }
+        sd.addEventListener('input', build); von.addEventListener('change', build);
+        build(); requestAnimationFrame(loop);
+      })();
+
+      // ===== 8 — Magnete e linee di B =====
+      (function () {
+        const svg = document.getElementById('mg-svg');
+        if (!svg) return;
+        const sx = document.getElementById('mg-x'), vx = document.getElementById('mg-x-val');
+        const btn = document.getElementById('mg-break'), out = document.getElementById('mg-out');
+        let broken = false;
+        // anelli di campo di un magnete centrato in (cx,cy), semilunghezza L
+        function magnetHtml(cx, cy, L, tag) {
+          let h = '';
+          const shells = [26, 46, 70, 98];
+          shells.forEach(s => {
+            h += `<path class="bline" d="M ${cx - L},${cy - 8} C ${cx - L - s},${cy - 8 - s * 1.15} ${cx + L + s},${cy - 8 - s * 1.15} ${cx + L},${cy - 8}"/>`;
+            h += `<path class="bline" d="M ${cx - L},${cy + 8} C ${cx - L - s},${cy + 8 + s * 1.15} ${cx + L + s},${cy + 8 + s * 1.15} ${cx + L},${cy + 8}"/>`;
+          });
+          h += `<rect x="${cx - L}" y="${cy - 16}" width="${L}" height="32" rx="4" fill="var(--primary)"/>`;
+          h += `<rect x="${cx}" y="${cy - 16}" width="${L}" height="32" rx="4" fill="var(--red)"/>`;
+          h += `<text x="${cx - L / 2}" y="${cy + 6}" text-anchor="middle" fill="#fff" font-weight="800" font-size="15">S</text>`;
+          h += `<text x="${cx + L / 2}" y="${cy + 6}" text-anchor="middle" fill="#fff" font-weight="800" font-size="15">N</text>`;
+          return h;
+        }
+        function go() {
+          const off = +sx.value; vx.textContent = off;
+          const cy = 150;
+          let html = '';
+          if (!broken) {
+            html = magnetHtml(320 + off, cy, 70, 'a');
+          } else {
+            html = magnetHtml(320 + off - 95, cy, 42, 'a') + magnetHtml(320 + off + 95, cy, 42, 'b');
+          }
+          svg.innerHTML = html;
+          out.innerHTML = broken
+            ? 'Spezzato! Ma niente polo isolato: <strong>ogni metà ha di nuovo un Nord e un Sud</strong>, con le sue linee chiuse. Puoi spezzarlo all\'infinito (fino al singolo atomo): sempre dipoli, mai monopòli.'
+            : 'Le linee di $\\vec B$ <strong>escono dal Nord</strong>, <strong>entrano nel Sud</strong>... e si richiudono dentro il magnete: sono sempre <strong>linee chiuse</strong>, senza inizio né fine.';
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        btn.addEventListener('click', () => {
+          broken = !broken;
+          btn.textContent = broken ? '🧲 Ricomponi il magnete' : '🔨 Spezza il magnete';
+          go();
+        });
+        sx.addEventListener('input', go); go();
+      })();
+
+      // ===== 9.2 — Moto circolare di Lorentz =====
+      (function () {
+        const svg = document.getElementById('lz-svg');
+        if (!svg) return;
+        const sv = document.getElementById('lz-v'), sb = document.getElementById('lz-b'), neg = document.getElementById('lz-neg');
+        const vv = document.getElementById('lz-v-val'), vb = document.getElementById('lz-b-val'), out = document.getElementById('lz-out');
+        const m = 1.67e-27, e = 1.6e-19;
+        let ang = 0, trail = [];
+        function params() {
+          const v = +sv.value * 1e5, B = +sb.value;
+          const r = m * v / (e * B);                    // metri
+          return { v, B, r, rpx: Math.max(14, Math.min(130, r * 12000)) }; // scala: 12000 px/m
+        }
+        function statics() {
+          let h = '';
+          for (let gx = 30; gx <= 290; gx += 52) {
+            for (let gy = 30; gy <= 290; gy += 52) {
+              h += `<text x="${gx}" y="${gy}" text-anchor="middle" fill="var(--muted)" font-size="13" opacity="0.7">×</text>`;
+            }
+          }
+          h += `<text x="160" y="18" text-anchor="middle" class="lbl-s" fill="var(--muted)">B entrante nello schermo (×)</text>`;
+          return h;
+        }
+        function frame() {
+          const { v, B, r, rpx } = params();
+          vv.textContent = (+sv.value).toFixed(1); vb.textContent = (+sb.value).toFixed(2);
+          const dir = neg.checked ? -1 : 1;
+          ang += dir * 0.045 * (v / 2e5) / (rpx / 60);   // velocità angolare visiva
+          const cx = 160, cyc = 170;
+          const px = cx + rpx * Math.cos(ang), py = cyc + rpx * Math.sin(ang);
+          trail.push([px, py]); if (trail.length > 90) trail.shift();
+          let h = statics();
+          h += `<circle cx="${cx}" cy="${cyc}" r="${rpx}" fill="none" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 5"/>`;
+          h += `<polyline fill="none" stroke="var(--gold)" stroke-width="2" opacity="0.8" points="${trail.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ')}"/>`;
+          h += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="${neg.checked ? 'var(--primary)' : 'var(--red)'}"/>`;
+          svg.innerHTML = h;
+          out.innerHTML = `Raggio: $r = \\dfrac{m v}{qB}$ = <span class="val-badge">${(r * 1000).toFixed(1)} mm</span> — ` +
+            `cresce con la velocità, cala con il campo. ${neg.checked ? 'Carica negativa: il verso di rotazione si <strong>inverte</strong>.' : ''}`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+          requestAnimationFrame(frame);
+        }
+        [sv, sb].forEach(s => s.addEventListener('input', () => { trail = []; }));
+        neg.addEventListener('change', () => { trail = []; });
+        requestAnimationFrame(frame);
+      })();
+
+      // ===== 10.1 — Spettrometro di massa =====
+      (function () {
+        const svg = document.getElementById('sp-svg');
+        if (!svg) return;
+        const sm = document.getElementById('sp-m'), sb = document.getElementById('sp-b');
+        const vm = document.getElementById('sp-m-val'), vb = document.getElementById('sp-b-val');
+        const out = document.getElementById('sp-out');
+        const u = 1.66e-27, e = 1.6e-19, vsel = 1e5;
+        function go() {
+          const mu = +sm.value, B2 = +sb.value;
+          vm.textContent = mu; vb.textContent = B2.toFixed(2);
+          const r = mu * u * vsel / (e * B2);          // metri
+          const rcm = r * 100;
+          const scale = 9;                              // px per cm
+          const rpx = rcm * scale;
+          const ex = 250, ey = 90;                      // uscita del selettore / fenditura
+          let h = '';
+          // selettore di velocità
+          h += `<rect x="40" y="60" width="180" height="60" rx="8" fill="color-mix(in srgb, var(--primary) 8%, transparent)" stroke="var(--border)"/>`;
+          h += `<line x1="50" y1="66" x2="210" y2="66" stroke="var(--red)" stroke-width="3"/>`;
+          h += `<line x1="50" y1="114" x2="210" y2="114" stroke="var(--primary)" stroke-width="3"/>`;
+          h += `<text x="130" y="52" text-anchor="middle" class="lbl-s" fill="var(--muted)">selettore di velocità (E e B₁ incrociati)</text>`;
+          h += `<line x1="50" y1="90" x2="240" y2="90" stroke="var(--green)" stroke-width="2" stroke-dasharray="6 4"/>`;
+          h += `<polygon points="244,90 230,84 230,96" fill="var(--green)"/>`;
+          h += `<text x="130" y="136" text-anchor="middle" class="lbl-s" fill="var(--green)">passa solo v = E/B₁ = 10⁵ m/s</text>`;
+          // camera con B2 (uscente x region sotto)
+          h += `<rect x="250" y="40" width="360" height="270" rx="10" fill="color-mix(in srgb, var(--accent) 7%, transparent)" stroke="var(--border)"/>`;
+          for (let gx = 285; gx <= 590; gx += 48) for (let gy = 70; gy <= 290; gy += 48)
+            h += `<text x="${gx}" y="${gy}" text-anchor="middle" fill="var(--muted)" font-size="12" opacity="0.65">×</text>`;
+          h += `<text x="430" y="30" text-anchor="middle" class="lbl-s" fill="var(--muted)">camera di deflessione: B₂ entrante (×)</text>`;
+          // semicirconferenza: centro sotto la fenditura
+          const cx = ex, cyc = ey + rpx;
+          h += `<path d="M ${ex},${ey} A ${rpx} ${rpx} 0 0 1 ${ex},${ey + 2 * rpx}" fill="none" stroke="var(--gold)" stroke-width="2.5"/>`;
+          // rivelatore = parete sinistra della camera
+          h += `<line x1="250" y1="40" x2="250" y2="310" stroke="var(--magenta)" stroke-width="4"/>`;
+          h += `<text x="262" y="305" class="lbl-s" fill="var(--magenta)">rivelatore</text>`;
+          const hitY = ey + 2 * rpx;
+          if (hitY < 312) {
+            h += `<circle cx="250" cy="${hitY}" r="6" fill="var(--gold)"/>`;
+            h += `<text x="268" y="${hitY + 4}" class="lbl-s" fill="var(--gold)">impatto a 2r = ${(2 * rcm).toFixed(1)} cm</text>`;
+          } else {
+            h += `<text x="430" y="300" text-anchor="middle" class="lbl-s" fill="var(--red)">raggio troppo grande: lo ione esce dalla camera!</text>`;
+          }
+          svg.innerHTML = h;
+          out.innerHTML = `$r = \\dfrac{m\\,v}{q\\,B_2}$ = <span class="val-badge">${rcm.toFixed(1)} cm</span> per m = ${mu} u — ` +
+            `a parità di tutto, uno ione <strong>più pesante</strong> curva più largo: lo spettrometro separa le masse.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sm.addEventListener('input', go); sb.addEventListener('input', go); go();
+      })();
+
+    });
+  </script>
+</body>
+
+</html>
