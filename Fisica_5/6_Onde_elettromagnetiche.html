@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 6 — Le onde elettromagnetiche</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    /* --- SVG fisici (theme-aware) --- */
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .poem { text-align: center; font-size: 1.5rem; margin: 1.3rem 0; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quinto anno · Lezione 6</div>
+    <h1>Le onde elettromagnetiche</h1>
+    <p>Il campo si mette a viaggiare: dalla boa sul mare alla natura della luce</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quinto anno</a>
+    <span class="sep">/</span> Le onde elettromagnetiche
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Le equazioni di Maxwell ci hanno lasciato con una promessa: campi elettrici e
+      magnetici che si generano a vicenda possono formare un'onda che si autosostiene, viaggiando a
+      $c = 1/\sqrt{\mu_0\varepsilon_0} \approx 3\times10^8$ m/s. Oggi manteniamo la promessa: capiamo che cos'è
+      un'onda, deriviamo (per i curiosi) l'equazione delle onde da Maxwell, e scopriamo che quell'onda... la stavamo
+      guardando da sempre.
+    </div>
+
+    <!-- 1 — CHE COS'È UN'ONDA -->
+    <section id="sec1">
+      <h2>1. Che cos'è un'onda?</h2>
+      <p>Guarda il mare da un molo: le creste sembrano correre verso la riva. Ma ora guarda la <strong>boa</strong>:
+        sale e scende, sale e scende... e resta sempre lì (al netto delle correnti). Che cosa sta viaggiando davvero,
+        allora? Non l'acqua: l'acqua oscilla quasi sul posto. A viaggiare è la <strong>perturbazione</strong> — la
+        forma, e con essa l'<strong>energia</strong>.</p>
+
+      <div class="definition">
+        Un'<strong>onda</strong> è una perturbazione che si propaga trasportando <strong>energia</strong> (e quantità
+        di moto) <strong>ma non materia</strong>. Il mezzo, se c'è, oscilla attorno alla propria posizione: non parte
+        per il viaggio.
+      </div>
+
+      <p>Verifichiamolo con la boa. Premi play e osserva: le creste corrono, la boa <strong>non si sposta in
+        orizzontale</strong> — la sua traiettoria è la linea tratteggiata verticale.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Ampiezza A (m): <span class="val" id="bo-a-val">0.6</span></label>
+          <input type="range" id="bo-a" min="0.2" max="1.2" step="0.1" value="0.6"></div>
+        <div class="control-group"><label>Lunghezza d'onda λ (m): <span class="val" id="bo-l-val">10</span></label>
+          <input type="range" id="bo-l" min="5" max="20" step="1" value="10"></div>
+        <div class="control-group"><label>Periodo T (s): <span class="val" id="bo-t-val">4</span></label>
+          <input type="range" id="bo-t" min="2" max="8" step="0.5" value="4"></div>
+        <label class="toggle-row"><input type="checkbox" id="bo-play" checked> onda in movimento</label>
+      </div>
+      <div class="ckt"><svg id="bo-svg" viewBox="0 0 640 260" aria-label="Onde del mare con una boa che oscilla verticalmente senza spostarsi"></svg></div>
+      <p class="eq-out" id="bo-out"></p>
+
+      <div class="curiosita"><strong>E sulla riva?</strong> Vicino alla spiaggia il fondale frena la base dell'onda, la
+        cresta la sorpassa e l'onda <strong>si rompe</strong>: da lì in poi l'acqua si sposta davvero (chiedi a chi fa
+        surf). Per questo l'esempio della boa vale "finché le onde non si rompono": finché l'onda è un'onda, trasporta
+        energia, non acqua.</div>
+
+      <h3>1.1 — La carta d'identità matematica di un'onda</h3>
+      <p>Un'onda "pulita" (armonica) è descritta da una sinusoide che dipende <em>sia dallo spazio sia dal tempo</em>:</p>
+      <div class="formula-box">
+        $$y(x, t) = A\,\sin\!\big(k\,x - \omega\,t\big) \qquad\text{con}\qquad k = \frac{2\pi}{\lambda},\quad \omega = \frac{2\pi}{T}$$
+      </div>
+      <p>Per leggere questa formula servono quattro grandezze. Due si vedono in una <strong>fotografia</strong>
+        dell'onda (tutto lo spazio, un solo istante), due in un <strong>film</strong> girato da un punto fisso
+        (un solo punto, tutto il tempo) — la boa, appunto:</p>
+      <div class="ckt"><svg id="wv-svg" viewBox="0 0 640 250" aria-label="Anatomia di un'onda: ampiezza e lunghezza d'onda nella fotografia, periodo nel film"></svg></div>
+
+      <p><strong>Ampiezza $A$</strong> (in metri, per un'onda del mare). È il <em>massimo scostamento</em> dalla
+        posizione di equilibrio: dal livello di quiete alla cresta — attenzione, non da valle a cresta. Misura quanto
+        è "forte" la perturbazione: quanto sale la boa, quanto è alto il volume di un suono, quanto è intensa una
+        luce. E non è un dettaglio estetico: l'energia trasportata cresce con il <em>quadrato</em> dell'ampiezza —
+        un'onda alta il doppio trasporta il quadruplo dell'energia.</p>
+      <p><strong>Lunghezza d'onda $\lambda$</strong> (in metri). Si legge nella <em>fotografia</em>: è la distanza
+        minima dopo la quale il profilo dell'onda si ripete identico — in pratica, la distanza tra due creste
+        consecutive (o tra due valli). È il "passo" dell'onda nello spazio.</p>
+      <p><strong>Periodo $T$</strong> (in secondi). Si legge nel <em>film</em>: è il tempo che un punto del mezzo
+        impiega a compiere un'oscillazione completa (su, giù e di nuovo su) — ovvero il tempo che passa tra due
+        creste successive che transitano davanti alla boa. È il "passo" dell'onda nel tempo.</p>
+      <p><strong>Frequenza $f = 1/T$</strong> (in hertz: $1$ Hz $= 1$ oscillazione al secondo). È la stessa
+        informazione del periodo, scritta al contrario: <em>quante</em> oscillazioni complete avvengono in un
+        secondo. Se la boa fa un su-e-giù completo in $T = 4$ s, compie $f = 1/4 = 0{,}25$ oscillazioni al secondo.
+        Periodo grande $\Leftrightarrow$ frequenza piccola, e viceversa. Qualche riferimento: la corrente di casa
+        oscilla a $50$ Hz, il La dell'accordatore a $440$ Hz, una radio FM a cento milioni di hertz.</p>
+
+      <p>E la <strong>velocità di propagazione</strong>? Osserva: in un tempo pari a un periodo $T$, ogni cresta
+        avanza esattamente fino alla posizione dov'era la cresta davanti a lei — cioè di una lunghezza d'onda
+        $\lambda$. Quindi</p>
+      <div class="formula-box">
+        $$v = \frac{\lambda}{T} = \lambda\, f$$
+      </div>
+      <p>È la formula più importante della lezione, e vale per <em>ogni</em> onda: mare, suono, corde di chitarra,
+        luce.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato — λ di una radio FM</span></div>
+        <p>Una stazione radio FM trasmette a $f = 100$ MHz $= 10^{8}$ Hz. Sapendo che le onde radio viaggiano alla
+          velocità della luce ($c = 3\times10^{8}$ m/s), calcola la loro lunghezza d'onda.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Da $v = \lambda f$ ricavo $\lambda = \dfrac{v}{f}$.</p>
+          <p><span class="step-num">2</span>$\lambda = \dfrac{3\times10^{8}}{10^{8}} = 3$ m.</p>
+          <p><span class="step-num">3</span>Tre metri: ecco perché le antenne FM sono lunghe circa un metro
+            (un quarto d'onda funziona già benissimo).</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\lambda = 3$ m.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 — FACOLTATIVA: DA MAXWELL ALLE ONDE -->
+    <section id="sec2" class="optional">
+      <h2>2. Da Maxwell all'equazione delle onde</h2>
+      <p>Approfondimento per i curiosi: la pagina di calcolo più celebre dell'Ottocento, raccontata a grandi linee.</p>
+
+      <p>Mettiamoci nel <strong>vuoto assoluto</strong>: niente cariche ($\rho = 0$), niente correnti ($\vec J = 0$).
+        Le equazioni di Maxwell in forma locale diventano perfettamente simmetriche:</p>
+      <div class="formula-box">
+        $$\nabla \cdot \vec E = 0 \qquad \nabla \cdot \vec B = 0 \qquad
+        \nabla \times \vec E = -\frac{\partial \vec B}{\partial t} \qquad
+        \nabla \times \vec B = \mu_0\varepsilon_0\,\frac{\partial \vec E}{\partial t}$$
+      </div>
+
+      <p>L'idea di Maxwell: applicare il rotore all'equazione di Faraday e sostituirci dentro quella di
+        Ampère–Maxwell. I dettagli richiedono un po' di algebra dei rotori, ma il risultato — per un campo che dipende
+        da una sola coordinata $x$ — è pulitissimo:</p>
+      <div class="formula-box">
+        $$\frac{\partial^2 E}{\partial x^2} = \mu_0\,\varepsilon_0\, \frac{\partial^2 E}{\partial t^2}$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">(e un'equazione identica per $B$)</p>
+      </div>
+
+      <p>Ora, i matematici conoscevano bene questa forma: è l'<strong>equazione delle onde</strong>, la stessa che
+        descrive una corda di violino o il suono nell'aria,</p>
+      <div class="formula-box">
+        $$\frac{\partial^2 y}{\partial x^2} = \frac{1}{v^2}\, \frac{\partial^2 y}{\partial t^2}$$
+      </div>
+      <p>le cui soluzioni sono <em>perturbazioni che viaggiano</em> con velocità $v$ — per esempio proprio le sinusoidi
+        $y = A\sin(kx - \omega t)$ della sezione 1. Confrontando le due equazioni, il campo elettromagnetico deve
+        propagarsi come un'onda con</p>
+      <div class="formula-box">
+        $$\frac{1}{v^2} = \mu_0\,\varepsilon_0 \qquad\Longrightarrow\qquad v = \frac{1}{\sqrt{\mu_0\,\varepsilon_0}}$$
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato — il calcolo che cambiò la fisica</span></div>
+        <p>Calcola $v = \dfrac{1}{\sqrt{\mu_0\,\varepsilon_0}}$ usando $\mu_0 = 4\pi\times10^{-7}$ T·m/A e
+          $\varepsilon_0 = 8{,}85\times10^{-12}$ C²/(N·m²).</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Prodotto: $\mu_0\varepsilon_0 = 4\pi\times10^{-7} \times 8{,}85\times10^{-12}
+            \approx 1{,}256\times10^{-6} \times 8{,}85\times10^{-12} \approx 1{,}11\times10^{-17}$.</p>
+          <p><span class="step-num">2</span>Radice: $\sqrt{1{,}11\times10^{-17}} \approx 3{,}33\times10^{-9}$.</p>
+          <p><span class="step-num">3</span>Inverto: $v = \dfrac{1}{3{,}33\times10^{-9}} \approx 3{,}0\times10^{8}$ m/s.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$v \approx 3\times10^{8}$ m/s — la velocità della luce.</span></div>
+        </div>
+      </div>
+
+      <div class="curiosita"><strong>Perché i fisici si commuovono qui.</strong> Fermati un istante su ciò che è
+        appena successo. $\mu_0$ si misura con <strong>fili e correnti</strong> (la forza tra due fili della lezione
+        scorsa); $\varepsilon_0$ si misura con <strong>cariche e condensatori</strong>. Esperimenti da tavolo, fatti
+        con calamite, bottiglie di Leida e pile — <em>la luce non c'entra niente</em>. Eppure, combinando quei due
+        numeri, dalla lavagna salta fuori $3\times10^{8}$ m/s: esattamente la velocità della luce che gli astronomi
+        misuravano da due secoli guardando i pianeti. Due mondi che sembravano separati — l'elettricità dei laboratori
+        e la luce delle stelle — si rivelano <strong>la stessa cosa</strong>. Maxwell lo scrisse quasi con pudore:
+        «difficilmente possiamo evitare di concludere che la luce consiste nelle ondulazioni dello stesso mezzo che è
+        causa dei fenomeni elettrici e magnetici». È forse l'unificazione più elegante della storia della fisica — e
+        l'avete appena rifatta con una calcolatrice.</div>
+    </section>
+
+    <!-- 3 — UN'UNICA ENTITÀ -->
+    <section id="sec3">
+      <h2>3. Un'unica entità: il campo elettromagnetico</h2>
+      <p>Da qui in avanti cambiamo definitivamente punto di vista. Non parleremo più di "campo elettrico" e "campo
+        magnetico" come di due personaggi distinti: esiste <strong>un'unica entità</strong>, il <strong>campo
+        elettromagnetico</strong>, di cui $\vec E$ e $\vec B$ sono due <em>manifestazioni</em> — due facce che si
+        sostengono a vicenda: il campo elettrico che varia genera quello magnetico, che variando rigenera quello
+        elettrico, e così via, per sempre. Questa staffetta <strong>si propaga come un'onda</strong>, senza bisogno di
+        fili né di cariche, alla velocità</p>
+      <div class="formula-box">
+        $$c = \frac{1}{\sqrt{\mu_0\,\varepsilon_0}} = 299\,792\,458\ \text{m/s} \approx 3\times10^{8}\ \text{m/s}$$
+      </div>
+
+      <div class="note"><strong>La velocità dipende dal mezzo — ma nel vuoto è <em>la</em> costante.</strong>
+        Guarda bene la formula: dentro c'è scritto anche il mezzo. In un materiale (acqua, vetro, plastica) le
+        costanti del vuoto $\mu_0$ ed $\varepsilon_0$ vanno sostituite con la permeabilità $\mu$ e la costante
+        dielettrica $\varepsilon$ <em>di quel materiale</em>, che sono più grandi: la velocità
+        $v = 1/\sqrt{\mu\,\varepsilon}$ risulta quindi <strong>minore di $c$</strong>. Nell'acqua la luce viaggia a
+        circa $2{,}25\times10^{8}$ m/s, nel vetro a circa $2\times10^{8}$ m/s — ed è proprio questo rallentamento
+        l'origine della rifrazione. Nel <strong>vuoto</strong>, invece, la velocità è la stessa per ogni frequenza,
+        per ogni sorgente e, per quanto ne sappiamo, in ogni angolo dell'universo: una <strong>costante
+        universale</strong> della natura, non la proprietà di un materiale. Per questo i fisici le hanno riservato
+        una lettera tutta sua, $c$.</div>
+
+      <div class="rule"><strong>Se conosci $\lambda$, conosci $f$ (e viceversa).</strong> Per ogni onda vale
+        $v = \lambda f$; per un'onda elettromagnetica nel vuoto la velocità è <em>sempre</em> $c$, quindi
+        $$\lambda\, f = c \qquad\Longrightarrow\qquad \lambda = \frac{c}{f}, \qquad f = \frac{c}{\lambda}$$
+        Lunghezza d'onda e frequenza non sono due informazioni indipendenti: sono <strong>la stessa etichetta</strong>
+        scritta in due lingue. Ed è proprio questa etichetta a distinguere un'onda radio da un raggio X: lo vedremo
+        nello <strong>spettro elettromagnetico</strong> (sezione 7).</div>
+
+      <p>L'onda elettromagnetica è <strong>trasversale</strong>: $\vec E$ e $\vec B$ oscillano perpendicolari tra loro
+        e alla direzione di propagazione. Guardala viaggiare:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Velocità dell'animazione: <span class="val" id="em-s-val">1.0</span></label>
+          <input type="range" id="em-s" min="0.2" max="2.5" step="0.1" value="1"></div>
+        <label class="toggle-row"><input type="checkbox" id="em-play" checked> in movimento</label>
+      </div>
+      <div class="ckt"><svg id="em-svg" viewBox="0 0 640 300" aria-label="Onda elettromagnetica: campo elettrico e magnetico perpendicolari che si propagano"></svg></div>
+      <p class="eq-out">Campo <strong style="color:var(--red)">elettrico $\vec E$</strong> (verticale) e campo
+        <strong style="color:var(--primary)">magnetico $\vec B$</strong> (orizzontale) oscillano <strong>in fase</strong>,
+        perpendicolari tra loro e alla direzione di propagazione: un'onda che si autosostiene, anche nel vuoto.</p>
+
+      <div class="note"><strong>Il metro è figlio di $c$.</strong> Il valore di $c$ è <em>esatto</em>, senza cifre
+        incerte: dal 1983 il Sistema Internazionale definisce il <strong>metro</strong> come la distanza percorsa
+        dalla luce nel vuoto in $1/299\,792\,458$ di secondo. Non misuriamo più la velocità della luce con il metro:
+        definiamo il metro con la velocità della luce.</div>
+    </section>
+
+    <!-- 4 — MISURARE LA VELOCITÀ DELLA LUCE -->
+    <section id="sec4">
+      <h2>4. Misurare la velocità della luce (anche in cucina)</h2>
+
+      <h3>4.1 — Due secoli di ingegno</h3>
+      <p>Misurare la velocità di qualcosa che percorre trecentomila chilometri in un secondo è un'impresa. Ecco le
+        tappe principali:</p>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Chi, quando</th><th>Come</th><th>Risultato</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Galileo</strong> (~1600)</td><td>Due lanterne su colline lontane: scopri e copri, cronometra il ritorno</td><td>Troppo veloce per misurarla: «se non è istantanea, è straordinariamente rapida»</td></tr>
+            <tr><td><strong>Ole Rømer</strong> (1676)</td><td>Le eclissi della luna Io di Giove ritardano quando la Terra è più lontana: la luce impiega tempo ad attraversare l'orbita</td><td>$\approx 2{,}2\times10^{8}$ m/s (primo valore finito!)</td></tr>
+            <tr><td><strong>Hippolyte Fizeau</strong> (1849)</td><td>Prima misura "terrestre": un raggio passa tra i denti di una ruota dentata rapidissima, va a uno specchio a 8 km e torna</td><td>$\approx 3{,}13\times10^{8}$ m/s</td></tr>
+            <tr><td><strong>Léon Foucault</strong> (1862)</td><td>Specchio rotante: la rotazione durante il viaggio del raggio devia il riflesso di un angolino misurabile</td><td>$\approx 2{,}98\times10^{8}$ m/s</td></tr>
+            <tr><td><strong>Albert Michelson</strong> (1879–1926)</td><td>Perfeziona il metodo di Foucault per mezzo secolo (Nobel 1907)</td><td>$299\,796 \pm 4$ km/s</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>E quando Maxwell (1865) tirò fuori dalla lavagna $1/\sqrt{\mu_0\varepsilon_0} \approx 3\times10^{8}$ m/s, il
+        cerchio si chiuse: <strong>quel campo elettromagnetico che si propaga è proprio la luce</strong>. La luce
+        visibile, anzi, è solo una piccola finestra della famiglia: onde radio, microonde, infrarossi, visibile,
+        ultravioletti, raggi X e gamma sono <em>tutte</em> onde elettromagnetiche, distinte solo dalla lunghezza
+        d'onda (le passeremo in rassegna, applicazioni comprese, nella sezione 7). Comprese le
+        <strong>microonde</strong> del tuo forno — il che ci regala un esperimento.</p>
+
+      <h3>4.2 — Esperimento: misurare $c$ con cioccolato e microonde</h3>
+      <p>Dentro il forno a microonde l'onda elettromagnetica rimbalza tra le pareti e forma un'<strong>onda
+        stazionaria</strong>: ci sono punti in cui il campo oscilla al massimo (i <em>ventri</em>, che scaldano tanto)
+        e punti in cui non oscilla affatto (i <em>nodi</em>, che non scaldano). Due ventri consecutivi distano
+        <strong>mezza lunghezza d'onda</strong>. Se togli il piatto rotante e metti una tavoletta di cioccolato per
+        pochi secondi, il cioccolato si scioglie <strong>solo sui ventri</strong>: misurando la distanza $d$ tra due
+        macchie fuse hai $\lambda = 2d$, e con la frequenza $f$ scritta sull'etichetta del forno...</p>
+      <div class="formula-box">$$c = \lambda\,f = 2\,d\,f$$</div>
+
+      <p>Prova la versione simulata:</p>
+      <div class="controls">
+        <button class="btn" id="ch-cook" type="button">▶ Accendi il forno (20 s)</button>
+        <button class="btn" id="ch-reset" type="button">↺ Nuova tavoletta</button>
+        <div class="control-group"><label>Distanza misurata tra due macchie d (cm): <span class="val" id="ch-d-val">5.0</span></label>
+          <input type="range" id="ch-d" min="4" max="8" step="0.1" value="5"></div>
+      </div>
+      <div class="ckt"><svg id="ch-svg" viewBox="0 0 640 300" aria-label="Esperimento simulato: tavoletta di cioccolato nel microonde con macchie fuse sui ventri dell'onda stazionaria"></svg></div>
+      <p class="eq-out" id="ch-out"></p>
+
+      <div class="rule"><strong>Adesso rifallo davvero!</strong> Ti servono: un forno a microonde, una tavoletta di
+        cioccolato grande (o una fila di tavolette, o del pane in cassetta). Procedura: ① togli il
+        <strong>piatto rotante</strong> (serve proprio a evitare i punti caldi: qui invece li vogliamo!); ② metti il
+        cioccolato su un piatto fermo; ③ accendi per <strong>15–20 secondi</strong>, finché compaiono le prime macchie
+        morbide — non di più, o si scioglie tutto; ④ misura con il righello la distanza tra i <strong>centri</strong>
+        di due macchie vicine; ⑤ leggi la frequenza sull'etichetta dietro il forno (quasi sempre
+        $f = 2450$ MHz) e calcola $c = 2\,d\,f$. Con $d \approx 6$ cm viene $\approx 3\times10^{8}$ m/s: hai misurato
+        la velocità della luce facendo merenda.</div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato — i conti dell'esperimento</span></div>
+        <p>Nel cioccolato trovi due macchie fuse a $d = 6{,}1$ cm l'una dall'altra; il forno lavora a
+          $f = 2{,}45$ GHz $= 2{,}45\times10^{9}$ Hz. Ricava la lunghezza d'onda delle microonde e la velocità della
+          luce.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Le macchie sono ventri consecutivi: $\lambda = 2d = 2 \times 0{,}061 =
+            0{,}122$ m ($12{,}2$ cm).</p>
+          <p><span class="step-num">2</span>$c = \lambda f = 0{,}122 \times 2{,}45\times10^{9} \approx 2{,}99\times10^{8}$ m/s.</p>
+          <p><span class="step-num">3</span>Scarto dal valore vero: meno dell'1% — niente male per un esperimento al
+            cioccolato.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$\lambda \approx 12{,}2$ cm, $c \approx 3{,}0\times10^{8}$ m/s.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — NEWTON vs HUYGENS, ETERE -->
+    <section id="sec5">
+      <h2>5. Onda o corpuscolo? Il litigio del secolo (e l'etere)</h2>
+
+      <div class="curiosita"><strong>Newton contro Huygens.</strong> Che cosa <em>fosse</em> la luce era stato per due
+        secoli un duello. <strong>Isaac Newton</strong> sosteneva che fosse fatta di <strong>corpuscoli</strong>,
+        minuscoli proiettili in volo rettilineo; <strong>Christiaan Huygens</strong> (fisico olandese, 1629–1695) che
+        fosse un'<strong>onda</strong>. Eppure già allora c'erano fenomeni che i proiettili non spiegavano: la
+        <strong>diffrazione</strong> (osservata da Grimaldi: la luce che sborda oltre i bordi di un ostacolo) e la
+        <strong>penombra</strong> dai contorni sfumati — proprio ciò che ci si aspetta dalle onde, non dai proiettili.
+        Ma Newton era... Newton: il gigante di *Principia* e del calcolo infinitesimale. E pare che il peso del suo
+        nome — il <strong>principio di autorità</strong>, più che gli esperimenti — abbia tenuto in vita la teoria
+        corpuscolare per un secolo buono. La scoperta di Maxwell sembrò chiudere il caso una volta per tutte: la luce
+        è un'onda (elettromagnetica), <strong>1 a 0 per Huygens</strong>. Morale doppia: la natura non si piega ai
+        cognomi illustri... e tenete a mente questo "sembrò": il Novecento riaprirà il fascicolo.</div>
+
+      <h3>5.1 — Se è un'onda, dove sta il mare? L'etere</h3>
+      <p>C'era però un problema concettuale enorme. Tutte le onde conosciute fino ad allora erano onde
+        <strong>meccaniche</strong>: il suono è un'oscillazione <em>dell'aria</em>, le onde del mare
+        <em>dell'acqua</em>, la vibrazione di una corda... <em>della corda</em>. Ogni onda sembrava avere bisogno di
+        un <strong>mezzo</strong> che oscillasse. E la luce, che attraversa lo spazio vuoto tra il Sole e la Terra, in
+        che cosa ondeggia?</p>
+      <p>Per non rinunciare all'idea di mezzo, i fisici ne <strong>inventarono</strong> uno: l'<strong>etere
+        luminifero</strong>, una sostanza invisibile, impalpabile, rigidissima eppure inconsistente, che avrebbe
+        dovuto riempire tutto l'universo solo per dare alla luce qualcosa in cui ondeggiare.</p>
+      <div class="note"><strong>Spoiler (da una lezione futura).</strong> L'ipotesi dell'etere <strong>non è
+        necessaria</strong> — e la fisica moderna l'ha abbandonata. Il campo elettromagnetico non è la vibrazione di
+        qualcosa: è esso stesso l'ente fisico che oscilla, e si propaga benissimo nel vuoto. A smontare l'etere
+        sperimentalmente ci penserà un celebre esperimento di fine Ottocento (Michelson, ancora lui), e a farne a meno
+        del tutto un impiegato dell'ufficio brevetti di Berna, nel 1905. Ci arriveremo.</div>
+    </section>
+
+    <!-- 6 — HUYGENS, DIFFUSIONE, DIFFRAZIONE -->
+    <section id="sec6">
+      <h2>6. Come si propaga la luce: Huygens all'opera</h2>
+
+      <h3>6.1 — Il principio di Huygens</h3>
+      <div class="definition">
+        <strong>Principio di Huygens.</strong> Ogni punto di un fronte d'onda si comporta come una piccola
+        <strong>sorgente di onde sferiche secondarie</strong>; il fronte d'onda a un istante successivo è
+        l'<strong>inviluppo</strong> (la "sagoma esterna") di tutte queste ondine.
+      </div>
+      <p>Sembra un trucco geometrico, ma spiega quasi tutta l'ottica: propagazione rettilinea, riflessione,
+        rifrazione — e soprattutto la diffrazione. Fai avanzare il fronte e osserva le sorgenti secondarie:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Avanzamento del fronte: <span class="val" id="hy-t-val">30</span>%</label>
+          <input type="range" id="hy-t" min="0" max="100" step="1" value="30"></div>
+        <label class="toggle-row"><input type="checkbox" id="hy-show" checked> mostra le sorgenti secondarie</label>
+      </div>
+      <div class="ckt"><svg id="hy-svg" viewBox="0 0 640 260" aria-label="Principio di Huygens: fronte d'onda come inviluppo di ondine secondarie"></svg></div>
+      <p class="eq-out" id="hy-out"></p>
+
+      <h3>6.2 — La diffrazione: la luce gira l'angolo</h3>
+      <p>Manda un'onda contro una parete con una <strong>fenditura</strong>. Se la fenditura è molto più larga della
+        lunghezza d'onda, l'onda passa quasi indisturbata e proietta un'"ombra" netta. Ma se la larghezza $a$ diventa
+        <strong>confrontabile con $\lambda$</strong>, le poche sorgenti secondarie rimaste nella fenditura riempiono lo
+        spazio di ondine quasi circolari: l'onda <strong>si apre a ventaglio</strong> e invade la zona d'ombra. È la
+        <strong>diffrazione</strong>.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Larghezza della fenditura a (in unità di λ): <span class="val" id="df-a-val">3.0</span></label>
+          <input type="range" id="df-a" min="0.5" max="8" step="0.1" value="3"></div>
+      </div>
+      <div class="ckt"><svg id="df-svg" viewBox="0 0 640 300" aria-label="Diffrazione da una fenditura: l'apertura dell'onda dipende dal rapporto tra lunghezza d'onda e larghezza della fenditura"></svg></div>
+      <p class="eq-out" id="df-out"></p>
+
+      <div class="note"><strong>Perché non ce ne accorgiamo con la luce?</strong> Per la luce visibile
+        $\lambda \approx 0{,}5\ \mu$m: una porta è un milione di volte più larga, e la luce ci passa dritta (ombre
+        nette). Il <strong>suono</strong>, invece, ha $\lambda$ di metri: la porta gli è "stretta" e il suono gira
+        l'angolo che è un piacere — ecco perché senti parlare qualcuno nell'altra stanza ma non lo vedi. Stessa fisica,
+        scala diversa. (Ed ecco la penombra sfumata che dava fastidio a Newton: bordi e fenditure diffrangono sempre un
+        pochino.)</div>
+
+      <h3>6.3 — La diffusione: perché il cielo è blu</h3>
+      <p>Quando la luce incontra particelle molto più piccole della sua lunghezza d'onda (le molecole dell'aria),
+        viene <strong>diffusa</strong>: assorbita e ri-emessa in tutte le direzioni. L'efficacia della diffusione però
+        dipende <em>fortemente</em> dal colore: le lunghezze d'onda corte (blu) vengono diffuse molto più di quelle
+        lunghe (rosso) — la legge di Rayleigh dice $\propto 1/\lambda^4$. Sposta il colore e guarda quanto viene
+        sparpagliato:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Lunghezza d'onda λ (nm): <span class="val" id="sc-l-val">550</span></label>
+          <input type="range" id="sc-l" min="400" max="700" step="10" value="550"></div>
+      </div>
+      <div class="ckt"><svg id="sc-svg" viewBox="0 0 640 260" aria-label="Diffusione della luce nell'atmosfera in funzione della lunghezza d'onda"></svg></div>
+      <p class="eq-out" id="sc-out"></p>
+
+      <div class="curiosita"><strong>Cielo blu, tramonto rosso: stesso motivo.</strong> Di giorno, il blu della luce
+        solare viene sparpagliato per tutto il cielo: ovunque guardi, ti arriva blu diffuso — il cielo è blu. Al
+        tramonto la luce attraversa uno spessore d'aria molto maggiore: il blu viene diffuso via <em>tutto</em> lungo
+        il percorso, e al tuo occhio arriva ciò che resta del raggio diretto: arancio e rosso. Un'unica leggina in
+        $1/\lambda^4$ e due spettacoli al giorno, gratis.</div>
+    </section>
+
+    <!-- 7 — LO SPETTRO ELETTROMAGNETICO -->
+    <section id="sec7">
+      <h2>7. Lo spettro elettromagnetico: una famiglia, mille mestieri</h2>
+      <p>Onde radio, microonde, infrarosso, luce visibile, ultravioletto, raggi X, raggi gamma: <strong>la fisica è
+        sempre la stessa</strong> — campi $\vec E$ e $\vec B$ che si propagano a velocità $c$ — e a cambiare è solo
+        la lunghezza d'onda (cioè la frequenza: $\lambda f = c$). Ma quell'unica etichetta cambia tutto: cambia il
+        modo in cui la radiazione interagisce con la materia, e quindi <strong>a che cosa serve</strong>. Clicca su
+        una banda dello spettro per esplorarla:</p>
+
+      <div class="ckt"><svg id="sp-svg" viewBox="0 0 640 250" aria-label="Spettro elettromagnetico dalle onde radio ai raggi gamma, con bande cliccabili"></svg></div>
+      <div id="sp-card" class="note" style="min-height:5.5rem;"></div>
+
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Banda</th><th>λ tipica</th><th>Un'applicazione pratica</th></tr></thead>
+          <tbody>
+            <tr><td>📻 Onde radio</td><td>da metri a chilometri</td><td>radio, TV, telecomunicazioni (le antenne, qui sotto)</td></tr>
+            <tr><td>📡 Microonde</td><td>1 mm – 1 m</td><td>forno a microonde, Wi-Fi, radar, GPS</td></tr>
+            <tr><td>🌡️ Infrarosso</td><td>700 nm – 1 mm</td><td>termocamere, telecomandi, visori notturni</td></tr>
+            <tr><td>🌈 Visibile</td><td>400 – 700 nm</td><td>la visione, la fotosintesi, le fibre ottiche</td></tr>
+            <tr><td>🟣 Ultravioletto</td><td>10 – 400 nm</td><td>sterilizzazione, controllo delle banconote</td></tr>
+            <tr><td>🦴 Raggi X</td><td>0,01 – 10 nm</td><td>radiografia e TAC, controlli bagagli</td></tr>
+            <tr><td>☢️ Raggi gamma</td><td>sotto 0,01 nm</td><td>radioterapia, sterilizzazione di strumenti chirurgici</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="curiosita"><strong>La finestra minuscola.</strong> Sul disegno, in scala logaritmica, il visibile è
+        una fettina sottile schiacciata tra infrarosso e ultravioletto: da 400 a 700 nm non c'è nemmeno un fattore 2,
+        contro le sedici decadi dell'intero spettro disegnato. Tutto ciò che i tuoi occhi vedranno mai — tramonti,
+        volti, schermi — abita in quella fessura. Il resto dello spettro lo "vediamo" soltanto con gli strumenti.</div>
+
+      <h3>7.1 — Telecomunicazioni: come funziona un'antenna</h3>
+      <p>Onde radio e microonde portano in giro voce, musica, televisione, Internet: sono la banda delle
+        <strong>telecomunicazioni</strong>. Ma come si fa, in pratica, a <em>creare</em> un'onda elettromagnetica su
+        comando — e a catturarla dall'altra parte? Con un oggetto sorprendentemente semplice: un'asta di metallo.</p>
+
+      <div class="definition">
+        <strong>Antenna trasmittente.</strong> Il circuito della stazione spinge gli elettroni dell'asta
+        <strong>su e giù</strong>, milioni o miliardi di volte al secondo (una corrente alternata di frequenza $f$).
+        Una carica che oscilla è una carica che <em>accelera</em>, e una carica accelerata genera un campo
+        elettromagnetico variabile che si stacca dall'antenna e parte alla velocità della luce: un'onda
+        elettromagnetica con esattamente la frequenza $f$ dell'oscillazione.
+      </div>
+      <div class="definition">
+        <strong>Antenna ricevente.</strong> Il processo inverso. Quando l'onda investe un'altra asta metallica, il
+        suo campo elettrico $\vec E$ spinge gli elettroni dell'asta su e giù <strong>alla stessa frequenza</strong>:
+        nasce una debolissima corrente alternata, copia fedele di quella di partenza, che il circuito del ricevitore
+        amplifica e decodifica in suoni, immagini, bit.
+      </div>
+
+      <div class="controls">
+        <div class="control-group"><label>Servizio:</label>
+          <select id="an-f">
+            <option value="100">Radio FM — 100 MHz</option>
+            <option value="600">TV digitale — 600 MHz</option>
+            <option value="1800">Telefonia — 1800 MHz</option>
+            <option value="2450">Wi-Fi (e forno a microonde) — 2450 MHz</option>
+          </select>
+        </div>
+        <label class="toggle-row"><input type="checkbox" id="an-play" checked> trasmissione attiva</label>
+      </div>
+      <div class="ckt"><svg id="an-svg" viewBox="0 0 640 280" aria-label="Antenna trasmittente con elettroni oscillanti, onda in propagazione e antenna ricevente"></svg></div>
+      <p class="eq-out" id="an-out"></p>
+
+      <div class="note"><strong>Quanto dev'essere lunga un'antenna?</strong> Un'asta "entra in risonanza" con l'onda
+        — trasmette e riceve al meglio — quando è lunga circa <strong>un quarto della lunghezza d'onda</strong>
+        ($\lambda/4$). Per la radio FM ($\lambda = 3$ m) servono $\approx 75$ cm: l'antenna a stelo delle vecchie
+        auto. Per Wi-Fi e telefonia ($\lambda$ di pochi centimetri) bastano antennine di $2$–$4$ cm, nascoste nel
+        telaio dello smartphone. E per le onde lunghissime delle trasmissioni intercontinentali d'epoca servivano
+        tralicci alti decine di metri: l'antenna è il righello dell'onda che deve gestire.</div>
+    </section>
+
+    <!-- 8 — FACOLTATIVA: LAMBERT-BEER -->
+    <section id="sec8" class="optional">
+      <h2>8. La legge di Lambert–Beer: la luce dentro la materia</h2>
+      <p>Approfondimento per i curiosi: che cosa succede a un fascio di luce (o di raggi X) mentre
+        <em>attraversa</em> un materiale? Viene assorbito un po' alla volta — e la matematica è una vecchia
+        conoscenza: l'esponenziale.</p>
+
+      <div class="definition">
+        <strong>Legge di Lambert–Beer.</strong> Un fascio di intensità iniziale $I_0$ che attraversa uno spessore $x$
+        di materiale ne esce attenuato secondo
+        $$I(x) = I_0\, e^{-\mu\, x}$$
+        dove $\mu$ è il <strong>coefficiente di attenuazione</strong> del materiale (unità: cm$^{-1}$): più $\mu$ è
+        grande, più il materiale è "opaco" a quella radiazione. Ogni strato uguale assorbe la stessa <em>frazione</em>
+        di ciò che gli arriva: per questo il calo è esponenziale, come un decadimento.
+      </div>
+
+      <p>Comodo da ricordare: lo <strong>spessore emivalente</strong> $x_{1/2} = \dfrac{\ln 2}{\mu}$ è lo spessore che
+        dimezza il fascio (il "tempo di dimezzamento", ma nello spazio). Esplora:</p>
+
+      <div class="two-col">
+        <div>
+          <div class="controls">
+            <div class="control-group"><label>Materiale (raggi X diagnostici):</label>
+              <select id="lb-mat">
+                <option value="0.2|20|tessuto molle">tessuto molle (μ ≈ 0,2 cm⁻¹)</option>
+                <option value="0.6|10|osso">osso (μ ≈ 0,6 cm⁻¹)</option>
+                <option value="30|0.25|piombo">piombo (μ ≈ 30 cm⁻¹)</option>
+              </select>
+            </div>
+            <div class="control-group"><label>Spessore x: <span class="val" id="lb-x-val">3.0</span> <span id="lb-unit">cm</span></label>
+              <input type="range" id="lb-x" min="0" max="100" step="1" value="15"></div>
+            <label class="toggle-row" title="Blocca gli assi per confrontare visivamente i cambiamenti"><input type="checkbox" id="lb-lock" checked> 🔒 blocca la scala</label>
+          </div>
+          <p id="lb-out" class="eq-out"></p>
+        </div>
+        <div><div class="plot" id="lb-plot" style="height: 320px;"></div></div>
+      </div>
+
+      <h3>8.1 — Dove la incontri: la fisica medica</h3>
+      <ul>
+        <li><strong>Radiografia:</strong> l'osso ($\mu$ alto) attenua i raggi X molto più del tessuto molle: sulla
+          lastra l'osso lascia "ombra" chiara, i tessuti scuri. Una radiografia è una mappa di Lambert–Beer.</li>
+        <li><strong>TAC:</strong> il computer ricostruisce, sezione per sezione, il valore di $\mu$ in <em>ogni punto</em>
+          del corpo, misurando l'attenuazione lungo migliaia di direzioni: è Lambert–Beer risolta al contrario.</li>
+        <li><strong>Saturimetro</strong> (quello da dito): confronta l'assorbimento di due luci (rossa e infrarossa) da
+          parte dell'emoglobina con e senza ossigeno, e da lì ricava la saturazione del sangue.</li>
+        <li><strong>Radioprotezione:</strong> il camice piombato del radiologo funziona perché pochi millimetri di
+          piombo, con il suo $\mu$ enorme, abbattono il fascio di ordini di grandezza.</li>
+        <li><strong>Laboratorio chimico:</strong> lo spettrofotometro misura quanta luce assorbe una soluzione e ne
+          ricava la concentrazione (è la forma "chimica" della stessa legge).</li>
+      </ul>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato — quanti raggi X passano?</span></div>
+        <p>Un fascio di raggi X attraversa $x = 2$ cm di osso ($\mu = 0{,}35$ cm$^{-1}$ a questa energia). Quale
+          frazione del fascio emerge? E qual è lo spessore emivalente dell'osso?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$\dfrac{I}{I_0} = e^{-\mu x} = e^{-0{,}35 \times 2} = e^{-0{,}7} \approx 0{,}50$:
+            emerge circa il <strong>50%</strong> del fascio.</p>
+          <p><span class="step-num">2</span>Coerente: lo spessore emivalente è $x_{1/2} = \dfrac{\ln 2}{\mu} =
+            \dfrac{0{,}693}{0{,}35} \approx 2$ cm — due centimetri di osso dimezzano il fascio.</p>
+          <p><span class="step-num">3</span>Per confronto, 2 cm di tessuto molle ($\mu = 0{,}2$) ne lasciano passare
+            $e^{-0{,}4} \approx 67\%$: è questa differenza a "disegnare" la radiografia.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$I/I_0 \approx 50\%$; $x_{1/2} \approx 2$ cm.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — QUIZ -->
+    <section id="quiz">
+      <h2>9. Quiz finale</h2>
+      <p>Dodici domande su onde, luce e propagazione. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 6 — Le onde elettromagnetiche · Fisica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Un\'onda trasporta:',
+        options: ['energia, ma non materia', 'materia, ma non energia', 'sia materia sia energia, sempre', 'niente: è solo un disegno'],
+        correct: 0, explain: 'La perturbazione (e la sua energia) viaggia; il mezzo oscilla sul posto — come la boa sul mare.' },
+      { type: 'mc', diff: 'easy', text: 'Una boa in mare aperto, al passaggio delle onde (e al netto delle correnti):',
+        options: ['viene trascinata verso riva', 'oscilla su e giù restando circa nello stesso punto', 'si muove in cerchio sempre più largo', 'affonda lentamente'],
+        correct: 1, explain: 'L\'acqua (e la boa con lei) oscilla attorno alla propria posizione: a viaggiare è la forma dell\'onda.' },
+      { type: 'mc', diff: 'easy', text: 'La relazione tra velocità, lunghezza d\'onda e frequenza di un\'onda è:',
+        options: ['$v = \\lambda / f$', '$v = \\lambda\\, f$', '$v = f / \\lambda$', '$v = \\lambda + f$'],
+        correct: 1, explain: 'In un periodo l\'onda avanza di una lunghezza d\'onda: $v = \\lambda/T = \\lambda f$.' },
+      { type: 'mc', diff: 'medium', text: 'La velocità delle onde elettromagnetiche nel vuoto è:',
+        options: ['$c = \\mu_0\\,\\varepsilon_0$', '$c = 1/\\sqrt{\\mu_0\\,\\varepsilon_0} \\approx 3\\times10^8$ m/s', 'dipende dalla frequenza', 'infinita'],
+        correct: 1, explain: 'Dalle equazioni di Maxwell: combinando le due costanti del vuoto salta fuori la velocità della luce.' },
+      { type: 'mc', diff: 'medium', text: 'In un\'onda elettromagnetica, i campi $\\vec E$ e $\\vec B$:',
+        options: ['sono paralleli tra loro', 'sono perpendicolari tra loro e alla direzione di propagazione', 'oscillano uno quando l\'altro è fermo', 'esistono solo dentro i fili'],
+        correct: 1, explain: 'Onda trasversale: E e B perpendicolari tra loro e alla propagazione, e oscillano in fase.' },
+      { type: 'mc', diff: 'medium', text: 'Nell\'esperimento del cioccolato al microonde, le macchie fuse vicine distano:',
+        options: ['una lunghezza d\'onda intera', 'mezza lunghezza d\'onda', 'un quarto di lunghezza d\'onda', 'una distanza casuale'],
+        correct: 1, explain: 'Sono i ventri dell\'onda stazionaria, separati da λ/2: per questo si calcola c = 2·d·f.' },
+      { type: 'mc', diff: 'medium', text: 'L\'etere luminifero fu introdotto perché:',
+        options: ['era stato osservato nei telescopi', 'si pensava che ogni onda avesse bisogno di un mezzo in cui propagarsi', 'serviva a spiegare il colore blu del cielo', 'Maxwell lo aveva previsto nelle sue equazioni'],
+        correct: 1, explain: 'Tutte le onde note erano meccaniche (suono nell\'aria, onde nell\'acqua): sembrava impensabile un\'onda senza mezzo. Ipotesi poi abbandonata: il campo si propaga da sé, anche nel vuoto.' },
+      { type: 'mc', diff: 'hard', text: 'Secondo il principio di Huygens, ogni punto di un fronte d\'onda:',
+        options: ['assorbe l\'onda e la ferma', 'è sorgente di onde sferiche secondarie, il cui inviluppo è il nuovo fronte', 'riflette l\'onda all\'indietro', 'aumenta la frequenza dell\'onda'],
+        correct: 1, explain: 'È il meccanismo che spiega propagazione, rifrazione e diffrazione.' },
+      { type: 'mc', diff: 'hard', text: 'La diffrazione attraverso una fenditura è ben visibile quando:',
+        options: ['la fenditura è molto più larga della lunghezza d\'onda', 'la larghezza della fenditura è confrontabile con la lunghezza d\'onda', 'l\'onda è molto veloce', 'la fenditura è perfettamente liscia'],
+        correct: 1, explain: 'Con a ~ λ l\'onda si apre a ventaglio; con a >> λ passa quasi dritta (ombre nette). Per questo il suono "gira l\'angolo" e la luce no.' },
+      { type: 'mc', diff: 'medium', text: 'Quale di queste onde elettromagnetiche ha la lunghezza d\'onda maggiore?',
+        options: ['i raggi X', 'la luce visibile', 'le onde radio', 'l\'ultravioletto'],
+        correct: 2, explain: 'Nello spettro, le onde radio stanno all\'estremo delle λ grandi (da metri a chilometri); raggi X e gamma a quello delle λ piccolissime — e poiché λf = c, λ grande significa frequenza (ed energia) piccola.' },
+      { type: 'mc', diff: 'hard', text: 'Un\'antenna riceve un segnale radio perché:',
+        options: ['il campo elettrico dell\'onda fa oscillare gli elettroni del metallo, creando una debole corrente alternata alla stessa frequenza', 'il metallo si magnetizza in modo permanente', 'l\'antenna riflette l\'onda verso la stazione trasmittente', 'gli elettroni dell\'antenna assorbono massa dall\'onda'],
+        correct: 0, explain: 'L\'onda "scrive" nel metallo la stessa oscillazione con cui è stata creata: una correntina alternata a frequenza f, che il ricevitore amplifica e decodifica. Trasmettere è il processo inverso — e l\'asta funziona al meglio se è lunga circa λ/4.' },
+      { type: 'open', diff: 'hard', text: 'Spiega perché il cielo è blu e i tramonti sono rossi, usando la diffusione della luce.',
+        keywords: ['diffus', 'blu', 'lambda', 'lunghezz', 'cort', 'rosso', 'atmosfer', 'percorso', 'molecol'], requiredMatches: 3,
+        explain: 'Le molecole dell\'aria diffondono molto di più le lunghezze d\'onda corte (blu), secondo la legge in 1/λ⁴: il blu viene sparpagliato per tutto il cielo, che appare blu. Al tramonto il percorso nell\'atmosfera è molto più lungo: il blu viene diffuso via del tutto e la luce diretta che arriva è rossa/arancio.' }
+    ];
+  </script>
+
+  <!-- Demo interattive di questa lezione -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const C = { blue: '#3b82f6', green: '#22c55e', red: '#ef4444', gold: '#f5b400', magenta: '#f06ab8', gray: '#9aa5c0' };
+
+      // ===== 1.1 — Anatomia dell'onda (figura statica) =====
+      (function () {
+        const svg = document.getElementById('wv-svg');
+        if (!svg) return;
+        function sine(x0, x1, y0, amp, per) {
+          let d = '';
+          for (let x = x0; x <= x1; x += 3) {
+            d += (d ? ' L' : 'M') + ` ${x} ${(y0 - amp * Math.cos(2 * Math.PI * (x - x0) / per)).toFixed(1)}`;
+          }
+          return d;
+        }
+        function dblArrow(x1, y1, x2, y2, col) {
+          const a = Math.atan2(y2 - y1, x2 - x1);
+          const head = (x, y, ang) =>
+            `<polygon points="${x},${y} ${(x + 9 * Math.cos(ang + 2.6)).toFixed(1)},${(y + 9 * Math.sin(ang + 2.6)).toFixed(1)} ` +
+            `${(x + 9 * Math.cos(ang - 2.6)).toFixed(1)},${(y + 9 * Math.sin(ang - 2.6)).toFixed(1)}" fill="${col}"/>`;
+          return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="1.8"/>` +
+            head(x1, y1, a) + head(x2, y2, a + Math.PI);
+        }
+        let h = '';
+        // ① fotografia: si leggono A e λ (creste a x = 30, 150, 270)
+        h += `<text x="165" y="24" text-anchor="middle" class="lbl">① La fotografia (un istante)</text>`;
+        h += `<line x1="22" y1="150" x2="308" y2="150" stroke="var(--text-soft)" stroke-width="1.4"/>`;
+        h += `<text x="306" y="168" text-anchor="end" class="lbl-s">posizione x</text>`;
+        h += `<line x1="22" y1="95" x2="300" y2="95" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 5" opacity="0.5"/>`;
+        h += `<path d="${sine(30, 300, 150, 55, 120)}" fill="none" stroke="var(--primary)" stroke-width="2.5"/>`;
+        h += dblArrow(30, 148, 30, 97, 'var(--red)');
+        h += `<text x="40" y="128" class="lbl" fill="var(--red)">A</text>`;
+        h += `<line x1="150" y1="95" x2="150" y2="78" stroke="var(--magenta)" stroke-width="1" stroke-dasharray="3 3"/>`;
+        h += `<line x1="270" y1="95" x2="270" y2="78" stroke="var(--magenta)" stroke-width="1" stroke-dasharray="3 3"/>`;
+        h += dblArrow(152, 82, 268, 82, 'var(--magenta)');
+        h += `<text x="210" y="72" text-anchor="middle" class="lbl" fill="var(--magenta)">λ</text>`;
+        h += `<text x="165" y="240" text-anchor="middle" class="lbl-s">qui si leggono A (altezza) e λ (passo nello spazio)</text>`;
+        // divisore
+        h += `<line x1="320" y1="30" x2="320" y2="225" stroke="var(--border)" stroke-width="1.4"/>`;
+        // ② film: si legge T (creste a t = 340, 460, 580)
+        h += `<text x="475" y="24" text-anchor="middle" class="lbl">② Il film in un punto (la boa)</text>`;
+        h += `<line x1="332" y1="150" x2="618" y2="150" stroke="var(--text-soft)" stroke-width="1.4"/>`;
+        h += `<text x="616" y="168" text-anchor="end" class="lbl-s">tempo t</text>`;
+        h += `<path d="${sine(340, 610, 150, 55, 120)}" fill="none" stroke="var(--green)" stroke-width="2.5"/>`;
+        h += `<line x1="460" y1="95" x2="460" y2="78" stroke="var(--magenta)" stroke-width="1" stroke-dasharray="3 3"/>`;
+        h += `<line x1="580" y1="95" x2="580" y2="78" stroke="var(--magenta)" stroke-width="1" stroke-dasharray="3 3"/>`;
+        h += dblArrow(462, 82, 578, 82, 'var(--magenta)');
+        h += `<text x="520" y="72" text-anchor="middle" class="lbl" fill="var(--magenta)">T</text>`;
+        h += `<circle cx="400" cy="205" r="7" fill="var(--red)"/>`;
+        h += `<text x="400" y="226" text-anchor="middle" class="lbl-s" fill="var(--red)">la boa, su e giù</text>`;
+        h += `<text x="475" y="240" text-anchor="middle" class="lbl-s">qui si leggono T (passo nel tempo) e f = 1/T</text>`;
+        svg.innerHTML = h;
+      })();
+
+      // ===== 1 — La boa sulle onde =====
+      (function () {
+        const svg = document.getElementById('bo-svg');
+        if (!svg) return;
+        const sa = document.getElementById('bo-a'), sl = document.getElementById('bo-l'), st = document.getElementById('bo-t');
+        const va = document.getElementById('bo-a-val'), vl = document.getElementById('bo-l-val'), vt = document.getElementById('bo-t-val');
+        const play = document.getElementById('bo-play'), out = document.getElementById('bo-out');
+        const PXM = 16;                          // pixel per metro
+        const BOAX = 320, Y0 = 140;
+        let t = 0, last = null;
+        function frame(ts) {
+          if (last == null) last = ts;
+          const dt = Math.min((ts - last) / 1000, 0.05); last = ts;
+          if (play.checked) t += dt;
+          const A = +sa.value, L = +sl.value, T = +st.value;
+          va.textContent = A.toFixed(1); vl.textContent = L; vt.textContent = T.toFixed(1);
+          const k = 2 * Math.PI / (L * PXM), om = 2 * Math.PI / T;
+          const surf = (x) => Y0 - A * PXM * Math.sin(k * x - om * t);
+          let d = `M 0 ${surf(0).toFixed(1)}`;
+          for (let x = 4; x <= 640; x += 4) d += ` L ${x} ${surf(x).toFixed(1)}`;
+          const yb = surf(BOAX);
+          let h = '';
+          h += `<path d="${d} L 640 260 L 0 260 Z" fill="color-mix(in srgb, var(--primary) 22%, transparent)" stroke="none"/>`;
+          h += `<path d="${d}" fill="none" stroke="var(--primary)" stroke-width="2.5"/>`;
+          // traiettoria della boa: verticale fissa
+          h += `<line x1="${BOAX}" y1="${Y0 - (A * PXM + 26)}" x2="${BOAX}" y2="${Y0 + A * PXM + 20}" stroke="var(--magenta)" stroke-width="1.6" stroke-dasharray="6 5"/>`;
+          h += `<text x="${BOAX + 10}" y="${Y0 - A * PXM - 28}" class="lbl-s" fill="var(--magenta)">la boa resta qui</text>`;
+          // boa
+          h += `<circle cx="${BOAX}" cy="${(yb - 9).toFixed(1)}" r="11" fill="var(--red)"/>`;
+          h += `<rect x="${BOAX - 2.5}" y="${(yb - 34).toFixed(1)}" width="5" height="18" fill="var(--red)" rx="2"/>`;
+          h += `<circle cx="${BOAX}" cy="${(yb - 38).toFixed(1)}" r="4" fill="var(--gold)"/>`;
+          // freccia della propagazione
+          h += `<line x1="60" y1="36" x2="180" y2="36" stroke="var(--green)" stroke-width="2.5"/><polygon points="190,36 174,29 174,43" fill="var(--green)"/>`;
+          h += `<text x="66" y="24" class="lbl-s" fill="var(--green)">l'onda (e l'energia) viaggia</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = `Velocità dell'onda: $v = \\lambda/T$ = <span class="val-badge">${(L / T).toFixed(2)} m/s</span> — ` +
+            `l'onda avanza, la boa oscilla in verticale <strong>senza spostarsi</strong>: viaggia l'energia, non l'acqua.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      })();
+
+      // ===== 3 — Onda elettromagnetica =====
+      (function () {
+        const svg = document.getElementById('em-svg');
+        if (!svg) return;
+        const ss = document.getElementById('em-s'), vs = document.getElementById('em-s-val');
+        const play = document.getElementById('em-play');
+        const Y0 = 150, L = 190;                 // asse e lunghezza d'onda in px
+        let t = 0, last = null;
+        function frame(ts) {
+          if (last == null) last = ts;
+          const dt = Math.min((ts - last) / 1000, 0.05); last = ts;
+          const sp = +ss.value; vs.textContent = sp.toFixed(1);
+          if (play.checked) t += dt * sp;
+          const k = 2 * Math.PI / L, om = 2.2;
+          let h = '';
+          // asse di propagazione
+          h += `<line x1="20" y1="${Y0}" x2="600" y2="${Y0}" stroke="var(--text-soft)" stroke-width="1.6"/>`;
+          h += `<polygon points="612,${Y0} 596,${Y0 - 7} 596,${Y0 + 7}" fill="var(--text-soft)"/>`;
+          h += `<text x="616" y="${Y0 + 4}" class="lbl-s" fill="var(--muted)">c →</text>`;
+          // inviluppi
+          let dE = '', dB = '';
+          for (let x = 30; x <= 590; x += 4) {
+            const s = Math.sin(k * x - om * t);
+            dE += (dE ? ' L' : 'M') + ` ${x} ${(Y0 - 92 * s).toFixed(1)}`;
+            dB += (dB ? ' L' : 'M') + ` ${x} ${(Y0 - 34 * s).toFixed(1)}`;
+          }
+          h += `<path d="${dE}" fill="none" stroke="var(--red)" stroke-width="1.6" opacity="0.55"/>`;
+          // frecce E (verticali) e B (pseudo-orizzontali, prospettiva)
+          for (let x = 40; x <= 580; x += 30) {
+            const s = Math.sin(k * x - om * t);
+            const eY = 92 * s, bL = 46 * s;
+            h += `<line x1="${x}" y1="${Y0}" x2="${x}" y2="${(Y0 - eY).toFixed(1)}" stroke="var(--red)" stroke-width="2.2"/>`;
+            if (Math.abs(eY) > 10) {
+              const dir = eY > 0 ? -1 : 1;
+              h += `<polygon points="${x},${(Y0 - eY + dir * 0).toFixed(1)} ${x - 4},${(Y0 - eY + dir * 8).toFixed(1)} ${x + 4},${(Y0 - eY + dir * 8).toFixed(1)}" fill="var(--red)"/>`;
+            }
+            h += `<line x1="${x}" y1="${Y0}" x2="${(x + bL * 0.75).toFixed(1)}" y2="${(Y0 + bL * 0.45).toFixed(1)}" stroke="var(--primary)" stroke-width="2.2"/>`;
+            if (Math.abs(bL) > 12) {
+              const bx = x + bL * 0.75, by = Y0 + bL * 0.45, sg = bL > 0 ? 1 : -1;
+              h += `<polygon points="${bx.toFixed(1)},${by.toFixed(1)} ${(bx - sg * 8).toFixed(1)},${(by - sg * 1).toFixed(1)} ${(bx - sg * 4).toFixed(1)},${(by - sg * 7).toFixed(1)}" fill="var(--primary)"/>`;
+            }
+          }
+          h += `<text x="36" y="34" class="lbl" fill="var(--red)">E (verticale)</text>`;
+          h += `<text x="36" y="56" class="lbl" fill="var(--primary)">B (orizzontale, "in profondità")</text>`;
+          svg.innerHTML = h;
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      })();
+
+      // ===== 4.2 — Cioccolato al microonde =====
+      (function () {
+        const svg = document.getElementById('ch-svg');
+        if (!svg) return;
+        const cook = document.getElementById('ch-cook'), reset = document.getElementById('ch-reset');
+        const sd = document.getElementById('ch-d'), vd = document.getElementById('ch-d-val');
+        const out = document.getElementById('ch-out');
+        const F = 2.45e9, PXCM = 24;             // pixel per cm
+        const SPOT = 6.12;                        // distanza reale tra ventri (cm)
+        const BARX = 90, BARW = 460, BARY = 150, BARH = 70;
+        let cooked = 0, cooking = false, last = null;
+        function draw() {
+          const d = +sd.value; vd.textContent = d.toFixed(1);
+          let h = '';
+          // forno
+          h += `<rect x="30" y="40" width="580" height="230" rx="16" fill="var(--surface)" stroke="var(--border)" stroke-width="2.5"/>`;
+          h += `<text x="320" y="30" text-anchor="middle" class="lbl-s" fill="var(--muted)">forno a microonde (f = 2,45 GHz) — piatto rotante rimosso!</text>`;
+          // onda stazionaria (visibile mentre cuoce)
+          if (cooking || cooked > 0) {
+            let dw = '';
+            for (let x = 0; x <= BARW; x += 3) {
+              const env = Math.abs(Math.sin(Math.PI * x / (SPOT * PXCM)));
+              dw += (dw ? ' L' : 'M') + ` ${BARX + x} ${(95 - 40 * env * (cooking ? (0.6 + 0.4 * Math.sin(Date.now() / 90)) : 0.9)).toFixed(1)}`;
+            }
+            h += `<path d="${dw}" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.8"/>`;
+            h += `<text x="320" y="70" text-anchor="middle" class="lbl-s" fill="var(--accent)">onda stazionaria: i ventri scaldano, i nodi no</text>`;
+          }
+          // tavoletta
+          h += `<rect x="${BARX}" y="${BARY}" width="${BARW}" height="${BARH}" rx="8" fill="#6b3f1d" stroke="#4a2a12" stroke-width="2"/>`;
+          for (let i = 1; i < 8; i++) h += `<line x1="${BARX + i * BARW / 8}" y1="${BARY}" x2="${BARX + i * BARW / 8}" y2="${BARY + BARH}" stroke="#4a2a12" stroke-width="1.6"/>`;
+          h += `<line x1="${BARX}" y1="${BARY + BARH / 2}" x2="${BARX + BARW}" y2="${BARY + BARH / 2}" stroke="#4a2a12" stroke-width="1.6"/>`;
+          // macchie fuse sui ventri
+          if (cooked > 0) {
+            for (let i = 0; i < 4; i++) {
+              const cx = BARX + (SPOT * PXCM) * (i + 0.5);
+              if (cx < BARX + BARW - 8) {
+                h += `<ellipse cx="${cx.toFixed(1)}" cy="${BARY + BARH / 2}" rx="${(13 + 5 * cooked).toFixed(1)}" ry="${(9 + 4 * cooked).toFixed(1)}" fill="#c98a4b" opacity="${(0.5 + 0.5 * cooked).toFixed(2)}"/>`;
+                h += `<ellipse cx="${(cx - 3).toFixed(1)}" cy="${BARY + BARH / 2 - 3}" rx="${(6 + 2 * cooked).toFixed(1)}" ry="${(4 + 2 * cooked).toFixed(1)}" fill="#e8b878" opacity="${(0.4 + 0.5 * cooked).toFixed(2)}"/>`;
+              }
+            }
+          }
+          // calibro di misura (dopo la cottura)
+          if (cooked >= 1) {
+            const x1 = BARX + SPOT * PXCM * 0.5, x2 = x1 + d * PXCM;
+            h += `<line x1="${x1.toFixed(1)}" y1="${BARY + BARH + 14}" x2="${x1.toFixed(1)}" y2="${BARY + BARH + 34}" stroke="var(--magenta)" stroke-width="2.5"/>`;
+            h += `<line x1="${x2.toFixed(1)}" y1="${BARY + BARH + 14}" x2="${x2.toFixed(1)}" y2="${BARY + BARH + 34}" stroke="var(--magenta)" stroke-width="2.5"/>`;
+            h += `<line x1="${x1.toFixed(1)}" y1="${BARY + BARH + 24}" x2="${x2.toFixed(1)}" y2="${BARY + BARH + 24}" stroke="var(--magenta)" stroke-width="1.6"/>`;
+            h += `<text x="${((x1 + x2) / 2).toFixed(1)}" y="${BARY + BARH + 48}" text-anchor="middle" class="em">d = ${d.toFixed(1)} cm</text>`;
+          }
+          svg.innerHTML = h;
+          if (cooked >= 1) {
+            const c = 2 * (d / 100) * F;
+            const good = Math.abs(d - SPOT) <= 0.25;
+            out.innerHTML = `$c = 2\\,d\\,f$ = <span class="val-badge">${(c / 1e8).toFixed(2)} × 10⁸ m/s</span>` +
+              (good ? ' — 🎉 <strong>compatibile con la velocità della luce!</strong> Hai centrato i ventri.'
+                    : ' — sposta i cursori sui <strong>centri</strong> di due macchie vicine (circa 6 cm).');
+            if (typeof renderMathIn === 'function') renderMathIn(out);
+          } else if (!cooking) {
+            out.innerHTML = 'Tavoletta pronta. Accendi il forno e osserva dove si scioglie.';
+          }
+        }
+        function loop(ts) {
+          if (!cooking) { last = null; return; }
+          if (last == null) last = ts;
+          const dt = Math.min((ts - last) / 1000, 0.05); last = ts;
+          cooked = Math.min(1, cooked + dt / 2.6);
+          out.innerHTML = `Cottura in corso… ${(cooked * 20).toFixed(0)} s / 20 s`;
+          draw();
+          if (cooked >= 1) { cooking = false; draw(); return; }
+          requestAnimationFrame(loop);
+        }
+        cook.addEventListener('click', () => {
+          if (cooking || cooked >= 1) return;
+          cooking = true; requestAnimationFrame(loop);
+        });
+        reset.addEventListener('click', () => { cooking = false; cooked = 0; sd.value = 5; draw(); });
+        sd.addEventListener('input', draw);
+        draw();
+      })();
+
+      // ===== 6.1 — Principio di Huygens =====
+      (function () {
+        const svg = document.getElementById('hy-svg');
+        if (!svg) return;
+        const st = document.getElementById('hy-t'), vt = document.getElementById('hy-t-val');
+        const show = document.getElementById('hy-show'), out = document.getElementById('hy-out');
+        function go() {
+          const t = +st.value; vt.textContent = t;
+          const x0 = 120, r = t * 1.6;            // fronte vecchio e raggio delle ondine
+          let h = '';
+          // fronte d'onda "vecchio"
+          h += `<line x1="${x0}" y1="30" x2="${x0}" y2="230" stroke="var(--primary)" stroke-width="3"/>`;
+          h += `<text x="${x0 - 8}" y="22" text-anchor="end" class="lbl-s" fill="var(--primary)">fronte d'onda</text>`;
+          // sorgenti secondarie + ondine
+          if (show.checked && r > 3) {
+            for (let i = 0; i < 9; i++) {
+              const y = 42 + i * 22;
+              h += `<circle cx="${x0}" cy="${y}" r="3" fill="var(--gold)"/>`;
+              h += `<path d="M ${x0} ${y - r} A ${r} ${r} 0 0 1 ${x0} ${y + r}" fill="none" stroke="var(--gold)" stroke-width="1.3" opacity="0.6"/>`;
+            }
+          }
+          // nuovo fronte = inviluppo
+          if (r > 3) {
+            h += `<line x1="${x0 + r}" y1="30" x2="${x0 + r}" y2="230" stroke="var(--magenta)" stroke-width="3"/>`;
+            h += `<text x="${x0 + r + 8}" y="22" class="lbl-s" fill="var(--magenta)">nuovo fronte (inviluppo)</text>`;
+          }
+          h += `<line x1="30" y1="248" x2="610" y2="248" stroke="var(--border)" stroke-width="1"/>`;
+          h += `<text x="320" y="243" text-anchor="middle" class="lbl-s" fill="var(--muted)">direzione di propagazione →</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = r <= 3
+            ? 'Fronte fermo: fai avanzare lo slider.'
+            : (show.checked
+              ? 'Ogni punto giallo emette la sua ondina sferica: la linea che le <strong>inviluppa</strong> tutte è il nuovo fronte — di nuovo piano e parallelo al primo.'
+              : 'Senza guardare le ondine, vedi solo il risultato: il fronte è avanzato restando piano. (Riattiva le sorgenti per vedere il perché.)');
+        }
+        st.addEventListener('input', go); show.addEventListener('change', go); go();
+      })();
+
+      // ===== 6.2 — Diffrazione da una fenditura =====
+      (function () {
+        const svg = document.getElementById('df-svg');
+        if (!svg) return;
+        const sa = document.getElementById('df-a'), va = document.getElementById('df-a-val');
+        const out = document.getElementById('df-out');
+        const WX = 300, CY = 150;                 // parete e centro fenditura
+        function go() {
+          const a = +sa.value; va.textContent = a.toFixed(1);
+          const half = a * 11;                    // semiapertura in px (λ ≈ 22 px)
+          const theta = Math.asin(Math.min(1, 1 / a));  // semiangolo di apertura ≈ asin(λ/a)
+          let h = '';
+          // fronti incidenti (piani)
+          for (let i = 0; i < 5; i++) {
+            const x = 40 + i * 52;
+            h += `<line x1="${x}" y1="40" x2="${x}" y2="260" stroke="var(--primary)" stroke-width="2" opacity="${0.35 + i * 0.13}"/>`;
+          }
+          h += `<text x="140" y="28" text-anchor="middle" class="lbl-s" fill="var(--primary)">onda in arrivo</text>`;
+          // parete con fenditura
+          h += `<line x1="${WX}" y1="30" x2="${WX}" y2="${CY - half}" stroke="var(--text-soft)" stroke-width="7"/>`;
+          h += `<line x1="${WX}" y1="${CY + half}" x2="${WX}" y2="270" stroke="var(--text-soft)" stroke-width="7"/>`;
+          h += `<text x="${WX}" y="290" text-anchor="middle" class="lbl-s" fill="var(--muted)">fenditura: a = ${a.toFixed(1)} λ</text>`;
+          // fronti trasmessi: archi limitati al ventaglio ±theta (+ un filo di sbordo)
+          const th = Math.min(Math.PI / 2 - 0.03, theta + 0.10);
+          for (let r = 26; r <= 300; r += 26) {
+            // arco centrato al centro della fenditura, semiapertura th attorno all'orizzontale
+            const ax1 = WX + r * Math.cos(th), ay1 = CY - r * Math.sin(th) - (a > 2 ? half * 0.75 : 0);
+            const ax2 = WX + r * Math.cos(th), ay2 = CY + r * Math.sin(th) + (a > 2 ? half * 0.75 : 0);
+            h += `<path d="M ${ax1.toFixed(1)} ${ay1.toFixed(1)} A ${r + (a > 2 ? half : 0)} ${r + (a > 2 ? half : 0)} 0 0 1 ${ax2.toFixed(1)} ${ay2.toFixed(1)}" fill="none" stroke="var(--magenta)" stroke-width="2" opacity="${(1 - r / 360).toFixed(2)}"/>`;
+          }
+          // zone d'ombra indicative
+          h += `<text x="470" y="52" text-anchor="middle" class="lbl-s" fill="var(--muted)" opacity="${a > 3 ? 0.9 : 0.35}">zona d'ombra</text>`;
+          h += `<text x="470" y="268" text-anchor="middle" class="lbl-s" fill="var(--muted)" opacity="${a > 3 ? 0.9 : 0.35}">zona d'ombra</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = a >= 4
+            ? `Fenditura <strong>larga</strong> (a = ${a.toFixed(1)} λ): l'onda prosegue quasi dritta, l'ombra è netta — è l'ottica "a raggi" di tutti i giorni.`
+            : a >= 1.5
+              ? `Fenditura <strong>media</strong>: i bordi cominciano a "sbavare" — l'onda sborda nella zona d'ombra.`
+              : `Fenditura <strong>stretta come λ</strong>: la fenditura si comporta come un'unica sorgente di Huygens e l'onda riparte a <strong>semicerchi</strong>, invadendo tutto: diffrazione al massimo.`;
+        }
+        sa.addEventListener('input', go); go();
+      })();
+
+      // ===== 6.3 — Diffusione: perché il cielo è blu =====
+      (function () {
+        const svg = document.getElementById('sc-svg');
+        if (!svg) return;
+        const sl = document.getElementById('sc-l'), vl = document.getElementById('sc-l-val');
+        const out = document.getElementById('sc-out');
+        function waveColor(l) {
+          if (l < 450) return '#7b5cff';
+          if (l < 490) return '#3b82f6';
+          if (l < 560) return '#22c55e';
+          if (l < 590) return '#f5b400';
+          if (l < 630) return '#f97316';
+          return '#ef4444';
+        }
+        function go() {
+          const l = +sl.value; vl.textContent = l;
+          const I = Math.pow(550 / l, 4);          // Rayleigh, normalizzata a 550 nm
+          const col = waveColor(l);
+          const nRays = Math.max(2, Math.round(I * 7));
+          let h = '';
+          // sole
+          h += `<circle cx="60" cy="80" r="26" fill="var(--gold)"/>`;
+          for (let i = 0; i < 8; i++) {
+            const a = i * Math.PI / 4;
+            h += `<line x1="${60 + 32 * Math.cos(a)}" y1="${80 + 32 * Math.sin(a)}" x2="${60 + 42 * Math.cos(a)}" y2="${80 + 42 * Math.sin(a)}" stroke="var(--gold)" stroke-width="2.5"/>`;
+          }
+          // atmosfera
+          h += `<rect x="180" y="40" width="290" height="180" rx="14" fill="color-mix(in srgb, var(--primary) 7%, transparent)" stroke="var(--border)" stroke-dasharray="6 5"/>`;
+          h += `<text x="325" y="34" text-anchor="middle" class="lbl-s" fill="var(--muted)">atmosfera (molecole d'aria)</text>`;
+          for (let i = 0; i < 22; i++) {
+            h += `<circle cx="${195 + (i * 61) % 262}" cy="${58 + (i * 37) % 148}" r="2.4" fill="var(--muted)" opacity="0.65"/>`;
+          }
+          // raggio incidente
+          h += `<line x1="95" y1="95" x2="325" y2="128" stroke="${col}" stroke-width="4"/>`;
+          // raggi diffusi in tutte le direzioni
+          for (let i = 0; i < nRays; i++) {
+            const a = (2 * Math.PI * i) / nRays + 0.35;
+            const len = 42 + 34 * Math.min(1, I / 2.5);
+            h += `<line x1="325" y1="128" x2="${(325 + len * Math.cos(a)).toFixed(1)}" y2="${(128 + len * Math.sin(a)).toFixed(1)}" stroke="${col}" stroke-width="2" opacity="0.8"/>`;
+          }
+          // raggio trasmesso (indebolito quanto più si diffonde)
+          h += `<line x1="325" y1="128" x2="600" y2="160" stroke="${col}" stroke-width="${Math.max(1, 4 - I * 0.8).toFixed(1)}" opacity="${Math.max(0.25, 1 - I * 0.16).toFixed(2)}"/>`;
+          h += `<text x="560" y="185" text-anchor="middle" class="lbl-s" fill="var(--muted)">luce che prosegue</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = `Diffusione relativa (legge di Rayleigh, $\\propto 1/\\lambda^4$): <span class="val-badge">${I.toFixed(1)}×</span> rispetto al verde — ` +
+            (l <= 480 ? 'il <strong>blu</strong> viene sparpagliato ovunque: è lui a colorare il cielo.'
+              : l >= 620 ? 'il <strong>rosso</strong> tira dritto quasi indisturbato: per questo sopravvive fino ai tramonti.'
+                : 'i colori intermedi si diffondono un po\': la somma di tutto dà il cielo che conosciamo.');
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sl.addEventListener('input', go); go();
+      })();
+
+      // ===== 7 — Lo spettro elettromagnetico =====
+      (function () {
+        const svg = document.getElementById('sp-svg');
+        if (!svg) return;
+        const card = document.getElementById('sp-card');
+        const X0 = 40, X1 = 600, LO = 3, HI = -13;      // log10(λ/m): da 1 km (sx) a 10⁻¹³ m (dx)
+        const px = (lg) => X0 + (X1 - X0) * (LO - lg) / (LO - HI);
+        const BANDS = [
+          { nome: '📻 Onde radio', a: 3, b: 0, col: '#8fa3bf', lbl: 'radio',
+            lam: 'da 1 m a chilometri', frq: 'fino a 300 MHz',
+            app: 'Le <strong>telecomunicazioni</strong>: radio AM e FM, televisione, radioamatori. Attraversano bene muri e nuvole e, rimbalzando sulla ionosfera, aggirano perfino la curvatura terrestre. Come si generano e si catturano? Con le <strong>antenne</strong>: vedi qui sotto.' },
+          { nome: '📡 Microonde', a: 0, b: -3, col: '#38bdf8', lbl: 'microonde',
+            lam: '1 mm – 1 m', frq: '300 MHz – 300 GHz',
+            app: 'Il <strong>forno a microonde</strong> (2,45 GHz) fa oscillare le molecole d\'acqua del cibo: l\'attrito tra molecole diventa calore — per questo il piatto vuoto non si scalda. Nella stessa banda: <strong>Wi-Fi e Bluetooth</strong> (2,4 GHz!), radar, GPS e collegamenti satellitari.' },
+          { nome: '🌡️ Infrarosso', a: -3, b: -6.155, col: '#f97316', lbl: 'infrarosso',
+            lam: '700 nm – 1 mm', frq: '300 GHz – 4·10¹⁴ Hz',
+            app: 'Il <strong>calore che senti a distanza</strong> da un termosifone è infrarosso: ogni corpo caldo ne emette. Applicazioni: telecomandi TV, <strong>termocamere</strong> e visori notturni, sensori antifurto, fisioterapia.' },
+          { nome: '🌈 Visibile', a: -6.155, b: -6.398, col: '#fff', lbl: '',
+            lam: '400 – 700 nm', frq: '4·10¹⁴ – 7,5·10¹⁴ Hz',
+            app: 'L\'unica banda che l\'occhio umano percepisce: dal violetto (400 nm) al rosso (700 nm). Visione, <strong>fotosintesi</strong>, laser... e le <strong>fibre ottiche</strong>: Internet intercontinentale viaggia su impulsi di luce dentro fili di vetro.' },
+          { nome: '🟣 Ultravioletto', a: -6.398, b: -8, col: '#a78bfa', lbl: 'UV',
+            lam: '10 – 400 nm', frq: '7,5·10¹⁴ – 3·10¹⁶ Hz',
+            app: 'Abbronzatura e vitamina D, ma anche scottature e danni al DNA: da qui in poi la radiazione è abbastanza energetica da rompere legami chimici (crema solare!). Applicazioni: <strong>sterilizzazione</strong> di acqua e sale operatorie, <strong>controllo delle banconote</strong> con la lampada UV.' },
+          { nome: '🦴 Raggi X', a: -8, b: -11, col: '#34d399', lbl: 'raggi X',
+            lam: '0,01 – 10 nm', frq: '3·10¹⁶ – 3·10¹⁹ Hz',
+            app: 'La <strong>radiografia</strong>: i raggi X attraversano i tessuti molli ma vengono assorbiti dalle ossa (legge di Lambert–Beer, sezione 8), disegnando lo scheletro sulla lastra. E ancora: TAC, <strong>controlli bagagli</strong> in aeroporto, cristallografia.' },
+          { nome: '☢️ Raggi gamma', a: -11, b: -13, col: '#f43f5e', lbl: 'gamma',
+            lam: 'sotto 0,01 nm', frq: 'oltre 3·10¹⁹ Hz',
+            app: 'I più energetici della famiglia. <strong>Radioterapia</strong>: fasci mirati distruggono le cellule tumorali. Sterilizzazione di strumenti chirurgici e, in astrofisica, i lampi gamma che raccontano gli eventi più violenti dell\'universo.' },
+        ];
+        let sel = 1;
+        function draw() {
+          const B = BANDS[sel];
+          let h = '<defs><linearGradient id="sp-rb" x1="0" y1="0" x2="1" y2="0">' +
+            '<stop offset="0" stop-color="#ef4444"/><stop offset="0.22" stop-color="#f97316"/>' +
+            '<stop offset="0.42" stop-color="#eab308"/><stop offset="0.58" stop-color="#22c55e"/>' +
+            '<stop offset="0.78" stop-color="#3b82f6"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs>';
+          h += `<text x="${X0}" y="36" class="lbl-s">← λ più grande</text>`;
+          h += `<text x="${X1}" y="36" text-anchor="end" class="lbl-s">f ed energia più grandi →</text>`;
+          // etichette di frequenza (sopra) e tacche di lunghezza d'onda (sotto)
+          const TICKS = [[3, '1 km', '300 kHz'], [0, '1 m', '300 MHz'], [-3, '1 mm', '300 GHz'],
+            [-6, '1 µm', '3·10¹⁴ Hz'], [-9, '1 nm', '3·10¹⁷ Hz'], [-12, '1 pm', '3·10²⁰ Hz']];
+          TICKS.forEach(([lg, lt, ft]) => {
+            const x = px(lg).toFixed(1);
+            h += `<text x="${x}" y="56" text-anchor="middle" class="lbl-s" font-size="10">${ft}</text>`;
+            h += `<line x1="${x}" y1="114" x2="${x}" y2="121" stroke="var(--muted)" stroke-width="1.2"/>`;
+            h += `<text x="${x}" y="135" text-anchor="middle" class="lbl-s" font-size="11">${lt}</text>`;
+          });
+          // bande
+          BANDS.forEach((bd, i) => {
+            const x1 = px(bd.a), x2 = px(bd.b), on = i === sel;
+            const fill = bd.lbl === '' ? 'url(#sp-rb)' : bd.col;
+            h += `<rect data-i="${i}" x="${x1.toFixed(1)}" y="62" width="${(x2 - x1).toFixed(1)}" height="52" fill="${fill}" ` +
+              `opacity="${on ? 1 : 0.55}" stroke="${on ? 'var(--text)' : 'none'}" stroke-width="2.5" style="cursor:pointer"/>`;
+            if (bd.lbl) h += `<text x="${((x1 + x2) / 2).toFixed(1)}" y="92" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" pointer-events="none">${bd.lbl}</text>`;
+          });
+          // zoom sul visibile
+          const v1 = px(-6.155), v2 = px(-6.398);
+          h += `<polygon points="${v1.toFixed(1)},114 ${v2.toFixed(1)},114 440,168 200,168" fill="var(--muted)" opacity="0.18"/>`;
+          h += `<rect data-i="3" x="200" y="168" width="240" height="28" fill="url(#sp-rb)" stroke="${sel === 3 ? 'var(--text)' : 'var(--border)'}" stroke-width="${sel === 3 ? 2.5 : 1}" style="cursor:pointer" rx="4"/>`;
+          [[700, 200], [600, 280], [500, 360], [400, 440]].forEach(([nm, x]) => {
+            h += `<line x1="${x}" y1="196" x2="${x}" y2="202" stroke="var(--muted)" stroke-width="1"/>`;
+            h += `<text x="${x}" y="216" text-anchor="middle" class="lbl-s" font-size="10">${nm} nm</text>`;
+          });
+          h += `<text x="320" y="238" text-anchor="middle" class="lbl-s">la finestra visibile, ingrandita</text>`;
+          svg.innerHTML = h;
+          card.innerHTML = `<strong>${B.nome}</strong> &nbsp;·&nbsp; λ: ${B.lam} &nbsp;·&nbsp; f: ${B.frq}<br>${B.app}`;
+        }
+        svg.addEventListener('click', (e) => {
+          const r = e.target.closest('rect[data-i]');
+          if (r) { sel = +r.getAttribute('data-i'); draw(); }
+        });
+        draw();
+      })();
+
+      // ===== 7.1 — Antenna trasmittente e ricevente =====
+      (function () {
+        const svg = document.getElementById('an-svg');
+        if (!svg) return;
+        const sel = document.getElementById('an-f'), play = document.getElementById('an-play');
+        const out = document.getElementById('an-out');
+        const TX = 120, RX = 530, CY = 145, V = 60;     // V: velocità dei fronti sullo schermo (px/s)
+        let t = 0, last = null, lastF = null;
+        function frame(ts) {
+          if (last == null) last = ts;
+          const dt = Math.min((ts - last) / 1000, 0.05); last = ts;
+          if (play.checked) t += dt;
+          const f = +sel.value;                         // MHz
+          // λ sullo schermo: mappa logaritmica (100 MHz → 107 px, 2450 MHz → 40 px)
+          const lpx = 34 + 76 * (Math.log10(3000 / f) / Math.log10(3000 / 88));
+          const om = 2 * Math.PI * V / lpx;             // stessa velocità per tutti: cambia la frequenza
+          const osc = Math.sin(om * t);
+          let h = '';
+          // fronti d'onda in espansione
+          for (let r = (t * V) % lpx; r < 470; r += lpx) {
+            if (r < 8) continue;
+            h += `<circle cx="${TX}" cy="${CY}" r="${r.toFixed(1)}" fill="none" stroke="var(--accent)" stroke-width="2" opacity="${Math.max(0, 0.8 * (1 - r / 470)).toFixed(2)}"/>`;
+          }
+          // antenna trasmittente con elettroni oscillanti
+          h += `<line x1="${TX}" y1="60" x2="${TX}" y2="230" stroke="var(--text-soft)" stroke-width="6" stroke-linecap="round"/>`;
+          for (let i = 0; i < 5; i++) {
+            h += `<circle cx="${TX}" cy="${(85 + i * 30 + 16 * osc).toFixed(1)}" r="5" fill="var(--gold)"/>`;
+          }
+          h += `<rect x="${TX - 30}" y="238" width="60" height="26" rx="6" fill="var(--surface)" stroke="var(--border)"/>`;
+          h += `<text x="${TX}" y="256" text-anchor="middle" class="lbl-s">~ ${f} MHz</text>`;
+          h += `<text x="${TX + 10}" y="46" class="lbl-s">trasmittente: elettroni su e giù</text>`;
+          // antenna ricevente: oscillazione indotta, in ritardo di (RX−TX)/V
+          const osc2 = Math.sin(om * (t - (RX - TX) / V)) * 0.7;
+          h += `<line x1="${RX}" y1="95" x2="${RX}" y2="195" stroke="var(--text-soft)" stroke-width="5" stroke-linecap="round"/>`;
+          for (let i = 0; i < 3; i++) {
+            h += `<circle cx="${RX}" cy="${(115 + i * 28 + 12 * osc2).toFixed(1)}" r="4.5" fill="var(--gold)"/>`;
+          }
+          h += `<circle cx="${RX}" cy="222" r="7" fill="var(--red)" opacity="${(0.25 + 0.7 * Math.abs(osc2)).toFixed(2)}"/>`;
+          h += `<text x="${RX}" y="82" text-anchor="middle" class="lbl-s">ricevente: stessa frequenza</text>`;
+          h += `<text x="${RX}" y="250" text-anchor="middle" class="lbl-s">segnale → amplificatore</text>`;
+          svg.innerHTML = h;
+          if (f !== lastF) {
+            lastF = f;
+            const lam = 300 / f;                        // metri
+            const lamTxt = lam >= 1 ? lam.toFixed(1).replace('.', ',') + ' m' : (lam * 100).toFixed(1).replace('.', ',') + ' cm';
+            const qTxt = lam / 4 >= 1 ? (lam / 4).toFixed(2).replace('.', ',') + ' m' : (lam * 25).toFixed(1).replace('.', ',') + ' cm';
+            out.innerHTML = `λ = c/f = <span class="val-badge">${lamTxt}</span> &nbsp;→&nbsp; antenna ideale (quarto d'onda): λ/4 ≈ <span class="val-badge">${qTxt}</span>`;
+          }
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      })();
+
+      // ===== 8 — Lambert-Beer =====
+      (function () {
+        const sel = document.getElementById('lb-mat');
+        if (!sel || !window.Plt) return;
+        const sx = document.getElementById('lb-x'), vx = document.getElementById('lb-x-val');
+        const lock = document.getElementById('lb-lock'), unit = document.getElementById('lb-unit');
+        const out = document.getElementById('lb-out');
+        const { linspace, update } = Plt;
+        function go() {
+          const [muS, xmaxS, nome] = sel.value.split('|');
+          const mu = parseFloat(muS), xmax = parseFloat(xmaxS);
+          const x = +sx.value / 100 * xmax;
+          vx.textContent = xmax < 1 ? (x * 10).toFixed(2) : x.toFixed(1);
+          unit.textContent = xmax < 1 ? 'mm' : 'cm';
+          const frac = Math.exp(-mu * x);
+          const xhalf = Math.LN2 / mu;
+          const xs = linspace(0, xmax, 240);
+          update('lb-plot', [
+            { x: xs, y: xs.map(v => Math.exp(-mu * v)), type: 'scatter', mode: 'lines', name: 'I/I₀', line: { color: C.gold, width: 3 } },
+            { x: [x], y: [frac], type: 'scatter', mode: 'markers', marker: { color: C.magenta, size: 11 }, showlegend: false },
+          ], {
+            xaxis: { title: `spessore (cm) — ${nome}`, range: lock.checked ? [0, xmax] : undefined },
+            yaxis: { title: 'frazione trasmessa I/I₀', range: lock.checked ? [0, 1.05] : undefined },
+            showlegend: false,
+          });
+          out.innerHTML = `Attraverso <span class="val-badge">${xmax < 1 ? (x * 10).toFixed(2) + ' mm' : x.toFixed(1) + ' cm'}</span> di ${nome} passa il ` +
+            `<span class="val-badge">${(frac * 100).toFixed(frac < 0.01 ? 2 : 1)}%</span> del fascio. ` +
+            `Spessore emivalente: $x_{1/2} = \\ln 2/\\mu$ = <span class="val-badge">${xhalf < 0.1 ? (xhalf * 10).toFixed(2) + ' mm' : xhalf.toFixed(1) + ' cm'}</span>.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sel.addEventListener('change', go); sx.addEventListener('input', go); lock.addEventListener('change', go);
+        go();
+      })();
+
+    });
+  </script>
+</body>
+
+</html>
