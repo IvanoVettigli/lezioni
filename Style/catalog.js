@@ -67,6 +67,7 @@ window.SITE_CATALOG = {
         { file: '4_Campi_Elettrico_Magnetico.html', title: 'Campi elettrico e magnetico', desc: 'Il concetto di campo, elettrizzazione, forza di Coulomb, potenziale, teorema di Gauss, magneti e monopòli, forza di Lorentz e spettrometro di massa' },
         { file: '5_Campo_elettromagnetico.html', title: 'Il campo elettromagnetico', desc: 'Faraday-Neumann-Lenz, esperimento di Ørsted, legge di Ampère, corrente di spostamento, equazione di continuità e le equazioni di Maxwell in forma locale' },
         { file: '6_Onde_elettromagnetiche.html', title: 'Le onde elettromagnetiche', desc: 'Onde e boe, da Maxwell alla natura della luce, la velocità misurata col cioccolato, principio di Huygens, diffrazione e diffusione, lo spettro elettromagnetico e le antenne' },
+        { file: 'Verifica_2_Campi_onde_elettromagnetiche.html', title: '📝 Verifica di prova · Campi e onde elettromagnetiche', desc: 'Allenati con una verifica completa (lez. 4-6): 10 quesiti a scelta multipla a correzione automatica, 5 a risposta aperta e 5 di ragionamento con soluzioni guidate', type: 'verifica' },
       ] },
       { folder: 'Laboratorio', year: null, title: '🧪 Laboratorio', meta: 'Schede PDF', lessons: [] },
     ],
