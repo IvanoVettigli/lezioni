@@ -69,6 +69,8 @@ window.SITE_CATALOG = {
         { file: '6_Onde_elettromagnetiche.html', title: 'Le onde elettromagnetiche', desc: 'Onde e boe, da Maxwell alla natura della luce, la velocità misurata col cioccolato, principio di Huygens, diffrazione e diffusione, lo spettro elettromagnetico e le antenne' },
         { file: 'Verifica_2_Campi_onde_elettromagnetiche.html', title: '📝 Verifica di prova · Campi e onde elettromagnetiche', desc: 'Allenati con una verifica completa (lez. 4-6): 10 quesiti a scelta multipla a correzione automatica, 5 a risposta aperta e 5 di ragionamento con soluzioni guidate', type: 'verifica' },
         { file: '7_Relativita_ristretta.html', title: 'La relatività ristretta', desc: 'Da Galileo a Einstein: l\'esperimento di Michelson-Morley con l\'interferometro, i due postulati, simultaneità, dilatazione dei tempi e contrazione delle lunghezze, lo spazio-tempo di Minkowski e le trasformazioni di Lorentz' },
+        { file: '8_Meccanica_relativistica.html', title: 'La meccanica relativistica', desc: 'Massa e massa a riposo, il muro della velocità della luce, fotoni e tachioni, i razzi che perdono massa, il quadrivettore energia-impulso, il triangolo di Einstein ed E = mc²' },
+        { file: '9_Relativita_generale.html', title: 'La relatività generale', desc: 'Geometrie non euclidee e teorema di Girard, geodetiche, tensori, la metrica e l\'equazione di campo di Einstein, buchi neri e raggio di Schwarzschild, l\'espansione dell\'universo, i viaggi nel tempo, materia ed energia oscura e il teorema di Noether' },
       ] },
       { folder: 'Laboratorio', year: null, title: '🧪 Laboratorio', meta: 'Schede PDF', lessons: [] },
     ],

@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 9 — La relatività generale</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    /* --- SVG fisici (theme-aware) --- */
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quinto anno · Lezione 9 · Modulo: Teoria della relatività</div>
+    <h1>La relatività generale</h1>
+    <p>Geometrie curve, tensori e la gravità come forma dello spazio-tempo</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quinto anno</a>
+    <span class="sep">/</span> La relatività generale
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> La relatività <em>ristretta</em> ha rifondato spazio, tempo e meccanica — ma con
+      una clausola scritta in piccolo: vale solo per i sistemi di riferimento <strong>inerziali</strong>. E il resto?
+      I sistemi che accelerano, che ruotano... e soprattutto la <strong>gravità</strong>, che di mestiere fa
+      accelerare tutto? Questa lezione racconta la scalata al problema: dieci anni, una matematica nuova e la teoria
+      che molti fisici considerano la più bella mai scritta.
+    </div>
+
+    <!-- 1 — VERSO UNA TEORIA DAVVERO RELATIVISTICA -->
+    <section id="sec1">
+      <h2>1. L'obiettivo: una teoria davvero relativistica</h2>
+
+      <p>Il programma della relatività — l'abbiamo imparato — non è "tutto è relativo", ma il suo contrario: le
+        <strong>leggi della fisica devono essere le stesse per tutti gli osservatori</strong>. La relatività ristretta
+        realizza questo sogno solo a metà: le sue leggi valgono per gli osservatori inerziali, quelli in moto
+        rettilineo uniforme. Ma che cosa hanno di speciale? Perché la natura dovrebbe preferire chi non accelera?
+        Einstein voleva di più: una teoria <strong>realmente relativistica</strong>, con leggi valide in
+        <strong>ogni</strong> sistema di riferimento — fermo, in moto, in caduta, in rotazione. Per questo si chiama
+        relatività <strong>generale</strong>.</p>
+
+      <p>Il prezzo fu altissimo. Tra la relatività ristretta (1905) e quella generale (1915) passano <strong>dieci
+        anni</strong>: Einstein dovette letteralmente tornare a scuola, perché la matematica necessaria — geometrie
+        curve, calcolo tensoriale — non la conosceva (lo aiutò l'amico matematico Marcel Grossmann: «Grossmann,
+        aiutami o impazzisco!»). E quella matematica parlava soprattutto <strong>italiano</strong>: il calcolo
+        tensoriale ("calcolo differenziale assoluto") era stato sviluppato dal matematico <strong>Gregorio
+        Ricci-Curbastro</strong> con il suo allievo Tullio Levi-Civita — è esattamente l'attrezzatura che Einstein
+        adoperò, e tra poco ne incontreremo perfino le iniziali dentro l'equazione finale. E negli ultimi mesi del 1915 la corsa divenne una gara vera: il grande matematico
+        <strong>David Hilbert</strong>, che amava punzecchiare («la fisica è troppo difficile per lasciarla ai
+        fisici», diceva — e la relatività generale, aggiungiamo noi, troppo bella), si mise a caccia delle stesse
+        equazioni per la propria strada. Einstein arrivò per primo per un soffio, a novembre 1915.</p>
+
+      <div class="curiosita">
+        <strong>Le malelingue.</strong> C'è chi nota che i dieci anni "difficili" coincidono con il deterioramento del
+        matrimonio con la prima moglie, <strong>Mileva Marić</strong> — compagna di studi al Politecnico di Zurigo,
+        fisica anche lei, con cui Einstein discuteva il proprio lavoro negli anni d'oro (si separarono nel 1914, alla
+        vigilia della volata finale). Quanto contribuì Mileva alle teorie? Le malelingue dicono molto; gli storici,
+        con le carte in mano, dicono che non lo sappiamo — e noi non crediamo ai pettegolezzi. Un fatto però è
+        documentato: quando nel 1922 arrivò il premio Nobel, l'assegno andò, come da accordi di divorzio,
+        <strong>tutto a Mileva</strong>. Trarne le conclusioni è lasciato per esercizio.
+      </div>
+
+      <p>Prima di poter anche solo <em>scrivere</em> la teoria, servono due strumenti matematici che Euclide e Newton
+        non avevano: le <strong>geometrie non euclidee</strong> e i <strong>tensori</strong>. Andiamo a procurarceli.</p>
+    </section>
+
+    <!-- 2 — EUCLIDE E IL QUINTO POSTULATO -->
+    <section id="sec2">
+      <h2>2. Euclide e il postulato che non tornava</h2>
+
+      <p>Per duemila anni "geometria" ha significato una cosa sola: gli <em>Elementi</em> di Euclide (III secolo
+        a.C.), l'edificio di teoremi costruito su cinque <strong>postulati</strong>, verità così evidenti da non
+        richiedere dimostrazione:</p>
+
+      <ol>
+        <li>tra due punti qualsiasi si può tracciare un segmento di retta;</li>
+        <li>ogni segmento si può prolungare indefinitamente in linea retta;</li>
+        <li>dato un centro e un raggio, si può tracciare una circonferenza;</li>
+        <li>tutti gli angoli retti sono uguali tra loro;</li>
+        <li>se una retta, tagliandone altre due, forma da uno stesso lato angoli interni con somma minore di due
+          retti, le due rette (prolungate) si incontrano da quel lato.</li>
+      </ol>
+
+      <p>Notate qualcosa? I primi quattro sono lampi: riga e compasso, un rigo ciascuno. Il <strong>quinto</strong> è
+        un comma di legge — più famoso nella forma equivalente: <em>per un punto esterno a una retta passa
+        <strong>una e una sola</strong> parallela alla retta data</em>. Ai matematici sembrò per secoli un teorema
+        travestito da postulato: possibile che non si potesse <em>dimostrare</em> dagli altri quattro? Ci provarono in
+        tanti. Ci lasciarono le penne in tanti.</p>
+
+      <div class="curiosita">
+        <strong>Saccheri, l'uomo che vinse senza accorgersene.</strong> Il tentativo più eroico è di un gesuita
+        italiano, <strong>Giovanni Girolamo Saccheri</strong> (1667–1733), professore a Pavia. La strategia era
+        brillante: <em>negare</em> il quinto postulato e derivarne una contraddizione — dimostrandolo così per
+        assurdo. Nel suo <em>Euclides ab omni naevo vindicatus</em> ("Euclide ripulito da ogni neo", 1733) Saccheri
+        sviluppò con rigore le conseguenze della negazione, aspettandosi il crollo... che non arrivò mai: al suo
+        posto, teorema dopo teorema, prendeva forma una geometria <strong>strana ma perfettamente coerente</strong>.
+        Saccheri non ci credette: la bollò come «ripugnante alla natura della linea retta» e morì convinto di aver
+        salvato Euclide. Aveva invece <strong>costruito (o trovato?) la prima geometria non euclidea</strong> — la
+        vittoria più clamorosa mai scambiata per una sconfitta. Un secolo dopo, Gauss, Bolyai e Lobačevskij
+        percorsero la stessa strada sapendo dove portava.
+      </div>
+    </section>
+
+    <!-- 3 — GEOMETRIA SFERICA -->
+    <section id="sec3">
+      <h2>3. La geometria sulla sfera: triangoli "grassi"</h2>
+
+      <p>La geometria non euclidea più facile da toccare ce l'hai sotto i piedi: la superficie della Terra. Ma
+        attenzione alla domanda chiave: su una sfera, <strong>che cos'è una retta?</strong> Una retta è il percorso
+        più diritto possibile — e sulla sfera è un <strong>cerchio massimo</strong>: una circonferenza che ha per
+        centro <em>il centro della sfera</em> (l'equatore, i meridiani; <em>non</em> i paralleli, che sono
+        circonferenze "piccole": per seguirli devi continuamente sterzare).</p>
+
+      <p>E qui crollano i teoremi di Euclide. Prendi l'equatore e due meridiani: formano un <strong>triangolo</strong>
+        i cui lati sono tutti "rette". I due angoli alla base, sull'equatore, sono <strong>retti</strong> (i meridiani
+        tagliano l'equatore a 90°); più l'angolo $\alpha$ al polo. Somma: $90° + 90° + \alpha$ — <strong>più di
+        180°</strong>, sempre! E c'è di meglio: l'<strong>eccesso</strong> oltre i 180° misura esattamente
+        l'<strong>area</strong> del triangolo. È il <strong>teorema di Girard</strong> (1626):</p>
+
+      <div class="formula-box">
+        $$\text{Area} = R^2\,(\alpha + \beta + \gamma - \pi)$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">angoli in radianti, $R$ = raggio della sfera: più il triangolo è "grasso" di angoli, più è grande</p>
+      </div>
+
+      <p>Prova: allarga l'angolo al polo e guarda somma e area crescere insieme.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Angolo al polo α: <span class="val" id="gir-a-val">60</span>°</label>
+          <input type="range" id="gir-a" min="10" max="170" step="5" value="60"></div>
+      </div>
+      <div class="ckt"><svg id="gir-svg" viewBox="0 0 640 360" aria-label="Teorema di Girard: triangolo sferico tra equatore e due meridiani"></svg></div>
+      <p class="eq-out" id="gir-out"></p>
+
+      <div class="note">
+        <strong>Il segno della curvatura.</strong> La sfera è il prototipo delle superfici a <strong>curvatura
+        positiva</strong>: le "rette" tendono a convergere (due meridiani partono paralleli all'equatore e si
+        incontrano al polo!), i triangoli sono più "grassi" di 180° (nessun intento di <em>triangle shaming</em>:
+        qui "grasso" è un complimento geometrico), e di parallele per un punto esterno... non ne
+        passa <strong>nessuna</strong>: due cerchi massimi qualsiasi si intersecano sempre. Il quinto postulato è
+        falso qui — eppure la geometria funziona benissimo.
+      </div>
+    </section>
+
+    <!-- 4 — CURVATURA NEGATIVA E GEODETICHE -->
+    <section id="sec4">
+      <h2>4. Curvatura negativa, geodetiche (ed Escher)</h2>
+
+      <h3>4.1 — La geometria della sella</h3>
+      <p>La sfera non è l'unico modo di tradire Euclide: c'è anche il suo opposto. Una superficie a <strong>curvatura
+        negativa</strong> — la sella di un cavallo, una patatina — si incurva in due direzioni <em>opposte</em>: lì le
+        "rette" tendono a <strong>divergere</strong>, i triangoli diventano "magri" (somma degli angoli
+        <strong>minore</strong> di 180°) e di parallele per un punto esterno ne passano <strong>infinite</strong>.
+        Confronta i tre mondi con lo slider:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Curvatura della superficie: <span class="val" id="cur-k-val">0.0</span></label>
+          <input type="range" id="cur-k" min="-1" max="1" step="0.05" value="0"></div>
+      </div>
+      <div class="ckt"><svg id="cur-svg" viewBox="0 0 640 300" aria-label="Triangolo su superficie a curvatura variabile: somma degli angoli maggiore, uguale o minore di 180 gradi"></svg></div>
+      <p class="eq-out" id="cur-out"></p>
+
+      <p>Che aspetto ha, una superficie del genere? Il modello classico a curvatura negativa <em>costante</em> è la
+        <strong>pseudosfera</strong> — in pratica, l'interno di un <strong>corno</strong> (o di una tromba): in ogni
+        suo punto la superficie curva "in su" lungo una direzione e "in giù" lungo l'altra, e i triangoli disegnati
+        sulla sua gola sono inesorabilmente magri:</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 240" aria-label="Pseudosfera: l'interno di un corno, superficie a curvatura negativa costante, con un triangolo dai lati concavi">
+        <path d="M 90 25 C 200 55 320 85 610 108" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+        <path d="M 90 215 C 200 185 320 155 610 132" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+        <ellipse cx="90" cy="120" rx="26" ry="95" fill="color-mix(in srgb, var(--primary) 8%, transparent)" stroke="var(--primary)" stroke-width="2.5"/>
+        <ellipse cx="210" cy="120" rx="17" ry="62" fill="none" stroke="var(--primary)" stroke-width="1.2" opacity="0.55"/>
+        <ellipse cx="330" cy="120" rx="11" ry="38" fill="none" stroke="var(--primary)" stroke-width="1.2" opacity="0.55"/>
+        <ellipse cx="450" cy="120" rx="7" ry="22" fill="none" stroke="var(--primary)" stroke-width="1.2" opacity="0.55"/>
+        <ellipse cx="550" cy="120" rx="4.5" ry="14" fill="none" stroke="var(--primary)" stroke-width="1.2" opacity="0.55"/>
+        <path d="M 90 63 C 220 92 380 108 610 114" fill="none" stroke="var(--primary)" stroke-width="1" opacity="0.45"/>
+        <path d="M 90 177 C 220 148 380 132 610 126" fill="none" stroke="var(--primary)" stroke-width="1" opacity="0.45"/>
+        <path d="M 150 96 Q 210 106 268 104 Q 262 122 264 142 Q 210 132 158 140 Q 152 118 150 96 Z" fill="color-mix(in srgb, var(--gold) 30%, transparent)" stroke="var(--red)" stroke-width="2.5"/>
+        <text x="212" y="176" text-anchor="middle" class="lbl-s" fill="var(--red)">triangolo "magro": somma minore di 180°</text>
+        <text x="480" y="210" text-anchor="middle" class="lbl-s">pseudosfera: curvatura negativa costante</text>
+      </svg></div>
+
+      <p>Queste geometrie "impossibili" furono messe in piedi da Lobačevskij e Bolyai, ma a dar loro cittadinanza fu
+        <strong>Bernhard Riemann</strong>, allievo di <strong>Gauss</strong>: nella sua leggendaria lezione del 1854
+        generalizzò tutto — superfici di qualsiasi dimensione, con curvatura <strong>diversa da punto a punto</strong>
+        (le <em>varietà</em>). All'inizio sembravano giochi astratti, non cose "reali e applicabili"; ma fu proprio
+        l'<strong>autorità di Gauss</strong> — che aveva esplorato le stesse idee in segreto, temendo «le strida dei
+        beoti» — a convincere il mondo matematico che valeva la pena studiarle. Sessant'anni dopo, Einstein trovò
+        nella geometria di Riemann l'attrezzo che gli serviva: raramente un "gioco astratto" è stato più profetico.</p>
+
+      <h3>4.2 — Le geodetiche: la retta, generalizzata</h3>
+      <div class="definition">
+        Una <strong>geodetica</strong> è il percorso <strong>più breve</strong> tra due punti su una superficie (più
+        in generale: il percorso "più diritto possibile", quello che non sterza mai). Nel piano euclideo le geodetiche
+        sono le rette; sulla sfera i cerchi massimi; su una superficie qualsiasi, curve che possono apparire
+        tutt'altro che "dritte" a chi le guarda da fuori.
+      </div>
+
+      <p>Le compagnie aeree lo sanno benissimo: la rotta più breve tra Roma e New York non è la linea "dritta" sulla
+        carta geografica, ma un arco che sale verso la Groenlandia — dritto sulla sfera, curvo sulla mappa:</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 260" aria-label="Rotta aerea Roma-New York: la geodetica sulla sfera appare curva sulla mappa piatta">
+        <rect x="30" y="30" width="580" height="190" rx="10" fill="color-mix(in srgb, var(--primary) 6%, transparent)" stroke="var(--border)"/>
+        <line x1="30" y1="125" x2="610" y2="125" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 5"/>
+        <line x1="175" y1="30" x2="175" y2="220" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 5"/>
+        <line x1="320" y1="30" x2="320" y2="220" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 5"/>
+        <line x1="465" y1="30" x2="465" y2="220" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 5"/>
+        <text x="600" y="120" text-anchor="end" class="lbl-s">45° N</text>
+        <circle cx="490" cy="105" r="7" fill="var(--red)"/>
+        <text x="500" y="96" class="lbl">Roma</text>
+        <circle cx="130" cy="118" r="7" fill="var(--red)"/>
+        <text x="96" y="144" class="lbl">New York</text>
+        <line x1="130" y1="118" x2="490" y2="105" stroke="var(--muted)" stroke-width="2" stroke-dasharray="8 6"/>
+        <text x="310" y="140" text-anchor="middle" class="lbl-s">"dritta" sulla mappa: ≈ 7100 km</text>
+        <path d="M 130 118 Q 310 28 490 105" fill="none" stroke="var(--green)" stroke-width="3"/>
+        <text x="310" y="58" text-anchor="middle" class="lbl" fill="var(--green)">geodetica (via Groenlandia): ≈ 6900 km</text>
+      </svg></div>
+
+      <p>Tieni stretta questa idea: <strong>"andare dritto" dipende dalla geometria in cui ti muovi</strong>. Un
+        oggetto che non sterza mai può descrivere, visto sulla mappa sbagliata, una traiettoria curva. Tra poco questa
+        frase diventerà la teoria della gravitazione.</p>
+
+      <div class="curiosita">
+        <strong>Escher, il pittore delle geometrie.</strong> Le geometrie non euclidee hanno sedotto anche l'arte.
+        <strong>Maurits Cornelis Escher</strong>, dopo l'incontro con il geometra Coxeter, dedicò alla geometria a
+        curvatura negativa la serie <em>Circle Limit</em> (1958-60): pesci, angeli e demoni che affollano un disco,
+        sempre più piccoli verso il bordo... ai <em>nostri</em> occhi. Nella geometria iperbolica che il disco
+        rappresenta (il "disco di Poincaré"), tutte le figure hanno la <strong>stessa dimensione</strong>: è la
+        distanza a funzionare diversamente, e il bordo del disco è un orizzonte infinitamente lontano. Un intero
+        universo non euclideo appeso a una parete.
+      </div>
+    </section>
+
+    <!-- 5 — I TENSORI -->
+    <section id="sec5">
+      <h2>5. I tensori: leggi uguali per tutti</h2>
+
+      <h3>5.1 — Coordinate controvarianti (e covarianti)</h3>
+      <p>Secondo attrezzo. Ricordiamo il punto filosofico della lezione 8: un <strong>vettore</strong> è un oggetto
+        reale (una freccia nello spazio), ma le sue <strong>coordinate</strong> sono un punto di vista: dipendono dal
+        sistema di riferimento. C'è però una domanda che non ci siamo mai fatti: <em>come</em> dipendono? Prova a
+        cambiare il sistema di riferimento — allarga le unità di misura della griglia — e guarda che cosa fanno le
+        coordinate della freccia (che resta <strong>sempre la stessa</strong>):</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Unità di misura della griglia: <span class="val" id="cov-u-val">1.0</span></label>
+          <input type="range" id="cov-u" min="0.5" max="2.5" step="0.05" value="1"></div>
+        <div class="control-group"><label>Rotazione del sistema: <span class="val" id="cov-r-val">0</span>°</label>
+          <input type="range" id="cov-r" min="0" max="90" step="1" value="0"></div>
+      </div>
+      <div class="ckt"><svg id="cov-svg" viewBox="0 0 640 300" aria-label="Vettore fisso su griglia con unità variabile e assi ruotabili: le coordinate cambiano, il vettore no"></svg></div>
+      <p class="eq-out" id="cov-out"></p>
+
+      <p>Ecco il paradosso apparente: <strong>allargo</strong> le unità e le coordinate
+        <strong>rimpiccioliscono</strong>. È logico (se misuri il corridoio in metri anziché in centimetri, il numero
+        scende da 500 a 5), ma merita un nome: le coordinate dei vettori si dicono <strong>controvarianti</strong>,
+        perché variano <em>contro</em> il cambiamento delle unità. Esistono però anche grandezze che fanno l'opposto —
+        i <strong>covettori</strong>, le cui componenti variano <em>insieme</em> alle unità (<strong>covarianti</strong>).
+        L'esempio classico è una pendenza, "metri di salita <em>per</em> passo": se allargo il passo (l'unità), i
+        metri di salita per passo <strong>aumentano</strong>. Vettori e covettori sono i due modi complementari in cui
+        le grandezze fisiche possono reagire a un cambio di punto di vista. (E ricordi gli
+        <strong>pseudovettori</strong> della lezione sul campo magnetico, quelli che allo specchio si comportano
+        "male"? Terza famiglia dello stesso zoo: classificare gli oggetti in base a come si trasformano è uno dei
+        mestieri più fruttuosi della fisica.)</p>
+
+      <h3>5.2 — Che cos'è un tensore</h3>
+      <div class="definition">
+        Un <strong>tensore</strong> è la generalizzazione del vettore: una "tabella" di componenti (con uno, due o più
+        indici — vettori e covettori sono tensori a un indice) in cui ogni indice si trasforma in modo
+        <strong>controvariante o covariante</strong> secondo regole precise. La ricompensa di questa disciplina:
+        <strong>un'equazione scritta tra tensori, se vale in un sistema di riferimento, vale in tutti</strong>.
+      </div>
+
+      <p>Ecco perché i tensori sono lo strumento perfetto per il programma di Einstein: vogliamo leggi della fisica
+        valide per <em>ogni</em> osservatore, e le equazioni tensoriali sono esattamente le frasi che non cambiano
+        significato quando cambi lingua. Non a caso l'intera relatività generale sarà scritta in tensori — e il primo
+        l'abbiamo già incontrato senza dirlo: l'"intervallo" $s^2$ nasce da un tensore che presenteremo tra poco.</p>
+
+      <h3>5.3 — Tensori al lavoro: il tensore degli sforzi</h3>
+      <p>I tensori non servono solo allo spazio-tempo: sono pane quotidiano dell'<strong>ingegneria</strong>. Dentro
+        un materiale sotto carico, ogni faccetta immaginaria subisce una forza che dipende sia dall'orientazione della
+        faccetta sia dalla direzione della forza: per descrivere tutto serve una tabella 3×3, il <strong>tensore degli
+        sforzi</strong> $\sigma_{ij}$ = "forza in direzione $i$ sulla faccia orientata come $j$". Le componenti
+        diagonali sono <strong>trazioni/compressioni</strong>, quelle fuori diagonale sono <strong>tagli</strong>.
+        È con questo oggetto che si progettano ponti, carrozzerie... e le <strong>barriere di sicurezza</strong> in
+        autostrada: il guardrail deve deformarsi assorbendo l'urto senza tranciarsi — cioè mantenere gli sforzi, in
+        <em>ogni</em> punto e per <em>ogni</em> direzione d'urto, sotto i limiti del materiale. Prova a caricare il
+        quadratino di acciaio:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Trazione σₓₓ: <span class="val" id="str-t-val">40</span> MPa</label>
+          <input type="range" id="str-t" min="-80" max="80" step="5" value="40"></div>
+        <div class="control-group"><label>Taglio σₓᵧ: <span class="val" id="str-s-val">0</span> MPa</label>
+          <input type="range" id="str-s" min="-60" max="60" step="5" value="0"></div>
+      </div>
+      <div class="ckt"><svg id="str-svg" viewBox="0 0 640 300" aria-label="Tensore degli sforzi: elemento di materiale con trazione e taglio"></svg></div>
+      <p class="eq-out" id="str-out"></p>
+
+      <div class="note">
+        <strong>Due cose che saltano all'occhio nella tabella.</strong> Primo: le due componenti fuori diagonale sono
+        <strong>sempre uguali</strong> ($\sigma_{xy} = \sigma_{yx}$): non è un caso, è l'<em>equilibrio dei
+        momenti</em> — se i tagli sulle facce orizzontali e verticali non si bilanciassero esattamente, il quadratino
+        riceverebbe una coppia netta e si metterebbe a <strong>ruotare da solo</strong>, cosa che i guardrail
+        preferiscono evitare: il tensore degli sforzi è sempre <strong>simmetrico</strong>. Secondo: la componente
+        $\sigma_{yy}$ resta $0$ semplicemente perché in questa demo non stiamo tirando in verticale — è la trazione
+        sulla faccia orizzontale, e nessuno slider la carica; in un caso reale (il peso della barriera, l'urto
+        obliquo) anche lei si popola.
+      </div>
+    </section>
+
+    <!-- 6 — LA METRICA E LO SPAZIO-TEMPO DINAMICO -->
+    <section id="sec6">
+      <h2>6. La metrica: lo spazio-tempo diventa un sistema fisico</h2>
+
+      <h3>6.1 — Il tensore metrico $g_{\mu\nu}$</h3>
+      <p>Abbiamo gli attrezzi: assembliamoli. Che cosa distingue la sfera dal piano dalla sella? Un'unica cosa:
+        <strong>come si misurano le distanze</strong> in ogni punto. Questa informazione è codificata da un tensore a
+        due indici, il <strong>tensore metrico</strong> $g_{\mu\nu}$ — la "tabella" che, punto per punto, dice quanto
+        vale il quadrato della distanza tra due punti vicinissimi:</p>
+
+      <div class="formula-box">
+        $$ds^2 = \sum_{\mu,\nu} g_{\mu\nu}\; dx^{\mu}\, dx^{\nu}$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">"il righello locale": conoscere $g_{\mu\nu}$ in ogni punto significa conoscere l'intera geometria della varietà</p>
+      </div>
+
+      <p>La conosciamo già, senza saperlo. Nello spazio-tempo piatto della relatività ristretta l'intervallo era
+        $s^2 = (c\,t)^2 - x^2 - y^2 - z^2$: è la formula qui sopra con $g_{\mu\nu}$ <strong>costante</strong>, la
+        tabella con $+1, -1, -1, -1$ sulla diagonale (la metrica di Minkowski). La relatività generale fa il passo
+        decisivo: lascia che $g_{\mu\nu}$ <strong>vari da punto a punto</strong> — che lo spazio-tempo, come le
+        varietà di Riemann, possa essere curvo, e curvo in modo diverso qua e là.</p>
+
+      <p>Le conseguenze filosofiche sono enormi. Per Newton lo spazio (e il tempo) era un <strong>palcoscenico</strong>:
+        rigido, assoluto, indifferente allo spettacolo che vi si recita sopra. Ora il palcoscenico ha una geometria
+        che può cambiare: lo spazio-tempo è diventato un <strong>sistema fisico a tutti gli effetti</strong>, con una
+        sua dinamica — qualcosa che si deforma, vibra, evolve, e di cui la fisica deve scrivere le equazioni del
+        moto.</p>
+
+      <h3>6.2 — Evoluzione... rispetto a che cosa? L'universo a blocco</h3>
+      <p>Ma qui c'è una sottigliezza vertiginosa: "dinamica" ed "evoluzione" significano <em>cambiare nel tempo</em> —
+        e il tempo è <strong>dentro</strong> lo spazio-tempo, non fuori! La descrizione più onesta è allora quella
+        <strong>"solida"</strong>: immagina un universo con due sole dimensioni spaziali (un foglio) e impila i fogli
+        lungo la terza dimensione, che è il tempo. Il risultato è un <strong>blocco</strong> quadridimensionale che
+        contiene tutta la storia in una volta: ogni fetta è un istante, la tua vita è un filo che attraversa il
+        blocco (la tua linea di universo), e il blocco... non evolve: <strong>è</strong>.</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 260" aria-label="Universo a blocco: fette di spazio impilate lungo il tempo">
+        <g transform="translate(60,0)">
+        <polygon points="60,200 300,200 360,160 120,160" fill="color-mix(in srgb, var(--primary) 14%, transparent)" stroke="var(--primary)" stroke-width="2"/>
+        <polygon points="60,140 300,140 360,100 120,100" fill="color-mix(in srgb, var(--primary) 11%, transparent)" stroke="var(--primary)" stroke-width="1.6"/>
+        <polygon points="60,80 300,80 360,40 120,40" fill="color-mix(in srgb, var(--primary) 8%, transparent)" stroke="var(--primary)" stroke-width="1.4"/>
+        <path d="M 170 190 C 200 160 160 120 200 95 C 225 78 235 70 240 62" fill="none" stroke="var(--red)" stroke-width="3"/>
+        <circle cx="170" cy="190" r="5" fill="var(--red)"/>
+        <circle cx="240" cy="62" r="5" fill="var(--red)"/>
+        <text x="255" y="60" class="lbl" fill="var(--red)">la tua linea di universo</text>
+        <text x="30" y="205" text-anchor="end" class="lbl-s">oggi</text>
+        <text x="30" y="145" text-anchor="end" class="lbl-s">domani</text>
+        <text x="30" y="85" text-anchor="end" class="lbl-s">dopodomani</text>
+        <line x1="415" y1="200" x2="415" y2="50" stroke="var(--text-soft)" stroke-width="2"/>
+        <polygon points="415,44 408,58 422,58" fill="var(--text-soft)"/>
+        <text x="428" y="120" class="lbl-s">tempo</text>
+        </g>
+      </svg></div>
+
+      <p>In questa visione, conoscendo una fetta (il presente) e le leggi, le fette successive sono
+        <strong>già determinate</strong>: tutto è già scritto nel blocco. Suona sconvolgente, ma è un
+        <strong>determinismo</strong> che la fisica si portava dietro da sempre: anche nella meccanica di Newton,
+        conoscendo posizioni e velocità iniziali si può calcolare — in linea di principio — tutto il futuro (è il
+        celebre "demone" di Laplace). La relatività si limita a renderlo <em>visibile</em>, scolpendolo nella
+        geometria. (Se la cosa vi turba: tranquilli, ci penserà la meccanica quantistica a rimettere il caso nel
+        mazzo.)</p>
+
+      <h3>6.3 — La gravità non è una forza: è geometria</h3>
+      <p>E finalmente possiamo rispondere alla domanda che ci trasciniamo da mesi: <strong>che cos'è l'interazione a
+        distanza?</strong> Come fa il Sole a "tirare" la Terra attraverso 150 milioni di km di vuoto? Risposta della
+        relatività generale: <strong>non la tira affatto</strong>.</p>
+
+      <div class="rule">
+        Una massa <strong>non agisce direttamente</strong> sulle altre masse: <strong>deforma lo spazio-tempo</strong>
+        intorno a sé (cambia $g_{\mu\nu}$). Gli altri corpi non subiscono forze: si muovono <strong>"dritti"</strong>
+        — lungo le <strong>geodetiche</strong> — in uno spazio-tempo che non è più dritto. Come disse John Wheeler:
+        «lo spazio-tempo dice alla materia come muoversi; la materia dice allo spazio-tempo come curvarsi».
+      </div>
+
+      <p>La Terra, quindi, non "curva" intorno al Sole: va sempre dritta — nel senso delle geodetiche, l'unico
+        "dritto" che la geometria le offre — ed è lo spazio-tempo a essere curvo. Guarda che cosa fa una massa alla
+        griglia (e a un raggio di luce di passaggio):</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Massa centrale: <span class="val" id="grv-m-val">0.5</span></label>
+          <input type="range" id="grv-m" min="0" max="1" step="0.05" value="0.5"></div>
+      </div>
+      <div class="ckt"><svg id="grv-svg" viewBox="0 0 640 320" aria-label="Griglia dello spazio-tempo deformata da una massa, con raggio di luce deviato"></svg></div>
+      <p class="eq-out" id="grv-out"></p>
+
+      <div class="curiosita">
+        <strong>Il lensing gravitazionale: l'universo come lente.</strong> La deviazione della luce non è solo una
+        conferma storica: oggi è uno <strong>strumento di lavoro</strong>. Una galassia o un ammasso di galassie,
+        curvando lo spazio-tempo, piega la luce degli oggetti retrostanti esattamente come una <strong>lente</strong>:
+        le immagini si deformano in archi, si sdoppiano (fino a quattro copie: la "croce di Einstein") o, con
+        l'allineamento perfetto, si chiudono in un <strong>anello di Einstein</strong> completo. Gli astronomi usano
+        queste distorsioni in due modi geniali: come <strong>bilancia</strong> — dall'intensità del lensing si ricava
+        quanta massa c'è nella lente, materia oscura compresa (ne riparleremo tra poco) — e come <strong>telescopio
+        gratuito</strong>: l'ingrandimento gravitazionale permette di vedere galassie così lontane e deboli che
+        nessuno strumento umano, da solo, potrebbe raggiungerle.
+      </div>
+
+      <div class="note">
+        <strong>Allora Tolomeo aveva ragione?</strong> Un colpo di scena: se ogni corpo segue semplicemente la propria
+        geodetica, e le leggi valgono in <em>ogni</em> sistema di riferimento, allora descrivere il moto "con la Terra
+        ferma al centro" (geocentrismo) o "con il Sole fermo" (eliocentrismo) sono entrambe scelte matematicamente
+        <strong>lecite</strong>: si tratta solo di decidere da quale sistema di riferimento osservare le stesse
+        geodetiche! Il sistema eliocentrico resta enormemente più <em>comodo</em> (la matematica è immensamente più
+        semplice, e le "forze" fittizie spariscono), ma nessun sistema è più "vero" in senso assoluto. Galileo e il
+        cardinal Bellarmino, in un certo senso, litigavano su una domanda mal posta — ma non ditelo a nessuno dei due.
+      </div>
+
+      <div class="curiosita">
+        <strong>Il pensiero più felice.</strong> La scintilla di tutto, Einstein la raccontò così: «ero seduto
+        all'ufficio brevetti quando mi venne il pensiero più felice della mia vita: <em>una persona in caduta libera
+        non sente il proprio peso</em>». In un ascensore che precipita (o su una stazione spaziale!) la gravità
+        localmente <strong>scompare</strong>; in un razzo che accelera, ne compare una indistinguibile da quella vera.
+        È il <strong>principio di equivalenza</strong>: gravità e accelerazione sono localmente la stessa cosa — il
+        ponte fisico che collega la caduta dei gravi alla geometria dei sistemi di riferimento. Il principio ha una
+        conseguenza misurabile: la <strong>massa inerziale</strong> (quella di $F = ma$, la resistenza ad accelerare)
+        e la <strong>massa gravitazionale</strong> (quella del peso, la "carica" della gravità) devono essere
+        <strong>esattamente uguali</strong> — altrimenti corpi diversi cadrebbero diversamente e l'ascensore non
+        cancellerebbe la gravità per tutti. È una delle affermazioni più torturate dagli sperimentali: dalle bilance
+        di torsione di Eötvös in poi, fino al satellite MICROSCOPE (2022), l'uguaglianza è stata verificata con
+        precisioni <strong>enormi</strong> — oggi a una parte su $10^{15}$: se le due masse differissero, sarebbe di
+        meno di un millesimo di miliardesimo di percento.
+      </div>
+    </section>
+
+    <!-- 7 — L'EQUAZIONE DI CAMPO -->
+    <section id="sec7">
+      <h2>7. L'equazione di campo di Einstein</h2>
+
+      <p>Resta da scrivere la legge: <em>quanto</em> si curva lo spazio-tempo, data la materia? La risposta —
+        novembre 1915 — sta in una riga:</p>
+
+      <div class="formula-box">
+        $$R_{\mu\nu} - \frac{1}{2}\,R\,g_{\mu\nu} = \frac{8\pi G}{c^4}\, T_{\mu\nu}$$
+      </div>
+
+      <p>Non spaventatevi dei simboli: presentiamo il <em>cast</em>, un membro alla volta.</p>
+      <ul>
+        <li>$g_{\mu\nu}$ è la nostra <strong>metrica</strong>: l'incognita dell'equazione! Risolvere le equazioni di
+          campo significa trovare la geometria dello spazio-tempo.</li>
+        <li>$R_{\mu\nu}$ è il <strong>tensore di Ricci</strong> — sì, proprio il Ricci-Curbastro della sezione 1: la
+          sua iniziale è scolpita nell'equazione più famosa della fisica. Si costruisce dalla metrica e misura la
+          <strong>curvatura</strong> punto per punto; è il "riassunto" a due indici del tensore di curvatura di
+          <strong>Riemann</strong>, l'oggetto (a quattro indici!) che cataloga la curvatura in modo completo — nella
+          sezione facoltativa sul trasporto parallelo vedremo da dove salta fuori.</li>
+        <li>$R$ è la <strong>curvatura scalare</strong>: un riassunto ancora più spinto — un semplice
+          <strong>numero</strong> in ogni punto, ottenuto "sommando" il tensore di Ricci. Positivo dove lo
+          spazio-tempo è curvo "a sfera", negativo dove è curvo "a sella": è il pronipote quadridimensionale della
+          curvatura dei nostri triangoli grassi e magri.</li>
+        <li>$T_{\mu\nu}$ è il <strong>tensore energia-impulso</strong>: il censimento di tutta la materia e l'energia
+          presenti — densità, flussi, pressioni (è il cugino spaziotemporale del tensore degli sforzi, non a caso ha
+          lo stesso aspetto).</li>
+        <li>$G$ e $c$ sono le vecchie conoscenze: la costante di gravitazione e la velocità della luce, lì per far
+          tornare le unità di misura.</li>
+      </ul>
+      <p>Morale del cast: a <strong>sinistra</strong> c'è solo <strong>geometria</strong>, a <strong>destra</strong>
+        c'è solo <strong>contenuto</strong>. In mezzo, un segno di uguale:</p>
+
+      <div class="rule">
+        $$\text{curvatura dello spazio-tempo} \;=\; \text{materia ed energia contenute}$$
+        La frase di Wheeler, diventata equazione. Un'equazione <strong>tensoriale</strong>: vale per ogni osservatore,
+        in ogni sistema di riferimento — l'obiettivo della sezione 1 è raggiunto. Ed è per questa densità — tutta la
+        gravitazione dell'universo in una riga che si legge ad alta voce — che i fisici la considerano la teoria più
+        <strong>elegante</strong> mai scritta: pochissime ipotesi, nessun ingranaggio nascosto, e dentro ci sono
+        Newton (come limite per campi deboli), le orbite, le maree, i buchi neri, le onde gravitazionali e la storia
+        dell'universo intero.
+      </div>
+
+      <p>C'è però un prezzo, ed è salato: l'equazione <strong>non è lineare</strong>. Il campo (lo spazio-tempo) dice
+        alla materia e all'energia come muoversi, ma la materia — muovendosi — <strong>modifica il campo</strong>, che a
+        sua volta cambia il moto della materia, che... E non basta: la deformazione dello spazio-tempo trasporta essa
+        stessa energia, quindi <strong>la gravità genera gravità</strong>. Questo circolo vizioso rende le equazioni
+        di campo <strong>difficilissime da risolvere</strong>, anche per i più bravi: in più di un secolo, le
+        soluzioni esatte conosciute si contano sulle dita — e quasi ognuna ha cambiato la fisica.</p>
+    </section>
+
+    <!-- 8 — SOLUZIONI PARTICOLARI -->
+    <section id="sec8">
+      <h2>8. Due soluzioni da leggenda: il vuoto e il buco nero</h2>
+
+      <h3>8.1 — Lo spazio-tempo vuoto: la metrica di Minkowski</h3>
+      <p>La soluzione più semplice: universo <strong>vuoto</strong>, $T_{\mu\nu} = 0$ dappertutto. L'equazione di campo
+        diventa $R_{\mu\nu} - \tfrac{1}{2}R\,g_{\mu\nu} = 0$: nessuna sorgente, nessuna curvatura. La soluzione è la
+        <strong>metrica di Minkowski</strong> $\eta_{\mu\nu}$ — scriviamola esplicitamente:</p>
+
+      <div class="formula-box">
+        $$g_{\mu\nu} = \eta_{\mu\nu} = \begin{pmatrix} +1 & 0 & 0 & 0 \\ 0 & -1 & 0 & 0 \\ 0 & 0 & -1 & 0 \\ 0 & 0 & 0 & -1 \end{pmatrix}$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">la «tabella» più semplice: <strong>costante</strong> ovunque,
+        diagonale con $+1$ per il tempo e $-1$ per le tre direzioni spaziali. Il suo $ds^2$ è esattamente
+        $(c\,dt)^2 - dx^2 - dy^2 - dz^2$: lo spazio-tempo piatto della relatività ristretta</p>
+      </div>
+
+      <p>Questa metrica, essendo costante ovunque nello spazio e nel tempo, implica banalmente che la curvatura sia
+        esattamente zero: è il buon vecchio spazio-tempo piatto, dove ritroviamo per intero la relatività ristretta (che
+        della generale è appunto il caso particolare senza gravità). Rassicurante: senza materia, niente curvatura...
+        anche se, vedremo tra poco, l'universo reale ha in serbo una sorpresa proprio qui. (Se siete curiosi, dopo aver
+        letto la <strong>sezione 12 (facoltativa)</strong>, potrete verificare per esercizio che, con questa metrica, il
+        tensore di Riemann e quello di Ricci si annullano davvero).</p>
+
+      <p>Ma questa è una soluzione <em>locale</em>: la metrica nelle vicinanze di una massa dipende dalla massa stessa
+        (e sarà la soluzione di Schwarzschild, tra un momento). A <strong>livello globale</strong>, la domanda diventa
+        un'altra: qual è la geometria dell'universo nel suo insieme? Viviamo in uno spazio-tempo globalmente piatto,
+        a curvatura positiva (come la sfera) o negativa (come la sella)?</p>
+
+      <p>Il metodo è concettualmente semplice, e lo conosciamo già dalla sezione 3: prendi <strong>tre punti molto
+        lontani</strong> — per esempio tre stelle o, meglio ancora, tre sorgenti nel fondo cosmico a miliardi di anni
+        luce — e studia il triangolo che formano. Se la somma degli angoli è <strong>esattamente 180°</strong>,
+        viviamo in un universo piatto; se è <strong>maggiore</strong>, la curvatura globale è positiva (spazio «chiuso»,
+        come la superficie di una sfera); se è <strong>minore</strong>, è negativa (spazio «aperto», come una sella
+        infinita).</p>
+
+      <p>In pratica è complicatissimo — le «stelle» sono le fluttuazioni della <strong>radiazione cosmica di
+        fondo</strong> (CMB), e il «triangolo» è lo schema delle macchie calde e fredde nell'immagine più antica
+        dell'universo, 380.000 anni dopo il Big Bang. I satelliti <strong>WMAP</strong> (2003) e
+        <strong>Planck</strong> (2015) hanno misurato le dimensioni angolari di queste macchie con precisione
+        straordinaria, e il verdetto è: la somma degli angoli è $180°$ <strong>entro un margine dell'1%</strong>.
+        L'universo, su scala globale, è piatto — o vicinissimo a esserlo. È uno dei risultati più sorprendenti della
+        cosmologia: tra infinite geometrie possibili, la natura sembra aver scelto quella che sta esattamente sul
+        filo tra curvatura positiva e negativa.</p>
+
+      <h3>8.2 — Schwarzschild e il buco nero</h3>
+      <p>La prima soluzione esatta <em>non banale</em> arrivò a tempo di record — e in circostanze incredibili.
+        Nell'inverno 1915-16 <strong>Karl Schwarzschild</strong>, astronomo tedesco arruolato <strong>al fronte
+        russo</strong>, lesse l'articolo di Einstein e in poche settimane, tra una granata e l'altra, risolse le
+        equazioni per il caso di una massa sferica isolata: la geometria attorno a una stella. Morì pochi mesi dopo;
+        la sua soluzione è oggi su ogni libro di fisica. E contiene un numero magico: il <strong>raggio di
+        Schwarzschild</strong>,</p>
+
+      <div class="formula-box">
+        $$r_s = \frac{2\,G\,M}{c^2}$$
+      </div>
+
+      <p>Se tutta la massa $M$ viene compressa <strong>dentro</strong> il proprio $r_s$, la curvatura si strozza:
+        entro quella superficie — l'<strong>orizzonte degli eventi</strong> — le geodetiche puntano tutte verso
+        l'interno, e nemmeno la luce può più uscire. È un <strong>buco nero</strong>: una regione da cui l'universo
+        esterno non riceve più nulla. Quanto bisogna comprimere? Prova:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Massa (in masse solari, scala logaritmica): <span class="val" id="rs-m-val">1</span></label>
+          <input type="range" id="rs-m" min="-6" max="9" step="0.5" value="0"></div>
+      </div>
+      <div class="ckt"><svg id="rs-svg" viewBox="0 0 640 150" aria-label="Calcolatore del raggio di Schwarzschild"></svg></div>
+      <p class="eq-out" id="rs-out"></p>
+
+      <div class="curiosita">
+        <strong>«Mostruosità matematiche» (e la scommessa di Hawking).</strong> Per decenni quasi nessuno credette che
+        i buchi neri fossero oggetti <em>reali</em>: lo stesso Einstein li considerava patologie della matematica, che
+        la natura avrebbe evitato con qualche pudore. Anche a fisica matura, la prudenza restò proverbiale:
+        nel 1974 <strong>Stephen Hawking</strong> — l'uomo che ai buchi neri aveva dedicato la carriera — scommise con
+        Kip Thorne che la sorgente X <strong>Cygnus X-1</strong> <em>non</em> fosse un buco nero. Una polizza
+        d'assicurazione, spiegò: se i buchi neri non fossero esistiti, il lavoro di una vita svaniva, ma almeno
+        avrebbe vinto la scommessa. Le prove si accumularono, e nel 1990 Hawking capitolò firmando la resa
+        (il premio pattuito — un abbonamento a una rivista per adulti per Thorne — scandalizzò la signora Thorne).
+        Oggi il dubbio non esiste più: nel 2019 l'Event Horizon Telescope ha <strong>fotografato</strong> l'ombra del
+        buco nero di M87, e al centro della Via Lattea le stelle orbitano vertiginosamente attorno a Sagittarius A*
+        (Nobel 2020). Le "mostruosità" sono cittadine dell'universo a pieno titolo.
+      </div>
+
+      <h3>8.3 — Il tempo rallenta dove la gravità è più forte</h3>
+      <p>La metrica di Schwarzschild non descrive solo l'orizzonte degli eventi: contiene un altro effetto
+        straordinario che non richiede un buco nero — basta una qualsiasi massa. Guardiamo la componente
+        temporale della metrica:</p>
+
+      <div class="formula-box">
+        $$d\tau^2 = \left(1 - \frac{r_s}{r}\right)\, dt^2 - \ldots$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">il fattore $\left(1 - r_s/r\right)$ davanti a $dt^2$ dice che
+        il <strong>tempo proprio</strong> $d\tau$ (quello dell'orologio locale) è sempre minore del tempo coordinato
+        $dt$ (quello di un orologio lontanissimo dalla massa). Più si è vicini alla massa ($r$ piccolo), più il
+        fattore si riduce — più il tempo <strong>rallenta</strong></p>
+      </div>
+
+      <p>Il risultato è spiazzante: <strong>il tempo non scorre per tutti nello stesso modo</strong>. Un orologio in
+        cantina — più vicino al centro della Terra — ticchetta leggermente più lentamente di uno in soffitta. Al
+        piano terra di un grattacielo invecchi un pochino di meno che all'ultimo piano. All'orizzonte degli eventi
+        di un buco nero, il fattore $(1 - r_s/r)$ va a zero: un osservatore lontano vede il tempo
+        <strong>fermarsi</strong> sulla superficie del buco nero — un orologio che cade dentro sembra rallentare
+        all'infinito, senza mai oltrepassare l'orizzonte (dal suo punto di vista, naturalmente, attraversa
+        l'orizzonte in un tempo finito: la relatività è spietata nel distinguere i punti di vista).</p>
+
+      <div class="note">
+        <strong>Misurato e verificato.</strong> La dilatazione gravitazionale del tempo non è speculazione teorica —
+        è stata misurata con precisione crescente:
+        <ul style="margin-top:0.5rem;">
+          <li><strong>Pound e Rebka (1959)</strong>: alla Harvard Tower, alta appena 22,5 metri, misurarono lo
+            spostamento verso il rosso di fotoni gamma tra la base e la cima: la frequenza cambiava di due parti su
+            $10^{15}$ — esattamente il valore previsto dalla relatività.</li>
+          <li><strong>Il GPS (ogni giorno)</strong>: i satelliti GPS orbitano a circa 20.200 km, dove la gravità è
+            più debole. I loro orologi corrono $+45\,\mu$s al giorno rispetto a quelli a terra (parzialmente
+            compensati dai $-7\,\mu$s della dilatazione da velocità). Senza correzioni relativistiche, il GPS
+            accumulerebbe <strong>circa 10 km di errore al giorno</strong>.</li>
+          <li><strong>Orologi ottici NIST (2010)</strong>: gli orologi atomici di ultima generazione sono così
+            precisi che i fisici del NIST (National Institute of Standards and Technology) hanno misurato la
+            dilatazione gravitazionale tra due orologi separati da appena <strong>33 centimetri</strong> di
+            altezza: quello più in basso ticchettava più lentamente, esattamente come previsto. Trentatré centimetri
+            — e la relatività generale è lì.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 9 — L'ESPANSIONE DELL'UNIVERSO -->
+    <section id="sec9">
+      <h2>9. L'universo si espande (ma dentro che cosa?)</h2>
+
+      <p>Se lo spazio-tempo è un sistema fisico con la sua dinamica, la domanda diventa inevitabile: e la geometria
+        dell'universo <em>intero</em>, che cosa fa? La risposta arrivò dall'osservazione. Negli anni Venti
+        <strong>Edwin Hubble</strong>, misurando la luce delle galassie, scoprì che i loro spettri sono quasi tutti
+        <strong>spostati verso il rosso</strong> (il <em>redshift</em> — su come la luce "sente" il moto delle
+        sorgenti, l'effetto Doppler e gli spettri delle stelle torneremo in lezioni dedicate, quando parleremo di
+        emissione e meccanica quantistica). E c'era una regola: più una galassia è lontana, maggiore è il suo
+        redshift. Tradotto:</p>
+
+      <div class="formula-box">
+        $$v = H_0 \, d$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">legge di Hubble (1929): ogni galassia si allontana con velocità proporzionale alla sua distanza $d$.
+        La costante di Hubble vale $H_0 \approx 70$ km/s per megaparsec (1 Mpc $\approx 3{,}26$ milioni di anni luce):
+        ogni megaparsec di distanza in più aggiunge $70$ km/s di fuga</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>Quanto vale, esattamente, $H_0$?</strong> Dipende da chi lo misura — e non è una battuta: i metodi
+        basati sull'universo primordiale danno $\approx 67$ km/s/Mpc, quelli basati sulle stelle vicine
+        $\approx 73$. Le barre d'errore si sono strette al punto che i due valori <strong>non sono più
+        compatibili</strong>: è la "tensione di Hubble", uno dei gialli aperti più caldi della cosmologia attuale.
+        Forse un errore nascosto, forse — sperano in molti — l'indizio di fisica nuova.
+      </div>
+
+      <p><strong>Tutto si allontana da tutto</strong> — e non perché siamo noi il centro dell'esplosione: ogni
+        osservatore, in qualsiasi galassia, vede la stessa cosa. Ma allora... l'universo si sta espandendo
+        <em>dentro che cosa</em>? Dove sarebbe il "bordo" che avanza?</p>
+
+      <p>La risposta della relatività generale è spiazzante: <strong>da nessuna parte</strong>. Non è l'universo che
+        si muove dentro qualcosa: è la <strong>metrica</strong> che cambia nel tempo — il modo stesso di calcolare le
+        distanze si aggiorna, e tutte le distanze crescono. L'analogia classica: disegna due punti su un
+        <strong>palloncino</strong> e gonfialo. I punti si allontanano, ma non perché camminano sulla gomma: è il
+        <strong>tessuto</strong> che si dilata sotto di loro. Solo che — ecco il salto — <strong>non c'è nessun
+        palloncino</strong>: non serve una stanza intorno né un "dentro" da riempire; a cambiare è la regola con cui
+        lo spazio misura se stesso. Guarda:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Fattore di scala a(t): <span class="val" id="exp-a-val">1.0</span></label>
+          <input type="range" id="exp-a" min="1" max="2.5" step="0.05" value="1"></div>
+      </div>
+      <div class="ckt"><svg id="exp-svg" viewBox="0 0 640 320" aria-label="Griglia dell'universo che si dilata: le galassie restano ferme nelle loro caselle ma le distanze crescono"></svg></div>
+      <p class="eq-out" id="exp-out"></p>
+
+      <div class="note">
+        <strong>Due dettagli da custodire.</strong> Primo: le galassie sono <em>ferme</em> nelle loro "caselle"
+        (coordinate comoventi) — non viaggiano <em>attraverso</em> lo spazio, è lo spazio a dilatarsi (per questo
+        l'espansione non viola il muro della velocità della luce: nulla si sta <em>muovendo</em>). Secondo: guarda
+        i numeri della demo — la galassia a distanza doppia si allontana a velocità doppia. La legge di Hubble non è
+        un'ipotesi in più: è la conseguenza automatica di una metrica che si dilata uniformemente.
+      </div>
+
+      <h3>9.1 — La costante cosmologica: il «più grave errore» (che forse non lo era)</h3>
+      <p>Ecco un colpo di scena che la storia della fisica tiene in serbo. Le equazioni di campo di Einstein, nella
+        loro forma più generale, ammettono un termine in più — un termine che Einstein stesso aggiunse nel 1917,
+        poi rinnegò, e che oggi è tornato al centro della cosmologia:</p>
+
+      <div class="formula-box">
+        $$R_{\mu\nu} - \frac{1}{2}\,R\,g_{\mu\nu} \;+\; \Lambda\, g_{\mu\nu} = \frac{8\pi G}{c^4}\, T_{\mu\nu}$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">l'equazione di campo con la <strong>costante cosmologica</strong>
+        $\Lambda$: un unico numero che, moltiplicato per la metrica, aggiunge un'«energia del vuoto» — uno spazio-tempo
+        che <em>spinge</em> anche dove non c'è nulla</p>
+      </div>
+
+      <p>Perché Einstein la introdusse? Nel 1917 l'idea di un universo in espansione era impensabile: tutti — Einstein
+        compreso — davano per scontato un universo <strong>statico</strong>, eterno e immutabile. Ma le equazioni,
+        senza $\Lambda$, non consentivano una soluzione statica stabile: la gravità avrebbe fatto collassare tutto.
+        Einstein aggiunse $\Lambda$ come un <strong>contrappeso</strong>: una «pressione negativa» del vuoto stesso,
+        calibrata per bilanciare esattamente la gravità e tenere l'universo fermo — un equilibrio perfetto, scritto
+        nell'equazione.</p>
+
+      <p>Poi, nel 1929, Hubble osservò che le galassie si allontanano: l'universo non era affatto statico. Einstein
+        non la prese bene. Eliminò $\Lambda$, definendola — secondo il racconto del fisico George Gamow — il
+        <strong>«più grave errore della mia carriera»</strong> (<em>die größte Eselei meines Lebens</em>, letteralmente
+        «la più grande asinata della mia vita»). Aveva aggiunto un termine ad hoc per difendere un pregiudizio, e la
+        natura l'aveva smentito.</p>
+
+      <p>Ma la storia ha un secondo colpo di scena. Nel 1998 due gruppi indipendenti di astronomi (Saul Perlmutter
+        da una parte, Brian Schmidt e Adam Riess dall'altra — Nobel 2011) scoprirono che l'espansione dell'universo
+        non sta rallentando, come ci si aspetterebbe dalla frenata gravitazionale: sta <strong>accelerando</strong>.
+        Qualcosa sta <em>spingendo</em> — e quel qualcosa si comporta esattamente come una costante cosmologica
+        positiva. Così $\Lambda$ è tornata nell'equazione, non più come un trucco per tenere fermo l'universo, ma
+        come la migliore descrizione di un'<strong>energia oscura</strong> che pervade il vuoto e ne accelera la
+        dilatazione. Il «più grave errore» potrebbe rivelarsi, con sommo imbarazzo postumo, una delle intuizioni
+        più profonde.</p>
+
+      <h3>9.2 — Il Big Bang: il film dell'universo, riavvolto</h3>
+      <p>Se tutto si allontana da tutto, è naturale premere «riavvolgi»: tornando indietro nel tempo, tutte le
+        galassie si riavvicinano, la materia si addensa, la temperatura sale — fino a un istante iniziale in cui
+        l'intero universo osservabile era compresso in una regione <strong>incredibilmente piccola, calda e
+        densa</strong>. È il <strong>Big Bang</strong>: non un'esplosione <em>in</em> uno spazio preesistente (lo
+        abbiamo detto: non c'è un «fuori»), ma l'inizio stesso dello spazio, del tempo e di tutta la fisica. La
+        prova più celebre: la <strong>radiazione cosmica di fondo</strong> (CMB), il «bagliore residuo» del
+        Big Bang — luce emessa quando l'universo aveva circa 380.000 anni e finalmente si raffreddò abbastanza
+        da diventare trasparente: è ancora lì, dappertutto, a una temperatura di 2,725 K
+        ($-270{,}4\,°\text{C}$), scoperta per caso da Penzias e Wilson nel 1965 (Nobel 1978) mentre
+        cercavano di eliminare un disturbo dall'antenna — il disturbo era l'universo neonato.</p>
+
+      <h3>9.3 — Il destino dell'universo: tre scenari</h3>
+      <p>L'espansione continuerà per sempre? Dipende dalla partita tra due avversari: l'<strong>inerzia
+        dell'espansione</strong> (il «lancio» iniziale del Big Bang) e la <strong>gravità</strong> (il
+        «richiamo» di tutta la massa contenuta). I modelli cosmologici attuali delineano essenzialmente due scenari
+        principali — più un terzo, meno popolare:</p>
+
+      <ol>
+        <li><strong>Espansione eterna</strong> (<em>Big Freeze</em>). Se la densità media dell'universo è al di sotto
+          di un valore critico — cioè se <strong>non c'è abbastanza massa</strong> per frenare il lancio — l'espansione
+          vince: le galassie si allontanano per sempre, le stelle si spengono una ad una e l'universo si avvia verso un
+          futuro freddo, buio e sempre più rarefatto. Con l'energia oscura ($\Lambda > 0$) il processo addirittura
+          <strong>accelera</strong>: è lo scenario oggi favorito dai dati.</li>
+        <li><strong>Il Grande Collasso</strong> (<em>Big Crunch</em>). Se la densità supera il valore critico —
+          <strong>abbastanza massa</strong> da vincere l'espansione — la gravità alla fine prevale: l'universo
+          rallenta, si ferma e inizia a <strong>contrarsi</strong>, comprimendosi di nuovo verso un punto —
+          un Big Bang al contrario. Alcuni fisici hanno speculato che dal Big Crunch potrebbe nascere un
+          <strong>nuovo</strong> Big Bang, avviando un <strong>universo ciclico</strong>: un'eternità di espansioni
+          e contrazioni, come un cuore cosmico che batte.</li>
+        <li><strong>L'universo stazionario</strong> (<em>Steady State</em>). Un'idea affascinante ma oggi
+          abbandonata: l'universo è <strong>eterno e immutabile nella media</strong>. Fu proposta nel 1948
+          dall'astrofisico britannico <strong>Fred Hoyle</strong> (insieme a Bondi e Gold): l'espansione è reale,
+          ma la materia si <strong>crea continuamente</strong> dal nulla, compensando la diluizione. Nessun inizio,
+          nessuna fine: un universo sempre uguale a se stesso. Ironia della storia: fu proprio Hoyle — scettico
+          del Big Bang — a coniare il termine «Big Bang», usandolo con intento sprezzante in una trasmissione radio
+          della BBC nel 1949. Il nome gli si rivoltò contro: piacque a tutti e restò. La scoperta della radiazione
+          cosmica di fondo nel 1965 inflisse il colpo di grazia al modello stazionario: quell'eco dell'universo
+          primordiale non aveva posto in un cosmo senza inizio.</li>
+      </ol>
+
+      <div class="curiosita">
+        <strong>Sant'Agostino e il tempo prima del tempo.</strong> «Che cosa faceva Dio prima di creare il cielo e
+        la Terra?» — la domanda beffarda fu posta a <strong>sant'Agostino d'Ippona</strong> nel V secolo. La risposta
+        che diede nelle <em>Confessioni</em> (XI, 13) è di una modernità stupefacente: <em>«Non vi fu un tempo
+        prima che Tu creassi il tempo. Se il cielo e la terra non esistevano, non esisteva neppure un "allora": non
+        c'era un "prima" di cui parlare»</em>. Milleseicento anni dopo, la relatività generale dice la stessa cosa
+        con i tensori: se lo spazio-tempo ha avuto un inizio (il Big Bang), il tempo stesso è nato con lui — il
+        concetto di «prima del Big Bang» è privo di significato, come chiedere cosa c'è a nord del Polo Nord.
+        Sant'Agostino e Einstein, senza saperlo, erano d'accordo.
+      </div>
+    </section>
+
+    <!-- 10 — INTERLUDIO: I VIAGGI NEL TEMPO -->
+    <section id="sec10">
+      <h2>10. Interludio: manuale narrativo dei viaggi nel tempo</h2>
+
+      <p>Uno spazio-tempo che si curva, si dilata e si lascia percorrere da linee di universo ha ovviamente
+        scatenato la fantasia — anche perché, sulla carta, le equazioni di Einstein ammettono soluzioni con
+        scorciatoie temporali (l'universo rotante di Gödel, i wormhole...). Nessuna sembra realizzabile, ma i
+        narratori non aspettavano il permesso. Quattro sono gli stili con cui le storie maneggiano il tempo:</p>
+
+      <ul>
+        <li><strong>1. La linea temporale fissa (autoconsistente).</strong> Il passato non si può cambiare, perché il
+          tuo viaggio <em>ne ha sempre fatto parte</em>: torni indietro e scopri di essere tu la causa di ciò che hai
+          sempre visto. È lo stile più elegante (niente paradossi!): in <em>Harry Potter e il Prigioniero di
+          Azkaban</em>, il Patronus che salva Harry era già stato lanciato... da Harry stesso; ne <em>L'esercito
+          delle 12 scimmie</em> il protagonista scopre che il ricordo d'infanzia che lo ossessiona è la propria fine.</li>
+        <li><strong>2. La linea temporale riscrivibile.</strong> Il passato si può cambiare e il presente si aggiorna
+          di conseguenza — con annessi paradossi ed effetto farfalla: in <em>Ritorno al futuro</em> Marty rischia di
+          cancellare se stesso (la foto dei fratelli che sbiadisce!); in <em>Terminator</em> si spedisce indietro un
+          assassino per riscrivere la guerra; nel racconto di Bradbury <em>Rumore di tuono</em> una farfalla
+          calpestata nel Cretaceo cambia le elezioni presidenziali.</li>
+        <li><strong>3. Il multiverso a rami.</strong> Cambiare il passato non riscrive nulla: <em>crea una linea
+          temporale nuova</em>, mentre l'originale continua indisturbata: è la regola dichiarata di <em>Avengers:
+          Endgame</em> («se torni indietro, quello diventa il tuo passato e questo resta il tuo presente»), del
+          Trunks di <em>Dragon Ball</em> (che salva il futuro... di un altro ramo, non il suo) e del labirinto di
+          linee di <em>Steins;Gate</em>.</li>
+        <li><strong>4. Il groviglio.</strong> Il tempo non è una linea ma una matassa, e le regole sono... flessibili.
+          La definizione canonica la dà il Dottore in <em>Doctor Who</em> (episodio <em>Blink</em>, 2007), e va
+          citata in originale: <em>«People assume that time is a strict progression of cause to effect, but actually
+          — from a non-linear, non-subjective viewpoint — it's more like a big ball of wibbly-wobbly... timey-wimey...
+          stuff»</em> ("la gente crede che il tempo sia una rigida successione di cause ed effetti, ma in realtà —
+          da un punto di vista non lineare e non soggettivo — è più tipo una grossa palla di roba
+          traballante-sballonzolante... temposa-cososa"). Scienza zero, onestà narrativa massima.</li>
+      </ul>
+
+      <div class="curiosita">
+        <strong>La festa più triste (e geniale) della storia.</strong> Il 28 giugno 2009 <strong>Stephen
+        Hawking</strong> organizzò un ricevimento per i <strong>viaggiatori del tempo</strong>, con tanto di
+        palloncini, champagne e striscione "Welcome, Time Travellers". Il tocco da maestro: gli <strong>inviti li
+        pubblicò solo DOPO la festa</strong>, così che soltanto qualcuno proveniente dal futuro potesse presentarsi.
+        Non venne nessuno. Hawking la definì una «prova sperimentale» che i viaggi all'indietro nel tempo non si
+        fanno — o quantomeno, aggiungiamo noi, che i viaggiatori del tempo non amano lo champagne.
+      </div>
+
+      <div class="warning">
+        <strong>⚠ Avviso spoiler.</strong> La sezione appena conclusa contiene spoiler su <em>Harry Potter e il
+        Prigioniero di Azkaban</em>, <em>L'esercito delle 12 scimmie</em>, <em>Ritorno al futuro</em>,
+        <em>Terminator</em>, <em>Avengers: Endgame</em>, <em>Dragon Ball</em> e <em>Steins;Gate</em>. Ci è sembrato
+        doveroso avvisarvi. Quanto al tempismo di questo avviso: da un punto di vista non lineare e non soggettivo,
+        esso arriva <em>prima</em> che leggiate la sezione — è tutta una questione di roba
+        traballante-sballonzolante, temposa-cososa.
+      </div>
+    </section>
+
+    <!-- 11 — OLTRE LA RELATIVITÀ GENERALE -->
+    <section id="sec11">
+      <h2>11. Oltre la relatività generale?</h2>
+
+      <h3>11.1 — I trionfi (anche in tasca tua)</h3>
+      <p>Un secolo di verifiche, e la teoria non ha mai sbagliato un colpo. Due esempi su tutti:</p>
+      <ul>
+        <li><strong>Il navigatore satellitare.</strong> I satelliti GPS orbitano veloci (la ristretta rallenta i loro
+          orologi di $7\ \mu$s al giorno) e in alto, dove lo spazio-tempo è meno curvato dalla Terra (la generale li
+          <em>anticipa</em> di $45\ \mu$s al giorno). Bilancio: $+38\ \mu$s al giorno. Sembrano spiccioli, ma il GPS
+          funziona cronometrando segnali alla velocità della luce: senza le correzioni di Einstein accumulerebbe
+          <strong>circa 10 km di errore al giorno</strong> — il navigatore ti parcheggerebbe nel comune sbagliato
+          entro cena. Ogni volta che l'auto "ricalcola il percorso", sta risolvendo equazioni relativistiche.</li>
+        <li><strong>Le onde gravitazionali.</strong> Se lo spazio-tempo è un sistema fisico, deve poter
+          <strong>vibrare</strong>: le equazioni prevedono increspature della metrica che viaggiano a $c$. Il 14
+          settembre 2015 gli osservatori LIGO le hanno sentite per la prima volta — l'urlo di due buchi neri che si
+          fondevano a oltre un miliardo di anni luce. E con che strumento? Un vecchio amico: l'<strong>interferometro
+          di Michelson</strong> della lezione 7, cresciuto fino a bracci di 3-4 km (in Italia: Virgo, vicino a Pisa),
+          capace di accorgersi di variazioni di lunghezza di $10^{-18}$ m — un millesimo di protone. Lo strumento che
+          "fallì" nel trovare l'etere, 130 anni dopo, ha aperto un'astronomia nuova (Nobel 2017).</li>
+      </ul>
+
+      <h3>11.2 — Le crepe: materia oscura ed energia oscura</h3>
+      <p>Eppure qualcosa scricchiola. Primo indizio: le <strong>galassie non ruotano come dovrebbero</strong>.
+        Contando la materia visibile, le stelle periferiche dovrebbero orbitare sempre più lente (come i pianeti
+        lontani dal Sole); invece le velocità restano <strong>piatte</strong>:</p>
+
+      <div class="controls">
+        <label class="toggle-row"><input type="checkbox" id="rot-dm"> aggiungi un alone di materia oscura</label>
+      </div>
+      <div class="two-col">
+        <div><p id="rot-out" class="eq-out"></p></div>
+        <div><div class="plot" id="rot-plot" style="height: 320px;"></div></div>
+      </div>
+
+      <p>Le spiegazioni in gara sono due, entrambe drastiche: o esiste una <strong>materia oscura</strong> — massa
+        invisibile ai telescopi (non emette luce) che avvolge le galassie e di cui sentiamo solo la gravità — oppure
+        vanno <strong>modificate le leggi</strong> (le teorie tipo <strong>MOND</strong>, dinamica newtoniana
+        modificata, ritoccano la gravità alle basse accelerazioni). Secondo indizio, ancora più grosso: dal 1998
+        sappiamo che l'espansione dell'universo sta <strong>accelerando</strong> (Nobel 2011) — e di nuovo il bivio:
+        o esiste un'<strong>energia oscura</strong> che spinge (da inserire nel lato destro delle equazioni), oppure
+        sono le equazioni di Einstein a dover cambiare su scala cosmica. <strong>Al momento non sappiamo quale strada
+        sia quella giusta</strong>: se i conti della materia e dell'energia oscura sono corretti, conosciamo appena il
+        5% del contenuto dell'universo. Per una teoria, avere problemi così belli è un lusso: la relatività generale
+        resta una delle costruzioni più profonde e sperimentalmente solide di cui l'umanità disponga — e il cartello
+        "lavori in corso" è l'invito, per qualcuno di voi, a proseguire il cantiere.</p>
+    </section>
+
+    <!-- 12 — FACOLTATIVA: TRASPORTO PARALLELO, CHRISTOFFEL, DERIVATA COVARIANTE, BIANCHI, NOETHER -->
+    <section id="sec12" class="optional">
+      <h2>12. Dal trasporto parallelo al teorema di Noether</h2>
+      <p>Approfondimento per i curiosi: un unico percorso — dalla geometria più concreta al teorema più bello della
+        fisica matematica, passando per il macchinario tecnico che tiene in piedi l'equazione di Einstein.</p>
+
+      <h3>12.1 — Trasporto parallelo: il vettore che torna ruotato</h3>
+      <p>Su una superficie curva c'è un problema che nel piano non ci sfiora nemmeno: <strong>confrontare vettori che
+        vivono in punti diversi</strong>. Nel piano sposti la freccia mantenendola parallela a se stessa e la
+        confronti: fatto. Su una sfera, «mantenerla parallela» va ridefinito — il meglio che puoi fare è il
+        <strong>trasporto parallelo</strong> (detto anche <em>di Levi-Civita</em>, ancora la scuola italiana!):
+        cammini lungo una curva portando il vettore con te, senza mai ruotarlo <em>rispetto al percorso</em>. E qui
+        arriva lo shock: su una superficie curva, il risultato <strong>dipende dalla strada che fai</strong>. Porta un
+        vettore lungo un giro chiuso e guarda come torna:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Cammino percorso: <span class="val" id="par-s-val">0</span>%</label>
+          <input type="range" id="par-s" min="0" max="100" step="1" value="0"></div>
+      </div>
+      <div class="ckt"><svg id="par-svg" viewBox="0 0 640 360" aria-label="Trasporto parallelo di un vettore lungo un triangolo sferico: al ritorno il vettore è ruotato"></svg></div>
+      <p class="eq-out" id="par-out"></p>
+
+      <p>Il vettore è tornato al punto di partenza <strong>ruotato</strong> — senza che nessuno l'abbia mai girato:
+        a ruotarlo è stata la <strong>curvatura</strong> racchiusa dal percorso (l'angolo di rotazione è esattamente
+        l'eccesso angolare del triangolo, il vecchio teorema di Girard sotto mentite spoglie!). Ed è proprio così che
+        la curvatura si definisce in generale: il <strong>tensore di Riemann</strong> non è altro che il catalogo di
+        <em>quanto ruota un vettore trasportato attorno a un anellino infinitesimo</em>, direzione per direzione —
+        ecco da dove nasce l'$R_{\mu\nu}$ dell'equazione di campo.</p>
+
+      <h3>12.2 — I simboli di Christoffel e la derivata covariante</h3>
+      <div class="definition">
+        <strong>I simboli di Christoffel</strong> $\Gamma^{\lambda}_{\mu\nu}$ sono le «istruzioni di manutenzione»
+        del trasporto parallelo: si calcolano dalla metrica $g_{\mu\nu}$ e dicono, punto per punto, <strong>come
+        correggere le componenti</strong> di un vettore per tenerlo davvero parallelo mentre gli assi coordinati
+        sotto di lui cambiano orientazione (pensa ai meridiani, che ruotano avvicinandosi al polo).
+      </div>
+
+      <p>Nel piano, la <strong>derivata</strong> di un campo vettoriale — la derivata che già conoscete — misura
+        come il campo cambia da un punto all'altro: la differenza tra il vettore «qui» e il vettore «lì», divisa per
+        la distanza. Su una superficie curva, però, questa ricetta non funziona: i due vettori vivono in spazi
+        tangenti <strong>diversi</strong> (orientati diversamente), e sottrarre le loro componenti «crude» mescola
+        il cambiamento <em>vero</em> del campo con il cambiamento <em>degli assi</em>. La soluzione è la
+        <strong>derivata covariante</strong> $\nabla_\mu$: la derivata «onesta» delle superfici curve,
+        che prima di fare la differenza <strong>trasporta parallelamente</strong> il vettore di partenza nel nuovo
+        punto, usando i simboli di Christoffel come «correttore». Il risultato è un tensore — e questo è il punto:
+        la derivata ordinaria di un vettore <em>non</em> è un tensore (dipende dalla scelta degli assi), mentre la
+        derivata covariante sì. È lei il mattone con cui si costruiscono equazioni fisiche che valgono per
+        <strong>tutti</strong> gli osservatori.</p>
+
+      <p>E con la derivata covariante si scrive l'equazione più elegante del capitolo: una <strong>geodetica</strong>
+        è la curva che <strong>trasporta parallelamente il proprio vettore tangente</strong>. Cioè: la curva che non
+        sterza mai. Il cerchio si chiude — andare «dritti» nello spazio-tempo curvo è, alla lettera, un trasporto
+        parallelo di se stessi.</p>
+
+      <h3>12.3 — Le identità di Bianchi: la contabilità della curvatura</h3>
+      <p>Dai $\Gamma$ si costruisce il tensore di Riemann $R^{\rho}{}_{\sigma\mu\nu}$, e da lì, per contrazione, il
+        tensore di Ricci $R_{\mu\nu}$ e lo scalare $R$ che già conosciamo. Ma il tensore di Riemann soddisfa, per
+        pura geometria, un'identità notevole — le <strong>identità di Bianchi</strong> (1902):</p>
+
+      <div class="formula-box">
+        $$\nabla_\lambda\, R^{\rho}{}_{\sigma\mu\nu} \;+\; \nabla_\mu\, R^{\rho}{}_{\sigma\nu\lambda}
+          \;+\; \nabla_\nu\, R^{\rho}{}_{\sigma\lambda\mu} \;=\; 0$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">una relazione tra derivate covarianti del tensore di Riemann
+        che vale <em>sempre</em>, in qualsiasi spazio-tempo: è un'identità della geometria, non una legge della fisica</p>
+      </div>
+
+      <p>Perché ci importa? Perché contraendo le identità di Bianchi si ottiene:</p>
+      <div class="formula-box">
+        $$\nabla^\mu \!\left(R_{\mu\nu} - \tfrac{1}{2}\,R\,g_{\mu\nu}\right) = 0$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">la divergenza del <strong>tensore di Einstein</strong>
+        $G_{\mu\nu}$ è automaticamente nulla</p>
+      </div>
+
+      <p>E questo, tramite l'equazione di campo, implica:</p>
+      <div class="formula-box">
+        $$\nabla^\mu T_{\mu\nu} = 0$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">la <strong>conservazione locale</strong> dell'energia e
+        dell'impulso: non è una regola aggiunta a mano — è una <em>conseguenza automatica</em> della geometria!</p>
+      </div>
+
+      <p>È un risultato stupefacente: la conservazione dell'energia-impulso, che in meccanica newtoniana era un
+        postulato separato, qui <strong>esce gratis</strong> dalla struttura geometrica delle equazioni di campo.
+        La geometria si tiene in piedi da sola — e nel farlo, impone le leggi di conservazione. Ma ecco
+        la domanda: <em>perché</em> le simmetrie della geometria generano leggi di conservazione? La risposta è
+        il teorema più bello della fisica.</p>
+
+      <h3>12.4 — Il teorema di Noether: simmetrie e conservazione</h3>
+      <p>Nel 1918 <strong>Emmy Noether</strong> — chiamata a Gottinga da Hilbert contro il parere di chi non voleva
+        una donna in facoltà («non siamo mica uno stabilimento balneare», sbottò Hilbert) — dimostrò un teorema che
+        Einstein definì un monumento del pensiero matematico:</p>
+
+      <div class="definition">
+        <strong>Teorema di Noether.</strong> A ogni <strong>simmetria continua</strong> delle leggi fisiche
+        corrisponde una <strong>legge di conservazione</strong>. Se le leggi non cambiano quando...
+        <div class="table-container" style="margin-top:0.6rem;">
+          <table>
+            <thead><tr><th>...trasformo così</th><th>allora si conserva</th></tr></thead>
+            <tbody>
+              <tr><td>traslazione nello <strong>spazio</strong> (l'esperimento funziona uguale qui e a Tokyo)</td><td>la <strong>quantità di moto</strong></td></tr>
+              <tr><td><strong>rotazione</strong> (funziona uguale comunque orientato)</td><td>il <strong>momento angolare</strong></td></tr>
+              <tr><td>traslazione nel <strong>tempo</strong> (funziona uguale oggi e domani)</td><td>l'<strong>energia</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p>È una rivelazione: le leggi di conservazione — che sembravano regole contabili calate dall'alto — sono
+        <strong>figlie delle simmetrie</strong>. L'energia si conserva <em>perché</em> le leggi della fisica sono le
+        stesse ieri, oggi e domani. La quantità di moto si conserva <em>perché</em> lo spazio è lo stesso qui e là.
+        Il momento angolare si conserva <em>perché</em> non esiste una direzione privilegiata. Il ponte tra simmetrie
+        e leggi di conservazione non è un'analogia: è un <strong>teorema</strong>, con dimostrazione matematica
+        rigorosa. Per questo il teorema di Noether è considerato da molti fisici e matematici uno dei risultati più
+        <strong>belli ed eleganti</strong> mai ottenuti: una sola idea che unifica, in una frase, tutta la struttura
+        delle leggi fisiche.</p>
+
+      <p>E le identità di Bianchi che abbiamo appena visto? Sono esattamente il teorema di Noether applicato alla
+        simmetria per <strong>diffeomorfismi</strong> (il fatto che le leggi di Einstein valgano in <em>qualsiasi</em>
+        sistema di coordinate): la conservazione locale di $T_{\mu\nu}$ è la legge di conservazione che «esce» da
+        quella simmetria. Il cerchio si chiude ancora una volta.</p>
+
+      <h3>12.5 — La vertigine cosmologica</h3>
+      <p>Ma aspetta... la simmetria per traslazione nel tempo è davvero rispettata, nel nostro universo?</p>
+
+      <div class="warning">
+        <strong>La vertigine cosmologica.</strong> In un universo <strong>in espansione</strong> la metrica cambia
+        col tempo: le leggi locali sono sempre le stesse, ma lo <em>scenario globale</em> di domani non è quello di
+        oggi — la simmetria per traslazione temporale vale solo <strong>localmente</strong>, non globalmente. E
+        Noether è spietata: niente simmetria, niente conservazione. Localmente tutto è in regola — le
+        <strong>identità di Bianchi</strong>, incorporate nella struttura stessa delle equazioni di Einstein,
+        garantiscono la conservazione locale dell'energia-impulso in ogni punto. Ma <strong>globalmente l'energia
+        dell'universo non si conserva</strong>: i fotoni del fondo cosmico, stirati dall'espansione verso il rosso,
+        perdono energia che non finisce da nessuna parte — semplicemente non c'è più. Alla domanda «ma allora dove va
+        l'energia?» la risposta onesta della relatività generale è: la domanda presuppone una simmetria che
+        l'universo non ha. Da brividi — ed è tutto scritto in quell'unica riga di equazione.
+      </div>
+
+      <p>La costante cosmologica $\Lambda$ che abbiamo incontrato nella sezione 9 è stato uno dei tentativi per
+        gestire questa vertigine: un termine che, aggiunto alle equazioni, permette al vuoto stesso di possedere
+        energia — un'energia che non si diluisce con l'espansione, perché è proprietà dello spazio-tempo e non
+        del suo contenuto. Se $\Lambda$ è positiva, ogni nuovo centimetro cubo di spazio che l'espansione crea
+        porta con sé la propria quota di energia oscura: il bilancio globale non torna, e il teorema di Noether
+        ci spiega con precisione chirurgica <em>perché</em>.</p>
+
+      <div class="curiosita">
+        <strong>Chi era Emmy Noether.</strong> <strong>Amalie Emmy Noether</strong> (1882–1935) è considerata da
+        molti la più grande matematica della storia. Nata a Erlangen, in una Germania che vietava alle donne
+        l'iscrizione universitaria, assistette alle lezioni come uditrice fino al cambio delle regole. A Gottinga,
+        nonostante il sostegno di Hilbert e Klein, le fu negata per anni una cattedra regolare: insegnò sotto il nome
+        di Hilbert, senza stipendio. La sua opera rivoluzionò l'<strong>algebra astratta</strong> — gli anelli, gli
+        ideali, le strutture algebriche che oggi portano il suo nome — e il teorema del 1918 è solo una delle
+        sue perle. Cacciata dalla Germania nazista nel 1933 perché ebrea, emigrò negli Stati Uniti, dove morì a
+        soli 53 anni per complicazioni post-operatorie. Einstein scrisse nel necrologio sul <em>New York Times</em>:
+        «<em>Emmy Noether fu il genio matematico creativo più significativo da quando le donne hanno avuto accesso
+        all'istruzione superiore</em>». Oggi il suo teorema è il <strong>ponte</strong> tra simmetrie e leggi di
+        conservazione: ogni volta che un fisico dice «l'energia si conserva», sta — che lo sappia o no — citando
+        Emmy Noether.
+      </div>
+    </section>
+
+    <!-- 13 — QUIZ -->
+    <section id="quiz">
+      <h2>13. Quiz finale</h2>
+      <p>Dieci domande su geometrie, tensori e spazio-tempo curvo. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 9 — La relatività generale · Fisica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezioni 3-4 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 3 — Teorema di Girard sulla sfera =====
+      (function () {
+        const svg = document.getElementById('gir-svg');
+        if (!svg) return;
+        const sa = document.getElementById('gir-a'), va = document.getElementById('gir-a-val');
+        const out = document.getElementById('gir-out');
+        const CX = 240, CY = 185, R = 145, TILT = 0.42;
+        // proiezione ortografica con inclinazione TILT (theta = latitudine, lam = longitudine)
+        function pt(thetaDeg, lamDeg) {
+          const th = thetaDeg * Math.PI / 180, lam = lamDeg * Math.PI / 180;
+          const X = Math.cos(th) * Math.cos(lam), Y = Math.cos(th) * Math.sin(lam), Z = Math.sin(th);
+          return [CX + R * Y, CY - R * (Z * Math.cos(TILT) - X * Math.sin(TILT))];
+        }
+        function poly(points) { return points.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' '); }
+        function go() {
+          const a = +sa.value; va.textContent = a;
+          const half = a / 2;
+          let h = '';
+          // sfera
+          h += `<circle cx="${CX}" cy="${CY}" r="${R}" fill="color-mix(in srgb, var(--primary) 7%, transparent)" stroke="var(--primary)" stroke-width="2"/>`;
+          // equatore: metà davanti (lam -90..90) piena, metà dietro tratteggiata
+          const eqF = [], eqB = [];
+          for (let l = -90; l <= 90; l += 5) eqF.push(pt(0, l));
+          for (let l = 90; l <= 270; l += 5) eqB.push(pt(0, l));
+          h += `<polyline points="${poly(eqB)}" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="4 5" opacity="0.6"/>`;
+          h += `<polyline points="${poly(eqF)}" fill="none" stroke="var(--text-soft)" stroke-width="2"/>`;
+          // triangolo: polo nord + equatore tra -half e +half
+          const m1 = [], m2 = [], eqT = [];
+          for (let t = 90; t >= 0; t -= 5) m1.push(pt(t, -half));
+          for (let l = -half; l <= half; l += 2.5) eqT.push(pt(0, l));
+          for (let t = 0; t <= 90; t += 5) m2.push(pt(t, half));
+          h += `<polygon points="${poly(m1.concat(eqT, m2))}" fill="color-mix(in srgb, var(--gold) 30%, transparent)" stroke="none"/>`;
+          h += `<polyline points="${poly(m1)}" fill="none" stroke="var(--red)" stroke-width="2.5"/>`;
+          h += `<polyline points="${poly(m2)}" fill="none" stroke="var(--red)" stroke-width="2.5"/>`;
+          h += `<polyline points="${poly(eqT)}" fill="none" stroke="var(--red)" stroke-width="2.5"/>`;
+          // vertici e angoli
+          const P = pt(90, 0), A = pt(0, -half), B = pt(0, half);
+          h += `<circle cx="${P[0].toFixed(1)}" cy="${P[1].toFixed(1)}" r="5" fill="var(--gold)"/>`;
+          h += `<text x="${P[0].toFixed(1)}" y="${(P[1] - 12).toFixed(1)}" text-anchor="middle" class="lbl">α = ${a}°</text>`;
+          h += `<circle cx="${A[0].toFixed(1)}" cy="${A[1].toFixed(1)}" r="5" fill="var(--gold)"/>`;
+          h += `<text x="${(A[0] - 10).toFixed(1)}" y="${(A[1] + 22).toFixed(1)}" text-anchor="end" class="lbl-s">90°</text>`;
+          h += `<circle cx="${B[0].toFixed(1)}" cy="${B[1].toFixed(1)}" r="5" fill="var(--gold)"/>`;
+          h += `<text x="${(B[0] + 10).toFixed(1)}" y="${(B[1] + 22).toFixed(1)}" class="lbl-s">90°</text>`;
+          // riquadro dei conti
+          const sum = 180 + a;
+          const area = a * Math.PI / 180;
+          h += `<text x="470" y="90" class="lbl">somma angoli:</text>`;
+          h += `<text x="470" y="114" class="em" font-size="18">${sum}°</text>`;
+          h += `<text x="470" y="150" class="lbl">eccesso: ${a}°</text>`;
+          h += `<text x="470" y="186" class="lbl">Area = ${area.toFixed(2).replace('.', ',')} · R²</text>`;
+          h += `<text x="470" y="210" class="lbl-s">(Girard: eccesso in radianti × R²)</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = `Due angoli retti alla base + $\\alpha = ${a}°$ al polo: somma <span class="val-badge">${sum}°</span>, sempre maggiore di 180°. E l'eccesso (${a}° $= ${area.toFixed(2).replace('.', ',')}$ rad) è proprio l'area in unità di $R^2$: sulla sfera <strong>gli angoli misurano le aree</strong>.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sa.addEventListener('input', go); go();
+      })();
+
+      // ===== 4.1 — Triangolo a curvatura variabile =====
+      (function () {
+        const svg = document.getElementById('cur-svg');
+        if (!svg) return;
+        const sk = document.getElementById('cur-k'), vk = document.getElementById('cur-k-val');
+        const out = document.getElementById('cur-out');
+        const A = [150, 250], B = [490, 250], C = [320, 62];
+        const G = [(A[0] + B[0] + C[0]) / 3, (A[1] + B[1] + C[1]) / 3];
+        function ctrl(P, Q, k) {
+          // punto di controllo: dal punto medio del lato, spostato via dal baricentro di k*BULGE
+          const M = [(P[0] + Q[0]) / 2, (P[1] + Q[1]) / 2];
+          const d = [M[0] - G[0], M[1] - G[1]];
+          const n = Math.hypot(d[0], d[1]) || 1;
+          const B0 = 95;
+          return [M[0] + (d[0] / n) * k * B0, M[1] + (d[1] / n) * k * B0];
+        }
+        function ang(V, M1, M2) {
+          // angolo tra le tangenti (M1-V) e (M2-V)
+          const a1 = Math.atan2(M1[1] - V[1], M1[0] - V[0]);
+          const a2 = Math.atan2(M2[1] - V[1], M2[0] - V[0]);
+          let d = Math.abs(a1 - a2);
+          if (d > Math.PI) d = 2 * Math.PI - d;
+          return d * 180 / Math.PI;
+        }
+        function go() {
+          const k = +sk.value; vk.textContent = k.toFixed(2);
+          const Mab = ctrl(A, B, k), Mbc = ctrl(B, C, k), Mca = ctrl(C, A, k);
+          const sum = ang(A, Mab, Mca) + ang(B, Mab, Mbc) + ang(C, Mbc, Mca);
+          let h = '';
+          h += `<path d="M ${A[0]} ${A[1]} Q ${Mab[0].toFixed(1)} ${Mab[1].toFixed(1)} ${B[0]} ${B[1]} Q ${Mbc[0].toFixed(1)} ${Mbc[1].toFixed(1)} ${C[0]} ${C[1]} Q ${Mca[0].toFixed(1)} ${Mca[1].toFixed(1)} ${A[0]} ${A[1]} Z" fill="color-mix(in srgb, ${k > 0.05 ? 'var(--red)' : k < -0.05 ? 'var(--primary)' : 'var(--green)'} 16%, transparent)" stroke="${k > 0.05 ? 'var(--red)' : k < -0.05 ? 'var(--primary)' : 'var(--green)'}" stroke-width="3"/>`;
+          [A, B, C].forEach(P => { h += `<circle cx="${P[0]}" cy="${P[1]}" r="5" fill="var(--gold)"/>`; });
+          h += `<text x="530" y="70" class="lbl">somma angoli:</text>`;
+          h += `<text x="530" y="96" class="em" font-size="19">${sum.toFixed(0)}°</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = k < -0.05
+            ? `Curvatura <strong>negativa</strong> (sella): i lati-geodetiche "rientrano", somma <span class="val-badge">${sum.toFixed(0)}°</span> — minore di 180°: triangolo "magro". Qui per un punto esterno passano <strong>infinite</strong> parallele.`
+            : k > 0.05
+              ? `Curvatura <strong>positiva</strong> (sfera): i lati "sbordano", somma <span class="val-badge">${sum.toFixed(0)}°</span> — maggiore di 180°: triangolo "grasso". Nessuna parallela possibile.`
+              : `Curvatura <strong>nulla</strong>: il piano di Euclide, somma <span class="val-badge">180°</span> esatti. Una e una sola parallela: il vecchio quinto postulato.`;
+        }
+        sk.addEventListener('input', go); go();
+      })();
+
+    });
+  </script>
+  <!-- Demo sezione 5 (tensori) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 5.1 — Coordinate controvarianti (unità + rotazione) =====
+      (function () {
+        const svg = document.getElementById('cov-svg');
+        if (!svg) return;
+        const su = document.getElementById('cov-u'), vu = document.getElementById('cov-u-val');
+        const sr = document.getElementById('cov-r'), vr = document.getElementById('cov-r-val');
+        const out = document.getElementById('cov-out');
+        const OX = 110, OY = 245;                // origine
+        const VX = 6, VY = 3;                    // vettore fisso: 6 e 3 "unità base" (u=1, φ=0)
+        const BASE = 55;                          // px per unità quando u=1
+        function go() {
+          const u = +su.value; vu.textContent = u.toFixed(2);
+          const phi = +sr.value; vr.textContent = phi;
+          const rad = phi * Math.PI / 180;
+          const step = BASE * u;                  // dimensione in px di UNA unità
+          // coordinate nella base ruotata di φ e scalata di u
+          const cx = (VX * Math.cos(rad) + VY * Math.sin(rad)) / u;
+          const cy = (-VX * Math.sin(rad) + VY * Math.cos(rad)) / u;
+          const mod = Math.hypot(VX, VY) / u;    // modulo nelle unità correnti (invariante per rotazione)
+          let h = '';
+          // griglia e assi, ruotati attorno all'origine (il vettore resta fuori dal gruppo: FISSO)
+          h += `<g transform="rotate(${-phi} ${OX} ${OY})">`;
+          for (let i = 0; i <= 14; i++) {
+            const x = OX + i * step;
+            h += `<line x1="${x.toFixed(1)}" y1="${OY - 460}" x2="${x.toFixed(1)}" y2="${OY + 120}" stroke="var(--border)" stroke-width="1"/>`;
+          }
+          for (let j = -3; j <= 9; j++) {
+            const y = OY - j * step;
+            h += `<line x1="${OX - 120}" y1="${y.toFixed(1)}" x2="${OX + 760}" y2="${y.toFixed(1)}" stroke="var(--border)" stroke-width="1"/>`;
+          }
+          h += `<line x1="${OX}" y1="${OY}" x2="${OX + 540}" y2="${OY}" stroke="var(--text-soft)" stroke-width="2.2"/>`;
+          h += `<polygon points="${OX + 550},${OY} ${OX + 536},${OY - 6} ${OX + 536},${OY + 6}" fill="var(--text-soft)"/>`;
+          h += `<line x1="${OX}" y1="${OY}" x2="${OX}" y2="${OY - 230}" stroke="var(--text-soft)" stroke-width="2.2"/>`;
+          h += `<polygon points="${OX},${OY - 240} ${OX - 6},${OY - 226} ${OX + 6},${OY - 226}" fill="var(--text-soft)"/>`;
+          // vettore base evidenziato
+          h += `<line x1="${OX}" y1="${OY}" x2="${(OX + step).toFixed(1)}" y2="${OY}" stroke="var(--green)" stroke-width="5"/>`;
+          h += `<text x="${(OX + step / 2).toFixed(1)}" y="${OY + 22}" text-anchor="middle" class="lbl-s" fill="var(--green)">1 unità</text>`;
+          h += `</g>`;
+          // vettore FISSO (in px: VX*BASE, VY*BASE — non dipende né da u né da φ)
+          const tipX = OX + VX * BASE, tipY = OY - VY * BASE;
+          h += `<line x1="${OX}" y1="${OY}" x2="${tipX}" y2="${tipY}" stroke="var(--red)" stroke-width="4"/>`;
+          const angA = Math.atan2(OY - tipY, tipX - OX);
+          h += `<polygon points="${tipX},${tipY} ${(tipX - 16 * Math.cos(angA - 0.4)).toFixed(1)},${(tipY + 16 * Math.sin(angA - 0.4)).toFixed(1)} ${(tipX - 16 * Math.cos(angA + 0.4)).toFixed(1)},${(tipY + 16 * Math.sin(angA + 0.4)).toFixed(1)}" fill="var(--red)"/>`;
+          h += `<text x="${tipX + 10}" y="${tipY - 8}" class="lbl" fill="var(--red)">v (sempre lui)</text>`;
+          svg.innerHTML = h;
+          const msgU = u > 1 ? 'unità <strong>più larghe</strong> ⇒ numeri più piccoli (controvarianti)'
+            : u < 1 ? 'unità <strong>più strette</strong> ⇒ numeri più grandi (controvarianti)'
+              : 'unità di base';
+          const msgR = phi > 0 ? ` — e la rotazione <strong>rimescola</strong> le due coordinate tra loro` : '';
+          out.innerHTML = `Coordinate di $\\vec v$ in questo sistema: <span class="val-badge">(${cx.toFixed(2).replace('.', ',')}; ${cy.toFixed(2).replace('.', ',')})</span> — ${msgU}${msgR}. Ma il modulo $\\sqrt{c_x^2 + c_y^2}$ = <span class="val-badge">${mod.toFixed(2).replace('.', ',')}</span> non sente la rotazione: è l'<strong>invariante</strong>. E la freccia, intanto, non si è mai mossa.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        su.addEventListener('input', go); sr.addEventListener('input', go); go();
+      })();
+
+      // ===== 5.3 — Tensore degli sforzi =====
+      (function () {
+        const svg = document.getElementById('str-svg');
+        if (!svg) return;
+        const st = document.getElementById('str-t'), vt = document.getElementById('str-t-val');
+        const ss = document.getElementById('str-s'), vs = document.getElementById('str-s-val');
+        const out = document.getElementById('str-out');
+        const CX = 230, CY = 150, HS = 70;       // centro e semilato
+        function arrow(x1, y1, x2, y2, col) {
+          const a = Math.atan2(y2 - y1, x2 - x1);
+          return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="3"/>` +
+            `<polygon points="${x2.toFixed(1)},${y2.toFixed(1)} ${(x2 - 12 * Math.cos(a - 0.42)).toFixed(1)},${(y2 - 12 * Math.sin(a - 0.42)).toFixed(1)} ${(x2 - 12 * Math.cos(a + 0.42)).toFixed(1)},${(y2 - 12 * Math.sin(a + 0.42)).toFixed(1)}" fill="${col}"/>`;
+        }
+        function go() {
+          const T = +st.value, S = +ss.value;
+          vt.textContent = T; vs.textContent = S;
+          const kT = T * 0.55, kS = S * 0.55;    // px
+          let h = '';
+          // quadrato deformato (esagerazione visiva): trazione allarga in x, taglio inclina
+          const sx = 1 + T / 400, sh = S / 300;
+          const P = [[-HS, -HS], [HS, -HS], [HS, HS], [-HS, HS]].map(p => [CX + p[0] * sx + sh * p[1], CY + p[1]]);
+          h += `<polygon points="${P.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')}" fill="color-mix(in srgb, var(--primary) 14%, transparent)" stroke="var(--primary)" stroke-width="2.5"/>`;
+          // frecce di trazione (facce destra/sinistra, orizzontali)
+          if (Math.abs(T) > 2) {
+            h += arrow(CX + HS * sx + 6, CY, CX + HS * sx + 6 + kT, CY, 'var(--red)');
+            h += arrow(CX - HS * sx - 6, CY, CX - HS * sx - 6 - kT, CY, 'var(--red)');
+            h += `<text x="${CX + HS * sx + kT + 16}" y="${CY + 4}" class="lbl-s" fill="var(--red)">${T > 0 ? 'trazione' : 'compressione'}</text>`;
+          }
+          // frecce di taglio (facce sopra/sotto, orizzontali opposte)
+          if (Math.abs(S) > 2) {
+            h += arrow(CX - kS, CY - HS - 14, CX + kS, CY - HS - 14, 'var(--gold)');
+            h += arrow(CX + kS, CY + HS + 14, CX - kS, CY + HS + 14, 'var(--gold)');
+            h += `<text x="${CX}" y="${CY - HS - 26}" text-anchor="middle" class="lbl-s" fill="var(--gold)">taglio</text>`;
+          }
+          // matrice
+          h += `<text x="450" y="100" class="lbl">il tensore, in tabella:</text>`;
+          h += `<line x1="452" y1="115" x2="452" y2="195" stroke="var(--text-soft)" stroke-width="2"/>`;
+          h += `<line x1="600" y1="115" x2="600" y2="195" stroke="var(--text-soft)" stroke-width="2"/>`;
+          h += `<text x="490" y="145" text-anchor="middle" class="em" font-size="16">${T}</text>`;
+          h += `<text x="560" y="145" text-anchor="middle" class="lbl" font-size="16">${S}</text>`;
+          h += `<text x="490" y="180" text-anchor="middle" class="lbl" font-size="16">${S}</text>`;
+          h += `<text x="560" y="180" text-anchor="middle" class="lbl" font-size="16">0</text>`;
+          h += `<text x="526" y="222" text-anchor="middle" class="lbl-s">σ (MPa) — simmetrico!</text>`;
+          svg.innerHTML = h;
+          const msg = Math.abs(T) < 3 && Math.abs(S) < 3 ? 'Materiale scarico: tabella di zeri, riposo assoluto.'
+            : Math.abs(S) < 3 ? `Solo componenti diagonali: pura ${T > 0 ? 'trazione (il quadratino si allunga)' : 'compressione (si accorcia)'}.`
+              : Math.abs(T) < 3 ? 'Solo componenti fuori diagonale: puro taglio — le facce scorrono l\'una rispetto all\'altra (il quadratino si "sbilencia").'
+                : 'Trazione e taglio insieme: il caso realistico di un urto sul guardrail — il progettista verifica che questa tabella resti ovunque nei limiti dell\'acciaio.';
+          out.innerHTML = msg;
+        }
+        st.addEventListener('input', go); ss.addEventListener('input', go); go();
+      })();
+
+    });
+  </script>
+  <!-- Demo sezioni 6-8 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 6.3 — Massa che curva la griglia =====
+      (function () {
+        const svg = document.getElementById('grv-svg');
+        if (!svg) return;
+        const sm = document.getElementById('grv-m'), vm = document.getElementById('grv-m-val');
+        const out = document.getElementById('grv-out');
+        const CX = 320, CY = 160;
+        // deformazione: i punti vengono attirati verso il centro con intensità che decresce con la distanza
+        function warp(x, y, M) {
+          const dx = x - CX, dy = y - CY;
+          const r = Math.hypot(dx, dy);
+          if (r < 1) return [x, y];
+          const pull = M * 4200 / (r + 42);
+          const f = Math.max(0.25, 1 - pull / (r + 1));
+          return [CX + dx * f, CY + dy * f];
+        }
+        function go() {
+          const M = +sm.value; vm.textContent = M.toFixed(2);
+          let h = '';
+          // griglia deformata
+          for (let gx = 40; gx <= 600; gx += 40) {
+            let d = '';
+            for (let gy = 20; gy <= 300; gy += 10) {
+              const [x, y] = warp(gx, gy, M);
+              d += `${d ? 'L' : 'M'} ${x.toFixed(1)} ${y.toFixed(1)} `;
+            }
+            h += `<path d="${d}" fill="none" stroke="var(--border)" stroke-width="1.2"/>`;
+          }
+          for (let gy = 20; gy <= 300; gy += 40) {
+            let d = '';
+            for (let gx = 40; gx <= 600; gx += 10) {
+              const [x, y] = warp(gx, gy, M);
+              d += `${d ? 'L' : 'M'} ${x.toFixed(1)} ${y.toFixed(1)} `;
+            }
+            h += `<path d="${d}" fill="none" stroke="var(--border)" stroke-width="1.2"/>`;
+          }
+          // raggio di luce: entra orizzontale in alto, segue la geodetica (deflessione verso la massa)
+          let d = '', ylight = 70;
+          for (let gx = 0; gx <= 640; gx += 8) {
+            const [x, y] = warp(gx, ylight, M * 0.9);
+            d += `${d ? 'L' : 'M'} ${x.toFixed(1)} ${y.toFixed(1)} `;
+          }
+          h += `<path d="${d}" fill="none" stroke="var(--gold)" stroke-width="3"/>`;
+          h += `<text x="16" y="58" class="lbl-s" fill="var(--gold)">raggio di luce</text>`;
+          // massa
+          if (M > 0.02) {
+            h += `<circle cx="${CX}" cy="${CY}" r="${(10 + 16 * M).toFixed(1)}" fill="var(--red)"/>`;
+            h += `<text x="${CX}" y="${CY + 44 + 16 * M}" text-anchor="middle" class="lbl">massa</text>`;
+          }
+          svg.innerHTML = h;
+          out.innerHTML = M < 0.03
+            ? 'Senza massa: griglia dritta, luce dritta — lo spazio-tempo piatto di Minkowski.'
+            : `La massa deforma la metrica: la griglia si strizza e il raggio di luce — che va sempre "dritto", cioè lungo la sua geodetica — appare <strong>deviato</strong>. Fu proprio la deflessione della luce delle stelle, misurata durante l'eclissi del 1919, a rendere Einstein una celebrità mondiale.`;
+        }
+        sm.addEventListener('input', go); go();
+      })();
+
+      // ===== 8.2 — Calcolatore del raggio di Schwarzschild =====
+      (function () {
+        const svg = document.getElementById('rs-svg');
+        if (!svg) return;
+        const sm = document.getElementById('rs-m'), vm = document.getElementById('rs-m-val');
+        const out = document.getElementById('rs-out');
+        const MSUN = 1.989e30, G = 6.674e-11, C = 3e8;
+        const RS_SUN = 2 * G * MSUN / (C * C);   // ≈ 2950 m
+        function fmt(m) {
+          if (m >= 1e12) return (m / 1e12).toFixed(1).replace('.', ',') + ' miliardi di km';
+          if (m >= 1e9) return (m / 1e9).toFixed(1).replace('.', ',') + ' milioni di km';
+          if (m >= 1000) return (m / 1000).toFixed(1).replace('.', ',') + ' km';
+          if (m >= 1) return m.toFixed(1).replace('.', ',') + ' m';
+          if (m >= 0.001) return (m * 1000).toFixed(1).replace('.', ',') + ' mm';
+          return m.toExponential(1).replace('.', ',') + ' m';
+        }
+        function go() {
+          const expo = +sm.value;
+          const Msol = Math.pow(10, expo);
+          vm.textContent = expo === 0 ? '1' : `10^${expo % 1 === 0 ? expo : expo.toFixed(1)}`;
+          const rs = RS_SUN * Msol;
+          let h = '';
+          // barra con esempi
+          const marks = [
+            { e: -5.5, name: 'Terra' },
+            { e: 0, name: 'Sole' },
+            { e: 1.2, name: 'stella grande' },
+            { e: 6.6, name: 'Sgr A*' },
+            { e: 9, name: 'M87*' },
+          ];
+          h += `<line x1="40" y1="70" x2="600" y2="70" stroke="var(--text-soft)" stroke-width="2"/>`;
+          marks.forEach(mk => {
+            const x = 40 + (mk.e + 6) / 15 * 560;
+            h += `<line x1="${x.toFixed(1)}" y1="62" x2="${x.toFixed(1)}" y2="78" stroke="var(--muted)" stroke-width="1.6"/>`;
+            h += `<text x="${x.toFixed(1)}" y="100" text-anchor="middle" class="lbl-s">${mk.name}</text>`;
+          });
+          const xm = 40 + (expo + 6) / 15 * 560;
+          h += `<circle cx="${xm.toFixed(1)}" cy="70" r="9" fill="var(--red)"/>`;
+          h += `<text x="${xm.toFixed(1)}" y="42" text-anchor="middle" class="em">r_s = ${fmt(rs)}</text>`;
+          svg.innerHTML = h;
+          const exempli = expo < -4 ? `Una massa come la Terra andrebbe compressa in una biglia da <strong>${fmt(RS_SUN * Math.pow(10, -5.5))}</strong>: circa 9 mm!`
+            : expo < 0.5 ? `Il Sole (700&nbsp;000 km di raggio) andrebbe compresso in <strong>3 km</strong>: densità inimmaginabile — infatti il Sole non diventerà mai un buco nero.`
+              : expo < 4 ? `Le stelle molto massicce, a fine vita, <em>non riescono</em> a evitare il collasso entro il proprio $r_s$: è così che nascono i buchi neri stellari.`
+                : `I buchi neri supermassicci come Sagittarius A* (4 milioni di soli) e M87* (6,5 miliardi) abitano i centri delle galassie: il loro orizzonte è grande come un'orbita planetaria.`;
+          out.innerHTML = `$r_s = \\dfrac{2GM}{c^2}$ = <span class="val-badge">${fmt(rs)}</span> per $M = ${expo === 0 ? '1' : '10^{' + (expo % 1 === 0 ? expo : expo.toFixed(1)) + '}'}$ masse solari. ${exempli}`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sm.addEventListener('input', go); go();
+      })();
+
+    });
+  </script>
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Il quinto postulato di Euclide, nella forma più nota, afferma che:',
+        options: ['tutti gli angoli retti sono uguali', 'per un punto esterno a una retta passa una e una sola parallela', 'la somma degli angoli di un triangolo è 360°', 'due punti individuano sempre una circonferenza'],
+        correct: 1, explain: 'È la forma di Playfair del postulato delle parallele — quello che per duemila anni sembrò un teorema travestito.' },
+      { type: 'mc', diff: 'easy', text: 'Il gesuita italiano Giovanni Girolamo Saccheri, cercando di dimostrare il quinto postulato:',
+        options: ['ci riuscì, chiudendo la questione', 'lo negò per assurdo e, senza riconoscerlo, costruì la prima geometria non euclidea', 'dimostrò che la Terra è sferica', 'inventò il calcolo tensoriale'],
+        correct: 1, explain: 'Negò il postulato aspettandosi una contraddizione che non arrivò mai: sviluppò teoremi di geometria non euclidea credendoli "ripugnanti" — la vittoria scambiata per sconfitta.' },
+      { type: 'mc', diff: 'easy', text: 'Sulla superficie di una sfera, le "rette" (geodetiche) sono:',
+        options: ['i paralleli', 'i cerchi massimi: circonferenze con centro nel centro della sfera', 'qualsiasi circonferenza tracciata sulla sfera', 'non esistono: sulla sfera nulla è dritto'],
+        correct: 1, explain: 'Equatore e meridiani sì, paralleli no (per seguirli bisogna "sterzare"). E un triangolo di cerchi massimi ha angoli che sommano a più di 180°.' },
+      { type: 'mc', diff: 'medium', text: 'Su una superficie a curvatura <strong>negativa</strong> (una sella), la somma degli angoli interni di un triangolo è:',
+        options: ['sempre 180°', 'sempre maggiore di 180°', 'sempre minore di 180°', 'esattamente 360°'],
+        correct: 2, explain: 'Curvatura negativa: geodetiche che divergono, triangoli "magri" (somma minore di 180°) e infinite parallele per un punto esterno.' },
+      { type: 'mc', diff: 'medium', text: 'Se allargo le unità di misura della griglia (il sistema di riferimento), le coordinate di un vettore fissato:',
+        options: ['crescono nella stessa proporzione', 'restano identiche', 'diminuiscono: variano in modo controvariante', 'diventano tutte nulle'],
+        correct: 2, explain: 'Come misurare in metri anziché in centimetri: numeri più piccoli. Le coordinate dei vettori variano CONTRO le unità; quelle dei covettori (es. una pendenza) variano insieme.' },
+      { type: 'mc', diff: 'medium', text: 'Il tensore metrico $g_{\\mu\\nu}$ dice:',
+        options: ['quanta massa contiene lo spazio-tempo', 'come si misurano le distanze in ogni punto, cioè la geometria della varietà', 'la velocità della luce in ogni punto', 'quanti assi ha il sistema di riferimento'],
+        correct: 1, explain: 'ds² = g_μν dx^μ dx^ν: il "righello locale". Conoscere g in ogni punto = conoscere l\'intera geometria dello spazio-tempo.' },
+      { type: 'mc', diff: 'medium', text: 'Secondo la relatività generale, la Terra orbita intorno al Sole perché:',
+        options: ['il Sole esercita una forza attrattiva a distanza attraverso lo spazio', 'segue la propria geodetica ("va dritta") in uno spazio-tempo curvato dalla massa del Sole', 'lo spazio la spinge con una pressione', 'è trattenuta dal campo magnetico solare'],
+        correct: 1, explain: 'Wheeler: lo spazio-tempo dice alla materia come muoversi, la materia dice allo spazio-tempo come curvarsi. Nessuna forza a distanza: geometria.' },
+      { type: 'mc', diff: 'hard', text: 'L\'equazione di campo di Einstein è difficilissima da risolvere perché:',
+        options: ['contiene troppe costanti fisiche', 'non è lineare: la materia curva il campo, che modifica il moto della materia, che ricurva il campo (e la gravità stessa genera gravità)', 'nessuno la sa scrivere per intero', 'vale solo in due dimensioni'],
+        correct: 1, explain: 'Il circolo campo↔materia (e il fatto che la deformazione trasporta essa stessa energia) rende le equazioni non lineari: le soluzioni esatte note si contano sulle dita.' },
+      { type: 'mc', diff: 'hard', text: 'Il raggio di Schwarzschild del Sole ($r_s = 2GM/c^2$) vale circa:',
+        options: ['3 km', '700 000 km (il suo raggio attuale)', '1 metro', '1 anno luce'],
+        correct: 0, explain: 'Comprimendo il Sole entro 3 km diventerebbe un buco nero (non accadrà: serve una stella molto più massiccia). Per la Terra: 9 millimetri!' },
+      { type: 'open', diff: 'hard', text: 'L\'universo si espande: spiega in che senso non si sta espandendo "dentro" qualcos\'altro, usando l\'analogia del palloncino e il concetto di metrica.',
+        keywords: ['metric', 'distanz', 'pallon', 'tessut', 'dilat', 'galassie', 'muov', 'spazio', 'coordinate'], requiredMatches: 3,
+        explain: 'Non è un\'esplosione dentro uno spazio preesistente: è la METRICA che cambia nel tempo — la regola con cui si calcolano le distanze. Come i punti su un palloncino che si gonfia: si allontanano senza muoversi sul tessuto... solo che non c\'è nessun palloncino né un "fuori": le galassie restano ferme nelle loro coordinate (comoventi) mentre tutte le distanze crescono, con velocità proporzionale alla distanza (legge di Hubble).' }
+    ];
+  </script>
+
+  <!-- Demo sezioni 9 e 11 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 9 — Espansione: la metrica che si dilata =====
+      (function () {
+        const svg = document.getElementById('exp-svg');
+        if (!svg) return;
+        const sa = document.getElementById('exp-a'), va = document.getElementById('exp-a-val');
+        const out = document.getElementById('exp-out');
+        const OX = 40, OY = 36, CELL = 17;       // origine e cella comovente (a=1)
+        const GAL = [[1, 1], [4, 2], [8, 1], [11, 4], [6, 5], [12, 2], [3, 6], [9, 6]];
+        const HA = 0, HB = 3;                     // indici delle due galassie evidenziate
+        function go() {
+          const a = +sa.value; va.textContent = a.toFixed(2);
+          const c = CELL * a;
+          let h = '';
+          // griglia comovente (si dilata tutta)
+          for (let i = 0; i <= 13; i++) h += `<line x1="${(OX + i * c).toFixed(1)}" y1="${OY}" x2="${(OX + i * c).toFixed(1)}" y2="${(OY + 7 * c).toFixed(1)}" stroke="var(--border)" stroke-width="1.2"/>`;
+          for (let j = 0; j <= 7; j++) h += `<line x1="${OX}" y1="${(OY + j * c).toFixed(1)}" x2="${(OX + 13 * c).toFixed(1)}" y2="${(OY + j * c).toFixed(1)}" stroke="var(--border)" stroke-width="1.2"/>`;
+          // galassie (FISSE nelle caselle)
+          GAL.forEach((g, i) => {
+            const x = OX + g[0] * c, y = OY + g[1] * c;
+            const hot = (i === HA || i === HB);
+            h += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${hot ? 9 : 6}" fill="${hot ? 'var(--red)' : 'var(--primary)'}"/>`;
+            h += `<circle cx="${(x - 2).toFixed(1)}" cy="${(y - 2).toFixed(1)}" r="2" fill="#fff" opacity="0.7"/>`;
+          });
+          // distanza tra le due evidenziate
+          const A = GAL[HA], B = GAL[HB];
+          const ax = OX + A[0] * c, ay = OY + A[1] * c, bx = OX + B[0] * c, by = OY + B[1] * c;
+          h += `<line x1="${ax.toFixed(1)}" y1="${ay.toFixed(1)}" x2="${bx.toFixed(1)}" y2="${by.toFixed(1)}" stroke="var(--gold)" stroke-width="2" stroke-dasharray="6 5"/>`;
+          const dcom = Math.hypot(B[0] - A[0], B[1] - A[1]);
+          h += `<text x="${((ax + bx) / 2).toFixed(1)}" y="${((ay + by) / 2 - 10).toFixed(1)}" text-anchor="middle" class="em">d = ${(dcom * a).toFixed(1).replace('.', ',')} unità</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = `Fattore di scala $a = ${a.toFixed(2).replace('.', ',')}$: le galassie sono <strong>ferme nelle loro caselle</strong>, ma ogni casella si è dilatata — la distanza evidenziata è passata da ${dcom.toFixed(1).replace('.', ',')} a <span class="val-badge">${(dcom * a).toFixed(1).replace('.', ',')}</span> unità. E una galassia a distanza doppia si è allontanata del doppio: eccola, la legge di Hubble.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sa.addEventListener('input', go); go();
+      })();
+
+      // ===== 11.2 — Curve di rotazione delle galassie =====
+      (function () {
+        const dm = document.getElementById('rot-dm');
+        if (!dm || !window.Plt) return;
+        const out = document.getElementById('rot-out');
+        const { linspace, update } = Plt;
+        // dati "osservati": piatti attorno a 220 km/s
+        const rObs = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+        const vObs = [205, 218, 222, 219, 224, 221, 218, 223, 220, 217, 222, 219, 221];
+        function go() {
+          const rs = linspace(0.4, 15, 200);
+          const vKep = rs.map(r => r < 3 ? 220 * (r / 3) : 220 * Math.sqrt(3 / r));
+          const data = [
+            { x: rObs, y: vObs, type: 'scatter', mode: 'markers', name: 'stelle osservate', marker: { color: '#f5b400', size: 9 } },
+            { x: rs, y: vKep, type: 'scatter', mode: 'lines', name: 'attesa (solo materia visibile)', line: { color: '#3b82f6', width: 3, dash: 'dot' } },
+          ];
+          if (dm.checked) {
+            data.push({ x: rs, y: rs.map(r => r < 3 ? 220 * (r / 3) : 220), type: 'scatter', mode: 'lines', name: 'visibile + alone di materia oscura', line: { color: '#22c55e', width: 3 } });
+          }
+          update('rot-plot', data, {
+            xaxis: { title: 'distanza dal centro galattico (kpc)', range: [0, 15.5] },
+            yaxis: { title: 'velocità orbitale (km/s)', range: [0, 280] },
+            legend: { orientation: 'h', y: 1.15 },
+          });
+          out.innerHTML = dm.checked
+            ? `Con un alone di <strong>materia oscura</strong> (massa invisibile distribuita intorno alla galassia) la curva teorica si appiattisce e aggancia i dati. L'alternativa: niente massa in più, ma leggi <strong>modificate</strong> (MOND). Gli esperimenti per decidere sono in corso — per ora, giuria riunita.`
+            : `Le stelle lontane dal centro dovrebbero rallentare come i pianeti lontani dal Sole ($v \\propto 1/\\sqrt{r}$, curva blu): invece restano a <strong>velocità costante</strong> (punti gialli). Da qualche parte manca massa... o fisica. Prova ad aggiungere la materia oscura.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        dm.addEventListener('change', go);
+        document.addEventListener('themechange', go);
+        go();
+      })();
+
+      // ===== 12 — Trasporto parallelo sul triangolo sferico =====
+      (function () {
+        const svg = document.getElementById('par-svg');
+        if (!svg) return;
+        const ss = document.getElementById('par-s'), vs = document.getElementById('par-s-val');
+        const out = document.getElementById('par-out');
+        const CX = 320, CY = 195, R = 140, TILT = 0.42, ALPHA = 80;
+        function pt(thetaDeg, lamDeg) {
+          const th = thetaDeg * Math.PI / 180, lam = lamDeg * Math.PI / 180;
+          const X = Math.cos(th) * Math.cos(lam), Y = Math.cos(th) * Math.sin(lam), Z = Math.sin(th);
+          return [CX + R * Y, CY - R * (Z * Math.cos(TILT) - X * Math.sin(TILT))];
+        }
+        function norm(v) { const n = Math.hypot(v[0], v[1]) || 1; return [v[0] / n, v[1] / n]; }
+        function basis(th, lam) {
+          const tc = Math.min(th, 88.5), e = 0.6;
+          const p0 = pt(tc, lam);
+          const eth = norm([pt(tc + e, lam)[0] - p0[0], pt(tc + e, lam)[1] - p0[1]]);
+          const elm = norm([pt(tc, lam + e)[0] - p0[0], pt(tc, lam + e)[1] - p0[1]]);
+          return [eth, elm];
+        }
+        function poly(points) { return points.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' '); }
+        function pathPoints(sFrac) {
+          // restituisce i punti (θ,λ) del cammino percorso fino a sFrac ∈ [0,1]
+          const pts = [];
+          const n = Math.round(sFrac * 90);
+          for (let i = 0; i <= n; i++) {
+            const s = (i / 90);
+            pts.push(state(s).pos);
+          }
+          return pts;
+        }
+        function state(s) {
+          const h = ALPHA / 2;
+          if (s <= 1 / 3) {                       // equatore A→B
+            const t = s * 3;
+            const lam = -h + ALPHA * t;
+            const [eth, elm] = basis(0, lam);
+            return { pos: pt(0, lam), vec: elm, leg: 1 };
+          } else if (s <= 2 / 3) {                // meridiano B → polo
+            const t = (s - 1 / 3) * 3;
+            const th = 90 * t;
+            const [eth, elm] = basis(th, h);
+            return { pos: pt(th, h), vec: elm, leg: 2 };
+          } else {                                // polo → A lungo il meridiano di A
+            const t = (s - 2 / 3) * 3;
+            const th = 90 * (1 - t);
+            const [eth, elm] = basis(th, -h);
+            const a = ALPHA * Math.PI / 180;
+            return { pos: pt(th, -h), vec: norm([Math.sin(a) * eth[0] + Math.cos(a) * elm[0], Math.sin(a) * eth[1] + Math.cos(a) * elm[1]]), leg: 3 };
+          }
+        }
+        function arrow(p, dir, col, L) {
+          const x2 = p[0] + dir[0] * L, y2 = p[1] + dir[1] * L;
+          const a = Math.atan2(y2 - p[1], x2 - p[0]);
+          return `<line x1="${p[0].toFixed(1)}" y1="${p[1].toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${col}" stroke-width="3.5"/>` +
+            `<polygon points="${x2.toFixed(1)},${y2.toFixed(1)} ${(x2 - 13 * Math.cos(a - 0.42)).toFixed(1)},${(y2 - 13 * Math.sin(a - 0.42)).toFixed(1)} ${(x2 - 13 * Math.cos(a + 0.42)).toFixed(1)},${(y2 - 13 * Math.sin(a + 0.42)).toFixed(1)}" fill="${col}"/>`;
+        }
+        function go() {
+          const sPct = +ss.value; vs.textContent = sPct;
+          const s = sPct / 100, h = ALPHA / 2;
+          let out_h = '';
+          // sfera + equatore
+          out_h += `<circle cx="${CX}" cy="${CY}" r="${R}" fill="color-mix(in srgb, var(--primary) 7%, transparent)" stroke="var(--primary)" stroke-width="2"/>`;
+          const eqF = [], eqB = [];
+          for (let l = -90; l <= 90; l += 5) eqF.push(pt(0, l));
+          for (let l = 90; l <= 270; l += 5) eqB.push(pt(0, l));
+          out_h += `<polyline points="${poly(eqB)}" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="4 5" opacity="0.6"/>`;
+          out_h += `<polyline points="${poly(eqF)}" fill="none" stroke="var(--text-soft)" stroke-width="1.6"/>`;
+          // triangolo (percorso completo, tenue)
+          const tri = [];
+          for (let l = -h; l <= h; l += 2.5) tri.push(pt(0, l));
+          for (let t = 0; t <= 90; t += 4) tri.push(pt(t, h));
+          for (let t = 90; t >= 0; t -= 4) tri.push(pt(t, -h));
+          out_h += `<polyline points="${poly(tri)}" fill="none" stroke="var(--gold)" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.7"/>`;
+          // tratto percorso
+          if (s > 0.005) out_h += `<polyline points="${poly(pathPoints(s))}" fill="none" stroke="var(--red)" stroke-width="2.5"/>`;
+          // vettore di partenza (fantasma in A)
+          const st0 = state(0);
+          out_h += arrow(st0.pos, st0.vec, 'var(--muted)', 34);
+          out_h += `<text x="${(st0.pos[0] - 8).toFixed(1)}" y="${(st0.pos[1] + 26).toFixed(1)}" text-anchor="end" class="lbl-s">partenza (verso est)</text>`;
+          // stato corrente
+          const st = state(s);
+          out_h += arrow(st.pos, st.vec, 'var(--red)', 46);
+          out_h += `<circle cx="${st.pos[0].toFixed(1)}" cy="${st.pos[1].toFixed(1)}" r="6" fill="var(--red)"/>`;
+          svg.innerHTML = out_h;
+          out.innerHTML = sPct === 0
+            ? `Il vettore parte dal vertice A puntando <strong>verso est</strong> lungo l'equatore. Trascina lo slider e portalo a spasso lungo il triangolo, senza mai ruotarlo rispetto al percorso.`
+            : sPct >= 100
+              ? `Tornato in A, il vettore punta in un'altra direzione: è <strong>ruotato di ${ALPHA}°</strong> — esattamente l'eccesso angolare (${ALPHA}°) del triangolo percorso. Nessuno l'ha girato: è stata la <strong>curvatura</strong> attraversata dal circuito.`
+              : st.leg === 1
+                ? `Lungo l'equatore il vettore resta puntato a est: il trasporto parallelo lo tiene "fermo" rispetto alla rotta.`
+                : st.leg === 2
+                  ? `Salendo lungo il meridiano il vettore resta perpendicolare alla rotta (sempre "a est"): nessuna rotazione apparente... finora.`
+                  : `Ridiscendendo lungo l'altro meridiano il vettore mantiene l'angolo col percorso — ma quell'angolo, fissato al polo, si porta dietro la memoria dell'apertura tra i due meridiani.`;
+        }
+        ss.addEventListener('input', go); go();
+      })();
+
+    });
+  </script>
+</body>
+
+</html>

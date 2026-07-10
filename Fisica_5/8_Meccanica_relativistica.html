@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 8 — La meccanica relativistica</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    /* --- SVG fisici (theme-aware) --- */
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quinto anno · Lezione 8 · Modulo: Teoria della relatività</div>
+    <h1>La meccanica relativistica</h1>
+    <p>Massa, energia e il muro della velocità della luce — fino alla formula più famosa del mondo</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quinto anno</a>
+    <span class="sep">/</span> La meccanica relativistica
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Nella scorsa lezione abbiamo ricostruito spazio e tempo: simultaneità relativa,
+      tempi che si dilatano, lunghezze che si contraggono, trasformazioni di Lorentz. Ma se cambiano spazio e tempo,
+      deve cambiare anche la <strong>meccanica</strong> che ci vive dentro: quantità di moto, energia... e la massa.
+      Oggi rifacciamo i conti — e in fondo al percorso ci aspetta l'equazione più famosa della fisica.
+    </div>
+
+    <!-- 1 — MASSA E MASSA A RIPOSO -->
+    <section id="sec1">
+      <h2>1. Massa e massa a riposo</h2>
+
+      <p>Nella meccanica di Newton la massa è una sola: un numero fisso, scritto sulla carta d'identità dell'oggetto,
+        uguale per tutti gli osservatori e per tutte le velocità. In relatività questa comodità si paga: come vedremo
+        tra un attimo, l'<strong>inerzia</strong> di un corpo — la sua resistenza a farsi accelerare — <strong>cresce
+        con la velocità</strong>. Serve allora distinguere due concetti che Newton poteva confondere:</p>
+
+      <div class="definition">
+        <strong>Massa a riposo</strong> $m_0$: la massa misurata nel sistema di riferimento in cui l'oggetto è
+        <strong>fermo</strong>. È una proprietà intrinseca dell'oggetto, un <strong>invariante</strong>: tutti gli
+        osservatori concordano sul suo valore (per questo è lei la vera "carta d'identità").
+        <br><br>
+        <strong>Massa relativistica</strong> $m$: la massa <em>efficace</em> che un osservatore attribuisce a un
+        oggetto che gli sfreccia davanti a velocità $v$, misurandone l'inerzia:
+        $$m = \gamma\, m_0 = \frac{m_0}{\sqrt{1 - v^2/c^2}}$$
+      </div>
+
+      <p>Il fattore è il solito $\gamma$ di Lorentz della lezione scorsa: vale $1$ da fermi, cresce piano alle
+        velocità "umane", ed <strong>esplode</strong> avvicinandosi a $c$. Muovi lo slider e guarda l'inerzia
+        lievitare:</p>
+
+      <div class="two-col">
+        <div>
+          <div class="controls">
+            <div class="control-group"><label>Velocità: <span class="val" id="ms-b-val">0.60</span> c</label>
+              <input type="range" id="ms-b" min="0" max="0.995" step="0.005" value="0.6"></div>
+            <label class="toggle-row" title="Blocca gli assi per confrontare visivamente i cambiamenti"><input type="checkbox" id="ms-lock" checked> 🔒 blocca la scala</label>
+          </div>
+          <p id="ms-out" class="eq-out"></p>
+        </div>
+        <div><div class="plot" id="ms-plot" style="height: 320px;"></div></div>
+      </div>
+
+      <div class="curiosita">
+        <strong>Una nota per i puristi.</strong> La "massa relativistica" è un concetto didattico caro ai libri di
+        testo (e lo useremo anche noi, perché rende l'idea in modo vivido), ma i fisici di oggi preferiscono un
+        vocabolario più asciutto: la parola <em>massa</em> da sola indica <strong>sempre</strong> la massa a riposo
+        $m_0$ — l'invariante — e l'aumento di inerzia si racconta dicendo che crescono l'<strong>energia</strong> e la
+        <strong>quantità di moto</strong>, non "la massa". Sono due modi di descrivere gli stessi identici esperimenti;
+        l'importante è non mescolarli a metà frase.
+      </div>
+    </section>
+
+    <!-- 2 — IL MURO DELLA LUCE -->
+    <section id="sec2">
+      <h2>2. Il muro della luce: perché $c$ è irraggiungibile</h2>
+
+      <p>Per far andare più veloce un oggetto bisogna <strong>fornirgli energia</strong> — questo vale da sempre, anche
+        per Newton: l'energia cinetica classica è $K = \frac{1}{2}m_0 v^2$, e con abbastanza energia raggiungi
+        <em>qualsiasi</em> velocità. Ma in relatività c'è il circolo vizioso: più l'oggetto va veloce, più la sua
+        inerzia $m = \gamma m_0$ cresce, più diventa faticoso accelerarlo ancora. L'energia cinetica relativistica
+        è</p>
+      <div class="formula-box">
+        $$K = (\gamma - 1)\,m_0\,c^2$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">(per $v \ll c$ si riottiene proprio $\frac{1}{2}m_0v^2$: la vecchia formula era il limite lento di questa)</p>
+      </div>
+      <p>e siccome $\gamma \to \infty$ quando $v \to c$, il conto è impietoso: <strong>portare a velocità $c$ un
+        oggetto dotato di massa costerebbe energia infinita</strong>. Prova tu a fare il pieno: ogni volta che
+        raddoppi l'energia, guadagni sempre meno velocità.</p>
+
+      <div class="two-col">
+        <div>
+          <div class="controls">
+            <div class="control-group"><label>Energia fornita: K = <span class="val" id="en-k-val">1.0</span> · m₀c²</label>
+              <input type="range" id="en-k" min="0" max="9" step="0.1" value="1"></div>
+            <label class="toggle-row" title="Blocca gli assi per confrontare visivamente i cambiamenti"><input type="checkbox" id="en-lock" checked> 🔒 blocca la scala</label>
+          </div>
+          <p id="en-out" class="eq-out"></p>
+        </div>
+        <div><div class="plot" id="en-plot" style="height: 340px;"></div></div>
+      </div>
+
+      <div class="rule">
+        <strong>Il limite di velocità dell'universo.</strong> Un oggetto con massa a riposo $m_0 \ne 0$ non può
+        <strong>superare</strong> la velocità della luce — e in realtà non può nemmeno <strong>raggiungerla</strong>:
+        ci si può avvicinare quanto si vuole (con energia sempre più spropositata), ma il muro non si tocca mai.
+        Non è un limite tecnologico dei nostri motori: è scritto nella struttura dello spazio-tempo.
+      </div>
+
+      <div class="curiosita">
+        <strong>Il muro alla prova dei fatti.</strong> Al CERN gli acceleratori fanno esattamente questo esperimento,
+        miliardi di volte al secondo: i protoni di LHC ricevono energie enormi — $\gamma \approx 7000$, cioè
+        un'inerzia settemila volte quella a riposo — e viaggiano a $0{,}999999991\,c$. Tutta quell'energia in più e
+        mancano ancora <em>tre metri al secondo</em> per raggiungere la luce: il muro regge benissimo.
+      </div>
+    </section>
+
+    <!-- 3 — CHI PUÒ VIAGGIARE ALLA VELOCITÀ DELLA LUCE -->
+    <section id="sec3">
+      <h2>3. Chi può viaggiare a $c$ (e chi, forse, oltre)</h2>
+
+      <p>Il ragionamento della sezione 2 ha un'uscita di sicurezza nascosta: tutto il problema nasce dalla massa a
+        riposo $m_0$ che, moltiplicata per $\gamma \to \infty$, fa esplodere l'energia. E se $m_0$ fosse
+        <strong>zero</strong>?</p>
+
+      <ul>
+        <li><strong>Particelle con $m_0 \ne 0$</strong> (elettroni, protoni, tu, la tua astronave): viaggiano
+          <strong>sempre sotto</strong> $c$. Possono avvicinarsi al muro quanto l'energia consente, mai toccarlo.</li>
+        <li><strong>Particelle con $m_0 = 0$</strong>: per loro $\gamma \cdot 0$ è una forma indeterminata che la
+          teoria risolve in modo elegante — possono trasportare energia e quantità di moto, ma <strong>solo</strong>
+          viaggiando <strong>esattamente a $c$</strong>, in ogni sistema di riferimento. Non possono andare più piano!
+          Anticipiamo il nome dell'inquilina più famosa di questa categoria: la luce stessa è fatta di particelle
+          senza massa a riposo chiamate <strong>fotoni</strong> (la storia completa — perché la luce, che per Maxwell
+          è un'onda, sia fatta di particelle — ve la racconterà la fisica quantistica: pazienza ancora un po').</li>
+        <li><strong>Particelle più veloci di $c$?</strong> Sulla carta la matematica ammette una terza famiglia: i
+          <strong>tachioni</strong>, particelle che vivrebbero <em>dall'altra parte del muro</em>, sempre più veloci
+          della luce. Sono stati teorizzati seriamente (e per loro il muro varrebbe al contrario: non potrebbero mai
+          <em>rallentare</em> fino a $c$!), ma <strong>non sono mai stati osservati</strong> — e c'è un ottimo motivo
+          per sperare che non esistano: ricordi il cono di luce? Un segnale più veloce della luce uscirebbe dal cono
+          e, per qualche osservatore, l'effetto precederebbe la causa. I tachioni farebbero a pezzi la causalità.</li>
+      </ul>
+
+      <div class="note">
+        <strong>Riassunto del traffico cosmico.</strong> Sotto il muro: tutto ciò che ha massa (per sempre).
+        Sul muro, esattamente: tutto ciò che non ha massa (per sempre). Oltre il muro: per ora, solo fantascienza
+        con equazioni eleganti. Nessuno attraversa mai il muro, in nessuna direzione.
+      </div>
+    </section>
+
+    <!-- 4 — ESERCIZI GUIDATI -->
+    <section id="sec4">
+      <h2>4. Mettiamo i numeri: esercizi guidati</h2>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato 1 — l'elettrone ingrassato</span></div>
+        <p>Un elettrone ($m_0 = 9{,}11\times10^{-31}$ kg) viaggia a $v = 0{,}8\,c$. Calcola la sua massa
+          relativistica $m = \gamma\,m_0$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$\gamma = \dfrac{1}{\sqrt{1 - 0{,}8^2}} = \dfrac{1}{\sqrt{0{,}36}} = \dfrac{1}{0{,}6} = \dfrac{5}{3} \approx 1{,}67$.</p>
+          <p><span class="step-num">2</span>$m = \gamma\,m_0 = \dfrac{5}{3} \times 9{,}11\times10^{-31} \approx 1{,}52\times10^{-30}$ kg.</p>
+          <p><span class="step-num">3</span>A $0{,}8\,c$ l'elettrone oppone il $67\%$ di inerzia in più: per
+            accelerarlo ancora serve più forza di quanto direbbe Newton.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$m \approx 1{,}52\times10^{-30}$ kg $\;(= 1{,}67\,m_0)$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato 2 — l'energia cinetica di un protone veloce</span></div>
+        <p>Un protone ($m_0 = 1{,}67\times10^{-27}$ kg) viaggia a $v = 0{,}6\,c$. Calcola la sua energia cinetica
+          relativistica $K = (\gamma - 1)\,m_0 c^2$ e confrontala con quella classica $\frac{1}{2} m_0 v^2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$\gamma = \dfrac{1}{\sqrt{1 - 0{,}36}} = \dfrac{1}{0{,}8} = 1{,}25$.</p>
+          <p><span class="step-num">2</span>Energia a riposo: $m_0 c^2 = 1{,}67\times10^{-27} \times (3\times10^{8})^2 = 1{,}50\times10^{-10}$ J.</p>
+          <p><span class="step-num">3</span>$K = (1{,}25 - 1) \times 1{,}50\times10^{-10} = 3{,}76\times10^{-11}$ J.</p>
+          <p><span class="step-num">4</span>Il conto classico darebbe $\frac{1}{2} m_0 (0{,}6c)^2 = 0{,}18\,m_0c^2 = 2{,}7\times10^{-11}$ J:
+            Newton <strong>sottostima</strong> del $28\%$ — e peggiora rapidamente a velocità più alte.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$K \approx 3{,}8\times10^{-11}$ J (classicamente: $2{,}7\times10^{-11}$ J).</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato 3 — quanta velocità compra un raddoppio di energia?</span></div>
+        <p>Un oggetto ha energia cinetica $K = m_0 c^2$ (cioè $\gamma = 2$). Se <strong>raddoppio</strong> l'energia
+          cinetica ($K = 2\,m_0c^2$, cioè $\gamma = 3$), la velocità raddoppia? Calcola $v$ nei due casi.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Da $\gamma = 1/\sqrt{1-\beta^2}$ ricavo $\beta = \sqrt{1 - 1/\gamma^2}$.</p>
+          <p><span class="step-num">2</span>Con $\gamma = 2$: $\beta = \sqrt{1 - 1/4} = \sqrt{0{,}75} \approx 0{,}87$.</p>
+          <p><span class="step-num">3</span>Con $\gamma = 3$: $\beta = \sqrt{1 - 1/9} = \sqrt{0{,}889} \approx 0{,}94$.</p>
+          <p><span class="step-num">4</span>Ho raddoppiato l'energia e guadagnato... il $9\%$ di velocità. Ecco il muro
+            all'opera: l'energia va sempre più a "ingrassare" l'inerzia e sempre meno a far correre l'oggetto.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$v$ passa da $0{,}87\,c$ a $0{,}94\,c$: nessun raddoppio!</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — ANCHE I RAZZI CAMBIANO MASSA -->
+    <section id="sec5">
+      <h2>5. Intermezzo: anche i razzi cambiano massa</h2>
+
+      <p>Un oggetto la cui massa <strong>varia durante il moto</strong> può sembrare un'esclusiva esotica della
+        relatività. Non lo è affatto: è il pane quotidiano dell'ingegneria spaziale. Un <strong>razzo</strong> è
+        essenzialmente un serbatoio volante: al decollo di un Saturn V, su circa $3000$ tonnellate totali, quasi il
+        <strong>90% è carburante</strong> — e viene bruciato ed espulso in pochi minuti. Man mano che il carburante
+        brucia, la massa del razzo <strong>diminuisce</strong>: a parità di spinta $F$, l'accelerazione
+        $a = F/m$ <strong>cresce</strong> lungo il volo.</p>
+
+      <div class="controls">
+        <button class="btn" id="rk-go" type="button">▶ Accendi i motori</button>
+        <button class="btn" id="rk-reset" type="button">↺ Nuovo pieno</button>
+      </div>
+      <div class="ckt"><svg id="rk-svg" viewBox="0 0 640 260" aria-label="Razzo che brucia carburante: la massa diminuisce e l'accelerazione cresce a spinta costante"></svg></div>
+      <p class="eq-out" id="rk-out"></p>
+
+      <div class="note">
+        <strong>Stessa espressione, fenomeni opposti.</strong> Attenzione però a non confondere i due casi. Nel razzo
+        la massa <strong>diminuisce</strong> perché la materia viene <em>fisicamente buttata fuori</em> dall'ugello:
+        è un problema di contabilità (chi fa ancora parte del razzo?), che Newton gestisce benissimo. Nella
+        relatività l'inerzia <strong>cresce</strong> con la velocità senza che nulla entri o esca dall'oggetto: è la
+        struttura dello spazio-tempo. In entrambi i casi, però, le equazioni del moto devono fare i conti con una
+        "massa" che non è più una costante — e per questo i fisici hanno imparato a maneggiare con cura il concetto.
+      </div>
+    </section>
+
+    <!-- 6 — VETTORI E QUADRIVETTORI -->
+    <section id="sec6">
+      <h2>6. Dai vettori ai quadrivettori</h2>
+
+      <h3>6.1 — Ripasso: che cos'è un vettore</h3>
+      <p>Un <strong>vettore</strong> è una grandezza fisica che non basta un numero a descrivere: serve anche una
+        direzione e un verso — una <strong>freccia</strong>. Spostamento, velocità, forza, campo elettrico: tutti
+        vettori. In un sistema di assi, un vettore si scrive per <strong>componenti</strong>,
+        $\vec v = (v_x,\ v_y,\ v_z)$, e qui c'è il punto che ci interessa: se <strong>ruoto gli assi</strong>, le
+        componenti cambiano tutte... ma il <strong>modulo</strong></p>
+      <div class="formula-box">
+        $$|\vec v|^2 = v_x^2 + v_y^2 + v_z^2$$
+      </div>
+      <p>resta identico (è Pitagora). Le componenti sono il punto di vista; il modulo è la realtà su cui tutti
+        concordano. Vi ricorda qualcosa? È esattamente il gioco di misure relative e invarianti della lezione
+        scorsa.</p>
+
+      <h3>6.2 — Energia e quantità di moto, ripassate e corrette</h3>
+      <p>Prima di assemblare il quadrivettore, rispolveriamo i due protagonisti della meccanica:</p>
+      <ul>
+        <li>La <strong>quantità di moto</strong> (o <em>impulso</em>) misura "quanto moto" trasporta un corpo:
+          classicamente $\vec p = m\vec v$. È la grandezza che si <strong>conserva</strong> negli urti: quella che un
+          camion ha in abbondanza anche a bassa velocità.</li>
+        <li>L'<strong>energia</strong> è la capacità di compiere lavoro; anche lei si <strong>conserva</strong>,
+          trasformandosi da una forma all'altra (cinetica, potenziale, termica...).</li>
+      </ul>
+      <p>In relatività entrambe ricevono la correzione ormai familiare — un fattore $\gamma$:</p>
+      <div class="formula-box">
+        $$\vec p = \gamma\, m_0\, \vec v \qquad\qquad E = \gamma\, m_0\, c^2$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">$E$ è l'energia <strong>totale</strong>; l'energia cinetica è ciò che eccede il valore da fermo: $K = E - m_0c^2 = (\gamma - 1)\,m_0c^2$, come nella sezione 2</p>
+      </div>
+      <p>Nota la sorpresa nascosta nella seconda formula: per $v = 0$ (cioè $\gamma = 1$) l'energia <strong>non è
+        zero</strong>. Ci torniamo tra un attimo — è la scoperta del secolo.</p>
+
+      <h3>6.3 — Il quadrivettore energia-impulso</h3>
+      <p>Nello spazio-tempo di Minkowski le frecce hanno <strong>quattro</strong> componenti: una temporale e tre
+        spaziali. Un <strong>quadrivettore</strong> è una quaterna che sotto le trasformazioni di Lorentz si mescola
+        esattamente come $(ct,\ x,\ y,\ z)$ — il quadrivettore posizione, il prototipo della famiglia. E come il
+        modulo di un vettore è invariante per rotazioni, ogni quadrivettore ha un "modulo" alla Minkowski —
+        <em>componente temporale al quadrato <strong>meno</strong> componenti spaziali al quadrato</em> — che è
+        <strong>invariante per trasformazioni di Lorentz</strong> (per il quadrivettore posizione è il nostro
+        $s^2$).</p>
+      <p>Ebbene: energia e quantità di moto, che separatamente dipendono dall'osservatore, insieme formano proprio un
+        quadrivettore — il <strong>quadrivettore energia-impulso</strong>:</p>
+      <div class="formula-box">
+        $$P = \left(\frac{E}{c},\ p_x,\ p_y,\ p_z\right)$$
+      </div>
+      <p>L'energia è la componente "temporale" del moto, la quantità di moto quella "spaziale": un'altra coppia
+        newtoniana che la relatività rivela essere due facce della stessa entità (come spazio e tempo, come campo
+        elettrico e magnetico). E il suo modulo invariante? Calcoliamolo nel sistema più comodo — quello in cui
+        l'oggetto è fermo, dove $E = m_0c^2$ e $\vec p = 0$:</p>
+      <div class="formula-box">
+        $$\left(\frac{E}{c}\right)^{2} - |\vec p|^2 = (m_0\,c)^2$$
+      </div>
+      <p>La "lunghezza" del quadrivettore energia-impulso è (a meno di un $c$) la <strong>massa a riposo</strong>!
+        Ecco perché $m_0$ è l'invariante perfetto: osservatori diversi misurano $E$ e $\vec p$ diversi, ma questa
+        combinazione dà a tutti lo stesso numero — la carta d'identità dell'oggetto, scolpita nella geometria.</p>
+    </section>
+
+    <!-- 7 — IL TRIANGOLO DI EINSTEIN E E=MC² -->
+    <section id="sec7">
+      <h2>7. Il triangolo di Einstein e $E = mc^2$</h2>
+
+      <p>Moltiplichiamo l'invariante appena trovato per $c^2$ e riordiniamo: otteniamo la relazione fondamentale tra
+        energia, impulso e massa,</p>
+      <div class="formula-box">
+        $$E^2 = (p\,c)^2 + (m_0\,c^2)^2$$
+      </div>
+      <p>Guardala bene: è un <strong>teorema di Pitagora</strong>! $E$ è l'ipotenusa di un triangolo rettangolo i cui
+        cateti sono $pc$ (il "lato moto") e $m_0c^2$ (il "lato massa"). È il <strong>triangolo di Einstein</strong> —
+        buffo, no? Pitagora era saltato nella geometria dello spazio-tempo (colpa del segno meno), e rieccolo qui,
+        risorto tra energia e impulso. Gioca con i cateti:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Quantità di moto: pc = <span class="val" id="tri-p-val">3.0</span></label>
+          <input type="range" id="tri-p" min="0" max="10" step="0.5" value="3"></div>
+        <div class="control-group"><label>Massa a riposo: m₀c² = <span class="val" id="tri-m-val">4.0</span></label>
+          <input type="range" id="tri-m" min="0" max="10" step="0.5" value="4"></div>
+      </div>
+      <div class="ckt"><svg id="tri-svg" viewBox="0 0 640 380" aria-label="Triangolo di Einstein: cateti pc e m0c2, ipotenusa E"></svg></div>
+      <p class="eq-out" id="tri-out"></p>
+
+      <p>I due casi estremi del triangolo sono vecchie conoscenze:</p>
+      <ul>
+        <li><strong>$m_0 = 0$</strong> (cateto massa nullo): il triangolo collassa sul cateto orizzontale e $E = pc$.
+          È il <strong>fotone</strong> della sezione 3: niente massa, solo moto — eppure trasporta energia e impulso
+          (è così che la luce "spinge": vele solari!).</li>
+        <li><strong>$p = 0$</strong> (cateto moto nullo): il triangolo collassa su quello verticale — e resta
+          soltanto la scoperta più famosa del Novecento:</li>
+      </ul>
+
+      <div class="definition">
+        <strong>L'energia a riposo.</strong> Per un oggetto fermo ($p = 0$):
+        $$E = m_0\,c^2$$
+        La formula più famosa del mondo (di solito scritta $E = mc^2$). Dice una cosa inaudita: un oggetto fermo, che
+        per Newton non ha alcuna energia meccanica, <strong>è</strong> energia — in quantità colossale, perché il
+        fattore di cambio è $c^2 = 9\times10^{16}$ m²/s². La massa non è altro che energia <strong>congelata</strong>.
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato — il triangolo 3-4-5</span></div>
+        <p>Una particella ha quantità di moto $pc = 3$ MeV e massa a riposo $m_0c^2 = 4$ MeV. Calcola la sua energia
+          totale $E$ e la sua energia cinetica $K$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Pitagora: $E = \sqrt{(pc)^2 + (m_0c^2)^2} = \sqrt{3^2 + 4^2} = \sqrt{25} = 5$ MeV. (Il caro vecchio triangolo 3-4-5!)</p>
+          <p><span class="step-num">2</span>Energia cinetica: $K = E - m_0c^2 = 5 - 4 = 1$ MeV.</p>
+          <p><span class="step-num">3</span>Bonus: da $E = \gamma\,m_0c^2$ ricavo $\gamma = 5/4$, cioè $v = 0{,}6\,c$ — il nostro triangolo preferito nasconde pure la velocità.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$E = 5$ MeV, $K = 1$ MeV.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — LA MASSA È ENERGIA -->
+    <section id="sec8">
+      <h2>8. La massa è energia (e come incassarla)</h2>
+
+      <p>$E = mc^2$ non è una curiosità da lavagna: è un <strong>tasso di cambio</strong>, e funziona nei due sensi.
+        La <strong>massa può trasformarsi in energia</strong> — un grammo di materia, interamente convertito,
+        libererebbe $E = 10^{-3} \times 9\times10^{16} = 9\times10^{13}$ J: il fabbisogno elettrico di una piccola
+        città per un anno, da un peso che sta su un'unghia. E viceversa, l'<strong>energia può condensarsi in
+        massa</strong>: negli acceleratori, dall'energia degli urti <em>nascono</em> particelle che prima non
+        esistevano.</p>
+
+      <p>A livello teorico è il modo più efficiente di ottenere energia che l'universo consenta. Il problema è
+        <em>incassare</em>: quasi tutti i processi che conosciamo grattano appena la superficie del capitale
+        $mc^2$:</p>
+
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Processo</th><th>Frazione di $mc^2$ liberata</th><th>Esempio</th></tr></thead>
+          <tbody>
+            <tr><td>Combustione (chimica)</td><td>$\approx 5\times10^{-10}$ ($0{,}00000005\%$)</td><td>benzina, legna: si toccano solo i legami tra atomi</td></tr>
+            <tr><td><strong>Fissione</strong> nucleare</td><td>$\approx 0{,}09\%$</td><td>uranio nelle centrali: un nucleo pesante si spezza</td></tr>
+            <tr><td><strong>Fusione</strong> nucleare</td><td>$\approx 0{,}7\%$</td><td>idrogeno → elio: il motore del Sole</td></tr>
+            <tr><td>Annichilazione materia-antimateria</td><td>$100\%$</td><td>per ora, solo laboratori (e fantascienza)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rule">
+        <strong>Il difetto di massa.</strong> Nelle <strong>reazioni nucleari</strong> i prodotti pesano
+        <strong>meno</strong> dei reagenti: la differenza — il <em>difetto di massa</em> $\Delta m$ — se n'è andata
+        sotto forma di energia, esattamente $E = \Delta m\,c^2$. Funziona in due direzioni opposte: nella
+        <strong>fusione</strong> nuclei leggeri si uniscono (è ciò che fa il Sole, convertendo in luce circa
+        <strong>4 milioni di tonnellate di massa al secondo</strong>); nella <strong>fissione</strong> nuclei pesanti
+        si spezzano (è ciò che accade nelle centrali nucleari). Alle reazioni nucleari — come funzionano, quanto
+        rendono, che problemi pongono — dedicheremo un capitolo a parte: ora sapete da quale formula discende tutto.
+      </div>
+
+      <div class="curiosita">
+        <strong>Anche la tua stufa obbedisce a Einstein.</strong> A rigore, <em>ogni</em> rilascio di energia paga in
+        massa: quando bruci un chilo di legna, i prodotti della combustione (raccolti tutti, fumo compreso) pesano
+        circa $10^{-9}$ kg meno della legna più l'ossigeno di partenza. Un microgrammo scarso: nessuna bilancia da
+        cucina se ne accorge, ed è per questo che per secoli abbiamo creduto che la massa si conservasse
+        <em>esattamente</em>. Si conserva quasi: il "quasi" è $E/c^2$, e con $c^2$ al denominatore serve un'energia
+        nucleare per notarlo.
+      </div>
+    </section>
+
+    <!-- 9 — QUIZ -->
+    <section id="quiz">
+      <h2>9. Quiz finale</h2>
+      <p>Dieci domande su massa, energia e quadrivettori. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 8 — La meccanica relativistica · Fisica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezioni 1-2 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 1 — Massa relativistica m = γ m0 =====
+      (function () {
+        const sb = document.getElementById('ms-b');
+        if (!sb || !window.Plt) return;
+        const vb = document.getElementById('ms-b-val'), lock = document.getElementById('ms-lock');
+        const out = document.getElementById('ms-out');
+        const { linspace, update } = Plt;
+        function go() {
+          const B = +sb.value; vb.textContent = B.toFixed(2);
+          const g = 1 / Math.sqrt(1 - B * B);
+          const xs = linspace(0, 0.995, 300);
+          update('ms-plot', [
+            { x: xs, y: xs.map(b => 1 / Math.sqrt(1 - b * b)), type: 'scatter', mode: 'lines', name: 'm/m₀ = γ', line: { color: '#f5b400', width: 3 } },
+            { x: [B], y: [g], type: 'scatter', mode: 'markers', marker: { color: '#f06ab8', size: 12 }, showlegend: false },
+            { x: [1, 1], y: [0, 11], type: 'scatter', mode: 'lines', name: 'muro: v = c', line: { color: '#ef4444', width: 2, dash: 'dash' } },
+          ], {
+            xaxis: { title: 'velocità v/c', range: lock.checked ? [0, 1.05] : undefined },
+            yaxis: { title: 'massa relativistica m/m₀', range: lock.checked ? [0, 11] : undefined },
+            legend: { orientation: 'h', y: 1.12 },
+          });
+          out.innerHTML = `A $v = ${B.toFixed(2).replace('.', ',')}\\,c$: $\\gamma$ = <span class="val-badge">${g.toFixed(2).replace('.', ',')}</span> — l'inerzia è ` +
+            (g < 1.05 ? 'praticamente quella a riposo: il mondo lento è newtoniano.'
+              : g < 2 ? `il ${Math.round((g - 1) * 100)}% in più di quella a riposo.`
+                : `<strong>${g.toFixed(1).replace('.', ',')} volte</strong> quella a riposo: la curva sta impennando verso il muro.`);
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sb.addEventListener('input', go); lock.addEventListener('change', go);
+        document.addEventListener('themechange', go);
+        go();
+      })();
+
+      // ===== 2 — Energia → velocità: il muro =====
+      (function () {
+        const sk = document.getElementById('en-k');
+        if (!sk || !window.Plt) return;
+        const vk = document.getElementById('en-k-val'), lock = document.getElementById('en-lock');
+        const out = document.getElementById('en-out');
+        const { linspace, update } = Plt;
+        function go() {
+          const K = +sk.value; vk.textContent = K.toFixed(1);
+          const bRel = Math.sqrt(1 - 1 / ((1 + K) * (1 + K)));   // da K=(γ−1)m0c² → γ=1+K
+          const bCl = Math.sqrt(2 * K);                          // da K=½m0v² (in unità m0c²)
+          const bs = linspace(0, 0.9995, 400);
+          update('en-plot', [
+            { x: bs, y: bs.map(b => 1 / Math.sqrt(1 - b * b) - 1), type: 'scatter', mode: 'lines', name: 'K relativistica', line: { color: '#f5b400', width: 3 } },
+            { x: linspace(0, 1.6, 100), y: linspace(0, 1.6, 100).map(b => 0.5 * b * b), type: 'scatter', mode: 'lines', name: 'K classica (Newton)', line: { color: '#3b82f6', width: 2.5, dash: 'dot' } },
+            { x: [bRel], y: [K], type: 'scatter', mode: 'markers', name: 'tu sei qui', marker: { color: '#f06ab8', size: 13 } },
+            { x: [1, 1], y: [0, 9.5], type: 'scatter', mode: 'lines', name: 'muro: v = c', line: { color: '#ef4444', width: 2, dash: 'dash' } },
+          ], {
+            xaxis: { title: 'velocità v/c', range: lock.checked ? [0, 1.6] : undefined },
+            yaxis: { title: 'energia cinetica K (in unità m₀c²)', range: lock.checked ? [0, 9.5] : undefined },
+            legend: { orientation: 'h', y: 1.12 },
+          });
+          out.innerHTML = `Con $K = ${K.toFixed(1).replace('.', ',')}\\,m_0c^2$: velocità raggiunta <span class="val-badge">${bRel.toFixed(3).replace('.', ',')} c</span>` +
+            (bCl > 1 ? ` — Newton prometteva <span class="val-badge">${bCl.toFixed(2).replace('.', ',')} c</span>: oltre il muro, impossibile!` : '.') +
+            ` La curva gialla si <strong>appiattisce sul muro</strong>: per $v \\to c$ serve $K \\to \\infty$.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sk.addEventListener('input', go); lock.addEventListener('change', go);
+        document.addEventListener('themechange', go);
+        go();
+      })();
+
+    });
+  </script>
+  <!-- Dati del quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'La <strong>massa a riposo</strong> $m_0$ di un oggetto è:',
+        options: ['la massa misurata nel sistema in cui l\'oggetto è fermo: un invariante, uguale per tutti gli osservatori', 'la massa misurata da un osservatore in moto', 'la massa dell\'oggetto quando è appoggiato a terra', 'una quantità che dipende dalla velocità'],
+        correct: 0, explain: 'È la "carta d\'identità" dell\'oggetto: tutti gli osservatori concordano sul suo valore. Ciò che dipende dalla velocità è l\'inerzia $m = \\gamma m_0$.' },
+      { type: 'mc', diff: 'easy', text: 'Un elettrone viaggia a $v = 0{,}6\\,c$ ($\\gamma = 1{,}25$). La sua massa relativistica è:',
+        options: ['$m_0$: la massa non cambia mai', '$1{,}25\\,m_0$', '$0{,}8\\,m_0$', '$2{,}5\\,m_0$'],
+        correct: 1, explain: '$m = \\gamma\\,m_0 = 1{,}25\\,m_0$: a $0{,}6\\,c$ l\'inerzia è il 25% in più.' },
+      { type: 'mc', diff: 'easy', text: 'Perché un oggetto con massa a riposo non nulla non può raggiungere la velocità della luce?',
+        options: ['perché l\'attrito con l\'aria lo frena', 'perché servirebbe un\'energia infinita: $\\gamma \\to \\infty$ quando $v \\to c$', 'perché i motori attuali non sono abbastanza potenti', 'in realtà può raggiungerla, ma solo nel vuoto'],
+        correct: 1, explain: 'K = (γ−1)m₀c² diverge quando v → c: ogni raddoppio di energia compra sempre meno velocità. Non è un limite tecnologico ma strutturale.' },
+      { type: 'mc', diff: 'medium', text: 'I <strong>fotoni</strong> hanno massa a riposo nulla. Di conseguenza:',
+        options: ['sono fermi in ogni sistema di riferimento', 'viaggiano sempre esattamente a $c$, e non possono andare più piano', 'viaggiano poco sotto la velocità della luce', 'non trasportano energia'],
+        correct: 1, explain: 'Le particelle senza massa possono trasportare energia e impulso ($E = pc$) solo viaggiando a $c$, in ogni sistema di riferimento.' },
+      { type: 'mc', diff: 'medium', text: 'I <strong>tachioni</strong> sono:',
+        options: ['particelle più veloci della luce osservate al CERN', 'i quanti di luce', 'particelle superluminali teorizzate ma mai osservate (e metterebbero in crisi la causalità)', 'particelle con massa infinita'],
+        correct: 2, explain: 'Esistono solo sulla carta: vivrebbero "oltre il muro", ma un segnale superluminale uscirebbe dal cono di luce e violerebbe la causalità. Mai visti.' },
+      { type: 'mc', diff: 'medium', text: 'Durante il volo di un razzo la massa diminuisce perché:',
+        options: ['è un effetto relativistico della velocità', 'il carburante viene bruciato ed espulso: la materia esce fisicamente dal razzo', 'la gravità diminuisce con la quota', 'il razzo si contrae nella direzione del moto'],
+        correct: 1, explain: 'Nessuna relatività qui: è contabilità newtoniana — il propellente (fino al ~90% della massa al decollo) viene espulso. A spinta costante, a = F/m cresce.' },
+      { type: 'mc', diff: 'medium', text: 'Il quadrivettore energia-impulso è $P = (E/c,\\ p_x,\\ p_y,\\ p_z)$. Il suo "modulo" alla Minkowski, $(E/c)^2 - |\\vec p|^2$, vale:',
+        options: ['zero per qualsiasi particella', '$(m_0\\,c)^2$: è un invariante legato alla massa a riposo', 'un valore diverso per ogni osservatore', '$\\gamma^2$'],
+        correct: 1, explain: 'Osservatori diversi misurano E e p diversi, ma la combinazione (E/c)² − p² dà a tutti (m₀c)²: la massa a riposo è la "lunghezza" del quadrivettore.' },
+      { type: 'mc', diff: 'hard', text: 'La relazione generale tra energia, quantità di moto e massa a riposo è:',
+        options: ['$E = p\\,c + m_0c^2$', '$E^2 = (p\\,c)^2 + (m_0\\,c^2)^2$', '$E = \\frac{1}{2}m_0v^2$', '$E^2 = (p\\,c)^2 - (m_0\\,c^2)^2$'],
+        correct: 1, explain: 'Il triangolo di Einstein: E è l\'ipotenusa, pc e m₀c² i cateti. Per p = 0 si riduce a E = m₀c²; per m₀ = 0 a E = pc.' },
+      { type: 'mc', diff: 'hard', text: 'Quanta energia libererebbe la conversione completa di $1$ kg di materia ($c^2 = 9\\times10^{16}$ m²/s²)?',
+        options: ['$9\\times10^{13}$ J', '$3\\times10^{8}$ J', '$9\\times10^{16}$ J', '$1$ J'],
+        correct: 2, explain: '$E = mc^2 = 1 \\times 9\\times10^{16} = 9\\times10^{16}$ J — l\'energia di decine di megatoni. Per 1 grammo: 9×10¹³ J.' },
+      { type: 'open', diff: 'hard', text: 'Spiega che cos\'è il <strong>difetto di massa</strong> nelle reazioni nucleari e che cosa c\'entra con $E = mc^2$.',
+        keywords: ['prodott', 'reagent', 'meno', 'minore', 'differenz', 'energia', 'massa', 'fusion', 'fission', 'liber'], requiredMatches: 3,
+        explain: 'Nelle reazioni nucleari (fusione di nuclei leggeri o fissione di nuclei pesanti) i prodotti hanno massa totale MINORE dei reagenti: la differenza Δm — il difetto di massa — viene liberata come energia secondo E = Δm·c². È così che il Sole brilla (fusione) e che funzionano le centrali nucleari (fissione).' }
+    ];
+  </script>
+
+  <!-- Demo sezioni 5 e 7 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 5 — Razzo: massa che diminuisce, accelerazione che cresce =====
+      (function () {
+        const svg = document.getElementById('rk-svg');
+        if (!svg) return;
+        const go = document.getElementById('rk-go'), rst = document.getElementById('rk-reset');
+        const out = document.getElementById('rk-out');
+        const M0 = 100, MDRY = 20, MDOT = 8, F = 1600;   // t, t, t/s, kN
+        const DUR = (M0 - MDRY) / MDOT;                  // 10 s di spinta
+        let t = 0, playing = false, last = null;
+        function draw() {
+          const tb = Math.min(t, DUR);
+          const m = M0 - MDOT * tb;
+          const a = F / m;                               // kN / t = m/s²
+          const v = (F / MDOT) * Math.log(M0 / m);       // Tsiolkovsky (senza gravità)
+          const fuelFrac = (m - MDRY) / (M0 - MDRY);
+          let h = '';
+          // razzo (orizzontale, punta a destra)
+          const y = 78;
+          h += `<rect x="180" y="${y - 26}" width="260" height="52" rx="12" fill="color-mix(in srgb, var(--primary) 14%, transparent)" stroke="var(--primary)" stroke-width="2.5"/>`;
+          h += `<polygon points="440,${y - 26} 486,${y} 440,${y + 26}" fill="color-mix(in srgb, var(--primary) 14%, transparent)" stroke="var(--primary)" stroke-width="2.5"/>`;
+          h += `<polygon points="180,${y - 26} 156,${y - 44} 180,${y - 8}" fill="var(--primary)" opacity="0.5"/>`;
+          h += `<polygon points="180,${y + 26} 156,${y + 44} 180,${y + 8}" fill="var(--primary)" opacity="0.5"/>`;
+          // serbatoio (carburante residuo)
+          h += `<rect x="190" y="${y - 16}" width="200" height="32" rx="6" fill="none" stroke="var(--border)"/>`;
+          h += `<rect x="190" y="${y - 16}" width="${(200 * fuelFrac).toFixed(1)}" height="32" rx="6" fill="var(--gold)" opacity="0.75"/>`;
+          h += `<text x="290" y="${y + 5}" text-anchor="middle" class="lbl-s">carburante ${(fuelFrac * 100).toFixed(0)}%</text>`;
+          // fiamma (spinta costante finché c'è carburante)
+          if (playing && tb < DUR) {
+            const fl = 40 + 14 * Math.sin(Date.now() / 60);
+            h += `<polygon points="180,${y - 12} ${180 - fl},${y} 180,${y + 12}" fill="var(--red)" opacity="0.85"/>`;
+            h += `<polygon points="180,${y - 6} ${180 - fl * 0.55},${y} 180,${y + 6}" fill="var(--gold)"/>`;
+          }
+          // barre m / a
+          const by = 170;
+          h += `<text x="60" y="${by - 12}" class="lbl-s">massa m</text>`;
+          h += `<rect x="60" y="${by}" width="220" height="20" rx="5" fill="none" stroke="var(--border)"/>`;
+          h += `<rect x="60" y="${by}" width="${(220 * m / M0).toFixed(1)}" height="20" rx="5" fill="var(--primary)" opacity="0.75"/>`;
+          h += `<text x="290" y="${by + 15}" class="lbl">${m.toFixed(0)} t</text>`;
+          h += `<text x="370" y="${by - 12}" class="lbl-s">accelerazione a = F/m (spinta costante)</text>`;
+          h += `<rect x="370" y="${by}" width="220" height="20" rx="5" fill="none" stroke="var(--border)"/>`;
+          h += `<rect x="370" y="${by}" width="${(220 * Math.min(1, a / 85)).toFixed(1)}" height="20" rx="5" fill="var(--magenta)" opacity="0.8"/>`;
+          h += `<text x="598" y="${by + 15}" class="lbl">${a.toFixed(0)} m/s²</text>`;
+          h += `<text x="60" y="${by + 55}" class="lbl">t = ${tb.toFixed(1)} s · velocità raggiunta: ${v.toFixed(0)} m/s</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = tb >= DUR
+            ? `Serbatoio vuoto: la massa è passata da ${M0} a ${MDRY} t e l'accelerazione, a parità di spinta, da <span class="val-badge">16 m/s²</span> a <span class="val-badge">80 m/s²</span> — quintuplicata senza toccare i motori.`
+            : playing
+              ? `Spinta costante F = ${F} kN, ma $a = F/m$ <strong>cresce</strong> mentre il carburante brucia.`
+              : `Il razzo pesa ${M0} t, di cui ${M0 - MDRY} di carburante. Accendi i motori e osserva $a = F/m$.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        function loop(ts) {
+          if (!playing) { last = null; return; }
+          if (last == null) last = ts;
+          const dt = Math.min((ts - last) / 1000, 0.05); last = ts;
+          t += dt * 1.4;
+          draw();
+          if (t >= DUR) { playing = false; draw(); return; }
+          requestAnimationFrame(loop);
+        }
+        go.addEventListener('click', () => { if (!playing && t < DUR) { playing = true; requestAnimationFrame(loop); } });
+        rst.addEventListener('click', () => { playing = false; t = 0; draw(); });
+        draw();
+      })();
+
+      // ===== 7 — Triangolo di Einstein =====
+      (function () {
+        const svg = document.getElementById('tri-svg');
+        if (!svg) return;
+        const sp = document.getElementById('tri-p'), vp = document.getElementById('tri-p-val');
+        const sm = document.getElementById('tri-m'), vm = document.getElementById('tri-m-val');
+        const out = document.getElementById('tri-out');
+        const X0 = 110, Y0 = 330, S = 26;        // vertice dell'angolo retto e scala px/unità
+        function go() {
+          const p = +sp.value, m = +sm.value;
+          vp.textContent = p.toFixed(1); vm.textContent = m.toFixed(1);
+          const E = Math.sqrt(p * p + m * m);
+          const xP = X0 + p * S, yM = Y0 - m * S;
+          let h = '';
+          // quadretto dell'angolo retto
+          if (p > 0.2 && m > 0.2) h += `<path d="M ${X0 + 14} ${Y0} L ${X0 + 14} ${Y0 - 14} L ${X0} ${Y0 - 14}" fill="none" stroke="var(--muted)" stroke-width="1.4"/>`;
+          // cateto orizzontale: pc
+          h += `<line x1="${X0}" y1="${Y0}" x2="${xP.toFixed(1)}" y2="${Y0}" stroke="var(--primary)" stroke-width="4"/>`;
+          h += `<text x="${(X0 + xP) / 2}" y="${Y0 + 26}" text-anchor="middle" class="lbl" fill="var(--primary)">pc = ${p.toFixed(1).replace('.', ',')} (moto)</text>`;
+          // cateto verticale: m0c²
+          h += `<line x1="${X0}" y1="${Y0}" x2="${X0}" y2="${yM.toFixed(1)}" stroke="var(--green)" stroke-width="4"/>`;
+          h += `<text x="${X0 - 12}" y="${(Y0 + yM) / 2}" text-anchor="end" class="lbl" fill="var(--green)">m₀c² = ${m.toFixed(1).replace('.', ',')}</text>`;
+          h += `<text x="${X0 - 12}" y="${(Y0 + yM) / 2 + 18}" text-anchor="end" class="lbl-s" fill="var(--green)">(massa)</text>`;
+          // ipotenusa: E
+          h += `<line x1="${X0}" y1="${yM.toFixed(1)}" x2="${xP.toFixed(1)}" y2="${Y0}" stroke="var(--gold)" stroke-width="4"/>`;
+          h += `<text x="${(X0 + xP) / 2 + 16}" y="${((Y0 + yM) / 2 - 12).toFixed(1)}" class="lbl" fill="var(--gold)">E = ${E.toFixed(2).replace('.', ',')}</text>`;
+          // vertici
+          h += `<circle cx="${X0}" cy="${Y0}" r="5" fill="var(--text-soft)"/>`;
+          h += `<circle cx="${xP.toFixed(1)}" cy="${Y0}" r="5" fill="var(--text-soft)"/>`;
+          h += `<circle cx="${X0}" cy="${yM.toFixed(1)}" r="5" fill="var(--text-soft)"/>`;
+          svg.innerHTML = h;
+          const is345 = Math.abs(p - 3) < 0.01 && Math.abs(m - 4) < 0.01;
+          out.innerHTML = `$E = \\sqrt{(pc)^2 + (m_0c^2)^2}$ = <span class="val-badge">${E.toFixed(2).replace('.', ',')}</span>` +
+            (m < 0.01 && p > 0 ? ' — triangolo <strong>collassato sul cateto del moto</strong>: $E = pc$, è un <strong>fotone</strong>!'
+              : p < 0.01 && m > 0 ? ' — triangolo <strong>collassato sul cateto della massa</strong>: $E = m_0c^2$, pura energia a riposo.'
+                : p < 0.01 && m < 0.01 ? ' — niente massa, niente moto: niente particella.'
+                  : is345 ? ' — il mitico triangolo <strong>3-4-5</strong>: $E = 5$! (γ = 5/4, cioè v = 0,6 c)'
+                    : `. Energia cinetica: $K = E - m_0c^2$ = <span class="val-badge">${(E - m).toFixed(2).replace('.', ',')}</span>.`);
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sp.addEventListener('input', go); sm.addEventListener('input', go); go();
+      })();
+
+    });
+  </script>
+</body>
+
+</html>
