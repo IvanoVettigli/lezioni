@@ -68,6 +68,7 @@ window.SITE_CATALOG = {
         { file: '5_Campo_elettromagnetico.html', title: 'Il campo elettromagnetico', desc: 'Faraday-Neumann-Lenz, esperimento di Ørsted, legge di Ampère, corrente di spostamento, equazione di continuità e le equazioni di Maxwell in forma locale' },
         { file: '6_Onde_elettromagnetiche.html', title: 'Le onde elettromagnetiche', desc: 'Onde e boe, da Maxwell alla natura della luce, la velocità misurata col cioccolato, principio di Huygens, diffrazione e diffusione, lo spettro elettromagnetico e le antenne' },
         { file: 'Verifica_2_Campi_onde_elettromagnetiche.html', title: '📝 Verifica di prova · Campi e onde elettromagnetiche', desc: 'Allenati con una verifica completa (lez. 4-6): 10 quesiti a scelta multipla a correzione automatica, 5 a risposta aperta e 5 di ragionamento con soluzioni guidate', type: 'verifica' },
+        { file: '7_Relativita_ristretta.html', title: 'La relatività ristretta', desc: 'Da Galileo a Einstein: l\'esperimento di Michelson-Morley con l\'interferometro, i due postulati, simultaneità, dilatazione dei tempi e contrazione delle lunghezze, lo spazio-tempo di Minkowski e le trasformazioni di Lorentz' },
       ] },
       { folder: 'Laboratorio', year: null, title: '🧪 Laboratorio', meta: 'Schede PDF', lessons: [] },
     ],
