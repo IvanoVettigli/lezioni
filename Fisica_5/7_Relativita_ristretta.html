@@ -773,7 +773,7 @@
           <button class="btn" id="fld-q" type="button">🏇 Sistema della carica</button>
         </div>
       </div>
-      <div class="ckt"><svg id="fld-svg" viewBox="0 0 640 300" aria-label="Filo con corrente e carica in moto: forza magnetica nel laboratorio, elettrica nel sistema della carica"></svg></div>
+      <div class="ckt"><svg id="fld-svg" viewBox="0 0 640 310" aria-label="Filo con corrente e carica in moto: animazione delle cariche nei due sistemi di riferimento"></svg></div>
       <p class="eq-out" id="fld-out"></p>
 
       <p>Stessa fisica (la carica si allontana dal filo), due contabilità: nel laboratorio la forza è
@@ -791,22 +791,12 @@
         lungo la propria direzione: per l'osservatore esterno ogni suo pezzetto si contrae! Misurando dal disco,
         allora, $C \ne 2\pi R$: la geometria di Euclide <strong>fallisce</strong> sul disco rotante.</p>
 
-      <div class="ckt"><svg viewBox="0 0 640 240" aria-label="Disco rotante di Ehrenfest: la circonferenza si contrae, il raggio no">
-        <circle cx="200" cy="120" r="88" fill="color-mix(in srgb, var(--primary) 8%, transparent)" stroke="var(--primary)" stroke-width="3"/>
-        <line x1="200" y1="120" x2="288" y2="120" stroke="var(--green)" stroke-width="3"/>
-        <text x="240" y="110" class="lbl-s" fill="var(--green)">raggio: invariato</text>
-        <g fill="var(--red)">
-          <polygon points="200,18 188,28 200,36"/>
-          <polygon points="302,120 292,108 284,120"/>
-          <polygon points="200,222 212,212 200,204"/>
-          <polygon points="98,120 108,132 116,120"/>
-        </g>
-        <text x="200" y="250" text-anchor="middle" class="lbl-s" fill="var(--red)">la circonferenza viaggia lungo se stessa → si contrae</text>
-        <text x="480" y="80" text-anchor="middle" class="lbl">C ≠ 2πR</text>
-        <text x="480" y="110" text-anchor="middle" class="lbl-s">la geometria euclidea fallisce:</text>
-        <text x="480" y="130" text-anchor="middle" class="lbl-s">servono le geometrie curve</text>
-        <text x="480" y="170" text-anchor="middle" class="lbl-s" fill="var(--gold)">→ relatività generale (1915)</text>
-      </svg></div>
+      <div class="controls">
+        <div class="control-group"><label>Velocità periferica: <span class="val" id="disk-b-val">0.5</span> c</label>
+          <input type="range" id="disk-b" min="0" max="0.95" step="0.05" value="0.5"></div>
+      </div>
+      <div class="ckt"><svg id="disk-svg" viewBox="0 0 640 300" aria-label="Disco rotante di Ehrenfest: la circonferenza si contrae al crescere della velocità"></svg></div>
+      <p class="eq-out" id="disk-out"></p>
 
       <p>Attenzione però: un sistema rotante <strong>non è inerziale</strong> (ogni punto accelera verso il centro),
         quindi siamo <em>fuori</em> dal territorio della relatività ristretta. Fu proprio rimuginando su questo disco
@@ -1442,65 +1432,174 @@
         sb.addEventListener('input', go); grid.addEventListener('change', go); go();
       })();
 
-      // ===== 8.1 — E ↔ B cambiando sistema =====
+      // ===== 8.1 — E ↔ B cambiando sistema (animato) =====
       (function () {
         const svg = document.getElementById('fld-svg');
         if (!svg) return;
         const bl = document.getElementById('fld-lab'), bq = document.getElementById('fld-q');
         const out = document.getElementById('fld-out');
-        let view = 'lab';
+        let view = 'lab', t = 0, last = null;
         function setTabs() {
           bl.classList.toggle('active', view === 'lab');
           bq.classList.toggle('active', view === 'q');
         }
-        function row(y, n, spacing, symbol, col, arrow) {
-          let h = '';
-          const tot = (n - 1) * spacing, x0 = 320 - tot / 2;
-          for (let i = 0; i < n; i++) {
-            const x = x0 + i * spacing;
-            h += `<text x="${x.toFixed(1)}" y="${y}" text-anchor="middle" font-size="17" font-weight="700" fill="${col}">${symbol}</text>`;
-            if (arrow) {
-              const dir = arrow === 'right' ? 1 : -1;
-              h += `<line x1="${x - 6 * dir}" y1="${y + 12}" x2="${x + 6 * dir}" y2="${y + 12}" stroke="${col}" stroke-width="1.6"/>`;
-              h += `<polygon points="${(x + 9 * dir).toFixed(1)},${y + 12} ${(x + 3 * dir).toFixed(1)},${y + 8.5} ${(x + 3 * dir).toFixed(1)},${y + 15.5}" fill="${col}"/>`;
-            }
-          }
-          return h;
-        }
-        function go() {
+        function frame(ts) {
+          if (last == null) last = ts;
+          const dt = Math.min((ts - last) / 1000, 0.05);
+          last = ts; t += dt;
+          const WX = 60, WW = 520, WY = 95, WH = 58;
+          const QY = 238, VPX = 70, NC = 14;
           let h = '';
           // filo
-          h += `<rect x="60" y="66" width="520" height="58" rx="10" fill="color-mix(in srgb, var(--text-soft) 7%, transparent)" stroke="var(--border)"/>`;
+          h += `<rect x="${WX}" y="${WY - WH / 2}" width="${WW}" height="${WH}" rx="10" fill="color-mix(in srgb, var(--text-soft) 7%, transparent)" stroke="var(--border)"/>`;
           if (view === 'lab') {
-            h += `<text x="12" y="30" class="lbl">Laboratorio: filo neutro, elettroni in moto</text>`;
-            h += row(88, 12, 42, '+', 'var(--red)', null);
-            h += row(114, 12, 42, '−', 'var(--primary)', 'right');
-            h += `<text x="600" y="100" text-anchor="end" class="lbl-s">densità uguali: filo neutro</text>`;
-            // carica di prova
-            h += `<circle cx="320" cy="210" r="14" fill="var(--red)"/><text x="320" y="215" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">+q</text>`;
-            h += `<line x1="340" y1="210" x2="392" y2="210" stroke="var(--text-soft)" stroke-width="2.2"/><polygon points="400,210 386,203 386,217" fill="var(--text-soft)"/>`;
-            h += `<text x="410" y="214" class="lbl-s">v (come gli elettroni)</text>`;
-            h += `<line x1="320" y1="228" x2="320" y2="266" stroke="var(--magenta)" stroke-width="3"/><polygon points="320,274 312,260 328,260" fill="var(--magenta)"/>`;
-            h += `<text x="332" y="262" class="em">F magnetica = qvB</text>`;
+            h += `<text x="12" y="30" class="lbl">🔬 Sistema del laboratorio</text>`;
+            h += `<text x="12" y="50" class="lbl-s">Filo neutro: stesse densità di + e −. Elettroni in moto →</text>`;
+            const sp = WW / (NC + 1);
+            // ioni + fermi
+            for (let i = 0; i < NC; i++) {
+              const x = WX + sp * (i + 1);
+              h += `<circle cx="${x.toFixed(1)}" cy="${WY - 13}" r="8" fill="var(--red)" opacity="0.9"/>`;
+              h += `<text x="${x.toFixed(1)}" y="${WY - 9}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">+</text>`;
+            }
+            // elettroni − in moto a destra
+            for (let i = 0; i < NC; i++) {
+              const bx = sp * (i + 1);
+              const x = WX + ((bx + VPX * t) % WW + WW) % WW;
+              h += `<circle cx="${x.toFixed(1)}" cy="${WY + 13}" r="8" fill="var(--primary)" opacity="0.9"/>`;
+              h += `<text x="${x.toFixed(1)}" y="${WY + 17}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">−</text>`;
+            }
+            // carica +q in moto
+            const qx = WX + ((200 + VPX * t) % WW + WW) % WW;
+            h += `<circle cx="${qx.toFixed(1)}" cy="${QY}" r="14" fill="var(--red)"/>`;
+            h += `<text x="${qx.toFixed(1)}" y="${QY + 5}" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">+q</text>`;
+            h += `<line x1="${(qx + 20).toFixed(1)}" y1="${QY}" x2="${(qx + 50).toFixed(1)}" y2="${QY}" stroke="var(--text-soft)" stroke-width="2.2"/>`;
+            h += `<polygon points="${(qx + 58).toFixed(1)},${QY} ${(qx + 46).toFixed(1)},${QY - 6} ${(qx + 46).toFixed(1)},${QY + 6}" fill="var(--text-soft)"/>`;
+            h += `<text x="${(qx + 62).toFixed(1)}" y="${QY + 5}" class="lbl-s">v →</text>`;
+            // freccia B concentrica al filo
+            h += `<text x="320" y="${WY + WH / 2 + 20}" text-anchor="middle" class="lbl-s" fill="var(--primary)">campo B (concentrico al filo)</text>`;
+            // freccia F magnetica
+            h += `<line x1="${qx.toFixed(1)}" y1="${QY + 20}" x2="${qx.toFixed(1)}" y2="${QY + 52}" stroke="var(--magenta)" stroke-width="3"/>`;
+            h += `<polygon points="${qx.toFixed(1)},${QY + 60} ${(qx - 8).toFixed(1)},${QY + 48} ${(qx + 8).toFixed(1)},${QY + 48}" fill="var(--magenta)"/>`;
+            h += `<text x="${(qx + 14).toFixed(1)}" y="${QY + 52}" class="em">F = qvB</text>`;
           } else {
-            h += `<text x="12" y="30" class="lbl">Sistema della carica: la carica è ferma, niente forza magnetica!</text>`;
-            h += row(88, 14, 36, '+', 'var(--red)', 'left');
-            h += row(114, 10, 52, '−', 'var(--primary)', null);
-            h += `<text x="600" y="100" text-anchor="end" class="lbl-s">+ contratti (fitti), − dilatati (radi):</text>`;
-            h += `<text x="600" y="118" text-anchor="end" class="em">il filo appare carico +</text>`;
-            h += `<circle cx="320" cy="210" r="14" fill="var(--red)"/><text x="320" y="215" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">+q</text>`;
-            h += `<text x="410" y="214" class="lbl-s">ferma</text>`;
-            h += `<line x1="320" y1="228" x2="320" y2="266" stroke="var(--magenta)" stroke-width="3"/><polygon points="320,274 312,260 328,260" fill="var(--magenta)"/>`;
-            h += `<text x="332" y="262" class="em">F elettrica = qE</text>`;
+            h += `<text x="12" y="30" class="lbl">🏇 Sistema della carica (+q ferma)</text>`;
+            h += `<text x="12" y="50" class="lbl-s">Ioni + contratti (fitti, in moto ←) · Elettroni − dilatati (radi, fermi)</text>`;
+            const spP = WW / (NC + 5);  // + più fitti
+            const spM = WW / (NC - 3);  // − più radi
+            const nP = Math.floor(WW / spP);
+            const nM = Math.max(2, Math.floor(WW / spM));
+            // ioni + in moto a sinistra (contratti)
+            for (let i = 0; i < nP; i++) {
+              const bx = spP * (i + 0.5);
+              const x = WX + ((bx - VPX * t) % WW + WW) % WW;
+              h += `<circle cx="${x.toFixed(1)}" cy="${WY - 13}" r="8" fill="var(--red)" opacity="0.9"/>`;
+              h += `<text x="${x.toFixed(1)}" y="${WY - 9}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">+</text>`;
+            }
+            // elettroni − fermi (dilatati)
+            for (let i = 0; i < nM; i++) {
+              const x = WX + spM * (i + 0.5);
+              h += `<circle cx="${x.toFixed(1)}" cy="${WY + 13}" r="8" fill="var(--primary)" opacity="0.9"/>`;
+              h += `<text x="${x.toFixed(1)}" y="${WY + 17}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">−</text>`;
+            }
+            // linee campo E dal filo alla carica
+            for (let i = 0; i < 7; i++) {
+              const ex = WX + WW * (i + 0.5) / 7;
+              h += `<line x1="${ex.toFixed(1)}" y1="${WY + WH / 2 + 4}" x2="${ex.toFixed(1)}" y2="${QY - 22}" stroke="var(--gold)" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.55"/>`;
+              h += `<polygon points="${ex.toFixed(1)},${QY - 18} ${(ex - 4).toFixed(1)},${QY - 26} ${(ex + 4).toFixed(1)},${QY - 26}" fill="var(--gold)" opacity="0.55"/>`;
+            }
+            h += `<text x="320" y="${WY + WH / 2 + 20}" text-anchor="middle" class="lbl-s" fill="var(--gold)">campo E (filo carico +)</text>`;
+            // carica +q ferma
+            h += `<circle cx="320" cy="${QY}" r="14" fill="var(--red)"/>`;
+            h += `<text x="320" y="${QY + 5}" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">+q</text>`;
+            h += `<text x="344" y="${QY + 5}" class="lbl-s">ferma</text>`;
+            // freccia F elettrica
+            h += `<line x1="320" y1="${QY + 20}" x2="320" y2="${QY + 52}" stroke="var(--magenta)" stroke-width="3"/>`;
+            h += `<polygon points="320,${QY + 60} 312,${QY + 48} 328,${QY + 48}" fill="var(--magenta)"/>`;
+            h += `<text x="334" y="${QY + 52}" class="em">F = qE</text>`;
           }
           svg.innerHTML = h;
           out.innerHTML = view === 'lab'
-            ? `Filo neutro, ma la carica in moto "è una corrente" antiparallela a quella del filo: forza <strong>magnetica</strong> che la respinge dal filo.`
-            : `Gli elettroni ora sono fermi (spaziatura dilatata), gli ioni positivi si muovono (spaziatura contratta): il filo appare <strong>carico positivamente</strong> e respinge la carica con una forza <strong>elettrica</strong>. Stesso effetto, campo diverso!`;
+            ? `Filo neutro, ma la carica in moto «è una corrente» antiparallela: forza <strong>magnetica</strong> che la allontana dal filo.`
+            : `Gli elettroni sono fermi (spaziatura più larga), gli ioni + si muovono e appaiono contratti (spaziatura più stretta): il filo risulta <strong>carico positivamente</strong> e respinge la carica con una forza <strong>elettrica</strong>. Stesso effetto, campo diverso!`;
+          requestAnimationFrame(frame);
         }
-        bl.addEventListener('click', () => { view = 'lab'; setTabs(); go(); });
-        bq.addEventListener('click', () => { view = 'q'; setTabs(); go(); });
-        setTabs(); go();
+        bl.addEventListener('click', () => { view = 'lab'; setTabs(); });
+        bq.addEventListener('click', () => { view = 'q'; setTabs(); });
+        setTabs();
+        requestAnimationFrame(frame);
+      })();
+
+      // ===== 8.2 — Disco rotante di Ehrenfest (animato) =====
+      (function () {
+        const svg = document.getElementById('disk-svg');
+        if (!svg) return;
+        const sb = document.getElementById('disk-b'), vb = document.getElementById('disk-b-val');
+        const out = document.getElementById('disk-out');
+        const CX = 210, CY = 150, R = 100;
+        const N_TICKS = 24;
+        let t = 0, last = null;
+        function frame(ts) {
+          if (last == null) last = ts;
+          const dt = Math.min((ts - last) / 1000, 0.05);
+          last = ts; t += dt;
+          const B = +sb.value; vb.textContent = B.toFixed(2);
+          const g = B > 0.001 ? 1 / Math.sqrt(1 - B * B) : 1;
+          const omega = B * 1.5;  // velocità angolare visiva (rad/s)
+          const ratio = 1 / g;    // C/(2πR) = 1/γ
+          let h = '';
+          // disco (riempimento)
+          h += `<circle cx="${CX}" cy="${CY}" r="${R}" fill="color-mix(in srgb, var(--primary) 10%, transparent)" stroke="var(--primary)" stroke-width="3"/>`;
+          // tacchette sulla circonferenza: ciascuna sottende un arco che si contrae
+          const tickArc = (2 * Math.PI / N_TICKS) * ratio;  // arco visibile contratto
+          const tickGap = 2 * Math.PI / N_TICKS;            // spaziatura angolare (fissa)
+          for (let i = 0; i < N_TICKS; i++) {
+            const a0 = tickGap * i + omega * t;
+            const aMid = a0 + tickGap / 2;
+            // arco contratto centrato su aMid
+            const aStart = aMid - tickArc / 2;
+            const aEnd = aMid + tickArc / 2;
+            const r1 = R - 2, r2 = R + 8;
+            const x1s = CX + r1 * Math.cos(aStart), y1s = CY + r1 * Math.sin(aStart);
+            const x1e = CX + r1 * Math.cos(aEnd),   y1e = CY + r1 * Math.sin(aEnd);
+            const x2s = CX + r2 * Math.cos(aStart), y2s = CY + r2 * Math.sin(aStart);
+            const x2e = CX + r2 * Math.cos(aEnd),   y2e = CY + r2 * Math.sin(aEnd);
+            h += `<path d="M ${x2s.toFixed(1)} ${y2s.toFixed(1)} A ${r2} ${r2} 0 0 1 ${x2e.toFixed(1)} ${y2e.toFixed(1)} L ${x1e.toFixed(1)} ${y1e.toFixed(1)} A ${r1} ${r1} 0 0 0 ${x1s.toFixed(1)} ${y1s.toFixed(1)} Z" fill="var(--red)" opacity="0.7"/>`;
+          }
+          // raggio (invariato)
+          const rAngle = omega * t;
+          const rx = CX + R * Math.cos(rAngle), ry = CY + R * Math.sin(rAngle);
+          h += `<line x1="${CX}" y1="${CY}" x2="${rx.toFixed(1)}" y2="${ry.toFixed(1)}" stroke="var(--green)" stroke-width="3.5"/>`;
+          h += `<text x="${(CX + (R / 2) * Math.cos(rAngle) - 18 * Math.sin(rAngle)).toFixed(1)}" y="${(CY + (R / 2) * Math.sin(rAngle) + 18 * Math.cos(rAngle)).toFixed(1)}" class="lbl-s" fill="var(--green)">R invariato</text>`;
+          // centro
+          h += `<circle cx="${CX}" cy="${CY}" r="4" fill="var(--gold)"/>`;
+          // frecce rotazione
+          for (let i = 0; i < 4; i++) {
+            const a = omega * t + Math.PI / 2 * i;
+            const ax = CX + (R + 18) * Math.cos(a), ay = CY + (R + 18) * Math.sin(a);
+            const da = 0.15;
+            const tx = ax + 8 * Math.cos(a + Math.PI / 2), ty = ay + 8 * Math.sin(a + Math.PI / 2);
+            const t1x = ax + 5 * Math.cos(a + da), t1y = ay + 5 * Math.sin(a + da);
+            const t2x = ax + 5 * Math.cos(a - da + Math.PI), t2y = ay + 5 * Math.sin(a - da + Math.PI);
+            h += `<polygon points="${tx.toFixed(1)},${ty.toFixed(1)} ${t1x.toFixed(1)},${t1y.toFixed(1)} ${t2x.toFixed(1)},${t2y.toFixed(1)}" fill="var(--red)" opacity="0.7"/>`;
+          }
+          // pannello info a destra
+          const IX = 380, IY = 50;
+          h += `<text x="${IX}" y="${IY}" class="lbl">Misure dal disco</text>`;
+          h += `<text x="${IX}" y="${IY + 30}" class="lbl-s">Raggio: <tspan fill="var(--green)" font-weight="700">R</tspan> (⊥ al moto: invariato)</text>`;
+          h += `<text x="${IX}" y="${IY + 55}" class="lbl-s">Circonferenza: <tspan fill="var(--red)" font-weight="700">C = 2πR/γ</tspan> (∥ al moto: contratta)</text>`;
+          h += `<text x="${IX}" y="${IY + 90}" class="lbl">C / (2πR) =</text>`;
+          h += `<text x="${IX + 110}" y="${IY + 90}" font-size="20" font-weight="700" fill="${ratio < 0.99 ? 'var(--red)' : 'var(--green)'}">${ratio.toFixed(3)}</text>`;
+          h += `<text x="${IX}" y="${IY + 120}" class="lbl-s" fill="var(--muted)">${ratio < 0.99 ? 'C ≠ 2πR: geometria euclidea violata!' : 'v ≈ 0: geometria euclidea OK'}</text>`;
+          h += `<text x="${IX}" y="${IY + 160}" class="lbl-s">γ = <tspan font-weight="700">${g.toFixed(2)}</tspan></text>`;
+          h += `<text x="${IX}" y="${IY + 195}" class="lbl-s" fill="var(--gold)">→ servono le geometrie curve</text>`;
+          h += `<text x="${IX}" y="${IY + 215}" class="lbl-s" fill="var(--gold)">→ relatività generale (1915)</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = `Le <span style="color:var(--red); font-weight:700">tacchette rosse</span> sulla circonferenza si accorciano (contrazione tangenziale) mentre il <span style="color:var(--green); font-weight:700">raggio</span> resta invariato (perpendicolare al moto). Rapporto $C/(2\\pi R)$ = <span class="val-badge">${ratio.toFixed(3)}</span>: ${ratio < 0.99 ? 'la geometria euclidea <strong>fallisce</strong> sul disco rotante.' : 'a bassa velocità la geometria euclidea resta valida.'}`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
       })();
 
     });
