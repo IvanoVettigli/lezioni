@@ -71,6 +71,7 @@ window.SITE_CATALOG = {
         { file: '7_Relativita_ristretta.html', title: 'La relatività ristretta', desc: 'Da Galileo a Einstein: l\'esperimento di Michelson-Morley con l\'interferometro, i due postulati, simultaneità, dilatazione dei tempi e contrazione delle lunghezze, lo spazio-tempo di Minkowski e le trasformazioni di Lorentz' },
         { file: '8_Meccanica_relativistica.html', title: 'La meccanica relativistica', desc: 'Massa e massa a riposo, il muro della velocità della luce, fotoni e tachioni, i razzi che perdono massa, il quadrivettore energia-impulso, il triangolo di Einstein ed E = mc²' },
         { file: '9_Relativita_generale.html', title: 'La relatività generale', desc: 'Geometrie non euclidee e teorema di Girard, geodetiche, tensori, la metrica e l\'equazione di campo di Einstein, buchi neri e raggio di Schwarzschild, l\'espansione dell\'universo, i viaggi nel tempo, materia ed energia oscura e il teorema di Noether' },
+        { file: 'Verifica_3_Tema_relativita.html', title: '📝 Verifica di prova · Tema scientifico sulla relatività', desc: 'Per il modulo di relatività (lez. 7-9) la prova cambia formato: una traccia da sviluppare in un saggio breve di un\'ora, con i consigli per impostarlo e uno svolgimento completo d\'esempio', type: 'verifica' },
       ] },
       { folder: 'Laboratorio', year: null, title: '🧪 Laboratorio', meta: 'Schede PDF', lessons: [] },
     ],
