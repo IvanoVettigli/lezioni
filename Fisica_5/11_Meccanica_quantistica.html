@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 11 — La meccanica quantistica</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    /* --- SVG fisici (theme-aware) --- */
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quinto anno · Lezione 11 · Modulo: Meccanica quantistica</div>
+    <h1>La meccanica quantistica</h1>
+    <p>La doppia fenditura, il gatto di Schrödinger, la funzione d'onda e un mondo che si lascia prevedere solo in probabilità</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quinto anno</a>
+    <span class="sep">/</span> La meccanica quantistica
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> La lezione scorsa si è chiusa nel disordine: la luce a volte è onda e a volte
+      particella, la materia idem, e il "dualismo onda-particella" sembra più una resa che una spiegazione. In questa
+      lezione affrontiamo il mostro di petto: partiamo dall'esperimento che contiene <em>tutto</em> il mistero, e
+      costruiamo la teoria che lo doma — la <strong>meccanica quantistica</strong>. Tenete a mente la bussola:
+      giudicheremo la teoria dai <strong>risultati sperimentali</strong>, non da quanto ci piace.
+    </div>
+
+    <!-- 1 — LA DOPPIA FENDITURA -->
+    <section id="sec1">
+      <h2>1. L'esperimento della doppia fenditura</h2>
+
+      <h3>1.1 — Il processo agli elettroni</h3>
+      <p>Vogliamo processare l'elettrone e strappargli una confessione: <strong>sei un'onda o una particella?</strong>
+        Il tribunale è di una semplicità disarmante: un <strong>cannone di elettroni</strong>, una barriera con
+        <strong>due fenditure</strong> sottili e vicine, e uno <strong>schermo</strong> che registra ogni arrivo con un
+        puntino. Le due ipotesi fanno previsioni nettamente diverse:</p>
+
+      <ul>
+        <li>se l'elettrone è una <strong>particella</strong> (una pallina minuscola), ciascuno passa da <em>una</em>
+          delle due fenditure e sullo schermo si accumulano <strong>due bande</strong>, una dietro ogni fenditura —
+          come proiettili sparati contro una staccionata con due varchi;</li>
+        <li>se l'elettrone è un'<strong>onda</strong>, passa da <em>entrambe</em> le fenditure, e le due onde
+          interferiscono: sullo schermo compaiono le <strong>frange</strong> — zone piene e zone vuote alternate —
+          che conosciamo dalla lezione 6 (Young e la luce).</li>
+      </ul>
+
+      <p>Risultato dell'esperimento: <strong>frange</strong>. D'accordo, dirai: allora è un'onda. Ma ora viene il
+        colpo di scena. Abbassiamo l'intensità del cannone finché nel dispositivo non c'è che <strong>un elettrone
+        alla volta</strong> — ciascuno arriva allo schermo prima che il successivo parta. Niente più "onde di folla":
+        ogni elettrone è solo con se stesso. Ebbene: ogni elettrone lascia sullo schermo <strong>un singolo
+        puntino</strong> (arriva <em>da particella</em>, in un punto preciso!), ma puntino dopo puntino, con la
+        pazienza di migliaia di lanci, il disegno che emerge è ancora quello delle <strong>frange di
+        interferenza</strong>. Il singolo elettrone, <em>non osservato</em>, si distribuisce come un'onda che è
+        passata da <strong>entrambe le fenditure e ha interferito con se stessa</strong>.</p>
+
+      <p>E se lo cogliamo sul fatto? Piazziamo un <strong>rivelatore</strong> alle fenditure, per sapere da quale
+        delle due passa davvero. Il risultato è sconcertante: appena il rivelatore è acceso — appena l'elettrone è
+        <em>osservato</em> — le frange <strong>spariscono</strong> e ricompaiono le due bande da particella.
+        Prova tutto con la simulazione:</p>
+
+      <div class="controls">
+        <button class="btn" id="df-one">spara 1 elettrone</button>
+        <button class="btn" id="df-100">spara 100</button>
+        <button class="btn" id="df-2000">spara 2000</button>
+        <button class="btn" id="df-clr">🗑 azzera lo schermo</button>
+        <label class="toggle-row"><input type="checkbox" id="df-obs"> 🔎 rivelatore alle fenditure (osserva da dove passa)</label>
+      </div>
+      <div class="ckt"><svg id="df-svg" viewBox="0 0 640 430" aria-label="Esperimento della doppia fenditura: gli elettroni arrivano come puntini ma si distribuiscono a frange; con il rivelatore acceso compaiono due bande"></svg></div>
+      <p class="eq-out" id="df-out"></p>
+
+      <div class="note">
+        <strong>Guarda bene che cosa succede.</strong> Ogni elettrone arriva come un <strong>puntino</strong>: mai
+        una "mezza onda spalmata", sempre un impatto localizzato. Ma la <strong>distribuzione</strong> dei puntini —
+        guarda l'istogramma crescere sotto lo schermo — segue la figura di diffrazione di un'onda. E col rivelatore
+        acceso l'interferenza svanisce (cambiando modalità lo schermo si azzera: sono due esperimenti diversi).
+        Attenzione all'errore facile: non è che "l'elettrone si sente spiato". È che <em>osservare significa
+        interagire</em> — e nel mondo quantistico questa interazione non è mai innocua. Ci torniamo subito.
+      </div>
+
+      <div class="curiosita">
+        <strong>Il più bell'esperimento della fisica (made in Italy).</strong> L'interferenza di elettroni
+        <em>uno alla volta</em> non è un esperimento mentale: la prima realizzazione è del <strong>1974, a
+        Bologna</strong> — Pier Giorgio Merli, Gian Franco Missiroli e Giulio Pozzi, con un microscopio elettronico
+        modificato. Nel 2002 i lettori di <em>Physics World</em> l'hanno votato «il più bell'esperimento della
+        fisica di tutti i tempi». E <strong>Feynman</strong> disse della doppia fenditura: è «un fenomeno impossibile
+        da spiegare in modo classico, che contiene il cuore della meccanica quantistica. In realtà, contiene
+        <em>l'unico</em> mistero».
+      </div>
+
+      <div class="rule">
+        <strong>Il verdetto del processo.</strong> La domanda «onda <em>o</em> particella?» è mal posta. L'elettrone
+        <strong>si propaga come un'onda</strong> (esplora entrambe le fenditure, interferisce) e <strong>si rivela
+        come una particella</strong> (arriva in un punto, tutto intero). Quale faccia mostra dipende da che cosa gli
+        chiediamo — cioè da <strong>se e come lo misuriamo</strong>.
+      </div>
+    </section>
+
+    <!-- 2 — IL PROBLEMA DELL'OSSERVATORE -->
+    <section id="sec2">
+      <h2>2. Il problema dell'osservatore</h2>
+
+      <h3>2.1 — Osservare non è mai gratis</h3>
+      <p>Nel linguaggio comune "osservare" è un'azione da spettatori: guardi la partita, la partita non cambia. Nel
+        mondo quantistico questo lusso non esiste. Per <em>vedere</em> un elettrone devi fargli arrivare addosso
+        almeno <strong>un fotone</strong> — e un fotone che rimbalza su un elettrone non è una carezza: gli cambia
+        stato (è l'effetto Compton della lezione scorsa!). <strong>Ogni misura è un'interazione fisica</strong>, e al
+        livello delle singole particelle non c'è modo di renderla "abbastanza delicata": il quanto di Planck fissa la
+        taglia minima del disturbo. Ecco perché il rivelatore della sezione 1 distrugge le frange: nel momento in cui
+        l'esperimento <em>costringe</em> l'elettrone a dichiarare da quale fenditura passa, l'elettrone smette di
+        poter passare "da entrambe", e l'interferenza muore.</p>
+
+      <p>Ma la faccenda è più profonda di un semplice urto. Prima della misura, la teoria descrive l'elettrone come
+        una <strong>sovrapposizione</strong> di possibilità (fenditura destra <em>e</em> sinistra insieme); la misura
+        lo costringe a "scegliere" — e da quel momento in poi il sistema è cambiato per sempre. Che cosa significhi
+        davvero questo passaggio dal <em>possibile</em> al <em>reale</em> è il famigerato <strong>problema della
+        misura</strong>: il punto più discusso, e tuttora aperto, di tutta la meccanica quantistica.</p>
+
+      <h3>2.2 — Il gatto di Schrödinger</h3>
+      <p>Per rendere il paradosso impossibile da ignorare, nel 1935 <strong>Erwin Schrödinger</strong> ideò il più
+        celebre esperimento mentale della storia. In una scatola chiusa ci sono: un <strong>atomo
+        radioattivo</strong> che in un certo tempo ha una data probabilità di decadere, un contatore Geiger, un
+        martelletto e una fiala di veleno — e un <strong>gatto</strong>. Se l'atomo decade, il contatore scatta, il
+        martelletto rompe la fiala, il gatto muore; se non decade, il gatto vive. Ora: finché nessuno guarda, la
+        meccanica quantistica descrive l'atomo come sovrapposizione di <em>decaduto</em> e <em>non decaduto</em>. Ma
+        allora la catena si propaga, e anche il gatto dovrebbe essere in una sovrapposizione di
+        <strong>vivo ⊕ morto</strong> — finché qualcuno non apre la scatola e "fa collassare" il tutto su uno dei due
+        esiti. Gioca tu con la scatola:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Probabilità che l'atomo sia decaduto: <span class="val" id="cat-p-val">50</span>%</label>
+          <input type="range" id="cat-p" min="10" max="90" step="5" value="50"></div>
+        <button class="btn" id="cat-open">📦 apri la scatola</button>
+        <button class="btn" id="cat-again">🔄 prepara di nuovo</button>
+      </div>
+      <div class="ckt"><svg id="cat-svg" viewBox="0 0 640 320" aria-label="Esperimento mentale del gatto di Schrödinger: scatola chiusa con sovrapposizione vivo e morto, apertura con collasso su un esito"></svg></div>
+      <p class="eq-out" id="cat-out"></p>
+
+      <div class="note">
+        <strong>Che cosa voleva dimostrare Schrödinger?</strong> Attenzione al rovesciamento: Schrödinger non
+        proponeva il gatto per celebrare la meccanica quantistica, ma per <strong>metterla in imbarazzo</strong> —
+        una riduzione all'assurdo: "se le vostre regole valgono, allora un gatto può essere vivo e morto insieme:
+        vi sembra sensato?". Gli <strong>esperimenti mentali</strong> erano le armi da duello dei fisici dell'epoca:
+        non potendo (ancora) fare gli esperimenti veri, si sfidavano su quelli immaginati, cercando la contraddizione
+        nascosta nella teoria dell'avversario. Nota: nella pratica il paradosso è oggi ben compreso — un gatto è un
+        sistema macroscopico che interagisce con miliardi di particelle, e la sovrapposizione si degrada
+        (i fisici dicono <em>decoerenza</em>) in tempi impercettibili. Ma il problema di fondo — <em>che cosa</em>
+        conta esattamente come "misura"? — non ha ancora una risposta che metta tutti d'accordo.
+      </div>
+
+      <div class="curiosita">
+        <strong>Einstein contro (quasi) se stesso.</strong> Il critico più agguerrito della meccanica quantistica fu
+        proprio uno dei suoi <strong>padri fondatori</strong>: Einstein, l'uomo dei fotoni, Nobel proprio per
+        l'effetto fotoelettrico. Non ne contestava i successi, ma il cuore probabilistico e il ruolo
+        dell'osservatore: «Dio <strong>non gioca a dadi</strong> con l'universo», ripeteva — e Bohr, stufo:
+        «Einstein, smettila di dire a Dio che cosa deve fare». Ai congressi Solvay (1927, 1930) Einstein presentava
+        a colazione esperimenti mentali costruiti per demolire il principio di indeterminazione, e Bohr li smontava
+        per cena (una volta usando contro Einstein... la sua stessa relatività generale). A un collega Einstein
+        chiese sconsolato: «Davvero credi che la Luna esista solo quando la guardi?». Vale la pena ricordarlo:
+        si può essere geni assoluti e trovarsi dalla parte perdente di un dibattito — o forse solo troppo in
+        anticipo: le sue obiezioni, come vedremo, hanno prodotto fisica profondissima.
+      </div>
+    </section>
+
+    <!-- 3 — IL PRINCIPIO DI INDETERMINAZIONE -->
+    <section id="sec3">
+      <h2>3. Il principio di indeterminazione di Heisenberg</h2>
+
+      <h3>3.1 — Posizione e quantità di moto: il baratto obbligatorio</h3>
+      <p>Nel 1927 <strong>Werner Heisenberg</strong> trasformò il disagio della sezione precedente in una legge
+        quantitativa. Non si tratta di un difetto degli strumenti, ma di una proprietà della natura: certe coppie di
+        grandezze <strong>non possono avere entrambe un valore preciso allo stesso tempo</strong>. La coppia più
+        famosa: la <strong>posizione</strong> $x$ e la <strong>quantità di moto</strong> $p$.</p>
+
+      <div class="formula-box">
+        $$\Delta x \cdot \Delta p \ \ge\ \frac{\hbar}{2} \qquad\text{con}\qquad \hbar = \frac{h}{2\pi} = 1{,}055\times10^{-34}\ \text{J}\cdot\text{s}$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">$\Delta x$ e $\Delta p$ sono le <em>incertezze</em> (le larghezze delle distribuzioni) di posizione e quantità di moto; $\hbar$ ("acca tagliata") è la costante di Planck divisa per $2\pi$</p>
+      </div>
+
+      <p>Il significato è un <strong>baratto</strong>: puoi preparare una particella con la posizione definita quanto
+        vuoi — ma il prezzo è una quantità di moto sempre più incerta, e viceversa. Il prodotto delle due incertezze
+        non scende <em>mai</em> sotto $\hbar/2$. Prova a "strizzare" il pacchetto d'onda:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Larghezza in posizione: Δx = <span class="val" id="hb-sx-val">1,00</span></label>
+          <input type="range" id="hb-sx" min="0.3" max="2.5" step="0.05" value="1"></div>
+        <label class="toggle-row"><input type="checkbox" id="hb-lock" checked> 🔒 blocca la scala</label>
+      </div>
+      <div class="two-col">
+        <div><div class="plot" id="hb-plot-x" style="height: 280px;"></div></div>
+        <div><div class="plot" id="hb-plot-p" style="height: 280px;"></div></div>
+      </div>
+      <p class="eq-out" id="hb-out"></p>
+
+      <div class="note">
+        <strong>Guarda il baratto in azione.</strong> Stringi $\Delta x$ (la campana di sinistra si fa stretta e
+        alta): la distribuzione delle quantità di moto <strong>si allarga</strong> inesorabilmente — e viceversa. Il
+        prodotto resta inchiodato al minimo consentito. Non c'è trucco sperimentale che possa vincere: è la stessa
+        matematica delle onde (un'onda corta e localizzata è fatta sommando <em>tante</em> lunghezze d'onda diverse —
+        e per de Broglie lunghezza d'onda <em>significa</em> quantità di moto).
+      </div>
+
+      <h3>3.2 — Anche energia e tempo</h3>
+      <p>La stessa relazione vale per un'altra coppia: l'<strong>energia</strong> e il <strong>tempo</strong>:</p>
+
+      <div class="formula-box">
+        $$\Delta E \cdot \Delta t \ \ge\ \frac{\hbar}{2}$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">uno stato che vive per un tempo breve $\Delta t$ non ha un'energia ben definita: la sua energia è incerta di almeno $\Delta E \approx \hbar/(2\Delta t)$</p>
+      </div>
+
+      <p>Anche questa versione ha conseguenze visibili: le <strong>righe spettrali</strong> della lezione scorsa non
+        sono mai infinitamente sottili, perché i livelli atomici da cui nascono hanno vita breve, quindi energia
+        leggermente "sfocata" — e la larghezza delle righe misura proprio la vita media degli stati. E su tempi
+        brevissimi la natura può "prendere in prestito" energia, purché la restituisca in fretta: è un ingrediente
+        chiave dell'effetto tunnel che incontreremo tra poco.</p>
+
+      <h3>3.3 — Non è colpa dello strumento</h3>
+      <p>Attenzione all'equivoco più comune. Quando nelle lezioni sui circuiti inserivamo un
+        <strong>amperometro</strong> o un <strong>voltmetro</strong>, anche lì la misura "disturbava" il sistema:
+        l'amperometro aggiunge la sua piccola resistenza interna, il voltmetro ruba un filo di corrente. Ma quello è
+        un limite <strong>tecnologico</strong>: costruendo strumenti sempre migliori (resistenze interne sempre più
+        piccole per l'amperometro, sempre più grandi per il voltmetro) il disturbo si riduce quanto si vuole, e
+        <em>in linea di principio</em> nulla vieta uno strumento perfetto che non altera il circuito.</p>
+
+      <div class="warning">
+        <strong>Qui è tutta un'altra storia.</strong> Il principio di indeterminazione <strong>non</strong> dice "i
+        nostri strumenti disturbano": dice che esiste un <strong>limite teorico</strong>, scritto nelle leggi della
+        natura, alla precisione con cui certe coppie di grandezze possono <em>esistere insieme</em> — nessuno
+        strumento futuro, per quanto ingegnoso, potrà aggirarlo. La differenza è filosoficamente enorme: non è che la
+        particella <em>ha</em> posizione e velocità precise e noi non riusciamo a leggerle; è che uno stato con
+        entrambe le proprietà definite <strong>non esiste proprio</strong>, come non esiste un'onda del mare
+        localizzata in un punto solo.
+      </div>
+    </section>
+
+    <!-- 4 — LA FUNZIONE D'ONDA -->
+    <section id="sec4">
+      <h2>4. La funzione d'onda e l'interpretazione di Copenaghen</h2>
+
+      <h3>4.1 — Che cosa oscilla? La probabilità</h3>
+      <p>Torniamo alla doppia fenditura con gli occhi di <strong>Erwin Schrödinger</strong> (1926). Le frange sono
+        una figura di interferenza, e l'interferenza è roba da onde: dunque, ragiona Schrödinger, scriviamo
+        un'<strong>equazione per le onde</strong> — come quella di d'Alembert per la corda o quella che Maxwell trovò
+        per i campi. Ma qui casca il punto sottile: un'onda è una <strong>grandezza fisica che oscilla</strong> — nel
+        mare oscilla l'altezza dell'acqua, nel suono la pressione dell'aria, nella luce i campi elettrico e
+        magnetico. Nell'onda di un elettrone, <em>che cosa</em> oscilla? La risposta della meccanica quantistica è la
+        più spiazzante della storia della fisica: oscilla la <strong>probabilità</strong> — o meglio, la sua
+        "radice", che chiamiamo <strong>ampiezza</strong>. L'equazione di Schrödinger non descrive l'elettrone: descrive
+        la <strong>funzione d'onda</strong> $\psi(x,t)$, e la funzione d'onda risponde a una sola domanda: <em>con
+        quale probabilità troverò l'elettrone qui, se lo cerco?</em></p>
+
+      <div class="formula-box">
+        $$P(a \le x \le b) \;=\; \int_a^b \big|\psi(x)\big|^2\, dx$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">la probabilità di trovare la particella tra $a$ e $b$ è l'<strong>integrale del modulo quadro</strong> della funzione d'onda su quell'intervallo (regola di Born). Dove $|\psi|^2$ è grande la particella si trova spesso; dove è nullo, mai. E l'integrale su tutto lo spazio fa $1$: da qualche parte la particella sta di sicuro</p>
+      </div>
+
+      <p>Ecco la doppia fenditura, spiegata: la funzione d'onda passa da <strong>entrambe</strong> le fenditure
+        (è un'onda, può farlo senza scandalo), le due parti interferiscono e $|\psi|^2$ sviluppa massimi e minimi —
+        le frange. Il singolo elettrone atterra in un punto a caso, ma <em>pescato</em> dalla distribuzione
+        $|\psi|^2$: per questo i puntini, accumulandosi, disegnano l'interferenza. L'equazione che governa tutto
+        merita di essere ammirata, anche se risolverla è mestiere universitario:</p>
+
+      <div class="formula-box">
+        $$i\hbar\, \frac{\partial \psi}{\partial t} \;=\; \hat{H}\, \psi$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">l'equazione di Schrödinger: $\hat{H}$ (l'<em>hamiltoniana</em>) codifica l'energia del sistema, e l'equazione dice come $\psi$ evolve nel tempo — in modo perfettamente <strong>deterministico</strong>, come le care vecchie equazioni differenziali. C'è perfino la $i$ dei numeri complessi: le ampiezze quantistiche sono numeri complessi, ed è per questo che possono <em>cancellarsi</em> tra loro nell'interferenza</p>
+      </div>
+
+      <h3>4.2 — Il collasso: l'interpretazione di Copenaghen</h3>
+      <p>Ma allora dov'è finita la casualità? Nel <strong>momento della misura</strong>. Secondo l'interpretazione
+        elaborata a Copenaghen attorno a Bohr (con Heisenberg e Born), la meccanica quantistica ha <em>due</em>
+        dinamiche distinte:</p>
+
+      <ul>
+        <li>finché <strong>nessuno misura</strong>, $\psi$ evolve secondo l'equazione di Schrödinger: liscia,
+          continua, deterministica — un'onda che si propaga, si divide, interferisce;</li>
+        <li>quando <strong>misuri</strong> (ad esempio la posizione), la funzione d'onda <strong>collassa</strong>:
+          da distribuzione estesa si concentra di colpo nel punto in cui hai trovato la particella. Il <em>dove</em>
+          è sorteggiato dalle probabilità $|\psi|^2$ — e su quel sorteggio la teoria non ha altro da dire.</li>
+      </ul>
+
+      <p>Il rivelatore della sezione 1 ora ha una spiegazione pulita: è una misura a metà strada, che fa collassare
+        $\psi$ su una sola fenditura; da lì in poi non c'è più nulla che possa interferire, e le frange muoiono. E il
+        gatto della sezione 2 è la stessa storia portata all'estremo: finché non apri, $\psi$ descrive la
+        sovrapposizione; aprire è misurare, misurare è collassare.</p>
+
+      <div class="curiosita">
+        <strong>La nota a piè di pagina da Nobel.</strong> Che $|\psi|^2$ fosse una <em>probabilità</em> lo capì
+        <strong>Max Born</strong> nel 1926 — e la storia è deliziosa: nella prima stesura dell'articolo Born scrisse
+        che la probabilità era proporzionale a $\psi$; l'intuizione giusta (il <em>quadrato</em> del modulo) la
+        aggiunse in bozza, in una <strong>nota a piè di pagina</strong>. Quella nota gli valse il Nobel (1954).
+        Quanto a Schrödinger, non perdonò mai alla propria equazione la piega probabilistica che aveva preso:
+        «Non mi piace, e mi dispiace di averci mai avuto a che fare» — il secondo padre pentito della teoria, dopo
+        Planck. La meccanica quantistica ha questo di unico: metà dei suoi fondatori passò la vita a combatterla.
+      </div>
+    </section>
+
+    <!-- 5 — LA MQ ALL'OPERA: SCATOLA E TUNNEL -->
+    <section id="sec5">
+      <h2>5. La meccanica quantistica all'opera: la scatola e il tunnel</h2>
+
+      <h3>5.1 — Un elettrone in una scatola</h3>
+      <p>Mettiamo al lavoro la funzione d'onda sul sistema più semplice possibile: un elettrone <strong>intrappolato
+        in una "scatola"</strong> — un segmento di lunghezza $L$ con pareti invalicabili (una <em>buca di
+        potenziale</em>). Fuori dalla scatola l'elettrone non può stare, quindi lì $\psi = 0$; e siccome $\psi$ è
+        un'onda continua, deve <strong>annullarsi alle pareti</strong>. Ma un'onda inchiodata a zero ai due estremi
+        è una vecchia conoscenza: è una <strong>corda di chitarra</strong>! Le uniche funzioni d'onda possibili sono
+        le onde stazionarie $\psi_n(x) = \sin\!\big(n\pi x / L\big)$, con $n = 1, 2, 3, \dots$ — e a ciascuna
+        corrisponde un'energia:</p>
+
+      <div class="formula-box">
+        $$E_n = n^2\,E_1 \qquad\text{con}\qquad E_1 = \frac{h^2}{8mL^2}$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">le energie sono <strong>quantizzate</strong>: solo i valori $E_1,\ 4E_1,\ 9E_1,\ 16E_1,\dots$ sono permessi. Nessuno le ha imposte a mano: la quantizzazione <em>emerge da sola</em> chiedendo a un'onda di stare in una scatola — esattamente come i modi della corda di chitarra e come l'orbita di de Broglie della lezione scorsa</p>
+      </div>
+
+      <div class="controls">
+        <div class="control-group"><label>Numero quantico: n = <span class="val" id="bx-n-val">1</span></label>
+          <input type="range" id="bx-n" min="1" max="6" step="1" value="1"></div>
+        <label class="toggle-row"><input type="checkbox" id="bx-lock" checked> 🔒 blocca la scala</label>
+      </div>
+      <div class="two-col">
+        <div><p id="bx-out" class="eq-out"></p></div>
+        <div><div class="plot" id="bx-plot" style="height: 320px;"></div></div>
+      </div>
+
+      <div class="note">
+        <strong>Due cose da notare.</strong> Primo: $|\psi|^2$ (la curva piena) ha dei punti in cui vale
+        <strong>zero</strong> — i <em>nodi</em>: posizioni dove l'elettrone non si trova <em>mai</em>, pur passando
+        (per così dire) di lì. Secondo, ancora più strano: il livello più basso è $E_1$, <strong>non zero</strong>.
+        Un elettrone confinato <strong>non può stare fermo</strong>: è Heisenberg all'opera — chiuderlo nella
+        scatola significa fissare $\Delta x \le L$, e quindi $\Delta p$ non può annullarsi. Questa "energia di punto
+        zero" è reale e misurabile: nel mondo quantistico nemmeno il riposo assoluto è permesso.
+      </div>
+
+      <h3>5.2 — L'effetto tunnel: passare attraverso i muri</h3>
+      <p>Ora l'esperimento concettuale decisivo. Una <strong>pallina classica</strong> che corre verso un dislivello
+        (una collinetta di altezza energetica $U$) ha un destino scritto nell'energia: se la sua energia cinetica
+        $K$ è minore di $U$, <strong>non passa</strong> — rallenta, si ferma, torna indietro. Sempre. Non è
+        questione di tentativi: le manca l'energia, punto. Per un <strong>elettrone</strong> le cose vanno
+        diversamente: la sua funzione d'onda non si azzera di colpo contro la barriera — <strong>penetra</strong>
+        dentro, smorzandosi esponenzialmente, e se la barriera è abbastanza sottile <em>dall'altra parte ne esce
+        ancora un po'</em>. Tradotto con la regola di Born: c'è una <strong>probabilità non nulla di trovare
+        l'elettrone oltre il muro</strong>, anche se "l'energia non gli basta". È l'<strong>effetto tunnel</strong>.
+        Confronta i due mondi:</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="tn-cl">pallina classica</button>
+          <button class="btn" id="tn-qm">elettrone quantistico</button>
+        </div>
+        <div class="control-group"><label>Energia (in % dell'altezza della barriera): <span class="val" id="tn-e-val">60</span>%</label>
+          <input type="range" id="tn-e" min="20" max="150" step="5" value="60"></div>
+        <div class="control-group"><label>Spessore della barriera: <span class="val" id="tn-w-val">60</span></label>
+          <input type="range" id="tn-w" min="20" max="120" step="5" value="60"></div>
+        <button class="btn" id="tn-fire">🔫 spara 100 elettroni</button>
+      </div>
+      <div class="ckt"><svg id="tn-svg" viewBox="0 0 640 340" aria-label="Effetto tunnel: la pallina classica rimbalza se l'energia non basta, la funzione d'onda dell'elettrone attraversa la barriera smorzandosi"></svg></div>
+      <p class="eq-out" id="tn-out"></p>
+
+      <div class="formula-box">
+        $$T \;\approx\; e^{-2\kappa L} \qquad\text{con}\qquad \kappa \propto \sqrt{U - E}$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">la probabilità di attraversamento $T$ crolla <strong>esponenzialmente</strong> con lo spessore $L$ della barriera e con la sua "altezza mancante" $U - E$: per una pallina da tennis contro un muro $T$ ha un numero con miliardi di zeri dopo la virgola — per questo i muri di casa reggono. Per un elettrone e una barriera di qualche nanometro, invece, il tunnel è ordinaria amministrazione</p>
+      </div>
+
+      <div class="rule">
+        <strong>Il tunnel manda avanti il mondo.</strong> Non è una curiosità da lavagna: <strong>il Sole
+        brilla per effetto tunnel</strong> — i protoni nel suo nucleo non avrebbero classicamente l'energia per
+        vincere la repulsione elettrica e fondersi (lezione 8: il difetto di massa!), ma il tunnel apre lo
+        spiraglio; il decadimento alfa degli atomi radioattivi è una particella che "scava" fuori dal nucleo; e il
+        <strong>microscopio a effetto tunnel</strong> (STM, Nobel 1986) usa la corrente di tunnel per fotografare i
+        singoli atomi.
+      </div>
+
+      <div class="curiosita">
+        <strong>La teoria "strana" che ti porti in tasca.</strong> E se la meccanica quantistica ti sembra un
+        gioco astratto, considera questo: i <strong>transistor</strong> — decine di miliardi in ogni telefono — sono
+        progettati con le equazioni di questa lezione: senza teoria quantistica dei materiali, <strong>niente
+        elettronica moderna</strong>, niente computer, niente smartphone. L'effetto tunnel lavora nelle
+        <strong>memorie flash</strong> e nei componenti a microonde dei <strong>cellulari</strong> (le
+        telecomunicazioni), e il confinamento delle onde guida la luce nelle <strong>fibre ottiche</strong> che ti
+        portano internet veloce fino a casa. Ecco il punto su cui torneremo alla fine: questa teoria, per quanto
+        strana e controintuitiva, <strong>funziona</strong> — e il criterio per giudicarla è tutto lì.
+      </div>
+    </section>
+
+    <!-- 6 — OLTRE COPENAGHEN -->
+    <section id="sec6">
+      <h2>6. Ma è davvero così? Le altre interpretazioni</h2>
+
+      <p>L'interpretazione di Copenaghen non è l'unico modo di leggere le equazioni. Il collasso, il ruolo speciale
+        dell'osservatore, la probabilità come ingrediente fondamentale: molti fisici — a partire da Einstein — hanno
+        cercato strade per <strong>riconciliare la meccanica quantistica con una visione più classica</strong> del
+        mondo. Vediamo la più elegante, e poi il teorema che ha messo dei paletti severissimi a tutta la categoria.</p>
+
+      <h3>6.1 — L'onda pilota di de Broglie-Bohm</h3>
+      <p>E se la particella <strong>esistesse davvero</strong>, sempre, con una posizione precisa in ogni istante —
+        come una buona vecchia pallina classica? È l'idea della teoria dell'<strong>onda pilota</strong>, proposta
+        da de Broglie nel 1927 e ripresa e completata da <strong>David Bohm</strong> nel 1952. Qui gli ingredienti
+        reali sono <strong>due</strong>:</p>
+
+      <ul>
+        <li>la <strong>particella</strong>, che ha in ogni istante una posizione e una traiettoria ben definite
+          (nessuna sovrapposizione, nessun gatto vivo-e-morto);</li>
+        <li>l'<strong>onda</strong> $\psi$, che non è un catalogo di probabilità ma un'<strong>onda fisica
+          reale</strong>, la quale <em>pilota</em> la particella — le dice come muoversi, come l'onda del mare
+          guida il surfista che la cavalca.</li>
+      </ul>
+
+      <p>La doppia fenditura, in questa lettura, si scioglie con naturalezza: l'<strong>onda</strong> passa da
+        <em>entrambe</em> le fenditure e interferisce; la <strong>particella</strong> passa da <em>una sola</em> —
+        ha una traiettoria, mica è un fantasma — ma dall'altra parte cavalca un'onda ormai piena di creste e ventri,
+        che la incanala: molte traiettorie finiscono dove $|\psi|^2$ è grande, nessuna dove è nullo. Le frange
+        emergono <strong>senza collasso e senza misteri</strong>. E la teoria è <strong>deterministica</strong>: se
+        conoscessi la posizione iniziale esatta della particella, potresti prevederne l'intera traiettoria; la
+        casualità quantistica diventa semplice <em>ignoranza delle condizioni iniziali</em> — come nel caos
+        classico della lezione scorsa. Il bello (o il sospetto): l'onda pilota riproduce <strong>esattamente le
+        stesse previsioni</strong> della meccanica quantistica standard — nessun esperimento, finora, può
+        distinguerle.</p>
+
+      <div class="note">
+        <strong>E allora perché non ha vinto?</strong> Due prezzi. Primo: per riprodurre gli stessi numeri senza
+        aggiungerne di nuovi, molti la giudicano un'eleganza "gratuita" — stessa fisica, più impalcatura. Secondo, e
+        più grave: l'onda pilota è spudoratamente <strong>non locale</strong> — la traiettoria di una particella
+        dipende <em>istantaneamente</em> dallo stato di tutte le altre con cui ha interagito, ovunque si trovino
+        nell'universo. Un'azione a distanza che alla relatività non piace affatto. Ma tienila a mente, questa
+        non-località: sta per tornare dal processo... assolta a metà.
+      </div>
+
+      <h3>6.2 — Le variabili nascoste e il teorema di Bell</h3>
+      <p>L'onda pilota è un esempio di una strategia generale: ricondurre l'indeterminazione quantistica a
+        <strong>variabili nascoste</strong> — l'idea che ci sia <em>qualcosa che ci sfugge</em>, un'informazione che
+        non conosciamo ma che esiste, e che se la conoscessimo la fisica tornerebbe deterministica. Era la posizione
+        di Einstein: la meccanica quantistica non è <em>sbagliata</em>, è <strong>incompleta</strong>. Sembra una
+        disputa da filosofi, indecidibile per principio. E invece nel 1964 <strong>John Bell</strong> compì un
+        piccolo miracolo: trasformò la questione metafisica in un <strong>esperimento</strong>.</p>
+
+      <p>L'intuizione si può assaporare con un'analogia. Prendi un paio di <strong>guanti</strong>, mettili in due
+        scatole e spediscile ai capi opposti del mondo. Chi apre la sua scatola e trova il guanto <em>sinistro</em>
+        sa <strong>istantaneamente</strong> che l'altra contiene il destro: nessuna magia, nessun segnale — era già
+        tutto deciso alla partenza (la "variabile nascosta" è quale guanto è finito in quale scatola). La meccanica
+        quantistica prevede coppie di particelle <strong>entangled</strong> ("intrecciate") che mostrano correlazioni
+        simili: misuri una, e sai subito qualcosa dell'altra. Einstein la chiamava con disprezzo «spaventosa azione
+        a distanza» e sosteneva che dovesse essere come per i guanti: tutto deciso in anticipo. Copenaghen ribatteva:
+        no, prima della misura <em>non c'è nessun fatto</em> — l'esito si decide al momento, per entrambe.</p>
+
+      <div class="rule">
+        <strong>Il colpo di genio di Bell.</strong> Se le particelle si comportano "da guanti" — cioè partono con un
+        <em>libretto di istruzioni</em> prefissato che stabilisce la risposta a ogni possibile misura — allora,
+        confrontando le correlazioni misurate lungo <strong>tre o più angolazioni diverse</strong>, un conto di pura
+        logica impone un <strong>tetto invalicabile</strong> a quanto le risposte possono risultare correlate: è la
+        <strong>disuguaglianza di Bell</strong>, e vale per <em>qualunque</em> teoria a variabili nascoste
+        <em>locali</em> (dove l'esito qui non dipende da ciò che si fa laggiù). La meccanica quantistica, per gli
+        stessi esperimenti, prevede correlazioni che <strong>sfondano quel tetto</strong>. Non più chiacchiere:
+        basta misurare.
+      </div>
+
+      <p>E la natura ha risposto. Dagli esperimenti pionieristici di Clauser (1972) e di <strong>Alain
+        Aspect</strong> (1982) fino ai test "senza scappatoie" del 2015, il verdetto è sempre lo stesso: le
+        disuguaglianze di Bell sono <strong>violate</strong>, esattamente come prevede la meccanica quantistica.
+        Conseguenza enorme: <strong>nessuna teoria a variabili nascoste locali può descrivere il nostro
+        universo</strong>. Chi vuole il determinismo deve pagare la non-località (l'onda pilota di Bohm sopravvive
+        proprio perché non-locale è già di suo); chi vuole la località deve rinunciare alle proprietà prestabilite.
+        Il mondo "classico sotto il cofano" sognato da Einstein — locale <em>e</em> deterministico — è
+        <strong>sperimentalmente escluso</strong>. Nel 2022 il Nobel è andato proprio a Clauser, Aspect e Zeilinger
+        per questi esperimenti.</p>
+
+      <div class="note">
+        <strong>Niente panico relativistico.</strong> L'entanglement <em>non</em> permette di trasmettere
+        informazione più veloce della luce: ciascuno dei due sperimentatori, dal suo lato, vede solo esiti
+        perfettamente casuali — la correlazione salta fuori soltanto <em>dopo</em>, confrontando i due taccuini (e il
+        confronto viaggia per canali normali, alla velocità della luce o meno). La relatività ristretta dorme sonni
+        tranquilli; a restarci male è solo la nostra intuizione.
+      </div>
+
+      <h3>6.3 — «Zitto e calcola»</h3>
+      <p>Dopo un secolo di dibattiti, molti fisici hanno adottato una linea sbrigativa e di grande successo pratico:
+        <strong>non chiederti che cosa "significhi"</strong> la funzione d'onda — prendi le equazioni, esegui i
+        calcoli, confronta con gli esperimenti. È l'approccio riassunto nel motto <em>«Shut up and calculate!»</em>
+        — <strong>«zitto e calcola»</strong> — spesso attribuito a Feynman ma probabilmente coniato da David Mermin.
+        I suoi sostenitori aggiungono, con un sorriso provocatorio: in fondo i filosofi sono bravissimi a
+        <em>sollevare</em> problemi — a <em>risolverli</em>, un po' meno. La battuta è ingenerosa (e infatti il
+        dibattito sui fondamenti ha prodotto fisica concreta: il teorema di Bell è nato proprio da lì, e oggi
+        alimenta crittografia e computer quantistici), ma fotografa bene lo spirito pragmatico con cui la teoria
+        viene usata ogni giorno nei laboratori.</p>
+    </section>
+
+    <!-- 7 — FACOLTATIVA: VETTORI, MATRICI, AUTOVETTORI -->
+    <section id="sec7" class="optional">
+      <h2>7. Matematica per la sezione 8: vettori, matrici e autovettori</h2>
+      <p>(Approfondimento facoltativo ma consigliato: serve a capire <em>davvero</em> la sezione 8. Chi non ha
+        pazienza può saltare direttamente alla sezione 8 e accontentarsi di una comprensione intuitiva — le parole
+        chiave verranno comunque spiegate al volo.)</p>
+
+      <h3>7.1 — Vettori: n-uple di numeri</h3>
+      <p>Un <strong>vettore</strong>, spogliato di frecce e poesia, è una <strong>n-upla ordinata di numeri</strong>
+        scritta in un sistema di riferimento: in due dimensioni $\vec{v} = (2,\ 1)$ significa "2 passi lungo il
+        primo asse, 1 lungo il secondo". I numeri sono le <em>componenti</em>, e — come sappiamo dalle lezioni di
+        relatività — dipendono dal sistema di riferimento scelto: cambi gli assi, cambiano le componenti, ma il
+        vettore (l'oggetto geometrico) resta lui.</p>
+
+      <h3>7.2 — Matrici: macchine che trasformano vettori</h3>
+      <p>Una <strong>matrice</strong> è una tabella quadrata di numeri che agisce da <strong>trasformazione</strong>:
+        prende in ingresso un vettore e ne restituisce un altro. In due dimensioni:</p>
+
+      <div class="formula-box">
+        $$\begin{pmatrix} a & b \\ c & d \end{pmatrix}\!\begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} a\,x + b\,y \\ c\,x + d\,y \end{pmatrix}$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">ogni componente del vettore in uscita è una combinazione delle componenti in ingresso: "righe per colonne". Trucco per leggere una matrice al volo: le sue <strong>colonne</strong> sono le immagini dei versori degli assi</p>
+      </div>
+
+      <p>L'esempio perfetto sono le <strong>rotazioni</strong>: ruotare ogni vettore del piano di un angolo $\theta$
+        è una trasformazione lineare, e la sua matrice si scrive con seni e coseni. Sperimenta:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Angolo di rotazione: θ = <span class="val" id="mx-t-val">30</span>°</label>
+          <input type="range" id="mx-t" min="0" max="360" step="5" value="30"></div>
+      </div>
+      <div class="ckt"><svg id="mx-svg" viewBox="0 0 640 360" aria-label="Matrice di rotazione applicata a un vettore del piano: il vettore ruotato e le immagini dei versori"></svg></div>
+      <p class="eq-out" id="mx-out"></p>
+
+      <h3>7.3 — Autovettori: le direzioni che non ruotano</h3>
+      <p>Per certe matrici esistono <strong>direzioni speciali</strong>: vettori che la trasformazione non ruota
+        affatto, ma si limita ad <strong>allungare o accorciare</strong>. Si chiamano <strong>autovettori</strong>,
+        e il fattore di allungamento è l'<strong>autovalore</strong>:</p>
+
+      <div class="formula-box">
+        $$A\,\vec{v} = \lambda\,\vec{v}$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">$\vec{v}$ autovettore, $\lambda$ autovalore: la matrice, su quella direzione, agisce come una semplice moltiplicazione. Le rette formate dagli autovettori si chiamano <strong>autospazi</strong></p>
+      </div>
+
+      <p>Prendiamo la matrice $A = \begin{pmatrix} 2 & 1 \\ 1 & 2 \end{pmatrix}$ (una "stiratura" del piano — una
+        rotazione pura non avrebbe direzioni fisse, per questo cambiamo esempio). Ruota il vettore blu e osserva
+        quando quello dorato gli resta parallelo:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Direzione del vettore: α = <span class="val" id="ev-a-val">20</span>°</label>
+          <input type="range" id="ev-a" min="0" max="180" step="1" value="20"></div>
+      </div>
+      <div class="ckt"><svg id="ev-svg" viewBox="0 0 640 360" aria-label="Autovettori e autospazi della matrice 2 1 / 1 2: il vettore trasformato resta parallelo solo lungo le direzioni speciali"></svg></div>
+      <p class="eq-out" id="ev-out"></p>
+
+      <h3>7.4 — Il premio: la matrice diventa diagonale</h3>
+      <div class="rule">
+        Ed ecco il colpo finale, quello che rende gli autovettori preziosi. Se scegli come <strong>base</strong> del
+        piano proprio gli autovettori — cioè descrivi tutti i vettori con componenti lungo quelle direzioni — allora
+        la matrice, riscritta nel nuovo sistema, diventa <strong>diagonale</strong>: tutti zeri, tranne gli
+        <strong>autovalori sulla diagonale</strong>. Per la nostra $A$: $\begin{pmatrix} 3 & 0 \\ 0 & 1 \end{pmatrix}$.
+        La trasformazione, vista dagli "occhi giusti", si rivela per quello che è: una moltiplicazione per $3$ in una
+        direzione e per $1$ nell'altra. Trovare gli autovettori significa trovare il punto di vista in cui la
+        trasformazione è <em>semplice</em>. Tienilo stretto: tra un attimo gli autovalori diventeranno... i risultati
+        delle misure.
+      </div>
+    </section>
+
+    <!-- 8 — LA FORMULAZIONE DI HEISENBERG -->
+    <section id="sec8">
+      <h2>8. La formulazione di Heisenberg: la fisica come matrici</h2>
+
+      <h3>8.1 — Due teorie, una fisica</h3>
+      <p>Colpo di scena storico: la meccanica quantistica non è nata con l'onda di Schrödinger. Un anno
+        <em>prima</em>, nell'estate del 1925, il ventitreenne <strong>Werner Heisenberg</strong> — rifugiato
+        sull'isoletta di Helgoland per sfuggire a una feroce allergia ai pollini — costruì una teoria fatta di
+        <strong>tabelle di numeri</strong> che si moltiplicavano con regole strane. Le mostrò a Max Born, che
+        riconobbe di che si trattava: erano <strong>matrici</strong> (Heisenberg non le aveva mai studiate!). Nacque
+        così la <em>meccanica delle matrici</em>, sviluppata con Born e Jordan. Quando l'anno dopo arrivò l'equazione
+        di Schrödinger, per un po' le due teorie si guardarono in cagnesco — finché si dimostrò (Schrödinger stesso,
+        e poi von Neumann in piena generalità) che sono <strong>matematicamente equivalenti</strong>: stessi numeri,
+        stesse previsioni, due linguaggi per la stessa fisica. Come le coordinate cartesiane e quelle polari.</p>
+
+      <h3>8.2 — Il dizionario della meccanica delle matrici</h3>
+      <div class="definition">
+        <strong>Le regole del gioco.</strong>
+        <ul style="margin:0.5rem 0 0;">
+          <li>Lo <strong>stato</strong> di un sistema fisico è un <strong>vettore</strong> (di lunghezza $1$) in uno
+            spazio vettoriale detto <strong>spazio di Hilbert</strong> — come i vettori della sezione 7, ma con
+            componenti che possono essere numeri complessi, e con dimensioni anche infinite.</li>
+          <li>Una <strong>grandezza fisica</strong> (un'<em>osservabile</em>: posizione, energia, quantità di
+            moto...) è una <strong>matrice hermitiana</strong>. <em>Hermitiana</em> significa: se la trasponi
+            (scambi righe e colonne) e coniughi ogni numero complesso, ritrovi la matrice di partenza — per matrici
+            di numeri reali vuol dire semplicemente <em>simmetrica</em>. Perché proprio hermitiana? Perché si
+            dimostra che le matrici hermitiane hanno tutti gli <strong>autovalori reali</strong> — e devono esserlo,
+            visto che stanno per diventare i numeri letti sugli strumenti.</li>
+          <li>Finché nessuno misura, lo stato <strong>evolve in modo deterministico</strong>, secondo
+            l'<strong>equazione di Heisenberg</strong> — la gemella dell'equazione di Schrödinger.</li>
+          <li>Quando <strong>misuri</strong> un'osservabile: i <strong>risultati possibili</strong> sono gli
+            <strong>autovalori</strong> della sua matrice (ecco la quantizzazione: se gli autovalori sono un elenco
+            discreto, la grandezza esce "a scatti"!); l'esito della singola misura è sorteggiato, e la
+            <strong>probabilità</strong> di ciascun autovalore è il <strong>quadrato della proiezione</strong> dello
+            stato sull'autovettore corrispondente — cioè quanto lo stato "contiene" di quella direzione; subito dopo
+            la misura, lo stato <strong>collassa sull'autovettore</strong> uscito.</li>
+        </ul>
+      </div>
+
+      <p>Un esempio in miniatura, con le matrici $2\times 2$ della sezione 7. Certe particelle hanno una grandezza
+        (lo <em>spin</em>, ne riparleremo) che misurata dà solo $+1$ o $-1$: la sua matrice è
+        $S = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}$, già diagonale, con autovalori $+1$ e $-1$ e autovettori
+        $(1,0)$ e $(0,1)$. Se lo stato del sistema è il vettore $(0{,}8;\ 0{,}6)$ — lunghezza $1$, controlla! —
+        allora la misura dà $+1$ con probabilità $0{,}8^2 = 0{,}64$ e $-1$ con probabilità $0{,}6^2 = 0{,}36$. Tutta
+        la struttura della meccanica quantistica, in due componenti.</p>
+
+      <h3>8.3 — Il segreto delle matrici: l'ordine conta</h3>
+      <p>E il principio di indeterminazione, in questo linguaggio? Qui la formulazione di Heisenberg mostra la sua
+        eleganza. Per le matrici, in generale, <strong>l'ordine dei fattori altera il prodotto</strong>:
+        $AB \ne BA$. E Heisenberg scoprì che per le matrici di posizione e quantità di moto vale una relazione
+        precisa:</p>
+
+      <div class="formula-box">
+        $$\hat{x}\,\hat{p} - \hat{p}\,\hat{x} = i\,\hbar$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">posizione e quantità di moto <strong>non commutano</strong> — e la differenza è proprio $\hbar$: la costante di Planck è la misura di quanto l'ordine delle operazioni conta nella natura</p>
+      </div>
+
+      <p>Due osservabili che non commutano non hanno autovettori in comune: uno stato non può essere
+        <em>contemporaneamente</em> autovettore dell'una e dell'altra — cioè non può avere entrambe le grandezze
+        definite. Il principio di indeterminazione della sezione 3 non è un assioma appiccicato: è un
+        <strong>teorema sulle matrici</strong>. Misurare $x$ e poi $p$ non è come misurare $p$ e poi $x$: l'ordine
+        delle misure conta, perché l'ordine dei prodotti conta.</p>
+
+      <div class="curiosita">
+        <strong>Le tre del mattino di Helgoland.</strong> Heisenberg raccontò così la notte in cui i conti tornarono:
+        «Erano quasi le tre del mattino... Dapprima fui profondamente scosso. Avevo la sensazione di guardare,
+        attraverso la superficie dei fenomeni atomici, un fondale di strana bellezza interiore. Mi sentii quasi
+        stordito al pensiero che ora dovevo indagare questa ricchezza di strutture matematiche che la natura aveva
+        dispiegato davanti a me». Troppo agitato per dormire, andò a scalare una roccia sul mare e aspettò l'alba in
+        cima. Aveva 23 anni, e in tasca la prima meccanica quantistica della storia.
+      </div>
+    </section>
+
+    <!-- 9 — IL CAMBIO DI PARADIGMA -->
+    <section id="sec9">
+      <h2>9. Il grande cambio di paradigma</h2>
+
+      <p>Tiriamo le fila, perché il punto d'arrivo di questa lezione è una frattura storica. <strong>Tutta la fisica
+        che avevamo costruito finora</strong> — la meccanica di Newton, l'elettromagnetismo di Maxwell, e sì, anche
+        la teoria della relatività, per quanto rivoluzionaria — condivide una promessa: dato lo stato del sistema,
+        la teoria ti dice <strong>quale sarà il risultato</strong> dell'esperimento. Un numero, una traiettoria, un
+        fatto. La meccanica quantistica rompe il contratto: anche conoscendo lo stato <em>alla perfezione</em>, la
+        teoria ti dice soltanto <strong>con quale probabilità</strong> uscirà un risultato piuttosto che un altro.
+        Il singolo esito è un sorteggio autentico — non l'ignoranza pratica del meteo o del lancio di un dado, che
+        con più informazioni sparirebbe, ma un limite <strong>di principio</strong>, certificato dal teorema di
+        Bell.</p>
+
+      <div class="rule">
+        <strong>Il paradosso da custodire.</strong> E tuttavia — ecco la beffa finale — questa teoria "dell'incertezza"
+        è la <strong>più precisa mai costruita</strong>: alcune sue previsioni (come le proprietà magnetiche
+        dell'elettrone) coincidono con gli esperimenti per una decina di cifre decimali, e sulle sue equazioni
+        girano i transistor, i laser, le memorie, il telefono che hai in tasca. Le <em>probabilità</em> che
+        fornisce sono esatte fino allo scrupolo; è il singolo evento a essere libero. Feynman lo disse senza giri di
+        parole: «Penso di poter affermare con sicurezza che <strong>nessuno capisce davvero la meccanica
+        quantistica</strong>» — eppure nessuna teoria è mai stata verificata così bene. Il cambio di paradigma
+        sconvolge i fisici ancora oggi; ma la bussola che ci siamo dati alla fine della lezione scorsa non trema:
+        se prevede correttamente gli esperimenti, è buona fisica. E questa li prevede come nient'altro al mondo.
+      </div>
+    </section>
+
+    <!-- 10 — QUIZ -->
+    <section id="quiz">
+      <h2>10. Quiz finale</h2>
+      <p>Dieci domande su fenditure, gatti, matrici e probabilità. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 11 — La meccanica quantistica · Fisica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezioni 1 e 2 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 1 — Doppia fenditura =====
+      (function () {
+        const svg = document.getElementById('df-svg');
+        if (!svg) return;
+        const chk = document.getElementById('df-obs');
+        const out = document.getElementById('df-out');
+        const XM = 320, XL = 70, XR = 570, W = XR - XL;   // schermo
+        const NBIN = 50;
+        let hits = [], hist = new Array(NBIN).fill(0), tot = 0;
+        // distribuzioni in u ∈ [-1, 1]
+        function probI(u) { const c = Math.cos(14 * u); return c * c * Math.exp(-(u * u) / 0.25); }
+        function probB(u) {
+          const g1 = Math.exp(-Math.pow((u - 0.28) / 0.16, 2)), g2 = Math.exp(-Math.pow((u + 0.28) / 0.16, 2));
+          return g1 + g2;
+        }
+        function sample() {
+          const f = chk.checked ? probB : probI;
+          for (let k = 0; k < 400; k++) {
+            const u = Math.random() * 2 - 1;
+            if (Math.random() * 1.05 < f(u)) return u;
+          }
+          return 0;
+        }
+        function shoot(n) {
+          for (let i = 0; i < n; i++) {
+            const u = sample();
+            tot++;
+            const bin = Math.min(NBIN - 1, Math.max(0, Math.floor((u + 1) / 2 * NBIN)));
+            hist[bin]++;
+            if (hits.length < 3000) hits.push([XM + u * (W / 2), 138 + Math.random() * 70]);
+          }
+          draw();
+        }
+        function reset() { hits = []; hist = new Array(NBIN).fill(0); tot = 0; draw(); }
+        function draw() {
+          const obs = chk.checked;
+          let h = '';
+          // cannone
+          h += `<rect x="300" y="8" width="40" height="22" rx="5" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2"/>`;
+          h += `<text x="352" y="24" class="lbl-s">cannone di elettroni</text>`;
+          // barriera con due fenditure
+          const s1 = XM - 30, s2 = XM + 30;
+          h += `<line x1="40" y1="78" x2="${s1 - 9}" y2="78" stroke="var(--text-soft)" stroke-width="5"/>`;
+          h += `<line x1="${s1 + 9}" y1="78" x2="${s2 - 9}" y2="78" stroke="var(--text-soft)" stroke-width="5"/>`;
+          h += `<line x1="${s2 + 9}" y1="78" x2="600" y2="78" stroke="var(--text-soft)" stroke-width="5"/>`;
+          h += `<text x="40" y="66" class="lbl-s">due fenditure</text>`;
+          if (obs) {
+            h += `<text x="${s1}" y="104" text-anchor="middle" style="font-size:15px;">🔎</text>`;
+            h += `<text x="${s2}" y="104" text-anchor="middle" style="font-size:15px;">🔎</text>`;
+            h += `<text x="${s2 + 22}" y="104" class="lbl-s" fill="var(--red)">rivelatore acceso</text>`;
+          }
+          // schermo con impatti
+          h += `<rect x="${XL - 8}" y="130" width="${W + 16}" height="86" rx="6" fill="#0d1017" stroke="var(--border)"/>`;
+          hits.forEach(p => { h += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="1.3" fill="#ffd97a"/>`; });
+          h += `<text x="${XL - 8}" y="126" class="lbl-s">schermo (ogni puntino = un elettrone)</text>`;
+          // istogramma
+          const HB = 342, HT = 238;
+          const mx = Math.max(1, ...hist);
+          h += `<line x1="${XL - 8}" y1="${HB}" x2="${XR + 8}" y2="${HB}" stroke="var(--muted)" stroke-width="1.5"/>`;
+          for (let i = 0; i < NBIN; i++) {
+            if (!hist[i]) continue;
+            const bh = (HB - HT) * hist[i] / mx;
+            h += `<rect x="${(XL + i * W / NBIN).toFixed(1)}" y="${(HB - bh).toFixed(1)}" width="${(W / NBIN - 1).toFixed(1)}" height="${bh.toFixed(1)}" fill="var(--accent)" opacity="0.75"/>`;
+          }
+          // curva teorica
+          if (tot >= 60) {
+            const f = obs ? probB : probI;
+            let fm = 0; const pts = [];
+            for (let i = 0; i <= 160; i++) { const u = -1 + i / 80; const v = f(u); if (v > fm) fm = v; pts.push([u, v]); }
+            let d = '';
+            pts.forEach(p => {
+              const x = XM + p[0] * (W / 2), y = HB - (HB - HT) * (p[1] / fm) * 0.96;
+              d += `${d ? 'L' : 'M'} ${x.toFixed(1)} ${y.toFixed(1)} `;
+            });
+            h += `<path d="${d}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-dasharray="5 4"/>`;
+            h += `<text x="${XR + 6}" y="${HT + 8}" text-anchor="end" class="lbl-s" fill="var(--gold)">previsione</text>`;
+          }
+          h += `<text x="${XL - 8}" y="${HB + 22}" class="lbl-s">istogramma degli arrivi — elettroni sparati: ${tot}</text>`;
+          h += `<text x="${XM}" y="418" text-anchor="middle" class="em">${obs ? 'DUE BANDE: osservato, l\'elettrone si comporta da particella' : tot >= 300 ? 'FRANGE: non osservato, ogni elettrone interferisce con se stesso' : 'spara elettroni e osserva il disegno che emerge...'}</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = obs
+            ? `Rivelatore <strong>acceso</strong>: sappiamo da quale fenditura passa ogni elettrone — e le frange <strong>spariscono</strong>: due bande, come proiettili. Con <span class="val-badge">${tot}</span> elettroni.`
+            : `Rivelatore <strong>spento</strong>: nessuno sa da dove passa l'elettrone — e con <span class="val-badge">${tot}</span> elettroni ${tot < 300 ? 'il disegno sta ancora emergendo: continua a sparare' : 'le <strong>frange di interferenza</strong> sono evidenti: ogni singolo elettrone si è comportato da onda'}.`;
+        }
+        document.getElementById('df-one').addEventListener('click', () => shoot(1));
+        document.getElementById('df-100').addEventListener('click', () => shoot(100));
+        document.getElementById('df-2000').addEventListener('click', () => shoot(2000));
+        document.getElementById('df-clr').addEventListener('click', reset);
+        chk.addEventListener('change', reset);
+        draw();
+      })();
+
+      // ===== 2.2 — Il gatto di Schrödinger =====
+      (function () {
+        const svg = document.getElementById('cat-svg');
+        if (!svg) return;
+        const sp = document.getElementById('cat-p'), vp = document.getElementById('cat-p-val');
+        const out = document.getElementById('cat-out');
+        let open = false, alive = true, nOpen = 0, nAlive = 0;
+        function draw() {
+          const p = +sp.value / 100;         // probabilità che l'atomo SIA decaduto (gatto morto)
+          let h = '';
+          // scatola
+          h += `<rect x="150" y="80" width="280" height="180" rx="10" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2.5"/>`;
+          if (!open) {
+            // coperchio chiuso
+            h += `<rect x="140" y="64" width="300" height="22" rx="6" fill="var(--surface-2)" stroke="var(--text-soft)" stroke-width="2.5"/>`;
+            // sovrapposizione: due gatti semitrasparenti + onda
+            h += `<text x="235" y="185" text-anchor="middle" style="font-size:56px;" opacity="${(1 - p).toFixed(2)}">😺</text>`;
+            h += `<text x="345" y="185" text-anchor="middle" style="font-size:56px;" opacity="${p.toFixed(2)}">💀</text>`;
+            h += `<text x="290" y="150" text-anchor="middle" class="lbl" style="font-size:24px;">?</text>`;
+            let d = '';
+            for (let x = 170; x <= 410; x += 4) d += `${d ? 'L' : 'M'} ${x} ${(228 + 9 * Math.sin((x - 170) / 12)).toFixed(1)} `;
+            h += `<path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.7"/>`;
+            h += `<text x="290" y="290" text-anchor="middle" class="em">scatola chiusa: vivo ⊕ morto (sovrapposizione)</text>`;
+          } else {
+            // coperchio aperto
+            h += `<rect x="404" y="18" width="22" height="86" rx="6" fill="var(--surface-2)" stroke="var(--text-soft)" stroke-width="2.5" transform="rotate(35 415 104)"/>`;
+            h += `<text x="290" y="192" text-anchor="middle" style="font-size:64px;">${alive ? '😺' : '💀'}</text>`;
+            h += `<text x="290" y="290" text-anchor="middle" class="em">collasso: il gatto è ${alive ? 'VIVO' : 'MORTO'} (e lo era... da quando?)</text>`;
+          }
+          // barre di probabilità
+          const bp = open ? (alive ? 0 : 1) : p;
+          h += `<text x="470" y="106" class="lbl-s">P(vivo)</text>`;
+          h += `<rect x="470" y="114" width="130" height="18" rx="4" fill="var(--surface-2)" stroke="var(--border)"/>`;
+          h += `<rect x="470" y="114" width="${(130 * (1 - bp)).toFixed(1)}" height="18" rx="4" fill="#22c55e"/>`;
+          h += `<text x="470" y="162" class="lbl-s">P(morto)</text>`;
+          h += `<rect x="470" y="170" width="130" height="18" rx="4" fill="var(--surface-2)" stroke="var(--border)"/>`;
+          h += `<rect x="470" y="170" width="${(130 * bp).toFixed(1)}" height="18" rx="4" fill="var(--red)"/>`;
+          h += `<text x="470" y="218" class="lbl-s">aperture: ${nOpen}${nOpen ? ` — vivo ${nAlive} (${Math.round(nAlive / nOpen * 100)}%)` : ''}</text>`;
+          svg.innerHTML = h;
+          const pc = +sp.value;
+          out.innerHTML = open
+            ? `Hai aperto: esito <strong>${alive ? 'vivo' : 'morto'}</strong>. Su ${nOpen} aperture: vivo il ${Math.round(nAlive / Math.max(1, nOpen) * 100)}% delle volte (atteso: ${100 - pc}%). La <em>singola</em> apertura è imprevedibile; le <em>frequenze</em> obbediscono alla teoria con precisione.`
+            : `Scatola chiusa, P(decadimento) = ${pc}%: la teoria descrive il sistema come sovrapposizione — non "o vivo o morto ma non sappiamo quale": <strong>entrambi</strong>, con pesi ${100 - pc}% e ${pc}%. Apri per far collassare.`;
+        }
+        document.getElementById('cat-open').addEventListener('click', () => {
+          if (open) return;
+          open = true; alive = Math.random() >= +sp.value / 100;
+          nOpen++; if (alive) nAlive++;
+          draw();
+        });
+        document.getElementById('cat-again').addEventListener('click', () => { open = false; draw(); });
+        sp.addEventListener('input', () => {
+          vp.textContent = sp.value;
+          open = false; nOpen = 0; nAlive = 0;   // cambiare p è un nuovo esperimento
+          draw();
+        });
+        draw();
+      })();
+
+    });
+  </script>
+
+  <!-- Demo sezione 3 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 3.1 — Indeterminazione: pacchetto in x ↔ distribuzione in p =====
+      (function () {
+        const sx = document.getElementById('hb-sx');
+        if (!sx || !window.Plt) return;
+        const vx = document.getElementById('hb-sx-val');
+        const lock = document.getElementById('hb-lock');
+        const out = document.getElementById('hb-out');
+        const { linspace, update } = Plt;
+        const xs = linspace(-6, 6, 300), ps = linspace(-3, 3, 300);
+        function gauss(t, s) { return Math.exp(-t * t / (2 * s * s)) / (s * Math.sqrt(2 * Math.PI)); }
+        function fmt(v) { return v.toFixed(2).replace('.', ','); }
+        function go() {
+          const s = +sx.value; vx.textContent = fmt(s);
+          const sp = 1 / (2 * s);                    // ħ = 1: pacchetto gaussiano ottimale
+          const lx = { xaxis: { title: 'posizione x', range: [-6, 6] },
+            yaxis: { title: '|ψ(x)|²' }, showlegend: false,
+            annotations: [{ x: 0, y: 1.02, yref: 'paper', text: `Δx = ${fmt(s)}`, showarrow: false, font: { color: '#3b82f6' } }] };
+          const lp = { xaxis: { title: 'quantità di moto p', range: [-3, 3] },
+            yaxis: { title: 'distribuzione di p' }, showlegend: false,
+            annotations: [{ x: 0, y: 1.02, yref: 'paper', text: `Δp = ${fmt(sp)}`, showarrow: false, font: { color: '#f5b400' } }] };
+          if (lock.checked) { lx.yaxis.range = [0, 1.45]; lp.yaxis.range = [0, 2.2]; }
+          update('hb-plot-x', [{ x: xs, y: xs.map(t => gauss(t, s)), type: 'scatter', mode: 'lines', line: { color: '#3b82f6', width: 3 }, fill: 'tozeroy', fillcolor: 'rgba(59,130,246,0.15)' }], lx);
+          update('hb-plot-p', [{ x: ps, y: ps.map(t => gauss(t, sp)), type: 'scatter', mode: 'lines', line: { color: '#f5b400', width: 3 }, fill: 'tozeroy', fillcolor: 'rgba(245,180,0,0.15)' }], lp);
+          out.innerHTML = `$\\Delta x = ${fmt(s)}$, $\\Delta p = ${fmt(sp)}$ (in unità $\\hbar = 1$): il prodotto vale
+            $\\Delta x \\cdot \\Delta p = $ <span class="val-badge">${fmt(s * sp)}</span> $= \\hbar/2$, il minimo assoluto —
+            il pacchetto gaussiano è il "miglior compromesso" possibile, e comunque non scende sotto il limite di Heisenberg.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sx.addEventListener('input', go); lock.addEventListener('change', go);
+        document.addEventListener('themechange', go);
+        go();
+      })();
+
+    });
+  </script>
+
+  <!-- Demo sezione 5 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 5.1 — Elettrone nella scatola =====
+      (function () {
+        const sn = document.getElementById('bx-n');
+        if (!sn || !window.Plt) return;
+        const vn = document.getElementById('bx-n-val');
+        const lock = document.getElementById('bx-lock');
+        const out = document.getElementById('bx-out');
+        const { linspace, update } = Plt;
+        const xs = linspace(0, 1, 320);
+        function go() {
+          const n = +sn.value; vn.textContent = n;
+          const psi = xs.map(x => Math.sin(n * Math.PI * x));
+          const layout = {
+            xaxis: { title: 'posizione x/L', range: [-0.06, 1.06] },
+            yaxis: { title: '', range: lock.checked ? [-1.25, 1.35] : undefined },
+            legend: { orientation: 'h', y: 1.16 },
+            shapes: [
+              { type: 'line', x0: 0, x1: 0, y0: -1.2, y1: 1.3, line: { color: '#888', width: 3 } },
+              { type: 'line', x0: 1, x1: 1, y0: -1.2, y1: 1.3, line: { color: '#888', width: 3 } },
+            ],
+          };
+          update('bx-plot', [
+            { x: xs, y: psi.map(v => v * v), type: 'scatter', mode: 'lines', name: '|ψ|² (probabilità)', line: { color: '#f5b400', width: 3 }, fill: 'tozeroy', fillcolor: 'rgba(245,180,0,0.18)' },
+            { x: xs, y: psi, type: 'scatter', mode: 'lines', name: 'ψ (funzione d\'onda)', line: { color: '#3b82f6', width: 2.5, dash: 'dot' } },
+          ], layout);
+          out.innerHTML = `Stato $n = ${n}$: la scatola contiene <strong>${n === 1 ? 'mezza lunghezza d\'onda' : n + ' mezze lunghezze d\'onda'}</strong>,
+            l'energia vale $E_{${n}} = ${n * n}\\,E_1$ e la densità $|\\psi|^2$ ha <span class="val-badge">${n - 1}</span> ${n === 2 ? 'nodo' : 'nodi'} interni${n > 1 ? ' — punti dove l\'elettrone non si trova mai' : ''}.
+            ${n === 1 ? 'Nota: questo è lo stato di <strong>minima</strong> energia, e non è zero — l\'elettrone confinato non può stare fermo.' : ''}`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sn.addEventListener('input', go); lock.addEventListener('change', go);
+        document.addEventListener('themechange', go);
+        go();
+      })();
+
+      // ===== 5.2 — Effetto tunnel: classico vs quantistico =====
+      (function () {
+        const svg = document.getElementById('tn-svg');
+        if (!svg) return;
+        const bCl = document.getElementById('tn-cl'), bQm = document.getElementById('tn-qm');
+        const sE = document.getElementById('tn-e'), vE = document.getElementById('tn-e-val');
+        const sW = document.getElementById('tn-w'), vW = document.getElementById('tn-w-val');
+        const bFire = document.getElementById('tn-fire');
+        const out = document.getElementById('tn-out');
+        const GY = 268, BX = 350, BH = 100;         // suolo, inizio barriera, altezza barriera
+        let mode = 'cl', ballX = 70, dir = 1, last = performance.now(), fireTxt = '';
+        function setMode(m) {
+          mode = m;
+          bCl.classList.toggle('active', m === 'cl');
+          bQm.classList.toggle('active', m === 'qm');
+          ballX = 70; dir = 1; fireTxt = '';
+          report();
+        }
+        bCl.addEventListener('click', () => setMode('cl'));
+        bQm.addEventListener('click', () => setMode('qm'));
+        function T() {
+          const E = +sE.value / 100, W = +sW.value;
+          if (E >= 1) return 1;
+          return Math.exp(-2 * 0.045 * Math.sqrt(1 - E) * W);
+        }
+        function report() {
+          const E = +sE.value, W = +sW.value, t = T();
+          if (mode === 'cl') {
+            out.innerHTML = E < 100
+              ? `Pallina classica con $K = ${E}\\%$ di $U$: <strong>non passa</strong>. Non al primo tentativo, non al milionesimo: la fisica classica non ammette eccezioni. (Alza l'energia sopra il 100% e passerà — semplicemente scavalcando.)`
+              : `Con $K = ${E}\\%$ di $U$ la pallina <strong>scavalca</strong> la barriera: nessun mistero, ha l'energia che serve. Il caso interessante è l'altro: riportala sotto il 100% e passa alla scheda quantistica.`;
+          } else {
+            out.innerHTML = (E >= 100)
+              ? `Con $E \\ge U$ l'elettrone passa (quasi) sempre: siamo sopra la barriera. Il miracolo è sotto il 100%: prova.`
+              : `Elettrone con $E = ${E}\\%$ di $U$, barriera di spessore ${W}: la funzione d'onda decade nella barriera ma <strong>riemerge</strong> — probabilità di attraversamento $T = $ <span class="val-badge">${t < 0.0001 ? t.toExponential(1).replace('.', ',') : (t * 100).toFixed(t * 100 < 1 ? 2 : 1).replace('.', ',') + '%'}</span>. ${fireTxt}`;
+          }
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        bFire.addEventListener('click', () => {
+          if (mode !== 'qm') { setMode('qm'); }
+          const t = T();
+          let k = 0;
+          for (let i = 0; i < 100; i++) if (Math.random() < t) k++;
+          fireTxt = `Sparati 100 elettroni: <strong>${k}</strong> ${k === 1 ? 'è passato' : 'sono passati'} (attesi ${(t * 100).toFixed(1).replace('.', ',')}).`;
+          report();
+        });
+        function frame(now) {
+          const dt = Math.min(50, now - last) / 1000; last = now;
+          const E = +sE.value / 100, W = +sW.value;
+          let h = '';
+          // suolo e barriera
+          h += `<line x1="20" y1="${GY}" x2="620" y2="${GY}" stroke="var(--text-soft)" stroke-width="2.5"/>`;
+          h += `<rect x="${BX}" y="${GY - BH}" width="${W}" height="${BH}" rx="4" fill="color-mix(in srgb, var(--muted) 35%, transparent)" stroke="var(--muted)" stroke-width="1.5"/>`;
+          h += `<text x="${BX + W / 2}" y="${GY - BH - 10}" text-anchor="middle" class="lbl-s">barriera (altezza U)</text>`;
+          // linea dell'energia
+          const eY = GY - BH * Math.min(1.35, E);
+          h += `<line x1="20" y1="${eY.toFixed(1)}" x2="620" y2="${eY.toFixed(1)}" stroke="var(--gold)" stroke-width="1.6" stroke-dasharray="6 5"/>`;
+          h += `<text x="612" y="${(eY - 6).toFixed(1)}" text-anchor="end" class="lbl-s" fill="var(--gold)">energia disponibile</text>`;
+          if (mode === 'cl') {
+            // pallina che corre e rimbalza (o scavalca)
+            const v = 150 * Math.sqrt(E);
+            ballX += dir * v * dt;
+            let by = GY - 9;
+            if (E >= 1) {
+              if (ballX > BX && ballX < BX + W) by = GY - BH - 9;         // sopra la barriera
+              if (ballX > 640) ballX = 70;
+            } else {
+              if (dir > 0 && ballX >= BX - 9) { dir = -1; }               // rimbalzo
+              if (dir < 0 && ballX <= 60) { dir = 1; }
+            }
+            h += `<circle cx="${ballX.toFixed(1)}" cy="${by.toFixed(1)}" r="9" fill="var(--red)"/>`;
+            h += `<text x="70" y="40" class="lbl">MONDO CLASSICO${E < 1 ? ': K minore di U → rimbalza, sempre' : ': K maggiore di U → scavalca'}</text>`;
+          } else {
+            // funzione d'onda: oscilla, decade nella barriera, riemerge ridotta
+            const t = T(), amp = 30, mid = GY - BH - 62;
+            const kap = 0.045 * Math.sqrt(Math.max(0, 1 - E));
+            const kx = 0.11 + 0.10 * Math.sqrt(Math.min(1.5, E));
+            const phase = now / 280;
+            let d = '';
+            for (let x = 24; x <= 616; x += 2) {
+              let y;
+              if (x < BX) y = mid + amp * Math.sin(kx * x - phase);
+              else if (x <= BX + W && E < 1) y = mid + amp * Math.sin(kx * BX - phase) * Math.exp(-kap * (x - BX));
+              else {
+                const a2 = E < 1 ? amp * Math.sqrt(t) : amp;
+                y = mid + a2 * Math.sin(kx * x - phase);
+              }
+              d += `${d ? 'L' : 'M'} ${x} ${y.toFixed(1)} `;
+            }
+            h += `<path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2.6"/>`;
+            h += `<text x="70" y="40" class="lbl">MONDO QUANTISTICO: ψ penetra la barriera</text>`;
+            h += `<text x="${BX + W + 12}" y="${mid - 40}" class="em">ampiezza superstite → T = ${(T() * 100) < 0.01 ? T().toExponential(1).replace('.', ',') : (T() * 100).toFixed(1).replace('.', ',') + '%'}</text>`;
+          }
+          svg.innerHTML = h;
+          requestAnimationFrame(frame);
+        }
+        sE.addEventListener('input', () => { vE.textContent = sE.value; fireTxt = ''; report(); });
+        sW.addEventListener('input', () => { vW.textContent = sW.value; fireTxt = ''; report(); });
+        report();
+        requestAnimationFrame(frame);
+      })();
+
+    });
+  </script>
+
+  <!-- Demo sezione 7 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      const OX = 320, OY = 185;
+      function arrow(x2, y2, color, w, dash) {
+        const a = Math.atan2(y2 - OY, x2 - OX);
+        const a1 = a + 2.7, a2 = a - 2.7;
+        return `<line x1="${OX}" y1="${OY}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${color}" stroke-width="${w}"${dash ? ' stroke-dasharray="6 5"' : ''}/>` +
+          `<polygon points="${x2.toFixed(1)},${y2.toFixed(1)} ${(x2 + 12 * Math.cos(a1)).toFixed(1)},${(y2 + 12 * Math.sin(a1)).toFixed(1)} ${(x2 + 12 * Math.cos(a2)).toFixed(1)},${(y2 + 12 * Math.sin(a2)).toFixed(1)}" fill="${color}"/>`;
+      }
+      function gridAxes() {
+        let h = '';
+        for (let x = 40; x <= 600; x += 40) h += `<line x1="${x}" y1="15" x2="${x}" y2="355" stroke="var(--border)" stroke-width="1"/>`;
+        for (let y = 25; y <= 345; y += 40) h += `<line x1="30" y1="${y}" x2="610" y2="${y}" stroke="var(--border)" stroke-width="1"/>`;
+        h += `<line x1="30" y1="${OY}" x2="610" y2="${OY}" stroke="var(--muted)" stroke-width="1.6"/>`;
+        h += `<line x1="${OX}" y1="15" x2="${OX}" y2="355" stroke="var(--muted)" stroke-width="1.6"/>`;
+        return h;
+      }
+      function fmt(x, d) { return x.toFixed(d === undefined ? 2 : d).replace('.', ',').replace('-', '−'); }
+
+      // ===== 7.2 — Matrice di rotazione =====
+      (function () {
+        const st = document.getElementById('mx-t');
+        if (!st) return;
+        const vt = document.getElementById('mx-t-val');
+        const svg = document.getElementById('mx-svg');
+        const out = document.getElementById('mx-out');
+        const S = 60, V = [2, 1];
+        function P(x, y) { return [OX + S * x, OY - S * y]; }
+        function go() {
+          const deg = +st.value; vt.textContent = deg;
+          const t = deg * Math.PI / 180, c = Math.cos(t), s = Math.sin(t);
+          const R = [[c, -s], [s, c]];
+          const rv = [R[0][0] * V[0] + R[0][1] * V[1], R[1][0] * V[0] + R[1][1] * V[1]];
+          let h = gridAxes();
+          // arco dell'angolo
+          if (deg > 0) {
+            const r0 = 34, a0 = Math.atan2(V[1], V[0]);
+            let d = '';
+            for (let k = 0; k <= 40; k++) {
+              const a = a0 + t * k / 40;
+              const [px, py] = P(Math.cos(a) * r0 / S, Math.sin(a) * r0 / S);
+              d += `${d ? 'L' : 'M'} ${px.toFixed(1)} ${py.toFixed(1)} `;
+            }
+            h += `<path d="${d}" fill="none" stroke="var(--muted)" stroke-width="1.4"/>`;
+          }
+          // immagini dei versori (colonne della matrice)
+          const e1 = P(c, s), e2 = P(-s, c);
+          h += arrow(e1[0], e1[1], '#22c55e', 2, true);
+          h += `<text x="${(e1[0] + 8).toFixed(1)}" y="${(e1[1] - 6).toFixed(1)}" class="lbl-s" fill="#22c55e">R·e₁ (1ª colonna)</text>`;
+          h += arrow(e2[0], e2[1], 'var(--magenta)', 2, true);
+          h += `<text x="${(e2[0] + 8).toFixed(1)}" y="${(e2[1] - 6).toFixed(1)}" class="lbl-s" fill="var(--magenta)">R·e₂ (2ª colonna)</text>`;
+          // vettore originale e ruotato
+          const p0 = P(V[0], V[1]), p1 = P(rv[0], rv[1]);
+          h += arrow(p0[0], p0[1], '#3b82f6', 3);
+          h += `<text x="${(p0[0] + 10).toFixed(1)}" y="${(p0[1] + 4).toFixed(1)}" class="lbl" fill="#3b82f6">v = (2, 1)</text>`;
+          h += arrow(p1[0], p1[1], '#f5b400', 3);
+          h += `<text x="${(p1[0] + 10).toFixed(1)}" y="${(p1[1] + 4).toFixed(1)}" class="lbl" fill="#f5b400">R·v</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = `$R(${deg}°) = \\begin{pmatrix} ${fmt(c)} & ${fmt(-s)} \\\\ ${fmt(s)} & ${fmt(c)} \\end{pmatrix}$, quindi
+            $R\\vec{v} = (${fmt(rv[0])};\\ ${fmt(rv[1])})$. Il vettore <strong>ruota di ${deg}°</strong> senza cambiare
+            lunghezza — e le colonne della matrice sono esattamente le frecce tratteggiate: dove finiscono i versori.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        st.addEventListener('input', go); go();
+      })();
+
+      // ===== 7.3 — Autovettori di A = [[2,1],[1,2]] =====
+      (function () {
+        const sa = document.getElementById('ev-a');
+        if (!sa) return;
+        const va = document.getElementById('ev-a-val');
+        const svg = document.getElementById('ev-svg');
+        const out = document.getElementById('ev-out');
+        const S = 62;
+        function P(x, y) { return [OX + S * x, OY - S * y]; }
+        function go() {
+          const deg = +sa.value; va.textContent = deg;
+          const t = deg * Math.PI / 180;
+          const u = [Math.cos(t), Math.sin(t)];
+          const Au = [2 * u[0] + u[1], u[0] + 2 * u[1]];
+          const isE1 = Math.abs(Math.sin(t - Math.PI / 4)) < 0.035;    // direzione y = x  (λ = 3)
+          const isE2 = Math.abs(Math.sin(t - 3 * Math.PI / 4)) < 0.035; // direzione y = −x (λ = 1)
+          let h = gridAxes();
+          // autospazi
+          const q1a = P(-2.6, -2.6), q1b = P(2.6, 2.6), q2a = P(-2.6, 2.6), q2b = P(2.6, -2.6);
+          h += `<line x1="${q1a[0]}" y1="${q1a[1]}" x2="${q1b[0]}" y2="${q1b[1]}" stroke="${isE1 ? '#22c55e' : 'var(--muted)'}" stroke-width="${isE1 ? 2.5 : 1.3}" stroke-dasharray="7 6" opacity="0.85"/>`;
+          h += `<line x1="${q2a[0]}" y1="${q2a[1]}" x2="${q2b[0]}" y2="${q2b[1]}" stroke="${isE2 ? '#22c55e' : 'var(--muted)'}" stroke-width="${isE2 ? 2.5 : 1.3}" stroke-dasharray="7 6" opacity="0.85"/>`;
+          const l1 = P(2.28, 2.52), l2 = P(-2.55, 2.42);
+          h += `<text x="${l1[0]}" y="${l1[1]}" class="lbl-s">autospazio y = x (λ = 3)</text>`;
+          h += `<text x="${l2[0]}" y="${l2[1]}" class="lbl-s">autospazio y = −x (λ = 1)</text>`;
+          // vettori
+          const p0 = P(u[0], u[1]), p1 = P(Au[0], Au[1]);
+          h += arrow(p1[0], p1[1], '#f5b400', 3);
+          h += `<text x="${(p1[0] + 10).toFixed(1)}" y="${(p1[1] + 4).toFixed(1)}" class="lbl" fill="#f5b400">A·u</text>`;
+          h += arrow(p0[0], p0[1], '#3b82f6', 3);
+          h += `<text x="${(p0[0] + 10).toFixed(1)}" y="${(p0[1] + 4).toFixed(1)}" class="lbl" fill="#3b82f6">u</text>`;
+          if (isE1 || isE2) {
+            h += `<text x="${OX}" y="34" text-anchor="middle" class="em" fill="#22c55e">AUTOVETTORE! A·u = ${isE1 ? '3' : '1'}·u — stessa direzione, solo ${isE1 ? 'allungato ×3' : 'lunghezza invariata'}</text>`;
+          }
+          svg.innerHTML = h;
+          // angolo tra u e Au
+          const dot = u[0] * Au[0] + u[1] * Au[1];
+          const nAu = Math.hypot(Au[0], Au[1]);
+          const ang = Math.acos(Math.max(-1, Math.min(1, dot / nAu))) * 180 / Math.PI;
+          out.innerHTML = (isE1 || isE2)
+            ? `$\\alpha = ${deg}°$: hai trovato un <strong>autovettore</strong> — $A\\vec{u}$ è <span class="val-badge">parallelo</span> a $\\vec{u}$, con autovalore $\\lambda = ${isE1 ? 3 : 1}$. Lungo questa direzione la matrice è una semplice moltiplicazione.`
+            : `$\\alpha = ${deg}°$: $A\\vec{u} = (${fmt(Au[0])};\\ ${fmt(Au[1])})$ è ruotato di <span class="val-badge">${fmt(ang, 1)}°</span> rispetto a $\\vec{u}$: direzione generica, niente di speciale. Cerca le direzioni in cui l'angolo si annulla (suggerimento: 45° e 135°).`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sa.addEventListener('input', go); go();
+      })();
+
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Nella doppia fenditura, sparando gli elettroni <strong>uno alla volta</strong> e senza osservare da quale fenditura passano, sullo schermo compare:',
+        options: ['una banda unica al centro', 'due bande, una per fenditura', 'la figura a frange dell\'interferenza', 'nessun impatto: gli elettroni si fermano'],
+        correct: 2, explain: 'Ogni elettrone arriva come un puntino, ma l\'accumulo disegna le frange: il singolo elettrone "passa da entrambe le fenditure" e interferisce con se stesso.' },
+      { type: 'mc', diff: 'easy', text: 'Se si accende un rivelatore che scopre da quale fenditura passa ogni elettrone:',
+        options: ['le frange diventano più nitide', 'non cambia nulla', 'le frange spariscono e restano due bande da particelle', 'gli elettroni si fermano prima dello schermo'],
+        correct: 2, explain: 'Osservare è interagire: la misura "costringe" l\'elettrone a scegliere una fenditura e distrugge l\'interferenza. È il cuore del problema dell\'osservatore.' },
+      { type: 'mc', diff: 'easy', text: 'Il significato fisico della funzione d\'onda $\\psi$ è che:',
+        options: ['$\\psi$ è la traiettoria della particella', 'l\'integrale di $|\\psi|^2$ su un intervallo è la probabilità di trovare lì la particella', '$\\psi$ è l\'energia della particella', '$\\psi$ misura la velocità dell\'onda'],
+        correct: 1, explain: 'Regola di Born: |ψ|² è una densità di probabilità. La funzione d\'onda non dice dove la particella È, ma con quale probabilità la TROVERAI.' },
+      { type: 'mc', diff: 'medium', text: 'Il principio di indeterminazione $\\Delta x \\cdot \\Delta p \\ge \\hbar/2$ afferma che:',
+        options: ['gli strumenti attuali non sono abbastanza precisi', 'più localizzi la particella, più la sua quantità di moto è indeterminata — per un limite di principio', 'posizione e velocità si misurano solo insieme', 'l\'errore di misura è sempre ħ/2'],
+        correct: 1, explain: 'Non è colpa degli strumenti: uno stato con posizione e quantità di moto entrambe definite NON ESISTE, come non esiste un\'onda localizzata in un punto con una sola lunghezza d\'onda.' },
+      { type: 'mc', diff: 'medium', text: 'La differenza tra il disturbo di un amperometro in un circuito e l\'indeterminazione di Heisenberg è che:',
+        options: ['non c\'è differenza: sono lo stesso fenomeno', 'l\'amperometro disturba di più', 'il disturbo dell\'amperometro è tecnologico e riducibile a piacere; quello quantistico è un limite teorico invalicabile', 'l\'indeterminazione vale solo per strumenti scadenti'],
+        correct: 2, explain: 'Per l\'amperometro si può costruire (in linea di principio) uno strumento sempre migliore; il limite di Heisenberg è scritto nelle leggi della natura e nessuno strumento futuro potrà aggirarlo.' },
+      { type: 'mc', diff: 'medium', text: 'Con il gatto nella scatola, Schrödinger voleva:',
+        options: ['dimostrare che i gatti sono quantistici', 'mettere in imbarazzo l\'interpretazione di Copenaghen portandola alle conseguenze assurde', 'proporre un esperimento da eseguire davvero', 'spiegare la radioattività'],
+        correct: 1, explain: 'Era una riduzione all\'assurdo CONTRO Copenaghen: "se le vostre regole valgono, un gatto può essere vivo e morto insieme". Gli esperimenti mentali erano le armi dei dibattiti tra fisici.' },
+      { type: 'mc', diff: 'medium', text: 'Per un elettrone chiuso in una scatola di lunghezza $L$, le energie permesse sono $E_n = n^2 E_1$. L\'energia più bassa possibile è:',
+        options: ['zero: l\'elettrone può stare fermo', '$E_1$, maggiore di zero: un elettrone confinato non può stare fermo', 'infinita', 'dipende dalla temperatura'],
+        correct: 1, explain: 'Confinare significa Δx limitato, quindi Δp non può essere zero (Heisenberg): esiste un\'energia di punto zero. Il riposo assoluto è vietato.' },
+      { type: 'mc', diff: 'hard', text: 'La probabilità che una particella attraversi per effetto tunnel una barriera di altezza $U$ e spessore $L$:',
+        options: ['è zero se l\'energia è minore di U, come in fisica classica', 'cresce con lo spessore della barriera', 'decresce esponenzialmente con lo spessore e con $\\sqrt{U-E}$ — ed è il motivo per cui il Sole brilla', 'è sempre del 50%'],
+        correct: 2, explain: 'T ≈ e^(−2κL) con κ ∝ √(U−E): piccola ma non nulla. La fusione nel Sole, il decadimento alfa e le memorie flash funzionano così.' },
+      { type: 'mc', diff: 'hard', text: 'Gli esperimenti sulle disuguaglianze di Bell (Nobel 2022) hanno mostrato che:',
+        options: ['Einstein aveva ragione: esistono le variabili nascoste locali', 'le disuguaglianze sono violate: nessuna teoria a variabili nascoste LOCALI può descrivere la natura', 'l\'entanglement permette di comunicare più veloci della luce', 'la meccanica quantistica è stata smentita'],
+        correct: 1, explain: 'Le correlazioni misurate sfondano il tetto di Bell: il mondo "locale e deterministico sotto il cofano" è sperimentalmente escluso. (E no: l\'entanglement non trasmette informazione più veloce della luce.)' },
+      { type: 'open', diff: 'hard', text: 'Nella formulazione di Heisenberg, che cosa rappresentano matrici, autovalori e autovettori? E che ruolo hanno le probabilità nella misura?',
+        keywords: ['osservabil', 'hermit', 'matric', 'autovalor', 'risultat', 'autovettor', 'collass', 'proiezion', 'quadrat', 'probabilit', 'hilbert', 'stato', 'vettore'], requiredMatches: 4,
+        explain: 'Un\'osservabile è una matrice hermitiana (autovalori reali); lo stato è un vettore nello spazio di Hilbert; i RISULTATI possibili di una misura sono gli AUTOVALORI; la PROBABILITÀ di ciascun esito è il quadrato della proiezione dello stato sull\'autovettore corrispondente, e dopo la misura lo stato collassa su quell\'autovettore.' }
+    ];
+  </script>
+
+</body>
+
+</html>

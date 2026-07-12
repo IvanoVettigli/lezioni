@@ -442,6 +442,46 @@
         nessuno strumento umano, da solo, potrebbe raggiungerle.
       </div>
 
+      <p>Ma tutto questo — lo spazio-tempo curvo, le geodetiche, la luce che si piega — <strong>come facciamo a
+        sapere che è vero</strong>, e non una splendida costruzione matematica senza riscontro nella realtà? La
+        relatività generale ebbe la sua prova del fuoco nel <strong>1919</strong>, e riguarda proprio la deviazione
+        della luce. Einstein aveva previsto un numero preciso: un raggio che sfiora il bordo del Sole deve piegarsi di
+        <strong>$1{,}75$ secondi d'arco</strong> (esattamente il <em>doppio</em> di quanto darebbe la vecchia gravità
+        di Newton trattando la luce come una pioggia di corpuscoli — la differenza tra le due previsioni era il vero
+        banco di prova). Per verificarlo bisogna osservare le stelle che appaiono <strong>vicinissime al Sole</strong>:
+        di norma impossibile, perché il Sole le acceca tutte. C'è però un'occasione in cui il cielo si fa buio in pieno
+        giorno — un'<strong>eclissi totale</strong>.</p>
+
+      <p>Il 29 maggio 1919 l'astronomo <strong>Arthur Eddington</strong> guidò una spedizione sull'isola di Príncipe,
+        al largo dell'Africa (una seconda squadra operava in Brasile), per fotografare il campo di stelle attorno al
+        Sole eclissato. Confrontando quelle lastre con foto dello stesso campo scattate di notte, mesi prima, il
+        verdetto fu netto: le stelle vicine al bordo del Sole apparivano <strong>spostate verso l'esterno</strong>,
+        della quantità prevista da Einstein. Attenzione al punto delicato: la luce non "sente" una forza che la
+        incurva. La luce va sempre <strong>dritta</strong> — segue la sua geodetica, la linea più dritta che la
+        geometria consente — ma <strong>lo spazio-tempo attorno al Sole è curvo</strong>; siamo noi, che osserviamo la
+        scena "dall'esterno", a <em>vedere</em> il raggio piegarsi. Di conseguenza una stella che sta di fatto
+        <strong>dietro</strong> al Sole ci appare spostata di lato. Prova a "accendere e spegnere" la gravità del Sole:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Gravità del Sole (curvatura dello spazio-tempo): <span class="val" id="ecl-g-val">60</span>%</label>
+          <input type="range" id="ecl-g" min="0" max="1" step="0.02" value="0.6"></div>
+      </div>
+      <div class="ckt"><svg id="ecl-svg" viewBox="0 0 640 300" aria-label="Simulazione dell'esperimento di Eddington del 1919: la luce di una stella dietro il Sole segue una geodetica curva e la stella appare spostata verso l'esterno"></svg></div>
+      <p class="eq-out" id="ecl-out"></p>
+
+      <div class="note">
+        <strong>Perché quella conferma pesò così tanto.</strong> Una teoria può essere elegantissima e coerentissima e
+        <em>ciò nonostante</em> sbagliata: la fisica non premia la bellezza, premia le <strong>previsioni che
+        superano gli esperimenti</strong>. Fino al 1919 la relatività generale era, per i più, matematica sublime di
+        cui diffidare. Quella manciata di stelle spostate su una lastra fotografica la trasformò di colpo in
+        <strong>fisica accertata</strong>: aveva fatto una previsione rischiosa, numerica, diversa da quella di Newton —
+        e la Natura le aveva dato ragione. I giornali di tutto il mondo titolarono in prima pagina («Luci tutte
+        storte nei cieli», scrisse il <em>New York Times</em>) ed Einstein divenne, da un giorno all'altro, l'icona
+        globale che è ancora oggi. È il metodo scientifico nella sua forma più pura — previsione audace, osservazione
+        decisiva — e ci ricorda che, per quanto una teoria sia profonda, l'ultima parola spetta sempre al confronto
+        con la realtà.
+      </div>
+
       <div class="note">
         <strong>Allora Tolomeo aveva ragione?</strong> Un colpo di scena: se ogni corpo segue semplicemente la propria
         geodetica, e le leggi valgono in <em>ogni</em> sistema di riferimento, allora descrivere il moto "con la Terra
@@ -1345,6 +1385,67 @@
             : `La massa deforma la metrica: la griglia si strizza e il raggio di luce — che va sempre "dritto", cioè lungo la sua geodetica — appare <strong>deviato</strong>. Fu proprio la deflessione della luce delle stelle, misurata durante l'eclissi del 1919, a rendere Einstein una celebrità mondiale.`;
         }
         sm.addEventListener('input', go); go();
+      })();
+
+      // ===== 6.3 — Esperimento di Eddington (eclissi 1919) =====
+      (function () {
+        const svg = document.getElementById('ecl-svg');
+        if (!svg) return;
+        const sg = document.getElementById('ecl-g'), vg = document.getElementById('ecl-g-val');
+        const out = document.getElementById('ecl-out');
+        const SUN = { x: 315, y: 170, r: 30 };
+        const P = { x: 315, y: 124 };            // punto in cui il raggio sfiora il Sole
+        const OBS = { x: 600, y: 210 };
+        const AMAX = 0.32;
+        // stella "apparente" A: prolungamento all'indietro del raggio in arrivo (retta OBS-P)
+        const dPO = Math.hypot(P.x - OBS.x, P.y - OBS.y);
+        const ux0 = (P.x - OBS.x) / dPO, uy0 = (P.y - OBS.y) / dPO;
+        const DST = (65 - P.x) / ux0;            // porta A a x≈65
+        const A = { x: P.x + DST * ux0, y: P.y + DST * uy0 };
+        function rot(vx, vy, a) { return [vx * Math.cos(a) - vy * Math.sin(a), vx * Math.sin(a) + vy * Math.cos(a)]; }
+        function go() {
+          const g = +sg.value; vg.textContent = Math.round(g * 100);
+          const alpha = AMAX * g;
+          // direzione della stella vera: ruoto (A-P) verso il Sole (verso y crescente)
+          const ax = (A.x - P.x) / DST, ay = (A.y - P.y) / DST;
+          const [rx1, ry1] = rot(ax, ay, alpha), [rx2, ry2] = rot(ax, ay, -alpha);
+          const [rx, ry] = (ry1 > ry2) ? [rx1, ry1] : [rx2, ry2];
+          const T = { x: P.x + DST * rx, y: P.y + DST * ry };
+          let h = '';
+          // cielo scuro dell'eclissi
+          h += `<rect x="0" y="0" width="640" height="300" fill="#0b1020" opacity="0.55" rx="10"/>`;
+          // stelle di sfondo
+          const bg = [[120, 40], [200, 95], [90, 200], [250, 250], [470, 60], [540, 130], [430, 250], [560, 230], [360, 40]];
+          bg.forEach(s => { h += `<circle cx="${s[0]}" cy="${s[1]}" r="1.4" fill="#fff" opacity="0.6"/>`; });
+          // corona + Sole eclissato (disco scuro con anello)
+          h += `<circle cx="${SUN.x}" cy="${SUN.y}" r="${SUN.r + 16}" fill="#ffd27f" opacity="${(0.16 + 0.16 * g).toFixed(2)}"/>`;
+          h += `<circle cx="${SUN.x}" cy="${SUN.y}" r="${SUN.r + 3}" fill="none" stroke="#ffe6a8" stroke-width="2.5" opacity="0.85"/>`;
+          h += `<circle cx="${SUN.x}" cy="${SUN.y}" r="${SUN.r}" fill="#12151f"/>`;
+          h += `<text x="${SUN.x}" y="${SUN.y + SUN.r + 18}" text-anchor="middle" class="lbl-s">Sole eclissato</text>`;
+          // raggio di luce reale: da T, arco sopra il Sole (Bézier con controllo in P), fino all'osservatore
+          h += `<path d="M ${T.x.toFixed(1)} ${T.y.toFixed(1)} Q ${P.x} ${P.y} ${OBS.x} ${OBS.y}" fill="none" stroke="var(--gold)" stroke-width="2.6"/>`;
+          // linea di vista apparente (dritta all'indietro): tratteggiata da OBS ad A
+          h += `<path d="M ${OBS.x} ${OBS.y} L ${A.x.toFixed(1)} ${A.y.toFixed(1)}" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="5 5" opacity="0.9"/>`;
+          // osservatore (Terra + telescopio)
+          h += `<circle cx="${OBS.x}" cy="${OBS.y}" r="10" fill="#3b82f6"/>`;
+          h += `<text x="${OBS.x - 2}" y="${OBS.y + 26}" text-anchor="middle" class="lbl-s">Terra</text>`;
+          // stella vera
+          h += `<circle cx="${T.x.toFixed(1)}" cy="${T.y.toFixed(1)}" r="5.5" fill="var(--gold)"/>`;
+          h += `<text x="${(T.x + 6).toFixed(1)}" y="${(T.y + 16).toFixed(1)}" class="lbl-s" fill="var(--gold)">stella (reale)</text>`;
+          // stella apparente
+          if (g > 0.04) {
+            h += `<circle cx="${A.x.toFixed(1)}" cy="${A.y.toFixed(1)}" r="6" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="3 3"/>`;
+            h += `<text x="${(A.x + 6).toFixed(1)}" y="${(A.y - 8).toFixed(1)}" class="lbl-s" fill="var(--accent)">posizione osservata</text>`;
+            // freccetta dello spostamento T -> A
+            h += `<line x1="${T.x.toFixed(1)}" y1="${T.y.toFixed(1)}" x2="${A.x.toFixed(1)}" y2="${A.y.toFixed(1)}" stroke="var(--magenta)" stroke-width="1.4" stroke-dasharray="2 3"/>`;
+          }
+          svg.innerHTML = h;
+          out.innerHTML = g < 0.04
+            ? `Gravità "spenta": lo spazio-tempo è piatto, la luce viaggia dritta e la stella si vede <strong>esattamente dov'è</strong>. È anche, in pratica, la previsione della vecchia fisica.`
+            : `La stella è <strong>dietro</strong> il Sole. La sua luce segue la geodetica — va "dritta" — ma lo spazio-tempo curvo del Sole fa sì che a noi il raggio (in oro) appaia <strong>piegato</strong>: prolungandolo all'indietro (tratteggio) vediamo la stella <strong>spostata verso l'esterno</strong>. Al bordo del Sole lo spostamento reale è di <span class="val-badge">1,75″</span> — il numero che Eddington misurò nel 1919.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sg.addEventListener('input', go); go();
       })();
 
       // ===== 8.2 — Calcolatore del raggio di Schwarzschild =====
