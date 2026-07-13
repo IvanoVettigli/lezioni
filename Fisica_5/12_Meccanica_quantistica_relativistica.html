@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 12 — La meccanica quantistica relativistica</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- math.js + Plotly -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    /* --- SVG fisici (theme-aware) --- */
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quinto anno · Lezione 12 · Modulo: Meccanica quantistica</div>
+    <h1>La meccanica quantistica relativistica</h1>
+    <p>Dal formalismo di Dirac ai decadimenti radioattivi, dall'antimateria al laser, fino al Modello Standard delle particelle</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quinto anno</a>
+    <span class="sep">/</span> La meccanica quantistica relativistica
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Abbiamo la meccanica quantistica: stati, sovrapposizioni, funzione d'onda,
+      matrici. Ma nel nostro edificio convivono due piani che ancora non si parlano: la teoria dei quanti e la
+      <strong>relatività ristretta</strong>. In questa lezione li facciamo incontrare — e dall'incontro nasceranno
+      l'antimateria, la spiegazione dei decadimenti radioattivi, il laser e, alla fine, l'attuale censimento di
+      tutto ciò che esiste: il <strong>Modello Standard</strong> delle particelle elementari.
+    </div>
+
+    <!-- 1 — BRA E KET -->
+    <section id="sec1">
+      <h2>1. Bra e ket: la stenografia di Dirac</h2>
+
+      <p>Ripartiamo da dove ci eravamo lasciati. Il principio di indeterminazione ci ha insegnato che lo stato di un
+        sistema quantistico non è un elenco di valori precisi ma un <strong>vettore nello spazio di Hilbert</strong>
+        (lezione 11, sezione 8), e che la misura ne estrae un esito con una certa probabilità. Per lavorare ogni
+        giorno con questi oggetti serviva una notazione comoda — e ci pensò <strong>Paul Dirac</strong>, con
+        un'invenzione tipografica così azzeccata che i fisici la usano identica da quasi un secolo.</p>
+
+      <div class="definition">
+        <strong>La notazione di Dirac.</strong> Uno <strong>stato</strong> si scrive come un <em>ket</em>:
+        $|\psi\rangle$ — la mezza parentesi destra "contiene" il vettore di stato. A ogni ket corrisponde un
+        <em>bra</em>: $\langle\varphi|$ — la mezza parentesi sinistra. Accostandoli si forma il <strong>prodotto
+        scalare</strong> tra i due stati:
+        $$\langle\varphi|\psi\rangle$$
+        un numero (in generale complesso) chiamato <strong>ampiezza</strong>: misura quanto lo stato $|\psi\rangle$
+        "contiene" dello stato $|\varphi\rangle$ — quanto i due stati si somigliano.
+      </div>
+
+      <p>Il nome è un gioco di parole tutto inglese: <em>bra</em> + <em>ket</em> = <em>bracket</em>, "parentesi"
+        (con la <em>c</em> sacrificata nel mezzo). Ma la notazione non è solo estetica: rende automatica la regola
+        più importante della teoria, quella che generalizza la regola di Born della lezione scorsa:</p>
+
+      <div class="formula-box">
+        $$P\big(\psi \to \varphi\big) \;=\; \big|\langle\varphi|\psi\rangle\big|^2$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">la <strong>probabilità di transizione</strong>: se il sistema è nello stato $|\psi\rangle$ e la misura chiede "sei nello stato $|\varphi\rangle$?", la probabilità che la risposta sia sì è il modulo quadro dell'ampiezza. È il "quadrato della proiezione" della lezione 11, in abito da sera</p>
+      </div>
+
+      <p>Tutto ciò che abbiamo fatto finora si riscrive in due righe. Lo stato del gatto?
+        $|{\text{gatto}}\rangle = \alpha\,|{\text{vivo}}\rangle + \beta\,|{\text{morto}}\rangle$. La probabilità di
+        trovarlo vivo aprendo la scatola? $|\langle \text{vivo}|\text{gatto}\rangle|^2 = |\alpha|^2$. L'esempio
+        dello spin con stato $(0{,}8;\ 0{,}6)$? Probabilità $\langle{+1}|\psi\rangle^2 = 0{,}64$ e
+        $\langle{-1}|\psi\rangle^2 = 0{,}36$. La notazione fa il lavoro sporco da sola — ed è per questo che in
+        questa lezione, dove parleremo continuamente di <em>transizioni</em> tra stati, ci sarà preziosa.</p>
+
+      <div class="curiosita">
+        <strong>L'uomo più strano del mondo.</strong> Paul Dirac è una leggenda della fisica anche per il suo
+        carattere: silenzioso fino al paradosso (i colleghi di Cambridge coniarono l'unità di misura "un dirac" =
+        una parola all'ora), letterale fino al comico. A una conferenza, uno studente alzò la mano: «Professore, non
+        ho capito l'equazione in alto a destra». Dirac rimase in silenzio finché il moderatore non gli chiese se
+        volesse rispondere. «Non era una domanda — disse — era un'affermazione». Eppure quest'uomo di pochissime
+        parole inventò la notazione più eloquente della fisica, e — lo vedremo tra poco — predisse l'esistenza di
+        metà universo con la sola forza della matematica.
+      </div>
+    </section>
+
+    <!-- 2 — LA DELTA DI DIRAC -->
+    <section id="sec2">
+      <h2>2. La delta di Dirac: l'oggetto impossibile che funziona</h2>
+
+      <h3>2.1 — Il problema: uno stato con posizione esatta</h3>
+      <p>Nel formalismo di Dirac vorremmo scrivere anche lo stato "particella <strong>esattamente</strong> nel punto
+        $x_0$": il ket $|x_0\rangle$. Ma che faccia ha la sua funzione d'onda? Dev'essere una distribuzione di
+        probabilità <strong>tutta concentrata in un punto</strong>: nulla ovunque, tranne che in $x_0$ — e però con
+        area totale pari a $1$ (la particella, da qualche parte, c'è di sicuro). Dirac battezzò questo oggetto
+        $\delta(x)$, la <strong>delta di Dirac</strong>, e ne fissò le regole d'uso:</p>
+
+      <div class="formula-box">
+        $$\delta(x) = 0 \ \text{ per } x \ne 0, \qquad \int_{-\infty}^{+\infty} \delta(x)\,dx = 1, \qquad \int_{-\infty}^{+\infty} \delta(x)\,f(x)\,dx = f(0)$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">la terza proprietà è la più utile: integrata contro qualunque funzione, la delta la "campiona" nel punto in cui è concentrata — un estrattore di valori puntuali</p>
+      </div>
+
+      <h3>2.2 — Perché non può essere una funzione</h3>
+      <p>C'è un problema, e non è un cavillo: <strong>nessuna funzione può fare questo mestiere</strong>. Lo
+        sappiamo dalla teoria dell'integrazione: se una funzione vale zero ovunque tranne che in un singolo punto,
+        il suo integrale vale <strong>zero</strong> — un punto solo non ha "larghezza", non contribuisce all'area
+        (è la stessa ragione per cui i razionali, che pure sono infiniti, hanno misura nulla nell'integrale di
+        Lebesgue — chi ha letto la sezione facoltativa della lezione di matematica sugli integrali riconoscerà
+        l'idea). Per avere area $1$ su base nulla, la delta dovrebbe valere "infinito" nell'origine — ma "infinito"
+        non è un valore. Dunque $\delta$ <strong>non è una funzione</strong>: è un oggetto di tipo nuovo, un
+        <strong>funzionale</strong> (i matematici dicono <em>distribuzione</em>): una macchina che non associa
+        numeri a punti, ma <strong>numeri a funzioni</strong> — dai in pasto $f$, restituisce $f(0)$. Ha senso solo
+        <em>sotto il segno di integrale</em>; scritta da sola è un'abbreviazione. Il modo onesto di pensarla:
+        il <strong>limite</strong> di campane sempre più strette e alte, ad area costante:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Larghezza della campana: ε = <span class="val" id="dl-e-val">1,00</span></label>
+          <input type="range" id="dl-e" min="0.05" max="1.5" step="0.05" value="1"></div>
+        <label class="toggle-row"><input type="checkbox" id="dl-lock" checked> 🔒 blocca la scala</label>
+      </div>
+      <div class="two-col">
+        <div><p id="dl-out" class="eq-out"></p></div>
+        <div><div class="plot" id="dl-plot" style="height: 300px;"></div></div>
+      </div>
+
+      <div class="curiosita">
+        <strong>Il fisico in anticipo sulla matematica.</strong> Quando Dirac introdusse la sua delta (1930), i
+        matematici storsero il naso: quell'oggetto, formalmente, <em>non esisteva</em>. La cosa notevole è che
+        Dirac — guidato da un istinto matematico infallibile — la usò per vent'anni <strong>senza mai sbagliare un
+        colpo</strong>: ogni suo calcolo con la delta era corretto. La toppa teorica arrivò solo nel dopoguerra,
+        quando <strong>Laurent Schwartz</strong> costruì la <em>teoria delle distribuzioni</em> che dà pieno diritto
+        di cittadinanza alla delta (e gli valse la medaglia Fields, 1950). Morale che vale un'intera filosofia della
+        scienza: a volte la fisica corre avanti con strumenti "illegali", e la matematica arriva dopo a
+        legalizzarli. È andata così anche con gli infinitesimi di Newton e il calcolo di Leibniz.
+      </div>
+    </section>
+
+    <!-- 3 — TRANSIZIONI E REGOLA D'ORO DI FERMI -->
+    <section id="sec3">
+      <h2>3. Le transizioni e la regola d'oro di Fermi</h2>
+
+      <h3>3.1 — Che cosa significa "transire"</h3>
+      <p>Armati della notazione giusta, mettiamo a fuoco il concetto centrale di tutta la lezione. Diciamo che un
+        sistema fisico <strong>esegue una transizione</strong> quando passa da uno stato $|i\rangle$ (iniziale) a
+        uno stato $|f\rangle$ (finale) <em>diverso</em>: un atomo eccitato che scende al livello fondamentale
+        emettendo un fotone; un atomo che assorbe un fotone e sale di livello; un nucleo instabile che si trasforma
+        in un altro nucleo sputando una particella. Ogni "salto" della lezione 10 — le righe del saggio alla fiamma!
+        — era una transizione. La domanda quantitativa è: <strong>quanto spesso avviene?</strong> Perché certe
+        transizioni sono fulminee (nanosecondi) e altre impiegano miliardi di anni?</p>
+
+      <h3>3.2 — La regola d'oro</h3>
+      <p>La risposta della meccanica quantistica è una formula così utile che <strong>Enrico Fermi</strong> la
+        chiamò «regola d'oro» — e il nome le è rimasto appiccicato. Senza derivarla, capiamone la struttura:</p>
+
+      <div class="formula-box">
+        $$W_{i \to f} \;\propto\; \big|\langle f|\,\hat{H}'\,|i\rangle\big|^2 \;\times\; \rho(E_f)$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">$W$ = probabilità di transizione per unità di tempo; $\hat{H}'$ = la perturbazione (l'interazione che "spinge" il salto); $\rho(E_f)$ = densità degli stati finali disponibili</p>
+      </div>
+
+      <p>Leggiamola come una frase. La velocità di una transizione dipende da due fattori moltiplicati:</p>
+      <ul>
+        <li><strong>quanto i due stati "si parlano"</strong>: $\langle f|\hat{H}'|i\rangle$ è un'ampiezza in piena
+          regola — lo stato iniziale, "agitato" dall'interazione $\hat{H}'$, quanto somiglia allo stato finale? Se
+          l'interazione non collega $|i\rangle$ a $|f\rangle$, l'ampiezza è zero e la transizione è
+          <strong>proibita</strong> (ecco perché negli spettri certe righe mancano: le "regole di selezione");</li>
+        <li><strong>quante porte d'uscita ci sono</strong>: $\rho(E_f)$ conta quanti stati finali, alla giusta
+          energia, sono disponibili. Più destinazioni possibili, più il salto è probabile — come un teatro: si esce
+          più in fretta se le porte sono venti che se è una sola.</li>
+      </ul>
+
+      <p>Tutto qui — ma questo "tutto qui" governa <em>ogni</em> processo di cui parleremo da qui in avanti:
+        l'emissione di luce dagli atomi, i decadimenti radioattivi con le loro vite medie che spaziano dai
+        microsecondi ai miliardi di anni (bastano piccole differenze nell'ampiezza per cambiare $W$ di venti ordini
+        di grandezza!), il funzionamento del laser. La regola d'oro è il ponte tra il formalismo astratto — bra,
+        ket, ampiezze — e i numeri che si misurano in laboratorio.</p>
+
+      <div class="curiosita">
+        <strong>L'oro di via Panisperna.</strong> Fermi è uno dei pochissimi fisici della storia grandi
+        <em>sia</em> in teoria <em>sia</em> in esperimento: a Roma, con i "ragazzi di via Panisperna", bombardava
+        nuclei con neutroni (Nobel 1938) mentre scriveva la teoria del decadimento β che useremo tra poco. La
+        chiamò «regola d'oro numero 2» nelle sue leggendarie dispense di Chicago — asciutte, dense, ancora oggi
+        studiate — e il soprannome scherzoso divenne il nome ufficiale. Capita, quando le dispense le scrive un
+        premio Nobel.
+      </div>
+    </section>
+
+    <!-- 4 — I DECADIMENTI RADIOATTIVI -->
+    <section id="sec4">
+      <h2>4. I decadimenti radioattivi</h2>
+
+      <h3>4.1 — L'origine della radioattività</h3>
+      <p>Prima applicazione in grande stile: i nuclei. Anche un nucleo atomico è un sistema quantistico con i suoi
+        stati e i suoi livelli — e certi nuclei si trovano in configurazioni <strong>instabili</strong>: esiste uno
+        stato a energia più bassa verso cui possono <strong>transire</strong>, liberando la differenza sotto forma di
+        particelle e radiazione. Questa è l'origine della <strong>radioattività</strong>, scoperta per caso da
+        Becquerel nel 1896 e domata da Marie e Pierre Curie: nessuna magia, solo transizioni quantistiche — con la
+        regola d'oro a dettare i tempi. Rutherford, senza sapere ancora <em>che cosa</em> fossero, battezzò i tre
+        tipi di radiazione con le prime lettere dell'alfabeto greco: <strong>α, β, γ</strong>. I nomi sono rimasti.</p>
+
+      <ul>
+        <li><strong>Decadimento α.</strong> Un nucleo pesante espelle una <strong>particella α</strong> — un nucleo
+          di elio, 2 protoni + 2 neutroni: $\ ^{238}\text{U} \to\ ^{234}\text{Th} + \alpha$. L'elemento
+          <em>trasmuta</em> (perde 2 di numero atomico). E il meccanismo lo conosci già: è l'<strong>effetto
+          tunnel</strong> della lezione 11 — la particella α non avrebbe l'energia per scavalcare la barriera che la
+          confina nel nucleo, ma la sua funzione d'onda "trapela" fuori (fu il primo trionfo del tunnel, con Gamow,
+          1928). Una particella α si ferma con un foglio di carta.</li>
+        <li><strong>Decadimento β.</strong> Dentro il nucleo, un <strong>neutrone si trasforma in un
+          protone</strong>, sparando fuori un elettrone (la "particella β") e un'altra particella fantasma di cui
+          parleremo più avanti, il neutrino: $\ ^{14}\text{C} \to\ ^{14}\text{N} + e^- + \bar{\nu}$. Il numero
+          atomico <em>sale</em> di uno: il carbonio diventa azoto. Si ferma con qualche millimetro di alluminio.</li>
+        <li><strong>Decadimento γ.</strong> Qui il nucleo non cambia identità: un nucleo in uno stato
+          <strong>eccitato</strong> scende al fondamentale emettendo un <strong>fotone γ</strong> — la stessa fisica
+          delle righe di emissione atomiche, ma con energie milioni di volte maggiori. Per fermarlo servono
+          centimetri di piombo.</li>
+      </ul>
+
+      <h3>4.2 — La legge del decadimento (e il suo cuore quantistico)</h3>
+      <p>Quando decade un singolo nucleo? <strong>Non si può sapere</strong> — è il sorteggio quantistico della
+        lezione 11, in purezza: il nucleo non "invecchia", non ha un orologio interno; ha solo una probabilità
+        costante di decadere in ogni istante, fissata dalla regola d'oro. Ma su miliardi di nuclei la statistica
+        diventa una legge di ferro:</p>
+
+      <div class="formula-box">
+        $$N(t) = N_0 \cdot 2^{-t/T_{1/2}}$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">$N$ = nuclei sopravvissuti, $T_{1/2}$ = <strong>emivita</strong> (o tempo di dimezzamento): a ogni emivita, la popolazione si dimezza. Le emivite spaziano dai microsecondi ai miliardi di anni: piccole differenze nell'ampiezza di transizione, esponenziate, diventano abissi</p>
+      </div>
+
+      <p>Guarda la legge nascere dal caso, un nucleo alla volta:</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="dec-a">α: uranio-238</button>
+          <button class="btn" id="dec-b">β: carbonio-14</button>
+          <button class="btn" id="dec-g">γ: cobalto eccitato</button>
+        </div>
+        <button class="btn" id="dec-run">▶ avvia</button>
+        <button class="btn" id="dec-rst">🗑 ricomincia</button>
+      </div>
+      <div class="ckt"><svg id="dec-svg" viewBox="0 0 640 380" aria-label="Simulatore di decadimento radioattivo: una popolazione di nuclei decade in modo casuale e la curva del numero di sopravvissuti segue l'esponenziale"></svg></div>
+      <p class="eq-out" id="dec-out"></p>
+
+      <div class="note">
+        <strong>Il caso che genera una legge.</strong> Ogni singolo pallino decade in un momento
+        <strong>imprevedibile</strong> — riavvia la simulazione e vedrai una storia sempre diversa. Eppure la curva
+        dei sopravvissuti si incolla ogni volta all'esponenziale teorica (tratteggiata). È il marchio di fabbrica
+        della meccanica quantistica: <em>singolo evento libero, statistica inchiodata</em>. Ed è così che funziona
+        la <strong>datazione al carbonio-14</strong>: il C-14 ha un'emivita di 5730 anni; misurando quanto ne resta
+        in un reperto organico si legge l'età — dai papiri egizi a Ötzi, l'uomo dei ghiacci.
+      </div>
+
+      <h3>4.3 — Le catene di decadimento</h3>
+      <p>Spesso il nucleo figlio è instabile a sua volta: decade anche lui, e poi il nipote, e così via — una
+        <strong>catena di decadimento</strong> che prosegue finché non si approda a un nucleo stabile. La catena
+        dell'uranio-238 è la più celebre: quattordici passaggi tra α e β, passando per il torio, il radio, il radon,
+        il polonio... fino ad arrestarsi sul <strong>piombo-206</strong>, stabile:</p>
+
+      <div class="ckt"><svg id="chain-svg" viewBox="0 0 640 170" aria-label="Catena di decadimento semplificata dall'uranio 238 al piombo 206">
+        <rect x="20" y="60" width="82" height="44" rx="9" fill="color-mix(in srgb, var(--accent) 16%, transparent)" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="61" y="79" text-anchor="middle" class="lbl">²³⁸U</text>
+        <text x="61" y="96" text-anchor="middle" class="lbl-s">4,5 mld anni</text>
+        <text x="122" y="76" text-anchor="middle" class="em">α</text>
+        <line x1="104" y1="82" x2="140" y2="82" stroke="var(--text-soft)" stroke-width="2"/>
+        <polygon points="140,78 148,82 140,86" fill="var(--text-soft)"/>
+        <rect x="150" y="60" width="82" height="44" rx="9" fill="color-mix(in srgb, var(--accent) 16%, transparent)" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="191" y="79" text-anchor="middle" class="lbl">²³⁴Th</text>
+        <text x="191" y="96" text-anchor="middle" class="lbl-s">24 giorni</text>
+        <text x="252" y="76" text-anchor="middle" class="em">β</text>
+        <line x1="234" y1="82" x2="270" y2="82" stroke="var(--text-soft)" stroke-width="2"/>
+        <polygon points="270,78 278,82 270,86" fill="var(--text-soft)"/>
+        <rect x="280" y="60" width="92" height="44" rx="9" fill="color-mix(in srgb, var(--muted) 18%, transparent)" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text x="326" y="86" text-anchor="middle" class="lbl-s">… 10 passaggi …</text>
+        <text x="392" y="76" text-anchor="middle" class="em">α, β</text>
+        <line x1="374" y1="82" x2="410" y2="82" stroke="var(--text-soft)" stroke-width="2"/>
+        <polygon points="410,78 418,82 410,86" fill="var(--text-soft)"/>
+        <rect x="420" y="60" width="82" height="44" rx="9" fill="color-mix(in srgb, var(--red) 14%, transparent)" stroke="var(--red)" stroke-width="1.5"/>
+        <text x="461" y="79" text-anchor="middle" class="lbl">²¹⁰Po</text>
+        <text x="461" y="96" text-anchor="middle" class="lbl-s">138 giorni</text>
+        <text x="522" y="76" text-anchor="middle" class="em">α</text>
+        <line x1="504" y1="82" x2="540" y2="82" stroke="var(--text-soft)" stroke-width="2"/>
+        <polygon points="540,78 548,82 540,86" fill="var(--text-soft)"/>
+        <rect x="550" y="60" width="76" height="44" rx="9" fill="color-mix(in srgb, #22c55e 16%, transparent)" stroke="#22c55e" stroke-width="1.5"/>
+        <text x="588" y="79" text-anchor="middle" class="lbl">²⁰⁶Pb</text>
+        <text x="588" y="96" text-anchor="middle" class="lbl-s">stabile ✓</text>
+        <text x="320" y="30" text-anchor="middle" class="lbl-s">la catena dell'uranio-238: quattordici decadimenti fino al piombo (durate: da microsecondi a miliardi di anni)</text>
+        <text x="320" y="150" text-anchor="middle" class="lbl-s">lungo la strada c'è anche il radon-222: un gas radioattivo che può accumularsi nelle cantine — si misura, e si ventila</text>
+      </svg></div>
+
+      <h3>4.4 — Fissione e fusione</h3>
+      <p>I decadimenti non esauriscono le trasformazioni nucleari. Le due protagoniste del bilancio energetico del
+        mondo (e della lezione 8, dove abbiamo imparato che la differenza di massa <em>è</em> l'energia liberata)
+        sono:</p>
+      <ul>
+        <li><strong>Fissione</strong>: un nucleo pesantissimo (uranio-235, plutonio) colpito da un neutrone si
+          <strong>spezza</strong> in due frammenti più leggeri, liberando energia e — punto cruciale — altri due o
+          tre <strong>neutroni</strong>, che possono spezzare altri nuclei: la <strong>reazione a catena</strong>.
+          Controllata (moderandola) alimenta le centrali nucleari; lasciata divergere, è la bomba.</li>
+        <li><strong>Fusione</strong>: due nuclei <strong>leggeri</strong> (idrogeno) si uniscono in uno più pesante
+          (elio), liberando ancora più energia per grammo. Serve vincere la repulsione elettrica — e infatti il Sole
+          ci riesce solo grazie all'effetto tunnel (lezione 11). Riprodurla sulla Terra in modo controllato è la
+          grande scommessa ingegneristica del secolo (ITER).</li>
+      </ul>
+      <div class="rule">
+        La bussola per orientarsi: il nucleo più "compatto" della natura è il <strong>ferro</strong>. Si guadagna
+        energia <em>spezzando</em> i nuclei più pesanti del ferro (fissione) e <em>fondendo</em> quelli più leggeri
+        (fusione); il ferro è la cenere finale di entrambe le strade — ed è per questo che le stelle, arrivate al
+        ferro, muoiono (lezione 9: e a volte diventano buchi neri).
+      </div>
+    </section>
+
+    <!-- 5 — ATOMI, RIGHE E ORBITALI -->
+    <section id="sec5">
+      <h2>5. Gli atomi, finalmente: righe e nubi di probabilità</h2>
+
+      <h3>5.1 — Le righe come transizioni</h3>
+      <p>Chiudiamo il conto aperto nella lezione 10: le <strong>righe di emissione e assorbimento</strong>. Ora
+        abbiamo tutto il vocabolario: gli elettroni negli atomi occupano stati a energie discrete (gli autovalori!);
+        quando un elettrone <strong>salta</strong> da uno stato a un altro compie una transizione, e il bilancio
+        energetico lo paga (o lo incassa) un fotone: $hf = E_i - E_f$. Salto in giù $\Rightarrow$ riga di
+        <strong>emissione</strong>; salto in su, pagato da un fotone assorbito della frequenza esatta $\Rightarrow$
+        riga di <strong>assorbimento</strong> (le righe scure degli spettri stellari!). Quali salti avvengano, e con
+        che frequenza, lo decide la regola d'oro: le righe intense sono transizioni "facili", quelle mancanti sono
+        proibite dalle regole di selezione. Prova i salti dell'idrogeno:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Livello di partenza: n = <span class="val" id="at-ni-val">3</span></label>
+          <input type="range" id="at-ni" min="2" max="6" step="1" value="3"></div>
+        <div class="control-group"><label>Livello di arrivo: n = <span class="val" id="at-nf-val">2</span></label>
+          <input type="range" id="at-nf" min="1" max="3" step="1" value="2"></div>
+      </div>
+      <div class="ckt"><svg id="at-svg" viewBox="0 0 640 330" aria-label="Livelli energetici dell'atomo di idrogeno con transizione tra due livelli ed emissione del fotone corrispondente"></svg></div>
+      <p class="eq-out" id="at-out"></p>
+
+      <h3>5.2 — Il modello atomico di oggi: gli orbitali</h3>
+      <p>Ed eccolo, il modello atomico che oggi consideriamo più vicino alla realtà — l'ultimo della rassegna
+        cominciata col panettone di Thomson. Niente orbite, niente traiettorie: l'elettrone è descritto dalla sua
+        funzione d'onda, e $|\psi|^2$ disegna una <strong>nube di probabilità</strong> attorno al nucleo —
+        l'<strong>orbitale</strong>. Dove la nube è densa, l'elettrone si fa trovare spesso; dove è rada, quasi mai;
+        una traiettoria tra un punto e l'altro semplicemente <em>non esiste</em>. Le nubi hanno forme precise,
+        dettate dall'equazione di Schrödinger: sfere (orbitali $s$), doppi lobi a manubrio (orbitali $p$),
+        quadrifogli ($d$)...</p>
+
+      <div class="ckt"><svg id="orb-svg" viewBox="0 0 640 190" aria-label="Forme stilizzate degli orbitali s, p e d come nubi di probabilità">
+        <defs>
+          <radialGradient id="orb-s" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#3b82f6" stop-opacity="0.85"/><stop offset="100%" stop-color="#3b82f6" stop-opacity="0.04"/></radialGradient>
+          <radialGradient id="orb-p" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f5b400" stop-opacity="0.85"/><stop offset="100%" stop-color="#f5b400" stop-opacity="0.04"/></radialGradient>
+          <radialGradient id="orb-d" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ec4899" stop-opacity="0.8"/><stop offset="100%" stop-color="#ec4899" stop-opacity="0.04"/></radialGradient>
+        </defs>
+        <circle cx="120" cy="85" r="52" fill="url(#orb-s)"/>
+        <circle cx="120" cy="85" r="3.4" fill="var(--text)"/>
+        <text x="120" y="165" text-anchor="middle" class="lbl">orbitale s — sfera</text>
+        <ellipse cx="320" cy="55" rx="26" ry="34" fill="url(#orb-p)"/>
+        <ellipse cx="320" cy="118" rx="26" ry="34" fill="url(#orb-p)"/>
+        <circle cx="320" cy="86" r="3.4" fill="var(--text)"/>
+        <text x="320" y="165" text-anchor="middle" class="lbl">orbitale p — due lobi</text>
+        <ellipse cx="492" cy="57" rx="20" ry="26" transform="rotate(45 492 57)" fill="url(#orb-d)"/>
+        <ellipse cx="548" cy="57" rx="20" ry="26" transform="rotate(-45 548 57)" fill="url(#orb-d)"/>
+        <ellipse cx="492" cy="113" rx="20" ry="26" transform="rotate(-45 492 113)" fill="url(#orb-d)"/>
+        <ellipse cx="548" cy="113" rx="20" ry="26" transform="rotate(45 548 113)" fill="url(#orb-d)"/>
+        <circle cx="520" cy="85" r="3.4" fill="var(--text)"/>
+        <text x="520" y="165" text-anchor="middle" class="lbl">orbitale d — quadrifoglio</text>
+      </svg></div>
+
+      <p>Ogni orbitale è etichettato da tre <strong>numeri quantici</strong> — e qui la fisica stringe la mano al
+        programma di scienze naturali, dove questi nomi li avete già incontrati: $n$ (il livello, che comanda
+        l'energia), $l$ (la forma: $s, p, d, f$), $m$ (l'orientazione nello spazio). Ne manca un quarto — lo
+        <strong>spin</strong> $s$ — che sui libri di chimica compare un po' dal nulla, come una rotazione interna
+        dell'elettrone. Da dove salti fuori davvero lo vediamo <em>adesso</em>: è il regalo della sezione più
+        elegante di questa lezione. E le configurazioni elettroniche ($1s^2\,2s^2\,2p^6\dots$), l'ordine di
+        riempimento, la struttura stessa della tavola periodica? Tutte conseguenze di questi numeri più un principio
+        che incontreremo tra poco (il principio di esclusione di Pauli, sezione 9): <strong>la chimica è meccanica
+        quantistica applicata</strong>.</p>
+    </section>
+
+    <!-- 6 — L'EQUAZIONE DI DIRAC -->
+    <section id="sec6">
+      <h2>6. L'equazione di Dirac: il matrimonio con la relatività</h2>
+
+      <h3>6.1 — Il pezzo mancante</h3>
+      <p>Per quanto potente, alla nostra costruzione manca un pezzo — e lo si vede a occhio nudo guardando
+        l'equazione di Schrödinger: il tempo e lo spazio vi compaiono in modo <strong>diseguale</strong> (una
+        derivata prima nel tempo, derivate seconde nello spazio). Ma la relatività ristretta ci ha insegnato che
+        spazio e tempo sono un blocco unico, che si mescola nei cambi di riferimento (lezione 7): un'equazione che li
+        tratta in modo asimmetrico <strong>non può essere relativistica</strong>. Finché gli elettroni vanno piano,
+        pazienza; ma negli atomi pesanti gli elettroni interni viaggiano a frazioni ragguardevoli di $c$, e per le
+        particelle dei raggi cosmici o degli acceleratori la questione è ineludibile: serve una meccanica quantistica
+        <strong>compatibile con Einstein</strong>.</p>
+
+      <h3>6.2 — L'equazione</h3>
+      <p>Il matrimonio lo celebrò Paul Dirac nel 1928, con un requisito estetico preciso: un'equazione di
+        <em>primo ordine</em> sia nel tempo sia nello spazio, perfettamente simmetrica. Il prezzo della simmetria fu
+        curioso: per far tornare i conti, i coefficienti dell'equazione <strong>non possono essere numeri</strong> —
+        devono essere <strong>matrici $4\times 4$</strong> (le matrici $\gamma$), e la funzione d'onda deve avere
+        quattro componenti. Eccola, da ammirare:</p>
+
+      <div class="formula-box">
+        $$\big(i\hbar\,\gamma^\mu \partial_\mu - m\,c\big)\,\psi = 0$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">l'equazione di Dirac: $\gamma^\mu$ sono quattro matrici $4\times4$, $\partial_\mu$ le derivate rispetto alle quattro coordinate dello spazio-tempo (notazione della lezione 9!), $m$ la massa. Una riga sola — Dirac la volle così compatta — e dentro c'è mezzo Novecento</p>
+      </div>
+
+      <p>E qui la matematica cominciò a <strong>regalare fisica</strong>. Primo regalo: quelle quattro componenti
+        non sono un difetto — due di esse descrivono un momento angolare <em>intrinseco</em> dell'elettrone, che
+        vale $\hbar/2$: lo <strong>spin</strong>. Nessuno l'ha messo a mano: chiedi che la meccanica quantistica
+        rispetti la relatività, e lo spin <strong>emerge da solo</strong> dalle equazioni. Il quarto numero quantico
+        della chimica, quello "caduto dal cielo", ha un certificato di nascita: è figlio di Einstein e di
+        Schrödinger, con Dirac come ostetrico.</p>
+
+      <h3>6.3 — Stern e Gerlach: lo spin colto sul fatto</h3>
+      <p>Ma lo spin non è un'astrazione matematica: si <strong>vede</strong> in laboratorio — e per giunta la sua
+        prova sperimentale arrivò nel 1922, <em>sei anni prima</em> dell'equazione di Dirac, quando ancora nessuno
+        sapeva che cosa significasse. Otto <strong>Stern</strong> e Walther <strong>Gerlach</strong> spararono un
+        fascio di atomi d'argento attraverso un campo magnetico <strong>non uniforme</strong> e raccolsero gli atomi
+        su una lastra. L'idea: ogni atomo, per via dello spin dell'elettrone, si comporta come un minuscolo
+        <strong>ago magnetico</strong>, e un campo disuniforme deflette gli aghi tanto più quanto più sono
+        "inclinati" rispetto al campo.</p>
+
+      <p>La previsione classica era chiara: gli aghi atomici escono dal forno orientati <strong>a caso</strong> in
+        tutte le direzioni, quindi sulla lastra dovrebbe comparire una <strong>striscia continua</strong>, sfumata
+        dal molto deflesso (aghi paralleli al campo) al poco deflesso (aghi perpendicolari). Quello che videro,
+        invece, lasciò tutti di stucco: <strong>due macchie nette</strong>, in alto e in basso, e niente in mezzo.
+        Come se l'ago magnetico dell'elettrone potesse puntare <em>solo</em> "tutto su" o "tutto giù" rispetto al
+        campo, mai in una posizione intermedia. Provalo:</p>
+
+      <div class="controls">
+        <button class="btn" id="sg-one">spara 1 atomo</button>
+        <button class="btn" id="sg-200">spara 200</button>
+        <button class="btn" id="sg-clr">🗑 azzera</button>
+        <label class="toggle-row"><input type="checkbox" id="sg-cl"> mostra la previsione classica</label>
+      </div>
+      <div class="ckt"><svg id="sg-svg" viewBox="0 0 640 300" aria-label="Esperimento di Stern-Gerlach: un fascio di atomi attraversa un campo magnetico disuniforme e si divide in due sole macchie invece di una striscia continua"></svg></div>
+      <p class="eq-out" id="sg-out"></p>
+
+      <div class="note">
+        <strong>Il messaggio dei due puntini.</strong> La grandezza "orientazione dello spin lungo il campo" è
+        <strong>quantizzata</strong>: misurandola, per un elettrone si ottengono solo <em>due</em> valori — li
+        chiamiamo <strong>spin su</strong> ($+\tfrac{1}{2}$) e <strong>spin giù</strong> ($-\tfrac{1}{2}$). È
+        l'ennesimo autovalore discreto della lezione 11 (l'osservabile "spin" è proprio la matrice $2\times 2$ che
+        abbiamo usato come esempio!). E c'è di più, tipicamente quantistico: se prendi gli atomi "su" e li rispari
+        in un secondo apparato <em>ruotato di lato</em>, si ridividono di nuovo a metà — misurare lo spin lungo una
+        direzione <strong>cancella</strong> l'informazione su un'altra. Posizione e quantità di moto, capitolo
+        secondo: due componenti dello spin sono grandezze incompatibili.
+      </div>
+
+      <h3>6.4 — Ma allora, che cos'è lo spin?</h3>
+      <p>Il nome è una trappola. <em>Spin</em> in inglese vuol dire "rotazione", e i primi fisici lo immaginarono
+        letteralmente come l'elettrone che gira su se stesso, una trottola carica. L'immagine è
+        <strong>sbagliata</strong>, e si smonta con un conto: perché una pallina delle dimensioni di un elettrone
+        abbia quel momento angolare, la sua superficie dovrebbe girare <strong>molto più veloce della luce</strong>.
+        Vietato. Lo spin <strong>non ha un analogo classico</strong>: è un momento angolare
+        <em>intrinseco</em>, una proprietà della particella tanto fondamentale quanto la sua massa o la sua carica —
+        semplicemente <em>ce l'ha</em>, senza che nulla stia girando.</p>
+
+      <p>E però un modo di <strong>visualizzarlo</strong> — non di "spiegarlo con le trottole", ma di afferrarne la
+        stranezza — esiste, e passa dalla matematica delle simmetrie. Ricordiamo dalle lezioni di geometria:
+        <strong>simmetria</strong> significa <em>restare uguale dopo una trasformazione</em>. Allora chiediamoci:
+        <strong>dopo quanti giri una particella torna "uguale a prima"?</strong> È questa la domanda che lo spin
+        misura davvero — e la risposta è sorprendente:</p>
+
+      <ul>
+        <li>una particella di <strong>spin 1</strong> torna identica dopo <strong>un giro completo</strong> (360°):
+          si comporta come una freccia, come ci aspetteremmo da qualsiasi oggetto normale;</li>
+        <li>una particella di <strong>spin 2</strong> torna uguale già dopo <strong>mezzo giro</strong> (180°):
+          come una retta a doppia punta, o l'immagine di un fiore a due petali;</li>
+        <li>e una particella di <strong>spin $\tfrac{1}{2}$</strong>, come l'elettrone, è quella davvero aliena:
+          <strong>non</strong> torna uguale dopo un giro — le serve un <strong>doppio giro</strong> (720°) per
+          tornare com'era! Dopo 360° è, in un senso preciso, "girata al contrario".</li>
+      </ul>
+
+      <p>Sembra assurdo che un oggetto ruotato di 360° non torni al punto di partenza — eppure c'è un modello
+        meccanico che fa esattamente questo, ed è a portata di mano. Immagina una pallina collegata all'ambiente da
+        alcuni <strong>nastri</strong> (i fisici lo chiamano "trucco della cintura", o <em>plate trick</em>): ruota
+        la pallina di un giro intero e i nastri restano <strong>attorcigliati</strong>, non riesci a districarli
+        senza ruotare ancora; ma ruotala di <strong>due</strong> giri e — magia — i nastri si sbrogliano
+        completamente, come se non l'avessi mai girata. Il "$720°$ per tornare a casa" dello spin $\tfrac{1}{2}$
+        <em>si tocca con mano</em>. Provaci:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Rotazione della pallina: <span class="val" id="spin-a-val">0</span>°</label>
+          <input type="range" id="spin-a" min="0" max="720" step="5" value="0"></div>
+      </div>
+      <div class="ckt"><svg id="spin-svg" viewBox="0 0 640 320" aria-label="Il trucco della cintura: una pallina collegata da nastri si attorciglia dopo un giro e si sbroglia solo dopo due giri, come una particella di spin un mezzo"></svg></div>
+      <p class="eq-out" id="spin-out"></p>
+
+      <div class="curiosita">
+        <strong>Il carattere fa la particella.</strong> Non è un dettaglio da salotto: quel "mezzo giro / un giro"
+        è <em>esattamente</em> la linea di confine tra le due famiglie della sezione 9. Le particelle che tornano
+        uguali dopo un numero <strong>intero</strong> di mezzi-giri storti — spin $\tfrac{1}{2}, \tfrac{3}{2},\dots$
+        — sono i <strong>fermioni</strong>, gli individualisti di Pauli che costruiscono la materia. Quelle che
+        tornano uguali dopo giri interi "normali" — spin $0, 1, 2,\dots$ — sono i <strong>bosoni</strong>, i
+        socievoli mediatori delle forze. La stessa proprietà geometrica che rende l'elettrone così bizzarro decide
+        se una particella può fare la chimica o trasportare una forza. Lo spin, nato come un errore di traduzione
+        ("rotazione"), è una delle etichette più profonde che una particella porti con sé.
+      </div>
+
+      <h3>6.5 — Il mare di Dirac e l'antimateria</h3>
+      <p>Secondo regalo, ancora più clamoroso — ma con parto travagliato. L'equazione ha anche soluzioni a
+        <strong>energia negativa</strong>, che non si possono buttare via. Per dar loro un senso Dirac immaginò il
+        <strong>mare di Dirac</strong>: il vuoto sarebbe in realtà un "mare" con tutti gli stati a energia negativa
+        già occupati da elettroni invisibili; una <strong>lacuna</strong> in quel mare — una bolla — apparirebbe
+        come una particella identica all'elettrone ma di <strong>carica opposta</strong>. Oggi riteniamo questa
+        interpretazione <strong>errata</strong> (la sistemazione pulita arriverà con la teoria quantistica dei
+        campi, che tratteremo tra poco a modo nostro), ma la <em>previsione</em> che conteneva era giusta e
+        rivoluzionaria: deve esistere l'<strong>antimateria</strong>.</p>
+
+      <div class="rule">
+        <strong>L'antimateria in tre righe.</strong> A ogni particella corrisponde un'<strong>antiparticella</strong>
+        con la <strong>stessa massa</strong> e <strong>carica opposta</strong> (e opposti tutti i "numeri di
+        etichetta"). Quando una particella incontra la sua antiparticella, si <strong>annichilano</strong>:
+        spariscono entrambe e l'intera massa diventa energia, $E = mc^2$ al 100% — la conversione perfetta della
+        tabella della lezione 8. E nel 1932, appena quattro anni dopo l'equazione, <strong>Carl Anderson</strong>
+        fotografò nei raggi cosmici la traccia di un "elettrone positivo": il <strong>positrone</strong>. Nobel a
+        trentun anni, e consacrazione dell'equazione più intelligente del suo autore — parole di Dirac: «la mia
+        equazione era più intelligente di me».
+      </div>
+
+      <div class="curiosita">
+        <strong>L'antimateria in corsia.</strong> Se l'antimateria vi sembra fantascienza, sappiate che c'è chi la
+        usa ogni giorno in ospedale: la <strong>PET</strong> (Positron Emission Tomography) inietta un tracciante
+        che decade β⁺ emettendo <strong>positroni</strong>; ciascun positrone si annichila col primo elettrone che
+        incontra producendo due fotoni γ in direzioni opposte, e dai puntini di annichilazione il computer
+        ricostruisce l'immagine 3D dei tessuti. Diagnosi oncologiche fatte con l'antimateria di Dirac — e con la
+        coincidenza dei due fotoni, pura conservazione della quantità di moto. Resta però un mistero gigante:
+        se materia e antimateria nascono sempre in coppia, <strong>perché l'universo è fatto quasi solo di
+        materia</strong>? Dove è finita l'antimetà? È uno dei grandi problemi aperti — lo ritroveremo nell'ultima
+        sezione.
+      </div>
+    </section>
+
+    <!-- 7 — ENTANGLEMENT -->
+    <section id="sec7">
+      <h2>7. L'entanglement (e perché non si può usare per telefonare)</h2>
+
+      <h3>7.1 — Stati che esistono solo in coppia</h3>
+      <p>Quando le particelle nascono <strong>insieme</strong> — una coppia creata in un decadimento, un elettrone e
+        un positrone prodotti nello stesso evento, due fotoni emessi da un'annichilazione — le leggi di
+        conservazione le legano: se lo spin totale iniziale era zero, deve restare zero. Ma in meccanica quantistica
+        questo vincolo produce qualcosa che non ha equivalente classico. Lo stato della coppia è una
+        <strong>sovrapposizione inseparabile</strong>:</p>
+
+      <div class="formula-box">
+        $$|\text{coppia}\rangle \;=\; \frac{1}{\sqrt{2}}\Big(\,|{\uparrow}\rangle_A\,|{\downarrow}\rangle_B \;-\; |{\downarrow}\rangle_A\,|{\uparrow}\rangle_B\,\Big)$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">"il primo su e il secondo giù" $+$ "il primo giù e il secondo su", in perfetta sovrapposizione: <strong>nessuna delle due particelle ha uno stato proprio</strong> — solo la coppia, come intero, ce l'ha. Schrödinger chiamò questa proprietà <em>Verschränkung</em>: <strong>entanglement</strong>, "intreccio"</p>
+      </div>
+
+      <p>Le conseguenze le conosciamo dalla lezione 11: se Alice misura la sua particella e trova $\uparrow$, lo
+        stato collassa e la particella di Bob è <em>istantaneamente</em> $\downarrow$ — a un metro o a un anno luce
+        di distanza. E il teorema di Bell ci ha garantito che non è un trucco da guanti spaiati: prima della misura
+        gli esiti <strong>non erano decisi</strong>. Sembra il telegrafo più veloce della luce: Einstein la
+        chiamava, con orrore, «spaventosa azione a distanza». La relatività è in pericolo?</p>
+
+      <h3>7.2 — Bob e Alice provano a telefonarsi</h3>
+      <p>No — e il modo migliore per capirlo è <strong>provarci</strong>. Alice vuole mandare un bit a Bob usando
+        solo le coppie entangled: prova a "scrivere" scegliendo <em>come</em> misurare la sua particella (asse
+        verticale = "0", asse orizzontale = "1"). Bob, lontanissimo, misura sempre le sue e guarda se riesce a
+        leggere il messaggio. Fai tu l'esperimento:</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="ba-z">Alice misura ↕ (vuole dire "0")</button>
+          <button class="btn" id="ba-x">Alice misura ↔ (vuole dire "1")</button>
+        </div>
+        <button class="btn" id="ba-50">📡 genera 50 coppie</button>
+        <button class="btn" id="ba-tel">📞 confronta i taccuini</button>
+        <button class="btn" id="ba-rst">🗑 azzera</button>
+      </div>
+      <div class="ckt"><svg id="ba-svg" viewBox="0 0 640 330" aria-label="Alice e Bob condividono coppie entangled: i risultati di Bob restano casuali qualunque cosa faccia Alice, la correlazione appare solo confrontando i dati"></svg></div>
+      <p class="eq-out" id="ba-out"></p>
+
+      <div class="rule">
+        <strong>Perché il telefono quantistico non squilla.</strong> Il punto è che Alice <strong>non sceglie
+        l'esito</strong> delle proprie misure: le esce $\uparrow$ o $\downarrow$ a caso, qualunque asse scelga. E
+        dal lato di Bob, ogni sequenza è <strong>50/50 perfettamente casuale</strong> — indistinguibile dal rumore,
+        qualunque cosa Alice combini. La correlazione c'è, ed è reale: ma diventa <em>visibile</em> solo quando i
+        due <strong>confrontano i taccuini</strong> — e quel confronto viaggia su un canale classico, alla velocità
+        della luce o meno. Nessuna informazione supera $c$: la relatività ristretta e la meccanica quantistica,
+        dopo essersi guardate in cagnesco per un secolo, firmano qui il loro armistizio. (Il che non rende
+        l'entanglement inutile, tutt'altro: è la risorsa chiave della <strong>crittografia quantistica</strong> e
+        dei computer quantistici — usato <em>insieme</em> a un canale classico, non al suo posto.)
+      </div>
+    </section>
+
+    <!-- 8 — IL LASER -->
+    <section id="sec8">
+      <h2>8. Il laser: transizioni atomiche in ordine di parata</h2>
+
+      <h3>8.1 — L'idea di Einstein: l'emissione stimolata</h3>
+      <p>Vediamo ora le transizioni atomiche trasformate in tecnologia — nello strumento più quantistico che ci
+        sia. La parola <strong>LASER</strong> è un acronimo: <em>Light Amplification by Stimulated Emission of
+        Radiation</em>, "amplificazione di luce mediante emissione stimolata di radiazione". Il cuore è un
+        meccanismo previsto da Einstein già nel 1917: oltre all'emissione <em>spontanea</em> (l'atomo eccitato
+        prima o poi decade da sé, in un momento e una direzione casuali), esiste l'<strong>emissione
+        stimolata</strong>: se un fotone con l'energia giusta <em>passa accanto</em> a un atomo eccitato, lo
+        "convince" a decadere subito, emettendo un fotone <strong>gemello</strong> — stessa frequenza, stessa
+        direzione, stessa fase. Da un fotone, due; da due, quattro: una <strong>valanga di luce perfettamente
+        coordinata</strong>.</p>
+
+      <h3>8.2 — L'inversione di popolazione e la cavità</h3>
+      <p>C'è un ostacolo: in condizioni normali gli atomi eccitati sono pochi, e i fotoni vengono più spesso
+        <em>assorbiti</em> (da atomi in basso) che clonati. Perché la valanga vinca serve
+        l'<strong>inversione di popolazione</strong>: più atomi sopra che sotto — una situazione innaturale, da
+        mantenere a forza <strong>pompando</strong> energia nel materiale. Il trucco classico usa <strong>tre
+        livelli</strong>: si pompano gli atomi a un livello alto e instabile, da cui cadono subito in un livello
+        intermedio <em>metastabile</em> (dove restano a lungo): lì si accumulano, e l'inversione è servita. Il tutto
+        avviene tra <strong>due specchi</strong> affacciati: i fotoni rimbalzano avanti e indietro attraversando il
+        materiale migliaia di volte e clonandosi a ogni passaggio; uno dei due specchi è
+        <strong>semi-riflettente</strong>, e la frazione che lascia passare è il fascio laser — monocromatico,
+        collimato, coerente. Aziona tu il pompaggio:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Potenza di pompaggio: <span class="val" id="ls-p-val">40</span>%</label>
+          <input type="range" id="ls-p" min="0" max="100" step="5" value="40"></div>
+      </div>
+      <div class="ckt"><svg id="ls-svg" viewBox="0 0 640 330" aria-label="Simulazione di un laser: pompaggio degli atomi, inversione di popolazione, emissione stimolata a valanga tra i due specchi e fascio in uscita"></svg></div>
+      <p class="eq-out" id="ls-out"></p>
+
+      <div class="curiosita">
+        <strong>Il rubino di Maiman.</strong> I laser oggi sono di ogni specie — a gas (il rosso He-Ne dei
+        laboratori scolastici), a diodo (puntatori, lettori ottici), a fibra — ma il primo della storia fu a
+        <strong>stato solido</strong>: il laser a <strong>rubino</strong> di Theodore Maiman (1960), un cilindretto
+        di rubino sintetico con le facce specchiate, avvolto da una lampada flash a spirale che faceva da pompa —
+        esattamente lo schema a tre livelli della simulazione. Nota tecnica gustosa: la rivista <em>Physical Review
+        Letters</em> gli <strong>rifiutò l'articolo</strong> giudicandolo "l'ennesimo lavoro sui maser": il primo
+        laser della storia fu pubblicato su <em>Nature</em> in meno di una pagina.
+      </div>
+
+      <div class="note">
+        <strong>A che cosa serve? A (quasi) tutto.</strong> Lettori di codici a barre e di dischi ottici, le
+        <strong>fibre ottiche</strong> che portano internet (il segnale è luce laser!), la chirurgia oculistica e i
+        bisturi di precisione, il taglio e la saldatura industriale, le stampanti, i lidar delle auto autonome, i
+        puntatori — e gli interferometri chilometrici di <strong>LIGO e Virgo</strong> che ascoltano le onde
+        gravitazionali (lezione 9: il cerchio dei moduli si chiude). Un'idea del 1917, un prototipo del 1960
+        definito «una soluzione in cerca di un problema» — e oggi non passa giornata senza incrociarne uno.
+      </div>
+    </section>
+
+    <!-- 9 — FACOLTATIVA: FERMIONI E BOSONI -->
+    <section id="sec9" class="optional">
+      <h2>9. Fermioni e bosoni: individualisti e "comunisti"</h2>
+      <p>(Approfondimento facoltativo — la divisione più profonda del mondo delle particelle, e la spiegazione
+        segreta di mezza lezione: tavola periodica, laser e stelle morte comprese.)</p>
+
+      <h3>9.1 — Le due famiglie</h3>
+      <p>Le particelle identiche, in meccanica quantistica, si dividono in due famiglie dal comportamento sociale
+        opposto:</p>
+      <ul>
+        <li>i <strong>fermioni</strong> (spin semintero: $1/2,\ 3/2,\dots$ — elettroni, protoni, neutroni, quark)
+          obbediscono al <strong>principio di esclusione di Pauli</strong>: <strong>mai due fermioni identici nello
+          stesso stato quantico</strong>. Individualisti irriducibili: ognuno esige il suo stato tutto per sé;
+          seguono la <em>statistica di Fermi-Dirac</em>;</li>
+        <li>i <strong>bosoni</strong> (spin intero: $0,\ 1,\ 2,\dots$ — fotoni, e altri che incontreremo tra poco)
+          non hanno alcun divieto — anzi: <strong>preferiscono</strong> ammassarsi tutti nello stesso stato, e più
+          sono, più l'ammucchiata attrae i nuovi arrivati. Particelle "comuniste", per usare il soprannome
+          scherzoso: tutte nello stesso stato, possibilmente quello a energia minima; seguono la <em>statistica di
+          Bose-Einstein</em>.</li>
+      </ul>
+
+      <p>Che lo spin decida il carattere sociale non è un caso: è il <em>teorema spin-statistica</em>, dimostrato
+        proprio da Pauli — e la dimostrazione richiede <strong>meccanica quantistica relativistica</strong>: un
+        altro regalo del matrimonio celebrato in questa lezione. Guarda le due famiglie sistemarsi sui livelli di
+        energia:</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="qs-f">fermioni (Pauli)</button>
+          <button class="btn" id="qs-b">bosoni</button>
+        </div>
+        <div class="control-group"><label>Numero di particelle: <span class="val" id="qs-n-val">10</span></label>
+          <input type="range" id="qs-n" min="2" max="16" step="1" value="10"></div>
+        <div class="control-group"><label>Agitazione termica: <span class="val" id="qs-t-val">0</span>%</label>
+          <input type="range" id="qs-t" min="0" max="100" step="5" value="0"></div>
+      </div>
+      <div class="ckt"><svg id="qs-svg" viewBox="0 0 640 330" aria-label="Statistiche quantistiche: i fermioni riempiono i livelli energetici uno per stato, i bosoni si accumulano tutti nel livello fondamentale"></svg></div>
+      <p class="eq-out" id="qs-out"></p>
+
+      <h3>9.2 — Le conseguenze, ovunque</h3>
+      <ul>
+        <li><strong>La tavola periodica esiste per Pauli.</strong> Gli elettroni sono fermioni: non possono
+          accatastarsi tutti nell'orbitale $1s$ — riempiono i gusci uno stato alla volta ($2$ per orbitale, grazie
+          alle due orientazioni dello spin), e da questo riempimento nascono le configurazioni elettroniche, la
+          chimica, la varietà degli elementi. Se gli elettroni fossero bosoni, ogni atomo sarebbe una palla
+          inerte con tutti gli elettroni nel fondamentale: <strong>niente legami, niente chimica, niente noi</strong>.</li>
+        <li><strong>Le stelle morte stanno in piedi per Pauli.</strong> Le nane bianche e le stelle di neutroni
+          (lezione 9) non collassano grazie alla <em>pressione di degenerazione</em>: i fermioni compressi
+          rifiutano di condividere gli stati, e questo rifiuto regge il peso di una stella. Quando nemmeno Pauli
+          basta più... buco nero.</li>
+        <li><strong>Il laser funziona per Bose.</strong> I fotoni sono bosoni: l'emissione stimolata della sezione 8
+          è esattamente la loro voglia di ammassarsi nello stesso stato — il fascio laser è un condominio di
+          miliardi di fotoni tutti identici, l'utopia bosonica realizzata.</li>
+        <li><strong>E ammassi ancora più estremi:</strong> raffreddando certi gas di atomi-bosoni a miliardesimi di
+          grado si ottiene il <em>condensato di Bose-Einstein</em> (previsto nel 1924, realizzato nel 1995, Nobel
+          2001): migliaia di atomi in un <strong>unico stato quantistico</strong>, un "super-atomo" macroscopico.
+          Parenti stretti: la superfluidità dell'elio liquido e — con un colpo di scena — la
+          <strong>superconduttività</strong>, dove gli elettroni (fermioni!) si mettono in coppia per godersi i
+          vantaggi della vita da bosone.</li>
+      </ul>
+    </section>
+
+    <!-- 10 — FACOLTATIVA: PATH INTEGRAL -->
+    <section id="sec10" class="optional">
+      <h2>10. Tutte le strade portano allo schermo: il path integral</h2>
+      <p>(Approfondimento facoltativo — la terza formulazione della meccanica quantistica, e forse la più
+        vertiginosa. Dopo le onde di Schrödinger e le matrici di Heisenberg, la somma sui cammini di Feynman.)</p>
+
+      <h3>10.1 — Da due fenditure a infinite</h3>
+      <p>Riprendiamo per l'ultima volta l'esperimento della doppia fenditura, e giochiamo al rialzo. Con
+        <strong>due</strong> fenditure, l'elettrone "passa da entrambe" e le due strade interferiscono. Apriamo una
+        terza fenditura: passa da <strong>tutte e tre</strong>, e le tre ampiezze si sommano. Quattro? Da tutte e
+        quattro. Aggiungiamo un secondo muro forato, poi un terzo: l'elettrone esplora <em>ogni</em> combinazione di
+        buchi. E adesso il colpo di teatro finale: togliamo <strong>del tutto</strong> i muri. Un muro senza muro è
+        un "muro" fatto solo di fenditure — <strong>infinite fenditure ovunque</strong>. La conclusione è
+        obbligata quanto folle: un elettrone libero che va dalla sorgente allo schermo percorre
+        <strong>tutti i cammini possibili contemporaneamente</strong> — il rettilineo, le curve gentili, gli zig-zag
+        deliranti, il giro largo passando per la Luna.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Cammini mostrati: <span class="val" id="pi-n-val">12</span></label>
+          <input type="range" id="pi-n" min="1" max="60" step="1" value="12"></div>
+      </div>
+      <div class="ckt"><svg id="pi-svg" viewBox="0 0 640 300" aria-label="Path integral: fascio di cammini possibili tra sorgente e rivelatore, con il cammino classico evidenziato"></svg></div>
+      <p class="eq-out" id="pi-out"></p>
+
+      <h3>10.2 — Ogni cammino col suo peso</h3>
+      <p>Questa è l'interpretazione <em>path integral</em> ("integrale sui cammini") di <strong>Richard
+        Feynman</strong> (1948): l'ampiezza di arrivare in un punto è la <strong>somma — anzi, l'integrale — su
+        tutti i cammini possibili</strong>, dove però ogni cammino contribuisce con il suo <strong>peso</strong>:
+        una fase che ruota tanto più in fretta quanto più grande è l'<strong>azione</strong> $S$ del cammino —
+        proprio l'azione della sezione facoltativa della lezione 11, e il peso è $e^{iS/\hbar}$. Da qui esce il
+        regalo concettuale più bello di tutta la storia: per i sistemi grandi, con $S \gg \hbar$, le fasi dei
+        cammini vicini ruotano vorticosamente e <strong>si cancellano a vicenda</strong> — tranne che attorno al
+        cammino dove l'azione è stazionaria, dove le fasi si allineano e si rinforzano. E quel cammino superstite è
+        esattamente la <strong>traiettoria classica</strong> del principio di minima azione. La pallina "sceglie" il
+        percorso di Newton perché è l'unico su cui gli infiniti percorsi quantistici non si suicidano per
+        interferenza: <strong>la fisica classica è il residuo dell'interferenza di tutte le strade non
+        prese</strong>.</p>
+    </section>
+
+    <!-- 11 — I DIAGRAMMI DI FEYNMAN -->
+    <section id="sec11">
+      <h2>11. I diagrammi di Feynman</h2>
+
+      <h3>11.1 — La grammatica delle interazioni</h3>
+      <p>Sommare su tutti i cammini e tutte le possibilità diventa presto un incubo contabile. Feynman inventò
+        allora una <strong>notazione grafica</strong> che è insieme uno strumento di calcolo rigoroso e il modo più
+        intuitivo di <em>vedere</em> le interazioni tra particelle: i <strong>diagrammi di Feynman</strong>. Le
+        regole di lettura: il tempo scorre (qui per noi) da sinistra a destra; le <strong>linee continue</strong>
+        sono particelle di materia; le <strong>linee ondulate</strong> sono i mediatori (fotoni e parenti); ogni
+        <strong>vertice</strong> — ogni nodo dove le linee si toccano — è un'interazione elementare. Ecco tre
+        classici:</p>
+
+      <div class="ckt"><svg id="fd-svg" viewBox="0 0 640 260" aria-label="Tre diagrammi di Feynman: repulsione tra elettroni con scambio di fotone, decadimento beta con bosone W, annichilazione elettrone-positrone">
+        <!-- (a) e- e- scambio fotone -->
+        <path d="M 30 60 L 95 105" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+        <path d="M 95 105 L 30 150" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+        <path d="M 200 60 L 135 105" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+        <path d="M 135 105 L 200 150" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+        <path d="M 95 105 q 5 -7 10 0 q 5 7 10 0 q 5 -7 10 0 q 5 7 10 0" fill="none" stroke="#f5b400" stroke-width="2.2"/>
+        <text x="115" y="92" text-anchor="middle" class="lbl-s" fill="#f5b400">γ</text>
+        <text x="24" y="55" text-anchor="end" class="lbl-s">e⁻</text>
+        <text x="24" y="162" text-anchor="end" class="lbl-s">e⁻</text>
+        <text x="206" y="55" class="lbl-s">e⁻</text>
+        <text x="206" y="162" class="lbl-s">e⁻</text>
+        <text x="115" y="200" text-anchor="middle" class="lbl-s">(a) repulsione elettrica:</text>
+        <text x="115" y="216" text-anchor="middle" class="lbl-s">scambio di un fotone</text>
+        <!-- (b) beta: n -> p + W- -> e- + antinu -->
+        <path d="M 250 105 L 340 105" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+        <path d="M 340 105 L 430 70" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+        <path d="M 340 105 q 6 8 12 4 q -2 10 8 10 q -2 9 9 9 q 0 9 9 8" fill="none" stroke="#ec4899" stroke-width="2.2"/>
+        <text x="382" y="122" class="lbl-s" fill="#ec4899">W⁻</text>
+        <path d="M 378 136 L 430 160" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+        <path d="M 378 136 L 402 196" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="244" y="98" text-anchor="end" class="lbl-s">n</text>
+        <text x="436" y="66" class="lbl-s">p</text>
+        <text x="436" y="166" class="lbl-s">e⁻</text>
+        <text x="408" y="208" class="lbl-s">ν̄ₑ</text>
+        <text x="345" y="234" text-anchor="middle" class="lbl-s">(b) decadimento β: il neutrone diventa protone</text>
+        <text x="345" y="250" text-anchor="middle" class="lbl-s">emettendo un W⁻ che si materializza in e⁻ + ν̄</text>
+        <!-- (c) annichilazione -->
+        <path d="M 480 60 L 545 105" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+        <path d="M 480 150 L 545 105" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+        <polygon points="509,76 501,84 512,88" fill="#3b82f6"/>
+        <polygon points="504,127 512,124 508,136" fill="#3b82f6"/>
+        <path d="M 545 105 q 5 -7 10 0 q 5 7 10 0 q 5 -7 10 0 q 5 7 10 0" fill="none" stroke="#f5b400" stroke-width="2.2"/>
+        <path d="M 545 105 q 5 7 10 0 q 5 -7 10 0 q 5 7 10 0 q 5 -7 10 0" transform="translate(0,6)" fill="none" stroke="#f5b400" stroke-width="2.2" opacity="0.85"/>
+        <text x="612" y="100" class="lbl-s" fill="#f5b400">γ γ</text>
+        <text x="474" y="55" text-anchor="end" class="lbl-s">e⁻</text>
+        <text x="474" y="162" text-anchor="end" class="lbl-s">e⁺</text>
+        <text x="560" y="200" text-anchor="middle" class="lbl-s">(c) annichilazione:</text>
+        <text x="560" y="216" text-anchor="middle" class="lbl-s">e⁻e⁺ → due fotoni (la PET!)</text>
+      </svg></div>
+
+      <h3>11.2 — Il fantasma nel decadimento β: il neutrino</h3>
+      <p>Il diagramma (b) contiene una storia che merita di essere raccontata. Misurando le energie del decadimento
+        β, negli anni Venti saltò fuori uno scandalo: l'elettrone usciva ogni volta con un'energia
+        <strong>diversa</strong>, e i conti dell'energia <strong>non tornavano mai</strong> — sembrava che il
+        principio di conservazione dell'energia, il più sacro di tutti, venisse violato (Bohr arrivò a proporre
+        seriamente di abbandonarlo!). Nel 1930 <strong>Wolfgang Pauli</strong> propose la via d'uscita: nel
+        decadimento nasce anche una <strong>terza particella</strong>, invisibile — neutra, leggerissima, che quasi
+        non interagisce — e si porta via l'energia mancante: il <strong>neutrino</strong>. Pauli stesso era
+        <strong>titubante</strong>, quasi imbarazzato dall'aver inventato una particella apposta per far quadrare i
+        conti: «Ho fatto una cosa terribile: ho postulato una particella che non può essere rivelata» — e scommise
+        una cassa di champagne che nessuno l'avrebbe mai vista. Perse, con 26 anni di ritardo: nel 1956 Reines e
+        Cowan rivelarono i neutrini di un reattore nucleare (e pare che lo champagne sia stato pagato). Morale
+        doppia: a volte "inventare una particella per far tornare i conti" è la mossa giusta — ma il disagio di
+        Pauli era sano: la differenza tra una toppa e una previsione la fa <strong>l'esperimento</strong>.</p>
+
+      <div class="curiosita">
+        <strong>L'antimateria che viaggia all'indietro.</strong> Nei diagrammi di Feynman le antiparticelle si
+        disegnano come particelle con la <strong>freccia rovesciata</strong> rispetto al tempo — guarda il positrone
+        nel diagramma (c). Non è solo un trucco grafico: nella matematica della teoria, un positrone che va avanti
+        nel tempo è <strong>indistinguibile da un elettrone che torna indietro</strong> (interpretazione di
+        Stückelberg e Feynman). Preso alla lettera è vertiginoso — e no, non permette paradossi del nonno: ma dopo
+        il manuale di viaggi nel tempo della lezione 9, almeno il lessico non vi spaventa più.
+      </div>
+    </section>
+
+    <!-- 12 — IL MODELLO STANDARD -->
+    <section id="sec12">
+      <h2>12. Il Modello Standard: il censimento di tutto</h2>
+
+      <h3>12.1 — Tutto è campo</h3>
+      <p>Siamo pronti per la fotografia di gruppo. La cornice concettuale definitiva — quella che sistema anche il
+        mare di Dirac — si chiama <em>teoria quantistica dei campi</em>, e il suo paradigma si enuncia in una riga:
+        <strong>tutto è campo</strong>. Per ogni tipo di particella esiste un campo che riempie l'intero universo
+        (come il campo elettromagnetico delle lezioni 4-6), e le particelle sono i <strong>quanti</strong> di quel
+        campo — le sue increspature elementari: il fotone è il quanto del campo elettromagnetico, l'elettrone il
+        quanto del campo elettronico, e via così. Due elettroni sono identici perché sono <em>increspature dello
+        stesso mare</em>. In questo quadro, il <strong>Modello Standard</strong> è il censimento di tutti i campi
+        conosciuti — e le loro particelle si dividono nelle due famiglie della sezione 9:</p>
+
+      <ul>
+        <li>i <strong>fermioni</strong> — rispettano Pauli, e sono i <strong>mattoni della materia</strong>: sei
+          <strong>quark</strong> (su/giù e le loro copie più pesanti; su e giù compongono protoni e neutroni) e sei
+          <strong>leptoni</strong> (l'elettrone, i suoi fratelli maggiori muone e tau, e i tre neutrini), organizzati
+          in tre "generazioni" fotocopia;</li>
+        <li>i <strong>bosoni</strong> — non rispettano Pauli, e sono i <strong>portalettere</strong>: trasportano le
+          interazioni da un fermione all'altro (sono le linee ondulate dei diagrammi di Feynman!). Più uno speciale,
+          il <strong>bosone di Higgs</strong> (trovato al CERN nel 2012), il cui campo dà la massa alle altre
+          particelle.</li>
+      </ul>
+
+      <h3>12.2 — Le quattro forze</h3>
+      <div class="definition">
+        <strong>Le interazioni fondamentali e i loro mediatori.</strong>
+        <div class="table-container" style="margin-top:0.6rem;">
+          <table>
+            <thead><tr><th>Forza</th><th>Mediatore</th><th>Che cosa fa</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Elettromagnetica</strong></td><td>fotone $\gamma$</td><td>lega elettroni e nuclei negli atomi, la chimica, la luce — tutta la vita quotidiana</td></tr>
+              <tr><td><strong>Forte</strong></td><td>gluoni</td><td>incolla i quark dentro protoni e neutroni; il suo "residuo" tiene insieme il nucleo, vincendo la repulsione elettrica tra i protoni</td></tr>
+              <tr><td><strong>Debole</strong></td><td>bosoni $W^\pm$ e $Z$</td><td>responsabile dei decadimenti β (il $W^-$ del diagramma!) e della fusione nel Sole</td></tr>
+              <tr><td><strong>Gravità</strong></td><td>gravitone (<em>ipotetico</em>)</td><td><strong>dovrebbe</strong> essere mediata dal gravitone — mai osservato: la gravità, per ora, resta fuori dal Modello Standard</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p>Questo censimento — una tabella che sta su una maglietta — riproduce con precisione spettacolare
+        <em>ogni</em> esperimento di fisica delle particelle mai eseguito: è, insieme alla relatività generale, la
+        teoria più verificata della storia. E proprio qui sta il problema: sono <strong>due</strong> teorie, non
+        una.</p>
+    </section>
+
+    <!-- 13 — OLTRE LE TEORIE ATTUALI -->
+    <section id="sec13">
+      <h2>13. Oltre le teorie attuali</h2>
+
+      <p>Il Modello Standard è quantistico ma ignora la gravità; la relatività generale descrive la gravità ma non
+        è quantistica. <strong>Non disponiamo di una teoria quantistica compatibile con la relatività
+        generale</strong> — quando si prova a "quantizzare" la gravità con le ricette che funzionano per le altre
+        forze, i calcoli esplodono in infiniti incurabili (le famigerate <em>divergenze ultraviolette</em>, cugine
+        cattive della catastrofe di inizio modulo: i problemi alle piccole scale, evidentemente, sono una tradizione
+        di famiglia). I candidati non mancano:</p>
+
+      <ul>
+        <li>la <strong>teoria delle stringhe</strong>: le particelle non sarebbero puntiformi ma minuscole
+          <strong>corde vibranti</strong> — ogni modo di vibrazione una particella diversa, come le note di una
+          chitarra; e tra i modi di vibrazione di una <strong>stringa chiusa</strong> spunta, gratis, proprio una
+          particella con le caratteristiche del <strong>gravitone</strong>: la gravità quantistica inclusa nel
+          prezzo;</li>
+        <li>la <strong>gravità emergente</strong>: forse la gravità non è una forza fondamentale ma una proprietà
+          <strong>collettiva</strong>, che emerge da qualcosa di più profondo come l'<em>entropia</em> e la
+          temperatura emergono dal caos delle molecole in meccanica statistica — curvatura dello spazio-tempo come
+          fenomeno termodinamico;</li>
+        <li>e altre ancora (gravità quantistica a loop, in cui è lo spazio-tempo stesso a essere fatto di "atomi"
+          discreti...).</li>
+      </ul>
+
+      <p>La verità onesta è che <strong>non lo sappiamo</strong>. E il motivo è quasi beffardo: per vedere insieme
+        effetti quantistici e gravitazionali servirebbero campi gravitazionali di intensità inaudita concentrati su
+        scale minuscole — dentro i buchi neri, o nell'istante del Big Bang — e <strong>nessun esperimento
+        realizzabile ci arriva</strong>: la natura ha nascosto la risposta nel posto più difficile da raggiungere.
+        Intanto la lista delle domande aperte resta lunga: le divergenze, la materia e l'energia oscura (lezione 9:
+        il 95% dell'universo non censito), il destino dell'antimateria mancante (sezione 6), il perché di tre
+        generazioni fotocopia...</p>
+
+      <div class="rule">
+        <strong>Fine del viaggio (che non finisce).</strong> Siamo partiti, tre lezioni fa, da una fisica che si
+        credeva completa a meno di due nuvolette. Chiudiamo con una fisica spettacolarmente potente — transistor,
+        laser, PET, GPS, onde gravitazionali — e spettacolarmente <em>incompleta</em>. Non è una sconfitta: è il
+        motore. In questo momento, <strong>uomini e donne di tutto il mondo</strong> — al CERN, nei telescopi in
+        Cile, nelle miniere trasformate in laboratori sotterranei, alle lavagne di mille università — collaborano,
+        litigano e ricominciano per capire l'universo in cui viviamo. È la più grande impresa collettiva della
+        nostra specie, ed è <em>aperta</em>: le nuvolette di oggi aspettano solo qualcuno che le prenda sul serio.
+        Magari qualcuno che oggi è seduto in una classe del quinto anno.
+      </div>
+    </section>
+
+    <!-- 14 — QUIZ -->
+    <section id="quiz">
+      <h2>14. Quiz finale</h2>
+      <p>Dieci domande su transizioni, decadimenti, antimateria e particelle. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 12 — La meccanica quantistica relativistica · Fisica · Quinto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezione 2 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 2.2 — La delta come limite di campane =====
+      (function () {
+        const se = document.getElementById('dl-e');
+        if (!se || !window.Plt) return;
+        const ve = document.getElementById('dl-e-val');
+        const lock = document.getElementById('dl-lock');
+        const out = document.getElementById('dl-out');
+        const { linspace, update } = Plt;
+        const xs = linspace(-3, 3, 400);
+        function fmt(v) { return v.toFixed(2).replace('.', ','); }
+        function go() {
+          const e = +se.value; ve.textContent = fmt(e);
+          const ys = xs.map(x => Math.exp(-x * x / (2 * e * e)) / (e * Math.sqrt(2 * Math.PI)));
+          const peak = 1 / (e * Math.sqrt(2 * Math.PI));
+          const layout = {
+            xaxis: { title: 'x', range: [-3, 3] },
+            yaxis: { title: '', range: lock.checked ? [0, 8.2] : undefined },
+            showlegend: false,
+            annotations: [{ x: 0, y: 1.03, yref: 'paper', text: `area = 1 (sempre) — altezza ≈ ${fmt(peak)}`, showarrow: false, font: { size: 12 } }],
+          };
+          update('dl-plot', [{ x: xs, y: ys, type: 'scatter', mode: 'lines', line: { color: '#8b5cf6', width: 3 }, fill: 'tozeroy', fillcolor: 'rgba(139,92,246,0.16)' }], layout);
+          out.innerHTML = `Campana di larghezza $\\varepsilon = ${fmt(e)}$: l'<strong>area resta $1$</strong> mentre
+            la larghezza si stringe e il picco sale (qui $\\approx ${fmt(peak)}$). La delta di Dirac è
+            l'<em>idea limite</em> di questo processo per $\\varepsilon \\to 0$: larghezza nulla, picco "infinito",
+            area sempre $1$. ${e <= 0.11 ? 'Più stretta di così il grafico non regge — ed è proprio il punto: <strong>nessuna funzione</strong> arriva in fondo al limite.' : 'Stringi ε fino in fondo e guarda dove si va a parare.'}`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        se.addEventListener('input', go); lock.addEventListener('change', go);
+        document.addEventListener('themechange', go);
+        go();
+      })();
+
+    });
+  </script>
+
+  <!-- Demo sezioni 4, 5 e 6 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 6.3 — Esperimento di Stern-Gerlach =====
+      (function () {
+        const svg = document.getElementById('sg-svg');
+        if (!svg) return;
+        const bOne = document.getElementById('sg-one'), b200 = document.getElementById('sg-200');
+        const bClr = document.getElementById('sg-clr'), chk = document.getElementById('sg-cl');
+        const out = document.getElementById('sg-out');
+        const SX = 470, YUP = 96, YDN = 204;         // schermo, macchie su/giù
+        let up = [], dn = [], cl = [];
+        function shoot(n) {
+          for (let i = 0; i < n; i++) {
+            // quantistico: due macchie (50/50)
+            if (Math.random() < 0.5) up.push([SX + Math.random() * 60, YUP + (Math.random() - 0.5) * 26]);
+            else dn.push([SX + Math.random() * 60, YDN + (Math.random() - 0.5) * 26]);
+            // classico: striscia continua (distribuzione ~ proiezione di orientazioni casuali)
+            const u = Math.random() * 2 - 1;          // cos(theta) uniforme
+            cl.push([SX + Math.random() * 60, 150 - u * 78 + (Math.random() - 0.5) * 8]);
+          }
+          draw();
+        }
+        function draw() {
+          const showCl = chk.checked;
+          let h = '';
+          // forno
+          h += `<rect x="20" y="132" width="46" height="36" rx="6" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2"/>`;
+          h += `<text x="43" y="184" text-anchor="middle" class="lbl-s">forno (Ag)</text>`;
+          // fascio
+          h += `<line x1="66" y1="150" x2="past" y2="150" stroke="var(--muted)" stroke-width="2" stroke-dasharray="4 4"/>`.replace('past', '250');
+          // magnete disuniforme (poli sagomati)
+          h += `<path d="M 250 96 L 400 96 L 400 120 Q 325 138 250 128 Z" fill="color-mix(in srgb, var(--red) 22%, transparent)" stroke="var(--red)" stroke-width="1.5"/>`;
+          h += `<text x="325" y="112" text-anchor="middle" class="lbl-s" fill="var(--red)">N</text>`;
+          h += `<path d="M 250 204 L 400 204 L 400 180 Q 325 168 250 176 Z" fill="color-mix(in srgb, var(--accent) 22%, transparent)" stroke="var(--accent)" stroke-width="1.5"/>`;
+          h += `<text x="325" y="196" text-anchor="middle" class="lbl-s" fill="var(--accent)">S</text>`;
+          h += `<text x="325" y="234" text-anchor="middle" class="lbl-s">campo magnetico disuniforme</text>`;
+          // schermo
+          h += `<rect x="${SX - 4}" y="60" width="72" height="180" rx="6" fill="#0d1017" stroke="var(--border)"/>`;
+          if (showCl) {
+            cl.forEach(p => { h += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="1.5" fill="#f5b400" opacity="0.5"/>`; });
+          }
+          up.forEach(p => { h += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2" fill="#22c55e"/>`; });
+          dn.forEach(p => { h += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2" fill="#22c55e"/>`; });
+          h += `<text x="${SX + 80}" y="${YUP + 4}" class="lbl-s" fill="#22c55e">spin su (+½)</text>`;
+          h += `<text x="${SX + 80}" y="${YDN + 4}" class="lbl-s" fill="#22c55e">spin giù (−½)</text>`;
+          if (showCl) h += `<text x="${SX + 80}" y="154" class="lbl-s" fill="#f5b400">atteso classico:<tspan x="${SX + 80}" dy="14">striscia continua</tspan></text>`;
+          svg.innerHTML = h;
+          const tot = up.length + dn.length;
+          out.innerHTML = tot === 0
+            ? `Spara qualche atomo. La fisica classica prevede una striscia continua (attivala per confronto); la meccanica quantistica prevede due macchie.`
+            : `Atomi sullo schermo: <span class="val-badge">${up.length}</span> su, <span class="val-badge">${dn.length}</span> giù (${tot} totali). Nessuno in mezzo: l'orientazione dello spin lungo il campo assume <strong>solo due valori</strong>. ${showCl ? 'In giallo la nuvola classica attesa — che gli esperimenti NON mostrano.' : ''}`;
+        }
+        bOne.addEventListener('click', () => shoot(1));
+        b200.addEventListener('click', () => shoot(200));
+        bClr.addEventListener('click', () => { up = []; dn = []; cl = []; draw(); });
+        chk.addEventListener('change', draw);
+        draw();
+      })();
+
+      // ===== 6.4 — Il trucco della cintura (spin ½) =====
+      (function () {
+        const sa = document.getElementById('spin-a');
+        if (!sa) return;
+        const va = document.getElementById('spin-a-val');
+        const svg = document.getElementById('spin-svg');
+        const out = document.getElementById('spin-out');
+        const CX = 320, CY = 150, R = 30;
+        const anchors = [[70, 60], [70, 240], [570, 60], [570, 240]];  // ancoraggi fissi ai bordi
+        function ribbon(ax, ay, ang, twist) {
+          // nastro dall'ancoraggio al bordo della pallina; 'twist' 0..1 = quanto è attorcigliato
+          const bx = CX + R * Math.cos(ang), by = CY + R * Math.sin(ang);
+          const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy);
+          const nx = -dy / len, ny = dx / len;         // normale
+          const N = 26, waves = 2;                     // mezze-onde lungo il nastro
+          let d1 = '', d2 = '';
+          for (let i = 0; i <= N; i++) {
+            const t = i / N;
+            const cx = ax + dx * t, cy = ay + dy * t;
+            const w = 3.2 + 6 * twist * Math.sin(Math.PI * waves * t) * Math.sin(Math.PI * t);
+            d1 += `${i ? 'L' : 'M'} ${(cx + nx * w).toFixed(1)} ${(cy + ny * w).toFixed(1)} `;
+          }
+          for (let i = N; i >= 0; i--) {
+            const t = i / N;
+            const cx = ax + dx * t, cy = ay + dy * t;
+            const w = 3.2 - 6 * twist * Math.sin(Math.PI * waves * t) * Math.sin(Math.PI * t);
+            d2 += `L ${(cx + nx * w).toFixed(1)} ${(cy + ny * w).toFixed(1)} `;
+          }
+          const col = twist < 0.04 ? '#22c55e' : 'var(--gold)';
+          return `<path d="${d1} ${d2} Z" fill="${col}" fill-opacity="0.22" stroke="${col}" stroke-width="1.6"/>`;
+        }
+        function go() {
+          const deg = +sa.value; va.textContent = deg;
+          const turns = deg / 360;
+          // attorcigliamento: 0 a 0 giri, massimo a 1 giro, di nuovo 0 a 2 giri
+          const twist = 1 - Math.abs(((turns % 2) + 2) % 2 - 1);   // 0→1→0 su [0,2] giri
+          const t = deg * Math.PI / 180;
+          let h = '';
+          // ancoraggi
+          anchors.forEach(a => { h += `<rect x="${a[0] - 6}" y="${a[1] - 6}" width="12" height="12" rx="3" fill="var(--text-soft)"/>`; });
+          // nastri, ai 4 punti cardinali ruotati
+          [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2].forEach((base, i) => {
+            h += ribbon(anchors[i][0], anchors[i][1], base + t, twist);
+          });
+          // pallina con marcatore per vedere la rotazione
+          h += `<circle cx="${CX}" cy="${CY}" r="${R}" fill="color-mix(in srgb, var(--accent) 30%, transparent)" stroke="var(--accent)" stroke-width="2.5"/>`;
+          const mx = CX + R * 0.62 * Math.cos(t - Math.PI / 2), my = CY + R * 0.62 * Math.sin(t - Math.PI / 2);
+          h += `<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="6" fill="var(--red)"/>`;
+          h += `<text x="${CX}" y="${CY + R + 22}" text-anchor="middle" class="lbl-s">la pallina (guarda il punto rosso) e i 4 nastri verso i fermi ai bordi</text>`;
+          svg.innerHTML = h;
+          const sbrogliato = twist < 0.04;
+          out.innerHTML = `Rotazione: <strong>${deg}°</strong> (${turns.toFixed(2).replace('.', ',')} giri). ` +
+            (deg === 0 ? 'Nastri a riposo.' :
+              sbrogliato ? (Math.abs(turns - 2) < 0.06
+                ? 'Due giri completi: i nastri sono <strong>completamente sbrogliati</strong>, come al via! 🎉 Ecco il "720° per tornare a casa" dello spin ½.'
+                : 'Nastri di nuovo lisci.')
+                : (Math.abs(turns - 1) < 0.06
+                  ? 'Un giro completo: i nastri sono <strong>attorcigliati al massimo</strong> — e non c\'è modo di sbrogliarli senza ruotare ancora. La particella <em>non</em> è tornata "com\'era".'
+                  : 'I nastri si stanno attorcigliando...'));
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sa.addEventListener('input', go); go();
+      })();
+
+      // ===== 4.2 — Simulatore di decadimento =====
+      (function () {
+        const svg = document.getElementById('dec-svg');
+        if (!svg) return;
+        const bA = document.getElementById('dec-a'), bB = document.getElementById('dec-b'), bG = document.getElementById('dec-g');
+        const bRun = document.getElementById('dec-run'), bRst = document.getElementById('dec-rst');
+        const out = document.getElementById('dec-out');
+        const MODES = {
+          a: { nome: 'α', da: '²³⁸U', a: '²³⁴Th', colVivo: '#3b82f6', colMorto: '#9aa0ab', part: 'α', partCol: '#f5b400', desc: 'uranio → torio + particella α (effetto tunnel)' },
+          b: { nome: 'β', da: '¹⁴C', a: '¹⁴N', colVivo: '#22c55e', colMorto: '#8b5cf6', part: 'e⁻', partCol: '#ef4444', desc: 'carbonio → azoto + elettrone (+ antineutrino)' },
+          g: { nome: 'γ', da: 'Co*', a: 'Co', colVivo: '#ec4899', colMorto: '#3b82f6', part: 'γ', partCol: '#f5b400', desc: 'nucleo eccitato → fondamentale + fotone γ' },
+        };
+        const N0 = 180, COLS = 15, T12 = 3.4;      // emivita in secondi simulati
+        let mode = 'a', nuclei = [], flying = [], hist = [], t = 0, running = false, last = performance.now();
+        function setMode(m) {
+          mode = m;
+          bA.classList.toggle('active', m === 'a');
+          bB.classList.toggle('active', m === 'b');
+          bG.classList.toggle('active', m === 'g');
+          reset();
+        }
+        bA.addEventListener('click', () => setMode('a'));
+        bB.addEventListener('click', () => setMode('b'));
+        bG.addEventListener('click', () => setMode('g'));
+        function reset() {
+          nuclei = []; flying = []; hist = [[0, N0]]; t = 0; running = false;
+          bRun.textContent = '▶ avvia';
+          for (let i = 0; i < N0; i++) nuclei.push({ vivo: true });
+          draw();
+        }
+        bRst.addEventListener('click', reset);
+        bRun.addEventListener('click', () => { running = !running; bRun.textContent = running ? '⏸ pausa' : '▶ avvia'; });
+        function draw() {
+          const M = MODES[mode];
+          const vivi = nuclei.filter(n => n.vivo).length;
+          let h = '';
+          // griglia nuclei (sinistra)
+          nuclei.forEach((n, i) => {
+            const x = 28 + (i % COLS) * 20, y = 30 + Math.floor(i / COLS) * 20;
+            h += `<circle cx="${x}" cy="${y}" r="7" fill="${n.vivo ? M.colVivo : M.colMorto}"${n.vivo && mode === 'g' ? ' stroke="#f5b400" stroke-width="2"' : ''}/>`;
+          });
+          h += `<text x="28" y="292" class="lbl-s">● ${M.da} (instabile: ${vivi})   ● ${M.a} (${N0 - vivi})</text>`;
+          // particelle in volo
+          flying.forEach(f => {
+            h += `<text x="${f.x.toFixed(1)}" y="${f.y.toFixed(1)}" style="font-size:11px; font-weight:700;" fill="${M.partCol}">${M.part}</text>`;
+          });
+          // grafico N(t) (destra)
+          const GX = 350, GY = 250, GW = 264, GH = 210;
+          h += `<line x1="${GX}" y1="${GY}" x2="${GX + GW}" y2="${GY}" stroke="var(--muted)" stroke-width="1.5"/>`;
+          h += `<line x1="${GX}" y1="${GY}" x2="${GX}" y2="${GY - GH}" stroke="var(--muted)" stroke-width="1.5"/>`;
+          const TMAX = 14;
+          // curva teorica
+          let dth = '';
+          for (let i = 0; i <= 100; i++) {
+            const tt = i / 100 * TMAX;
+            dth += `${dth ? 'L' : 'M'} ${(GX + tt / TMAX * GW).toFixed(1)} ${(GY - GH * Math.pow(2, -tt / T12)).toFixed(1)} `;
+          }
+          h += `<path d="${dth}" fill="none" stroke="var(--gold)" stroke-width="2" stroke-dasharray="6 5"/>`;
+          // curva simulata
+          let dsim = '';
+          hist.forEach(p => { dsim += `${dsim ? 'L' : 'M'} ${(GX + Math.min(1, p[0] / TMAX) * GW).toFixed(1)} ${(GY - GH * p[1] / N0).toFixed(1)} `; });
+          h += `<path d="${dsim}" fill="none" stroke="${M.colVivo}" stroke-width="2.6"/>`;
+          // marcatori emivite
+          for (let k = 1; k <= 3; k++) {
+            const xk = GX + k * T12 / TMAX * GW;
+            h += `<line x1="${xk.toFixed(1)}" y1="${GY}" x2="${xk.toFixed(1)}" y2="${(GY - GH * Math.pow(2, -k)).toFixed(1)}" stroke="var(--border)" stroke-width="1.2" stroke-dasharray="3 4"/>`;
+            h += `<text x="${xk.toFixed(1)}" y="${GY + 16}" text-anchor="middle" class="lbl-s" style="font-size:10px;">${k}·T½</text>`;
+          }
+          h += `<text x="${GX - 6}" y="${GY - GH + 4}" text-anchor="end" class="lbl-s" style="font-size:10px;">${N0}</text>`;
+          h += `<text x="${GX - 6}" y="${GY + 4}" text-anchor="end" class="lbl-s" style="font-size:10px;">0</text>`;
+          h += `<text x="${GX + GW / 2}" y="${GY - GH - 12}" text-anchor="middle" class="lbl-s">sopravvissuti N(t) — teoria (oro) vs simulazione</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = `Decadimento <strong>${M.nome}</strong>: ${M.desc}. Sopravvissuti:
+            <span class="val-badge">${vivi}/${N0}</span> dopo ${t.toFixed(1).replace('.', ',')} s
+            (${(t / T12).toFixed(1).replace('.', ',')} emivite). ${vivi === 0 ? 'Popolazione esaurita: ricomincia!' : running ? 'Ogni nucleo decide da solo, a caso — ma la curva sa già dove andare.' : 'Premi ▶ per far partire il tempo.'}`;
+        }
+        function frame(now) {
+          const dt = Math.min(60, now - last) / 1000; last = now;
+          if (running) {
+            t += dt;
+            const p = 1 - Math.pow(2, -dt / T12);   // probabilità di decadere in questo intervallo
+            nuclei.forEach((n, i) => {
+              if (n.vivo && Math.random() < p) {
+                n.vivo = false;
+                const x = 28 + (i % COLS) * 20, y = 30 + Math.floor(i / COLS) * 20;
+                const a = Math.random() * 2 * Math.PI;
+                flying.push({ x, y, vx: Math.cos(a) * 70, vy: Math.sin(a) * 70, life: 1 });
+              }
+            });
+            flying.forEach(f => { f.x += f.vx * dt; f.y += f.vy * dt; f.life -= dt; });
+            flying = flying.filter(f => f.life > 0 && f.x > 0 && f.x < 640 && f.y > 0 && f.y < 380);
+            const vivi = nuclei.filter(n => n.vivo).length;
+            if (!hist.length || t - hist[hist.length - 1][0] > 0.08) hist.push([t, vivi]);
+            if (vivi === 0) running = false;
+            draw();
+          }
+          requestAnimationFrame(frame);
+        }
+        reset();
+        requestAnimationFrame(frame);
+      })();
+
+      // ===== 5.1 — Salti dell'idrogeno =====
+      (function () {
+        const si = document.getElementById('at-ni');
+        if (!si) return;
+        const sf = document.getElementById('at-nf');
+        const vi = document.getElementById('at-ni-val'), vf = document.getElementById('at-nf-val');
+        const svg = document.getElementById('at-svg');
+        const out = document.getElementById('at-out');
+        function En(n) { return -13.6 / (n * n); }
+        function yOf(n) { return 280 - 240 * (1 + En(n) / 13.6); }   // E=-13,6 → y=280 ; E=0 → y=40
+        function wl2col(nm) {
+          let r = 0, g = 0, b = 0;
+          if (nm < 380 || nm > 780) return '#b18cff';
+          if (nm < 440) { r = (440 - nm) / 60; b = 1; }
+          else if (nm < 490) { g = (nm - 440) / 50; b = 1; }
+          else if (nm < 510) { g = 1; b = (510 - nm) / 20; }
+          else if (nm < 580) { r = (nm - 510) / 70; g = 1; }
+          else if (nm < 645) { r = 1; g = (645 - nm) / 65; }
+          else { r = 1; }
+          const c = x => Math.round(255 * Math.max(0, Math.min(1, x)));
+          return `rgb(${c(r)},${c(g)},${c(b)})`;
+        }
+        function go() {
+          let ni = +si.value, nf = +sf.value;
+          vi.textContent = ni; vf.textContent = nf;
+          if (nf >= ni) { nf = ni - 1; sf.value = nf; vf.textContent = nf; }
+          const dE = En(ni) - En(nf);              // > 0: emissione
+          const lam = 1240 / dE;                   // nm
+          const col = wl2col(lam);
+          let h = '';
+          // livelli
+          for (let n = 1; n <= 6; n++) {
+            const y = yOf(n);
+            h += `<line x1="60" y1="${y.toFixed(1)}" x2="360" y2="${y.toFixed(1)}" stroke="${n === ni || n === nf ? 'var(--accent)' : 'var(--muted)'}" stroke-width="${n === ni || n === nf ? 2.5 : 1.4}"/>`;
+            h += `<text x="52" y="${(y + 4).toFixed(1)}" text-anchor="end" class="lbl-s">n=${n}  (${En(n).toFixed(2).replace('.', ',')} eV)</text>`;
+          }
+          // elettrone e freccia di salto
+          h += `<circle cx="210" cy="${yOf(ni).toFixed(1)}" r="7" fill="#3b82f6" opacity="0.45"/>`;
+          h += `<circle cx="210" cy="${yOf(nf).toFixed(1)}" r="7" fill="#3b82f6"/>`;
+          h += `<line x1="210" y1="${yOf(ni).toFixed(1)}" x2="210" y2="${(yOf(nf) - 9).toFixed(1)}" stroke="#3b82f6" stroke-width="2.5" stroke-dasharray="5 4"/>`;
+          h += `<polygon points="210,${yOf(nf).toFixed(1)} 205,${(yOf(nf) - 11).toFixed(1)} 215,${(yOf(nf) - 11).toFixed(1)}" fill="#3b82f6"/>`;
+          // fotone emesso
+          let d = '';
+          const fy = (yOf(ni) + yOf(nf)) / 2;
+          for (let x = 230; x <= 420; x += 2) d += `${d ? 'L' : 'M'} ${x} ${(fy + 10 * Math.sin((x - 230) / (lam / 42))).toFixed(1)} `;
+          h += `<path d="${d}" fill="none" stroke="${col}" stroke-width="2.6"/>`;
+          h += `<polygon points="428,${fy.toFixed(1)} 416,${(fy - 5).toFixed(1)} 416,${(fy + 5).toFixed(1)}" fill="${col}"/>`;
+          h += `<text x="440" y="${(fy + 4).toFixed(1)}" class="lbl" fill="${col}">fotone: λ = ${Math.round(lam)} nm</text>`;
+          h += `<text x="440" y="${(fy + 24).toFixed(1)}" class="lbl-s">${lam < 380 ? 'ultravioletto (serie di Lyman)' : lam <= 780 ? 'visibile (serie di Balmer!)' : 'infrarosso (serie di Paschen)'}</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = `Salto $n=${ni} \\to n=${nf}$: il fotone porta via $\\Delta E = ${dE.toFixed(2).replace('.', ',')}$ eV,
+            cioè $\\lambda = 1240/\\Delta E \\approx$ <span class="val-badge">${Math.round(lam)} nm</span>.
+            ${nf === 2 && lam >= 380 && lam <= 780 ? 'È una delle righe visibili dell\'idrogeno — quelle degli spettri stellari della lezione 10!' : nf === 1 ? 'Le discese verso n=1 sono tutte nell\'ultravioletto.' : ''}`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        si.addEventListener('input', go); sf.addEventListener('input', go);
+        go();
+      })();
+
+    });
+  </script>
+
+  <!-- Demo sezioni 7, 8 e 9 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 7.2 — Bob e Alice: niente segnali superluminali =====
+      (function () {
+        const svg = document.getElementById('ba-svg');
+        if (!svg) return;
+        const bZ = document.getElementById('ba-z'), bX = document.getElementById('ba-x');
+        const b50 = document.getElementById('ba-50'), bTel = document.getElementById('ba-tel'), bRst = document.getElementById('ba-rst');
+        const out = document.getElementById('ba-out');
+        let base = 'z', coppie = [], confronto = false;
+        function setBase(b) {
+          base = b;
+          bZ.classList.toggle('active', b === 'z');
+          bX.classList.toggle('active', b === 'x');
+          draw();
+        }
+        bZ.addEventListener('click', () => setBase('z'));
+        bX.addEventListener('click', () => setBase('x'));
+        b50.addEventListener('click', () => {
+          for (let i = 0; i < 50; i++) {
+            const aRes = Math.random() < 0.5 ? 1 : 0;          // esito di Alice: SEMPRE casuale
+            const bRes = base === 'z' ? 1 - aRes : (Math.random() < 0.5 ? 1 : 0);  // stessa base: anticorrelati
+            coppie.push({ base, aRes, bRes });
+          }
+          confronto = false;
+          draw();
+        });
+        bTel.addEventListener('click', () => { confronto = true; draw(); });
+        bRst.addEventListener('click', () => { coppie = []; confronto = false; draw(); });
+        function draw() {
+          const N = coppie.length;
+          const bUp = coppie.filter(c => c.bRes === 1).length;
+          let h = '';
+          // laboratori
+          h += `<rect x="20" y="40" width="180" height="150" rx="10" fill="color-mix(in srgb, var(--accent) 8%, transparent)" stroke="var(--accent)" stroke-width="1.5"/>`;
+          h += `<text x="110" y="62" text-anchor="middle" class="lbl">Alice</text>`;
+          h += `<text x="110" y="80" text-anchor="middle" class="lbl-s">misura ${base === 'z' ? '↕ ("0")' : '↔ ("1")'}</text>`;
+          h += `<rect x="440" y="40" width="180" height="150" rx="10" fill="color-mix(in srgb, var(--gold) 10%, transparent)" stroke="var(--gold)" stroke-width="1.5"/>`;
+          h += `<text x="530" y="62" text-anchor="middle" class="lbl">Bob</text>`;
+          h += `<text x="530" y="80" text-anchor="middle" class="lbl-s">misura sempre ↕</text>`;
+          // sorgente
+          h += `<circle cx="320" cy="115" r="14" fill="var(--magenta)"/>`;
+          h += `<text x="320" y="146" text-anchor="middle" class="lbl-s">sorgente di coppie entangled</text>`;
+          h += `<line x1="306" y1="115" x2="204" y2="115" stroke="var(--magenta)" stroke-width="1.6" stroke-dasharray="4 4"/>`;
+          h += `<line x1="334" y1="115" x2="436" y2="115" stroke="var(--magenta)" stroke-width="1.6" stroke-dasharray="4 4"/>`;
+          // ultimi esiti (max 18 simboli)
+          const ult = coppie.slice(-18);
+          ult.forEach((c, i) => {
+            const x = 34 + i * 9;
+            h += `<text x="${x}" y="${118}" style="font-size:11px;" fill="var(--accent)">${c.aRes ? '↑' : '↓'}</text>`;
+            h += `<text x="${454 + i * 9}" y="${118}" style="font-size:11px;" fill="var(--gold)">${c.bRes ? '↑' : '↓'}</text>`;
+          });
+          // istogramma di Bob
+          if (N) {
+            const p = bUp / N;
+            h += `<text x="454" y="150" class="lbl-s">Bob vede: ↑ ${(p * 100).toFixed(0)}% · ↓ ${((1 - p) * 100).toFixed(0)}%</text>`;
+            h += `<rect x="454" y="158" width="150" height="12" rx="3" fill="var(--surface-2)" stroke="var(--border)"/>`;
+            h += `<rect x="454" y="158" width="${(150 * p).toFixed(1)}" height="12" rx="3" fill="var(--gold)"/>`;
+          }
+          // confronto
+          if (confronto && N) {
+            h += `<path d="M 110 200 Q 320 262 530 200" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-dasharray="8 6"/>`;
+            h += `<text x="320" y="252" text-anchor="middle" class="lbl-s" fill="#22c55e">canale classico (velocità ≤ c): confronto dei taccuini</text>`;
+            const zC = coppie.filter(c => c.base === 'z');
+            const zAnti = zC.filter(c => c.aRes !== c.bRes).length;
+            const xC = coppie.filter(c => c.base === 'x');
+            const xAnti = xC.filter(c => c.aRes !== c.bRes).length;
+            h += `<text x="320" y="292" text-anchor="middle" class="lbl">coppie con stessa base: anticorrelate al ${zC.length ? Math.round(zAnti / zC.length * 100) : '—'}% · basi diverse: ${xC.length ? Math.round(xAnti / xC.length * 100) + '%' : '—'} (caso)</text>`;
+            h += `<text x="320" y="314" text-anchor="middle" class="em">la correlazione esiste — ma si vede solo ADESSO, dopo il confronto classico</text>`;
+          } else {
+            h += `<text x="320" y="292" text-anchor="middle" class="lbl-s">${N ? 'Bob, da solo, vede solo rumore 50/50: il "messaggio" di Alice non arriva.' : 'genera qualche coppia per cominciare'}</text>`;
+          }
+          svg.innerHTML = h;
+          out.innerHTML = N === 0
+            ? `Scegli che cosa "vuole dire" Alice (la base di misura), genera le coppie e guarda che cosa riceve Bob.`
+            : confronto
+              ? `Ecco la magia — e il suo limite: <strong>solo confrontando</strong> i dati emerge l'anticorrelazione perfetta nelle coppie misurate sulla stessa base. Ma il confronto ha richiesto un canale classico: nessuna informazione ha mai viaggiato più veloce di $c$.`
+              : `${N} coppie generate. Guarda il pannello di Bob: <strong>50/50 casuale</strong>, qualunque base scelga Alice — da questa sequenza Bob non può estrarre <em>nessun</em> bit. Prova a cambiare base e generarne altre: non cambia niente. Poi premi «📞».`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        draw();
+      })();
+
+      // ===== 8.2 — Il laser =====
+      (function () {
+        const svg = document.getElementById('ls-svg');
+        if (!svg) return;
+        const sp = document.getElementById('ls-p'), vp = document.getElementById('ls-p-val');
+        const out = document.getElementById('ls-out');
+        const ROWS = 4, COLS = 8, X0 = 90, Y0 = 60, DX = 62, DY = 56;
+        const XM1 = 48, XM2 = 592;                    // specchi
+        let atoms = [], photons = [], beam = 0, beamShow = [], last = performance.now(), acc = 0;
+        for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) atoms.push({ x: X0 + c * DX, y: Y0 + r * DY, exc: false });
+        function frame(now) {
+          const dt = Math.min(50, now - last) / 1000; last = now;
+          const P = +sp.value / 100;
+          // pompaggio
+          atoms.forEach(a => {
+            if (!a.exc && Math.random() < P * 2.2 * dt) a.exc = true;
+            else if (a.exc && Math.random() < 0.12 * dt) {
+              // emissione spontanea: metà persa di lato, metà entra in cavità
+              a.exc = false;
+              if (Math.random() < 0.5 && photons.length < 60) photons.push({ x: a.x, y: a.y, dir: Math.random() < 0.5 ? 1 : -1 });
+            }
+          });
+          // fotoni in cavità
+          const speed = 300 * dt;
+          photons.forEach(f => { f.x += f.dir * speed; });
+          const nuovi = [];
+          photons.forEach(f => {
+            atoms.forEach(a => {
+              if (a.exc && Math.abs(a.y - f.y) < 10 && Math.abs(a.x - f.x) < speed) {
+                a.exc = false;
+                if (photons.length + nuovi.length < 60) nuovi.push({ x: a.x, y: a.y, dir: f.dir });
+              }
+            });
+          });
+          photons = photons.concat(nuovi);
+          // specchi
+          photons = photons.filter(f => {
+            if (f.x <= XM1) { f.dir = 1; f.x = XM1 + 1; return true; }
+            if (f.x >= XM2) {
+              if (Math.random() < 0.25) { beam++; beamShow.push({ x: XM2 + 4, y: f.y, life: 0.5 }); return false; }
+              f.dir = -1; f.x = XM2 - 1; return true;
+            }
+            return true;
+          });
+          beamShow.forEach(b => { b.x += 260 * dt; b.life -= dt; });
+          beamShow = beamShow.filter(b => b.life > 0 && b.x < 648);
+          acc += dt;
+          if (acc > 0.1) { acc = 0; draw(P); }
+          requestAnimationFrame(frame);
+        }
+        function draw(P) {
+          vp.textContent = Math.round(P * 100);
+          const nExc = atoms.filter(a => a.exc).length;
+          let h = '';
+          // specchi
+          h += `<rect x="${XM1 - 8}" y="36" width="8" height="220" rx="3" fill="var(--text-soft)"/>`;
+          h += `<rect x="${XM2}" y="36" width="8" height="220" rx="3" fill="var(--text-soft)" opacity="0.45"/>`;
+          h += `<text x="${XM1 - 4}" y="276" text-anchor="middle" class="lbl-s">specchio</text>`;
+          h += `<text x="${XM2 + 4}" y="276" text-anchor="middle" class="lbl-s">semi-riflettente</text>`;
+          // atomi
+          atoms.forEach(a => {
+            if (a.exc) h += `<circle cx="${a.x}" cy="${a.y}" r="11" fill="var(--gold)" opacity="0.25"/>`;
+            h += `<circle cx="${a.x}" cy="${a.y}" r="6" fill="${a.exc ? 'var(--gold)' : 'var(--muted)'}"/>`;
+          });
+          // fotoni
+          photons.forEach(f => { h += `<circle cx="${f.x.toFixed(0)}" cy="${f.y}" r="3" fill="#ef4444"/>`; });
+          beamShow.forEach(b => { h += `<circle cx="${b.x.toFixed(0)}" cy="${b.y}" r="3" fill="#ef4444" opacity="${(b.life * 2).toFixed(2)}"/>`; });
+          h += `<text x="320" y="304" text-anchor="middle" class="lbl-s">atomi eccitati: ${nExc}/${atoms.length} — fotoni in cavità: ${photons.length} — fotoni emessi nel fascio: ${beam}</text>`;
+          h += `<text x="320" y="24" text-anchor="middle" class="em">${nExc > atoms.length / 2 ? 'INVERSIONE DI POPOLAZIONE: la valanga stimolata può vincere' : 'sotto inversione: pompa di più!'}</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = P < 0.15
+            ? `Pompa quasi spenta: pochi atomi eccitati, i rari fotoni spontanei muoiono senza clonarsi. Alza la potenza.`
+            : nExc > atoms.length / 2
+              ? `Pompa al ${Math.round(P * 100)}%: più di metà degli atomi è nel livello metastabile — ogni fotone che attraversa la cavità <strong>si clona</strong> a valanga (emissione stimolata), e dallo specchio semi-riflettente esce il fascio: fotoni <strong>tutti identici</strong>, per frequenza, fase e direzione.`
+              : `Pompa al ${Math.round(P * 100)}%: eccitazione in corso, ma senza inversione l'assorbimento vince ancora sull'emissione stimolata.`;
+        }
+        sp.addEventListener('input', () => { vp.textContent = sp.value; });
+        draw(+sp.value / 100);
+        requestAnimationFrame(frame);
+      })();
+
+      // ===== 9.1 — Fermioni vs bosoni =====
+      (function () {
+        const svg = document.getElementById('qs-svg');
+        if (!svg) return;
+        const bF = document.getElementById('qs-f'), bB = document.getElementById('qs-b');
+        const sn = document.getElementById('qs-n'), vn = document.getElementById('qs-n-val');
+        const st = document.getElementById('qs-t'), vt = document.getElementById('qs-t-val');
+        const out = document.getElementById('qs-out');
+        let mode = 'f';
+        const NL = 8, Y0 = 285, DY = 32, X0 = 150, W = 340;
+        function setMode(m) {
+          mode = m;
+          bF.classList.toggle('active', m === 'f');
+          bB.classList.toggle('active', m === 'b');
+          go();
+        }
+        bF.addEventListener('click', () => setMode('f'));
+        bB.addEventListener('click', () => setMode('b'));
+        function go() {
+          const N = +sn.value; vn.textContent = N;
+          const T = +st.value / 100; vt.textContent = Math.round(T * 100);
+          // assegna le particelle ai livelli
+          const occup = [];                        // per livello: array di particelle
+          for (let l = 0; l < NL; l++) occup.push([]);
+          if (mode === 'f') {
+            let placed = 0;
+            for (let l = 0; l < NL && placed < N; l++) {
+              for (let s = 0; s < 2 && placed < N; s++) {      // 2 stati di spin per livello
+                let lev = l;
+                if (T > 0 && Math.random() < T * 0.5 && l >= Math.floor(N / 2) - 2) lev = Math.min(NL - 1, l + 1 + Math.floor(Math.random() * 2));
+                occup[lev].push({ spin: s });
+                placed++;
+              }
+            }
+          } else {
+            for (let i = 0; i < N; i++) {
+              let lev = 0;
+              if (T > 0 && Math.random() < T * 0.45) lev = 1 + Math.floor(Math.random() * 2.4);
+              occup[Math.min(lev, NL - 1)].push({ spin: 0 });
+            }
+          }
+          let h = '';
+          for (let l = 0; l < NL; l++) {
+            const y = Y0 - l * DY;
+            h += `<line x1="${X0}" y1="${y}" x2="${X0 + W}" y2="${y}" stroke="var(--muted)" stroke-width="1.6"/>`;
+            h += `<text x="${X0 - 10}" y="${y + 4}" text-anchor="end" class="lbl-s">E${l + 1}</text>`;
+            occup[l].forEach((p, i) => {
+              const x = X0 + 24 + i * 22;
+              if (mode === 'f') {
+                h += `<circle cx="${x}" cy="${y - 11}" r="8" fill="${p.spin ? '#3b82f6' : '#ef4444'}"/>`;
+                h += `<text x="${x}" y="${y - 6.5}" text-anchor="middle" style="font-size:11px; font-weight:700;" fill="#fff">${p.spin ? '↓' : '↑'}</text>`;
+              } else {
+                h += `<circle cx="${x}" cy="${y - 11}" r="8" fill="#22c55e"/>`;
+              }
+            });
+          }
+          if (mode === 'f') {
+            const fermi = Math.ceil(N / 2);
+            const yF = Y0 - (fermi - 1) * DY - 16;
+            h += `<line x1="${X0 - 4}" y1="${yF}" x2="${X0 + W + 4}" y2="${yF}" stroke="var(--gold)" stroke-width="1.6" stroke-dasharray="7 5"/>`;
+            h += `<text x="${X0 + W + 10}" y="${yF + 4}" class="lbl-s" fill="var(--gold)">livello di Fermi</text>`;
+          } else {
+            h += `<text x="${X0 + W + 10}" y="${Y0 - 8}" class="lbl-s" fill="#22c55e">condensato!</text>`;
+          }
+          svg.innerHTML = h;
+          out.innerHTML = mode === 'f'
+            ? `<strong>${N} fermioni</strong>: massimo 2 per livello (uno ↑ e uno ↓ — è lo spin a raddoppiare i posti). Anche a temperatura zero la "pila" arriva in alto: gli ultimi arrivati hanno energia enorme <em>solo</em> perché i posti bassi erano occupati. È questa energia forzata a reggere le nane bianche.`
+            : `<strong>${N} bosoni</strong>: nessun divieto — e a bassa agitazione termica si ammassano <em>tutti</em> nel fondamentale: il condensato di Bose-Einstein. Alza l'agitazione: qualcuno sale, ma la maggioranza resta giù, in perfetto stile "comunista".`;
+        }
+        sn.addEventListener('input', go); st.addEventListener('input', go);
+        go();
+      })();
+
+    });
+  </script>
+
+  <!-- Demo sezione 10 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 10.1 — Path integral: fascio di cammini =====
+      (function () {
+        const sn = document.getElementById('pi-n');
+        if (!sn) return;
+        const vn = document.getElementById('pi-n-val');
+        const svg = document.getElementById('pi-svg');
+        const out = document.getElementById('pi-out');
+        const AX = 60, AY = 150, BX = 580, BY = 150;
+        // cammini pre-generati (deterministici al variare dello slider: seed fisso via LCG)
+        function lcg(seed) { let s = seed; return () => (s = (s * 48271) % 2147483647) / 2147483647; }
+        const PATHS = [];
+        for (let k = 0; k < 60; k++) {
+          const rnd = lcg(k * 7919 + 13);
+          const wig = 8 + rnd() * 110;             // ampiezza delle deviazioni
+          const pts = [[AX, AY]];
+          const NSEG = 9;
+          for (let i = 1; i < NSEG; i++) {
+            const x = AX + (BX - AX) * i / NSEG;
+            const y = AY + (rnd() * 2 - 1) * wig * Math.sin(Math.PI * i / NSEG);
+            pts.push([x, y]);
+          }
+          pts.push([BX, BY]);
+          PATHS.push({ pts, dev: wig });
+        }
+        PATHS.sort((a, b) => a.dev - b.dev);
+        function go() {
+          const n = +sn.value; vn.textContent = n;
+          let h = '';
+          for (let k = n - 1; k >= 1; k--) {
+            const P = PATHS[k];
+            const o = Math.max(0.12, 0.6 - P.dev / 250);
+            let d = '';
+            P.pts.forEach((p, i) => {
+              if (i === 0) d = `M ${p[0]} ${p[1]} `;
+              else {
+                const prev = P.pts[i - 1];
+                d += `Q ${((prev[0] + p[0]) / 2).toFixed(0)} ${prev[1].toFixed(0)} ${p[0].toFixed(0)} ${p[1].toFixed(0)} `;
+              }
+            });
+            h += `<path d="${d}" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity="${o.toFixed(2)}"/>`;
+          }
+          // cammino classico (dritto), sempre presente ed evidenziato
+          h += `<line x1="${AX}" y1="${AY}" x2="${BX}" y2="${BY}" stroke="var(--gold)" stroke-width="3.4"/>`;
+          h += `<circle cx="${AX}" cy="${AY}" r="8" fill="var(--red)"/>`;
+          h += `<text x="${AX}" y="${AY + 28}" text-anchor="middle" class="lbl-s">sorgente</text>`;
+          h += `<circle cx="${BX}" cy="${BY}" r="8" fill="#22c55e"/>`;
+          h += `<text x="${BX}" y="${BY + 28}" text-anchor="middle" class="lbl-s">rivelatore</text>`;
+          h += `<text x="320" y="34" text-anchor="middle" class="em">in oro: il cammino classico (azione stazionaria) — gli altri si cancellano quasi del tutto tra loro</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = n === 1
+            ? `Un solo cammino: quello dritto, classico. Ma la meccanica quantistica non si accontenta...`
+            : `${n} cammini (di infiniti): l'elettrone li percorre <strong>tutti</strong>, ciascuno con peso $e^{iS/\\hbar}$. I cammini "strampalati" (azione lontana dal minimo) hanno fasi che ruotano in fretta e si <strong>cancellano a coppie</strong>; quelli vicini al cammino dorato hanno fasi allineate e si <strong>rinforzano</strong>. Per $S \\gg \\hbar$ sopravvive solo la strada di Newton.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sn.addEventListener('input', go); go();
+      })();
+
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Nella notazione di Dirac, la probabilità che un sistema nello stato $|\\psi\\rangle$ venga trovato nello stato $|\\varphi\\rangle$ è:',
+        options: ['$\\langle\\varphi|\\psi\\rangle$', '$|\\langle\\varphi|\\psi\\rangle|^2$', '$|\\psi\\rangle + |\\varphi\\rangle$', 'sempre il 50%'],
+        correct: 1, explain: 'L\'ampiezza ⟨φ|ψ⟩ è un numero complesso; la probabilità di transizione è il suo modulo quadro — la regola di Born in notazione di Dirac.' },
+      { type: 'mc', diff: 'easy', text: 'La delta di Dirac non può essere una funzione perché:',
+        options: ['è troppo grande per essere disegnata', 'una funzione nulla ovunque tranne che in un punto ha integrale zero, mentre la delta deve avere integrale 1', 'Dirac non la definì mai', 'le funzioni non possono valere zero'],
+        correct: 1, explain: 'Un punto solo non ha "larghezza": non contribuisce all\'area. La delta è un funzionale (distribuzione): ha senso solo sotto integrale, dove "campiona" le funzioni: ∫δ(x)f(x)dx = f(0).' },
+      { type: 'mc', diff: 'easy', text: 'Nel decadimento β, un nucleo di carbonio-14:',
+        options: ['emette un nucleo di elio e diventa berillio', 'si spezza in due frammenti uguali', 'trasforma un neutrone in protone, emette un elettrone (e un antineutrino) e diventa azoto-14', 'emette solo un fotone γ senza cambiare identità'],
+        correct: 2, explain: 'β = trasmutazione: n → p + e⁻ + ν̄. Il numero atomico sale di 1: il carbonio diventa azoto. È la base della datazione al radiocarbonio.' },
+      { type: 'mc', diff: 'medium', text: 'L\'emivita $T_{1/2}$ di un nucleo radioattivo è:',
+        options: ['il tempo dopo il quale ogni singolo nucleo decade di sicuro', 'il tempo in cui la popolazione di nuclei si dimezza (in media)', 'metà della vita della sorgente', 'il tempo del primo decadimento'],
+        correct: 1, explain: 'Il singolo nucleo decade in un momento imprevedibile (sorteggio quantistico); la statistica però è ferrea: N(t) = N₀·2^(−t/T½), a ogni emivita metà popolazione.' },
+      { type: 'mc', diff: 'medium', text: 'La regola d\'oro di Fermi dice che la probabilità di transizione per unità di tempo dipende:',
+        options: ['solo dall\'energia iniziale', 'dall\'ampiezza $|\\langle f|\\hat{H}\'|i\\rangle|^2$ e dalla densità degli stati finali disponibili', 'solo dalla temperatura', 'dal numero di misure effettuate'],
+        correct: 1, explain: 'Due fattori: quanto i due stati "si parlano" tramite l\'interazione, e quante porte d\'uscita ci sono alla giusta energia. Governa righe spettrali, decadimenti e laser.' },
+      { type: 'mc', diff: 'medium', text: 'L\'equazione di Dirac (1928) è importante perché:',
+        options: ['eliminò la necessità della funzione d\'onda', 'rese la meccanica quantistica compatibile con la relatività ristretta, facendo emergere lo spin e predicendo l\'antimateria', 'dimostrò che gli elettroni sono onde classiche', 'introdusse la gravità nella meccanica quantistica'],
+        correct: 1, explain: 'Chiedendo un\'equazione quantistica relativistica, Dirac ottenne "gratis" lo spin ħ/2 e le soluzioni a energia negativa che anticiparono il positrone (Anderson, 1932).' },
+      { type: 'mc', diff: 'medium', text: 'Perché l\'entanglement NON permette di comunicare più veloci della luce?',
+        options: ['perché le particelle entangled non sono mai davvero correlate', 'perché ciascun osservatore, da solo, vede esiti perfettamente casuali: la correlazione appare solo confrontando i dati su un canale classico', 'perché l\'entanglement svanisce a grandi distanze', 'in realtà lo permette, ma è vietato dalla legge'],
+        correct: 1, explain: 'Alice non sceglie i propri esiti (escono a caso) e Bob vede sempre 50/50: nessun bit viaggia. L\'informazione emerge solo dal confronto, che va alla velocità della luce o meno.' },
+      { type: 'mc', diff: 'hard', text: 'Per far funzionare un laser è indispensabile:',
+        options: ['raffreddare il materiale allo zero assoluto', 'l\'inversione di popolazione: più atomi nello stato eccitato (metastabile) che in quello di arrivo', 'usare soltanto gas nobili', 'eliminare del tutto l\'emissione spontanea'],
+        correct: 1, explain: 'Senza inversione, l\'assorbimento vince sull\'emissione stimolata e la valanga non parte. Si ottiene pompando energia, tipicamente con lo schema a tre livelli (rubino di Maiman).' },
+      { type: 'mc', diff: 'hard', text: 'Il principio di esclusione di Pauli vale:',
+        options: ['per tutte le particelle', 'per i bosoni, come i fotoni', 'per i fermioni, come gli elettroni: mai due nello stesso stato — ed è il motivo per cui esiste la tavola periodica', 'solo dentro i nuclei'],
+        correct: 2, explain: 'I fermioni (spin semintero) sono "individualisti": riempiono i livelli uno stato alla volta — da qui configurazioni elettroniche e chimica. I bosoni invece si ammassano volentieri (laser, condensati).' },
+      { type: 'open', diff: 'hard', text: 'Il Modello Standard: quali sono le due grandi famiglie di particelle e i loro ruoli? Elenca le quattro interazioni fondamentali con i rispettivi mediatori, segnalando quale resta problematica.',
+        keywords: ['fermion', 'boson', 'materia', 'mediat', 'fotone', 'gluon', 'forte', 'debole', 'W', 'Z', 'gravit', 'Pauli', 'quark', 'lepton'], requiredMatches: 5,
+        explain: 'FERMIONI (rispettano Pauli): quark e leptoni, i mattoni della materia. BOSONI: i mediatori delle forze. Elettromagnetica → fotone; forte → gluoni (lega i quark, e come residuo il nucleo); debole → W± e Z (decadimenti β); gravità → gravitone IPOTETICO, mai osservato: la gravità non è ancora inclusa nel Modello Standard, e una teoria quantistica della gravità è il grande problema aperto.' }
+    ];
+  </script>
+
+</body>
+
+</html>
