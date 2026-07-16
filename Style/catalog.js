@@ -24,7 +24,10 @@ window.SITE_CATALOG = {
     label: 'Matematica con elementi di Informatica',
     icon: '📐',
     years: [
-      { folder: 'Matematica_1', year: 1, title: 'Primo anno',   lessons: [] },
+      { folder: 'Matematica_1', year: 1, title: 'Primo anno',   lessons: [
+        { file: '1_Matematica.html', title: 'La Matematica', desc: 'Che cos\'è la matematica: l\'etimologia e i Pitagorici, la matematica come linguaggio, si scopre o si inventa, STUDIARE vs FARE, gli assiomi e la libertà, a che cosa serve — e un tema al posto del quiz' },
+        { file: '2_Logica.html', title: 'La logica', desc: 'Le strategie di dimostrazione e i sistemi formali, gli insiemi e le loro operazioni con diagrammi interattivi, le partizioni, tavole di verità da completare e leggi di De Morgan, relazioni e funzioni (iniettive, suriettive, biiettive), Russell, Bourbaki e Gödel, la logica fuzzy' },
+      ] },
       { folder: 'Matematica_2', year: 2, title: 'Secondo anno', lessons: [] },
       { folder: 'Matematica_3', year: 3, title: 'Terzo anno',   lessons: [] },
       { folder: 'Matematica_4', year: 4, title: 'Quarto anno',  lessons: [] },

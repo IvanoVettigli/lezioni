@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 2 — La logica</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* card dei simboli nuovi */
+    .sym-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin: 0.9rem 0; }
+    .sym-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem 0.7rem; text-align: center; }
+    .sym-card .sym { font-size: 1.6rem; font-weight: 800; color: var(--accent); display: block; }
+    .sym-card .nome { font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; }
+    .sym-card .significa { font-size: 0.86rem; display: block; margin-top: 0.2rem; }
+    /* tavole di verità */
+    .tv-table { border-collapse: collapse; margin: 0.6rem auto; }
+    .tv-table th, .tv-table td { border: 1px solid var(--border); padding: 0.4rem 1rem; text-align: center; font-weight: 600; }
+    .tv-table th { background: var(--surface-2); }
+    .tv-cell { cursor: pointer; user-select: none; min-width: 3.2rem; background: color-mix(in srgb, var(--accent) 7%, transparent); }
+    .tv-cell:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+    .tv-ok { background: color-mix(in srgb, #22c55e 25%, transparent) !important; }
+    .tv-no { background: color-mix(in srgb, #ef4444 28%, transparent) !important; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Primo anno · Lezione 2</div>
+    <h1>La logica</h1>
+    <p>Le regole del ragionamento: insiemi, proposizioni e relazioni — gli attrezzi con cui la matematica parla di qualsiasi cosa</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Primo anno</a>
+    <span class="sep">/</span> La logica
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Nella prima lezione abbiamo detto che la matematica è un linguaggio e un gioco di
+      regole scelte. Oggi apriamo la cassetta degli attrezzi e tiriamo fuori i pezzi fondamentali: la
+      <strong>logica</strong>, gli <strong>insiemi</strong>, le <strong>proposizioni</strong> e le
+      <strong>relazioni</strong>. Sembrano quattro argomenti: sono quattro facce dello stesso superpotere — parlare
+      con precisione di <em>qualunque cosa</em>.
+    </div>
+
+    <!-- 1 — CHE COS'È LA LOGICA -->
+    <section id="sec1">
+      <h2>1. Che cos'è la logica</h2>
+
+      <div class="warning">
+        <strong>Disambiguazione, prima di tutto.</strong> Nel linguaggio di tutti i giorni "logico" significa
+        "sensato", "di buon senso" («è logico che se piove mi bagno»). In matematica no: la <strong>logica</strong> è
+        una cosa molto <strong>specifica e precisa</strong> — è la disciplina che studia le <strong>regole del
+        ragionamento</strong> stesse: quando, da certe premesse, una conclusione segue <em>davvero</em>, e quando
+        invece ci stiamo raccontando una storia.
+      </div>
+
+      <p>Per certi versi la logica è la parte più <strong>"profonda"</strong> della matematica: non studia i numeri
+        o le figure, studia il <em>modo in cui si ragiona</em> su numeri, figure e tutto il resto. Le teorie
+        matematiche hanno infatti una struttura ben precisa, che si chiama <strong>logico-deduttiva</strong>:</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 210" aria-label="La struttura logico-deduttiva: dagli assiomi, tramite le regole di deduzione, si arriva ai teoremi">
+        <rect x="30" y="60" width="160" height="80" rx="12" fill="color-mix(in srgb, var(--accent) 14%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="110" y="95" text-anchor="middle" class="lbl">ASSIOMI</text>
+        <text x="110" y="116" text-anchor="middle" class="lbl-s">punti di partenza</text>
+        <text x="110" y="130" text-anchor="middle" class="lbl-s">assunti come veri</text>
+        <line x1="196" y1="100" x2="256" y2="100" stroke="var(--text-soft)" stroke-width="2.5"/>
+        <polygon points="264,100 252,94 252,106" fill="var(--text-soft)"/>
+        <rect x="270" y="60" width="170" height="80" rx="12" fill="color-mix(in srgb, var(--gold) 14%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+        <text x="355" y="90" text-anchor="middle" class="lbl">REGOLE DI</text>
+        <text x="355" y="108" text-anchor="middle" class="lbl">DEDUZIONE</text>
+        <text x="355" y="128" text-anchor="middle" class="lbl-s">passi leciti, uno alla volta</text>
+        <line x1="446" y1="100" x2="506" y2="100" stroke="var(--text-soft)" stroke-width="2.5"/>
+        <polygon points="514,100 502,94 502,106" fill="var(--text-soft)"/>
+        <rect x="520" y="60" width="100" height="80" rx="12" fill="color-mix(in srgb, #22c55e 16%, transparent)" stroke="#22c55e" stroke-width="2"/>
+        <text x="570" y="95" text-anchor="middle" class="lbl">TEOREMI</text>
+        <text x="570" y="116" text-anchor="middle" class="lbl-s">nuove verità</text>
+        <text x="325" y="180" text-anchor="middle" class="lbl-s">il percorso dagli assiomi a un teorema si chiama DIMOSTRAZIONE</text>
+      </svg></div>
+
+      <p>Si parte da <strong>assiomi</strong> — pensate agli assiomi della geometria di Euclide: «per due punti passa
+        una e una sola retta» — che assumiamo come veri, come le regole di un gioco. Poi ci sono <strong>regole
+        precise</strong> per derivare, dalle cose vere, <em>altre</em> cose vere. Se seguiamo le regole senza
+        strappi, il risultato a cui arriviamo è <strong>matematicamente vero</strong>: il processo si chiama
+        <strong>dimostrazione</strong>, e il risultato si chiama <strong>teorema</strong>.</p>
+
+      <div class="rule">
+        <strong>Una dimostrazione è più preziosa di un diamante.</strong> Un risultato scientifico può essere
+        rivisto, una misura migliorata, una teoria fisica sostituita da una più profonda. Un <strong>teorema
+        dimostrato, no</strong>: il teorema di Pitagora è vero oggi esattamente come 2500 anni fa, e sarà vero tra
+        un milione di anni. Una dimostrazione matematica è <strong>per sempre</strong>. (Il diamante, invece, con
+        abbastanza pressione e temperatura torna grafite.)
+      </div>
+    </section>
+
+    <!-- 2 — DIMOSTRARE NON È PROVARE -->
+    <section id="sec2">
+      <h2>2. Dimostrare non significa "fare qualche prova"</h2>
+
+      <p>Attenzione all'errore più naturale del mondo: <em>«l'ho verificato su dieci esempi, quindi è
+        vero»</em>. No: dieci esempi, un milione di esempi, un miliardo di esempi <strong>non sono una
+        dimostrazione</strong>. La storia della matematica è piena di lezioni memorabili su questo punto:</p>
+
+      <ul>
+        <li><strong>I numeri di Fermat.</strong> Fermat osservò che i numeri della forma $F_n = 2^{2^n} + 1$ erano
+          primi: $F_0 = 3$, $F_1 = 5$, $F_2 = 17$, $F_3 = 257$, $F_4 = 65\,537$ — cinque su cinque! Congetturò che lo
+          fossero <em>tutti</em>. Eulero controllò il successivo: $F_5 = 4\,294\,967\,297 = 641 \times 6\,700\,417$.
+          Non primo. Cinque conferme, poi il crollo — e a oggi, di numeri di Fermat primi oltre $F_4$, non ne è mai
+          stato trovato nemmeno uno.</li>
+        <li><strong>La congettura di Pólya.</strong> Un'affermazione sui numeri interi verificata, a mano e poi al
+          calcolatore, per <strong>centinaia di milioni</strong> di casi consecutivi... e falsa: il primo
+          controesempio spunta vicino a $906\,150\,000$. Se "tanti esempi" bastassero, questa sarebbe stata la
+          congettura più dimostrata della storia.</li>
+        <li><strong>La congettura di Eulero</strong> (una generalizzazione dell'ultimo teorema di Fermat) resistette
+          per quasi <strong>due secoli</strong>, finché nel 1966 un calcolatore trovò:
+          $$27^5 + 84^5 + 110^5 + 133^5 = 144^5.$$
+          Un solo controesempio, e due secoli di fiducia in frantumi.</li>
+      </ul>
+
+      <div class="definition">
+        <strong>Morale.</strong> Gli esempi possono <em>suggerire</em> che qualcosa sia vero (i matematici la
+        chiamano <em>congettura</em>) e un solo <strong>controesempio</strong> basta a demolirla. Ma per promuovere
+        una congettura a <strong>teorema</strong> serve una <strong>dimostrazione</strong>: un ragionamento che
+        copra <em>tutti</em> i casi possibili — anche quelli che nessun computer potrà mai controllare.
+      </div>
+
+      <p>E come si fa a coprire <em>infiniti</em> casi con un ragionamento finito? I matematici, in millenni di
+        mestiere, hanno messo a punto un repertorio di <strong>strategie di dimostrazione</strong>. Le incontrerete
+        tutte, negli anni; ecco il catalogo, per riconoscerle quando arrivano:</p>
+
+      <ul>
+        <li><strong>Dimostrazione diretta</strong> — la via maestra: si parte dalle ipotesi e, un passo lecito dopo
+          l'altro, si arriva alla tesi. (La dimostrazione di Pitagora qui sotto è di questo tipo.)</li>
+        <li><strong>Dimostrazione per assurdo</strong> — la via del giallista: si suppone che la tesi sia
+          <em>falsa</em> e si mostra che ne segue una contraddizione insostenibile; quindi la tesi doveva essere
+          vera. (È la strategia che useremo tra un attimo per $\sqrt{2}$.)</li>
+        <li><strong>Contronominale</strong> — invece di dimostrare «se $A$ allora $B$», si dimostra l'equivalente
+          «se <em>non</em> $B$ allora <em>non</em> $A$»: a volte è molto più comodo. (Esempio: «se $n^2$ è pari
+          allora $n$ è pari» si dimostra meglio come «se $n$ è dispari, $n^2$ è dispari».)</li>
+        <li><strong>Per casi</strong> — si divide il problema in un numero finito di casi che coprono tutte le
+          possibilità (una <em>partizione</em>! — la incontreremo tra poco) e si sistema ciascun caso: «o $n$ è
+          pari, o è dispari: se è pari... se è dispari...».</li>
+        <li><strong>Per induzione</strong> — la scala infinita: si dimostra che la proprietà vale per il primo
+          gradino, e che <em>se</em> vale per un gradino <em>allora</em> vale per il successivo. Risultato: vale per
+          tutti gli infiniti gradini. (Le dedicheremo il giusto spazio più avanti: è la regina delle dimostrazioni
+          sui numeri naturali.)</li>
+        <li><strong>Controesempio</strong> — la strategia per <em>demolire</em>: per dimostrare che un'affermazione
+          universale è falsa basta esibire un caso che la viola. È ciò che fece Eulero con $F_5$.</li>
+      </ul>
+
+      <p>Vediamone una all'opera su un esempio vero — uno che conoscete già dalla lezione 1: l'irrazionalità di
+        $\sqrt{2}$, lo scandalo dei Pitagorici. La strategia è la <strong>dimostrazione per assurdo</strong>:
+        supponiamo che sia falsa, e mostriamo che ne segue un disastro.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Dimostrazione — $\sqrt{2}$ non è una frazione</span></div>
+        <p>Vogliamo dimostrare: non esistono numeri interi $a$ e $b$ tali che $\left(\dfrac{a}{b}\right)^2 = 2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">📐 Mostra la dimostrazione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Per assurdo</strong>, supponiamo che $\sqrt{2} = \dfrac{a}{b}$, con
+            la frazione già <em>ridotta ai minimi termini</em> ($a$ e $b$ senza divisori comuni).</p>
+          <p><span class="step-num">2</span>Elevando al quadrato: $2 = \dfrac{a^2}{b^2}$, cioè $a^2 = 2\,b^2$. Quindi
+            $a^2$ è pari — e allora anche $a$ è pari (il quadrato di un dispari è dispari). Scriviamo $a = 2k$.</p>
+          <p><span class="step-num">3</span>Sostituendo: $4k^2 = 2b^2$, cioè $b^2 = 2k^2$. Ma allora anche $b^2$ è
+            pari, e quindi anche $b$ è pari!</p>
+          <p><span class="step-num">4</span><strong>Assurdo:</strong> $a$ e $b$ sono entrambi pari, ma li avevamo
+            presi senza divisori comuni. La supposizione iniziale era insostenibile: $\sqrt{2}$ non è una frazione. ∎</p>
+          <div class="result-box"><span class="result-label">Nota il potere</span><span class="result-value">Quattro righe, e abbiamo escluso <em>tutte</em> le infinite frazioni possibili, in un colpo solo e per sempre. Questo nessun computer può farlo provando.</span></div>
+        </div>
+      </div>
+
+      <p>E già che ci siamo, sistemiamo un conto in sospeso con la lezione 1: lì avete <em>verificato</em> il
+        teorema di Pitagora muovendo gli slider (tanti esempi!) — ma ora sappiamo che le verifiche non bastano.
+        Ecco una vera dimostrazione, tra le più eleganti mai inventate:</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Dimostrazione — il teorema di Pitagora</span></div>
+        <p>Vogliamo dimostrare che in ogni triangolo rettangolo di cateti $a$, $b$ e ipotenusa $c$ vale
+          $a^2 + b^2 = c^2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">📐 Mostra la dimostrazione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Prendo un quadrato di lato $a + b$ e ci sistemo dentro <strong>quattro
+            copie</strong> del triangolo, con le ipotenuse rivolte verso l'interno: al centro resta un buco quadrato
+            di lato $c$. Area totale: $4$ triangoli $+ c^2$.</p>
+          <p><span class="step-num">2</span>Ora, <em>nello stesso quadrato</em>, risistemo i quattro triangoli
+            accoppiandoli in due rettangoli $a \times b$ negli angoli: stavolta i buchi rimasti sono <strong>due
+            quadrati</strong>, uno di lato $a$ e uno di lato $b$. Area totale: $4$ triangoli $+ a^2 + b^2$.</p>
+          <p><span class="step-num">3</span>Il quadrato grande è lo stesso e i quattro triangoli sono gli stessi:
+            quindi i buchi devono avere la stessa area totale: $c^2 = a^2 + b^2$. ∎</p>
+          <div class="result-box"><span class="result-label">Nota</span><span class="result-value">Nessun numero specifico, nessuna misura: solo lati $a$, $b$, $c$ qualsiasi. Per questo vale per <em>tutti</em> i triangoli rettangoli in un colpo solo — anche quelli che nessuno disegnerà mai.</span></div>
+        </div>
+      </div>
+
+      <p>Usiamo questi esempi — Pitagora, $\sqrt 2$ — perché, in teoria, di matematica ne avete già studiati otto
+        anni e ne avrete sentito parlare. Ma tenete a mente il punto della lezione: la logica <strong>non riguarda
+        necessariamente numeri o forme geometriche</strong>. Le regole del ragionamento funzionano su qualunque
+        argomento. E per convincervene...</p>
+    </section>
+
+    <!-- 3 — SISTEMI FORMALI -->
+    <section id="sec3">
+      <h2>3. I sistemi formali (ovvero: gli scacchi sono matematica)</h2>
+
+      <div class="definition">
+        Un <strong>sistema formale</strong> è fatto di: dei <strong>simboli</strong> di partenza; delle
+        <strong>configurazioni iniziali</strong> (gli assiomi); e delle <strong>regole</strong> che dicono quali
+        mosse sono lecite per passare da una configurazione all'altra. Tutto ciò che è raggiungibile applicando le
+        regole a partire dagli assiomi è un "teorema" del sistema.
+      </div>
+
+      <p>Detta così sembra astrattissima. E invece la conoscete benissimo: gli <strong>scacchi</strong> sono un
+        sistema formale. I simboli sono i pezzi; l'assioma è la posizione iniziale della scacchiera; le regole di
+        deduzione sono le mosse legali (l'alfiere in diagonale, il cavallo a L...). Una posizione è "raggiungibile"
+        — è un teorema del sistema — se esiste una partita legale che ci arriva. Notate una cosa importante: le
+        regole degli scacchi non parlano <em>di nulla</em> — non ci sono numeri, non ci sono triangoli, non c'è il
+        mondo. Eppure il gioco è profondissimo. La <strong>dama</strong> è un altro sistema formale; il
+        <strong>Go</strong>, con due sole "regole" essenziali, genera una complessità che ha resistito ai computer
+        per decenni più degli scacchi.</p>
+
+      <div class="curiosita">
+        <strong>Un invito, non un compito.</strong> Se volete <em>allenare</em> la testa a fare matematica senza
+        aprire un libro di matematica: <strong>giocate</strong>. Scacchi, dama, Go — una partita è un piccolo
+        teorema che provate a dimostrare contro qualcuno che cerca di dimostrare il contrario. Calcolo, strategia,
+        "se faccio questo, lui fa quello, allora io..." — è <em>esattamente</em> il ragionamento deduttivo, ed è
+        molto divertente giocare con la matematica. (E no: non serve essere "portati". Serve solo perdere le prime
+        venti partite di buon umore.)
+      </div>
+    </section>
+
+    <!-- 4 — GLI INSIEMI -->
+    <section id="sec4">
+      <h2>4. Gli insiemi: le scatole della matematica</h2>
+
+      <p>Il primo attrezzo formale che impariamo a usare è anche il più semplice: la scatola.</p>
+
+      <div class="definition">
+        Un <strong>insieme</strong> è una collezione di oggetti, detti <strong>elementi</strong>, definita da una
+        regola di appartenenza <strong>oggettiva</strong>: per ogni oggetto dev'essere possibile stabilire, senza
+        ambiguità e senza opinioni, se appartiene o no all'insieme.
+      </div>
+
+      <p>La parola chiave è <strong>oggettiva</strong>. «L'insieme dei Pokémon <em>carini</em>» non è un insieme:
+        carino per chi? Pikachu sì e Jigglypuff no? Finiremmo a litigare — la regola è un'opinione. «L'insieme dei
+        Pokémon <em>di tipo Elettro</em>» invece va benissimo: per ogni Pokémon la risposta è scritta, ufficiale e
+        uguale per tutti. Stessa cosa per «l'insieme dei compagni simpatici» (no) contro «l'insieme dei compagni
+        nati di lunedì» (sì).</p>
+
+      <p>Un insieme si può rappresentare in due modi: <strong>per elencazione</strong>, scrivendo gli elementi tra
+        parentesi graffe — $E = \{$Pikachu, Magnemite, Zapdos, Emolga$\}$ — oppure con un <strong>diagramma di
+        Eulero-Venn</strong>: una linea chiusa che racchiude gli elementi. Dentro = appartiene, fuori = non
+        appartiene:</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 260" aria-label="Diagramma di Eulero-Venn dell'insieme E dei Pokémon di tipo Elettro, con Charizard fuori dall'insieme">
+        <ellipse cx="270" cy="130" rx="190" ry="105" fill="color-mix(in srgb, var(--gold) 10%, transparent)" stroke="var(--gold)" stroke-width="2.5"/>
+        <text x="270" y="42" text-anchor="middle" class="lbl" fill="var(--gold)">E = Pokémon di tipo Elettro ⚡</text>
+        <circle cx="185" cy="110" r="4" fill="var(--text)"/><text x="185" y="132" text-anchor="middle" class="lbl-s">Pikachu</text>
+        <circle cx="300" cy="95" r="4" fill="var(--text)"/><text x="300" y="117" text-anchor="middle" class="lbl-s">Magnemite</text>
+        <circle cx="230" cy="175" r="4" fill="var(--text)"/><text x="230" y="197" text-anchor="middle" class="lbl-s">Zapdos</text>
+        <circle cx="340" cy="165" r="4" fill="var(--text)"/><text x="340" y="187" text-anchor="middle" class="lbl-s">Emolga</text>
+        <circle cx="555" cy="120" r="4" fill="var(--text)"/><text x="555" y="142" text-anchor="middle" class="lbl-s">Charizard</text>
+        <text x="185" y="86" text-anchor="middle" class="em">Pikachu ∈ E</text>
+        <text x="555" y="90" text-anchor="middle" class="em">Charizard ∉ E</text>
+        <text x="320" y="248" text-anchor="middle" class="lbl-s">la linea chiusa È la regola: dentro chi appartiene, fuori chi non appartiene — |E| = 4</text>
+      </svg></div>
+
+      <p>Ecco i primi simboli del nostro nuovo alfabeto:</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">{ }</span><span class="nome">parentesi graffe</span><span class="significa">racchiudono gli elementi di un insieme</span></div>
+        <div class="sym-card"><span class="sym">∈</span><span class="nome">"appartiene a"</span><span class="significa">Pikachu ∈ E: Pikachu sta nell'insieme E</span></div>
+        <div class="sym-card"><span class="sym">∉</span><span class="nome">"non appartiene a"</span><span class="significa">Charizard ∉ E: non sta in E</span></div>
+        <div class="sym-card"><span class="sym">|A|</span><span class="nome">cardinalità</span><span class="significa">il numero di elementi di A (la sua "dimensione")</span></div>
+        <div class="sym-card"><span class="sym">∅</span><span class="nome">insieme vuoto</span><span class="significa">l'insieme senza nessun elemento: |∅| = 0</span></div>
+      </div>
+
+      <p>Il numero di elementi può essere <strong>finito</strong> (i giorni della settimana: $|G| = 7$) o
+        <strong>infinito</strong> (i numeri pari); per ora, salvo avviso contrario, lavoreremo con insiemi
+        <strong>finiti</strong>. La <strong>cardinalità</strong> (o dimensione) di un insieme è semplicemente
+        quanti elementi contiene: per il nostro $E$ di Pokémon elettrici, $|E| = 4$. Attenzione a un dettaglio da
+        veri matematici: un insieme non conta le ripetizioni e non ha un ordine — $\{1, 2, 3\}$ e $\{3, 1, 2\}$
+        sono lo <em>stesso</em> insieme.</p>
+    </section>
+
+    <!-- 5 — FACOLTATIVA: LINNEO -->
+    <section id="sec5" class="optional">
+      <h2>5. La classificazione di Linneo</h2>
+      <p>(Approfondimento facoltativo — dove si scopre che gli insiemi hanno riorganizzato la natura intera, un
+        secolo prima che qualcuno scrivesse la parola "insieme" in un libro di matematica.)</p>
+
+      <p><strong>Carl Nilsson Linnaeus</strong> — italianizzato in <strong>Linneo</strong> — era un naturalista e
+        medico svedese del Settecento (1707-1778) con un'ossessione magnifica: mettere ordine nel catalogo del
+        vivente. Ai suoi tempi le piante e gli animali avevano nomi lunghi, descrittivi e diversi da paese a paese:
+        impossibile capirsi. Nel suo <em>Systema Naturae</em> Linneo propose di organizzare <strong>tutti gli esseri
+        viventi in insiemi annidati</strong>: i <strong>regni</strong>, divisi in classi, divise in ordini, poi
+        famiglie, generi e specie — una gerarchia di scatole dentro le scatole, dove ogni essere vivente trova
+        esattamente il suo posto.</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 230" aria-label="La classificazione di Linneo come insiemi annidati: dal regno alla specie, con l'esempio dell'essere umano">
+        <ellipse cx="320" cy="115" rx="300" ry="100" fill="color-mix(in srgb, var(--accent) 7%, transparent)" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="320" y="34" text-anchor="middle" class="lbl-s">REGNO: Animalia</text>
+        <ellipse cx="330" cy="122" rx="235" ry="76" fill="color-mix(in srgb, var(--accent) 8%, transparent)" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="330" y="64" text-anchor="middle" class="lbl-s">CLASSE: Mammalia (i mammiferi)</text>
+        <ellipse cx="340" cy="130" rx="172" ry="54" fill="color-mix(in srgb, var(--gold) 10%, transparent)" stroke="var(--gold)" stroke-width="1.5"/>
+        <text x="340" y="94" text-anchor="middle" class="lbl-s">ORDINE: Primates</text>
+        <ellipse cx="350" cy="138" rx="115" ry="35" fill="color-mix(in srgb, var(--gold) 12%, transparent)" stroke="var(--gold)" stroke-width="1.5"/>
+        <text x="350" y="122" text-anchor="middle" class="lbl-s">GENERE: Homo</text>
+        <ellipse cx="358" cy="147" rx="62" ry="17" fill="color-mix(in srgb, var(--magenta) 16%, transparent)" stroke="var(--magenta)" stroke-width="1.5"/>
+        <text x="358" y="152" text-anchor="middle" class="lbl-s">Homo sapiens — noi 👋</text>
+      </svg></div>
+
+      <p>A Linneo dobbiamo anche la <strong>nomenclatura binomiale</strong>: ogni specie ha un nome di due parole,
+        genere + specie, in latino — <em>Homo sapiens</em>, <em>Canis lupus</em>, <em>Pinus pinea</em> — uguale per
+        gli scienziati di tutto il mondo. Perché è importante per noi? Perché è l'esempio perfetto di che cosa si
+        guadagna a pensare per <strong>insiemi e sottoinsiemi</strong>: un linguaggio universale, la fine delle
+        ambiguità, e una struttura su cui costruire (un secolo dopo, Darwin ci leggerà dentro la parentela evolutiva:
+        gli insiemi di Linneo erano alberi genealogici sotto mentite spoglie). Classificare è la prima forma di
+        capire.</p>
+    </section>
+
+    <!-- 6 — SOTTOINSIEMI E OPERAZIONI -->
+    <section id="sec6">
+      <h2>6. Sottoinsiemi e operazioni tra insiemi</h2>
+
+      <p>Linneo ci ha già mostrato l'idea: un insieme può stare <em>dentro</em> un altro.</p>
+
+      <div class="definition">
+        $B$ è un <strong>sottoinsieme</strong> di $A$ se <strong>ogni</strong> elemento di $B$ appartiene anche ad
+        $A$. I mammiferi sono un sottoinsieme degli animali; i Pokémon elettrici sono un sottoinsieme dei Pokémon.
+      </div>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">⊆</span><span class="nome">"è sottoinsieme di"</span><span class="significa">B ⊆ A: tutto ciò che sta in B sta anche in A</span></div>
+      </div>
+
+      <p>E ora le <strong>operazioni</strong>: come con i numeri si fanno somme e sottrazioni, con gli insiemi si
+        fanno unioni, intersezioni e differenze. Tre simboli nuovi:</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">∪</span><span class="nome">unione</span><span class="significa">A ∪ B: gli elementi che stanno in A <strong>oppure</strong> in B (o in entrambi)</span></div>
+        <div class="sym-card"><span class="sym">∩</span><span class="nome">intersezione</span><span class="significa">A ∩ B: gli elementi che stanno <strong>sia</strong> in A <strong>sia</strong> in B</span></div>
+        <div class="sym-card"><span class="sym">∖</span><span class="nome">differenza</span><span class="significa">A ∖ B: gli elementi di A che <strong>non</strong> stanno in B</span></div>
+      </div>
+
+      <p>Il modo migliore per capirle è vederle. Prendiamo due insiemi concreti: $A$ = Pokémon di tipo
+        <strong>Elettro</strong> e $B$ = Pokémon di tipo <strong>Volante</strong> (e sì, qualcuno — come Zapdos ed
+        Emolga — è di entrambi i tipi: è proprio lì che succedono le cose interessanti). Scegli un'operazione e
+        guarda quale zona si accende:</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="vn-u">A ∪ B (unione)</button>
+          <button class="btn" id="vn-i">A ∩ B (intersezione)</button>
+          <button class="btn" id="vn-ab">A ∖ B (differenza)</button>
+          <button class="btn" id="vn-ba">B ∖ A (differenza)</button>
+        </div>
+      </div>
+      <div class="ckt"><svg id="vn-svg" viewBox="0 0 640 320" aria-label="Diagramma di Eulero-Venn interattivo con le operazioni di unione, intersezione e differenza tra due insiemi di Pokémon"></svg></div>
+      <p class="eq-out" id="vn-out"></p>
+
+      <div class="note">
+        <strong>Occhio all'intersezione.</strong> È l'operazione che il linguaggio comune sbaglia più spesso: "gli
+        studenti che fanno sport <em>e</em> musica" in italiano è ambiguo (tutti quelli che fanno l'una o l'altra
+        cosa? solo chi le fa entrambe?), ma $S \cap M$ non lo è mai. Ecco un altro caso in cui il matematichese
+        paga: una scrittura, un solo significato.
+      </div>
+    </section>
+
+    <!-- 7 — PARTIZIONI -->
+    <section id="sec7">
+      <h2>7. Le partizioni: dividere senza avanzi e senza doppioni</h2>
+
+      <p>C'è un modo speciale — e importantissimo — di spezzare un insieme in pezzi: si chiama
+        <strong>partizione</strong>. L'idea intuitiva: dividere gli elementi in gruppi in modo che <strong>ognuno
+        finisca in un gruppo, e in uno solo</strong>. Come dividere la classe in squadre per il torneo: nessuno
+        escluso, nessuno in due squadre.</p>
+
+      <div class="definition">
+        Una <strong>partizione</strong> di un insieme $A$ è una divisione in gruppi (sottoinsiemi) che rispetta
+        <strong>tre regole</strong>:
+        <ol style="margin:0.4rem 0 0;">
+          <li>nessun gruppo è <strong>vuoto</strong>;</li>
+          <li>i gruppi non si <strong>sovrappongono</strong>: due gruppi diversi non hanno elementi in comune;</li>
+          <li>i gruppi, messi insieme, <strong>ricoprono tutto</strong> $A$: nessun elemento resta fuori.</li>
+        </ol>
+      </div>
+
+      <p>Mettiamola alla prova su un insieme concreto: i 12 studenti di una classe (immaginaria e molto sportiva).
+        Prova i tre criteri di divisione e guarda quali regole reggono e quali crollano:</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="pa-st">per stagione di nascita</button>
+          <button class="btn" id="pa-sp">per sport praticato</button>
+          <button class="btn" id="pa-mo">chi ha il motorino</button>
+        </div>
+      </div>
+      <div class="ckt"><svg id="pa-svg" viewBox="0 0 640 356" aria-label="Verifica interattiva delle partizioni: dividere dodici studenti secondo criteri diversi e controllare le tre proprietà"></svg></div>
+      <p class="eq-out" id="pa-out"></p>
+
+      <div class="note">
+        <strong>Perché le partizioni contano così tanto?</strong> Perché dividere bene è il primo passo di quasi ogni
+        ragionamento: i casi di una dimostrazione ("o $n$ è pari, o è dispari — e in entrambi i casi..."), le
+        classifiche per gironi, perfino l'orario scolastico (ogni ora in una e una sola casella). E a fine lezione
+        scopriremo che le partizioni hanno una gemella segreta tra le <em>relazioni</em>: tenetele a mente.
+      </div>
+    </section>
+
+    <!-- 8 — PROPOSIZIONI -->
+    <section id="sec8">
+      <h2>8. Le proposizioni: frasi con la patente</h2>
+
+      <p>Dagli insiemi passiamo alle <strong>frasi</strong>. La logica non lavora con qualunque frase: lavora solo
+        con quelle a cui si può dare una patente di verità.</p>
+
+      <div class="definition">
+        Una <strong>proposizione</strong> è un enunciato che è <strong>o vero o falso</strong> — una cosa sola delle
+        due, e senza opinioni di mezzo. «Roma è la capitale d'Italia» è una proposizione (vera). «$7$ è pari» è una
+        proposizione (falsa). «Che ore sono?» non lo è (non è né vera né falsa). «Forza Napoli!» nemmeno.
+        «La pizza con l'ananas è buona» purtroppo nemmeno: come i "Pokémon carini", è un'opinione.
+      </div>
+
+      <p>C'è poi una distinzione importante. Confrontate: «$7$ è pari» e «$x$ è pari». La prima è una proposizione
+        <strong>chiusa</strong>: il suo valore di verità è deciso (falso, e amen). La seconda è una proposizione
+        <strong>aperta</strong>: contiene una <strong>variabile</strong> ($x$), e finché non le diamo un valore non
+        possiamo dire se sia vera o falsa — è vera <em>se</em> $x = 4$, falsa <em>se</em> $x = 7$. Le proposizioni
+        aperte sono "macchine da riempire": diventeranno importantissime, perché sono esattamente le regole
+        oggettive che definiscono gli insiemi («$x$ è di tipo Elettro»!).</p>
+    </section>
+
+    <!-- 9 — CONNETTIVI E TAVOLE DI VERITÀ -->
+    <section id="sec9">
+      <h2>9. I connettivi logici e le tavole di verità</h2>
+
+      <p>Con le proposizioni si costruiscono proposizioni più grandi, incollandole con i <strong>connettivi
+        logici</strong> — le congiunzioni del matematichese. Eccoli, con i loro simboli (quattro card nuove per la
+        collezione):</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">¬</span><span class="nome">NOT — "non"</span><span class="significa">¬A è vera quando A è falsa (e viceversa)</span></div>
+        <div class="sym-card"><span class="sym">∧</span><span class="nome">AND — "e"</span><span class="significa">A ∧ B è vera solo se A e B sono <strong>entrambe</strong> vere</span></div>
+        <div class="sym-card"><span class="sym">∨</span><span class="nome">OR — "oppure"</span><span class="significa">A ∨ B è vera se <strong>almeno una</strong> tra A e B è vera</span></div>
+        <div class="sym-card"><span class="sym">⊕</span><span class="nome">XOR — "o... o..."</span><span class="significa">A ⊕ B è vera se è vera <strong>una sola</strong> delle due</span></div>
+        <div class="sym-card"><span class="sym">↑</span><span class="nome">NAND — "non entrambe"</span><span class="significa">A ↑ B è falsa <strong>solo</strong> se A e B sono entrambe vere: è ¬(A ∧ B)</span></div>
+      </div>
+
+      <p>Per definire un connettivo senza ambiguità si usa la sua <strong>tavola di verità</strong>: una tabella che
+        elenca <em>tutti</em> i casi possibili (V = vero, F = falso) e per ciascuno dice il risultato. Eccole per i
+        nostri quattro connettivi:</p>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.6rem;">
+        <div><table class="tv-table"><thead><tr><th>A</th><th>¬A</th></tr></thead><tbody>
+          <tr><td>V</td><td>F</td></tr><tr><td>F</td><td>V</td></tr></tbody></table></div>
+        <div><table class="tv-table"><thead><tr><th>A</th><th>B</th><th>A ∧ B</th></tr></thead><tbody>
+          <tr><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>F</td></tr>
+          <tr><td>F</td><td>V</td><td>F</td></tr><tr><td>F</td><td>F</td><td>F</td></tr></tbody></table></div>
+        <div><table class="tv-table"><thead><tr><th>A</th><th>B</th><th>A ∨ B</th></tr></thead><tbody>
+          <tr><td>V</td><td>V</td><td>V</td></tr><tr><td>V</td><td>F</td><td>V</td></tr>
+          <tr><td>F</td><td>V</td><td>V</td></tr><tr><td>F</td><td>F</td><td>F</td></tr></tbody></table></div>
+        <div><table class="tv-table"><thead><tr><th>A</th><th>B</th><th>A ⊕ B</th></tr></thead><tbody>
+          <tr><td>V</td><td>V</td><td>F</td></tr><tr><td>V</td><td>F</td><td>V</td></tr>
+          <tr><td>F</td><td>V</td><td>V</td></tr><tr><td>F</td><td>F</td><td>F</td></tr></tbody></table></div>
+        <div><table class="tv-table"><thead><tr><th>A</th><th>B</th><th>A ↑ B</th></tr></thead><tbody>
+          <tr><td>V</td><td>V</td><td>F</td></tr><tr><td>V</td><td>F</td><td>V</td></tr>
+          <tr><td>F</td><td>V</td><td>V</td></tr><tr><td>F</td><td>F</td><td>V</td></tr></tbody></table></div>
+      </div>
+
+      <div class="curiosita">
+        <strong>Il NAND, operaio instancabile.</strong> Sembra il connettivo meno naturale del gruppo ("non
+        entrambe"?), e invece è il più importante di tutti per una ragione sorprendente: con il <strong>solo
+        NAND</strong>, combinato con se stesso, si possono costruire <em>tutti</em> gli altri connettivi — il NOT
+        ($A \uparrow A$), l'AND, l'OR, tutto. Per questo i circuiti dei computer sono fatti in gran parte di
+        <strong>porte NAND</strong>: miliardi di copie dello stesso mattoncino logico. Quando arriveremo
+        all'informatica, ve lo ritroverete davanti.
+      </div>
+
+      <div class="note">
+        <strong>Il dettaglio a cui fare attenzione: OR vs XOR.</strong> In italiano "o" è ambiguo. «Al bar prendo il
+        cornetto o il maritozzo» — e se li prendo entrambi, ho mentito? Il matematichese ha due parole diverse:
+        $\vee$ (va bene anche entrambi: il "e/o" dei moduli) e $\oplus$ (o l'uno o l'altro, <strong>non</strong>
+        entrambi: come il menu a prezzo fisso, «dolce ⊕ caffè»). Notate anche che $A \cap B$ e $A \wedge B$ si
+        somigliano non per caso: «sta in $A \cap B$» significa «sta in $A$» $\wedge$ «sta in $B$» — insiemi e
+        proposizioni sono due facce dello stesso disegno.
+      </div>
+
+      <h3>9.1 — Ora tocca a voi: completate le tavole</h3>
+      <p>Cliccate sulle celle colorate per scegliere V o F (ogni clic cambia il valore), poi premete
+        <em>controlla</em>. Prima riga di ogni tabella: pensate a che cosa deve succedere, non tirate a caso —
+        <em>fare</em> matematica, ricordate?</p>
+
+      <div class="ckt" style="padding: 1rem;">
+        <p class="lbl" style="margin: 0 0 0.2rem; font-family: inherit;"><strong>Esercizio 1:</strong> $A \wedge (\neg B)$ — "A e non-B"</p>
+        <table class="tv-table" id="tv1">
+          <thead><tr><th>A</th><th>B</th><th>¬B</th><th>A ∧ (¬B)</th></tr></thead>
+          <tbody>
+            <tr><td>V</td><td>V</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td></tr>
+            <tr><td>V</td><td>F</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td></tr>
+            <tr><td>F</td><td>V</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td></tr>
+            <tr><td>F</td><td>F</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td></tr>
+          </tbody>
+        </table>
+        <div class="controls" style="justify-content:center;"><button class="btn tv-check" data-table="tv1">✔ controlla</button></div>
+        <p class="eq-out" id="tv1-out" style="text-align:center;"></p>
+      </div>
+
+      <div class="ckt" style="padding: 1rem;">
+        <p class="lbl" style="margin: 0 0 0.2rem; font-family: inherit;"><strong>Esercizio 2:</strong> $(A \vee B) \wedge \neg(A \wedge B)$ — vi ricorda qualcuno?</p>
+        <table class="tv-table" id="tv2">
+          <thead><tr><th>A</th><th>B</th><th>A ∨ B</th><th>A ∧ B</th><th>¬(A ∧ B)</th><th>tutto insieme</th></tr></thead>
+          <tbody>
+            <tr><td>V</td><td>V</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td></tr>
+            <tr><td>V</td><td>F</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td></tr>
+            <tr><td>F</td><td>V</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td></tr>
+            <tr><td>F</td><td>F</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td></tr>
+          </tbody>
+        </table>
+        <div class="controls" style="justify-content:center;"><button class="btn tv-check" data-table="tv2">✔ controlla</button></div>
+        <p class="eq-out" id="tv2-out" style="text-align:center;"></p>
+      </div>
+
+      <h3>9.2 — Tautologie, contraddizioni e contingenze</h3>
+      <p>Compilando le tavole avrete notato che la colonna finale può avere caratteri molto diversi. I logici
+        distinguono tre specie di proposizioni composte:</p>
+
+      <div class="definition">
+        <ul style="margin:0.2rem 0 0;">
+          <li>una <strong>tautologia</strong> è una proposizione <strong>sempre vera</strong>, qualunque valore
+            abbiano i suoi ingredienti: la sua colonna è tutta V. Esempio: $A \vee \neg A$ («domani piove o non
+            piove» — verità garantita, informazione zero);</li>
+          <li>una <strong>contraddizione</strong> è <strong>sempre falsa</strong>: colonna tutta F. Esempio:
+            $A \wedge \neg A$ («piove e non piove»);</li>
+          <li>una <strong>contingenza</strong> è tutto il resto: vera per alcuni valori e falsa per altri — la sua
+            verità <em>dipende</em> dagli ingredienti. Quasi tutte le proposizioni interessanti sono qui.</li>
+        </ul>
+      </div>
+
+      <p>Le tautologie sono le "leggi" della logica: valgono <em>sempre</em>, e quindi si possono usare per
+        trasformare le proposizioni senza cambiarne il significato. Le più celebri sono le <strong>leggi di De
+        Morgan</strong>, che spiegano come il NOT "si distribuisce" cambiando i connettivi:</p>
+
+      <div class="formula-box">
+        $$\neg(A \wedge B) \;\Leftrightarrow\; \neg A \vee \neg B \qquad\qquad \neg(A \vee B) \;\Leftrightarrow\; \neg A \wedge \neg B$$
+        <p style="margin:0.4rem 0 0; font-size:0.9rem;">a parole: «non è vero che (giovane <strong>e</strong> ricco)» = «o non giovane, <strong>o</strong> non ricco»; «non è vero che (promosso <strong>o</strong> rimandato)» = «non promosso <strong>e</strong> non rimandato». Il ¬ entra nella parentesi e scambia ∧ con ∨</p>
+      </div>
+
+      <div class="ckt" style="padding: 1rem;">
+        <p class="lbl" style="margin: 0 0 0.2rem; font-family: inherit;"><strong>Esercizio 3:</strong> dimostra la <strong>prima</strong> legge di De Morgan, $\neg(A \wedge B) \Leftrightarrow \neg A \vee \neg B$ — se le colonne ¬(A ∧ B) e ¬A ∨ ¬B coincidono riga per riga, l'equivalenza è dimostrata (per tutti i casi possibili!)</p>
+        <table class="tv-table" id="tv3">
+          <thead><tr><th>A</th><th>B</th><th>A ∧ B</th><th>¬(A ∧ B)</th><th>¬A</th><th>¬B</th><th>¬A ∨ ¬B</th></tr></thead>
+          <tbody>
+            <tr><td>V</td><td>V</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td></tr>
+            <tr><td>V</td><td>F</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td></tr>
+            <tr><td>F</td><td>V</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="V">?</td></tr>
+            <tr><td>F</td><td>F</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td></tr>
+          </tbody>
+        </table>
+        <div class="controls" style="justify-content:center;"><button class="btn tv-check" data-table="tv3">✔ controlla</button></div>
+        <p class="eq-out" id="tv3-out" style="text-align:center;"></p>
+      </div>
+
+      <div class="ckt" style="padding: 1rem;">
+        <p class="lbl" style="margin: 0 0 0.2rem; font-family: inherit;"><strong>Esercizio 4:</strong> ora la <strong>seconda</strong> legge, $\neg(A \vee B) \Leftrightarrow \neg A \wedge \neg B$ — stesso metodo: se le colonne ¬(A ∨ B) e ¬A ∧ ¬B coincidono ovunque, è dimostrata anche lei</p>
+        <table class="tv-table" id="tv4">
+          <thead><tr><th>A</th><th>B</th><th>A ∨ B</th><th>¬(A ∨ B)</th><th>¬A</th><th>¬B</th><th>¬A ∧ ¬B</th></tr></thead>
+          <tbody>
+            <tr><td>V</td><td>V</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td></tr>
+            <tr><td>V</td><td>F</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td></tr>
+            <tr><td>F</td><td>V</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="F">?</td></tr>
+            <tr><td>F</td><td>F</td><td class="tv-cell" data-ans="F">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td><td class="tv-cell" data-ans="V">?</td></tr>
+          </tbody>
+        </table>
+        <div class="controls" style="justify-content:center;"><button class="btn tv-check" data-table="tv4">✔ controlla</button></div>
+        <p class="eq-out" id="tv4-out" style="text-align:center;"></p>
+      </div>
+    </section>
+
+    <!-- 10 — RELAZIONI -->
+    <section id="sec10">
+      <h2>10. Le relazioni: le frecce tra le cose</h2>
+
+      <p>Ultimo attrezzo, il più potente. Finora abbiamo messo gli oggetti nelle scatole (insiemi) e dato patenti di
+        verità alle frasi (proposizioni). Una <strong>relazione</strong> fa il passo successivo:
+        <strong>collega</strong> gli oggetti tra loro. «Ada è amica di Bruno», «$3$ è minore di $7$», «Milano è a
+        nord di Napoli»: ogni volta che una frase lega <em>due</em> elementi, lì c'è una relazione. Possiamo
+        immaginarla come un insieme di <strong>frecce</strong>: una freccia da $a$ a $b$ per ogni coppia in
+        relazione. Si scrive $a\,\mathcal{R}\,b$, "a è in relazione con b". Prima di andare avanti, due simboli
+        nuovi che useremo per parlare delle relazioni:</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">⇒</span><span class="nome">"implica"</span><span class="significa">se la parte sinistra è vera, allora è vera anche la destra</span></div>
+        <div class="sym-card"><span class="sym">⇔</span><span class="nome">"se e solo se"</span><span class="significa">le due parti sono vere o false <strong>insieme</strong>: ognuna implica l'altra</span></div>
+      </div>
+
+      <p>Le relazioni si distinguono per le <strong>proprietà</strong> che hanno. Per ciascuna diamo prima l'idea
+        intuitiva, poi la scrittura formale (leggetela ad alta voce: è la stessa frase, in matematichese):</p>
+
+      <ul>
+        <li><strong>Riflessiva</strong> — <em>intuizione:</em> ogni elemento è in relazione con se stesso («è alto
+          quanto»: ognuno è alto quanto se stesso). <em>Formale:</em> $a\,\mathcal{R}\,a$ per ogni $a$.</li>
+        <li><strong>Simmetrica</strong> — <em>intuizione:</em> se vale in un verso, vale anche nell'altro («è
+          compagno di banco di»: se io lo sono di te, tu lo sei di me). <em>Formale:</em>
+          $a\,\mathcal{R}\,b \Rightarrow b\,\mathcal{R}\,a$.</li>
+        <li><strong>Antisimmetrica</strong> — <em>intuizione:</em> due elementi <em>diversi</em> non possono essere
+          in relazione in entrambi i versi («è più alto o uguale a»: se io ≥ te e tu ≥ me, siamo alti uguali).
+          <em>Formale:</em> $a\,\mathcal{R}\,b$ e $b\,\mathcal{R}\,a$ $\Rightarrow a = b$.</li>
+        <li><strong>Transitiva</strong> — <em>intuizione:</em> la relazione "passa attraverso" («è più veloce di»:
+          se Ada batte Bruno e Bruno batte Carla, Ada batte Carla). <em>Formale:</em> $a\,\mathcal{R}\,b$ e
+          $b\,\mathcal{R}\,c$ $\Rightarrow a\,\mathcal{R}\,c$.</li>
+        <li><strong>Intransitiva</strong> — <em>intuizione:</em> la relazione <em>non passa mai</em> attraverso
+          («è genitore di»: se io sono genitore tuo e tu di tuo figlio, io NON sono suo genitore — sono suo
+          nonno). <em>Formale:</em> $a\,\mathcal{R}\,b$ e $b\,\mathcal{R}\,c$ $\Rightarrow$ non
+          $a\,\mathcal{R}\,c$.</li>
+      </ul>
+    </section>
+
+    <!-- 11 — EQUIVALENZA E ORDINE -->
+    <section id="sec11">
+      <h2>11. Due famiglie regali: equivalenza e ordine</h2>
+
+      <p>Tra tutte le combinazioni possibili di proprietà, due sono così importanti da avere un nome proprio.</p>
+
+      <div class="definition">
+        <strong>Relazione di equivalenza</strong> — <em>intuizione:</em> «essere uguali <em>rispetto a
+        qualcosa</em>», anche senza essere identici: avere la stessa età, essere nati lo stesso mese, tifare la
+        stessa squadra. <em>Formale:</em> una relazione <strong>riflessiva</strong>, <strong>simmetrica</strong> e
+        <strong>transitiva</strong>.
+      </div>
+
+      <div class="definition">
+        <strong>Relazione d'ordine</strong> — <em>intuizione:</em> «poter mettere in fila»: minore o uguale,
+        l'ordine alfabetico, "arriva prima di". <em>Formale:</em> una relazione <strong>riflessiva</strong>,
+        <strong>antisimmetrica</strong> e <strong>transitiva</strong>.
+      </div>
+
+      <p>E qui arriva il regalo promesso nella sezione 7. Una relazione di equivalenza <strong>divide da sola
+        l'insieme in gruppi</strong> — le <em>classi di equivalenza</em>: tutti quelli "uguali tra loro" finiscono
+        insieme, nessuno resta fuori, nessuno sta in due gruppi. Vi suona familiare? Una relazione di equivalenza
+        genera sempre una <strong>partizione</strong> (e viceversa!): "essere nati nella stessa stagione" è
+        l'equivalenza; le quattro stagioni sono la partizione. Due attrezzi, un solo meccanismo.</p>
+
+      <p>Mettiamo tutto alla prova. Scegli una relazione sull'insieme dei soliti studenti e osserva le frecce: la
+        demo controlla le proprietà una per una ed emette il verdetto:</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="re-mese">«è nato lo stesso mese di»</button>
+          <button class="btn" id="re-alto">«è più alto di»</button>
+          <button class="btn" id="re-amico">«è amico di»</button>
+          <button class="btn" id="re-figlio">«è genitore di»</button>
+        </div>
+      </div>
+      <div class="ckt"><svg id="re-svg" viewBox="0 0 640 300" aria-label="Grafo interattivo delle relazioni: frecce tra elementi e verifica delle proprietà riflessiva, simmetrica, transitiva"></svg></div>
+      <p class="eq-out" id="re-out"></p>
+    </section>
+
+    <!-- 12 — LE FUNZIONI -->
+    <section id="sec12">
+      <h2>12. Le relazioni più importanti di tutte: le funzioni</h2>
+
+      <p>C'è un tipo di relazione così importante da meritare un nome tutto suo — e cinque anni di frequentazione:
+        la <strong>funzione</strong>. L'idea intuitiva: una <strong>macchina affidabile</strong>. Metti dentro un
+        elemento, ne esce <em>esattamente uno</em>. Sempre. Il distributore di merendine: premi B4, esce <em>una</em>
+        merendina (non zero, non due). La relazione «il piatto preferito di»: ogni persona ne ha uno.</p>
+
+      <div class="definition">
+        Una <strong>funzione</strong> $f$ da un insieme $X$ (il <strong>dominio</strong>) a un insieme $Y$ (il
+        <strong>codominio</strong>) è una relazione in cui <strong>ogni</strong> elemento di $X$ è collegato a
+        <strong>uno e un solo</strong> elemento di $Y$. Nel disegno a frecce: da ogni elemento del dominio parte
+        <strong>esattamente una freccia</strong> — nessuno a secco, nessuno con due frecce. (Sulle frecce in arrivo
+        in $Y$, invece, nessun vincolo: è lì che le funzioni si differenziano.)
+      </div>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">f: X → Y</span><span class="nome">"f da X in Y"</span><span class="significa">la funzione f prende gli elementi di X e li manda in Y</span></div>
+        <div class="sym-card"><span class="sym">f(x)</span><span class="nome">si legge "f di x"</span><span class="significa">l'elemento di Y che la funzione assegna a x: l'output della macchina quando l'input è x</span></div>
+      </div>
+
+      <p>Le frecce <em>in arrivo</em> distinguono tre proprietà celebri — prima l'intuizione, poi la forma
+        precisa:</p>
+
+      <ul>
+        <li><strong>Iniettiva</strong> — <em>intuizione:</em> niente doppioni in arrivo: elementi diversi finiscono
+          su bersagli diversi. <em>Formale:</em> $x_1 \ne x_2 \Rightarrow f(x_1) \ne f(x_2)$ — ogni elemento di $Y$
+          riceve <strong>al più una</strong> freccia.</li>
+        <li><strong>Suriettiva</strong> — <em>intuizione:</em> nessun bersaglio dimenticato: tutto $Y$ viene
+          raggiunto. <em>Formale:</em> ogni elemento di $Y$ riceve <strong>almeno una</strong> freccia.</li>
+        <li><strong>Biiettiva</strong> — <em>intuizione:</em> l'accoppiamento perfetto, uno-a-uno: ogni elemento di
+          $Y$ riceve <strong>esattamente una</strong> freccia. <em>Formale:</em> iniettiva $\wedge$ suriettiva.</li>
+      </ul>
+
+      <p>Gioca con gli esempi e osserva le frecce (il verdetto è automatico):</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="fn-gen">«piatto preferito»</button>
+          <button class="btn" id="fn-inj">«numero di maglia»</button>
+          <button class="btn" id="fn-sur">«sport praticato»</button>
+          <button class="btn" id="fn-bij">«banco assegnato»</button>
+          <button class="btn" id="fn-no">«fratello di»</button>
+        </div>
+      </div>
+      <div class="ckt"><svg id="fn-svg" viewBox="0 0 640 320" aria-label="Funzioni come relazioni a frecce tra due insiemi: esempi interattivi di funzioni iniettive, suriettive, biiettive e di relazioni che non sono funzioni"></svg></div>
+      <p class="eq-out" id="fn-out"></p>
+
+      <div class="rule">
+        <strong>Il superpotere della biiezione.</strong> Se tra $X$ e $Y$ esiste una funzione biiettiva, ogni
+        elemento dell'uno è "sposato" con esattamente un elemento dell'altro: si può percorrere la freccia anche
+        <strong>all'indietro</strong> (la funzione è <em>invertibile</em>) e — soprattutto — i due insiemi hanno per
+        forza <strong>la stessa cardinalità</strong>. È così che si contano le cose in matematica: il pastore che
+        conta le pecore con i sassolini sta costruendo una biiezione. E vi anticipo un segreto dei prossimi anni:
+        con le biiezioni si riesce perfino a "contare" gli insiemi <em>infiniti</em> — con sorprese memorabili.
+      </div>
+    </section>
+
+    <!-- 13 — LA LOGICA PARLA DI TUTTO -->
+    <section id="sec13">
+      <h2>13. La logica può parlare di qualsiasi cosa</h2>
+
+      <p>Fate caso a una cosa: in questa lezione abbiamo parlato di Pokémon, stagioni, sport, motorini, amicizie e
+        genitori — quasi mai di numeri. Non è un caso: è il punto. <strong>La logica non studia le cose: studia le
+        relazioni tra le cose.</strong> E volendo, può studiare anche le relazioni tra le relazioni («la simmetria
+        è più restrittiva della riflessività?» è una domanda su relazioni... di relazioni).</p>
+
+      <div class="note">
+        <strong>Nota: che cos'è un metadiscorso.</strong> Quando un discorso parla <em>di altri discorsi</em> invece
+        che del mondo, si chiama <strong>metadiscorso</strong> (dal greco <em>metà</em>, "oltre, al di sopra"). «Il
+        gatto dorme» parla di un gatto; «la frase "il gatto dorme" ha tre parole» parla di una <em>frase</em>: è un
+        metadiscorso. La logica è la disciplina che si è guadagnata il diritto di farlo con precisione: può usare la
+        matematica per studiare la matematica stessa. Tenete a mente questa idea vertiginosa: sta per esplodere.
+      </div>
+
+      <p>Se la logica parla di tutto, verrebbe la tentazione di <strong>ricostruire tutto con la logica</strong>. Il
+        tentativo è stato fatto sul serio: <strong>Bertrand Russell</strong> — logico, matematico e anche filosofo,
+        premio Nobel per la letteratura — con Alfred Whitehead scrisse i monumentali <em>Principia Mathematica</em>,
+        il progetto di rifondare l'intera matematica partendo dalla pura logica. Il rigore era tale che la
+        dimostrazione che $1 + 1 = 2$ arriva dopo <strong>centinaia di pagine</strong> di preparazione — con
+        l'impagabile commento a margine degli autori: «la proposizione qui sopra è <em>occasionalmente
+        utile</em>».</p>
+
+      <p>Perché mai servono centinaia di pagine per $1 + 1 = 2$? Perché partendo dalla pura logica bisogna prima
+        <strong>definire i numeri</strong> — senza poter usare numeri! La soluzione (nella versione che poi è
+        diventata standard) è di una eleganza vertiginosa: si costruiscono <strong>dal nulla</strong>, letteralmente,
+        usando solo gli insiemi di questa lezione. Lo <strong>zero</strong> è definito come l'<strong>insieme
+        vuoto</strong>: $0 = \varnothing$. L'<strong>uno</strong> è <strong>l'insieme che contiene solo l'insieme
+        vuoto</strong>: $1 = \{\varnothing\}$. Il due è l'insieme che contiene i due oggetti costruiti finora:
+        $2 = \{\varnothing, \{\varnothing\}\}$. E così via: ogni numero è l'insieme dei precedenti — l'intera
+        aritmetica tirata fuori dal nulla, un pacchetto alla volta.</p>
+
+      <div class="note">
+        <strong>Ma ∅ e {∅} non sono la stessa cosa?</strong> No — ed è una differenza da capire bene, perché è il
+        gradino su cui tutto si regge. $\varnothing$ è la <strong>scatola vuota</strong>: dentro non c'è niente,
+        $|\varnothing| = 0$. $\{\varnothing\}$ è una <strong>scatola che contiene una scatola vuota</strong>:
+        dentro c'è <em>qualcosa</em> — la scatola vuota, appunto! — quindi $|\{\varnothing\}| = 1$. Chiedete a
+        chiunque abbia ricevuto un pacco regalo vuoto: il pacco c'era eccome. Il "nulla", una volta impacchettato,
+        è già un oggetto: ed è esattamente così che la matematica fabbrica l'uno partendo dallo zero.
+      </div>
+
+      <div class="curiosita">
+        <strong>Il matematico che non esisteva: Bourbaki.</strong> Il progetto di rifondare tutto ebbe anche un
+        secondo assalto, ancora più curioso. Dal 1935 un gruppo di giovani e brillanti matematici francesi si mise a
+        riscrivere <em>l'intera matematica</em> — dalla teoria degli insiemi in su, con rigore assoluto, struttura
+        dopo struttura — firmando i volumi (gli <em>Éléments de mathématique</em>) con un unico pseudonimo
+        collettivo: <strong>Nicolas Bourbaki</strong>, dal nome di un generale ottocentesco. Bourbaki, persona,
+        non è mai esistito; Bourbaki, matematico, ha scritto migliaia di pagine e plasmato lo stile della matematica
+        moderna — l'impostazione assiomatica, l'ossessione per il rigore (celebre il quasi totale divieto di
+        figure!) e perfino il lessico: il simbolo $\varnothing$ per l'insieme vuoto e i termini
+        <strong>iniettiva</strong>, <strong>suriettiva</strong> e <strong>biiettiva</strong> che avete appena
+        imparato sono invenzioni sue. Se questa lezione parte dagli insiemi per arrivare a tutto il resto... be',
+        state leggendo un'eredità di Bourbaki.
+      </div>
+    </section>
+
+    <!-- 14 — GÖDEL -->
+    <section id="sec14">
+      <h2>14. Il limite: paradossi e il teorema di Gödel</h2>
+
+      <h3>14.1 — Che cos'è un paradosso</h3>
+      <p>Prima di raccontare il colpo di scena, serve la parola chiave. Nel linguaggio comune "paradosso" è una cosa
+        strana o sorprendente; in logica è qualcosa di molto più serio.</p>
+
+      <div class="definition">
+        Un <strong>paradosso</strong> è un ragionamento che, partendo da premesse che sembrano vere e procedendo
+        con passi che sembrano leciti, arriva a una <strong>contraddizione</strong> — una proposizione della forma
+        $A \wedge \neg A$, che come sappiamo dalla sezione 9.2 è <em>sempre falsa</em>. Per la matematica un
+        paradosso non è un giochino da enigmisti: è un <strong>allarme antincendio</strong>. Se le regole del
+        sistema producono anche <em>una sola</em> contraddizione, l'intero edificio è compromesso — dalle fondamenta
+        incrinate si può "dimostrare" qualunque cosa, e i teoremi non valgono più niente. Un paradosso vero
+        costringe a tornare indietro e capire <em>quale</em> premessa apparentemente innocente va buttata.
+      </div>
+
+      <p>Il paradosso più antico del repertorio è il <strong>mentitore di Creta</strong>: il cretese Epimenide
+        afferma «tutti i cretesi mentono». Se dice il vero... allora lui, cretese, mente. Nella sua versione più
+        affilata il paradosso diventa una singola frase:</p>
+
+      <div class="definition" style="text-align:center;">
+        <p style="font-size:1.15rem; margin:0.2rem 0;"><em>«Questa frase è falsa.»</em></p>
+      </div>
+
+      <p>Provate a darle una patente di verità: se è <strong>vera</strong>, allora è vero ciò che dice — cioè che è
+        falsa. Se è <strong>falsa</strong>, allora ciò che dice non vale — cioè è vera. Oscilla per sempre: non è né
+        vera né falsa, in barba al <em>tertium non datur</em>. Il motore del guaio è
+        l'<strong>autoriferimento</strong>: una frase che parla <em>di se stessa</em> — il metadiscorso della
+        sezione 13, avvitato su se stesso.</p>
+
+      <h3>14.2 — Il barbiere di Russell</h3>
+      <p>«D'accordo — direte — ma sono giochetti di parole: la matematica mica ci casca.» Ci è cascata, eccome. E
+        a farla cascare fu proprio <strong>Russell</strong>, che nel 1902 scoprì un paradosso nel cuore della teoria
+        degli insiemi — proprio quella che avete imparato oggi. La versione da salotto, resa celebre dallo stesso
+        Russell, è il <strong>paradosso del barbiere</strong>:</p>
+
+      <div class="definition">
+        In un villaggio c'è un solo barbiere, che per regolamento <strong>rade tutti e soli gli uomini che non si
+        radono da sé</strong>. Domanda: <strong>chi fa la barba al barbiere?</strong>
+        <ul style="margin:0.4rem 0 0;">
+          <li>Se il barbiere <em>si rade da sé</em>, allora è uno che si rade da sé — e il regolamento gli
+            <strong>vieta</strong> di radersi (lui rade <em>solo</em> chi non si rade da sé).</li>
+          <li>Se <em>non</em> si rade da sé, allora è uno di quelli che non si radono da sé — e il regolamento lo
+            <strong>obbliga</strong> a radersi.</li>
+        </ul>
+        Contraddizione in entrambi i casi: quel barbiere <strong>non può esistere</strong>.
+      </div>
+
+      <p>Fin qui sembra solo un indovinello. Ma Russell aveva costruito il barbiere per spiegare al grande pubblico
+        una versione molto più velenosa: prendete <strong>l'insieme $R$ di tutti gli insiemi che non contengono se
+        stessi</strong>. (Sembra sensato: l'insieme dei Pokémon non è un Pokémon, quindi non contiene se stesso; e
+        di insiemi così ce ne sono in abbondanza.) Ora la domanda da barbiere: <strong>$R$ contiene se
+        stesso?</strong> Se sì, allora per definizione non dovrebbe stare in $R$; se no, allora soddisfa la regola e
+        dovrebbe starci. La stessa trappola — ma stavolta dentro la matematica: la definizione di insieme
+        "qualunque regola oggettiva va bene" produceva una <strong>contraddizione</strong>. Quando Russell la
+        comunicò per lettera al logico Gottlob Frege — che stava per pubblicare l'opera della vita, fondata proprio
+        su quella nozione di insieme — Frege rispose con una delle frasi più oneste della storia della scienza:
+        «l'aritmetica vacilla». (Per i <em>nostri</em> insiemi niente panico: finché le regole parlano di Pokémon e
+        compagni di classe, e non di insiemi che parlano di insiemi di se stessi, il pavimento è solido. Ma i
+        matematici dovettero riscrivere le fondamenta con molta più cautela.)</p>
+
+      <h3>14.3 — Il teorema di incompletezza</h3>
+      <p>E qui la storia prende una piega da romanzo. Nel 1931 un giovane logico austriaco, <strong>Kurt
+        Gödel</strong>, prese il motore dei paradossi — l'autoriferimento del mentitore e del barbiere — e invece di
+        usarlo per far crollare qualcosa lo trasformò in uno strumento di precisione, dimostrando — con una
+        dimostrazione impeccabile, cioè con le armi della logica stessa — che il sogno di Russell era
+        <strong>impossibile</strong>. L'idea, in versione intuitiva: Gödel trovò il modo di costruire, dentro
+        qualunque sistema formale abbastanza potente da fare l'aritmetica, una proposizione che dice di se stessa:</p>
+
+      <div class="definition" style="text-align:center;">
+        <p style="font-size:1.15rem; margin:0.2rem 0;"><em>«Questa proposizione non è dimostrabile.»</em></p>
+      </div>
+
+      <p>Fermatevi a pensarci: è il mentitore di Creta promosso a matematica — ma con una differenza geniale.
+        La frase del mentitore parlava di <em>verità</em> e produceva un paradosso; quella di Gödel parla di
+        <em>dimostrabilità</em>, e non produce nessuna contraddizione: produce una conclusione. Se il sistema
+        riuscisse a dimostrarla, dimostrerebbe una cosa falsa — sistema da buttare. Se non la dimostra... allora
+        quella proposizione è <em>vera</em>, ed è vera <strong>senza essere dimostrabile</strong>. Conclusione, nota come
+        <strong>teorema di incompletezza</strong>: in ogni sistema formale abbastanza ricco esistono verità che il
+        sistema <strong>non potrà mai dimostrare</strong>. Non per pigrizia o mancanza di ingegno: <em>per
+        principio</em>.</p>
+
+      <p>Per i matematici dell'epoca fu un <strong>colpo durissimo</strong>. Il grande progetto del primo Novecento
+        — trovare un sistema perfetto che, girando la manovella, producesse prima o poi tutte le verità matematiche
+        — era in frantumi: Russell vide vacillare l'opera di una vita, e il programma del grande David Hilbert
+        («dobbiamo sapere, sapremo!») ricevette una risposta beffarda proprio dall'interno. La matematica, lo
+        strumento della certezza assoluta, aveva dimostrato <em>da sola</em> di avere dei limiti che nessuno potrà
+        mai superare.</p>
+
+      <div class="curiosita">
+        <strong>Ma niente funerali.</strong> Attenzione all'equivoco: Gödel non dice che la matematica è sbagliata,
+        né che "tutto è relativo". I teoremi dimostrati restano veri per sempre — il diamante non si scalfisce.
+        Dice che nessuna singola gabbia di regole potrà contenere <em>tutta</em> la verità: ce ne sarà sempre una
+        appollaiata fuori dalle sbarre. Ad alcuni sembrò una sconfitta; a noi può sembrare una garanzia
+        d'occupazione: la matematica non finirà mai.
+      </div>
+
+      <h3>14.4 — Ma gli assiomi che usiamo si contraddicono tra loro?</h3>
+      <p>Gödel non si fermò qui. Si pose una domanda ancora più inquietante: supponiamo di avere un insieme di
+        assiomi — le regole fondamentali del gioco. Possiamo essere <em>sicuri</em> che queste regole non si
+        contraddicano tra loro? Cioè: seguendo un percorso di assiomi arrivo a una certa verità, ma seguendo
+        un percorso diverso arrivo a una verità diversa — e le due si contraddicono? Un sistema con questa
+        malattia nascosta sarebbe un disastro: da una contraddizione si può "dimostrare" qualunque cosa, vera o
+        falsa.</p>
+
+      <div class="definition">
+        Un insieme di assiomi si dice <strong>consistente</strong> (o <em>non contraddittorio</em>) se non
+        esiste nessuna proposizione $P$ tale che il sistema dimostri contemporaneamente $P$ e $\neg P$.
+        La <strong>consistenza</strong> è la garanzia minima di salute di un sistema formale.
+      </div>
+
+      <p>Il sogno dei matematici del primo Novecento era dimostrare, una volta per tutte, che l'aritmetica e
+        la geometria sono consistenti — che non nascondono nessuna bomba a orologeria. Ebbene, nel 1931 Gödel
+        dimostrò anche questo sogno essere <strong>irraggiungibile</strong>, con il suo
+        <strong>secondo teorema di incompletezza</strong>:</p>
+
+      <div class="rule">
+        <strong>Secondo teorema di incompletezza di Gödel.</strong> Nessun sistema formale sufficientemente
+        potente da fare l'aritmetica può <em>dimostrare la propria consistenza</em> restando all'interno del
+        sistema stesso. In altre parole: se il sistema è abbastanza ricco, non può provarsi "sano" da solo.
+      </div>
+
+      <p>La conseguenza è sconvolgente e vale la pena fermarsi a sentirla bene: <strong>non possiamo
+        dimostrare</strong> che l'aritmetica che usiamo ogni giorno non si contraddica da qualche parte.
+        Non per mancanza di ingegno — <em>per principio</em>. Potrebbe esistere, da qualche parte nella
+        selva dei numeri, un problema che facendolo girare in un modo produce una risposta vera, e girandolo
+        in un altro modo produce la risposta opposta — ugualmente vera secondo le regole. Se quel giorno
+        arrivasse, l'intera matematica andrebbe riscritta da capo.</p>
+
+      <div class="warning">
+        <strong>Attenzione: non è detto che accadrà.</strong> I matematici credono — e hanno ottimi motivi
+        per crederlo — che l'aritmetica e la geometria euclidea siano consistenti. Ma Gödel dimostrò che
+        questa convinzione, per quanto fondata, non potrà mai diventare una <em>certezza assoluta ottenuta
+        dall'interno del sistema</em>. Rimane, in fondo in fondo, un atto di fiducia — il più ragionevole
+        possibile, ma pur sempre un atto di fiducia.
+      </div>
+    </section>
+
+    <!-- 15 — LOGICA FUZZY -->
+    <section id="sec15">
+      <h2>15. E non ci siamo fermati: la logica fuzzy</h2>
+
+      <p>Il colpo di Gödel non fermò la logica — anzi, il Novecento ne inventò di nuove. Per capire la più famosa
+        bisogna prima nominare il pilastro che va a toccare. Tutta la logica che abbiamo costruito in questa lezione
+        — dalle proposizioni alle tavole di verità — poggia su un principio fissato da <strong>Aristotele</strong>
+        oltre duemila anni fa: il <strong><em>tertium non datur</em></strong>, "una terza possibilità non è data".
+        Per ogni proposizione $A$, o è vera $A$ o è vera $\neg A$: <strong>non esiste una via di mezzo</strong>
+        (avrete riconosciuto la tautologia $A \vee \neg A$ della sezione 9.2 — è proprio lui). È il principio che
+        rende le tavole di verità possibili: due valori, V e F, e basta.</p>
+
+      <p>Ma il mondo reale sembra non aver letto Aristotele. «Luca è alto»: e se Luca è alto $1{,}78$ m? Vero?
+        Falso? Un po'? E ancora peggio: un chicco di grano non è un mucchio; se aggiungo <em>un</em> chicco a
+        qualcosa che non è un mucchio, non lo faccio diventare un mucchio... eppure, chicco dopo chicco, il mucchio
+        a un certo punto c'è! (È il <em>paradosso del sorite</em>, e tormenta i filosofi dall'antica Grecia.) Il
+        problema è sempre lo stesso: il confine netto vero/falso taglia con l'accetta concetti che nel mondo
+        <strong>sfumano</strong> con gradualità.</p>
+
+      <p>La <strong>logica fuzzy</strong> (in inglese: "sfumata"), proposta da Lotfi Zadeh nel 1965, prende il toro
+        per le corna e <strong>rovescia il principio aristotelico</strong>: il terzo... è dato, eccome — anzi, ne
+        sono dati infiniti. Tra il vero ($1$) e il falso ($0$) c'è un intero <strong>continuo di gradi di
+        verità</strong>: una proposizione può essere vera al $70\%$, al $35\%$, al $99\%$. Gli insiemi diventano
+        "sfumati": si può appartenere all'insieme delle persone alte <em>un po'</em>. E il paradosso del sorite si
+        scioglie da solo: ogni chicco aggiunto alza di un soffio il grado di verità di «è un mucchio» — nessun
+        confine miracoloso da cercare, solo una rampa dolce al posto del gradino.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Altezza di Luca: <span class="val" id="fz-h-val">178</span> cm</label>
+          <input type="range" id="fz-h" min="150" max="200" step="1" value="178"></div>
+      </div>
+      <div class="ckt"><svg id="fz-svg" viewBox="0 0 640 260" aria-label="Logica fuzzy: il grado di verità della proposizione Luca è alto cresce con continuità, contro il gradino netto della logica classica"></svg></div>
+      <p class="eq-out" id="fz-out"></p>
+
+      <div class="curiosita">
+        <strong>Le sfumature lavorano per voi.</strong> Sembra filosofia? È ingegneria quotidiana: la logica fuzzy
+        pilota le <strong>lavatrici</strong> (quanto è "molto sporco" il carico?), i <strong>condizionatori</strong>
+        (quanto è "quasi caldo"?), i <strong>freni ABS</strong>, l'<strong>autofocus</strong> delle fotocamere, i
+        cuociriso che azzeccano la cottura, perfino la metropolitana automatica di Sendai, in Giappone, famosa per
+        le frenate morbide. Ogni volta che un apparecchio si comporta "con buon senso" invece che a scatti, è
+        probabile che dentro ci sia una manciata di regole fuzzy. Da Aristotele alla lavatrice: non male, per la
+        disciplina che studia le regole del ragionamento.
+      </div>
+    </section>
+
+    <!-- 16 — DIMOSTRAZIONE DI DIO (FACOLTATIVA) -->
+    <section id="sec16" class="optional">
+      <h2>16. La logica può davvero parlare di qualsiasi cosa: la dimostrazione ontologica di Gödel</h2>
+      <p>(Approfondimento facoltativo — dove si scopre che la logica, armata delle stesse regole che abbiamo
+        studiato in questa lezione, può avventurarsi persino nel territorio della teologia. Non come atto di
+        fede, ma come esercizio di pura logica.)</p>
+
+      <h3>16.1 — Perché Gödel ci provò</h3>
+      <p>Verso la fine della sua vita, Kurt Gödel — lo stesso che aveva dimostrato i limiti intrinseci della
+        matematica — si dedicò a un esercizio di logica del tutto insolito: formalizzare in modo rigoroso
+        un'antica prova filosofica dell'esistenza di Dio. Gödel non la presentò come un argomento teologico,
+        né tantomeno come dichiarazione di fede personale. La considerava un <strong>esercizio di logica
+        modale</strong>: si danno alcune definizioni, si applicano le regole del ragionamento, e si traggono
+        le conclusioni che quelle premesse implicano. Come un gioco di scacchi in cui le mosse seguono regole
+        precise — indipendentemente dal fatto che le posizioni raggiunte abbiano un significato nel "mondo
+        reale".</p>
+
+      <div class="curiosita">
+        <strong>Niente spiritualità, solo logica.</strong> La prova di Gödel non ha nulla a che fare con la
+        religione personale o con l'esperienza mistica. È un esercizio di logica formale: si parte da
+        definizioni precise, si usano le regole di deduzione che conoscete già, e si arriva a una conclusione.
+        Che poi quella conclusione «risuoni» con credenze religiose è, per la logica, irrilevante — esattamente
+        come il teorema di Pitagora non "appartiene" a nessun triangolo fisico.
+      </div>
+
+      <p>L'argomento che Gödel formalizzò ha radici antiche: risale ad Anselmo di Canterbury (XI secolo) e
+        fu rilanciato da Leibniz nel Seicento. Si chiama <strong>argomento ontologico</strong>: la parola
+        «ontologico» viene dal greco <em>ón</em>, «ente, ciò che è» — è un argomento sull'<em>essere</em>,
+        sull'esistenza stessa.</p>
+
+      <h3>16.2 — L'idea chiave: le proprietà positive</h3>
+      <p>Il cuore della dimostrazione è un concetto che ricorda molto un'idea che già conoscete: i
+        <strong>numeri naturali</strong>. I numeri naturali (0, 1, 2, 3, …) hanno una caratteristica
+        speciale: quando aggiungiamo qualcosa a un numero naturale, il risultato è ancora un numero naturale;
+        e nessuna quantità positiva "fa uscire" dal dominio del positivo. Gödel usa un'idea analoga per le
+        <em>proprietà</em>:</p>
+
+      <div class="definition">
+        Una proprietà si dice <strong>positiva</strong> se esprime qualcosa di genuinamente buono,
+        perfezionante — qualcosa che un essere massimamente grande preferirebbe avere piuttosto che non avere.
+        La negazione di una proprietà positiva <em>non</em> è positiva, e la congiunzione di due proprietà
+        positive è ancora positiva — proprio come la somma di due numeri naturali è un numero naturale.
+      </div>
+
+      <p>Esempi intuitivi: l'esistenza, la bontà, la conoscenza, il potere — Gödel le considera proprietà
+        positive. La loro negazione (non-esistenza, malvagità, ignoranza, impotenza) non lo sono. Finora
+        siamo ancora nel dominio delle definizioni: non abbiamo detto nulla di controverso sul piano logico,
+        esattamente come quando definiamo «$A$ è un sottoinsieme di $B$» non stiamo ancora affermando nulla
+        di vero o falso.</p>
+
+      <h3>16.3 — La catena logica</h3>
+      <p>Con la nozione di proprietà positiva in mano, Gödel costruisce la sua dimostrazione a passi, come
+        ogni buona dimostrazione matematica:</p>
+
+      <div class="definition">
+        <ol style="margin:0.4rem 0 0;">
+          <li><strong>Definizione di essere «simil-divino».</strong> Un essere $x$ è <em>god-like</em> (simil-divino)
+            se <strong>possiede tutte e sole le proprietà positive</strong>. È cioè l'essere che realizza al
+            massimo grado tutto ciò che è buono — l'equivalente logico del "più grande pensabile".</li>
+          <li><strong>Lemma 1.</strong> Se una proprietà è positiva, allora è <em>possibile</em> che esista
+            qualcosa che la possiede. (Seguendo le regole della logica modale, che distingue «è necessariamente
+            vero», «è possibilmente vero», «è vero».) </li>
+          <li><strong>Lemma 2.</strong> La proprietà di essere god-like è positiva. (Segue dalla definizione:
+            possedere tutte le proprietà positive è esso stesso qualcosa di massimamente positivo.)</li>
+          <li><strong>Corollario.</strong> È <em>possibile</em> che esista un essere god-like.</li>
+          <li><strong>Definizione di «essenza».</strong> Una proprietà $\varphi$ è l'<em>essenza</em> di $x$
+            se $x$ la possiede e ogni altra proprietà di $x$ ne è una conseguenza necessaria. L'essenza
+            «cattura» completamente che cosa è un ente.</li>
+          <li><strong>Lemma 3.</strong> Essere god-like è l'essenza di ogni essere god-like. (Un essere che
+            ha tutte le proprietà positive ha in esse la sua caratterizzazione completa.)</li>
+          <li><strong>Definizione di «esistenza necessaria».</strong> Un essere esiste <em>necessariamente</em>
+            se la sua essenza è necessariamente istanziata — cioè non potrebbe non esistere.</li>
+          <li><strong>Lemma 4.</strong> L'esistenza necessaria è una proprietà positiva.</li>
+          <li><strong>Teorema.</strong> Necessariamente, esiste un essere god-like. $\square$</li>
+        </ol>
+      </div>
+
+      <p>La struttura è impeccabilmente logica: ogni passo segue dalle definizioni e dai lemmi precedenti,
+        usando le regole della <strong>logica modale del secondo ordine</strong> — una logica più potente di
+        quella che abbiamo visto, ma con lo stesso DNA: simboli, regole, deduzioni.</p>
+
+      <h3>16.4 — Cosa ci dice questo esercizio</h3>
+      <p>Vale la pena soffermarsi su <em>che cosa</em> dimostra davvero la prova di Gödel:</p>
+
+      <ul>
+        <li><strong>Dimostra</strong> che, <em>accettando le definizioni di Gödel</em> (in particolare il
+          concetto di proprietà positiva e di logica modale usata), la conclusione segue in modo necessario.
+          Il ragionamento è corretto.</li>
+        <li><strong>Non dimostra</strong> che le premesse siano «vere nel mondo». Come ogni dimostrazione
+          matematica, parte da assiomi — che qui sono scelte filosofiche precise. Chi non accetta il concetto
+          di «proprietà positiva» come Gödel lo definisce, semplicemente gioca a un gioco con regole diverse.
+          Come chi giocasse agli scacchi con il re e la regina scambiati: le mosse sarebbero legali, ma non
+          sarebbero scacchi.</li>
+        <li><strong>Dimostra</strong>, ancora una volta, la potenza straordinaria della logica: può costruire
+          ragionamenti validi su concetti che sembrano sfuggire a qualsiasi formalizzazione — Dio, l'essenza,
+          la necessità. La logica «parla di qualunque cosa», esattamente come dicevamo nella prima sezione di
+          questa lezione.</li>
+      </ul>
+
+      <div class="warning">
+        <strong>Il paradosso finale.</strong> Ricordate il secondo teorema di incompletezza di Gödel? Lui stesso
+        ha dimostrato che nessun insieme di assiomi può <em>dimostrare la propria consistenza</em>. Questo vale
+        anche per la dimostrazione ontologica: non possiamo escludere che le premesse (la definizione di
+        proprietà positiva, gli assiomi modali) abbiano contraddizioni nascoste. Gödel — l'uomo che ha
+        dimostrato i limiti della certezza matematica — costruisce un argomento che, per la sua stessa scoperta,
+        non può garantirsi completamente da solo. C'è qualcosa di magnificamente coerente in questo.
+      </div>
+
+      <div class="curiosita">
+        <strong>Un fatto storico curioso.</strong> Gödel era noto per la sua riservatezza e tenne il manoscritto
+        della prova nel cassetto per decenni, mostrandolo solo a pochi amici. La circostanza che lo spinse a
+        renderlo pubblico fu la malattia di un amico comune: temendo che l'argomento andasse perduto, lo fece
+        circolare. Nel 1987, sei anni dopo la morte di Gödel, il logico Dana Scott pubblicò una versione
+        rifinita. Oggi la prova viene studiata nei corsi di logica modale di tutto il mondo — non come
+        teologia, ma come esempio straordinario di ragionamento formale applicato a concetti astratti.
+      </div>
+    </section>
+
+    <!-- 17 — QUIZ -->
+    <section id="quiz">
+      <h2>17. Quiz finale</h2>
+      <p>Dieci domande su logica, insiemi, proposizioni e relazioni. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 2 — La logica · Matematica · Primo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezioni 6 e 7 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 6 — Operazioni tra insiemi (Eulero-Venn) =====
+      (function () {
+        const svg = document.getElementById('vn-svg');
+        if (!svg) return;
+        const out = document.getElementById('vn-out');
+        const btns = { u: document.getElementById('vn-u'), i: document.getElementById('vn-i'), ab: document.getElementById('vn-ab'), ba: document.getElementById('vn-ba') };
+        // elementi: solo A (elettrici puri), intersezione, solo B (volanti puri)
+        const soloA = ['Pikachu', 'Magnemite', 'Voltorb'];
+        const both = ['Zapdos', 'Emolga'];
+        const soloB = ['Pidgey', 'Charizard', 'Butterfree'];
+        const CA = { x: 240, y: 150, r: 130 }, CB = { x: 400, y: 150, r: 130 };
+        let mode = 'u';
+        function setMode(m) {
+          mode = m;
+          Object.keys(btns).forEach(k => btns[k].classList.toggle('active', k === m));
+          draw();
+        }
+        Object.keys(btns).forEach(k => btns[k].addEventListener('click', () => setMode(k)));
+        function draw() {
+          const hlA = (mode === 'u' || mode === 'ab');
+          const hlB = (mode === 'u' || mode === 'ba');
+          const hlI = (mode === 'u' || mode === 'i');
+          let h = '';
+          h += `<defs>
+            <clipPath id="vn-clipA"><circle cx="${CA.x}" cy="${CA.y}" r="${CA.r}"/></clipPath>
+            <clipPath id="vn-clipB"><circle cx="${CB.x}" cy="${CB.y}" r="${CB.r}"/></clipPath>
+          </defs>`;
+          // riempimenti: A solo, B solo (cerchi pieni), intersezione via clip
+          if (hlA) h += `<circle cx="${CA.x}" cy="${CA.y}" r="${CA.r}" fill="rgba(245,180,0,0.22)"/>`;
+          if (hlB) h += `<circle cx="${CB.x}" cy="${CB.y}" r="${CB.r}" fill="rgba(59,130,246,0.22)"/>`;
+          if (!hlI) {
+            // "spegni" l'intersezione se non va evidenziata ma i cerchi sì
+            if (hlA || hlB) h += `<g clip-path="url(#vn-clipA)"><circle cx="${CB.x}" cy="${CB.y}" r="${CB.r}" fill="var(--surface-2)"/></g>`;
+          } else if (!hlA && !hlB) {
+            // solo intersezione
+            h += `<g clip-path="url(#vn-clipA)"><circle cx="${CB.x}" cy="${CB.y}" r="${CB.r}" fill="rgba(34,197,94,0.30)"/></g>`;
+          }
+          // bordi
+          h += `<circle cx="${CA.x}" cy="${CA.y}" r="${CA.r}" fill="none" stroke="var(--gold)" stroke-width="2.5"/>`;
+          h += `<circle cx="${CB.x}" cy="${CB.y}" r="${CB.r}" fill="none" stroke="#3b82f6" stroke-width="2.5"/>`;
+          h += `<text x="${CA.x - 85}" y="40" text-anchor="middle" class="lbl" fill="var(--gold)">A = tipo Elettro ⚡</text>`;
+          h += `<text x="${CB.x + 85}" y="40" text-anchor="middle" class="lbl" fill="#3b82f6">B = tipo Volante 🕊</text>`;
+          // elementi
+          const put = (nome, x, y) => `<circle cx="${x}" cy="${y}" r="4" fill="var(--text)"/><text x="${x}" y="${y + 18}" text-anchor="middle" class="lbl-s">${nome}</text>`;
+          h += put('Pikachu', 175, 115); h += put('Magnemite', 165, 175); h += put('Voltorb', 200, 235);
+          h += put('Zapdos', 320, 120); h += put('Emolga', 320, 190);
+          h += put('Pidgey', 465, 115); h += put('Charizard', 478, 175); h += put('Butterfree', 445, 235);
+          svg.innerHTML = h;
+          const res = { u: soloA.concat(both, soloB), i: both, ab: soloA, ba: soloB }[mode];
+          const nome = { u: 'A ∪ B — l\'unione', i: 'A ∩ B — l\'intersezione', ab: 'A ∖ B — la differenza "A meno B"', ba: 'B ∖ A — la differenza "B meno A"' }[mode];
+          const spiega = {
+            u: 'tutti quelli che sono elettrici <strong>oppure</strong> volanti (o entrambe le cose): si "fondono" le due scatole.',
+            i: 'solo chi è elettrico <strong>e</strong> volante insieme: la zona dove i cerchi si sovrappongono.',
+            ab: 'gli elettrici che <strong>non</strong> sono volanti: ad A togliamo la parte in comune con B.',
+            ba: 'i volanti che <strong>non</strong> sono elettrici: a B togliamo la parte in comune con A.',
+          }[mode];
+          out.innerHTML = `<strong>${nome}</strong> = {${res.join(', ')}} — ${spiega} Cardinalità: <span class="val-badge">${res.length}</span>.`;
+        }
+        draw();
+      })();
+
+      // ===== 7 — Partizioni =====
+      (function () {
+        const svg = document.getElementById('pa-svg');
+        if (!svg) return;
+        const out = document.getElementById('pa-out');
+        const btns = { st: document.getElementById('pa-st'), sp: document.getElementById('pa-sp'), mo: document.getElementById('pa-mo') };
+        // 12 studenti
+        const NOMI = ['Ada', 'Bruno', 'Carla', 'Dino', 'Elsa', 'Febo', 'Gaia', 'Hugo', 'Ida', 'Leo', 'Mia', 'Nino'];
+        const CASI = {
+          st: {
+            titolo: 'per stagione di nascita',
+            gruppi: [
+              { nome: 'Primavera', col: '#22c55e', chi: [0, 4, 8] },
+              { nome: 'Estate', col: '#f5b400', chi: [1, 5] },
+              { nome: 'Autunno', col: '#e8743b', chi: [2, 6, 9, 11] },
+              { nome: 'Inverno', col: '#3b82f6', chi: [3, 7, 10] },
+            ],
+            vuoti: false, sovrapposti: false, avanzi: false,
+            verdetto: 'È una <strong>partizione</strong>! Ognuno è nato in una e una sola stagione: gruppi non vuoti, nessuna sovrapposizione, nessun escluso. ✅',
+          },
+          sp: {
+            titolo: 'per sport praticato',
+            gruppi: [
+              { nome: 'Calcio', col: '#22c55e', chi: [0, 1, 4, 7] },
+              { nome: 'Pallavolo', col: '#3b82f6', chi: [2, 7, 9] },
+              { nome: 'Nuoto', col: '#f5b400', chi: [5, 10] },
+            ],
+            vuoti: false, sovrapposti: true, avanzi: true,
+            verdetto: '<strong>Non</strong> è una partizione, per due motivi: Hugo fa calcio <em>e</em> pallavolo (sovrapposizione ✗), e Dino, Gaia, Ida e Nino non fanno nessuno sport (restano fuori ✗).',
+          },
+          mo: {
+            titolo: 'chi ha il motorino',
+            gruppi: [
+              { nome: 'Ha il motorino', col: '#e8743b', chi: [1, 5, 9] },
+            ],
+            vuoti: false, sovrapposti: false, avanzi: true,
+            verdetto: '<strong>Non</strong> è una partizione: un solo gruppo che non copre tutti — i nove senza motorino restano fuori (✗ regola 3). Basterebbe però aggiungere il gruppo "non ha il motorino" e diventerebbe una partizione perfetta in due gruppi!',
+          },
+        };
+        let caso = 'st';
+        function setCaso(c) {
+          caso = c;
+          Object.keys(btns).forEach(k => btns[k].classList.toggle('active', k === c));
+          draw();
+        }
+        Object.keys(btns).forEach(k => btns[k].addEventListener('click', () => setCaso(k)));
+        function draw() {
+          const C = CASI[caso];
+          let h = '';
+          // insieme grande
+          h += `<rect x="20" y="34" width="600" height="230" rx="16" fill="none" stroke="var(--text-soft)" stroke-width="2"/>`;
+          h += `<text x="30" y="24" class="lbl-s">l'insieme A: la classe (12 studenti)</text>`;
+          // posizioni studenti: griglia 6×2
+          const pos = NOMI.map((n, i) => [70 + (i % 6) * 100, 100 + Math.floor(i / 6) * 110]);
+          // bolle dei gruppi: raggruppo con ellissi attorno agli assegnati? Semplifico: coloro i pallini per gruppo
+          const colDi = {};
+          const gruppoDi = {};
+          C.gruppi.forEach(g => g.chi.forEach(i => {
+            if (gruppoDi[i] !== undefined) { colDi[i] = 'both'; } else { gruppoDi[i] = g.nome; colDi[i] = g.col; }
+          }));
+          NOMI.forEach((n, i) => {
+            const [x, y] = pos[i];
+            if (colDi[i] === 'both') {
+              // mezzo e mezzo per le sovrapposizioni
+              h += `<path d="M ${x} ${y - 16} A 16 16 0 0 0 ${x} ${y + 16} Z" fill="#22c55e"/>`;
+              h += `<path d="M ${x} ${y - 16} A 16 16 0 0 1 ${x} ${y + 16} Z" fill="#3b82f6"/>`;
+              h += `<circle cx="${x}" cy="${y}" r="16" fill="none" stroke="var(--red)" stroke-width="3"/>`;
+              h += `<text x="${x}" y="${y - 24}" text-anchor="middle" class="em">in 2 gruppi!</text>`;
+            } else if (colDi[i]) {
+              h += `<circle cx="${x}" cy="${y}" r="16" fill="${colDi[i]}"/>`;
+            } else {
+              h += `<circle cx="${x}" cy="${y}" r="16" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="4 3"/>`;
+              h += `<text x="${x}" y="${y - 24}" text-anchor="middle" class="lbl-s" fill="var(--red)">fuori!</text>`;
+            }
+            h += `<text x="${x}" y="${y + 4}" text-anchor="middle" style="font-size:10px; font-weight:700;" fill="${colDi[i] && colDi[i] !== 'both' ? '#fff' : 'var(--text)'}">${n.slice(0, 2)}</text>`;
+            h += `<text x="${x}" y="${y + 34}" text-anchor="middle" class="lbl-s" style="font-size:10px;">${n}</text>`;
+          });
+          // legenda gruppi (riga propria)
+          let lx = 40;
+          C.gruppi.forEach(g => {
+            h += `<circle cx="${lx}" cy="292" r="8" fill="${g.col}"/>`;
+            h += `<text x="${lx + 14}" y="296" class="lbl-s">${g.nome} (${g.chi.length})</text>`;
+            lx += 26 + g.nome.length * 7.4 + 30;
+          });
+          // check tre regole (riga separata, sotto la legenda)
+          const c1 = !C.vuoti, c2 = !C.sovrapposti, c3 = !C.avanzi;
+          h += `<text x="320" y="326" text-anchor="middle" class="lbl">① non vuoti ${c1 ? '✓' : '✗'}  ·  ② senza sovrapposizioni ${c2 ? '✓' : '✗'}  ·  ③ nessun escluso ${c3 ? '✓' : '✗'}</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = `<strong>Divisione ${C.titolo}:</strong> ${C.verdetto}`;
+        }
+        draw();
+      })();
+
+    });
+  </script>
+
+  <!-- Demo sezioni 9, 11 e 14 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 9.1 — Tavole di verità da completare =====
+      (function () {
+        document.querySelectorAll('.tv-cell').forEach(cell => {
+          cell.addEventListener('click', () => {
+            cell.classList.remove('tv-ok', 'tv-no');
+            cell.textContent = cell.textContent === '?' ? 'V' : (cell.textContent === 'V' ? 'F' : 'V');
+          });
+        });
+        document.querySelectorAll('.tv-check').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const table = document.getElementById(btn.dataset.table);
+            const out = document.getElementById(btn.dataset.table + '-out');
+            let tot = 0, ok = 0, vuote = 0;
+            table.querySelectorAll('.tv-cell').forEach(cell => {
+              tot++;
+              cell.classList.remove('tv-ok', 'tv-no');
+              if (cell.textContent === '?') { vuote++; return; }
+              if (cell.textContent === cell.dataset.ans) { cell.classList.add('tv-ok'); ok++; }
+              else { cell.classList.add('tv-no'); }
+            });
+            if (vuote === tot) { out.innerHTML = 'Prima compila qualche cella (clicca per alternare V e F)!'; return; }
+            const bravo = {
+              tv1: 'Nota il trucco: prima la colonna ¬B, poi l\'AND con A: le tavole si costruiscono un pezzo alla volta.',
+              tv2: 'E avrai riconosciuto il risultato: (A ∨ B) ∧ ¬(A ∧ B) è esattamente lo <strong>XOR</strong> — l\'hai appena dimostrato, colonna per colonna.',
+              tv3: 'Le colonne ¬(A ∧ B) e ¬A ∨ ¬B coincidono su TUTTE le righe: hai appena <strong>dimostrato</strong> la prima legge di De Morgan — quattro casi possibili, quattro verificati, nessuno escluso. Ora tocca alla seconda.',
+              tv4: 'Anche ¬(A ∨ B) e ¬A ∧ ¬B coincidono ovunque: <strong>seconda legge dimostrata</strong>. Le hai dimostrate entrambe: il ¬ entra nella parentesi e scambia ∧ con ∨ — sempre, garantito dalla tavola di verità.',
+            }[btn.dataset.table] || '';
+            out.innerHTML = ok === tot
+              ? `🎉 <strong>${ok}/${tot}</strong> — perfetto! ${bravo}`
+              : `<strong>${ok}/${tot}</strong> giuste${vuote ? ` (${vuote} ancora vuote)` : ''} — le celle rosse sono da rivedere: rileggi la definizione del connettivo e riprova. Sbagliare e riprovare È il metodo.`;
+          });
+        });
+      })();
+
+      // ===== 11 — Grafo delle relazioni =====
+      (function () {
+        const svg = document.getElementById('re-svg');
+        if (!svg) return;
+        const out = document.getElementById('re-out');
+        const btns = { mese: document.getElementById('re-mese'), alto: document.getElementById('re-alto'), amico: document.getElementById('re-amico'), figlio: document.getElementById('re-figlio') };
+        // 5 nodi disposti a pentagono
+        const NOMI = ['Ada', 'Bruno', 'Carla', 'Dino', 'Elsa'];
+        const POS = NOMI.map((n, i) => {
+          const a = -Math.PI / 2 + i * 2 * Math.PI / 5;
+          return [320 + 160 * Math.cos(a), 162 + 100 * Math.sin(a)];
+        });
+        const CASI = {
+          mese: {
+            titolo: '«è nato lo stesso mese di»',
+            // gruppi: {Ada,Carla} gennaio, {Bruno,Dino,Elsa} giugno → frecce doppie dentro i gruppi + cappi
+            archi: [[0, 2], [2, 0], [1, 3], [3, 1], [1, 4], [4, 1], [3, 4], [4, 3], [0, 0], [1, 1], [2, 2], [3, 3], [4, 4]],
+            prop: { rifl: true, simm: true, trans: true },
+            tipo: 'È una <strong>relazione di EQUIVALENZA</strong> (riflessiva ✓, simmetrica ✓, transitiva ✓) — e infatti divide i cinque in classi: {Ada, Carla} e {Bruno, Dino, Elsa}. Ecco la partizione promessa!',
+          },
+          alto: {
+            titolo: '«è più alto di»  (Ada 180 > Bruno 175 > Carla 170 > Dino 165 > Elsa 160)',
+            archi: [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]],
+            prop: { rifl: false, simm: false, trans: true },
+            tipo: 'Transitiva ✓ ma non riflessiva (nessuno è più alto di se stesso) e per niente simmetrica: è il cuore di una <strong>relazione d\'ORDINE</strong> — mette tutti in fila (col "più alto <em>o uguale</em>" diventerebbe un ordine in piena regola).',
+          },
+          amico: {
+            titolo: '«è amico di»',
+            archi: [[0, 1], [1, 0], [1, 2], [2, 1], [3, 4], [4, 3]],
+            prop: { rifl: false, simm: true, trans: false },
+            tipo: 'Simmetrica ✓ (l\'amicizia va in due versi) ma <strong>non transitiva</strong>: Ada è amica di Bruno e Bruno di Carla, ma Ada e Carla non si conoscono. Né equivalenza né ordine: le relazioni "umane" raramente si fanno incasellare.',
+          },
+          figlio: {
+            titolo: '«è genitore di»  (Ada → Carla → Elsa)',
+            archi: [[0, 2], [2, 4]],
+            prop: { rifl: false, simm: false, trans: false, intrans: true },
+            tipo: '<strong>Intransitiva</strong>: Ada è genitore di Carla e Carla di Elsa, ma Ada NON è genitore di Elsa (è sua nonna!). Qui la relazione non "passa attraverso" mai: l\'esatto contrario della transitività.',
+          },
+        };
+        let caso = 'mese';
+        function setCaso(c) {
+          caso = c;
+          Object.keys(btns).forEach(k => btns[k].classList.toggle('active', k === c));
+          draw();
+        }
+        Object.keys(btns).forEach(k => btns[k].addEventListener('click', () => setCaso(k)));
+        function freccia(i, j) {
+          if (i === j) {
+            // cappio (riflessività)
+            const [x, y] = POS[i];
+            return `<path d="M ${x - 10} ${y - 22} C ${x - 26} ${y - 48}, ${x + 26} ${y - 48}, ${x + 10} ${y - 22}" fill="none" stroke="var(--gold)" stroke-width="1.6" opacity="0.75" marker-end="url(#re-arr)"/>`;
+          }
+          const [x1, y1] = POS[i], [x2, y2] = POS[j];
+          const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy);
+          const ux = dx / L, uy = dy / L;
+          // parti dal bordo del nodo, arriva prima del bordo; leggera curvatura per distinguere i due versi
+          const sx = x1 + ux * 26, sy = y1 + uy * 26, ex = x2 - ux * 30, ey = y2 - uy * 30;
+          const mx = (sx + ex) / 2 - uy * 10, my = (sy + ey) / 2 + ux * 10;
+          return `<path d="M ${sx.toFixed(1)} ${sy.toFixed(1)} Q ${mx.toFixed(1)} ${my.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#re-arr)"/>`;
+        }
+        function draw() {
+          const C = CASI[caso];
+          let h = `<defs><marker id="re-arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="var(--accent)"/></marker></defs>`;
+          h += `<text x="16" y="24" class="lbl">${C.titolo}</text>`;
+          C.archi.forEach(([i, j]) => { h += freccia(i, j); });
+          NOMI.forEach((n, i) => {
+            const [x, y] = POS[i];
+            h += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="22" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2"/>`;
+            h += `<text x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle" class="lbl-s" style="font-weight:700;">${n}</text>`;
+          });
+          const p = CASI[caso].prop;
+          h += `<text x="320" y="288" text-anchor="middle" class="lbl-s">riflessiva ${p.rifl ? '✓' : '✗'} · simmetrica ${p.simm ? '✓' : '✗'} · transitiva ${p.trans ? '✓' : '✗'}${p.intrans ? ' · intransitiva ✓' : ''}</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = C.tipo;
+        }
+        draw();
+      })();
+
+      // ===== 12 — Le funzioni =====
+      (function () {
+        const svg = document.getElementById('fn-svg');
+        if (!svg) return;
+        const out = document.getElementById('fn-out');
+        const btns = { gen: document.getElementById('fn-gen'), inj: document.getElementById('fn-inj'), sur: document.getElementById('fn-sur'), bij: document.getElementById('fn-bij'), no: document.getElementById('fn-no') };
+        const X = ['Ada', 'Bruno', 'Carla', 'Dino'];
+        const CASI = {
+          gen: {
+            titolo: '«il piatto preferito di» — funzione, ma senza lodi',
+            Y: ['pizza 🍕', 'sushi 🍣', 'burger 🍔', 'kebab 🌯'],
+            archi: [[0, 0], [1, 0], [2, 1], [3, 2]],
+            fn: true,
+            verdetto: 'È una <strong>funzione</strong> (ogni persona ha esattamente un piatto preferito) ma: pizza riceve <em>due</em> frecce (✗ iniettiva) e kebab nessuna (✗ suriettiva). La maggioranza delle funzioni è così: onesta, senza medaglie.',
+          },
+          inj: {
+            titolo: '«il numero di maglia di» — iniettiva',
+            Y: ['7', '9', '10', '11', '23'],
+            archi: [[0, 2], [1, 0], [2, 4], [3, 1]],
+            fn: true,
+            verdetto: '<strong>Iniettiva</strong> ✓: mai due giocatori con lo stesso numero (i doppioni sono vietati dal regolamento!). Ma non suriettiva: il numero 11 resta libero. Tipico quando il codominio è più grande del dominio.',
+          },
+          sur: {
+            titolo: '«lo sport praticato da» — suriettiva',
+            Y: ['calcio ⚽', 'nuoto 🏊'],
+            archi: [[0, 0], [1, 0], [2, 1], [3, 1]],
+            fn: true,
+            verdetto: '<strong>Suriettiva</strong> ✓: ogni sport ha almeno un praticante — il codominio è tutto coperto. Ma non iniettiva: Ada e Bruno condividono il calcio. Tipico quando il dominio è più grande del codominio.',
+          },
+          bij: {
+            titolo: '«il banco assegnato a» — biiettiva',
+            Y: ['banco 1', 'banco 2', 'banco 3', 'banco 4'],
+            archi: [[0, 2], [1, 0], [2, 3], [3, 1]],
+            fn: true,
+            verdetto: '<strong>Biiettiva</strong> ✓✓: ogni banco ha esattamente uno studente. L\'accoppiamento è perfetto e reversibile: dal banco puoi risalire allo studente ("chi sta al banco 3?" ha una e una sola risposta). E infatti |X| = |Y| = 4: solo tra insiemi della stessa cardinalità può esistere una biiezione.',
+          },
+          no: {
+            titolo: '«è fratello/sorella di» — NON è una funzione!',
+            Y: ['Elsa', 'Febo', 'Gaia', 'Hugo'],
+            archi: [[0, 0], [0, 1], [2, 3]],
+            fn: false,
+            verdetto: '<strong>Non è una funzione</strong>: Ada ha due frecce (due fratelli — quale sarebbe "IL" fratello?), mentre Bruno e Dino non ne hanno nessuna (figli unici). È una relazione legittima, ma la macchina non è affidabile: a volte dà due risposte, a volte nessuna.',
+          },
+        };
+        let caso = 'gen';
+        function setCaso(c) {
+          caso = c;
+          Object.keys(btns).forEach(k => btns[k].classList.toggle('active', k === c));
+          draw();
+        }
+        Object.keys(btns).forEach(k => btns[k].addEventListener('click', () => setCaso(k)));
+        function draw() {
+          const C = CASI[caso];
+          const XT = 78, YT = 78;                       // y iniziale delle colonne
+          const xs = X.map((n, i) => [185, XT + i * 56]);
+          const ys = C.Y.map((n, i) => [455, YT + i * (C.Y.length > 4 ? 46 : 56)]);
+          let h = `<defs><marker id="fn-arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="var(--accent)"/></marker></defs>`;
+          h += `<text x="320" y="28" text-anchor="middle" class="lbl">${C.titolo}</text>`;
+          // contenitori
+          h += `<ellipse cx="165" cy="${XT + (X.length - 1) * 28 + 8}" rx="95" ry="${(X.length - 1) * 28 + 42}" fill="none" stroke="var(--gold)" stroke-width="2"/>`;
+          h += `<text x="165" y="${XT - 20}" text-anchor="middle" class="lbl-s" fill="var(--gold)">X (dominio)</text>`;
+          const ryY = (C.Y.length - 1) * (C.Y.length > 4 ? 23 : 28) + 42;
+          h += `<ellipse cx="480" cy="${YT + (C.Y.length - 1) * (C.Y.length > 4 ? 23 : 28) + 8}" rx="105" ry="${ryY}" fill="none" stroke="#3b82f6" stroke-width="2"/>`;
+          h += `<text x="480" y="${YT - 20}" text-anchor="middle" class="lbl-s" fill="#3b82f6">Y (codominio)</text>`;
+          // frecce
+          C.archi.forEach(([i, j]) => {
+            const [x1, y1] = xs[i], [x2, y2] = ys[j];
+            h += `<line x1="${x1 + 12}" y1="${y1}" x2="${x2 - 60}" y2="${y2}" stroke="var(--accent)" stroke-width="2" marker-end="url(#fn-arr)"/>`;
+          });
+          // elementi
+          X.forEach((n, i) => {
+            const [x, y] = xs[i];
+            const nArchi = C.archi.filter(a => a[0] === i).length;
+            h += `<circle cx="${x}" cy="${y}" r="5" fill="${nArchi === 1 ? 'var(--text)' : 'var(--red)'}"/>`;
+            h += `<text x="${x - 12}" y="${y + 4}" text-anchor="end" class="lbl-s"${nArchi !== 1 ? ' fill="var(--red)" style="font-weight:700;"' : ''}>${n}${nArchi === 0 ? ' (0 frecce!)' : nArchi > 1 ? ` (${nArchi} frecce!)` : ''}</text>`;
+          });
+          C.Y.forEach((n, j) => {
+            const [x, y] = ys[j];
+            const inN = C.archi.filter(a => a[1] === j).length;
+            h += `<circle cx="${x - 60 + 10}" cy="${y}" r="5" fill="var(--text)"/>`;
+            h += `<text x="${x - 40}" y="${y + 4}" class="lbl-s">${n} ${inN === 0 ? '· mai colpito' : inN > 1 ? `· colpito ${inN} volte` : ''}</text>`;
+          });
+          // verdetto proprietà
+          if (C.fn) {
+            const inCounts = C.Y.map((n, j) => C.archi.filter(a => a[1] === j).length);
+            const inj = inCounts.every(c => c <= 1), sur = inCounts.every(c => c >= 1);
+            h += `<text x="320" y="306" text-anchor="middle" class="lbl">funzione ✓  ·  iniettiva ${inj ? '✓' : '✗'}  ·  suriettiva ${sur ? '✓' : '✗'}  ·  biiettiva ${inj && sur ? '✓' : '✗'}</text>`;
+          } else {
+            h += `<text x="320" y="306" text-anchor="middle" class="lbl" fill="var(--red)">funzione ✗ — c'è chi ha 0 frecce e chi ne ha 2</text>`;
+          }
+          svg.innerHTML = h;
+          out.innerHTML = C.verdetto;
+        }
+        draw();
+      })();
+
+      // ===== 15 — Logica fuzzy =====
+      (function () {
+        const sh = document.getElementById('fz-h');
+        if (!sh) return;
+        const vh = document.getElementById('fz-h-val');
+        const svg = document.getElementById('fz-svg');
+        const out = document.getElementById('fz-out');
+        const X0 = 70, X1 = 590, Y0 = 200, Y1 = 50;   // area del grafico: 150..200 cm, grado 0..1
+        function xOf(cm) { return X0 + (cm - 150) / 50 * (X1 - X0); }
+        function yOf(g) { return Y0 - g * (Y0 - Y1); }
+        function fuzzy(cm) { return cm <= 162 ? 0 : cm >= 185 ? 1 : (cm - 162) / 23; }
+        function go() {
+          const cm = +sh.value; vh.textContent = cm;
+          const g = fuzzy(cm);
+          const classico = cm >= 175;
+          let h = '';
+          // assi
+          h += `<line x1="${X0}" y1="${Y0}" x2="${X1}" y2="${Y0}" stroke="var(--muted)" stroke-width="1.5"/>`;
+          h += `<line x1="${X0}" y1="${Y0}" x2="${X0}" y2="${Y1 - 10}" stroke="var(--muted)" stroke-width="1.5"/>`;
+          h += `<text x="${X1}" y="${Y0 + 20}" text-anchor="end" class="lbl-s">altezza (cm)</text>`;
+          h += `<text x="${X0 - 8}" y="${yOf(1) + 4}" text-anchor="end" class="lbl-s">1</text>`;
+          h += `<text x="${X0 - 8}" y="${yOf(0) + 4}" text-anchor="end" class="lbl-s">0</text>`;
+          [150, 160, 170, 180, 190, 200].forEach(c => {
+            h += `<line x1="${xOf(c)}" y1="${Y0}" x2="${xOf(c)}" y2="${Y0 + 5}" stroke="var(--muted)" stroke-width="1"/>`;
+            h += `<text x="${xOf(c)}" y="${Y0 + 20}" text-anchor="middle" class="lbl-s" style="font-size:10px;">${c}</text>`;
+          });
+          // logica classica: gradino a 175
+          h += `<path d="M ${X0} ${yOf(0)} L ${xOf(175)} ${yOf(0)} L ${xOf(175)} ${yOf(1)} L ${X1} ${yOf(1)}" fill="none" stroke="var(--red)" stroke-width="2" stroke-dasharray="6 5" opacity="0.8"/>`;
+          h += `<text x="${xOf(176)}" y="${yOf(1) - 8}" class="lbl-s" fill="var(--red)">logica classica: o alto o no (soglia 175)</text>`;
+          // fuzzy: rampa 162→185
+          h += `<path d="M ${X0} ${yOf(0)} L ${xOf(162)} ${yOf(0)} L ${xOf(185)} ${yOf(1)} L ${X1} ${yOf(1)}" fill="none" stroke="var(--accent)" stroke-width="3"/>`;
+          h += `<text x="${xOf(152)}" y="${yOf(0.62)}" class="lbl-s" fill="var(--accent)">logica fuzzy: gradi di verità</text>`;
+          // punto di Luca
+          h += `<line x1="${xOf(cm)}" y1="${Y0}" x2="${xOf(cm)}" y2="${yOf(g)}" stroke="var(--gold)" stroke-width="1.5" stroke-dasharray="3 4"/>`;
+          h += `<circle cx="${xOf(cm)}" cy="${yOf(g)}" r="7" fill="var(--gold)"/>`;
+          h += `<text x="${xOf(cm)}" y="${yOf(g) - 14}" text-anchor="middle" class="em">${Math.round(g * 100)}%</text>`;
+          svg.innerHTML = h;
+          out.innerHTML = `Con Luca alto ${cm} cm: per la logica <strong>classica</strong> «Luca è alto» è
+            <span class="val-badge">${classico ? 'VERA' : 'FALSA'}</span> (${classico ? 'sopra' : 'sotto'} la soglia — anche per un solo centimetro).
+            Per la logica <strong>fuzzy</strong> è vera al <span class="val-badge">${Math.round(g * 100)}%</span>${g > 0 && g < 1 ? ' — una sfumatura che il vero/falso non sa dire' : ''}.`;
+        }
+        sh.addEventListener('input', go);
+        go();
+      })();
+
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'In matematica, una <strong>dimostrazione</strong> è:',
+        options: ['una verifica su un gran numero di esempi', 'un ragionamento che, partendo dagli assiomi e seguendo le regole di deduzione, copre tutti i casi possibili', 'un esperimento di laboratorio', 'l\'opinione condivisa dalla maggioranza dei matematici'],
+        correct: 1, explain: 'Gli esempi suggeriscono (congettura), la dimostrazione garantisce — per sempre. I numeri di Fermat e la congettura di Pólya insegnano: milioni di conferme non bastano.' },
+      { type: 'mc', diff: 'easy', text: 'Quale di queste regole definisce correttamente un insieme?',
+        options: ['«i compagni di classe simpatici»', '«le canzoni belle uscite quest\'anno»', '«i compagni di classe nati di lunedì»', '«i film da vedere assolutamente»'],
+        correct: 2, explain: 'La regola di appartenenza dev\'essere OGGETTIVA: nato di lunedì sì/no è verificabile e uguale per tutti; "simpatico", "bello" e "assolutamente" sono opinioni.' },
+      { type: 'mc', diff: 'easy', text: 'Se $A = \\{1, 2, 3, 4\\}$ e $B = \\{3, 4, 5\\}$, allora $A \\cap B$ è:',
+        options: ['$\\{1, 2, 3, 4, 5\\}$', '$\\{3, 4\\}$', '$\\{1, 2\\}$', '$\\{5\\}$'],
+        correct: 1, explain: 'L\'intersezione ∩ prende solo gli elementi che stanno in ENTRAMBI gli insiemi: 3 e 4. (L\'unione ∪ avrebbe dato {1,2,3,4,5}, la differenza A∖B avrebbe dato {1,2}.)' },
+      { type: 'mc', diff: 'medium', text: 'Dividere gli studenti della classe in «chi gioca a calcio» e «chi gioca a pallavolo» in generale NON è una partizione perché:',
+        options: ['i gruppi sono troppo pochi', 'qualcuno può fare entrambi gli sport e qualcuno nessuno dei due', 'lo sport non è una regola oggettiva', 'le partizioni valgono solo per i numeri'],
+        correct: 1, explain: 'Una partizione richiede: gruppi non vuoti, nessuna sovrapposizione, nessun escluso. Chi fa due sport viola la seconda regola; chi non ne fa nessuno viola la terza.' },
+      { type: 'mc', diff: 'medium', text: 'Quale di questi enunciati è una <strong>proposizione aperta</strong>?',
+        options: ['«$12$ è divisibile per $3$»', '«Che ore sono?»', '«$x$ è divisibile per $3$»', '«Roma è la capitale della Francia»'],
+        correct: 2, explain: 'Contiene la variabile x: diventa vera o falsa solo quando x riceve un valore. La prima e l\'ultima sono chiuse (una vera, una falsa); la domanda non è una proposizione.' },
+      { type: 'mc', diff: 'medium', text: '$A \\vee B$ (OR) è falsa:',
+        options: ['quando A e B sono entrambe vere', 'quando almeno una tra A e B è vera', 'solo quando A e B sono entrambe false', 'quando A e B hanno lo stesso valore di verità'],
+        correct: 2, explain: 'L\'OR è generoso: basta una vera per renderlo vero. L\'unico caso in cui fallisce è F ∨ F. (Quella che è falsa quando A e B coincidono è lo XOR!)' },
+      { type: 'mc', diff: 'medium', text: 'Una funzione $f: X \\to Y$ è <strong>iniettiva</strong> quando:',
+        options: ['ogni elemento di Y viene raggiunto da almeno una freccia', 'elementi diversi di X finiscono su elementi diversi di Y', 'da ogni elemento di X partono due frecce', 'X e Y hanno la stessa cardinalità'],
+        correct: 1, explain: 'Iniettiva = niente doppioni in arrivo: ogni bersaglio è colpito al più una volta. "Ogni elemento di Y raggiunto" è la suriettività; le due insieme fanno la biiettività.' },
+      { type: 'mc', diff: 'hard', text: 'Una relazione di equivalenza è riflessiva, simmetrica e transitiva. Il suo "superpotere" è che:',
+        options: ['mette in fila tutti gli elementi dal più piccolo al più grande', 'divide automaticamente l\'insieme in classi: una partizione', 'vale solo per i numeri', 'rende vere tutte le proposizioni aperte'],
+        correct: 1, explain: 'Ogni equivalenza raggruppa gli elementi "uguali tra loro" in classi di equivalenza: nessuno fuori, nessuno in due classi — esattamente una partizione. (Mettere in fila è il mestiere delle relazioni d\'ordine.)' },
+      { type: 'mc', diff: 'hard', text: 'Il teorema di incompletezza di Gödel (1931) afferma, in sostanza, che:',
+        options: ['la matematica è piena di errori', 'in ogni sistema formale abbastanza potente esistono proposizioni vere ma non dimostrabili dentro il sistema', 'non si può dimostrare che 1+1=2', 'i teoremi dimostrati possono diventare falsi'],
+        correct: 1, explain: 'Gödel costruì una proposizione che dice "io non sono dimostrabile": il sogno di un sistema perfetto e completo (Russell, Hilbert) è impossibile PER PRINCIPIO. I teoremi già dimostrati, però, restano veri per sempre.' },
+      { type: 'open', diff: 'hard', text: 'Spiega la differenza tra verificare una proprietà su molti esempi e dimostrarla, citando almeno un caso storico in cui "tanti esempi" hanno ingannato.',
+        keywords: ['dimostr', 'controesempio', 'congettur', 'esempi', 'Fermat', 'Eulero', 'Pólya', 'Polya', 'tutti i casi', 'assurdo', 'infinit'], requiredMatches: 3,
+        explain: 'Gli esempi, per quanti siano, non coprono gli infiniti casi: al più fondano una CONGETTURA, e un solo controesempio la abbatte. I numeri di Fermat (primi fino a F₄, poi Eulero trovò F₅ composto), la congettura di Pólya (falsa dopo ~906 milioni di casi) e quella di Eulero (27⁵+84⁵+110⁵+133⁵=144⁵) lo dimostrano. Solo una dimostrazione — come quella per assurdo dell\'irrazionalità di √2 — copre tutti i casi in un colpo solo, per sempre.' }
+    ];
+  </script>
+
+</body>
+
+</html>
