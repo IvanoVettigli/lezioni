@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 6 — I sistemi di numerazione</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* card dei simboli nuovi */
+    .sym-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin: 0.9rem 0; }
+    .sym-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem 0.7rem; text-align: center; }
+    .sym-card .sym { font-size: 1.6rem; font-weight: 800; color: var(--accent); display: block; }
+    .sym-card .nome { font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; }
+    .sym-card .significa { font-size: 0.86rem; display: block; margin-top: 0.2rem; }
+    /* tabelle */
+    .num-tab { border-collapse: collapse; margin: 0.7rem auto; }
+    .num-tab th, .num-tab td { border: 1px solid var(--border); padding: 0.35rem 0.85rem; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .num-tab th { background: var(--surface-2); }
+    .num-tab .apples { text-align: left; font-size: 0.95rem; letter-spacing: 1px; }
+    .num-tab .bin { color: var(--accent); font-family: Consolas, monospace; }
+    .num-tab .hexc { color: var(--gold); font-family: Consolas, monospace; }
+    .num-tab .kanji { font-size: 1.25rem; }
+    /* divinazione binaria */
+    .mg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem; max-width: 300px; margin: 0.8rem auto; }
+    .mg-cell { background: var(--surface); border: 1.5px solid var(--accent); border-radius: 9px; text-align: center; padding: 0.5rem 0; font-weight: 800; font-size: 1.15rem; }
+    .mg-string { font-family: Consolas, monospace; font-size: 1.5rem; letter-spacing: 6px; text-align: center; margin: 0.5rem 0; color: var(--accent); font-weight: 700; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Primo anno · Lezione 6</div>
+    <h1>I sistemi di numerazione</h1>
+    <p>Dai numeri romani al binario dei computer: come si vestono i numeri — con un trucco di magia e i colori in esadecimale</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Primo anno</a>
+    <span class="sep">/</span> I sistemi di numerazione
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Nelle lezioni 4 e 5 abbiamo costruito i numeri: naturali, relativi, razionali,
+      reali. Oggi cambiamo domanda: non <em>che cosa sono</em> i numeri, ma <em>come si scrivono</em>. Sembra una
+      questione da poco — e invece è una delle idee più potenti della storia: dal modo in cui scrivi i numeri
+      dipende se i calcoli sono facili o impossibili. E il vostro telefono, che di calcoli ne fa miliardi al
+      secondo, i numeri li scrive in un modo tutto suo.
+    </div>
+
+    <!-- 1 — VESTITI E PARTIZIONI -->
+    <section id="sec1">
+      <h2>1. Un numero, tanti vestiti (e una partizione)</h2>
+
+      <p>Ripartiamo da un'idea della lezione 4: lo stesso numero può indossare <strong>vestiti diversi</strong>.
+        $\frac{3}{2}$, $\frac{6}{4}$, $\frac{9}{6}$: tre scritture, una sola quantità. Già che ci siamo,
+        approfondiamo con gli attrezzi della lezione 2 — perché qui c'è sotto qualcosa di elegante.</p>
+
+      <p>Considerate la relazione <strong>«è equivalente a»</strong> sull'insieme di <em>tutte</em> le frazioni.
+        È <strong>riflessiva</strong> (ogni frazione è equivalente a se stessa), <strong>simmetrica</strong> (se
+        $\frac{3}{2}$ è equivalente a $\frac{6}{4}$, vale anche il contrario) e <strong>transitiva</strong>
+        (equivalente dell'equivalente è equivalente): è una <strong>relazione di equivalenza</strong>! E che cosa fa
+        ogni relazione di equivalenza? <strong>Partiziona</strong> l'insieme: divide tutte le frazioni in classi —
+        senza avanzi e senza doppioni. Nella stessa classe di $\frac{3}{2}$ ci sono $\frac{6}{4}$, $\frac{9}{6}$,
+        $\frac{12}{8}$... tutto il suo guardaroba.</p>
+
+      <div class="rule">
+        <strong>Il colpo di scena:</strong> un numero razionale <em>è</em> la sua classe di equivalenza. "Un numero e
+        i suoi vestiti" era una metafora; la matematica la prende alla lettera: il numero $1{,}5$ è
+        <strong>l'insieme di tutte le frazioni equivalenti</strong> a $\frac{3}{2}$. Gli oggetti matematici si
+        costruiscono con gli insiemi — ve lo avevamo promesso quando Russell fabbricava i numeri dal vuoto.
+      </div>
+
+      <p>Bene: e i <strong>numeri naturali</strong>? Anche loro hanno vestiti diversi? Oh, sì. Molto più di quanto
+        immaginiate.</p>
+    </section>
+
+    <!-- 2 — I ROMANI -->
+    <section id="sec2">
+      <h2>2. Chi ha deciso che si scrivono così? I numeri romani</h2>
+
+      <p>Noi scriviamo $0, 1, 2, 3, \ldots$ — ma <strong>chi lo ha deciso</strong>? Nessuna legge di natura: è una
+        convenzione, e altre civiltà ne hanno scelte di diversissime. Gli antichi Romani, per esempio, scrivevano
+        <strong>I, II, III, IV, V</strong>... Studiamo il loro sistema sul serio: è il modo migliore per apprezzare
+        il nostro.</p>
+
+      <table class="num-tab">
+        <tr><th>Simbolo</th><td>I</td><td>V</td><td>X</td><td>L</td><td>C</td><td>D</td><td>M</td></tr>
+        <tr><th>Valore</th><td>1</td><td>5</td><td>10</td><td>50</td><td>100</td><td>500</td><td>1000</td></tr>
+      </table>
+
+      <p>Le regole di costruzione:</p>
+      <ul>
+        <li><strong>Regola additiva:</strong> i simboli si scrivono dal più grande al più piccolo e si
+          <strong>sommano</strong>: $\text{XXVII} = 10 + 10 + 5 + 1 + 1 = 27$; $\text{MMXXV} = 2025$.</li>
+        <li><strong>Regola sottrattiva:</strong> un simbolo più piccolo <em>prima</em> di uno più grande si
+          <strong>sottrae</strong>: $\text{IV} = 5 - 1 = 4$, $\text{IX} = 9$, $\text{XL} = 40$,
+          $\text{CM} = 900$. Solo I, X e C possono stare "in anticipo", e solo davanti ai due gradini
+          successivi.</li>
+        <li>Uno stesso simbolo non si ripete più di <strong>tre volte</strong> di fila (da qui la necessità della
+          regola sottrattiva: 4 non è IIII ma IV).</li>
+      </ul>
+
+      <p>Esempio da leggere con calma: $\text{MCMXCIV} = 1000 + (1000 - 100) + (100 - 10) + (5 - 1) = 1994$. Bello,
+        monumentale... e pieno di problemi:</p>
+
+      <div class="warning">
+        <strong>I guai del sistema romano.</strong>
+        <br>• <strong>Ambiguità e convenzioni ballerine:</strong> il 4 si scrive IV... ma per secoli si è usato
+        anche IIII (guardate il quadrante di molti orologi antichi: c'è scritto IIII!). Stessa quantità, costruzioni
+        diverse, dispute infinite.
+        <br>• <strong>Manca lo zero:</strong> nessun simbolo per il "niente" — e senza zero, come vedremo, il
+        sistema posizionale non può nascere.
+        <br>• <strong>Non si può far di conto per iscritto:</strong> provate a calcolare in colonna
+        $\text{XXVII} + \text{XIV}$... da dove si comincia? I simboli non si incolonnano, i "riporti" non
+        esistono. I Romani infatti <em>non</em> calcolavano con questi simboli: usavano l'abaco, e i numeri scritti
+        servivano solo a <strong>registrare</strong> i risultati.
+      </div>
+    </section>
+
+    <!-- 3 — CINESE E GIAPPONESE -->
+    <section id="sec3">
+      <h2>3. Il giro del mondo: cinese e giapponese</h2>
+
+      <p>Altre civiltà, altri vestiti. I sistemi tradizionali <strong>cinese</strong> e <strong>giapponese</strong>
+        lavorano entrambi in <strong>base 10</strong>, con un simbolo per ogni cifra da 1 a 9 e un simbolo per il
+        10:</p>
+
+      <table class="num-tab">
+        <tr><th>Numero</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td></tr>
+        <tr><th>Cinese</th><td class="kanji">一</td><td class="kanji">二</td><td class="kanji">三</td><td class="kanji">四</td><td class="kanji">五</td><td class="kanji">六</td><td class="kanji">七</td><td class="kanji">八</td><td class="kanji">九</td><td class="kanji">十</td></tr>
+        <tr><th>(lettura)</th><td>yī</td><td>èr</td><td>sān</td><td>sì</td><td>wǔ</td><td>liù</td><td>qī</td><td>bā</td><td>jiǔ</td><td>shí</td></tr>
+        <tr><th>Giapponese</th><td class="kanji">一</td><td class="kanji">二</td><td class="kanji">三</td><td class="kanji">四</td><td class="kanji">五</td><td class="kanji">六</td><td class="kanji">七</td><td class="kanji">八</td><td class="kanji">九</td><td class="kanji">十</td></tr>
+        <tr><th>(lettura)</th><td>ichi</td><td>ni</td><td>san</td><td>shi</td><td>go</td><td>roku</td><td>shichi</td><td>hachi</td><td>kyū</td><td>jū</td></tr>
+      </table>
+
+      <p>I simboli sono <strong>gli stessi</strong> — il Giappone adottò i caratteri cinesi (i <em>kanji</em>) più di
+        mille anni fa — ma le letture sono diverse. Il meccanismo è <strong>moltiplicativo-additivo</strong>: il 23
+        si scrive <span class="kanji" style="font-size:1.15rem;">二十三</span>, letteralmente
+        "due-dieci-tre" = $2 \times 10 + 3$. Esistono poi simboli per il centinaio
+        (<span class="kanji" style="font-size:1.15rem;">百</span>) e il migliaio
+        (<span class="kanji" style="font-size:1.15rem;">千</span>): il 1994 è
+        <span class="kanji" style="font-size:1.15rem;">一千九百九十四</span> — "un-mille nove-cento nove-dieci
+        quattro". Più regolare del romano (niente regola sottrattiva, niente ambiguità), ma per il calcolo scritto
+        vale lo stesso discorso: anche in Cina e Giappone i conti si facevano con l'abaco.</p>
+    </section>
+
+    <!-- 4 — IL POSIZIONALE -->
+    <section id="sec4">
+      <h2>4. Il nostro: il sistema posizionale</h2>
+
+      <p>E adesso il campione del mondo: il sistema che usiamo noi, detto <strong>posizionale decimale</strong>.
+        L'idea rivoluzionaria è nel nome: il valore di una cifra dipende dalla <strong>posizione</strong> in cui si
+        trova. Il "5" di 52 vale cinquanta; il "5" di 25 vale cinque: <strong>stesso simbolo, valore diverso</strong>
+        a seconda del posto che occupa. Nei sistemi precedenti questo non succedeva mai: X vale dieci ovunque lo
+        metti.</p>
+
+      <div class="definition">
+        Una precisazione di vocabolario: le <strong>cifre</strong> sono i <strong>simboli</strong> — noi ne abbiamo
+        dieci: $0, 1, 2, 3, 4, 5, 6, 7, 8, 9$ — mentre i <strong>numeri</strong> sono le quantità che con quei
+        simboli scriviamo. Con 10 cifre costruiamo <strong>infiniti numeri</strong>, come con 21 lettere
+        costruiamo infinite parole. La cifra sta al numero come la lettera sta alla parola.
+      </div>
+
+      <p>Il meccanismo lo conoscete da sempre, ma guardiamolo in faccia. Contando, arrivati a $9$ le cifre
+        finiscono: per il numero successivo scriviamo <strong>10</strong> — cioè "<strong>1 decina e 0
+        unità</strong>". Poi 11 (una decina e una unità), 12, ... fino a 99 (9 decine e 9 unità); il successivo è
+        <strong>100</strong>: un centinaio, 0 decine, 0 unità. Ogni posizione vale <strong>dieci volte</strong>
+        quella alla sua destra — e lo zero, il grande ritardatario della lezione 4, qui è indispensabile: tiene
+        occupato il posto vuoto.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Ogni numero è una somma di potenze di 10</div>
+        $$527 = 5 \times 10^2 + 2 \times 10^1 + 7 \times 10^0 = 500 + 20 + 7$$
+        <p class="formula-note">Qui usiamo il fatto che qualsiasi numero elevato alla 0 fa <strong>1</strong>
+          ($10^0 = 1$), quindi l'ultima posizione è quella delle unità: centinaia, decine, unità = $10^2$, $10^1$,
+          $10^0$. Probabilmente lo sapete già dalle scuole medie; altrimenti nessun problema, lo vedremo per bene in
+          una prossima lezione — per ora fidatevi.</p>
+      </div>
+
+      <p>Questo sistema — nato in India, perfezionato dagli Arabi (ricordate al-Khwārizmī?), arrivato in Europa nel
+        Medioevo — ha avuto un <strong>successo planetario</strong>: oggi lo usa tutto il mondo, qualunque lingua si
+        parli. Il motivo è doppio: si scrive <strong>veloce</strong> (tre cifre per il 527, contro l'infilata romana)
+        e soprattutto si <strong>calcola veloce</strong> — incolonni, sommi cifra per cifra, riporti: le operazioni
+        in colonna che fate dalle elementari <em>esistono</em> grazie alla posizionalità.</p>
+
+      <p>Ma una domanda sorge: perché le cifre devono essere proprio <strong>dieci</strong>? Probabilmente perché
+        abbiamo <strong>dieci dita</strong> — il pallottoliere di serie che l'evoluzione ci ha montato addosso. Una
+        scelta comoda, non obbligatoria: il meccanismo posizionale funziona con <em>qualsiasi</em> numero di cifre.
+        E c'è qualcuno, vicinissimo a voi, che di "dita" ne ha soltanto due...</p>
+    </section>
+
+    <!-- 5 — LA BASE 2 -->
+    <section id="sec5">
+      <h2>5. La base 2: il sistema del computer</h2>
+
+      <p>Il computer. In fisica studierete che, per ragioni di praticità e di costo, gli strumenti elettronici
+        distinguono bene due soli stati: <strong>acceso e spento</strong>, passa corrente o non passa (lo abbiamo
+        già accennato nella lezione 3 con le schede perforate). Per una macchina così esistono solo <strong>due
+        cifre</strong>: $0$ e $1$.</p>
+
+      <p>E allora contiamo con le sue regole. Niente cose: $0$. Una cosa: $1$. Due cose...? Il computer <strong>non
+        conosce la cifra 2</strong> (almeno a livello hardware — poi il software traduce tutto nel linguaggio comodo
+        per noi). Ma conosce il trucco posizionale: cifre finite? <strong>Si va di riporto!</strong> Due si scrive
+        $10_2$ — si legge «uno-zero in base due», e significa "1 gruppo da due e 0 unità":
+        $10_2 = 1 \times 2^1 + 0 \times 2^0$. Stesso identico meccanismo del nostro 10, solo che i gruppi non sono
+        da dieci: sono da <strong>due</strong>. Guardate la tabella e leggetela riga per riga:</p>
+
+      <table class="num-tab">
+        <tr><th>Le mele sul tavolo</th><th>Base 10</th><th>Base 2</th></tr>
+        <tr><td class="apples">—</td><td>0</td><td class="bin">0</td></tr>
+        <tr><td class="apples">🍎</td><td>1</td><td class="bin">1</td></tr>
+        <tr><td class="apples">🍎🍎</td><td>2</td><td class="bin">10</td></tr>
+        <tr><td class="apples">🍎🍎🍎</td><td>3</td><td class="bin">11</td></tr>
+        <tr><td class="apples">🍎🍎🍎🍎</td><td>4</td><td class="bin">100</td></tr>
+        <tr><td class="apples">🍎🍎🍎🍎🍎</td><td>5</td><td class="bin">101</td></tr>
+        <tr><td class="apples">🍎🍎🍎🍎🍎🍎</td><td>6</td><td class="bin">110</td></tr>
+        <tr><td class="apples">🍎🍎🍎🍎🍎🍎🍎</td><td>7</td><td class="bin">111</td></tr>
+        <tr><td class="apples">🍎🍎🍎🍎🍎🍎🍎🍎</td><td>8</td><td class="bin">1000</td></tr>
+      </table>
+
+      <p>Le mele sono <strong>le stesse</strong> in ogni riga: cambia solo il vestito del numero. Con due sole cifre
+        si costruiscono <strong>tutti</strong> i numeri! E c'è un bonus spettacolare: le <strong>tabelline</strong>.
+        In base 10 ne avete imparate a memoria cento; in base 2 eccole <em>tutte</em>:</p>
+
+      <div class="two-col">
+        <table class="num-tab">
+          <tr><th>+</th><th>0</th><th>1</th></tr>
+          <tr><th>0</th><td class="bin">0</td><td class="bin">1</td></tr>
+          <tr><th>1</th><td class="bin">1</td><td class="bin">10</td></tr>
+        </table>
+        <table class="num-tab">
+          <tr><th>×</th><th>0</th><th>1</th></tr>
+          <tr><th>0</th><td class="bin">0</td><td class="bin">0</td></tr>
+          <tr><th>1</th><td class="bin">0</td><td class="bin">1</td></tr>
+        </table>
+      </div>
+
+      <p>Tutta l'aritmetica binaria sta in queste otto caselle (l'unica da ricordare: $1 + 1 = 10_2$, "zero e
+        riporto uno"). Per questo i circuiti che fanno i conti dentro la ALU (lezione 3!) possono essere così
+        semplici e veloci.</p>
+    </section>
+
+    <!-- 6 — LE CONVERSIONI -->
+    <section id="sec6">
+      <h2>6. Cambiare base: le conversioni</h2>
+
+      <h3>6.1 — Da base 2 a base 10: somma le potenze</h3>
+      <p>Questa la conosciamo già (lezione 3, schede perforate): ogni cifra binaria vale una <strong>potenza di
+        2</strong> — da destra: $2^0 = 1$, $2^1 = 2$, $2^2 = 4$, $2^3 = 8$, $2^4 = 16$... — e si sommano le potenze
+        accese:</p>
+
+      <div class="formula-box">
+        $$1101_2 = 1 \times 2^3 + 1 \times 2^2 + 0 \times 2^1 + 1 \times 2^0 = 8 + 4 + 0 + 1 = 13$$
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 1 — da binario a decimale</span><span class="difficulty easy">Facile</span></div>
+        <p><strong>(a)</strong> $1010_2$; &nbsp; <strong>(b)</strong> $11100_2$; &nbsp; <strong>(c)</strong> $100101_2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">a</span>$1010_2 = 8 + 2 = \mathbf{10}$.</p>
+          <p><span class="step-num">b</span>$11100_2 = 16 + 8 + 4 = \mathbf{28}$.</p>
+          <p><span class="step-num">c</span>$100101_2 = 32 + 4 + 1 = \mathbf{37}$.</p>
+        </div>
+      </div>
+
+      <h3>6.2 — Da base 10 a base 2: l'algoritmo dei resti</h3>
+      <p>E il viaggio inverso? C'è un algoritmo (al-Khwārizmī sarebbe fiero) tanto meccanico quanto infallibile:
+        le <strong>divisioni successive per 2</strong>.</p>
+
+      <div class="rule">
+        <strong>L'algoritmo dei resti.</strong>
+        <br><strong>1)</strong> Dividi il numero per 2 e segna il <strong>resto</strong> (che può essere solo 0 o 1).
+        <br><strong>2)</strong> Dividi il quoziente per 2, segna il resto. Ripeti finché il quoziente diventa 0.
+        <br><strong>3)</strong> Leggi i resti <strong>dall'ultimo al primo</strong>: ecco il numero in base 2.
+        <br><em>Perché funziona?</em> Ogni divisione per 2 chiede: "questa quantità è fatta di gruppi da 2, e ne
+        avanza una?" — il resto è esattamente la cifra di quella posizione, dalle unità in su.
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">Esempio: 13 in base 2</div>
+        $$13 : 2 = 6 \text{ resto } \mathbf{1} \qquad 6 : 2 = 3 \text{ resto } \mathbf{0} \qquad 3 : 2 = 1 \text{ resto } \mathbf{1} \qquad 1 : 2 = 0 \text{ resto } \mathbf{1}$$
+        <p class="formula-note">Letti dal basso verso l'alto: $\mathbf{1101_2}$ ✓ (proprio il 13 di prima!)</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2 — da decimale a binario</span><span class="difficulty medium">Medio</span></div>
+        <p>Converti con l'algoritmo dei resti: <strong>(a)</strong> $22$; &nbsp; <strong>(b)</strong> $37$; &nbsp;
+          <strong>(c)</strong> $64$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">a</span>$22:2 = 11$ r $0$; $11:2 = 5$ r $1$; $5:2 = 2$ r $1$; $2:2 = 1$ r $0$;
+            $1:2 = 0$ r $1$. Dal basso: $\mathbf{10110_2}$. (Verifica: $16+4+2 = 22$ ✓)</p>
+          <p><span class="step-num">b</span>$37:2 = 18$ r $1$; $18:2 = 9$ r $0$; $9:2 = 4$ r $1$; $4:2 = 2$ r $0$;
+            $2:2 = 1$ r $0$; $1:2 = 0$ r $1$. Dal basso: $\mathbf{100101_2}$ — il (c) dell'esercizio 1, il cerchio si chiude.</p>
+          <p><span class="step-num">c</span>$64:2 = 32$ r $0$... tutti resti $0$ fino a $1:2 = 0$ r $1$:
+            $\mathbf{1000000_2}$. Sensato: $64 = 2^6$, una potenza esatta — come il nostro 1.000.000 è $10^6$.</p>
+        </div>
+      </div>
+
+      <div class="curiosita">
+        <strong>La battuta d'obbligo.</strong> Al mondo esistono <strong>10 tipi di persone</strong>: quelle che
+        conoscono il sistema di numerazione binario e quelle che non lo conoscono. (Se non avete riso, rileggete la
+        tabella delle mele. Se avete riso, benvenuti nel club: ormai siete del primo tipo.)
+      </div>
+    </section>
+
+    <!-- 7 — LA DIVINAZIONE BINARIA -->
+    <section id="sec7">
+      <h2>7. Il gioco: la divinazione binaria</h2>
+
+      <p>E adesso trasformiamo il binario in un <strong>trucco di magia</strong> da fare in coppia. Il gioco si
+        chiama <em>divinazione binaria</em> e funziona così: una persona <strong>pensa un numero da 0 a 15</strong>
+        (senza dirlo!); il "mago" le mostra <strong>quattro tabelle</strong> di numeri, una alla volta, e per
+        ciascuna fa una sola domanda: <em>«Il tuo numero è in questa tabella?»</em>. Dopo quattro sì/no... il mago
+        legge nella mente. Provate qui — uno di voi pensa il numero, l'altro preme i bottoni:</p>
+
+      <div class="controls">
+        <button class="btn" id="mg-yes">✅ Sì, c'è</button>
+        <button class="btn" id="mg-no">❌ No, non c'è</button>
+        <button class="btn" id="mg-reset">↺ ricomincia</button>
+      </div>
+      <div class="ckt">
+        <p id="mg-title" style="text-align:center; font-weight:700; margin:0.4rem 0;"></p>
+        <div class="mg-grid" id="mg-grid"></div>
+        <div class="mg-string" id="mg-string"></div>
+      </div>
+      <p class="eq-out" id="mg-out"></p>
+
+      <div class="note">
+        <strong>Il trucco svelato</strong> (dopo aver giocato!). Ogni tabella contiene i numeri che hanno un certo
+        <strong>1 nella scrittura binaria</strong>: la prima raccoglie quelli con la cifra da 8, la seconda quelli
+        con la cifra da 4, poi da 2, poi da 1. Rispondendo sì o no, la vittima sta <strong>dettando al mago il suo
+        numero in base 2, una cifra alla volta</strong> — senza saperlo. Quattro risposte = quattro bit = un numero
+        da 0 a 15.
+        <br><br>C'è anche un modo <strong>ancora più rapido</strong> per il mago, che non richiede di scrivere
+        niente in binario: <strong>guardare il primo numero in alto a sinistra di ogni tabella</strong> (è 8, 4, 2,
+        1 — proprio le potenze di 2!). Ogni volta che la vittima dice «sì, c'è», il mago <strong>somma quel primo
+        numero</strong> a un totale che tiene a mente. Alla fine il totale <em>è</em> il numero pensato! Se il numero
+        è 13, dirà sì alla tabella dell'8 (totale 8), sì a quella del 4 (totale 12), no al 2, sì all'1 (totale 13).
+        Magia. Funziona anche su carta: copiatevi le quattro tabelle e portatele a cena. Fate i maghi finché qualcuno
+        non segue questo corso.
+      </div>
+    </section>
+
+    <!-- 8 — BIT, BYTE E INFORMAZIONE -->
+    <section id="sec8">
+      <h2>8. Che cos'è l'informazione? Bit e byte</h2>
+
+      <p>Il binario ci porta dritti a una domanda profonda: <strong>che cos'è un'informazione?</strong> Non è una
+        domanda semplice — i filosofi ci litigano ancora. Ma c'è una domanda più facile e più utile: <strong>come si
+        misura</strong> l'informazione? Risposta: con i <strong>bit</strong>.</p>
+
+      <p>Volete sapere una cosa semplice: <em>la luce è accesa o spenta?</em> La risposta è un sì o un no: un
+        <strong>singolo bit</strong> di informazione. Volete sapere una cosa più ricca: <em>quale materia preferisci
+        tra matematica, italiano, scienze motorie e scienze umane?</em> Un bit non basta più — le risposte possibili
+        sono <strong>quattro</strong>. Ma il trucco lo conosciamo: associamo a ogni risposta un numero e scriviamo
+        il numero in binario: matematica $= 00$, italiano $= 01$, scienze motorie $= 10$, scienze umane $= 11$.
+        Servono <strong>2 bit</strong>. (E per 8 opzioni? 3 bit. Per 16? 4 bit — il gioco della divinazione, di
+        nuovo: quattro domande sì/no per un numero da 0 a 15.)</p>
+
+      <p>Cogliete lo schema: ogni bit in più <strong>raddoppia</strong> il numero di risposte distinguibili — con
+        $n$ bit si distinguono $2^n$ possibilità. L'informazione cresce a <strong>potenze di 2</strong>: 1 bit → 2,
+        2 bit → 4, 3 bit → 8, 4 bit → 16, ... 8 bit → 256. Ecco perché, non a caso, i <strong>tagli di
+        memoria</strong> delle RAM e delle memorie di massa sono quasi sempre potenze di 2:
+        16, 32, 64 (quelle dei dispositivi di qualche anno fa), poi 128, 256, 512 GB e così via. Non è
+        superstizione: è il modo in cui i numeri binari riempiono lo spazio degli indirizzi, esattamente il doppio a
+        ogni gradino.</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">bit</span><span class="nome">binary digit</span><span class="significa">l'unità di misura dell'informazione: una risposta sì/no, una cifra binaria (0 o 1)</span></div>
+        <div class="sym-card"><span class="sym">byte</span><span class="nome">8 bit</span><span class="significa">il "pacchetto" standard: 8 bit = 256 combinazioni, quanto basta per una lettera o un numero da 0 a 255</span></div>
+      </div>
+
+      <p>Un gruppo di <strong>8 bit</strong> si chiama <strong>byte</strong>: è il mattoncino con cui si misurano le
+        memorie. E siccome i byte nei dispositivi sono miliardi, si usano i <strong>multipli</strong> — li ricordate,
+        vero? deci, etto, kilo (migliaia), mega (milioni), giga (miliardi): mentre scrivo, le memorie di telefoni e
+        computer si misurano in <strong>Gigabyte</strong> — miliardi di byte, decine di miliardi di sì/no, in un
+        oggetto che sta in tasca.</p>
+    </section>
+
+    <!-- 9 — I PIXEL -->
+    <section id="sec9">
+      <h2>9. Un'immagine è una sequenza di bit: i pixel</h2>
+
+      <p>Facciamo un esempio che avete letteralmente sotto gli occhi: lo <strong>schermo</strong> del cellulare.
+        È composto da tantissimi <strong>pixel</strong>, puntini minuscoli. Facciamo finta, per ora, che ogni pixel
+        possa essere solo <strong>acceso o spento</strong>: allora un'immagine è... una sequenza di bit! Potrei
+        scrivervi un messaggio: «partendo dal primo pixel in alto a sinistra, riga per riga, la sequenza
+        Acceso/Spento è: SAAS AASA...» — e voi potreste <strong>ricostruire l'immagine</strong>. Parti dal
+        <strong>cuoricino</strong> qui pronto, poi divertiti: cancella le lettere e <strong>disegna qualcosa di
+        tuo</strong> (A = acceso, S = spento, 64 caratteri per una griglia 8×8 — una faccina? la tua iniziale?):</p>
+
+      <div class="controls">
+        <div class="control-group" style="flex:1; min-width:280px;"><label>messaggio (A/S)</label>
+          <input type="text" id="px-str" maxlength="64" style="width:100%; font-family:Consolas,monospace;"
+                 value="SAASSAASAAAAAAAAAAAAAAAAAAAAAAAASAAAAAASSSAAAASSSSSAASSSSSSSSSSS"></div>
+      </div>
+      <div class="ckt"><svg id="px-svg" viewBox="0 0 640 300" aria-label="Griglia otto per otto di pixel accesi e spenti costruita dalla stringa di caratteri"></svg></div>
+      <p class="eq-out" id="px-out"></p>
+
+      <p>Nella realtà ogni pixel non è solo acceso/spento: contiene <strong>più componenti</strong> che ne regolano
+        il colore (ci arriviamo nella prossima sezione!), e su uno schermo di pixel ce ne sono <strong>milioni</strong>
+        — così densi che a occhio nudo l'immagine sembra <em>continua</em>. E invece no: è fatta di punti
+        <strong>discreti</strong>, contabili, esattamente come i numeri naturali. Lo schermo è la dimostrazione
+        quotidiana che una quantità enorme di "sì/no" sa travestirsi da realtà sfumata.</p>
+
+      <div class="curiosita">
+        <strong>Descrivere il mondo con il testo.</strong> Quel "messaggio" di lettere che codifica l'immagine è
+        un'idea potentissima: rappresentare <em>qualsiasi</em> informazione — immagini, rubriche, mappe, partite a
+        scacchi — come <strong>testo strutturato</strong> che uomo e macchina possono leggere. In informatica
+        esistono formati standard nati per questo: il più famoso si chiama <strong>JSON</strong>, e lo incontrerete
+        ovunque — è il modo in cui le app e i server del cloud (lezione 3) si scambiano dati di ogni tipo, dal
+        meteo ai messaggi. Il nostro giochino coi pixel è lo stesso principio, in miniatura.
+      </div>
+    </section>
+
+    <!-- 10 — L'ESADECIMALE -->
+    <section id="sec10">
+      <h2>10. La base 16: l'esadecimale</h2>
+
+      <p>Il binario è perfetto per le macchine, ma per gli umani è <em>prolisso</em>: già il 200 richiede otto cifre
+        ($11001000_2$). Per questo in informatica si usa moltissimo un'altra base, la <strong>base 16</strong> o
+        <strong>esadecimale</strong>. Servono <strong>sedici cifre</strong>: le solite da 0 a 9... e poi? Si
+        prendono in prestito le lettere: $\text{A} = 10$, $\text{B} = 11$, $\text{C} = 12$, $\text{D} = 13$,
+        $\text{E} = 14$, $\text{F} = 15$.</p>
+
+      <table class="num-tab">
+        <tr><th>Base 10</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td></tr>
+        <tr><th>Base 2</th><td class="bin">0</td><td class="bin">1</td><td class="bin">10</td><td class="bin">11</td><td class="bin">100</td><td class="bin">101</td><td class="bin">110</td><td class="bin">111</td><td class="bin">1000</td><td class="bin">1001</td><td class="bin">1010</td><td class="bin">1011</td><td class="bin">1100</td><td class="bin">1101</td><td class="bin">1110</td><td class="bin">1111</td></tr>
+        <tr><th>Base 16</th><td class="hexc">0</td><td class="hexc">1</td><td class="hexc">2</td><td class="hexc">3</td><td class="hexc">4</td><td class="hexc">5</td><td class="hexc">6</td><td class="hexc">7</td><td class="hexc">8</td><td class="hexc">9</td><td class="hexc">A</td><td class="hexc">B</td><td class="hexc">C</td><td class="hexc">D</td><td class="hexc">E</td><td class="hexc">F</td></tr>
+      </table>
+
+      <p>Il meccanismo è il solito, con le <strong>potenze di 16</strong>: ogni posizione vale sedici volte quella
+        alla sua destra. E le conversioni funzionano con gli stessi due attrezzi di sempre:</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Da base 16 a base 10 (somma le potenze) e ritorno (dividi per 16)</div>
+        $$\text{2F}_{16} = 2 \times 16^1 + 15 \times 16^0 = 32 + 15 = 47$$
+        $$47 : 16 = 2 \;\text{resto}\; 15 \,(= \text{F}) \qquad 2 : 16 = 0 \;\text{resto}\; 2 \qquad \Rightarrow\; 47 = \text{2F}_{16}$$
+        <p class="formula-note">Anche le tabelline esadecimali esistono (una tavola pitagorica 16×16, da brividi):
+          basta ricordare che si somma "in gruppi da sedici": $9 + 1 = \text{A}$, $\text{F} + 1 = 10_{16}$
+          (cioè sedici!), $\text{A} \times 2 = 14_{16}$ (cioè venti).</p>
+      </div>
+
+      <p>Ma perché <strong>proprio</strong> 16? Guardate la tabella qui sopra: $16 = 2^4$, quindi <strong>una cifra
+        esadecimale corrisponde esattamente a quattro cifre binarie</strong> — la conversione tra base 2 e base 16 è
+        una semplice sostituzione a blocchi. Un <strong>byte</strong> (8 bit) diventa esattamente <strong>due
+        cifre</strong> esadecimali: $11001000_2 = \text{C8}_{16}$. Compatto per gli umani, immediato per le
+        macchine: il traduttore perfetto.</p>
+
+      <h3>10.1 — L'esadecimale dei colori</h3>
+      <p>L'applicazione che avete visto mille volte senza saperlo: i <strong>colori</strong>. Ogni pixel dello
+        schermo mescola tre luci — <strong>Rosso, Verde e Blu</strong> (RGB) — ciascuna con un'intensità da 0 a 255:
+        esattamente <strong>un byte</strong>, cioè due cifre esadecimali. Un colore è quindi una sigla di sei cifre:
+        <code>#RRGGBB</code>. Rosso puro = <code>#FF0000</code>, bianco = <code>#FFFFFF</code>, nero =
+        <code>#000000</code>. Gioca col mixer:</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Rosso</label><input type="range" id="hx-r" min="0" max="255" step="1" value="230"><span class="val-badge" id="hx-r-val">230</span></div>
+        <div class="control-group"><label>Verde</label><input type="range" id="hx-g" min="0" max="255" step="1" value="120"><span class="val-badge" id="hx-g-val">120</span></div>
+        <div class="control-group"><label>Blu</label><input type="range" id="hx-b" min="0" max="255" step="1" value="40"><span class="val-badge" id="hx-b-val">40</span></div>
+      </div>
+      <div class="ckt"><svg id="hx-svg" viewBox="0 0 640 170" aria-label="Anteprima del colore composto dai tre canali rosso verde blu con il suo codice esadecimale"></svg></div>
+      <p class="eq-out" id="hx-out"></p>
+
+      <p>Altri posti dove l'esadecimale vive: gli <strong>indirizzi di memoria</strong> dei programmi, i codici
+        <strong>MAC</strong> delle schede di rete (tipo <code>A4:5E:60:F2:11:9C</code>), i codici dei caratteri
+        <strong>Unicode</strong> (l'emoji 😀 è ufficialmente il carattere <code>U+1F600</code>), i codici di errore
+        dei sistemi operativi. Ogni volta che vedete cifre mescolate alle lettere A-F, ora sapete che cosa state
+        guardando: byte in abito da sera.</p>
+    </section>
+
+    <!-- 11 — L'OTTALE -->
+    <section id="sec11">
+      <h2>11. La base 8: l'ottale</h2>
+
+      <p>Ultima tappa del giro: la <strong>base 8</strong>, o <strong>ottale</strong>. Cifre da $0$ a $7$, posizioni
+        che valgono potenze di 8, stessi identici attrezzi di conversione:</p>
+
+      <table class="num-tab">
+        <tr><th>Base 10</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>16</td></tr>
+        <tr><th>Base 8</th><td class="hexc">0</td><td class="hexc">1</td><td class="hexc">2</td><td class="hexc">3</td><td class="hexc">4</td><td class="hexc">5</td><td class="hexc">6</td><td class="hexc">7</td><td class="hexc">10</td><td class="hexc">11</td><td class="hexc">12</td><td class="hexc">20</td></tr>
+      </table>
+
+      <div class="formula-box">
+        $$52_8 = 5 \times 8^1 + 2 \times 8^0 = 40 + 2 = 42
+        \qquad\qquad
+        42 : 8 = 5 \;\text{r}\; 2, \quad 5 : 8 = 0 \;\text{r}\; 5 \;\Rightarrow\; 52_8$$
+        <p class="formula-note">Anche qui il segreto è una potenza di 2: $8 = 2^3$, quindi una cifra ottale = tre
+          cifre binarie esatte.</p>
+      </div>
+
+      <p>L'ottale era popolarissimo agli albori dell'informatica (quando le macchine lavoravano a gruppi di 3 bit) e
+        sopravvive in un posto che conoscete: i <strong>permessi dei file</strong> di Linux (lezione 3!). Il famoso
+        codice <code>755</code> è ottale: ogni cifra impacchetta tre bit — lettura, scrittura, esecuzione — per
+        proprietario, gruppo e altri. $7 = 111_2$ (può tutto), $5 = 101_2$ (legge ed esegue, non scrive).</p>
+
+      <div class="curiosita">
+        <strong>La seconda battuta d'obbligo.</strong> Perché per i matematici Halloween e Natale sono lo stesso
+        giorno? Perché <strong>OCT 31 = DEC 25</strong>: il 31 in base otto ($3 \times 8 + 1$) è esattamente il 25
+        in base dieci. Ottobre e dicembre, ottale e decimale: due feste, un solo numero. (Da oggi siete autorizzati
+        a rovinarla a tutti i cenoni.)
+      </div>
+
+      <h3>11.1 — Le tabelline complete (per i coraggiosi)</h3>
+      <p>Abbiamo visto quanto sono semplici le tabelline in base 2. In base 8 e in base 16, invece, sono... una bella
+        sfida: ogni prodotto va scritto nella nuova base (ricordando che, per esempio, in base 16 dopo il 9 vengono
+        A, B, C, D, E, F, e che $16$ si scrive $10_{16}$). Ecco le <strong>tavole pitagoriche complete</strong>, per
+        chi vuole vederle davvero tutte — la casella riga $r$, colonna $c$ contiene il prodotto $r \times c$ scritto
+        nella base indicata:</p>
+
+      <div class="controls">
+        <button class="btn" id="tt-oct">🔢 Mostra la tabellina della base 8</button>
+        <button class="btn" id="tt-hex">🔢 Mostra la tabellina della base 16</button>
+      </div>
+      <div id="tt-oct-box" style="display:none;">
+        <p style="text-align:center; font-weight:700; margin:0.6rem 0 0.2rem;">Tavola pitagorica in base 8 (ottale)</p>
+        <div style="overflow-x:auto;"><div id="tt-oct-tab"></div></div>
+      </div>
+      <div id="tt-hex-box" style="display:none;">
+        <p style="text-align:center; font-weight:700; margin:0.6rem 0 0.2rem;">Tavola pitagorica in base 16 (esadecimale)</p>
+        <div style="overflow-x:auto;"><div id="tt-hex-tab"></div></div>
+      </div>
+    </section>
+
+    <!-- 12 — QUIZ -->
+    <section id="quiz">
+      <h2>12. Quiz finale</h2>
+      <p>Dieci domande su basi, conversioni e bit. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 6 — I sistemi di numerazione · Matematica · Primo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezioni 7, 9 e 10 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 7 — Divinazione binaria =====
+      (function () {
+        const grid = document.getElementById('mg-grid');
+        if (!grid) return;
+        const title = document.getElementById('mg-title'), strEl = document.getElementById('mg-string'), out = document.getElementById('mg-out');
+        const BITS = [8, 4, 2, 1];
+        let idx = 0, bits = [];
+        function table(bit) {
+          const t = [];
+          for (let n = 0; n <= 15; n++) if (n & bit) t.push(n);
+          return t;
+        }
+        function partial() { return bits.reduce((s, b, i) => s + (b ? BITS[i] : 0), 0); }
+        function draw() {
+          if (idx < 4) {
+            title.textContent = 'Tabella ' + (idx + 1) + ' di 4 — il numero pensato è qui dentro?';
+            const t = table(BITS[idx]);
+            grid.innerHTML = t.map((n, i) => '<div class="mg-cell"' +
+              (i === 0 ? ' style="border-color: var(--magenta); color: var(--magenta);"' : '') + '>' + n + '</div>').join('');
+            out.innerHTML = 'Chi ha pensato il numero risponde solo <strong>sì</strong> o <strong>no</strong>; il mago preme il bottone giusto. ' +
+              'Trucco veloce: il primo numero in alto a sinistra è <strong>' + BITS[idx] + '</strong> — se la risposta è sì, il mago lo somma al totale.' +
+              (idx > 0 ? ' &nbsp;Totale finora: <strong>' + partial() + '</strong>.' : '');
+          } else {
+            const n = partial();
+            title.textContent = 'Il mago ha letto nella tua mente...';
+            grid.innerHTML = '<div class="mg-cell" style="grid-column: 2 / span 2; font-size:2rem; padding:0.8rem 0; border-color: var(--magenta); color: var(--magenta);">' + n + '</div>';
+            out.innerHTML = '🔮 <strong>Il numero che hai pensato è ' + n + '!</strong> (In binario: ' +
+              bits.join('') + '&#8322; = ' + (bits[0] ? '8' : '0') + '+' + (bits[1] ? '4' : '0') + '+' + (bits[2] ? '2' : '0') + '+' + (bits[3] ? '1' : '0') +
+              '.) Premi &laquo;ricomincia&raquo; per rifare il trucco — poi leggete insieme come funziona, qui sotto.';
+          }
+          strEl.innerHTML = bits.map(b => b).join(' ') + (idx < 4 ? ' ' + Array(4 - idx).fill('_').join(' ') : '');
+        }
+        function answer(b) {
+          if (idx >= 4) return;
+          bits.push(b); idx++;
+          draw();
+        }
+        document.getElementById('mg-yes').addEventListener('click', function () { answer(1); });
+        document.getElementById('mg-no').addEventListener('click', function () { answer(0); });
+        document.getElementById('mg-reset').addEventListener('click', function () { idx = 0; bits = []; draw(); });
+        draw();
+      })();
+
+      // ===== 9 — Il display di pixel =====
+      (function () {
+        const inp = document.getElementById('px-str');
+        if (!inp) return;
+        const svg = document.getElementById('px-svg'), out = document.getElementById('px-out');
+        function draw() {
+          const raw = inp.value.toUpperCase();
+          let s = '';
+          for (let i = 0; i < raw.length && s.length < 64; i++)
+            if (raw[i] === 'A' || raw[i] === 'S') s += raw[i];
+          while (s.length < 64) s += 'S';
+          const S = 32, x0 = 192, y0 = 16;
+          let h = '<rect x="' + (x0 - 8) + '" y="' + (y0 - 8) + '" width="' + (8 * S + 16) + '" height="' + (8 * S + 16) + '" rx="10" fill="#0b0e14" stroke="var(--border)"/>';
+          let on = 0;
+          for (let i = 0; i < 64; i++) {
+            const r = Math.floor(i / 8), c = i % 8, acc = s[i] === 'A';
+            if (acc) on++;
+            h += '<rect x="' + (x0 + c * S + 2) + '" y="' + (y0 + r * S + 2) + '" width="' + (S - 4) + '" height="' + (S - 4) + '" rx="4" fill="' + (acc ? '#7CFF6B' : '#1a1f29') + '"' + (acc ? ' opacity="0.95"' : '') + '/>';
+          }
+          svg.innerHTML = h;
+          out.innerHTML = 'Il tuo "display": <strong>64 pixel</strong> = 64 bit = <strong>8 byte</strong> di informazione. Accesi: ' + on + '. Cambia le lettere e disegna qualcos\'altro!';
+        }
+        inp.addEventListener('input', draw);
+        draw();
+      })();
+
+      // ===== 10 — Il mixer dei colori =====
+      (function () {
+        const sr = document.getElementById('hx-r');
+        if (!sr) return;
+        const sg = document.getElementById('hx-g'), sb = document.getElementById('hx-b');
+        const svg = document.getElementById('hx-svg'), out = document.getElementById('hx-out');
+        function hex2(v) { return v.toString(16).toUpperCase().padStart(2, '0'); }
+        function draw() {
+          const r = +sr.value, g = +sg.value, b = +sb.value;
+          document.getElementById('hx-r-val').textContent = r;
+          document.getElementById('hx-g-val').textContent = g;
+          document.getElementById('hx-b-val').textContent = b;
+          const code = '#' + hex2(r) + hex2(g) + hex2(b);
+          const bright = (r * 299 + g * 587 + b * 114) / 1000;
+          svg.innerHTML =
+            '<rect x="40" y="15" width="560" height="110" rx="14" fill="rgb(' + r + ',' + g + ',' + b + ')" stroke="var(--border)" stroke-width="1.5"/>' +
+            '<text x="320" y="80" text-anchor="middle" style="font-family:Consolas,monospace; font-size:30px; font-weight:800;" fill="' + (bright > 128 ? '#111' : '#fff') + '">' + code + '</text>' +
+            '<text x="320" y="155" text-anchor="middle" class="lbl-s">tre byte, sei cifre esadecimali: un colore</text>';
+          out.innerHTML = 'R = ' + r + ' = <strong>' + hex2(r) + '</strong>&#8321;&#8326; &nbsp;&middot;&nbsp; G = ' + g + ' = <strong>' + hex2(g) + '</strong>&#8321;&#8326; &nbsp;&middot;&nbsp; B = ' + b + ' = <strong>' + hex2(b) + '</strong>&#8321;&#8326; &nbsp;&rarr;&nbsp; codice <strong>' + code + '</strong>';
+        }
+        [sr, sg, sb].forEach(s => s.addEventListener('input', draw));
+        draw();
+      })();
+
+      // ===== 11.1 — Tabelline complete base 8 e base 16 =====
+      (function () {
+        function tableHTML(base) {
+          const conv = n => n.toString(base).toUpperCase();
+          let h = '<table class="num-tab" style="margin:0.3rem auto;"><tr><th>×</th>';
+          for (let c = 1; c < base; c++) h += '<th class="hexc">' + conv(c) + '</th>';
+          h += '</tr>';
+          for (let r = 1; r < base; r++) {
+            h += '<tr><th class="hexc">' + conv(r) + '</th>';
+            for (let c = 1; c < base; c++)
+              h += '<td class="hexc">' + conv(r * c) + '</td>';
+            h += '</tr>';
+          }
+          return h + '</table>';
+        }
+        function wire(btn, box, tab, base, label) {
+          const b = document.getElementById(btn); if (!b) return;
+          const boxEl = document.getElementById(box), tabEl = document.getElementById(tab);
+          let built = false;
+          b.addEventListener('click', function () {
+            const show = boxEl.style.display === 'none';
+            boxEl.style.display = show ? 'block' : 'none';
+            b.textContent = (show ? '🙈 Nascondi' : '🔢 Mostra') + ' la tabellina della base ' + base;
+            if (show && !built) { tabEl.innerHTML = tableHTML(base); built = true; }
+          });
+        }
+        wire('tt-oct', 'tt-oct-box', 'tt-oct-tab', 8);
+        wire('tt-hex', 'tt-hex-box', 'tt-hex-tab', 16);
+      })();
+
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Che cosa significa che il nostro sistema di numerazione è <strong>posizionale</strong>?',
+        options: ['che i numeri si scrivono in fila', 'che il valore di una cifra dipende dalla posizione che occupa nel numero', 'che ogni numero ha una posizione fissa sulla retta', 'che si scrive da sinistra a destra', 'che le cifre sono dieci'],
+        correct: 1, explain: 'Il "5" di 52 vale cinquanta, il "5" di 25 vale cinque: stesso simbolo, valore diverso a seconda del posto. Nel sistema romano invece X vale dieci ovunque si trovi.' },
+      { type: 'mc', diff: 'easy', text: 'Qual è la differenza tra <strong>cifra</strong> e <strong>numero</strong>?',
+        options: ['nessuna: sono sinonimi', 'le cifre sono i numeri piccoli', 'le cifre sono i simboli (da 0 a 9), i numeri sono le quantità che si scrivono combinandole', 'i numeri sono pari, le cifre dispari', 'le cifre esistono solo in base 10'],
+        correct: 2, explain: 'La cifra sta al numero come la lettera sta alla parola: con 10 simboli si scrivono infiniti numeri.' },
+      { type: 'mc', diff: 'easy', text: 'Quanto vale il numero romano $\\text{XLII}$?',
+        options: ['$62$', '$42$', '$38$', '$92$', '$1052$'],
+        correct: 1, explain: 'XL = 50 − 10 = 40 (regola sottrattiva: X prima di L si sottrae), poi II = 2: totale 42.' },
+      { type: 'mc', diff: 'medium', text: 'Perché i Romani NON facevano i calcoli per iscritto con i loro numeri?',
+        options: ['perché era vietato dalla legge', 'perché non sapevano sommare', 'perché il papiro costava troppo', 'perché il sistema non è posizionale: niente colonne, niente riporti — per calcolare usavano l\'abaco', 'in realtà li facevano benissimo'],
+        correct: 3, explain: 'Senza posizionalità (e senza zero) i simboli non si incolonnano: la scrittura serviva a registrare i risultati, i conti si facevano con l\'abaco.' },
+      { type: 'mc', diff: 'medium', text: 'La scomposizione corretta di $527$ è:',
+        options: ['$5 \\times 10^2 + 2 \\times 10^1 + 7 \\times 10^0$', '$5 \\times 10^3 + 2 \\times 10^2 + 7 \\times 10^1$', '$5 + 2 + 7$', '$527 \\times 10^0 \\times 10^1 \\times 10^2$', '$7 \\times 10^2 + 2 \\times 10^1 + 5 \\times 10^0$'],
+        correct: 0, explain: '500 + 20 + 7: centinaia, decine, unità = potenze di 10 decrescenti. E 10⁰ = 1: qualsiasi numero alla zero fa uno.' },
+      { type: 'mc', diff: 'medium', text: 'Quanto vale $11011_2$ in base 10?',
+        options: ['$22$', '$25$', '$27$', '$19$', '$11011$'],
+        correct: 2, explain: 'Potenze accese: 16 + 8 + 2 + 1 = 27.' },
+      { type: 'mc', diff: 'medium', text: 'Nell\'algoritmo delle divisioni successive per 2, il numero binario si ottiene leggendo i resti:',
+        options: ['nell\'ordine in cui escono', 'solo quelli uguali a 1', 'dall\'ultimo al primo', 'sommandoli tra loro', 'scartando il primo'],
+        correct: 2, explain: 'Il primo resto è la cifra delle unità (la più a destra), l\'ultimo è la più a sinistra: si legge dal basso verso l\'alto. Esempio: 13 → resti 1,0,1,1 → 1101₂.' },
+      { type: 'mc', diff: 'hard', text: 'Perché in informatica si usa proprio la base 16?',
+        options: ['perché 16 è un numero fortunato', 'perché $16 = 2^4$: una cifra esadecimale equivale esattamente a 4 bit, e un byte a due cifre', 'perché ci sono 16 lettere utilizzabili', 'perché i primi computer avevano 16 tasti', 'per rendere i codici incomprensibili'],
+        correct: 1, explain: 'La conversione binario ↔ esadecimale è una sostituzione a blocchi di 4 bit: 11001000₂ = C8₁₆. Compatto per gli umani, immediato per le macchine.' },
+      { type: 'mc', diff: 'hard', text: 'Il codice colore <code>#00FF00</code> corrisponde a:',
+        options: ['rosso puro', 'blu puro', 'bianco', 'verde puro', 'nero'],
+        correct: 3, explain: 'Formato #RRGGBB: rosso = 00 (spento), verde = FF (massimo: 255), blu = 00. Solo la luce verde accesa al massimo: verde puro.' },
+      { type: 'open', diff: 'hard', text: 'Confronta il sistema romano e il sistema posizionale: come funzionano, e perché il posizionale ha vinto? Spiega poi perché i computer usano la base 2 e come si convertono i numeri tra base 10 e base 2.',
+        keywords: ['posizion', 'roman', 'zero', 'riport', 'colonna', 'abaco', 'potenze', 'binari', 'resti', 'divisioni', 'acceso', 'spento', 'cifra', 'bit'], requiredMatches: 4,
+        explain: 'Il romano è additivo-sottrattivo: simboli dal valore fisso, niente zero, impossibile calcolare in colonna (serviva l\'abaco). Nel posizionale il valore di una cifra dipende dalla posizione (potenze di 10): scrittura compatta e calcoli veloci con i riporti. I computer distinguono due stati (acceso/spento) → base 2, con le sole cifre 0 e 1: da binario a decimale si sommano le potenze di 2 accese; da decimale a binario si usano le divisioni successive per 2 leggendo i resti dall\'ultimo al primo.' }
+    ];
+  </script>
+
+</body>
+
+</html>

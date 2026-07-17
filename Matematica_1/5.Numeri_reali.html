@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 5 — I numeri reali</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* card dei simboli nuovi */
+    .sym-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin: 0.9rem 0; }
+    .sym-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem 0.7rem; text-align: center; }
+    .sym-card .sym { font-size: 1.6rem; font-weight: 800; color: var(--accent); display: block; }
+    .sym-card .nome { font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; }
+    .sym-card .significa { font-size: 0.86rem; display: block; margin-top: 0.2rem; }
+    /* card delle proprietà delle operazioni */
+    .prop-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 0.8rem; margin: 1rem 0; }
+    .prop-card { background: var(--surface-2); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; padding: 0.75rem 0.95rem; }
+    .prop-card.mul { border-left-color: var(--gold); }
+    .prop-card.mix { border-left-color: var(--magenta); }
+    .prop-card .prop-name { font-weight: 800; font-size: 0.95rem; margin-bottom: 0.25rem; }
+    .prop-card .prop-formula { text-align: center; font-size: 1.05rem; margin: 0.35rem 0 0.5rem; }
+    .prop-card p { margin: 0.3rem 0 0; font-size: 0.92rem; }
+    /* tabelle piccole (zigzag, diagonale di Cantor) */
+    .mini-tab { border-collapse: collapse; margin: 0.6rem auto; }
+    .mini-tab th, .mini-tab td { border: 1px solid var(--border); padding: 0.3rem 0.75rem; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .mini-tab th { background: var(--surface-2); }
+    .diag { color: var(--magenta); font-weight: 800; text-decoration: underline; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Primo anno · Lezione 5</div>
+    <h1>I numeri reali</h1>
+    <p>Potenze, radici e una retta che non si riempie mai — fino agli infiniti di Cantor e ai numeri "immaginari"</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Primo anno</a>
+    <span class="sep">/</span> I numeri reali
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Nella lezione 4 ogni operazione "impossibile" ci ha regalato numeri nuovi: la
+      sottrazione ha creato $\mathbb{Z}$, la divisione ha creato $\mathbb{Q}$. Era rimasta in sospeso un'operazione:
+      la <strong>radice quadrata</strong>. Oggi la affrontiamo — e ci costringerà all'allargamento più profondo di
+      tutti: i <strong>numeri reali</strong>. In fondo alla lezione, per i più coraggiosi, tre sezioni facoltative da
+      vertigine: le strutture algebriche, gli infiniti più grandi di altri infiniti e i numeri "immaginari".
+    </div>
+
+    <!-- 1 — LE POTENZE -->
+    <section id="sec1">
+      <h2>1. Le potenze: l'operazione che funziona (quasi) sempre</h2>
+
+      <p>Nella lezione 4 abbiamo detto che con i naturali possiamo sempre elevare a potenza. La buona notizia è che
+        la potenza funziona sempre anche <strong>nei relativi e nei razionali</strong> — basta stare attenti a due
+        regole:</p>
+
+      <div class="rule">
+        <strong>Potenza di un numero relativo.</strong> Il segno del risultato dipende dall'<strong>esponente</strong>:
+        <br>• esponente <strong>pari</strong> → risultato sempre <strong>positivo</strong>: i segni meno si
+        accoppiano e si eliminano (regola dei segni!). Es: $(-2)^4 = (-2)(-2)(-2)(-2) = +16$;
+        <br>• esponente <strong>dispari</strong> → il risultato <strong>conserva il segno della base</strong>: un
+        meno resta spaiato. Es: $(-2)^3 = -8$, mentre $(+2)^3 = +8$.
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">Potenza di una frazione</div>
+        $$\left(\frac{a}{b}\right)^{\!n} = \frac{a^n}{b^n}
+        \qquad \text{es.: } \left(\frac{2}{3}\right)^{\!3} = \frac{2^3}{3^3} = \frac{8}{27}$$
+        <p class="formula-note">Si eleva sia il numeratore sia il denominatore: una moltiplicazione ripetuta di
+          frazioni è "numeratore per numeratore, denominatore per denominatore" ripetuto.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 1 — potenze con segni e frazioni</span><span class="difficulty easy">Facile</span></div>
+        <p><strong>(a)</strong> $(-3)^2$; &nbsp; <strong>(b)</strong> $(-1)^{15}$; &nbsp;
+          <strong>(c)</strong> $\left(-\dfrac{1}{2}\right)^{4}$; &nbsp; <strong>(d)</strong> $\left(-\dfrac{2}{5}\right)^{3}$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">a</span>Esponente pari: $(-3)^2 = +9$.</p>
+          <p><span class="step-num">b</span>Esponente dispari: il segno resta. $(-1)^{15} = -1$ (quindici meno: quattordici si accoppiano, uno resta spaiato).</p>
+          <p><span class="step-num">c</span>$\left(-\dfrac{1}{2}\right)^{4} = +\dfrac{1^4}{2^4} = \dfrac{1}{16}$ (pari → positivo).</p>
+          <p><span class="step-num">d</span>$\left(-\dfrac{2}{5}\right)^{3} = -\dfrac{2^3}{5^3} = -\dfrac{8}{125}$ (dispari → negativo).</p>
+        </div>
+      </div>
+
+      <p>Notate un dettaglio che ci servirà tra pochissimo: comunque scegliate un numero (positivo o negativo), il
+        suo <strong>quadrato non è mai negativo</strong>. Pari → positivo, sempre. Tenetelo in tasca.</p>
+    </section>
+
+    <!-- 2 — LA RADICE -->
+    <section id="sec2">
+      <h2>2. L'operazione inversa: la radice quadrata</h2>
+
+      <p>E se voglio andare <strong>all'indietro</strong>? Cioè: qual è il numero di cui $4$ è il quadrato? Qui c'è
+        una prima sorpresa: i candidati sono <strong>due</strong> — sia $+2$ sia $-2$, perché $(+2)^2 = 4$ e anche
+        $(-2)^2 = 4$. (Per non fare confusione, i matematici hanno deciso una convenzione: il simbolo
+        $\sqrt{4}$ indica la <strong>radice positiva</strong>, cioè $\sqrt{4} = 2$; se voglio anche l'altra scrivo
+        $\pm\sqrt{4}$.)</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">$\sqrt{\phantom{x}}$</span><span class="nome">radice quadrata</span><span class="significa">$\sqrt{a}$ è il numero positivo (o nullo) il cui quadrato è $a$: l'operazione inversa dell'elevare al quadrato</span></div>
+      </div>
+
+      <p>Ma la vera bomba è un'altra: qual è il numero il cui quadrato è <strong>2</strong>? Nella lezione 2 lo
+        abbiamo <strong>dimostrato per assurdo</strong>: quel numero <strong>non può scriversi come rapporto di due
+        interi</strong>. Non è in $\mathbb{Q}$. Eppure... <em>deve esistere</em>! Guardate qui:</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 240" aria-label="Quadrato di lato 1 con la diagonale: per il teorema di Pitagora la diagonale misura radice di 2">
+        <rect x="240" y="40" width="160" height="160" fill="color-mix(in srgb, var(--accent) 10%, transparent)" stroke="var(--accent)" stroke-width="2.5"/>
+        <line x1="240" y1="200" x2="400" y2="40" stroke="var(--magenta)" stroke-width="3"/>
+        <text x="320" y="226" text-anchor="middle" class="lbl">1</text>
+        <text x="222" y="126" text-anchor="middle" class="lbl">1</text>
+        <text x="345" y="115" class="lbl" fill="var(--magenta)">√2</text>
+        <text x="510" y="100" text-anchor="middle" class="lbl-s">Pitagora:</text>
+        <text x="510" y="124" text-anchor="middle" class="lbl">d&#178; = 1&#178; + 1&#178; = 2</text>
+        <text x="510" y="150" text-anchor="middle" class="lbl">d = √2</text>
+      </svg></div>
+
+      <p>Un quadrato di lato $1$: per il teorema di Pitagora la sua diagonale misura esattamente $\sqrt{2}$. La
+        diagonale è lì, la potete <strong>disegnare e toccare</strong> — ma la sua lunghezza non è esprimibile come
+        frazione del lato. Lato e diagonale sono <strong>incommensurabili</strong>: non esiste nessun "righello
+        comune", per quanto fine, che misuri entrambi un numero intero di volte. Per i Pitagorici — quelli del "tutto
+        è rapporto tra interi" — fu uno scandalo assoluto. Per noi è l'indizio che <strong>alla retta dei numeri
+        manca ancora qualcosa</strong>.</p>
+    </section>
+
+    <!-- 3 — RIEMPIRE LA RETTA -->
+    <section id="sec3">
+      <h2>3. La retta che non si riempie mai (quasi)</h2>
+
+      <p>Riprendiamo la nostra retta dei numeri — stavolta con la freccia solo a destra, il verso in cui i numeri
+        crescono. All'inizio è <strong>vuota</strong>: popolala tu, un colpo alla volta, e guarda che cosa
+        succede.</p>
+
+      <div class="controls">
+        <button class="btn" id="rl-next">1️⃣ aggiungi i numeri naturali</button>
+      </div>
+      <div class="ckt"><svg id="rl-svg" viewBox="0 0 640 130" aria-label="La retta dei numeri che si riempie progressivamente: naturali, negativi, razionali sempre più fitti, e infine i reali"></svg></div>
+      <p class="eq-out" id="rl-out">La retta è ancora vuota: solo punti senza nome. Premi il bottone!</p>
+
+      <p>La morale della simulazione: i razionali si <strong>infittiscono quanto vuoi</strong> — tra due frazioni ce
+        n'è sempre un'altra — eppure <strong>non bastano</strong>: restano buchi invisibili ma reali, come il punto
+        a distanza $\sqrt{2}$ dallo zero, o $\pi$. Per riempire <em>ogni</em> punto della retta servono i
+        <strong>numeri reali</strong>:</p>
+
+      <div class="definition">
+        I <strong>numeri reali</strong> $\mathbb{R}$ sono <em>tutti</em> i punti della retta dei numeri: i razionali
+        <strong>più</strong> gli irrazionali (i numeri come $\sqrt{2}$ e $\pi$, che non sono rapporti di interi e
+        hanno infinite cifre decimali senza periodo). Con $\mathbb{R}$ la retta è <strong>completa</strong>: senza
+        buchi. E finalmente le <strong>radici si possono sempre calcolare</strong>... purché il numero sotto radice
+        non sia negativo (tenete anche questo in tasca: servirà nell'ultima sezione).
+      </div>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">$\mathbb{R}$</span><span class="nome">numeri reali</span><span class="significa">tutti i punti della retta: razionali + irrazionali. La retta, finalmente piena</span></div>
+      </div>
+    </section>
+
+    <!-- 4 — LA TORRE -->
+    <section id="sec4">
+      <h2>4. La torre dei numeri: contenuti, ma diversi</h2>
+
+      <p>Facciamo il censimento del viaggio: $\mathbb{N} \subseteq \mathbb{Z} \subseteq \mathbb{Q} \subseteq
+        \mathbb{R}$. Ricordate la definizione di <strong>sottoinsieme</strong> della lezione 2? Ogni naturale è anche
+        un relativo, ogni relativo è anche un razionale (basta mettergli il denominatore 1), ogni razionale è un
+        punto della retta. Scatole dentro scatole.</p>
+
+      <div class="warning">
+        <strong>Ma attenzione a una cosa importante.</strong> "Contenuto in" non significa "uguale a". Con i numeri
+        naturali <strong>NON posso fare</strong> operazioni che con i relativi posso fare (la sottrazione, sempre);
+        con i relativi non posso fare ciò che i razionali permettono (la divisione, sempre); e con i razionali non
+        posso calcolare $\sqrt{2}$. A ogni piano della torre <strong>si sbloccano poteri nuovi</strong>: per questo
+        si dice che $\mathbb{N}$, $\mathbb{Z}$, $\mathbb{Q}$ e $\mathbb{R}$ sono <strong>strutture matematiche
+        diverse</strong> — stessi mattoni via via inglobati, ma regole del gioco sempre più ricche. (Che cosa sia
+        esattamente una "struttura" lo raccontiamo nella sezione facoltativa 8.)
+      </div>
+    </section>
+
+    <!-- 5 — LE ESPRESSIONI -->
+    <section id="sec5">
+      <h2>5. Le espressioni numeriche</h2>
+
+      <p>Ora che abbiamo tutti i numeri e tutte le operazioni, possiamo affrontare le <strong>espressioni
+        numeriche</strong>: quei calcoli lunghi, con tante operazioni in fila, da svolgere con pazienza
+        <strong>un passaggio alla volta</strong>.</p>
+
+      <div class="definition">
+        Un'<strong>espressione numerica</strong> è una sequenza di numeri legati da operazioni (ed eventualmente
+        parentesi). Il suo valore si ottiene eseguendo le operazioni <strong>nell'ordine giusto</strong>:
+        <br><strong>1)</strong> prima le <strong>parentesi</strong>, dalle più interne $(\;)$ alle più esterne $[\;]$ e $\{\;\}$;
+        <br><strong>2)</strong> poi le <strong>potenze</strong>;
+        <br><strong>3)</strong> poi <strong>moltiplicazioni e divisioni</strong>, nell'ordine in cui compaiono;
+        <br><strong>4)</strong> per ultime <strong>addizioni e sottrazioni</strong>.
+      </div>
+
+      <p><strong>L'ordine conta davvero</strong>: $2 + 3 \times 4$ fa $2 + 12 = 14$ (prima la moltiplicazione!), non
+        $5 \times 4 = 20$. Le due letture danno risultati diversi: senza una regola condivisa, ognuno leggerebbe un
+        numero diverso — e le parentesi servono proprio a <em>cambiare</em> l'ordine quando ci serve:
+        $(2 + 3) \times 4 = 20$, stavolta sì.</p>
+
+      <p>E non è un gioco per la lavagna: l'ordine sbagliato costa <strong>soldi e voti veri</strong>. Tre scene di
+        vita quotidiana:</p>
+
+      <ul>
+        <li><strong>Lo scontrino.</strong> Compri una bibita da 2 € e tre pizzette da 5 €: il totale è
+          $2 + 3 \times 5 = 2 + 15 = 17$ €. Chi legge da sinistra senza regole calcola $(2 + 3) \times 5 = 25$ € — e
+          regala 8 euro alla cassa. Il registratore di cassa, per fortuna, conosce le precedenze.</li>
+        <li><strong>Il punteggio della verifica.</strong> Regolamento noto: risposte giuste 1 punto, errate
+          $-0{,}25$. Con 10 giuste e 4 errate: $10 \times 1 - 4 \times 0{,}25 = 10 - 1 = 9$ punti. Chi eseguisse le
+          operazioni da sinistra otterrebbe $((10 \times 1) - 4) \times 0{,}25 = 1{,}5$... e si prenderebbe un
+          bello spavento. Le moltiplicazioni prima!</li>
+        <li><strong>Le due calcolatrici.</strong> Provate a digitare $2 + 3 \times 4$ su una calcolatrice
+          <em>di base</em> (quella del supermercato, o certe app minimali): risponde <strong>20</strong>, perché
+          esegue ingenuamente da sinistra. Una calcolatrice <em>scientifica</em> risponde <strong>14</strong>,
+          perché conosce l'ordine delle operazioni. Due macchine, due risultati: fidarsi dello strumento senza
+          sapere le regole è la "scatola nera" della lezione 1.</li>
+      </ul>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Espressione 1</span><span class="difficulty easy">Facile</span></div>
+        <p>$$5 + 3 \times 2 - 4$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Prima la moltiplicazione: $3 \times 2 = 6$.</p>
+          <p><span class="step-num">2</span>Poi da sinistra: $5 + 6 - 4 = 11 - 4 = \mathbf{7}$.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Espressione 2</span><span class="difficulty easy">Facile</span></div>
+        <p>$$(5 + 3) \times 2 - 4 : 2$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Prima la parentesi: $5 + 3 = 8$.</p>
+          <p><span class="step-num">2</span>Poi moltiplicazioni e divisioni: $8 \times 2 = 16$ e $4 : 2 = 2$.</p>
+          <p><span class="step-num">3</span>Infine la sottrazione: $16 - 2 = \mathbf{14}$.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Espressione 3</span><span class="difficulty medium">Medio</span></div>
+        <p>$$2^3 + \left[\,12 - (5 - 2) \times 3\,\right] : 3$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Parentesi tonda (la più interna): $5 - 2 = 3$.</p>
+          <p><span class="step-num">2</span>Dentro la quadra, prima la moltiplicazione: $3 \times 3 = 9$; poi $12 - 9 = 3$.</p>
+          <p><span class="step-num">3</span>La potenza: $2^3 = 8$.</p>
+          <p><span class="step-num">4</span>La divisione: $3 : 3 = 1$. Infine $8 + 1 = \mathbf{9}$.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Espressione 4</span><span class="difficulty hard">Difficile</span></div>
+        <p>$$\left(\frac{1}{2} + \frac{1}{3}\right)^{\!2} : \frac{5}{6} - \left(\frac{2}{3}\right)^{\!2}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Parentesi: $\dfrac{1}{2} + \dfrac{1}{3} = \dfrac{3 + 2}{6} = \dfrac{5}{6}$ (somma col mcm, lezione 4!).</p>
+          <p><span class="step-num">2</span>Potenze: $\left(\dfrac{5}{6}\right)^{2} = \dfrac{25}{36}$ e $\left(\dfrac{2}{3}\right)^{2} = \dfrac{4}{9}$.</p>
+          <p><span class="step-num">3</span>Divisione (= moltiplicare per l'inversa): $\dfrac{25}{36} : \dfrac{5}{6} = \dfrac{25}{36} \cdot \dfrac{6}{5} = \dfrac{150}{180} = \dfrac{5}{6}$.</p>
+          <p><span class="step-num">4</span>Sottrazione col mcm(6, 9) = 18: $\dfrac{5}{6} - \dfrac{4}{9} = \dfrac{15}{18} - \dfrac{8}{18} = \mathbf{\dfrac{7}{18}}$.</p>
+        </div>
+      </div>
+
+      <p>Altre quattro, per mettere alla prova gli angoli più insidiosi delle regole (la 5 e la 6 nascondono le
+        trappole classiche):</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Espressione 5</span><span class="difficulty medium">Medio</span></div>
+        <p>$$18 : 3 \times 2 - 5$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Trappola!</strong> Moltiplicazioni e divisioni hanno la
+            <em>stessa</em> precedenza: si eseguono <strong>nell'ordine in cui compaiono</strong>, da sinistra.
+            Quindi prima $18 : 3 = 6$, poi $6 \times 2 = 12$.</p>
+          <p><span class="step-num">2</span>Infine $12 - 5 = \mathbf{7}$. (Chi fa prima $3 \times 2$ ottiene
+            $18 : 6 - 5 = -2$: sbagliato!)</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Espressione 6</span><span class="difficulty medium">Medio</span></div>
+        <p>$$(-2)^3 + 3 \times \left[\,7 - (4 - 6)\,\right]$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Parentesi tonda: $4 - 6 = -2$ (retta dei numeri!).</p>
+          <p><span class="step-num">2</span>Quadra: $7 - (-2) = 7 + 2 = 9$ — togliere un debito è un regalo: meno per meno...</p>
+          <p><span class="step-num">3</span>Potenza: $(-2)^3 = -8$ (esponente dispari: il segno resta).</p>
+          <p><span class="step-num">4</span>$-8 + 3 \times 9 = -8 + 27 = \mathbf{19}$.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Espressione 7</span><span class="difficulty hard">Difficile</span></div>
+        <p>$$\left\{\left[\,(3^2 - 2^3) + 5\,\right] \times 4 - 20\right\} : 2$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Nella tonda, prima le potenze: $3^2 = 9$ e $2^3 = 8$, quindi $9 - 8 = 1$.</p>
+          <p><span class="step-num">2</span>Quadra: $1 + 5 = 6$.</p>
+          <p><span class="step-num">3</span>Graffa: $6 \times 4 - 20 = 24 - 20 = 4$ (dentro la graffa vale il solito ordine: prima la moltiplicazione).</p>
+          <p><span class="step-num">4</span>$4 : 2 = \mathbf{2}$. Tre livelli di parentesi, zero panico: <em>dall'interno verso l'esterno</em>, sempre.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Espressione 8</span><span class="difficulty hard">Difficile</span></div>
+        <p>$$\left(\frac{3}{4} - \frac{1}{2}\right) : \left(\frac{1}{2}\right)^{\!2} + \frac{1}{2}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Parentesi: $\dfrac{3}{4} - \dfrac{1}{2} = \dfrac{3 - 2}{4} = \dfrac{1}{4}$.</p>
+          <p><span class="step-num">2</span>Potenza: $\left(\dfrac{1}{2}\right)^{2} = \dfrac{1}{4}$.</p>
+          <p><span class="step-num">3</span>Divisione (moltiplico per l'inversa): $\dfrac{1}{4} : \dfrac{1}{4} = \dfrac{1}{4} \cdot \dfrac{4}{1} = 1$.</p>
+          <p><span class="step-num">4</span>$1 + \dfrac{1}{2} = \mathbf{\dfrac{3}{2}}$.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — LE PROPRIETÀ -->
+    <section id="sec6">
+      <h2>6. Le proprietà delle operazioni</h2>
+
+      <p>Guardiamo più da vicino le nostre operazioni. Non sono meccanismi anonimi: hanno "caratteri" precisi, e
+        questi caratteri hanno un nome e un ruolo. Non è pignoleria da matematici: <strong>ogni proprietà è uno
+        strumento di lavoro</strong> — è ciò che vi autorizza a riordinare, raggruppare e spezzare i calcoli come vi
+        conviene. Quando tra qualche mese risolverete le equazioni, starete usando <em>esattamente</em> queste carte.
+        Eccole, una per una.</p>
+
+      <h3>6.1 — Le proprietà dell'addizione</h3>
+      <div class="prop-cards">
+        <div class="prop-card">
+          <div class="prop-name">Commutativa (+)</div>
+          <div class="prop-formula">$a + b = b + a$</div>
+          <p>L'ordine degli addendi non conta: 3 mele e poi 5, o 5 e poi 3 — il cesto si riempie uguale.
+            <strong>Attenzione: la sottrazione NON ce l'ha</strong>: $5 - 3 = 2$ ma $3 - 5 = -2$ (chiedete alla
+            zeppola). È il motivo per cui conviene la somma algebrica: trasformata in addizione, torna riordinabile.</p>
+        </div>
+        <div class="prop-card">
+          <div class="prop-name">Associativa (+)</div>
+          <div class="prop-formula">$(a + b) + c = a + (b + c)$</div>
+          <p>Quando gli addendi sono tre o più, posso <strong>raggrupparli come voglio</strong>. Al supermercato:
+            $7 + 8 + 2$ — nessuno somma 7 e 8 e poi aggiunge 2; tutti fanno $7 + (8 + 2) = 7 + 10 = 17$. Le
+            parentesi si spostano senza cambiare il totale: è la licenza ufficiale per farlo.</p>
+        </div>
+        <div class="prop-card">
+          <div class="prop-name">Elemento neutro (+): lo zero</div>
+          <div class="prop-formula">$a + 0 = a$</div>
+          <p>Aggiungere zero non cambia niente: se oggi sul conto non entra e non esce nulla, il saldo resta quello.
+            Sembra banale, ma è la proprietà che <em>definisce</em> che cosa lo zero è: il numero che "non fa
+            niente" nell'addizione.</p>
+        </div>
+        <div class="prop-card">
+          <div class="prop-name">Esistenza dell'opposto</div>
+          <div class="prop-formula">$a + (-a) = 0$</div>
+          <p>Ogni numero ha il suo <strong>opposto</strong>, che sommato a lui dà zero: $+7$ e $-7$ si annullano —
+            un credito di 7 euro e un debito di 7 euro fanno un portafoglio in pari. È il "potere" sbloccato da
+            $\mathbb{Z}$ nella lezione 4, e il motore della somma algebrica della sezione 7.</p>
+        </div>
+      </div>
+
+      <h3>6.2 — Le proprietà della moltiplicazione</h3>
+      <div class="prop-cards">
+        <div class="prop-card mul">
+          <div class="prop-name">Commutativa (×)</div>
+          <div class="prop-formula">$a \times b = b \times a$</div>
+          <p>3 file da 4 mattonelle o 4 file da 3: ruota la testa di 90° ed è <strong>lo stesso pavimento</strong>.
+            (Anche qui, la parente stretta non ce l'ha: $10 : 2 \ne 2 : 10$ — la divisione non è commutativa.)</p>
+        </div>
+        <div class="prop-card mul">
+          <div class="prop-name">Associativa (×)</div>
+          <div class="prop-formula">$(a \times b) \times c = a \times (b \times c)$</div>
+          <p>Raggruppo i fattori come mi pare: $25 \times 7 \times 4$ — invece di partire da $25 \times 7$, faccio
+            $(25 \times 4) \times 7 = 100 \times 7 = 700$ in un lampo. Scegliere il raggruppamento furbo è metà
+            dell'arte del calcolo a mente.</p>
+        </div>
+        <div class="prop-card mul">
+          <div class="prop-name">Elemento neutro (×): l'uno</div>
+          <div class="prop-formula">$a \times 1 = a$</div>
+          <p>Una fila sola di 7 mattonelle è... 7 mattonelle. L'uno è per la moltiplicazione ciò che lo zero è per
+            l'addizione: il numero che non fa niente. (Vi ricorda qualcosa? Moltiplicare sopra e sotto una frazione
+            per lo stesso numero = moltiplicarla per 1 = cambiarle il vestito senza cambiare il numero!)</p>
+        </div>
+        <div class="prop-card mul">
+          <div class="prop-name">Elemento assorbente: lo zero</div>
+          <div class="prop-formula">$a \times 0 = 0$</div>
+          <p>Sette file da zero mattonelle sono zero mattonelle: lo zero <strong>assorbe</strong> qualunque numero.
+            Ed è il motivo profondo per cui <strong>non si può dividere per zero</strong> (lezione 4): nessun
+            numero moltiplicato per 0 potrà mai restituire il dividendo.</p>
+        </div>
+        <div class="prop-card mul">
+          <div class="prop-name">Esistenza dell'inverso</div>
+          <div class="prop-formula">$a \times \frac{1}{a} = 1 \quad (a \ne 0)$</div>
+          <p>Ogni numero (tranne lo zero!) ha il suo <strong>inverso</strong>, che moltiplicato per lui dà 1:
+            $4 \times \frac{1}{4} = 1$, $\frac{2}{3} \times \frac{3}{2} = 1$. È il "potere" sbloccato da
+            $\mathbb{Q}$, e la ragione per cui dividere = moltiplicare per l'inverso.</p>
+        </div>
+        <div class="prop-card mul">
+          <div class="prop-name">Annullamento del prodotto</div>
+          <div class="prop-formula">$a \times b = 0 \;\Rightarrow\; a = 0 \text{ oppure } b = 0$</div>
+          <p>Se un prodotto fa zero, <strong>almeno uno dei fattori è zero</strong>: non c'è altro modo. Adesso
+            sembra un'osservazione innocua; quando risolverete le equazioni sarà una delle armi più potenti del
+            vostro arsenale. Segnatevela.</p>
+        </div>
+      </div>
+
+      <h3>6.3 — Il ponte tra le due: la distributiva</h3>
+      <div class="prop-cards">
+        <div class="prop-card mix">
+          <div class="prop-name">Distributiva (× rispetto a +)</div>
+          <div class="prop-formula">$a \times (b + c) = a \times b + a \times c$</div>
+          <p>L'unica proprietà che fa lavorare <strong>le due operazioni insieme</strong>: la moltiplicazione si
+            "distribuisce" su ogni addendo. È il trucco del calcolo a mente che usate già senza saperlo:
+            $3 \times 12 = 3 \times (10 + 2) = 30 + 6 = 36$. E letta al contrario — da destra a sinistra — si
+            chiama <strong>raccoglimento</strong>: $30 + 6 = 3 \times (10 + 2)$. Tra qualche mese, quando
+            comparirà l'algebra con le lettere, questo doppio senso di marcia sarà il pane quotidiano.</p>
+        </div>
+      </div>
+
+      <div class="curiosita">
+        <strong>Perché tanti nomi?</strong> Vi sembrerà burocrazia, ma provate a togliere anche una sola di queste
+        proprietà e i conti crollano: senza commutativa non potreste riordinare, senza associativa ogni calcolo a
+        tre termini sarebbe ambiguo, senza distributiva non esisterebbe il calcolo a mente (né l'algebra). Sono
+        esattamente le "regole del gioco" della lezione 1 — e nella sezione facoltativa 8 vedrete che è proprio dal
+        <em>menu di proprietà disponibili</em> che le strutture algebriche prendono il nome.
+      </div>
+    </section>
+
+    <!-- 7 — LA SOMMA ALGEBRICA -->
+    <section id="sec7">
+      <h2>7. La somma algebrica: le operazioni fondamentali sono due</h2>
+
+      <p>Chiudiamo la parte "obbligatoria" con un cambio di prospettiva. Vi hanno sempre detto che le operazioni
+        dell'aritmetica sono <strong>quattro</strong>: addizione, sottrazione, moltiplicazione e divisione. Sorpresa:
+        a ben guardare sono <strong>due</strong>.</p>
+
+      <p>Guardate: $4 - 2$ è esattamente la stessa cosa di $4 + (-2)$ — "sottrarre 2" e "aggiungere il numero
+        $-2$" portano nello stesso punto della retta. La sottrazione non è un'operazione nuova: è
+        <strong>un'addizione con l'opposto</strong>. Quando leggiamo $7 - 9 + 2$ come "somma di $+7$, $-9$ e $+2$"
+        la chiamiamo <strong>somma algebrica</strong>: un solo tipo di operazione, e in più — essendo un'addizione —
+        torna perfino commutativa (posso riordinare: $7 + 2 - 9 = 0$).</p>
+
+      <p>E la divisione? L'abbiamo già smascherata nella lezione 4: dividere per un numero è
+        <strong>moltiplicare per il suo inverso</strong> ($: \frac{4}{5}$ = $\times \frac{5}{4}$). Quindi il conto
+        torna: <strong>addizione e moltiplicazione</strong> sono le due operazioni fondamentali; sottrazione e
+        divisione sono le stesse operazioni "camuffate" con l'opposto e con l'inverso.</p>
+    </section>
+
+    <!-- 8 — STRUTTURE ALGEBRICHE (FACOLTATIVA) -->
+    <section id="sec8" class="optional">
+      <h2>8. Che cos'è una struttura algebrica</h2>
+
+      <p>Sezione per curiosi: diamo un nome preciso a quella sensazione di "piani della torre" della sezione 4.</p>
+
+      <div class="definition">
+        Una <strong>struttura algebrica</strong> è un <strong>insieme</strong> (lezione 2!) dotato di una o più
+        <strong>operazioni</strong> che soddisfano certe <strong>proprietà</strong> (quelle della sezione 6:
+        commutativa, elementi neutri, esistenza di opposti e inversi...). A seconda di <em>quali</em> proprietà
+        valgono, la struttura ha nomi diversi — come i gradi di una cintura di arti marziali.
+      </div>
+
+      <ul>
+        <li>$\mathbb{N}$ con $+$ e $\times$ è un <strong>semianello</strong>: le operazioni funzionano, ci sono i
+          neutri (0 e 1)... ma mancano gli <strong>opposti</strong> (non c'è il $-3$): metà anello, appunto;</li>
+        <li>$\mathbb{Z}$ è un <strong>anello</strong>: ora ogni numero ha il suo opposto e la sottrazione funziona
+          sempre. Manca però l'<strong>inverso</strong>: non c'è nessun intero che moltiplicato per 3 dia 1;</li>
+        <li>$\mathbb{Q}$ è un <strong>campo</strong>: ogni numero (tranne lo 0) ha anche l'inverso, e tutte e
+          quattro le operazioni funzionano sempre. È la "cintura nera" delle strutture;</li>
+        <li>$\mathbb{R}$ è anche lui un <strong>campo</strong>, ma con una medaglia in più: è <strong>completo</strong>
+          — la retta non ha buchi. È proprio questa completezza a permettere le radici (e, tra qualche anno,
+          l'analisi matematica).</li>
+      </ul>
+
+      <div class="curiosita">
+        <strong>Perché dare nomi alle strutture?</strong> Perché un teorema dimostrato "per tutti gli anelli" vale
+        <em>gratis</em> per i numeri interi, per i polinomi, per le matrici... È il colpo da maestro
+        dell'astrazione — la stessa filosofia del gruppo Bourbaki che avete incontrato nella lezione 2: studiare le
+        <em>regole del gioco</em>, non i singoli giocatori.
+      </div>
+    </section>
+
+    <!-- 9 — GLI INFINITI (FACOLTATIVA) -->
+    <section id="sec9" class="optional">
+      <h2>9. Sono più i numeri naturali o i numeri reali?</h2>
+
+      <p>Domanda da vertigine: gli insiemi $\mathbb{N}$, $\mathbb{Z}$, $\mathbb{Q}$, $\mathbb{R}$ sono tutti
+        <strong>infiniti</strong>... ma sono infiniti <em>uguali</em>? Per rispondere serve un attrezzo che avete
+        già: la <strong>corrispondenza biunivoca</strong> (lezione 2 — la funzione biiettiva, l'accoppiamento
+        perfetto uno-a-uno). Due insiemi hanno la <strong>stessa cardinalità</strong> se si possono accoppiare i
+        loro elementi senza avanzi, da nessuna delle due parti.</p>
+
+      <h3>9.1 — Naturali e relativi: stessa taglia!</h3>
+      <p>$\mathbb{N}$ è contenuto <em>strettamente</em> in $\mathbb{Z}$: mancano tutti i negativi. Eppure... li
+        posso accoppiare <strong>tutti</strong>, alternando positivi e negativi a zigzag:</p>
+
+      <table class="mini-tab">
+        <tr><th>$\mathbb{N}$</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>...</td></tr>
+        <tr><th>$\mathbb{Z}$</th><td>0</td><td>+1</td><td>−1</td><td>+2</td><td>−2</td><td>+3</td><td>−3</td><td>...</td></tr>
+      </table>
+
+      <p>Nessun relativo sfugge all'elenco, nessun naturale resta disoccupato: è una corrispondenza biunivoca.
+        Quindi $\mathbb{N}$ è contenuto in $\mathbb{Z}$... e allo stesso tempo <strong>hanno la stessa
+        cardinalità</strong>! Una parte grande quanto il tutto: benvenuti nelle <strong>stranezze
+        dell'infinito</strong>.</p>
+
+      <div class="curiosita">
+        <strong>L'albergo di Hilbert.</strong> Un albergo con <strong>infinite stanze</strong>, tutte occupate.
+        Arriva un nuovo ospite: "Siamo al completo!"... ma il direttore, che è un matematico, annuncia: «Ogni ospite
+        si sposti nella stanza successiva» — chi era nella 1 va nella 2, chi era nella 2 nella 3... e la stanza
+        <strong>1 resta libera</strong>. Arriva poi un pullman con <strong>infiniti</strong> nuovi ospiti? Nessun
+        problema: ognuno raddoppi il numero della propria stanza — si liberano tutte le stanze <strong>dispari</strong>,
+        che sono infinite. In un albergo infinito, "pieno" non significa "non c'è più posto": è esattamente il gioco
+        dello zigzag qui sopra.
+      </div>
+
+      <h3>9.2 — E i razionali? Ancora stessa taglia</h3>
+      <p>Vorrete rilanciare: i razionali però sono <em>densissimi</em> — tra 0 e 1 ce ne sono già infiniti! Eppure
+        anche $\mathbb{Q}$ si può mettere in fila e accoppiare con $\mathbb{N}$: si dispongono tutte le frazioni in
+        una griglia (righe = numeratori, colonne = denominatori) e la si percorre <strong>a zigzag lungo le
+        diagonali</strong>, saltando i doppioni. Nessuna frazione sfugge. Anche $\mathbb{Q}$ ha la taglia di
+        $\mathbb{N}$: questo infinito "da elenco" si chiama <strong>numerabile</strong>.</p>
+
+      <h3>9.3 — I reali NO: l'argomento diagonale di Cantor</h3>
+      <p>E i reali? Nel 1891 <strong>Georg Cantor</strong> dimostrò — con una delle dimostrazioni più eleganti di
+        sempre, per assurdo — che i reali <strong>non si possono</strong> mettere in fila. Supponiamo (per assurdo)
+        di avere un elenco completo di tutti i reali tra 0 e 1:</p>
+
+      <table class="mini-tab">
+        <tr><th>#1</th><td>0,<span class="diag">5</span> 2 9 1 7 ...</td></tr>
+        <tr><th>#2</th><td>0, 3 <span class="diag">1</span> 4 1 5 ...</td></tr>
+        <tr><th>#3</th><td>0, 8 6 <span class="diag">0</span> 2 4 ...</td></tr>
+        <tr><th>#4</th><td>0, 1 4 4 <span class="diag">9</span> 0 ...</td></tr>
+        <tr><th>...</th><td>...</td></tr>
+      </table>
+
+      <p>Ora costruiamo un numero <strong>sabotatore</strong>: prendiamo la <strong>diagonale</strong> (la prima
+        cifra del primo numero, la seconda del secondo...) e <strong>cambiamo ogni cifra</strong> (per esempio
+        aggiungendo 1): dalla diagonale $5, 1, 0, 9, \ldots$ otteniamo $0{,}6211\ldots$ Questo numero è diverso dal
+        #1 (prima cifra diversa), diverso dal #2 (seconda cifra diversa), diverso dal #3, dal #4... <strong>diverso
+        da tutti</strong>. L'elenco "completo" non lo conteneva: contraddizione! Nessun elenco può contenere tutti i
+        reali.</p>
+
+      <div class="rule">
+        <strong>Esistono infiniti più grandi di altri infiniti.</strong> L'infinito di $\mathbb{N}$ (e di
+        $\mathbb{Z}$, e di $\mathbb{Q}$) si chiama <strong>aleph-zero</strong>, $\aleph_0$: l'infinito numerabile.
+        L'infinito di $\mathbb{R}$ è strettamente più grande, e si chiama <strong>cardinalità del continuo</strong>.
+        Esiste qualcosa <em>in mezzo</em>? Nessuno ha mai trovato un insieme di taglia intermedia; l'ipotesi che non
+        esista (e che quindi il continuo sia $\aleph_1$, il gradino subito dopo $\aleph_0$) si chiama
+        <strong>ipotesi del continuo</strong> — e qui il cerchio si chiude in modo vertiginoso: si è dimostrato
+        (Gödel 1940, Cohen 1963) che dagli assiomi standard della matematica <strong>non si può né dimostrarla né
+        confutarla</strong>. Esattamente il tipo di enunciato che il teorema di incompletezza della lezione 2 ci
+        aveva promesso.
+      </div>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">$\aleph_0$</span><span class="nome">aleph-zero</span><span class="significa">la cardinalità di $\mathbb{N}$: l'infinito numerabile, quello che si può "mettere in fila"</span></div>
+      </div>
+    </section>
+
+    <!-- 10 — I NUMERI COMPLESSI (FACOLTATIVA) -->
+    <section id="sec10" class="optional">
+      <h2>10. La storia non finisce: i numeri complessi</h2>
+
+      <p>Pensavate che con $\mathbb{R}$ fosse finita? C'è ancora <strong>un'operazione proibita</strong>: la radice
+        quadrata dei numeri <strong>negativi</strong>. Lo avete tenuto in tasca dalla sezione 1: qualunque numero
+        reale, elevato al quadrato, dà un risultato positivo (o zero). Quindi $\sqrt{-1}$ non può essere nessun
+        numero della retta. E se mi servisse lo stesso? (Vi servirà davvero: tra qualche anno, per risolvere le
+        equazioni di secondo grado.)</p>
+
+      <p>Conoscete ormai la mossa: si <strong>inventano (o scoprono?) numeri nuovi</strong>. Si definisce
+        l'<strong>unità immaginaria</strong> $i$, il numero il cui quadrato è $-1$, e con lei tutti i numeri
+        <strong>immaginari</strong> ($2i$, $-5i$, ...). Ma stavolta c'è un problema di spazio: la retta è
+        <strong>già piena</strong> — i reali l'hanno completata! Dove li mettiamo, i numeri nuovi? Serve una
+        <strong>seconda dimensione</strong>: un piano.</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 300" aria-label="Il piano di Gauss: asse orizzontale dei numeri reali, asse verticale degli immaginari, e il punto 3 più 2i">
+        <line x1="60" y1="170" x2="600" y2="170" stroke="var(--text-soft)" stroke-width="2"/>
+        <polygon points="606,170 594,164 594,176" fill="var(--text-soft)"/>
+        <line x1="320" y1="290" x2="320" y2="30" stroke="var(--text-soft)" stroke-width="2"/>
+        <polygon points="320,24 314,36 326,36" fill="var(--text-soft)"/>
+        <text x="590" y="192" text-anchor="middle" class="lbl">reali (Re)</text>
+        <text x="368" y="40" text-anchor="middle" class="lbl">immaginari (Im)</text>
+        <text x="380" y="188" text-anchor="middle" class="lbl-s">1</text>
+        <text x="440" y="188" text-anchor="middle" class="lbl-s">2</text>
+        <text x="500" y="188" text-anchor="middle" class="lbl-s">3</text>
+        <text x="304" y="115" text-anchor="middle" class="lbl-s">i</text>
+        <text x="296" y="65" text-anchor="middle" class="lbl-s">2i</text>
+        <line x1="500" y1="170" x2="500" y2="60" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="5 4"/>
+        <line x1="320" y1="60" x2="500" y2="60" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="5 4"/>
+        <circle cx="500" cy="60" r="7" fill="var(--magenta)"/>
+        <text x="524" y="50" class="lbl" fill="var(--magenta)">$3 + 2i$</text>
+        <text x="140" y="250" text-anchor="middle" class="lbl-s">ogni punto del piano</text>
+        <text x="140" y="268" text-anchor="middle" class="lbl-s">= un numero complesso</text>
+      </svg></div>
+
+      <p>Questo è il <strong>piano di Gauss</strong>: sull'asse orizzontale i <strong>numeri reali</strong>,
+        sull'asse verticale gli <strong>immaginari</strong>. Un <strong>numero complesso</strong> è un punto del
+        piano, e si scrive come <strong>parte reale + parte immaginaria</strong>: per esempio $3 + 2i$. L'insieme di
+        tutti loro si chiama $\mathbb{C}$ — e naturalmente anche i complessi si possono sommare, moltiplicare e
+        molto altro ancora: le operazioni funzionano che è una meraviglia (perfino le radici dei negativi, ormai).</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">$i$</span><span class="nome">unità immaginaria</span><span class="significa">il numero tale che $i^2 = -1$: la radice "impossibile" resa possibile</span></div>
+        <div class="sym-card"><span class="sym">$\mathbb{C}$</span><span class="nome">numeri complessi</span><span class="significa">i punti del piano di Gauss: parte reale + parte immaginaria, come $3 + 2i$</span></div>
+      </div>
+
+      <div class="curiosita">
+        <strong>"Immaginari" era un insulto.</strong> Il nome glielo affibbiò Cartesio nel Seicento, e non era un
+        complimento: quei numeri sembravano fantasie senza cittadinanza nel mondo reale, un trucco da giocolieri per
+        far tornare i conti. E invece la storia si è presa la rivincita: oggi i numeri complessi descrivono le
+        correnti alternate, le onde, i segnali del vostro telefono e il cuore della fisica quantistica. I numeri
+        "che non esistono" fanno funzionare il mondo che esiste — ne riparleremo, promesso.
+      </div>
+
+      <p>E chiudiamo con una domanda che lasciamo <strong>a voi</strong> (la sezione 9 vi ha dato tutti gli
+        attrezzi): sono di più i numeri <strong>reali</strong> o i numeri <strong>complessi</strong>? La retta o il
+        piano? Pensateci: la risposta è più sorprendente di quanto crediate.</p>
+    </section>
+
+    <!-- 11 — QUIZ -->
+    <section id="quiz">
+      <h2>11. Quiz finale</h2>
+      <p>Dieci domande su potenze, radici, espressioni e infiniti. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 5 — I numeri reali · Matematica · Primo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezione 3: la retta che si riempie -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      (function () {
+        const svg = document.getElementById('rl-svg');
+        if (!svg) return;
+        const out = document.getElementById('rl-out');
+        const btn = document.getElementById('rl-next');
+        const X0 = 320, U = 45, LO = -6, HI = 6;
+        const X = v => X0 + v * U;
+        let phase = 0;
+        const LABELS = ['1️⃣ aggiungi i numeri naturali', '2️⃣ aggiungi i negativi', '3️⃣ aggiungi razionali (i mezzi)',
+                        '4️⃣ ancora razionali (terzi e quarti)', '5️⃣ ancora!', '6️⃣ ANCORA!',
+                        '🌊 riempi ogni buco: i numeri reali', '↺ ricomincia'];
+        const MSGS = [
+          'La retta è ancora vuota: solo punti senza nome. Premi il bottone!',
+          'Ecco i <strong>naturali</strong>: 0, 1, 2, 3... perfetti per contare. Ma a sinistra dello zero, il deserto.',
+          'Ecco i <strong>negativi</strong>: ora la retta è simmetrica, e la sottrazione funziona sempre. Però tra un intero e l\'altro c\'è il vuoto...',
+          'Ecco i <strong>mezzi</strong> (le frazioni con denominatore 2): la retta comincia a popolarsi.',
+          'Terzi e quarti: tra due frazioni ce n\'è sempre un\'altra. La retta si infittisce...',
+          'Denominatori fino a 8: sembra quasi piena, vero? <em>Sembra.</em>',
+          'Denominatori fino a 16: fittissima! Eppure... in mezzo a questa polvere di punti ci sono ancora <strong>buchi</strong>: $\\sqrt{2}$, $\\pi$ e infiniti altri numeri che nessuna frazione può raggiungere.',
+          'Ecco i <strong>numeri reali</strong>: OGNI punto della retta è un numero. I buchi (come √2 e π, evidenziati) sono colmati: la retta è finalmente <strong>completa</strong>.'
+        ];
+        function base() {
+          return '<line x1="14" y1="70" x2="620" y2="70" stroke="var(--text-soft)" stroke-width="2.5"/>' +
+                 '<polygon points="630,70 616,63 616,77" fill="var(--text-soft)"/>';
+        }
+        function ints(from, to, col) {
+          let h = '';
+          for (let v = from; v <= to; v++)
+            h += '<line x1="' + X(v) + '" y1="62" x2="' + X(v) + '" y2="78" stroke="' + col + '" stroke-width="2"/>' +
+                 '<text x="' + X(v) + '" y="98" text-anchor="middle" class="lbl-s" fill="' + col + '" style="font-size:11px; font-weight:700;">' + v + '</text>';
+          return h;
+        }
+        function rats(maxDen, r, op) {
+          let h = '';
+          for (let d = 2; d <= maxDen; d++)
+            for (let n = LO * d; n <= HI * d; n++) {
+              if (n % d === 0) continue;
+              // disegna solo le frazioni ridotte con denominatore esattamente d (niente doppioni)
+              let g = Math.abs(n), b = d, t; while (b) { t = g % b; g = b; b = t; }
+              if (g > 1) continue;
+              h += '<circle cx="' + X(n / d).toFixed(1) + '" cy="70" r="' + r + '" fill="var(--accent)" opacity="' + op + '"/>';
+            }
+          return h;
+        }
+        function draw() {
+          let h = base();
+          if (phase >= 7) {
+            h += '<rect x="14" y="66" width="606" height="8" rx="4" fill="var(--accent)" opacity="0.85"/>';
+            h += ints(LO, HI, 'var(--text)');
+            h += '<line x1="' + X(Math.SQRT2) + '" y1="50" x2="' + X(Math.SQRT2) + '" y2="70" stroke="var(--magenta)" stroke-width="2.5"/>' +
+                 '<text x="' + X(Math.SQRT2) + '" y="42" text-anchor="middle" class="em">√2</text>' +
+                 '<line x1="' + X(Math.PI) + '" y1="50" x2="' + X(Math.PI) + '" y2="70" stroke="var(--magenta)" stroke-width="2.5"/>' +
+                 '<text x="' + X(Math.PI) + '" y="42" text-anchor="middle" class="em">π</text>';
+          } else {
+            if (phase >= 1) h += ints(0, HI, '#57ab5a');
+            if (phase >= 2) h += ints(LO, -1, '#e0705f');
+            if (phase >= 3) h += rats(2, 3.2, 0.9);
+            if (phase >= 4) h += rats(4, 2.4, 0.75);
+            if (phase >= 5) h += rats(8, 1.7, 0.6);
+            if (phase >= 6) h += rats(16, 1.1, 0.5);
+            if (phase >= 6) {
+              h += '<circle cx="' + X(Math.SQRT2) + '" cy="70" r="4.5" fill="none" stroke="var(--magenta)" stroke-width="1.8" stroke-dasharray="3 2"/>' +
+                   '<text x="' + X(Math.SQRT2) + '" y="45" text-anchor="middle" class="em">√2?</text>' +
+                   '<circle cx="' + X(Math.PI) + '" cy="70" r="4.5" fill="none" stroke="var(--magenta)" stroke-width="1.8" stroke-dasharray="3 2"/>' +
+                   '<text x="' + X(Math.PI) + '" y="45" text-anchor="middle" class="em">π?</text>';
+            }
+          }
+          svg.innerHTML = h;
+          out.innerHTML = MSGS[phase];
+          btn.textContent = LABELS[phase];
+          if (window.renderMathIn) window.renderMathIn(out);
+        }
+        btn.addEventListener('click', function () {
+          phase = (phase + 1) % 8;
+          draw();
+        });
+        draw();
+      })();
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Quanto vale $(-2)^6$?',
+        options: ['$-64$', '$+64$', '$-12$', '$+12$', 'non si può calcolare'],
+        correct: 1, explain: 'Esponente PARI → risultato positivo: i sei segni meno si accoppiano e si eliminano. (−2)⁶ = +64.' },
+      { type: 'mc', diff: 'easy', text: 'Quanto vale $\\left(-\\dfrac{1}{3}\\right)^{3}$?',
+        options: ['$\\dfrac{1}{27}$', '$-\\dfrac{1}{9}$', '$-\\dfrac{1}{27}$', '$\\dfrac{1}{9}$', '$-\\dfrac{3}{9}$'],
+        correct: 2, explain: 'Potenza di frazione: elevo numeratore e denominatore → 1/27. Esponente dispari → il segno meno resta: −1/27.' },
+      { type: 'mc', diff: 'easy', text: 'Perché $\\sqrt{2}$ non è un numero razionale?',
+        options: ['perché è più grande di 1', 'perché lo abbiamo dimostrato per assurdo: nessuna frazione al quadrato dà 2', 'perché non si può disegnare', 'perché è negativo', 'perché ha poche cifre decimali'],
+        correct: 1, explain: 'È la dimostrazione per assurdo della lezione 2. Eppure √2 esiste eccome: è la diagonale del quadrato di lato 1 (Pitagora). Lato e diagonale sono incommensurabili.' },
+      { type: 'mc', diff: 'medium', text: 'Quanto vale l\'espressione $2 + 3 \\times 4^2$?',
+        options: ['$400$', '$80$', '$146$', '$50$', '$56$'],
+        correct: 3, explain: 'Ordine: prima la potenza (4² = 16), poi la moltiplicazione (3×16 = 48), infine l\'addizione (2+48 = 50). Chi legge da sinistra senza regole ottiene tutt\'altro!' },
+      { type: 'mc', diff: 'medium', text: 'L\'elemento neutro della moltiplicazione e quello dell\'addizione sono, nell\'ordine:',
+        options: ['$0$ e $1$', '$1$ e $0$', 'entrambi $0$', 'entrambi $1$', 'la moltiplicazione non ha elemento neutro'],
+        correct: 1, explain: 'Moltiplicare per 1 non cambia nulla (neutro della ×); aggiungere 0 non cambia nulla (neutro del +). E attenzione: lo 0 nella moltiplicazione è l\'elemento che ANNULLA tutto.' },
+      { type: 'mc', diff: 'medium', text: 'La somma algebrica $7 - 9 + 2$ vale:',
+        options: ['$0$', '$-4$', '$14$', '$4$', '$18$'],
+        correct: 0, explain: 'La leggo come somma di +7, −9 e +2: essendo un\'addizione posso riordinare: 7 + 2 − 9 = 0. La sottrazione è solo un\'addizione con l\'opposto.' },
+      { type: 'mc', diff: 'medium', text: '$\\mathbb{N} \\subseteq \\mathbb{Z} \\subseteq \\mathbb{Q} \\subseteq \\mathbb{R}$, eppure diciamo che sono "strutture diverse" perché:',
+        options: ['hanno simboli diversi', 'a ogni allargamento si sbloccano operazioni nuove che prima non funzionavano sempre', 'i naturali sono più moderni dei reali', 'non è vero: sono la stessa struttura', 'i reali non contengono lo zero'],
+        correct: 1, explain: 'In N la sottrazione non funziona sempre, in Z la divisione no, in Q le radici no: ogni piano della torre ha regole del gioco più ricche. Contenuto non significa uguale!' },
+      { type: 'mc', diff: 'hard', text: 'Nella sezione facoltativa: perché $\\mathbb{N}$ e $\\mathbb{Z}$ hanno la stessa cardinalità?',
+        options: ['perché sono entrambi finiti', 'perché esiste una corrispondenza biunivoca: 0→0, 1→+1, 2→−1, 3→+2, 4→−2, ...', 'perché contengono gli stessi numeri', 'non è vero: i relativi sono il doppio', 'perché lo ha deciso Hilbert'],
+        correct: 1, explain: 'Lo zigzag accoppia ogni naturale con un relativo senza avanzi da nessuna parte: biiezione → stessa taglia, anche se N è contenuto strettamente in Z. Stranezze dell\'infinito (vedi albergo di Hilbert).' },
+      { type: 'mc', diff: 'hard', text: 'L\'argomento diagonale di Cantor dimostra che:',
+        options: ['i razionali sono più dei naturali', 'ogni elenco di numeri reali ne dimentica per forza qualcuno: i reali NON sono numerabili', 'i reali si possono mettere in fila con lo zigzag', 'l\'infinito non esiste', 'i naturali sono più dei reali'],
+        correct: 1, explain: 'Dato un qualsiasi elenco, il numero "sabotatore" costruito cambiando le cifre della diagonale è diverso da tutti quelli elencati. Quindi nessun elenco è completo: l\'infinito dei reali (il continuo) è più grande di ℵ₀.' },
+      { type: 'open', diff: 'hard', text: 'Racconta perché i razionali non bastano a riempire la retta dei numeri, e come i numeri reali completano il quadro. Cita $\\sqrt{2}$, gli incommensurabili e che cosa significa che la retta diventa "completa".',
+        keywords: ['razional', 'irrazional', 'radice', 'incommensurabil', 'diagonale', 'pitagora', 'buc', 'retta', 'complet', 'frazion', 'reali', 'pi greco', 'denso'], requiredMatches: 4,
+        explain: 'I razionali sono densi (tra due ce n\'è sempre un altro) ma lasciano buchi: √2 — la diagonale del quadrato di lato 1, che esiste per Pitagora — non è rapporto di interi (dimostrazione per assurdo): lato e diagonale sono incommensurabili. I reali aggiungono gli irrazionali e riempiono OGNI punto: la retta diventa completa, senza buchi, e le radici (dei non negativi) si possono sempre calcolare.' }
+    ];
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 3 — L'informatica</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* card informative (sigle, definizioni brevi) */
+    .sym-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin: 0.9rem 0; }
+    .sym-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem 0.7rem; text-align: center; }
+    .sym-card .sym { font-size: 1.4rem; font-weight: 800; color: var(--accent); display: block; }
+    .sym-card .nome { font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; }
+    .sym-card .significa { font-size: 0.86rem; display: block; margin-top: 0.2rem; }
+    /* scheda perforata */
+    .punch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; max-width: 260px; margin: 0.6rem auto; }
+    .punch-cell { aspect-ratio: 1; border: 2px solid var(--border); border-radius: 6px; background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: var(--muted); transition: all .12s; }
+    .punch-cell.holed { background: #14161c; border-color: var(--accent); color: var(--accent); box-shadow: inset 0 0 0 3px var(--surface-2); }
+    .obb-banner { border: 2px solid var(--red); border-radius: 12px; background: color-mix(in srgb, var(--red) 10%, var(--surface)); padding: 1rem 1.2rem; margin: 1.2rem 0; }
+    .obb-banner h2 { color: var(--red); border: none; margin-top: 0; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Primo anno · Lezione 3</div>
+    <h1>L'informatica</h1>
+    <p>Dalle schede perforate al cloud: hardware, software, sistemi operativi — e come non farsi rubare l'armadietto digitale</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Primo anno</a>
+    <span class="sep">/</span> L'informatica
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Abbiamo detto (lezione 1) che questo percorso non è solo matematica: è anche
+      <strong>informatica</strong> e, dal terzo anno, fisica — i princìpi che fanno funzionare il mondo intorno a
+      noi. Oggi apriamo il capitolo informatica: che cos'è, com'è nata, di che cosa è fatta una macchina che calcola,
+      e — parte molto seria, non saltatela — come si custodisce il proprio <strong>account scolastico</strong>.
+    </div>
+
+    <!-- 1 — ETIMOLOGIA -->
+    <section id="sec1">
+      <h2>1. Che cos'è l'informatica</h2>
+
+      <p>Come sempre, partiamo dalla parola. <strong>Informatica</strong> è una crasi, cioè la fusione di due
+        parole: <strong>inform</strong>azione + auto<strong>matica</strong>. Letteralmente: il <em>trattamento
+        automatico dell'informazione</em>. In francese, dove il termine è nato (<em>informatique</em>, 1962),
+        rende l'idea ancora meglio: far elaborare l'informazione da una macchina, senza che un umano debba fare i
+        conti a mano.</p>
+
+      <p>C'è una vecchia definizione, oggi un po' in disuso ma bellissima, che la chiamava <strong>«la figlia della
+        fisica e della matematica»</strong>. E il motivo è profondo — riguarda i due genitori:</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 250" aria-label="L'informatica come figlia della matematica (algoritmi) e della fisica (macchine)">
+        <rect x="40" y="30" width="230" height="86" rx="12" fill="color-mix(in srgb, var(--accent) 14%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="155" y="58" text-anchor="middle" class="lbl" fill="var(--accent)">📐 MATEMATICA</text>
+        <text x="155" y="82" text-anchor="middle" class="lbl-s">inventa gli ALGORITMI</text>
+        <text x="155" y="100" text-anchor="middle" class="lbl-s">(le ricette per risolvere)</text>
+        <rect x="370" y="30" width="230" height="86" rx="12" fill="color-mix(in srgb, var(--gold) 14%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+        <text x="485" y="58" text-anchor="middle" class="lbl" fill="var(--gold)">⚛️ FISICA</text>
+        <text x="485" y="82" text-anchor="middle" class="lbl-s">costruisce le MACCHINE</text>
+        <text x="485" y="100" text-anchor="middle" class="lbl-s">(che eseguono le ricette)</text>
+        <path d="M 155 116 C 155 160, 320 160, 320 190" fill="none" stroke="var(--muted)" stroke-width="2"/>
+        <path d="M 485 116 C 485 160, 320 160, 320 190" fill="none" stroke="var(--muted)" stroke-width="2"/>
+        <rect x="200" y="192" width="240" height="46" rx="12" fill="color-mix(in srgb, var(--magenta) 16%, transparent)" stroke="var(--magenta)" stroke-width="2.5"/>
+        <text x="320" y="221" text-anchor="middle" class="lbl" fill="var(--magenta)">💻 INFORMATICA</text>
+      </svg></div>
+
+      <ul>
+        <li>la <strong>matematica</strong> produce gli <strong>algoritmi</strong>: procedure precise, passo dopo
+          passo, che <em>automatizzano</em> la soluzione di un problema. «Per sommare due numeri in colonna: incolonna
+          le cifre, parti da destra, somma, riporta...» — è un algoritmo, e lo conoscete da anni;</li>
+        <li>la <strong>fisica</strong> si occupa di costruire i <strong>macchinari</strong> che possono
+          <em>eseguire</em> quegli algoritmi — sfruttando l'elettricità, i semiconduttori, la luce.</li>
+      </ul>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">algoritmo</span><span class="nome">dal nome di al-Khwārizmī</span><span class="significa">una sequenza finita e precisa di passi che risolve un problema, sempre allo stesso modo</span></div>
+      </div>
+
+      <p>Un algoritmo senza una macchina è solo una ricetta su un foglio; una macchina senza un algoritmo è ferraglia
+        inerte. L'informatica è nata dal matrimonio dei due — e il mondo per come lo conosciamo, dallo smartphone
+        alle previsioni del tempo, dagli ospedali alle banche, <strong>senza informatica semplicemente non
+        esisterebbe</strong>.</p>
+    </section>
+
+    <!-- 2 — STORIA: ANALOGICO -->
+    <section id="sec2">
+      <h2>2. Un po' di storia: dalle macchine analogiche a quelle digitali</h2>
+
+      <p>L'idea di far fare i calcoli a una macchina è antichissima. Molto prima dell'elettricità, i popoli
+        dell'antichità costruivano <strong>macchine analogiche</strong> per automatizzare compiti difficili — come
+        prevedere la posizione delle stelle e dei pianeti.</p>
+
+      <div class="definition">
+        <strong>Analogico</strong> vuol dire che la macchina rappresenta i numeri con <strong>grandezze fisiche che
+        variano con continuità</strong>: l'angolo di rotazione di un ingranaggio, la lunghezza di un'ombra, il
+        livello di un liquido. "Analogico" perché la grandezza fisica è <em>in analogia</em> con il numero: più
+        grande il numero, più grande l'angolo. (L'opposto è <strong>digitale</strong>, dove tutto è ridotto a
+        cifre discrete — 0 e 1 — come vedremo tra poco.)
+      </div>
+
+      <div class="curiosita">
+        <strong>Il computer di 2000 anni fa.</strong> Nel 1901, in un relitto affondato al largo dell'isola greca di
+        <strong>Antikythera</strong>, i palombari trovarono un blocco di bronzo corroso. Ci vollero decenni per
+        capire che cos'era: un <strong>calcolatore astronomico a ingranaggi</strong> del I-II secolo a.C., con
+        oltre 30 ruote dentate finemente lavorate. Girando una manovella, prevedeva le posizioni del Sole e della
+        Luna, le fasi lunari e persino le eclissi. Nessuno costruì niente di così complesso per i successivi
+        <em>mille</em> anni: era un vero computer analogico, con duemila anni di anticipo.
+      </div>
+
+      <p>Le macchine analogiche hanno però un limite: sono costruite per fare <em>una cosa sola</em> (l'Antikythera
+        calcolava gli astri, e basta), e la loro precisione dipende da quanto è ben fatto l'ingranaggio. La svolta
+        arriva in tempi moderni con i <strong>calcolatori elettronici digitali</strong>: macchine che rappresentano
+        ogni informazione con <strong>cifre</strong> (in inglese <em>digit</em>: da qui "digitale"), e che possono
+        essere <strong>riprogrammate</strong> per fare compiti sempre diversi. È la strada che porta dritta al
+        computer che avete in tasca.</p>
+    </section>
+
+    <!-- 3 — SCHEDE PERFORATE -->
+    <section id="sec3">
+      <h2>3. Come si "parlava" ai primi computer: le schede perforate</h2>
+
+      <p>I primi computer elettronici (anni '40-'50) erano enormi armadi pieni di valvole, e non avevano né tastiera
+        né schermo. Come si diceva loro che cosa fare? Con le <strong>schede perforate</strong>: cartoncini rigidi in
+        cui si praticavano dei <strong>fori</strong> secondo uno schema preciso. Ogni posizione era una casella: un
+        <strong>foro</strong> valeva <strong>1</strong>, l'<strong>assenza di foro</strong> valeva
+        <strong>0</strong>. Impilando migliaia di schede si "caricava" un intero programma nella macchina, che le
+        leggeva facendo passare la luce (o dei sensori) attraverso i buchi.</p>
+
+      <p>Perché proprio 1 e 0? Perché per una macchina elettrica è facilissimo distinguere due soli stati: passa
+        corrente / non passa corrente, c'è il foro / non c'è. Due simboli bastano a scrivere qualunque numero: è il
+        sistema <strong>binario</strong>, il vero alfabeto dei computer. Provate voi: bucate la scheda per dire al
+        computer quali numeri sommare.</p>
+
+      <div class="two-col">
+        <div>
+          <p class="lbl" style="font-family:inherit; margin-bottom:0.2rem;"><strong>Numero A</strong> (4 bit)</p>
+          <div class="punch-grid" id="punch-a"></div>
+          <p class="lbl" style="font-family:inherit; margin:0.6rem 0 0.2rem;"><strong>Numero B</strong> (4 bit)</p>
+          <div class="punch-grid" id="punch-b"></div>
+          <p class="lbl-s" style="text-align:center; margin-top:0.4rem;">clicca una casella per fare (o togliere) il foro</p>
+        </div>
+        <div>
+          <div class="ckt" style="min-height:120px; display:flex; align-items:center; justify-content:center;">
+            <div id="punch-out" style="text-align:center;"></div>
+          </div>
+          <p class="eq-out" id="punch-detail" style="text-align:center;"></p>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Ogni casella vale il doppio della precedente.</strong> Da destra a sinistra i quattro fori valgono
+        $1, 2, 4, 8$ (le potenze di 2). Un foro nella casella "4" e uno nella "1" fanno $4 + 1 = 5$. Con 4 caselle si
+        arriva fino a $8+4+2+1 = 15$. È lo stesso principio delle nostre cifre in colonna (unità, decine,
+        centinaia...), ma con due simboli invece di dieci. Le schede perforate hanno programmato i computer per
+        quarant'anni — e chi le usava temeva una cosa sopra ogni altra: <em>far cadere per terra il mazzo</em> e
+        doverlo rimettere in ordine.
+      </div>
+    </section>
+
+    <!-- 4 — VON NEUMANN -->
+    <section id="sec4">
+      <h2>4. Lo schema di Von Neumann: l'anatomia di ogni computer</h2>
+
+      <p>Come è fatto <em>dentro</em> un computer? Nel 1945 il matematico <strong>John von Neumann</strong> descrisse
+        uno schema così azzeccato che, ottant'anni dopo, <strong>ogni computer del mondo lo segue ancora</strong> —
+        il vostro telefono compreso. L'idea rivoluzionaria: tenere i <strong>dati</strong> e il
+        <strong>programma</strong> insieme, nella stessa memoria, così che la macchina possa cambiare compito
+        semplicemente caricando istruzioni diverse. Ecco l'architettura, con i suoi pezzi:</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 360" aria-label="Schema dell'architettura di Von Neumann: input e output dialogano con la CPU, che a sua volta è collegata alla memoria; il tutto tramite il bus">
+        <!-- memoria (in alto) -->
+        <rect x="225" y="26" width="190" height="66" rx="10" fill="color-mix(in srgb, #22c55e 16%, transparent)" stroke="#22c55e" stroke-width="2"/>
+        <text x="320" y="52" text-anchor="middle" class="lbl">MEMORIA</text>
+        <text x="320" y="74" text-anchor="middle" class="lbl-s">dati + programma insieme</text>
+        <!-- CPU box (al centro) -->
+        <rect x="180" y="150" width="280" height="120" rx="12" fill="none" stroke="var(--magenta)" stroke-width="2.5" stroke-dasharray="6 4"/>
+        <text x="320" y="142" text-anchor="middle" class="lbl" fill="var(--magenta)">CPU (l'unità centrale)</text>
+        <rect x="196" y="168" width="120" height="86" rx="9" fill="color-mix(in srgb, var(--accent) 16%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="256" y="200" text-anchor="middle" class="lbl">Unità di</text>
+        <text x="256" y="218" text-anchor="middle" class="lbl">controllo</text>
+        <text x="256" y="238" text-anchor="middle" class="lbl-s">dirige il traffico</text>
+        <rect x="324" y="168" width="120" height="86" rx="9" fill="color-mix(in srgb, var(--gold) 16%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+        <text x="384" y="206" text-anchor="middle" class="lbl">ALU</text>
+        <text x="384" y="228" text-anchor="middle" class="lbl-s">fa i calcoli</text>
+        <!-- input -->
+        <rect x="18" y="180" width="150" height="60" rx="10" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2"/>
+        <text x="93" y="207" text-anchor="middle" class="lbl">INPUT ⌨️</text>
+        <text x="93" y="227" text-anchor="middle" class="lbl-s">tastiera, mouse, mic</text>
+        <!-- output -->
+        <rect x="472" y="180" width="150" height="60" rx="10" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2"/>
+        <text x="547" y="207" text-anchor="middle" class="lbl">OUTPUT 🖥️</text>
+        <text x="547" y="227" text-anchor="middle" class="lbl-s">schermo, audio, stampa</text>
+        <!-- collegamenti: input↔CPU, CPU↔output, CPU↔memoria (frecce a doppio verso) -->
+        <line x1="168" y1="210" x2="180" y2="210" stroke="var(--text-soft)" stroke-width="3"/>
+        <polygon points="180,210 168,204 168,216" fill="var(--text-soft)"/>
+        <line x1="460" y1="210" x2="472" y2="210" stroke="var(--text-soft)" stroke-width="3"/>
+        <polygon points="472,210 460,204 460,216" fill="var(--text-soft)"/>
+        <line x1="320" y1="92" x2="320" y2="150" stroke="var(--text-soft)" stroke-width="3"/>
+        <polygon points="320,150 314,138 326,138" fill="var(--text-soft)"/>
+        <polygon points="320,92 314,104 326,104" fill="var(--text-soft)"/>
+        <text x="335" y="122" class="lbl-s" fill="var(--muted)">BUS</text>
+        <!-- didascalie di flusso -->
+        <text x="174" y="256" text-anchor="middle" class="lbl-s" fill="var(--muted)" style="font-size:10px;">i dati entrano</text>
+        <text x="466" y="256" text-anchor="middle" class="lbl-s" fill="var(--muted)" style="font-size:10px;">i risultati escono</text>
+        <text x="320" y="300" text-anchor="middle" class="lbl-s">input e output dialogano con la CPU, che smista e usa la memoria — tutto sul BUS, l'autostrada interna</text>
+        <text x="320" y="322" text-anchor="middle" class="lbl-s" style="font-size:11px;">(le frecce a due punte: le informazioni viaggiano nei due sensi)</text>
+      </svg></div>
+
+      <p>Componente per componente, che cosa fa ciascuno:</p>
+      <ul>
+        <li><strong>Unità di input</strong> — le porte d'ingresso: tastiera, mouse, touchscreen, microfono,
+          fotocamera. Trasformano il mondo esterno in dati che la macchina capisce.</li>
+        <li><strong>Unità di output</strong> — le porte d'uscita: schermo, altoparlanti, stampante. Trasformano i
+          dati elaborati in qualcosa che noi possiamo percepire.</li>
+        <li><strong>Memoria</strong> — il grande magazzino: conserva <em>sia</em> i dati su cui lavorare <em>sia</em>
+          il programma (la lista di istruzioni). È l'intuizione geniale di von Neumann: programma e dati nello stesso
+          posto. La CPU legge da qui le istruzioni e i dati, e ci riscrive i risultati.</li>
+        <li><strong>ALU</strong> (Arithmetic Logic Unit) — la calcolatrice del sistema: esegue le operazioni
+          aritmetiche (somma, sottrazione...) e logiche (gli AND, OR, NOT della lezione 2!).</li>
+        <li><strong>Unità di controllo</strong> — il direttore d'orchestra: legge le istruzioni dalla memoria, decide
+          che cosa fare e coordina tutti gli altri, un passo alla volta.</li>
+      </ul>
+      <p>L'ALU e l'unità di controllo insieme formano la <strong>CPU</strong> (Central Processing Unit), il
+        "processore" di cui sentite parlare — ed è lei il vero centro di smistamento: i dati che arrivano dall'input
+        <strong>vanno alla CPU</strong> (non direttamente alla memoria!), che li elabora appoggiandosi alla memoria e
+        poi manda i risultati all'output. E tutto viaggia sul <strong>bus</strong>, l'autostrada interna che collega i
+        pezzi.</p>
+
+      <div class="note">
+        <strong>Un dispositivo può essere input <em>e</em> output insieme.</strong> La divisione netta "questo entra,
+        quello esce" è un po' scolastica: oggi molte periferiche fanno entrambe le cose. Lo <strong>schermo
+        touchscreen</strong> è l'esempio perfetto — <em>mostra</em> le immagini (output) e nello stesso istante
+        <em>riceve</em> i tuoi tocchi (input). Anche una cuffia con microfono, o una stampante multifunzione che
+        scansiona, sono ingresso e uscita nello stesso oggetto.
+      </div>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">CPU</span><span class="nome">Central Processing Unit</span><span class="significa">il "cervello": ALU + unità di controllo, esegue le istruzioni</span></div>
+        <div class="sym-card"><span class="sym">ALU</span><span class="nome">Arithmetic Logic Unit</span><span class="significa">l'unità che fa i conti e le operazioni logiche</span></div>
+      </div>
+
+      <div class="rule">
+        <strong>Ottant'anni e non sentirli.</strong> Che stiate usando un supercomputer, un portatile o uno
+        smartphone, sotto il cofano c'è lo schema di von Neumann del 1945: input, output, memoria unica per dati e
+        programma, una CPU che macina istruzioni. Cambiano la velocità (miliardi di operazioni al secondo) e le
+        dimensioni (da una stanza a un chip di pochi millimetri), ma l'anatomia è la stessa. Pochi progetti hanno
+        avuto una vita così lunga.
+      </div>
+    </section>
+
+    <!-- 5 — HARDWARE VS SOFTWARE -->
+    <section id="sec5">
+      <h2>5. Hardware e software: due facce, nessun padrone</h2>
+
+      <p>Nel mondo dell'informatica tutto si divide in due grandi categorie, e la regola per distinguerle è
+        infantile ma perfetta:</p>
+
+      <div class="two-col">
+        <div class="definition" style="margin:0;">
+          <strong>Hardware</strong> 🔧 = tutto ciò che puoi <strong>toccare</strong>. Lo schermo, la tastiera, il
+          chip della CPU, la memoria, i cavi, la batteria. La "ferramenta" (è proprio quello che significa
+          <em>hardware</em> in inglese).
+        </div>
+        <div class="definition" style="margin:0;">
+          <strong>Software</strong> 👻 = tutto ciò che <strong>non</strong> puoi toccare. I programmi, le app, il
+          sistema operativo, i dati. Le istruzioni e le informazioni — pura logica, senza peso.
+        </div>
+      </div>
+
+      <p>La tentazione è chiedersi «e chi comanda?». La risposta è: <strong>nessuno dei due</strong>. Non c'è
+        gerarchia, sono <strong>inseparabili</strong>:</p>
+      <ul>
+        <li>senza software, l'hardware è solo un mucchio di <strong>plastica e semiconduttori</strong>: uno
+          smartphone spento è un fermacarte costoso;</li>
+        <li>senza hardware, il software <strong>non può essere eseguito</strong>: un'app è solo un testo di
+          istruzioni che, senza una macchina che le legga, non fa assolutamente nulla.</li>
+      </ul>
+      <p>È come una ricetta (software) e una cucina (hardware): la ricetta più geniale non sfama nessuno senza
+        fornelli, e la cucina più attrezzata resta fredda senza una ricetta. Servono entrambe.</p>
+    </section>
+
+    <!-- 6 — LA CIPOLLA DEL SOFTWARE -->
+    <section id="sec6">
+      <h2>6. Il software a strati: la cipolla</h2>
+
+      <p>Il software, a sua volta, non è un blocco unico: è organizzato a <strong>strati</strong>, come una
+        <strong>cipolla</strong>. Ogni strato parla solo con quelli accanto e offre servizi a quello sopra,
+        nascondendo la complessità di quelli sotto. Clicca gli strati dal cuore verso l'esterno:</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="on-hw">Hardware</button>
+          <button class="btn" id="on-fw">Firmware / BIOS</button>
+          <button class="btn" id="on-so">Sistema operativo</button>
+          <button class="btn" id="on-lib">Librerie di sistema</button>
+          <button class="btn" id="on-app">App</button>
+        </div>
+      </div>
+      <div class="ckt"><svg id="on-svg" viewBox="0 0 640 320" aria-label="Il software organizzato a strati come una cipolla: dall'hardware al centro fino alle app all'esterno"></svg></div>
+      <p class="eq-out" id="on-out"></p>
+
+      <h3>6.1 — Perché gli strati? Una storia di sala giochi</h3>
+      <p>Non è sempre stato così. In passato <strong>ogni macchina aveva il suo software su misura</strong>: hardware
+        e software venivano progettati l'uno per l'altro, saldati insieme. L'esempio perfetto sono i primi
+        <strong>cabinati da sala giochi</strong>: ogni gioco aveva il proprio hardware dedicato e il proprio software
+        scritto apposta per <em>quell'</em>hardware. Volevi cambiare gioco? Dovevi <strong>cambiare l'intero
+        cabinato</strong> — un armadio nuovo, con costi altissimi. Un incubo, per chi gestiva le sale.</p>
+
+      <p>La soluzione fu geniale e la usiamo ancora: rendere il software <strong>generico</strong>. Invece di
+        scriverlo per uno specifico hardware, lo si scrive perché giri su un <strong>sistema operativo</strong> — uno
+        strato intermedio che "traduce" tra il programma e la macchina. Così lo stesso programma funziona su hardware
+        diversi, purché ci sia sotto il sistema operativo giusto.</p>
+
+      <div class="note">
+        <strong>Il rovescio della medaglia: i mondi separati.</strong> Un software pensato per un sistema operativo
+        <em>non</em> gira su un altro. Un'app scritta per <strong>Android</strong> non funziona su
+        <strong>iOS</strong> (l'iPhone) e viceversa: sono due cipolle diverse, con strati intermedi incompatibili.
+        Per questo chi sviluppa un'app di solito ne prepara <strong>due versioni</strong>, una per Android e una per
+        iOS, così da poterla "vendere" al pubblico più ampio possibile. Lo stesso gioco, costruito due volte.
+      </div>
+    </section>
+
+    <!-- 7 — SISTEMI OPERATIVI E LINUX -->
+    <section id="sec7">
+      <h2>7. Il sistema operativo (e la storia di Linux)</h2>
+
+      <p>Abbiamo nominato più volte il <strong>sistema operativo</strong>: è ora di dire bene che cos'è, perché è il
+        software più importante che c'è nella macchina.</p>
+
+      <div class="definition">
+        Il <strong>sistema operativo</strong> (SO) è il grande <strong>gestore</strong> che sta tra l'hardware e le
+        applicazioni. Si occupa di: <strong>distribuire le risorse</strong> (chi usa la CPU adesso? quanta memoria a
+        ciascuna app?), far <strong>convivere più programmi</strong> insieme (il <em>multitasking</em>: musica +
+        chat + browser tutti insieme), gestire i <strong>file</strong>, parlare con schermo, rete e periferiche, e
+        proteggere il sistema. È il portiere, il vigile e l'amministratore del condominio, tutto in uno. Senza,
+        ogni app dovrebbe sapere pilotare da sola ogni singolo pezzo di hardware: un caos.
+      </div>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">SO</span><span class="nome">Sistema Operativo (in inglese Operating System, OS)</span><span class="significa">il software che gestisce l'hardware e fa girare le app. Es: Windows, macOS, Android, iOS, Linux</span></div>
+        <div class="sym-card"><span class="sym">kernel</span><span class="nome">"nòcciolo"</span><span class="significa">il cuore del sistema operativo: lo strato più interno, che parla direttamente con l'hardware</span></div>
+      </div>
+
+      <h3>7.1 — Unix, Torvalds e la nascita di Linux</h3>
+      <p>Qui entra in scena uno dei personaggi più importanti — e uno dei sistemi operativi più diffusi al mondo,
+        anche se molti non sanno di usarlo ogni giorno. Negli anni '70 esisteva <strong>Unix</strong>, un sistema
+        operativo eccellente, robusto ed elegante... ma la cui <strong>licenza d'uso costava tantissimo</strong>:
+        praticabile solo per grandi università e aziende. Nel 1991 uno studente finlandese di 21 anni,
+        <strong>Linus Torvalds</strong>, decise di scriverne uno <em>simile</em> a Unix — e prese una decisione che
+        avrebbe cambiato l'informatica: renderlo <strong>libero</strong>. Chiunque avrebbe potuto usarlo, copiarlo,
+        studiarlo e migliorarlo, gratis. Lo chiamò <strong>Linux</strong>.</p>
+
+      <p>Sembrava il progetto di un ragazzo nel tempo libero. Oggi Linux fa girare la maggior parte dei
+        <strong>server</strong> di internet, dei supercomputer, e — vedremo tra poco — è il cuore nascosto di
+        <strong>Android</strong>. Ma per capire davvero la portata di quella scelta di Torvalds, dobbiamo fermarci un
+        attimo su una domanda che sembra noiosa e invece è decisiva: che cos'è la <strong>licenza</strong> di un
+        software?</p>
+    </section>
+
+    <!-- 8 — LICENZE E OPEN SOURCE -->
+    <section id="sec8">
+      <h2>8. Le licenze del software (e il software libero)</h2>
+
+      <p>Il software ha una caratteristica economica strana, unica nel suo genere. Prendete una sedia: costa fatica e
+        materiali costruirne una, e se ne volete cento dovete costruirle cento volte. Il software no: una volta
+        scritto, se ne possono fare <strong>copie illimitate a costo zero</strong> — copiare un programma è come
+        copiare un file, un istante e via. La classica legge della <strong>domanda e dell'offerta</strong>, che
+        regola il prezzo delle sedie, qui non funziona: l'offerta è, di fatto, infinita.</p>
+
+      <p>E però qualcuno quel software l'ha <strong>scritto</strong>, spesso con anni di lavoro. È giusto che veda
+        premiato il suo impegno. Come si concilia "copie infinite gratis" con "chi lavora va pagato"? La risposta è
+        la <strong>licenza</strong>:</p>
+
+      <div class="definition">
+        La <strong>licenza</strong> di un software è il contratto che stabilisce <strong>che cosa puoi farci</strong>:
+        se puoi usarlo, copiarlo, modificarlo, rivenderlo, o guardarne il "codice sorgente" (le istruzioni con cui è
+        scritto). Non compri il programma: compri il <em>permesso di usarlo</em> a certe condizioni.
+      </div>
+
+      <p>Le licenze sono di molti tipi, ma la grande divisione è questa:</p>
+      <ul>
+        <li><strong>Software proprietario</strong> (o "chiuso"): il codice sorgente è segreto, non lo puoi vedere né
+          modificare, e di solito paghi per il permesso di usarlo. Esempi: Windows, Photoshop, la maggior parte dei
+          videogiochi.</li>
+        <li><strong>Software open source</strong> ("a sorgente aperto"): il codice è <strong>pubblico</strong>,
+          chiunque può leggerlo, studiarlo, modificarlo e ridistribuirlo. È il modello di Linux.</li>
+      </ul>
+
+      <div class="warning">
+        <strong>Attenzione a un equivoco diffusissimo: open source NON significa gratis.</strong> Sono due cose
+        diverse! <em>Open source</em> riguarda la <strong>libertà</strong> (posso vedere e modificare il codice);
+        <em>gratuito</em> riguarda il <strong>prezzo</strong> (non pago). Esistono software open source a pagamento
+        (paghi il supporto, l'assistenza, versioni pronte all'uso) e software gratuiti ma chiusissimi (molte app del
+        telefono: gratis, ma il codice è top secret). La libertà e il prezzo sono assi indipendenti.
+      </div>
+
+      <div class="curiosita">
+        <strong>Anche l'hardware può essere open source.</strong> Non solo il software: esistono progetti in cui sono
+        pubblici perfino gli schemi elettronici dell'hardware, così che chiunque possa costruirselo o modificarlo. Il
+        più famoso è <strong>Arduino</strong>, una piccola scheda programmabile con cui si costruiscono robot,
+        sensori, domotica — un progetto nato in <strong>Italia</strong> (a Ivrea, nel 2005) e diventato lo strumento
+        preferito di studenti e inventori di tutto il mondo. (Nota di cronaca: di recente il marchio è stato
+        <em>acquisito</em> da una grande azienda — capita spesso alle belle storie open source.)
+      </div>
+    </section>
+
+    <!-- 9 — LINUX VS WINDOWS, ANDROID, CLOUD -->
+    <section id="sec9">
+      <h2>9. Linux, Windows, Android e la nuvola</h2>
+
+      <p>Torniamo ai sistemi operativi, ora che abbiamo gli strumenti per capirne le storie. Sul computer di casa la
+        scena è dominata da due nomi: <strong>Windows</strong> (di Microsoft), il più diffuso, comodo e pieno di
+        programmi già pronti; e <strong>Linux</strong>, il libero, il potente, quello che i "nerd" adorano.</p>
+
+      <p>Ma il colpo di scena è che Linux, quello che sembrava un progetto di nicchia, ha <strong>vinto dove nessuno
+        guardava</strong>:</p>
+      <ul>
+        <li><strong>Android è Linux.</strong> Il sistema operativo di miliardi di telefoni Android è costruito
+          <em>sopra il kernel di Linux</em> — il nòcciolo scritto da Torvalds. Se avete un telefono Android, avete
+          Linux in tasca (e probabilmente non lo sapevate).</li>
+        <li><strong>Internet gira su Linux.</strong> La maggioranza dei <strong>server</strong> del mondo — i
+          computer sempre accesi che fanno funzionare siti, app e servizi — usa Linux, per la sua stabilità e perché
+          è libero e gratuito da installare su migliaia di macchine.</li>
+      </ul>
+
+      <h3>9.1 — Il cloud: quando il software gira altrove</h3>
+      <p>E qui arriva un'idea che sta cambiando tutto: spesso il software che usate <strong>non viene eseguito sul
+        vostro dispositivo</strong>, ma <strong>nel cloud</strong> ("nella nuvola"). Che cosa vuol dire, in
+        pratica?</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 230" aria-label="Il funzionamento del cloud: il telefono manda una richiesta via internet a un server, che esegue il software e restituisce solo la risposta">
+        <!-- telefono -->
+        <rect x="30" y="70" width="120" height="72" rx="10" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2"/>
+        <text x="90" y="100" text-anchor="middle" class="lbl">📱 il tuo</text>
+        <text x="90" y="118" text-anchor="middle" class="lbl">telefono</text>
+        <!-- internet (nuvola al centro) -->
+        <ellipse cx="320" cy="106" rx="66" ry="30" fill="color-mix(in srgb, var(--accent) 10%, transparent)" stroke="var(--muted)" stroke-width="2"/>
+        <text x="320" y="111" text-anchor="middle" class="lbl-s">🌐 internet</text>
+        <!-- server -->
+        <rect x="490" y="66" width="130" height="94" rx="10" fill="color-mix(in srgb, #22c55e 14%, transparent)" stroke="#22c55e" stroke-width="2"/>
+        <text x="555" y="94" text-anchor="middle" class="lbl">🖥️ SERVER</text>
+        <text x="555" y="113" text-anchor="middle" class="lbl-s">esegue il software</text>
+        <text x="555" y="129" text-anchor="middle" class="lbl-s">(magari un'IA)</text>
+        <text x="555" y="148" text-anchor="middle" class="lbl-s" fill="#22c55e">gira su Linux</text>
+        <!-- ANDATA: telefono → server (riga sopra) -->
+        <line x1="150" y1="90" x2="490" y2="90" stroke="var(--accent)" stroke-width="2.5"/>
+        <polygon points="490,90 478,84 478,96" fill="var(--accent)"/>
+        <text x="320" y="80" text-anchor="middle" class="lbl-s" fill="var(--accent)">la DOMANDA va al server →</text>
+        <!-- RITORNO: server → telefono (riga sotto) -->
+        <line x1="490" y1="126" x2="150" y2="126" stroke="var(--gold)" stroke-width="2.5"/>
+        <polygon points="150,126 162,120 162,132" fill="var(--gold)"/>
+        <text x="320" y="145" text-anchor="middle" class="lbl-s" fill="var(--gold)">← torna solo la RISPOSTA</text>
+        <text x="320" y="200" text-anchor="middle" class="lbl-s">il lavoro pesante avviene sul server; al telefono arriva solo il risultato finito</text>
+      </svg></div>
+
+      <p>Il vostro cellulare si collega a internet e chiede a un potente computer lontano — il <strong>server</strong>
+        — di fare qualcosa: risolvere un problema di matematica, riassumere un brano, generare un'immagine. Su quel
+        server gira il software vero (magari un modello di <strong>intelligenza artificiale</strong> enorme, che sul
+        telefono non ci starebbe mai), e al vostro dispositivo torna <strong>solo la risposta</strong>. Il telefono
+        fa la domanda e mostra il risultato; il lavoro pesante è successo altrove. E indovinate su quale sistema
+        operativo gira, di solito, quel server? <strong>Linux</strong>, naturalmente.</p>
+
+      <h3>9.2 — Ma allora quale sistema operativo scelgo?</h3>
+      <p>Domanda legittima. Se Linux è potente e gratis, perché non lo usano tutti? Perché, essendo un progetto
+        libero e adattabile a infinite macchine diverse, installarlo e configurarlo è <strong>meno immediato</strong>
+        di accendere un computer con Windows o un Mac già pronti. C'è un aforisma scherzoso che gira tra gli
+        informatici (prendetelo per quello che è — una battuta):</p>
+
+      <div class="curiosita">
+        <strong>La battuta sui sistemi operativi.</strong> «Se <strong>sai</strong> quello che stai facendo e vuoi
+        libertà totale, usi <strong>Linux</strong>. Se hai <strong>una vaga idea</strong> di quello che fai e non
+        vuoi troppe rogne, usi <strong>Windows</strong> (o Android). Se <strong>non hai idea</strong> di quello che
+        fai ma vuoi farlo lo stesso, usi <strong>macOS</strong> (o iOS).» Scherzi a parte: macOS e iOS sono ottimi
+        sistemi, e hanno un vantaggio reale — sono pensati per un <strong>numero limitato di modelli</strong> di
+        macchina (solo dispositivi Apple), quindi sfruttano l'hardware fino in fondo e "funzionano e basta". Il
+        prezzo di questa cura, letteralmente, è il prezzo: non potendo spalmare i costi su tante macchine diverse,
+        costano parecchio.
+      </div>
+
+      <h3>9.3 — Una differenza fondamentale: il file system</h3>
+      <p>C'è un punto in cui i sistemi operativi si distinguono davvero, molto più che nell'aspetto: il modo in cui
+        <strong>organizzano i file</strong>, cioè il <strong>file system</strong>.</p>
+
+      <div class="definition">
+        Un <strong>file</strong> è un contenitore di dati con un nome (una foto, un documento, una canzone). Il
+        <strong>file system</strong> è il modo in cui il sistema operativo li <strong>organizza e ritrova</strong>:
+        di solito una struttura ad <strong>albero</strong> di <strong>cartelle</strong> dentro cartelle, come un
+        grande archivio con faldoni dentro cassetti dentro armadi.
+      </div>
+
+      <p>Windows e Linux organizzano l'albero in modo <strong>simile ma non identico</strong>:</p>
+      <ul>
+        <li>su <strong>Windows</strong> ogni disco ha una <em>lettera</em>: il disco principale è <code>C:</code>,
+          una chiavetta USB diventa <code>D:</code> o <code>E:</code>... Il percorso di un file usa il
+          <strong>backslash</strong>: <code>C:\Utenti\Marco\foto.jpg</code>. Ci sono più alberi, uno per disco;</li>
+        <li>su <strong>Linux</strong> (e macOS, che gli somiglia) c'è <strong>un unico albero</strong> che parte da
+          una sola radice, la cartella <code>/</code>; ogni disco o chiavetta viene "innestato" da qualche parte
+          dentro quell'albero. Il percorso usa lo <strong>slash</strong>: <code>/home/marco/foto.jpg</code>.</li>
+      </ul>
+      <p>La somiglianza (cartelle ad albero, percorsi, nomi di file) è molto più forte della differenza (le lettere
+        di disco, il verso della barra): chi impara a muoversi in uno si ritrova quasi a casa nell'altro.</p>
+
+      <h4>I livelli di accesso: chi può fare cosa</h4>
+      <p>Un file system serio non lascia che chiunque tocchi qualunque file: assegna a ogni file dei
+        <strong>permessi</strong>, che dicono chi può farci cosa. I tre livelli fondamentali:</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">👁️ lettura</span><span class="nome">read</span><span class="significa">puoi aprire e vedere il contenuto del file, ma non modificarlo</span></div>
+        <div class="sym-card"><span class="sym">✏️ scrittura</span><span class="nome">write</span><span class="significa">puoi modificare, salvare o cancellare il file</span></div>
+        <div class="sym-card"><span class="sym">👑 amministratore</span><span class="nome">admin / root</span><span class="significa">il "padrone di casa": può fare tutto, anche cambiare i permessi degli altri e toccare i file di sistema</span></div>
+      </div>
+
+      <p>Ecco perché, quando installi un programma, il computer ti chiede la password: quell'operazione tocca file di
+        sistema e serve il livello <strong>amministratore</strong>. È una protezione: se un virus gira coi permessi
+        di un utente normale, non può distruggere il sistema — gli manca la chiave da "padrone di casa". (Su Linux
+        l'amministratore si chiama <em>root</em>, "radice": è colui che comanda dalla radice dell'albero.)</p>
+
+      <h4>iOS e Android: due filosofie opposte</h4>
+      <p>E sui telefoni? Qui le strade divergono nettamente:</p>
+      <ul>
+        <li><strong>iOS</strong> (iPhone) ha un file system <strong>chiuso</strong>: l'utente normale
+          <em>non vede</em> l'albero delle cartelle, non può curiosare tra i file di sistema né spostare le cose a
+          piacimento. Ogni app vive nel suo recinto e non può ficcare il naso in quello delle altre. Perché questa
+          scelta drastica? Per <strong>sicurezza e semplicità</strong>: se l'utente non può toccare niente di
+          delicato, non può romperlo, e un'app malevola trova pochissimo da rubare. Il prezzo è la libertà: fai
+          quello che Apple ha previsto, e nulla di più.</li>
+        <li><strong>Android</strong> ha un file system <strong>aperto</strong>, ereditato da Linux (ricordate? sotto
+          c'è il suo kernel): volendo, puoi esplorare le cartelle, spostare file, installare app da fonti diverse.
+          Più libertà, ma anche più modi per combinare guai.</li>
+      </ul>
+
+      <div class="note">
+        <strong>La tendenza: nascondere la complessità.</strong> Che sia iOS o Android, la direzione è ormai chiara:
+        costruire <strong>interfacce così intuitive</strong> che l'utente non debba <em>nemmeno sapere</em> che
+        esiste un file system. "La tua foto è nell'app Galleria", non "in <code>/storage/emulated/0/DCIM/</code>".
+        È comodissimo — ma attenzione: comodità e comprensione tirano in direzioni opposte. Più il sistema fa tutto
+        al posto tuo, meno capisci come funziona... e meno sei libero di farlo funzionare a modo tuo (lezione 1,
+        ricordate?).
+      </div>
+
+      <h3>9.4 — Generalità contro ottimizzazione</h3>
+      <p>Torniamo su un'idea che è spuntata più volte, perché è una delle più importanti di tutta l'informatica:
+        <strong>quando si guadagna in generalità, di solito si perde in ottimizzazione</strong>. Un software
+        "generico", che deve girare su mille macchine diverse, non potrà mai sfruttare nessuna di esse fino in fondo,
+        come farebbe un software cucito su misura per una sola.</p>
+
+      <p>Il paradosso è sotto gli occhi di tutti. I primi <strong>cabinati da sala giochi</strong> avevano potenze
+        di calcolo <em>ridicole</em> rispetto a un telefono di oggi — eppure facevano girare videogiochi fluidi,
+        perché ogni riga di codice era limata per <em>quell'</em>hardware. I sistemi moderni sono
+        <strong>migliaia di volte più potenti</strong>, e ciò nonostante ogni tanto "si impallano", scattano,
+        rallentano: non perché manchi la potenza, ma perché il software generico di oggi è pieno di strati, comodità
+        e sprechi che una volta nessuno si poteva permettere.</p>
+
+      <div class="curiosita">
+        <strong>Sulla Luna con la memoria di un citofono.</strong> Il computer di bordo che portò gli uomini sulla
+        Luna nel 1969 (l'<em>Apollo Guidance Computer</em>) aveva risorse così risicate che oggi fanno sorridere:
+        una manciata di kilobyte di memoria, meno di quanta ne serva per contenere <em>una singola foto</em> del
+        vostro telefono. Con <strong>quelle</strong> briciole di potenza — che oggi non basterebbero nemmeno ad
+        <em>avviare</em> un sistema operativo moderno — la NASA calcolò rotte interplanetarie e fece allunare due
+        persone. La lezione non è "i vecchi erano più bravi", ma qualcosa di più sottile: la potenza bruta non è
+        tutto. Un codice pensato con cura vale più di un hardware dieci volte più veloce sprecato male.
+      </div>
+    </section>
+
+    <!-- 10 — L'ACCOUNT SCOLASTICO -->
+    <section id="sec10">
+      <div class="obb-banner">
+        <h2>⚠️ 10. Sezione OBBLIGATORIA: gestire l'account scolastico</h2>
+        <p style="margin:0;">Questa sezione non è facoltativa. Chi la salterà non solo prenderà brutti voti: sarà
+          <strong>ostracizzato dalla comunità scolastica</strong> — semplicemente non riuscirà a fare cose che tutti
+          gli altri fanno, e la sua vita a scuola diventerà scomodissima. Leggetela. Tutta. Due volte.</p>
+      </div>
+
+      <h3>10.1 — Che cos'è un account</h3>
+      <p>Un <strong>account</strong> è, in sostanza, un <strong>armadietto digitale</strong>: uno spazio personale
+        dove sono conservate tutte le informazioni che decidiamo di metterci dentro. Di solito contiene almeno un
+        <strong>indirizzo email</strong> e un <strong>codice identificativo</strong> (che dice "questo armadietto è
+        tuo"). Ma dentro può esserci di tutto: età, sesso, città, pizza preferita, il numero di telefono, il numero
+        di telefono di <em>tutti</em> i tuoi amici, quante volte hai ascoltato l'ultimo singolo degli Iron Maiden...
+        tanto, tantissimo di voi.</p>
+
+      <p>Per <strong>chiudere</strong> questo armadietto si usa una chiave: la <strong>password</strong>. Nei sistemi
+        moderni, al posto di una password fatta di lettere e numeri, spesso si usa l'<strong>impronta
+        digitale</strong> o una <strong>foto del viso</strong> — ma il concetto è identico: è la chiave. E vale la
+        regola che avete imparato in logica (lezione 2): si accede a tutto ciò che c'è nell'armadietto
+        <strong>se e solo se</strong> si conosce la password.</p>
+
+      <div class="warning" style="border-left-width:6px;">
+        <strong>⚠️ MEMORIZZATE LA PASSWORD DEL VOSTRO ACCOUNT SCOLASTICO.</strong> Chi non lo farà sarà severamente
+        punito. La punizione sarà impartita dal professore in persona, che troverà il modo più doloroso possibile di
+        infliggerla. (Il professore scherza — ma solo sulla punizione. Sulla password, <strong>no</strong>: senza,
+        siete davvero bloccati fuori.)
+      </div>
+
+      <h3>10.2 — I due account della scuola</h3>
+      <p>A scuola avrete (almeno) <strong>due account</strong> distinti, con due scopi diversi:</p>
+
+      <div class="two-col">
+        <div class="definition" style="margin:0;">
+          <strong>1. Argo</strong> 📋 — il registro elettronico. Ci si accede con nome utente e password, e dentro ci
+          sono <strong>voti, assenze, compiti e avvisi</strong>. A livello di princìpi informatici, Argo non è tanto
+          diverso da Instagram o TikTok: ti registri e accedi alle tue informazioni. Solo che al posto del reel col
+          trend del momento, c'è l'avviso che domani si esce un'ora prima — e al posto dei like, ci sono i voti.
+        </div>
+        <div class="definition" style="margin:0;">
+          <strong>2. Posta istituzionale</strong> ✉️ — fornita da <strong>Google</strong>. Con email e password si
+          accede alla casella di posta e a <strong>Google Classroom</strong>, dove i professori caricano il
+          materiale delle lezioni e avvisano delle novità importanti. È il vostro ufficio postale e la vostra aula
+          digitale.
+        </div>
+      </div>
+
+      <div class="rule">
+        <strong>Genitori, presa visione!</strong> Attenzione a un dettaglio che rovina le gite: molti avvisi su Argo
+        (l'uscita anticipata, l'autorizzazione...) diventano validi <strong>solo dopo che un genitore entra nel
+        <em>suo</em> account e clicca "presa visione"</strong>. Se non lo fa, quell'uscita anticipata... non vale, e
+        <strong>restate a scuola</strong>. Quindi: fate fare la presa visione. Ricordatelo a casa, con insistenza.
+      </div>
+
+      <div class="note">
+        <strong>Se cambio telefono e perdo la password?</strong> Eravate abituati a entrare con l'impronta o il
+        volto, cambiate telefono, e la password vera... non ve la ricordate più. <strong>Panico. Prendete pure il
+        panico</strong> — sì, avete letto bene: <em>abbiate</em> il terrore che possa succedere, così farete di
+        tutto perché non succeda. (In realtà esistono <strong>procedure di recupero</strong> per rientrare, quindi
+        il mondo non finisce. Ma se ve lo dico troppo tranquillamente, poi vi rilassate e la password non la
+        segnate nessuno.) Il fatto vero è questo: siete tantissimi, e se in troppi perdete le credenziali
+        contemporaneamente, gestire tutti i recuperi diventa un incubo per la segreteria — e chi ci rimette tempo e
+        pazienza siete voi. Quindi la password vera, quella "di riserva", <strong>segnatevela</strong> in un posto
+        sicuro — non affidatevi solo all'impronta. Fatelo <em>col panico giusto</em>.
+      </div>
+
+      <div class="curiosita">
+        <strong>Perché il telefono deve avere il blocco schermo.</strong> Piattaforme serie come Argo e Google
+        Workspace a volte <em>pretendono</em> che il tuo smartphone abbia un sistema di sicurezza attivo: un
+        <strong>PIN</strong>, una sequenza da disegnare col dito, o il riconoscimento del volto per sbloccarlo. Non è
+        una fissazione: se il telefono si sblocca senza nulla, chiunque lo prenda in mano può aprire tutti i tuoi
+        "armadietti". Per questo i servizi che custodiscono dati delicati (i tuoi voti, le tue comunicazioni)
+        obbligano ad avere almeno una serratura sulla porta di casa.
+      </div>
+    </section>
+
+    <!-- 11 — PRIVACY -->
+    <section id="sec11">
+      <h2>11. Una riflessione finale: tutto è tracciato</h2>
+
+      <p>Chiudiamo con qualcosa su cui vale la pena pensare davvero. Una volta che siamo registrati in un account,
+        <strong>tutto ciò che facciamo può essere registrato</strong>, e ogni azione può essere ricondotta a
+        <em>quel</em> particolare account: quando hai aperto Classroom, quale post hai messo "mi piace", a che ora hai
+        consegnato il compito. E c'è di più: quando siamo su internet, a ogni dispositivo viene associato un codice
+        chiamato <strong>indirizzo IP</strong> — una specie di "targa" che dice da dove ti stai collegando.</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">IP</span><span class="nome">Internet Protocol address</span><span class="significa">il "numero di targa" del tuo dispositivo in rete: identifica da dove ti colleghi. Ne riparleremo in una lezione dedicata</span></div>
+      </div>
+
+      <p>È vero, esistono modi per <strong>mascherare</strong> l'indirizzo IP, o per far risultare che ci stiamo
+        collegando da un altro paese — dal Madagascar, che so (si usano strumenti chiamati VPN, ne parleremo). Ma
+        resta il fatto di fondo: quello che facciamo online, nella stragrande maggioranza dei casi, è
+        <strong>tracciato</strong>. L'anonimato totale è molto più difficile di quanto sembri.</p>
+
+      <p>Qui entra in gioco un diritto importante: il <strong>diritto alla privacy</strong>. Significa che le
+        informazioni che mettiamo nei nostri account <strong>non possono essere usate senza il nostro
+        consenso</strong> — quel consenso che diamo (spesso senza leggere...) accettando i <strong>«termini e
+        condizioni»</strong> al momento dell'iscrizione. Ma qui si apre la domanda difficile, che vi lasciamo aperta,
+        perché non ha una risposta semplice e vi accompagnerà per tutta la vita:</p>
+
+      <div class="definition" style="text-align:center;">
+        <p style="margin:0.2rem 0;">Agli albori, internet era <strong>terra di nessuno</strong>: si era davvero
+          anonimi, e si poteva fare (nel bene e nel male) quasi tutto. Oggi lo si è sempre meno.</p>
+        <p style="margin:0.6rem 0 0.2rem; font-weight:700;">È meglio più protezione delle persone e più tutela dei
+          deboli — al prezzo di meno libertà e un controllo più stretto da parte di governi e multinazionali?<br>
+          Oppure più libertà per tutti — al prezzo di meno protezione?</p>
+      </div>
+
+      <p>Non c'è una risposta "giusta": è una delle grandi questioni del nostro tempo, e ci riguarda tutti. La cosa
+        peggiore che possiate fare è <strong>non pensarci affatto</strong> — cliccare "Accetto" senza guardare, e
+        lasciare che altri decidano per voi. Ricordate la lezione 1: studiare queste cose significa
+        <strong>conquistarsi la libertà</strong>, anche quella di scegliere consapevolmente cosa condividere di sé.</p>
+    </section>
+
+    <!-- 12 — QUIZ -->
+    <section id="quiz">
+      <h2>12. Quiz finale</h2>
+      <p>Dieci domande su hardware, software, sistemi operativi e sicurezza. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 3 — L'informatica · Matematica · Primo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezioni 3 e 6 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 3 — Schede perforate: somma binaria =====
+      (function () {
+        const ga = document.getElementById('punch-a'), gb = document.getElementById('punch-b');
+        if (!ga) return;
+        const out = document.getElementById('punch-out'), detail = document.getElementById('punch-detail');
+        const VAL = [8, 4, 2, 1];
+        const A = [false, false, false, false], B = [false, false, false, false];
+        function build(grid, arr) {
+          grid.innerHTML = '';
+          VAL.forEach((v, i) => {
+            const c = document.createElement('div');
+            c.className = 'punch-cell' + (arr[i] ? ' holed' : '');
+            c.textContent = v;
+            c.addEventListener('click', () => { arr[i] = !arr[i]; build(grid, arr); go(); });
+            grid.appendChild(c);
+          });
+        }
+        function val(arr) { return arr.reduce((s, b, i) => s + (b ? VAL[i] : 0), 0); }
+        function bits(arr) { return arr.map(b => b ? '1' : '0').join(''); }
+        function go() {
+          const a = val(A), b = val(B), s = a + b;
+          out.innerHTML = `<div style="font-size:1.5rem; font-weight:800;">${a} + ${b} = <span style="color:var(--accent);">${s}</span></div>
+            <div class="lbl-s" style="margin-top:0.4rem;">il computer legge:</div>
+            <div style="font-family:monospace; font-size:1.1rem; letter-spacing:2px;">${bits(A)} + ${bits(B)}</div>
+            <div style="font-family:monospace; font-size:1.1rem; letter-spacing:2px; color:var(--accent);">= ${s.toString(2).padStart(5, '0')}</div>`;
+          detail.innerHTML = `Ogni foro accende una potenza di 2. A = ${A.map((x, i) => x ? VAL[i] : null).filter(x => x).join('+') || '0'} = ${a}; B = ${B.map((x, i) => x ? VAL[i] : null).filter(x => x).join('+') || '0'} = ${b}. La macchina non "capisce" i numeri: manipola solo fori e non-fori — cioè 1 e 0.`;
+        }
+        // valori iniziali: A=5 (0101), B=3 (0011)
+        A[1] = true; A[3] = true; B[2] = true; B[3] = true;
+        build(ga, A); build(gb, B); go();
+      })();
+
+      // ===== 6 — La cipolla del software =====
+      (function () {
+        const svg = document.getElementById('on-svg');
+        if (!svg) return;
+        const out = document.getElementById('on-out');
+        const LAYERS = [
+          { id: 'hw', nome: 'Hardware', col: 'var(--text-soft)', desc: 'Il nòcciolo di tutto: i circuiti fisici. Non è software, ma è ciò su cui tutto poggia — CPU, memoria, schermo.' },
+          { id: 'fw', nome: 'Firmware / BIOS', col: '#ef4444', desc: 'Il primo software che si sveglia all\'accensione: controlla che l\'hardware funzioni e avvia il sistema operativo. Vive dentro un piccolo chip sulla scheda madre.' },
+          { id: 'so', nome: 'Sistema operativo (kernel)', col: '#f5b400', desc: 'Il gestore centrale: distribuisce CPU e memoria, gestisce file e periferiche, fa convivere i programmi. È il vero regista della macchina.' },
+          { id: 'lib', nome: 'Librerie di sistema', col: '#22c55e', desc: 'Strumenti pronti all\'uso che il sistema offre alle app: "disegna una finestra", "riproduci un suono", "collegati a internet". Così ogni app non deve reinventare tutto.' },
+          { id: 'app', nome: 'Applicazioni', col: 'var(--accent)', desc: 'Lo strato che tocchi tu: il browser, i giochi, la chat, questa lezione. Poggia su tutti gli strati sotto — e non lo sa nemmeno.' },
+        ];
+        let sel = 'hw';
+        LAYERS.forEach(L => document.getElementById('on-' + L.id).addEventListener('click', () => { sel = L.id; draw(); }));
+        function draw() {
+          LAYERS.forEach(L => document.getElementById('on-' + L.id).classList.toggle('active', L.id === sel));
+          const CX = 320, CY = 160;
+          let h = '';
+          // dal più esterno al più interno per non coprire
+          for (let i = LAYERS.length - 1; i >= 0; i--) {
+            const L = LAYERS[i];
+            const rx = 60 + i * 55, ry = 34 + i * 30;
+            const on = L.id === sel;
+            h += `<ellipse cx="${CX}" cy="${CY}" rx="${rx}" ry="${ry}" fill="${on ? 'color-mix(in srgb, ' + L.col + ' 26%, transparent)' : 'transparent'}" stroke="${L.col}" stroke-width="${on ? 3.5 : 2}"/>`;
+            // etichetta sul bordo alto di ogni anello
+            if (i === 0) h += `<text x="${CX}" y="${CY + 4}" text-anchor="middle" class="lbl-s" fill="${L.col}">${L.nome}</text>`;
+            else h += `<text x="${CX}" y="${CY - ry + 16}" text-anchor="middle" class="lbl-s" fill="${L.col}" style="font-weight:${on ? 700 : 400};">${L.nome}</text>`;
+          }
+          svg.innerHTML = h;
+          const L = LAYERS.find(x => x.id === sel);
+          out.innerHTML = `<strong style="color:${L.col};">${L.nome}.</strong> ${L.desc}`;
+        }
+        draw();
+      })();
+
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'La parola "informatica" nasce dalla fusione di:',
+        options: ['informazione + matematica', 'informazione + automatica', 'internet + matematica', 'informazione + elettronica'],
+        correct: 1, explain: 'Informatica = informazione + automatica: il trattamento automatico dell\'informazione. È stata chiamata "la figlia della matematica (algoritmi) e della fisica (macchine)".' },
+      { type: 'mc', diff: 'easy', text: 'Un <strong>algoritmo</strong> è:',
+        options: ['un componente fisico del computer', 'una sequenza finita e precisa di passi che risolve un problema', 'un tipo di memoria', 'il codice segreto di un account'],
+        correct: 1, explain: 'È la "ricetta" passo-passo che automatizza la soluzione di un problema — il contributo della matematica all\'informatica. La fisica ci mette la macchina che lo esegue.' },
+      { type: 'mc', diff: 'easy', text: 'Nelle schede perforate dei primi computer, un foro e l\'assenza di foro rappresentavano:',
+        options: ['le lettere A e B', 'i numeri 1 e 0 (sistema binario)', 'acceso e in pausa', 'input e output'],
+        correct: 1, explain: 'Foro = 1, niente foro = 0: due soli simboli, facilissimi da distinguere per una macchina elettrica. È il sistema binario, l\'alfabeto dei computer.' },
+      { type: 'mc', diff: 'medium', text: 'Nello schema di Von Neumann, l\'idea rivoluzionaria è che:',
+        options: ['la CPU è separata dalla memoria', 'i dati e il programma stanno insieme nella stessa memoria', 'non serve un\'unità di input', 'l\'ALU esegue solo somme'],
+        correct: 1, explain: 'Programma e dati nella stessa memoria: così la macchina cambia compito solo caricando istruzioni diverse. Ottant\'anni dopo, ogni computer segue ancora questo schema.' },
+      { type: 'mc', diff: 'medium', text: 'La differenza tra hardware e software è che:',
+        options: ['l\'hardware è più importante del software', 'il software è più importante dell\'hardware', 'l\'hardware si può toccare, il software no — e sono inseparabili', 'l\'hardware è gratis, il software a pagamento'],
+        correct: 2, explain: 'Hardware = ciò che tocchi, software = ciò che non tocchi. Nessuna gerarchia: senza software l\'hardware è plastica inerte, senza hardware il software non gira.' },
+      { type: 'mc', diff: 'medium', text: 'Che cosa fa un <strong>sistema operativo</strong>?',
+        options: ['solo far girare i videogiochi', 'gestisce le risorse (CPU, memoria), fa convivere i programmi e fa da ponte tra hardware e app', 'è il componente che esegue i calcoli', 'protegge il telefono dai graffi'],
+        correct: 1, explain: 'È il gestore centrale: distribuisce CPU e memoria, gestisce file e periferiche, permette il multitasking. Windows, macOS, Android, iOS, Linux sono sistemi operativi.' },
+      { type: 'mc', diff: 'medium', text: 'Perché un\'app scritta per Android di solito non funziona su iOS?',
+        options: ['perché iOS è più costoso', 'perché sono sistemi operativi diversi, con strati intermedi incompatibili', 'perché Android è open source e iOS no', 'perché iOS non ha la CPU'],
+        correct: 1, explain: 'Sono due "cipolle" diverse: il software generico è scritto per uno specifico SO. Per questo gli sviluppatori preparano due versioni, una per Android e una per iOS.' },
+      { type: 'mc', diff: 'medium', text: 'Il livello di accesso <strong>amministratore</strong> (root, su Linux) serve perché:',
+        options: ['rende il computer più veloce', 'permette di fare tutto, anche modificare i file di sistema e i permessi altrui — per questo installare programmi lo richiede', 'è l\'unico che può leggere i file', 'protegge lo schermo touchscreen'],
+        correct: 1, explain: 'Lettura = vedere, scrittura = modificare, amministratore = "padrone di casa" che può tutto. È una protezione: un virus con permessi da utente normale non può distruggere il sistema, gli manca la chiave da admin.' },
+      { type: 'mc', diff: 'hard', text: '"Open source" significa che il software:',
+        options: ['è sempre gratuito', 'ha il codice sorgente pubblico, che chiunque può vedere e modificare', 'funziona solo su Linux', 'non ha bisogno di licenza'],
+        correct: 1, explain: 'Open source riguarda la LIBERTÀ (codice pubblico e modificabile), non il prezzo. Esistono software open source a pagamento e software gratuiti ma chiusi: libertà e prezzo sono assi indipendenti.' },
+      { type: 'mc', diff: 'hard', text: 'Quando si dice che un software "gira nel cloud", si intende che:',
+        options: ['il software è memorizzato nella RAM del telefono', 'il software viene eseguito su un server remoto, e al dispositivo torna solo la risposta', 'il software funziona solo senza internet', 'il software è meteorologico'],
+        correct: 1, explain: 'Il tuo dispositivo manda una richiesta via internet a un server (spesso su Linux!), che esegue il lavoro pesante — magari un\'IA — e rimanda solo il risultato. Utile per compiti troppo grandi per il telefono.' },
+      { type: 'open', diff: 'hard', text: 'Che cos\'è un account, che ruolo ha la password, e perché è così importante custodire quella dell\'account scolastico? Accenna anche al tema della privacy e del tracciamento online.',
+        keywords: ['account', 'armadietto', 'password', 'chiave', 'informazioni', 'privacy', 'tracc', 'consenso', 'IP', 'account scolastico', 'argo', 'recuper', 'dati'], requiredMatches: 4,
+        explain: 'Un account è un "armadietto digitale" che custodisce le nostre informazioni (email, ID e molto altro); la password è la chiave che lo apre — si accede SE E SOLO SE la si conosce. Per l\'account scolastico (Argo per voti/avvisi, la posta Google per Classroom) è vitale memorizzarla: senza si resta bloccati fuori, e i recuperi sono lenti. Sul fronte privacy: sotto un account ogni azione è tracciabile e ricondotta a noi, e l\'IP identifica da dove ci colleghiamo; il diritto alla privacy protegge i nostri dati solo entro il consenso dato nei "termini e condizioni". La grande domanda aperta è l\'equilibrio tra protezione e libertà.' }
+    ];
+  </script>
+
+</body>
+
+</html>
