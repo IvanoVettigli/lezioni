@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 7 — Algebra: monomi e polinomi</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* card dei simboli nuovi */
+    .sym-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin: 0.9rem 0; }
+    .sym-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem 0.7rem; text-align: center; }
+    .sym-card .sym { font-size: 1.6rem; font-weight: 800; color: var(--accent); display: block; }
+    .sym-card .nome { font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; }
+    .sym-card .significa { font-size: 0.86rem; display: block; margin-top: 0.2rem; }
+    /* dimostrazioni passo-passo */
+    .proof-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .proof-thesis { font-weight: 700; margin-bottom: 0.5rem; }
+    .proof-steps .pstep { padding: 0.5rem 0.7rem; margin: 0.4rem 0; border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 8px 8px 0; }
+    .proof-steps .pstep.qed { border-left-color: #22c55e; background: color-mix(in srgb, #22c55e 10%, transparent); font-weight: 600; }
+    /* tabella esponenti */
+    .exp-tab { border-collapse: collapse; margin: 0.7rem auto; width: 100%; max-width: 560px; }
+    .exp-tab th, .exp-tab td { border: 1px solid var(--border); padding: 0.4rem 0.8rem; text-align: center; }
+    .exp-tab th { background: var(--surface-2); }
+    .exp-tab td:first-child { text-align: left; font-weight: 600; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Primo anno · Lezione 7</div>
+    <h1>L'algebra: monomi e polinomi</h1>
+    <p>Le lettere al posto dei numeri: descrivere infiniti casi in un colpo solo, dimostrare per tutti — e giocare con un numero infinito</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Primo anno</a>
+    <span class="sep">/</span> Algebra: monomi e polinomi
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Fin qui abbiamo lavorato con i <em>numeri</em>: naturali, relativi, razionali,
+      reali, e i modi per scriverli. Oggi facciamo il salto che dà il nome a tutto: l'<strong>algebra</strong>, cioè
+      la matematica che mette le <strong>lettere</strong> al posto dei numeri. Sembra una complicazione — e invece è
+      una liberazione: con una lettera parliamo di <em>infiniti</em> numeri in una volta sola.
+    </div>
+
+    <!-- 1 — L'ASTRAZIONE -->
+    <section id="sec1">
+      <h2>1. Perché conviene ragionare in astratto</h2>
+
+      <p>Immaginate: siamo in 4 e ognuno prende una pizza da 6 €. Quanto abbiamo speso? Facile: $4 \times 6 = 24$ €.
+        Ma se le pizze fossero da <strong>10</strong> € l'una? E se fossimo in <strong>6</strong>, o in
+        <strong>2</strong>? Ogni volta un conto nuovo. Oppure... facciamo una cosa più furba. Chiamiamo
+        <strong>S</strong> la spesa, <strong>N</strong> il numero di persone e <strong>P</strong> il prezzo di una
+        pizza. Allora:</p>
+
+      <div class="formula-box">
+        $$S = N \times P$$
+        <p class="formula-note">Mentre $24 = 6 \times 4$ descrive <strong>un solo</strong> caso, $S = N \times P$
+          descrive <strong>infiniti</strong> casi in un colpo solo: basta sostituire i numeri che vuoi. È bello, ed
+          è comodo.</p>
+      </div>
+
+      <p>Prima di andare avanti, prova tu. Immagina una situazione un po' più complicata: un <strong>primo
+        gruppo</strong> di persone prende pizze da <strong>6</strong> € (una a testa), un <strong>secondo
+        gruppo</strong> pizze da <strong>8</strong> €, un <strong>terzo gruppo</strong> pizze da <strong>10</strong>
+        €. Scrivi una formula algebrica che dia la spesa totale $S$. (Suggerimento: dai un nome al numero di persone
+        di ciascun gruppo.)</p>
+
+      <div class="controls">
+        <button class="btn btn-toggle" id="pz-btn">💡 Mostra una soluzione</button>
+      </div>
+      <div id="pz-sol" style="display:none;">
+        <div class="formula-box">
+          $$S = a \times 6 + b \times 8 + c \times 10$$
+          <p class="formula-note">dove $a$, $b$, $c$ sono le persone del primo, secondo e terzo gruppo. (Se non ti
+            piacciono $a,b,c$ puoi chiamarle come vuoi: $N_1, N_2, N_3$, o $x, y, z$... l'importante è che ogni
+            lettera stia per una quantità precisa. Anche questa è una formula giusta — le lettere sono
+            <em>tue</em>.)</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 — LE LETTERE PER DIMOSTRARE -->
+    <section id="sec2">
+      <h2>2. Le lettere per dimostrare (per tutti i numeri insieme)</h2>
+
+      <p>Usare le lettere al posto dei numeri ci fa descrivere infinite situazioni in un colpo solo. E questo è
+        prezioso soprattutto quando vogliamo <strong>dimostrare</strong> qualcosa — ricordate? La dimostrazione è il
+        <strong>cuore della matematica</strong> (lezione 2). Con una lettera possiamo provare una proprietà per
+        <em>tutti</em> i numeri in una volta, non uno per uno (impresa impossibile: sono infiniti!).</p>
+
+      <p>Mettiamoci d'accordo su una convenzione. Un numero naturale <strong>qualsiasi</strong> lo indichiamo con la
+        lettera <strong>$n$</strong>: può essere $0, 1, 2, 3, \ldots$ o qualunque altro. Ma se volessi parlare solo
+        dei numeri <strong>pari</strong>? I pari sono i numeri divisibili per 2 (senza resto). Quindi se prendo un
+        numero qualsiasi $n$ e lo moltiplico per 2, il risultato $2n$ <strong>deve per forza essere pari</strong>:</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">$2n$</span><span class="nome">un numero pari qualsiasi</span><span class="significa">il doppio di un naturale: divisibile per 2 per costruzione</span></div>
+        <div class="sym-card"><span class="sym">$2n + 1$</span><span class="nome">un numero dispari qualsiasi</span><span class="significa">il successivo di un pari: diviso 2 dà resto 1</span></div>
+      </div>
+
+      <p>E i dispari? Un numero è dispari se diviso per 2 dà resto 1. Prendo un pari, $2n$, e considero il numero
+        <strong>successivo</strong>, $2n + 1$: diviso per 2 fa $n$ con resto 1 — dispari! Quindi ogni pari si scrive
+        $2n$, ogni dispari $2n + 1$. Con queste due formulette possiamo dimostrare un sacco di cose.</p>
+
+      <h3>2.1 — Un attrezzo in più: la messa in evidenza</h3>
+      <p>Prima di lanciarci nelle dimostrazioni, ci serve un ultimo attrezzo. Ricordate la <strong>proprietà
+        distributiva</strong> (lezione 5)? La moltiplicazione si "distribuisce" sulla somma:</p>
+
+      <div class="formula-box">
+        $$a \times (b + c) = a \times b + a \times c$$
+        <p class="formula-note">Letta da sinistra a destra, "apre" la parentesi. Es: $3 \times (10 + 2) = 3 \times 10 + 3 \times 2 = 30 + 6 = 36$.</p>
+      </div>
+
+      <p>Ma una regola si può leggere <strong>anche al contrario</strong>, da destra a sinistra! Se in una somma
+        vedo lo <strong>stesso fattore ripetuto</strong> in ogni pezzo, posso "tirarlo fuori" e raccoglierlo davanti
+        a una parentesi. Questa operazione — l'inverso della distributiva — si chiama <strong>messa in
+        evidenza</strong> (o raccoglimento a fattor comune):</p>
+
+      <div class="formula-box">
+        $$\underbrace{a \times b + a \times c}_{\text{la } a \text{ è in entrambi}} = a \times (b + c)$$
+        <p class="formula-note">La $a$, comune ai due addendi, esce fuori; dentro la parentesi resta la somma di
+          quello che l'accompagnava.</p>
+      </div>
+
+      <p>Guardiamola su qualche numero, per prenderci la mano nel "tornare indietro":</p>
+      <ul>
+        <li>$30 + 6$: entrambi sono multipli di $3$ ($30 = 3 \times 10$, $6 = 3 \times 2$) → raccolgo il 3:
+          $3 \times (10 + 2) = 3 \times 12 = 36$. ✓</li>
+        <li>$14 + 21$: entrambi multipli di $7$ ($14 = 7 \times 2$, $21 = 7 \times 3$) → $7 \times (2 + 3) = 7 \times 5 = 35$. ✓</li>
+        <li>$2n + 2m$: c'è un $2$ in tutti e due i termini → lo raccolgo: $2 \times (n + m)$. <em>(Tenete a mente
+          questo: è esattamente la mossa che useremo tra un attimo per dimostrare che la somma di due pari è
+          pari!)</em></li>
+      </ul>
+
+      <p>La messa in evidenza la rivedremo in dettaglio nella prossima lezione, quando lavoreremo per bene con i
+        polinomi. Per ora ci basta saperla riconoscere e usare: è la chiave che fa scattare quasi tutte le
+        dimostrazioni che stanno per arrivare.</p>
+
+      <div class="note">
+        <strong>Una lettera può nascondere un intero gruppo di lettere.</strong> Non siamo obbligati a usare una
+        lettera solo per un numero: possiamo usarla come <strong>abbreviazione di un'intera espressione</strong>.
+        Per esempio, se scrivo $z = a + b + c$, d'ora in poi posso usare la sola lettera $z$ al posto di tutta la
+        somma $a + b + c$ — è più corta e più comoda. È lo stesso trucco delle dimostrazioni: quando otteniamo
+        $2 \times (n + m)$, diciamo "chiamiamo $k$ il numero $n + m$" e scriviamo $2k$, che si vede subito essere
+        pari. Dare un nome a un pezzo di formula è come mettere le cose in una scatola con un'etichetta: la scatola
+        si maneggia meglio del suo contenuto sparso.
+      </div>
+    </section>
+
+    <!-- 3 — LE DIMOSTRAZIONI -->
+    <section id="sec3">
+      <h2>3. Sei dimostrazioni (una alla volta)</h2>
+
+      <p>Per ciascuna delle proprietà qui sotto trovi la <strong>tesi</strong> (quello che vogliamo dimostrare).
+        <strong>Prova prima da solo</strong> — carta e penna, usando $2n$ e $2m$ per due pari, $2n+1$ e $2m+1$ per
+        due dispari — poi rivela la dimostrazione <strong>un passo alla volta</strong> col pulsante, e controllati.</p>
+
+      <h3>3.1 — Le somme</h3>
+      <div class="proof-card" id="dm-1"></div>
+      <div class="proof-card" id="dm-2"></div>
+      <div class="proof-card" id="dm-3"></div>
+
+      <h3>3.2 — I prodotti</h3>
+      <div class="proof-card" id="dm-4"></div>
+      <div class="proof-card" id="dm-5"></div>
+      <div class="proof-card" id="dm-6"></div>
+
+      <div class="rule">
+        <strong>Che bello lavorare con le lettere!</strong> In sei mosse abbiamo scoperto come si comportano somma e
+        prodotto rispetto a pari e dispari — <em>per tutti i numeri possibili e immaginabili</em>, non per qualche
+        esempio. Nessuna quantità di esempi avrebbe potuto dimostrarlo (ricordate i numeri di Fermat della lezione
+        2?); una lettera sì.
+      </div>
+    </section>
+
+    <!-- 4 — I MONOMI -->
+    <section id="sec4">
+      <h2>4. I monomi</h2>
+
+      <p>Se una lettera ci è servita così bene, perché fermarci ai numeri naturali? Una lettera può stare al posto di
+        <strong>qualsiasi</strong> numero — naturale, relativo, razionale, reale. Di solito usiamo le
+        <strong>lettere minuscole dell'alfabeto latino</strong>: $a, b, c, \ldots, x, y, z$. E arriviamo al primo
+        mattone dell'algebra:</p>
+
+      <div class="definition">
+        Un <strong>monomio</strong> è un'espressione formata da una <strong>parte numerica</strong> (il
+        <em>coefficiente</em>) e una <strong>parte letterale</strong>, legate dalla moltiplicazione. Esempi: $2n$
+        (il doppio di $n$), $5x^2$, $-\tfrac{3}{4}ab$.
+      </div>
+
+      <div class="note">
+        <strong>Anche $a$ da solo è un monomio!</strong> Non si vede nessun numero davanti, ma c'è: $a = 1 \cdot a$.
+        Siccome l'$1$ è l'<strong>elemento neutro della moltiplicazione</strong> (lezione 5), possiamo evitare di
+        scriverlo — ma il coefficiente è $1$. Stessa logica al contrario: potremmo scrivere $\tfrac{a}{1}$, ma se
+        dividere per 1 non cambia niente, perché prendersi la briga? I matematici sono gente pigrissima: tutto ciò
+        che non cambia il risultato, lo cancellano.
+      </div>
+
+      <p>A ogni monomio si associa un numero che ne misura la "taglia":</p>
+
+      <div class="definition">
+        Il <strong>grado</strong> di un monomio è la <strong>somma degli esponenti</strong> della sua parte
+        letterale. Esempi: $5x^3$ ha grado $3$; $2ab$ ha grado $1 + 1 = 2$ (ricorda: $a$ è $a^1$); $7x^2y^3$ ha
+        grado $2 + 3 = 5$. Un numero da solo, come $4$, ha grado $0$ (nessuna lettera).
+      </div>
+    </section>
+
+    <!-- 5 — OPERAZIONI CON I MONOMI -->
+    <section id="sec5">
+      <h2>5. Operazioni con i monomi</h2>
+
+      <h3>5.1 — Somma e sottrazione: solo tra simili</h3>
+      <p>Due monomi si possono sommare (o sottrarre) soltanto se sono <strong>simili</strong>, cioè se hanno la
+        <strong>stessa parte letterale</strong>. Il motivo è concreto: immagina due buste, una con 5 mele e una con
+        3 mele. In tutto?</p>
+
+      <div class="formula-box">
+        $$5m + 3m = 8m$$
+        <p class="formula-note">8 mele! Somma i coefficienti (5 + 3), la parte letterale resta la stessa. Come dire
+          "5 mele + 3 mele = 8 mele": non diventano pere.</p>
+      </div>
+
+      <p>Funziona anche con la sottrazione (e i relativi della lezione 4 tornano utili): se al bancone erano rimasti
+        <strong>2 dolci</strong> al cioccolato e ne ordino <strong>3</strong>, quanti ne restano?</p>
+
+      <div class="formula-box">
+        $$2d - 3d = -1d = -d$$
+        <p class="formula-note">Un dolce "in negativo": me ne manca uno — qualcuno resterà molto triste. (Il segno
+          meno racconta una mancanza, esattamente come le zeppole della lezione 4.)</p>
+      </div>
+
+      <div class="warning">
+        <strong>Monomi NON simili non si sommano.</strong> $5m + 3d$ resta $5m + 3d$: mele e dolci non si mescolano.
+        E $2x + 3x^2$? Nemmeno: hanno lettere uguali ma <em>esponenti diversi</em>, quindi parti letterali diverse.
+        Restano affiancati — e diventano un <strong>polinomio</strong> (ci arriviamo tra poco).
+      </div>
+
+      <h3>5.2 — La moltiplicazione: si può sempre</h3>
+      <p>La moltiplicazione, invece, si può fare <strong>sempre</strong>, anche tra monomi diversi. Esempio concreto:
+        per il volume di un cilindro moltiplico l'area di base per l'altezza. Se la base ha area $2m^2$ (due metri
+        quadrati) e l'altezza è $3m$ (tre metri):</p>
+
+      <div class="formula-box">
+        $$2m^2 \times 3m = 6m^3$$
+        <p class="formula-note">Ho <strong>moltiplicato i coefficienti</strong> ($2 \times 3 = 6$) e
+          <strong>sommato gli esponenti</strong> della parte letterale ($2 + 1 = 3$). E infatti metri quadrati per
+          metri danno metri cubi: un volume!</p>
+      </div>
+
+      <p>Quel "sommare gli esponenti" merita una spiegazione tutta sua — perché nasconde una delle idee più eleganti
+        di tutta la matematica.</p>
+    </section>
+
+    <!-- 6 — LE PROPRIETÀ DEGLI ESPONENTI -->
+    <section id="sec6">
+      <h2>6. Le proprietà degli esponenti</h2>
+
+      <p>Prima le mettiamo in tabella, poi le capiamo una per una (perché le regole imparate a memoria si dimenticano;
+        quelle capite, no).</p>
+
+      <table class="exp-tab">
+        <tr><th>Proprietà</th><th>Regola</th><th>Esempio</th></tr>
+        <tr><td>Prodotto di potenze (stessa base)</td><td>$a^m \cdot a^n = a^{m+n}$</td><td>$a^2 \cdot a^3 = a^5$</td></tr>
+        <tr><td>Quoziente di potenze (stessa base)</td><td>$a^m : a^n = a^{m-n}$</td><td>$c^3 : c = c^2$</td></tr>
+        <tr><td>Potenza di potenza</td><td>$(a^m)^n = a^{m \cdot n}$</td><td>$(a^2)^3 = a^6$</td></tr>
+        <tr><td>Esponente 1</td><td>$a^1 = a$</td><td>$7^1 = 7$</td></tr>
+        <tr><td>Esponente 0</td><td>$a^0 = 1$</td><td>$5^0 = 1$</td></tr>
+        <tr><td>Esponente negativo</td><td>$a^{-n} = \dfrac{1}{a^n}$</td><td>$3^{-2} = \dfrac{1}{9}$</td></tr>
+      </table>
+
+      <h3>6.1 — Perché si sommano (prodotto) e si sottraggono (quoziente)</h3>
+      <p>Ricordiamo cosa vuol dire una potenza: $a^2$ significa $a \cdot a$, e $a^3$ significa $a \cdot a \cdot a$.
+        Allora moltiplicare $a^2$ per $a^3$ significa scrivere:</p>
+      <div class="formula-box">
+        $$a^2 \cdot a^3 = (a \cdot a) \cdot (a \cdot a \cdot a) = a^5$$
+        <p class="formula-note">Basta <strong>contare le $a$</strong>: due più tre, cinque. Ecco perché gli esponenti
+          si <strong>sommano</strong>.</p>
+      </div>
+
+      <p>E per la divisione? $c^3$ significa $c \cdot c \cdot c$; e $c$ da solo è $c^1$ (esponente 1, che non
+        scriviamo perché $a^1 = a$ — di nuovo la pigrizia dei matematici). Allora:</p>
+      <div class="formula-box">
+        $$c^3 : c = \frac{c \cdot c \cdot c}{c} = c \cdot c = c^2$$
+        <p class="formula-note">Una $c$ sopra e una sotto si <strong>semplificano</strong>: restano due $c$. Gli
+          esponenti si <strong>sottraggono</strong>: $3 - 1 = 2$.</p>
+      </div>
+
+      <h3>6.2 — Gli esponenti negativi (la divisione travestita)</h3>
+      <p>Riassumendo: prodotto → sommo gli esponenti, quoziente → li sottraggo. Ma allora, quando scrivo una
+        divisione, perché non usare direttamente un esponente <strong>negativo</strong>? Guardate:</p>
+      <div class="formula-box">
+        $$c^3 : c = c^3 \cdot c^{-1} = c^{3 + (-1)} = c^2$$
+        <p class="formula-note">Ho trasformato la divisione in una moltiplicazione <strong>invertendo il segno
+          dell'esponente</strong>! (Vi ricorda qualcosa? Dividere = moltiplicare per l'inverso, lezione 5.) Quindi i
+          numeri si possono elevare anche a potenze negative: significa farne la divisione. Es: $3^{-2} = \dfrac{1}{3^2} = \dfrac{1}{9}$.</p>
+      </div>
+
+      <h3>6.3 — E finalmente: perché $a^0 = 1$?</h3>
+      <p>Elevare a potenza significa moltiplicare un numero per se stesso tante volte... ma moltiplicarlo
+        <strong>zero</strong> volte, che senso ha? Nessuno, a prima vista. La risposta la troviamo tenendo ferma la
+        regola che ci piace tanto — "sommo gli esponenti". Scriviamo $a^7 \cdot a^{-7}$, che è come $a^7 : a^7$:</p>
+      <div class="formula-box">
+        $$a^7 \cdot a^{-7} = \frac{a^7}{a^7} = 1 \qquad\text{ma anche}\qquad a^7 \cdot a^{-7} = a^{7 + (-7)} = a^0$$
+        <p class="formula-note">Un numero diviso se stesso fa <strong>1</strong>. E la regola degli esponenti dice
+          che fa $a^0$. Perché le due cose coincidano <strong>deve</strong> essere $a^0 = 1$: non è un capriccio, è
+          la scelta che tiene in piedi tutto il sistema. (Vale per $a \ne 0$: lo zero, come sempre, fa storie a
+          parte.)</p>
+      </div>
+    </section>
+
+    <!-- 7 — I POLINOMI -->
+    <section id="sec7">
+      <h2>7. I polinomi</h2>
+
+      <div class="definition">
+        Un <strong>polinomio</strong> è la <strong>somma di due o più monomi</strong> <em>non</em> simili (che quindi
+        non si possono fondere in uno solo). Esempi: $2n + 1$ (il nostro numero dispari!), $3x^2 - 5x + 4$,
+        $ab + b^2$. I monomi che lo compongono si chiamano <strong>termini</strong>.
+      </div>
+
+      <p>La richiesta "non simili" è importante: se due termini fossero simili, li sommeremmo e otterremmo un
+        polinomio più corto. $2x + 3x$ non è un polinomio a due termini: è il monomio $5x$. Un polinomio "in ordine"
+        ha già fatto tutte le somme possibili.</p>
+
+      <div class="definition">
+        Il <strong>grado</strong> di un polinomio è il <strong>grado più alto</strong> tra i suoi termini. Esempio:
+        $3x^2 - 5x + 4$ ha termini di grado $2$, $1$ e $0$ → grado del polinomio: $\mathbf{2}$.
+      </div>
+
+      <p>Due polinomi si possono <strong>sommare</strong> (mettendo insieme i termini simili) e
+        <strong>moltiplicare</strong> (con la proprietà distributiva: ogni termine del primo per ogni termine del
+        secondo — ricorda la moltiplicazione "ogni con ogni" della lezione 4). Si possono anche
+        <strong>dividere</strong> tra loro: per farlo esiste uno strumento elegante, il <strong>teorema di
+        Ruffini</strong>... ma quello è il piatto forte della <em>prossima</em> lezione. Per ora, alleniamoci a
+        tradurre.</p>
+
+      <h3>7.1 — Dal matematichese all'italiano (e ritorno)</h3>
+      <p>Le formule sono una lingua: si traduce in entrambe le direzioni. Leggi la consegna, prova a rispondere, poi
+        rivela la soluzione.</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="tr-it">🇮🇹 dall'italiano</button>
+          <button class="btn" id="tr-mat">🔢 dal matematichese</button>
+        </div>
+      </div>
+      <div class="ckt" style="min-height:130px;">
+        <p id="tr-q" style="font-weight:600;"></p>
+        <div class="controls"><button class="btn btn-toggle" id="tr-btn">💡 Mostra la traduzione</button>
+          <button class="btn" id="tr-new">🔀 altra frase</button></div>
+        <p id="tr-a" class="eq-out" style="display:none;"></p>
+      </div>
+    </section>
+
+    <!-- 8 — IL GROSSONE (FACOLTATIVA) -->
+    <section id="sec8" class="optional">
+      <h2>8. Giocare con l'infinito: il Grossone</h2>
+
+      <p>Sezione per chi ama vertigini. Ricordate gli <strong>infiniti</strong> della lezione 5 — l'albergo di
+        Hilbert che pur essendo pieno accoglie ancora infiniti ospiti, i teoremi di Cantor sugli infiniti più grandi
+        di altri infiniti? Quelle idee, quando furono proposte, accesero un <strong>dibattito feroce</strong> tra i
+        matematici.</p>
+
+      <div class="two-col">
+        <div class="curiosita" style="margin:0;">
+          <strong>Il partito del «sì».</strong> <strong>David Hilbert</strong>, uno dei più grandi matematici di
+          sempre, difese Cantor con una frase rimasta celebre: <em>«Nessuno potrà scacciarci dal paradiso che Cantor
+          ha creato»</em>. Per lui quegli infiniti erano una conquista magnifica.
+        </div>
+        <div class="warning" style="margin:0;">
+          <strong>Il partito del «no».</strong> Altri li giudicarono un errore, qualcosa di malato da dimenticare al
+          più presto. <strong>Henri Poincaré</strong> assunse una posizione critica (si tramanda che parlasse degli
+          insiemi infiniti come di una «malattia» da cui la matematica sarebbe un giorno guarita); e
+          <strong>Leopold Kronecker</strong>, maestro di Cantor, arrivò a dargli del «corruttore di giovani».
+        </div>
+      </div>
+
+      <p>In tempi recentissimi il matematico <strong>Yaroslav Sergeyev</strong> ha proposto un modo diverso di
+        "mettere una pezza" ai paradossi: il <strong>Grossone</strong>, che si scrive con il simbolo ①.</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">①</span><span class="nome">il Grossone</span><span class="significa">un numero infinito con le proprietà dell'"ultimo" numero naturale: il numero di elementi di $\mathbb{N}$</span></div>
+      </div>
+
+      <p>L'idea è audace. L'ultimo dei numeri naturali <strong>non esiste</strong> — non riusciamo nemmeno a
+        immaginarlo, dovrebbe essere infinito. Ebbene: <em>immaginiamo che esista lo stesso</em>. Gli diamo un nome
+        (Grossone), ne descriviamo le proprietà e definiamo per bene come farci somme, moltiplicazioni e tutte le
+        operazioni — proprio come, secoli fa, si è fatto con lo zero, con i negativi, con gli immaginari: numeri
+        "inventati (o scoperti?)" per poter fare i conti che prima non si potevano fare.</p>
+
+      <div class="curiosita">
+        <strong>Body shaming a un numero.</strong> Il nome «Grossone» è già simpatico in italiano; si racconta che
+        Sergeyev, in una conferenza in Italia, si divertisse a chiamarlo scherzosamente <em>«grassone»</em> — facendo
+        del bonario body shaming... a un numero. (Un numero infinito, per giunta: se la caverà.)
+      </div>
+
+      <p>Con questo numero si costruisce una teoria <strong>coerente con i teoremi di Cantor</strong>, ma che in un
+        certo senso <strong>scioglie i paradossi</strong>: l'idea è che sia la nostra mente umana a non riuscire a
+        contare fino all'ultimo elemento dei naturali — ma quell'elemento, in qualche modo, <em>c'è</em>. Pensate al
+        riso: 3 chicchi più 5 chicchi fanno 8 chicchi, li conto. Ma un <strong>mucchietto</strong> di riso (che non
+        peso, non conto grano per grano) più un altro mucchietto fa... ancora <strong>un mucchietto</strong> — magari
+        più grande, ma sempre un mucchietto. Esattamente come $\infty + \infty = \infty$: finché non "contiamo",
+        l'infinito si comporta così.</p>
+
+      <div class="rule">
+        <strong>Non è solo un gioco di stile.</strong> Spessissimo, per <strong>ottimizzare</strong> un processo —
+        quale giro deve fare un corriere per consumare meno benzina, che forma dare a una lattina per usare meno
+        alluminio — servono calcoli che tirano in ballo l'infinito, e bisogna ricorrere all'algebra o ad
+        approssimazioni. Con il Grossone si possono ottenere soluzioni <strong>più in fretta e con molta meno potenza
+        di calcolo</strong>. È una teoria giovanissima, studiata e sviluppata <em>proprio adesso</em> — non secoli
+        fa: chissà quali vantaggi pratici porterà. Intanto, è già bellissimo poter <strong>giocare con i
+        numeri</strong>.
+      </div>
+    </section>
+
+    <!-- 9 — QUIZ -->
+    <section id="quiz">
+      <h2>9. Quiz finale</h2>
+      <p>Dieci domande su lettere, dimostrazioni, esponenti e polinomi. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 7 — Algebra: monomi e polinomi · Matematica · Primo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezioni 1 e 3 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 1 — Rivela la formula delle pizze =====
+      (function () {
+        const btn = document.getElementById('pz-btn'), sol = document.getElementById('pz-sol');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+          const show = sol.style.display === 'none';
+          sol.style.display = show ? 'block' : 'none';
+          btn.textContent = show ? '🙈 Nascondi la soluzione' : '💡 Mostra una soluzione';
+          if (show && window.renderMathIn) window.renderMathIn(sol);
+        });
+      })();
+
+      // ===== 3 — Dimostrazioni passo-passo pari/dispari =====
+      (function () {
+        const PROOFS = {
+          'dm-1': {
+            thesis: 'La somma di due numeri <strong>pari</strong> è un numero <strong>pari</strong>.',
+            steps: [
+              'Prendo due pari qualsiasi: \\(2n\\) e \\(2m\\).',
+              'Li sommo: \\(2n + 2m\\).',
+              'Metto in evidenza il 2 (§2.1): \\(2n + 2m = 2(n + m)\\).',
+              'Ma \\(n + m\\) è un naturale, chiamiamolo \\(k\\): il risultato è \\(2k\\), cioè un numero pari. <strong>C.V.D.</strong>'
+            ]
+          },
+          'dm-2': {
+            thesis: 'La somma di due numeri <strong>dispari</strong> è un numero <strong>pari</strong>.',
+            steps: [
+              'Prendo due dispari qualsiasi: \\(2n + 1\\) e \\(2m + 1\\).',
+              'Li sommo: \\(2n + 1 + 2m + 1 = 2n + 2m + 2\\).',
+              'Metto in evidenza il 2: \\(2n + 2m + 2 = 2(n + m + 1)\\).',
+              'È della forma \\(2k\\) con \\(k = n + m + 1\\): quindi <strong>pari</strong>! (Sorpresa: dispari + dispari NON fa dispari.) <strong>C.V.D.</strong>'
+            ]
+          },
+          'dm-3': {
+            thesis: 'La somma di un numero <strong>pari</strong> e uno <strong>dispari</strong> è un numero <strong>dispari</strong>.',
+            steps: [
+              'Prendo un pari \\(2n\\) e un dispari \\(2m + 1\\).',
+              'Li sommo: \\(2n + 2m + 1\\).',
+              'Metto in evidenza il 2 nei primi due termini: \\(2(n + m) + 1\\).',
+              'È della forma \\(2k + 1\\) con \\(k = n + m\\): quindi <strong>dispari</strong>. <strong>C.V.D.</strong>'
+            ]
+          },
+          'dm-4': {
+            thesis: 'Il prodotto di due numeri <strong>pari</strong> è un numero <strong>pari</strong>.',
+            steps: [
+              'Prendo due pari: \\(2n\\) e \\(2m\\).',
+              'Li moltiplico: \\(2n \\times 2m = 4nm\\).',
+              'Scrivo \\(4nm = 2 \\cdot (2nm)\\): metto in evidenza un 2.',
+              'È della forma \\(2k\\) con \\(k = 2nm\\): <strong>pari</strong>. <strong>C.V.D.</strong>'
+            ]
+          },
+          'dm-5': {
+            thesis: 'Il prodotto di due numeri <strong>dispari</strong> è un numero <strong>dispari</strong>.',
+            steps: [
+              'Prendo due dispari: \\(2n + 1\\) e \\(2m + 1\\).',
+              'Li moltiplico (proprietà distributiva): \\((2n+1)(2m+1) = 4nm + 2n + 2m + 1\\).',
+              'Metto in evidenza il 2 in tutti i termini tranne l\'ultimo: \\(2(2nm + n + m) + 1\\).',
+              'È della forma \\(2k + 1\\) con \\(k = 2nm + n + m\\): <strong>dispari</strong>. <strong>C.V.D.</strong>'
+            ]
+          },
+          'dm-6': {
+            thesis: 'Il prodotto di un numero <strong>pari</strong> per uno <strong>dispari</strong> è un numero <strong>pari</strong>.',
+            steps: [
+              'Prendo un pari \\(2n\\) e un dispari \\(2m + 1\\).',
+              'Li moltiplico: \\(2n \\times (2m + 1)\\).',
+              'Basta osservare che c\'è già un fattore 2 davanti: \\(2 \\cdot \\big(n(2m+1)\\big)\\).',
+              'È della forma \\(2k\\) con \\(k = n(2m+1)\\): <strong>pari</strong>. (Basta UN fattore pari per rendere pari tutto il prodotto.) <strong>C.V.D.</strong>'
+            ]
+          }
+        };
+        Object.keys(PROOFS).forEach(function (id) {
+          const box = document.getElementById(id);
+          if (!box) return;
+          const P = PROOFS[id];
+          let shown = 0;
+          function render() {
+            let h = '<div class="proof-thesis">Tesi: ' + P.thesis + '</div>';
+            if (shown === 0) {
+              h += '<p class="lbl-s" style="margin:0.3rem 0 0.6rem;">Provaci da solo, poi rivela i passaggi uno alla volta.</p>';
+            } else {
+              h += '<div class="proof-steps">';
+              for (let i = 0; i < shown; i++)
+                h += '<div class="pstep' + (i === P.steps.length - 1 ? ' qed' : '') + '"><strong>' + (i + 1) + '.</strong> ' + P.steps[i] + '</div>';
+              h += '</div>';
+            }
+            const done = shown >= P.steps.length;
+            h += '<div style="margin-top:0.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">';
+            if (!done) h += '<button class="btn" data-act="next">' + (shown === 0 ? '▶ Mostra il primo passo' : '▶ Passo successivo') + '</button>';
+            if (shown > 0) h += '<button class="btn" data-act="reset">↺ ricomincia</button>';
+            h += '</div>';
+            box.innerHTML = h;
+            if (window.renderMathIn) window.renderMathIn(box);
+          }
+          box.addEventListener('click', function (e) {
+            const b = e.target.closest('button'); if (!b) return;
+            if (b.dataset.act === 'next') shown++;
+            else if (b.dataset.act === 'reset') shown = 0;
+            render();
+          });
+          render();
+        });
+      })();
+
+    });
+  </script>
+
+  <!-- Demo sezione 7: traduci italiano <-> polinomio -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      (function () {
+        const q = document.getElementById('tr-q'), a = document.getElementById('tr-a'), btn = document.getElementById('tr-btn');
+        if (!q) return;
+        const IT = [
+          { it: 'Il triplo di un numero, aumentato di 5.', mat: '\\(3x + 5\\)' },
+          { it: 'Il doppio di un numero, diminuito del suo quadrato.', mat: '\\(2x - x^2\\)' },
+          { it: 'La somma tra un numero e il suo successivo.', mat: '\\(x + (x + 1) = 2x + 1\\) — sempre dispari!' },
+          { it: 'Il quadrato di un numero, aumentato del triplo del numero, meno 7.', mat: '\\(x^2 + 3x - 7\\)' },
+          { it: 'La metà di un numero, sommata al doppio di un secondo numero.', mat: '\\(\\dfrac{x}{2} + 2y\\)' },
+          { it: 'Il perimetro di un rettangolo di base \\(b\\) e altezza \\(h\\).', mat: '\\(2b + 2h\\) (oppure \\(2(b+h)\\))' }
+        ];
+        const MAT = [
+          { mat: '\\(5a - 2\\)', it: 'Il quintuplo di un numero, diminuito di 2. (Es: "5 caramelle a testa, meno le 2 che ho già dato".)' },
+          { mat: '\\(x^2 + y^2\\)', it: 'La somma dei quadrati di due numeri. (Es: il quadrato costruito su ciascun cateto, nel teorema di Pitagora!)' },
+          { mat: '\\(n + (n+1) + (n+2)\\)', it: 'La somma di tre numeri consecutivi. (Si può semplificare in \\(3n + 3 = 3(n+1)\\): sempre multiplo di 3!)' },
+          { mat: '\\(b \\cdot h\\)', it: 'L\'area di un rettangolo (base per altezza), o di un parallelogramma.' },
+          { mat: '\\(2\\pi r\\)', it: 'La lunghezza di una circonferenza di raggio \\(r\\).' },
+          { mat: '\\(a^2 - b^2\\)', it: 'La differenza dei quadrati di due numeri. (Un giorno scoprirai che vale anche \\((a+b)(a-b)\\)...)' }
+        ];
+        let mode = 'it', i = 0;
+        function show() {
+          const arr = mode === 'it' ? IT : MAT, item = arr[i % arr.length];
+          q.innerHTML = (mode === 'it' ? '<span class="lbl-s">Traduci in matematichese:</span><br>' : '<span class="lbl-s">Che cosa può dire, in italiano?</span><br>') +
+            (mode === 'it' ? item.it : item.mat);
+          a.style.display = 'none';
+          a.innerHTML = '➜ ' + (mode === 'it' ? item.mat : item.it);
+          btn.textContent = '💡 Mostra la traduzione';
+          if (window.renderMathIn) window.renderMathIn(q);
+        }
+        function reveal() {
+          const vis = a.style.display !== 'none';
+          a.style.display = vis ? 'none' : 'block';
+          btn.textContent = vis ? '💡 Mostra la traduzione' : '🙈 Nascondi';
+          if (!vis && window.renderMathIn) window.renderMathIn(a);
+        }
+        document.getElementById('tr-it').addEventListener('click', function () {
+          mode = 'it'; i = 0; this.classList.add('active'); document.getElementById('tr-mat').classList.remove('active'); show();
+        });
+        document.getElementById('tr-mat').addEventListener('click', function () {
+          mode = 'mat'; i = 0; this.classList.add('active'); document.getElementById('tr-it').classList.remove('active'); show();
+        });
+        document.getElementById('tr-new').addEventListener('click', function () { i++; show(); });
+        btn.addEventListener('click', reveal);
+        show();
+      })();
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Perché la formula $S = N \\times P$ è più utile di $24 = 6 \\times 4$?',
+        options: ['perché è più corta', 'perché descrive infiniti casi in un colpo solo, non uno solo', 'perché usa le lettere maiuscole', 'perché non contiene numeri', 'in realtà è meno utile'],
+        correct: 1, explain: 'Con le lettere basta sostituire i numeri per ottenere ogni caso: una formula sola vale per tutte le combinazioni di persone e prezzi. È il potere dell\'astrazione.' },
+      { type: 'mc', diff: 'easy', text: 'Come si scrive, in algebra, "un numero pari qualsiasi"?',
+        options: ['$n + 2$', '$2n$', '$n^2$', '$2n + 1$', '$n / 2$'],
+        correct: 1, explain: '2n è il doppio di un naturale: divisibile per 2 per costruzione, quindi pari. (2n+1 è invece un dispari: il successivo di un pari.)' },
+      { type: 'mc', diff: 'easy', text: 'La somma di due numeri dispari è:',
+        options: ['sempre dispari', 'sempre pari', 'a volte pari a volte dispari', 'sempre un numero primo', 'sempre zero'],
+        correct: 1, explain: '(2n+1) + (2m+1) = 2n + 2m + 2 = 2(n+m+1): forma 2k → PARI. Sorpresa controintuitiva, ma la dimostrazione con le lettere non lascia scampo.' },
+      { type: 'mc', diff: 'medium', text: 'Qual è il grado del monomio $7x^2y^3$?',
+        options: ['$7$', '$2$', '$3$', '$5$', '$6$'],
+        correct: 3, explain: 'Il grado è la SOMMA degli esponenti della parte letterale: 2 + 3 = 5. Il coefficiente 7 non conta per il grado.' },
+      { type: 'mc', diff: 'medium', text: 'Quanto fa $2x^3 \\times 4x^2$?',
+        options: ['$6x^5$', '$8x^6$', '$8x^5$', '$6x^6$', '$8x^{5}y$'],
+        correct: 2, explain: 'Coefficienti: 2×4 = 8. Esponenti: si SOMMANO, 3+2 = 5. Risultato: 8x⁵.' },
+      { type: 'mc', diff: 'medium', text: 'Quanto vale $a^0$ (con $a \\ne 0$)?',
+        options: ['$0$', '$a$', '$1$', 'non è definito', '$a^0$ non si può calcolare'],
+        correct: 2, explain: 'Sempre 1. Il motivo: a⁷·a⁻⁷ = a⁷/a⁷ = 1, ma per la regola degli esponenti è anche a⁷⁻⁷ = a⁰. Perché tutto torni, a⁰ deve valere 1.' },
+      { type: 'mc', diff: 'medium', text: 'Che cosa significa l\'esponente negativo, come in $3^{-2}$?',
+        options: ['un numero negativo: $-9$', 'una divisione: $3^{-2} = \\dfrac{1}{3^2} = \\dfrac{1}{9}$', 'una moltiplicazione per $-2$', 'zero', 'un errore di scrittura'],
+        correct: 1, explain: 'L\'esponente negativo è la divisione travestita: a⁻ⁿ = 1/aⁿ. Così una divisione diventa un prodotto (con l\'esponente cambiato di segno), come dividere = moltiplicare per l\'inverso.' },
+      { type: 'mc', diff: 'medium', text: 'Perché $5x + 3y$ non si può "sommare" in un unico monomio?',
+        options: ['perché 5 e 3 sono diversi', 'perché i due monomi non sono simili: hanno parte letterale diversa ($x$ e $y$)', 'perché manca una parentesi', 'perché uno è pari e uno dispari', 'in realtà fa $8xy$'],
+        correct: 1, explain: 'Si sommano solo monomi SIMILI (stessa parte letterale): 5 mele + 3 mele fa 8 mele, ma 5 mele + 3 pere restano separate. 5x + 3y è un polinomio a due termini.' },
+      { type: 'mc', diff: 'hard', text: 'Qual è il grado del polinomio $4x^3 - 2x^5 + x - 9$?',
+        options: ['$4$', '$3$', '$5$', '$9$', '$0$'],
+        correct: 2, explain: 'Il grado del polinomio è il grado più ALTO tra i suoi termini: qui il termine −2x⁵ ha grado 5, il massimo. L\'ordine in cui sono scritti i termini non conta.' },
+      { type: 'open', diff: 'hard', text: 'Spiega perché conviene usare le lettere al posto dei numeri, con un esempio. Poi dimostra, usando $2n$ per un pari e $2m+1$ per un dispari, che la somma di un numero pari e uno dispari è sempre dispari.',
+        keywords: ['letter', 'astra', 'infinit', 'dimostr', 'pari', 'dispari', '2n', '2m', 'raccol', 'distributiva', 'generale', 'tutti'], requiredMatches: 4,
+        explain: 'Le lettere descrivono infiniti casi insieme (es. S = N·P vale per ogni prezzo e ogni numero di persone) e permettono di DIMOSTRARE una proprietà per TUTTI i numeri, non uno per uno. Dimostrazione: pari + dispari = 2n + (2m+1) = 2n + 2m + 1 = 2(n+m) + 1, che è della forma 2k+1 (con k = n+m): quindi DISPARI. Provato per tutti i pari e tutti i dispari in un colpo solo.' }
+    ];
+  </script>
+
+</body>
+
+</html>
