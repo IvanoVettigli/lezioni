@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 9 — Algoritmi e scomposizione top-down</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .sym-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin: 0.9rem 0; }
+    .sym-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem 0.7rem; text-align: center; }
+    .sym-card .sym { font-size: 1.4rem; font-weight: 800; color: var(--accent); display: block; }
+    .sym-card .nome { font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; }
+    .sym-card .significa { font-size: 0.86rem; display: block; margin-top: 0.2rem; }
+    /* pseudocodice */
+    .pseudo { font-family: Consolas, 'Courier New', monospace; font-size: 0.92rem; line-height: 1.55;
+      background: #0d1117; color: #d5dae3; border: 1px solid var(--border); border-radius: 10px;
+      padding: 0.8rem 1rem; margin: 0.6rem 0; overflow-x: auto; }
+    .pseudo .kw { color: #ff9ec4; font-weight: 700; }
+    .pseudo .io { color: #7ee787; font-weight: 700; }
+    .pseudo .cm { color: #8b949e; font-style: italic; }
+    .pseudo .nu { color: #ffcf5e; }
+    .code-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; align-items: start; margin: 1rem 0; }
+    .code-flow .ckt { margin: 0; }
+    /* cifrario di Cesare */
+    .cs-box { font-family: Consolas, monospace; font-size: 1.05rem; letter-spacing: 1px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.8rem; margin: 0.4rem 0; word-break: break-word; min-height: 2.4rem; }
+    .cs-list { font-family: Consolas, monospace; font-size: 0.86rem; line-height: 1.7; max-height: 320px; overflow-y: auto; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.8rem; margin: 0.5rem 0; }
+    .cs-alpha { font-family: Consolas, monospace; font-size: 0.95rem; line-height: 1.6; overflow-x: auto; white-space: nowrap; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.7rem; }
+    .cs-alpha .tag { display: inline-block; min-width: 5.2rem; color: var(--muted); font-weight: 700; }
+    .cs-alpha .row-b { color: var(--accent); font-weight: 700; }
+    .cs-list .hit { background: color-mix(in srgb, #22c55e 26%, transparent); font-weight: 700; border-radius: 4px; padding: 0 0.2rem; }
+    /* RSA stepper */
+    .rsa-step { border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 8px 8px 0; padding: 0.55rem 0.8rem; margin: 0.45rem 0; }
+    .rsa-step.pub { border-left-color: #22c55e; background: color-mix(in srgb, #22c55e 8%, transparent); }
+    .rsa-step.priv { border-left-color: var(--magenta); background: color-mix(in srgb, var(--magenta) 8%, transparent); }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Primo anno · Lezione 9</div>
+    <h1>Algoritmi e scomposizione top-down</h1>
+    <p>Dalla ricetta della pasta al pseudocodice: come si scrive una procedura che funziona sempre — e come si spezza un problema troppo grande</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Primo anno</a>
+    <span class="sep">/</span> Algoritmi e top-down
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Nella lezione 3 abbiamo detto che l'informatica nasce dall'incontro tra gli
+      <strong>algoritmi</strong> (che vengono dalla matematica) e le <strong>macchine</strong> (che vengono dalla
+      fisica). Oggi torniamo su quella parola e la prendiamo sul serio: che cos'è <em>davvero</em> un algoritmo,
+      come si scrive, quanto costa eseguirlo — e soprattutto come si fa a inventarne uno partendo da un problema
+      che sembra troppo grande.
+    </div>
+
+    <!-- 1 — CHE COS'È UN ALGORITMO -->
+    <section id="sec1">
+      <h2>1. Che cos'è un algoritmo</h2>
+
+      <p>Partiamo, come sempre, dalla parola. <strong>Algoritmo</strong> viene dal nome di
+        <strong>al-Khwārizmī</strong>, il matematico persiano del IX secolo che lavorava a Baghdad — lo stesso da cui
+        viene la parola <em>algebra</em> (lezione 7). I suoi libri, tradotti in latino nel Medioevo, insegnavano
+        all'Europa i procedimenti di calcolo con le cifre indo-arabe: <em>algorismus</em> divenne il nome di quei
+        procedimenti, e poi di qualunque procedura meccanica di calcolo.</p>
+
+      <div class="definition">
+        Un <strong>algoritmo</strong> è una <strong>sequenza di azioni che risolve un problema</strong>.
+      </div>
+
+      <p>Detta così sembra semplicissimo — e infatti di algoritmi ne usate decine ogni giorno senza accorgervene.
+        Ma attenzione: non tutti gli algoritmi sono uguali. In questa lezione ne distingueremo <strong>tre
+        livelli</strong>, sempre più esigenti:</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">🍝</span><span class="nome">generico</span><span class="significa">una ricetta, le istruzioni del mobile da montare: va bene per gli umani</span></div>
+        <div class="sym-card"><span class="sym">✏️</span><span class="nome">matematico</span><span class="significa">preciso, senza ambiguità, sempre stesso risultato</span></div>
+        <div class="sym-card"><span class="sym">💻</span><span class="nome">informatico</span><span class="significa">tutto quanto sopra, e in più: deve finire!</span></div>
+      </div>
+    </section>
+
+    <!-- 2 — L'ALGORITMO GENERICO -->
+    <section id="sec2">
+      <h2>2. L'algoritmo generico: la ricetta</h2>
+
+      <p>L'esempio perfetto di algoritmo "di tutti i giorni" è una <strong>ricetta di cucina</strong>. Ha tutti gli
+        ingredienti giusti (letteralmente): una lista di <em>dati di partenza</em> e una sequenza di <em>passi</em>
+        che ci accompagnano fino al risultato.</p>
+
+      <div class="ckt" style="padding:1rem 1.2rem;">
+        <p style="margin:0 0 0.4rem; font-weight:700;">🍝 Pasta al pomodoro (per 4 persone)</p>
+        <p style="margin:0 0 0.5rem;"><strong>Ingredienti (input):</strong> 320 g di spaghetti, 400 g di pomodori
+          pelati, 2 cucchiai di olio, 1 spicchio d'aglio, sale q.b., qualche foglia di basilico.</p>
+        <p style="margin:0;"><strong>Procedimento:</strong></p>
+        <ol style="margin:0.3rem 0 0; padding-left:1.3rem;">
+          <li>Metti una pentola con l'acqua sul fuoco;</li>
+          <li>quando l'acqua bolle, aggiungi il sale <em>q.b.</em> e butta gli spaghetti;</li>
+          <li>intanto scalda l'olio in padella con l'aglio;</li>
+          <li>aggiungi i pelati e cuoci a fuoco medio per circa 15 minuti;</li>
+          <li>scola la pasta <em>al dente</em> e versala nella padella;</li>
+          <li>salta per un minuto, aggiungi il basilico e servi.</li>
+        </ol>
+      </div>
+
+      <p>Funziona: chiunque sappia leggere arriva (più o meno) a un piatto di pasta. Eppure, per un matematico,
+        questa ricetta ha <strong>due difetti gravissimi</strong>.</p>
+
+      <div class="warning">
+        <strong>Difetto 1: è ambigua.</strong> «Aggiungi sale <em>q.b.</em>» — quanto basta. E <em>quanto</em> basta?
+        C'è chi lo vuole appena accennato, chi lo vuole saporito, chi per motivi di salute non può mangiarne quasi
+        per niente... e magari sono tutti seduti allo stesso tavolo! Lo stesso vale per «a fuoco medio», «circa 15
+        minuti», «al dente». Un'istruzione che due persone interpretano in modo diverso non è un'istruzione
+        matematica.
+      </div>
+
+      <div class="warning">
+        <strong>Difetto 2: non è deterministica.</strong> Cioè: <em>partendo dagli stessi ingredienti non si ottiene
+        necessariamente lo stesso risultato</em>. Non ci credete? Io ci provo, a fare la stessa parmigiana di
+        melanzane di mio padre: compro gli stessi ingredienti, dallo stesso fruttivendolo, seguo i passaggi uno per
+        uno. Risultato: la parmigiana di mio padre <strong>non si batte</strong>. Stesso input, output diverso — e
+        la matematica queste cose non le tollera.
+      </div>
+    </section>
+
+    <!-- 3 — L'ALGORITMO MATEMATICO -->
+    <section id="sec3">
+      <h2>3. L'algoritmo matematico: le quattro proprietà</h2>
+
+      <p>Per meritarsi il titolo di <strong>algoritmo matematico</strong>, una procedura deve avere quattro
+        proprietà precise:</p>
+
+      <div class="rule">
+        <strong>1) Sequenziale</strong> — si esegue <strong>un passo alla volta</strong>, in un ordine stabilito:
+        prima il primo, poi il secondo. Niente "fai queste cose più o meno insieme".
+        <br><strong>2) Non ambiguo</strong> — ogni passo deve essere <strong>chiaro e non fraintendibile</strong>:
+        due persone diverse (o due macchine) devono capire esattamente la stessa cosa. Addio "q.b.".
+        <br><strong>3) Deterministico</strong> — partendo dagli stessi valori iniziali (<strong>input</strong>) si
+        deve arrivare <em>sempre</em> agli stessi risultati (<strong>output</strong>). Niente tocco magico del papà.
+        <br><strong>4) Generale</strong> — non deve risolvere <em>un</em> caso, ma <strong>tutti i casi</strong>
+        della classe di problemi a cui si riferisce. Un metodo che funziona solo per $7 + 5$ non è un algoritmo:
+        deve funzionare per qualunque coppia di numeri.
+      </div>
+
+      <p>Il bello è che algoritmi matematici perfetti li conoscete da anni: sono le <strong>quattro operazioni in
+        colonna</strong>. Addizione, sottrazione, moltiplicazione, divisione — quei procedimenti meccanici che
+        eseguite senza pensarci sono algoritmi da manuale.</p>
+
+      <div class="curiosita">
+        <strong>Da dove vengono?</strong> Proprio dal libro di al-Khwārizmī e dal sistema di numerazione
+        <strong>posizionale</strong> che abbiamo studiato nella lezione 6! Incolonnare le cifre e propagare i
+        riporti funziona <em>perché</em> ogni posizione vale dieci volte quella alla sua destra. Coi numeri romani,
+        ricordate, la stessa cosa era impossibile: nessun algoritmo scritto, solo l'abaco. Cambiare il modo di
+        scrivere i numeri ha reso possibili gli algoritmi che usiamo ancora oggi.
+      </div>
+
+      <p>Guardiamo l'addizione in colonna come <em>sequenza di passi</em>, per vedere che rispetta tutte e quattro
+        le proprietà:</p>
+
+      <div class="ckt" style="padding:0.9rem 1.1rem;">
+        <p style="margin:0 0 0.4rem;"><strong>Algoritmo: addizione in colonna</strong></p>
+        <ol style="margin:0; padding-left:1.3rem;">
+          <li>Incolonna i due numeri allineando le unità;</li>
+          <li>poni il riporto iniziale a 0 e parti dalla colonna più a destra;</li>
+          <li>somma le due cifre della colonna e il riporto;</li>
+          <li>se il risultato è minore di 10, scrivilo sotto e poni il riporto a 0; altrimenti scrivi la cifra delle
+            unità e poni il riporto a 1;</li>
+          <li>passa alla colonna successiva a sinistra e ripeti dal passo 3;</li>
+          <li>quando le colonne finiscono: se il riporto è 1, scrivilo davanti. Fine.</li>
+        </ol>
+      </div>
+
+      <p>Sequenziale ✓ (un passo alla volta), non ambiguo ✓ (ogni istruzione è precisa), deterministico ✓ (stessi
+        numeri, stesso risultato, sempre), generale ✓ (funziona per qualunque coppia di numeri). Questo sì che è un
+        algoritmo matematico.</p>
+    </section>
+
+    <!-- 4 — LA FINITEZZA -->
+    <section id="sec4">
+      <h2>4. Un problema: e se non finisce mai?</h2>
+
+      <p>Prendiamo però un caso particolare, quello che ci ha già dato filo da torcere nella lezione 4:
+        <strong>$10 : 3$</strong>. Applichiamo l'algoritmo della divisione: $3$ sta in $10$ tre volte, resto $1$;
+        abbasso uno zero, $3$ sta in $10$ tre volte, resto $1$; abbasso uno zero, $3$ sta in $10$ tre volte...</p>
+
+      <div class="formula-box">
+        $$10 : 3 = 3{,}3333333333\ldots$$
+        <p class="formula-note">L'algoritmo è perfettamente sequenziale, non ambiguo, deterministico e generale...
+          ma <strong>non finisce mai</strong>. Continuerebbe a produrre "3" per l'eternità.</p>
+      </div>
+
+      <p>Per un essere umano non è un dramma: a un certo punto ci fermiamo, scriviamo $3{,}\overline{3}$ e andiamo a
+        pranzo. Ma un <strong>computer</strong>? Una macchina che esegue alla lettera resterebbe lì per sempre.
+        Serve quindi una quinta proprietà:</p>
+
+      <div class="definition">
+        Un <strong>algoritmo informatico</strong> deve avere tutte le proprietà di quello matematico e in più essere
+        <strong>finito</strong>: deve <strong>terminare in un tempo finito</strong>, dopo un numero finito di passi.
+        Se non termina, non è un algoritmo utile a una macchina.
+      </div>
+
+      <div class="curiosita">
+        <strong>Il ciclo infinito.</strong> Ogni programmatore, prima o poi, scrive per sbaglio un algoritmo che non
+        finisce: il programma si "pianta" e resta lì a macinare passi inutili finché non lo si spegne a forza. E c'è
+        di più: <strong>non esiste</strong> un programma capace di stabilire, in generale, se un altro programma
+        terminerà oppure no. Lo dimostrò Alan Turing nel 1936 (si chiama <em>problema della fermata</em>), ed è un
+        parente stretto dei teoremi di Gödel della lezione 2: anche l'informatica ha i suoi limiti invalicabili.
+      </div>
+    </section>
+
+    <!-- 5 — PSEUDOCODICE -->
+    <section id="sec5">
+      <h2>5. Come si scrive un algoritmo: pseudocodice e diagrammi</h2>
+
+      <p>Un algoritmo è una sequenza di passi, ma dobbiamo scriverla in modo che anche un <strong>calcolatore</strong>
+        la capisca. Per farlo esistono i <strong>linguaggi di programmazione</strong>, ciascuno con la sua sintassi
+        precisa e i suoi campi d'elezione:</p>
+
+      <ul>
+        <li><strong>C / C++</strong> — velocissimi, usati per i <strong>videogiochi</strong> e per i programmi che
+          devono spremere la macchina;</li>
+        <li><strong>Python</strong> — semplice e leggibile, il re dell'<strong>intelligenza artificiale</strong> e
+          del calcolo scientifico;</li>
+        <li><strong>Java</strong> — il cavallo di battaglia delle <strong>aziende</strong> che sviluppano grandi
+          servizi informatici (banche, gestionali);</li>
+        <li><strong>JavaScript</strong> — il linguaggio dei <strong>siti web</strong>: tutte le simulazioni che state
+          usando in queste lezioni sono scritte in JavaScript!</li>
+      </ul>
+
+      <p>Noi però, per ora, non impareremo nessuno di questi. Useremo due strumenti più semplici e universali:</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">pseudocodice</span><span class="nome">"quasi codice"</span><span class="significa">l'algoritmo scritto in italiano, ma con la struttura rigida di un programma</span></div>
+        <div class="sym-card"><span class="sym">diagramma di flusso</span><span class="nome">flowchart</span><span class="significa">lo stesso algoritmo disegnato: blocchi e frecce che mostrano il percorso</span></div>
+      </div>
+
+      <p>Nei diagrammi di flusso ogni forma ha un significato preciso:</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 120" aria-label="I simboli dei diagrammi di flusso: inizio e fine, istruzione, input output, decisione">
+        <ellipse cx="70" cy="45" rx="52" ry="21" fill="color-mix(in srgb, #22c55e 18%, transparent)" stroke="#22c55e" stroke-width="2"/>
+        <text x="70" y="50" text-anchor="middle" class="lbl">inizio / fine</text>
+        <text x="70" y="88" text-anchor="middle" class="lbl-s">ovale</text>
+        <rect x="160" y="24" width="110" height="42" rx="6" fill="color-mix(in srgb, var(--accent) 18%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="215" y="50" text-anchor="middle" class="lbl">istruzione</text>
+        <text x="215" y="88" text-anchor="middle" class="lbl-s">rettangolo</text>
+        <polygon points="325,24 435,24 415,66 305,66" fill="color-mix(in srgb, var(--gold) 18%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+        <text x="370" y="50" text-anchor="middle" class="lbl">leggi / scrivi</text>
+        <text x="370" y="88" text-anchor="middle" class="lbl-s">parallelogramma</text>
+        <polygon points="545,18 605,45 545,72 485,45" fill="color-mix(in srgb, var(--magenta) 18%, transparent)" stroke="var(--magenta)" stroke-width="2"/>
+        <text x="545" y="50" text-anchor="middle" class="lbl">domanda?</text>
+        <text x="545" y="88" text-anchor="middle" class="lbl-s">rombo (decisione)</text>
+      </svg></div>
+
+      <p>E qualunque algoritmo, per quanto complicato, si costruisce mettendo insieme <strong>tre sole
+        strutture</strong>:</p>
+      <ol>
+        <li><strong>sequenziale</strong> — le istruzioni una dopo l'altra;</li>
+        <li><strong>condizionale</strong> — un'istruzione si esegue <em>solo se</em> è verificata una condizione;</li>
+        <li><strong>iterativa</strong> — un blocco di istruzioni si <em>ripete</em> più volte.</li>
+      </ol>
+      <p>Solo tre. Con queste tre si scrive qualunque programma esistente, dal videogioco al sistema operativo.
+        Vediamole una per una.</p>
+    </section>
+
+    <!-- 6 — STRUTTURA SEQUENZIALE -->
+    <section id="sec6">
+      <h2>6. La struttura sequenziale</h2>
+
+      <p>La più semplice: le istruzioni vengono eseguite <strong>una dopo l'altra</strong>, dall'alto verso il basso,
+        senza saltare nulla. Ecco un algoritmo che calcola l'area di un rettangolo:</p>
+
+      <div class="code-flow">
+        <div>
+          <p class="lbl-s" style="margin:0 0 0.3rem;"><strong>Pseudocodice</strong></p>
+<pre class="pseudo"><span class="kw">ALGORITMO</span> AreaRettangolo
+  <span class="io">LEGGI</span> base
+  <span class="io">LEGGI</span> altezza
+  area <span class="kw">←</span> base <span class="kw">×</span> altezza
+  <span class="io">SCRIVI</span> area
+<span class="kw">FINE</span></pre>
+          <p class="lbl-s">La freccia <strong>←</strong> significa «assegna»: <em>metti dentro area il risultato di
+            base × altezza</em>. Non è un uguale: è un'azione.</p>
+        </div>
+        <div class="ckt"><svg viewBox="0 0 260 330" aria-label="Diagramma di flusso della struttura sequenziale">
+          <ellipse cx="130" cy="26" rx="46" ry="18" fill="color-mix(in srgb, #22c55e 18%, transparent)" stroke="#22c55e" stroke-width="2"/>
+          <text x="130" y="31" text-anchor="middle" class="lbl">inizio</text>
+          <line x1="130" y1="44" x2="130" y2="64" stroke="var(--text-soft)" stroke-width="2"/><polygon points="130,70 125,58 135,58" fill="var(--text-soft)"/>
+          <polygon points="80,72 200,72 185,106 65,106" fill="color-mix(in srgb, var(--gold) 18%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+          <text x="130" y="94" text-anchor="middle" class="lbl">leggi base</text>
+          <line x1="130" y1="106" x2="130" y2="124" stroke="var(--text-soft)" stroke-width="2"/><polygon points="130,130 125,118 135,118" fill="var(--text-soft)"/>
+          <polygon points="80,132 200,132 185,166 65,166" fill="color-mix(in srgb, var(--gold) 18%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+          <text x="130" y="154" text-anchor="middle" class="lbl">leggi altezza</text>
+          <line x1="130" y1="166" x2="130" y2="184" stroke="var(--text-soft)" stroke-width="2"/><polygon points="130,190 125,178 135,178" fill="var(--text-soft)"/>
+          <rect x="60" y="192" width="140" height="38" rx="6" fill="color-mix(in srgb, var(--accent) 18%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+          <text x="130" y="216" text-anchor="middle" class="lbl">area ← b × h</text>
+          <line x1="130" y1="230" x2="130" y2="248" stroke="var(--text-soft)" stroke-width="2"/><polygon points="130,254 125,242 135,242" fill="var(--text-soft)"/>
+          <polygon points="80,256 200,256 185,290 65,290" fill="color-mix(in srgb, var(--gold) 18%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+          <text x="130" y="278" text-anchor="middle" class="lbl">scrivi area</text>
+          <line x1="130" y1="290" x2="130" y2="302" stroke="var(--text-soft)" stroke-width="2"/><polygon points="130,308 125,296 135,296" fill="var(--text-soft)"/>
+          <ellipse cx="130" cy="312" rx="46" ry="16" fill="color-mix(in srgb, #22c55e 18%, transparent)" stroke="#22c55e" stroke-width="2"/>
+          <text x="130" y="317" text-anchor="middle" class="lbl">fine</text>
+        </svg></div>
+      </div>
+    </section>
+
+    <!-- 7 — STRUTTURA CONDIZIONALE -->
+    <section id="sec7">
+      <h2>7. La struttura condizionale</h2>
+
+      <p>Qui l'algoritmo <strong>si biforca</strong>: si pone una domanda, e a seconda della risposta (vera o falsa
+        — ricordate la logica della lezione 2?) si prende una strada o l'altra. In pseudocodice si scrive
+        <strong>SE ... ALLORA ... ALTRIMENTI</strong>.</p>
+
+      <p>Facciamo l'esempio classico: stabilire se un numero è <strong>pari o dispari</strong>. Ci serve un
+        operatore nuovo, importantissimo in informatica:</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">%</span><span class="nome">modulo (resto)</span><span class="significa">$a \; \% \; b$ è il <strong>resto</strong> della divisione di $a$ per $b$. Es: $10 \; \% \; 3 = 1$, &nbsp; $8 \; \% \; 2 = 0$</span></div>
+      </div>
+
+      <p>Con il modulo la domanda diventa banale: un numero è pari esattamente quando il resto della sua divisione
+        per 2 è zero — è la definizione della lezione 4, tradotta in matematichese eseguibile.</p>
+
+      <div class="code-flow">
+        <div>
+          <p class="lbl-s" style="margin:0 0 0.3rem;"><strong>Pseudocodice</strong></p>
+<pre class="pseudo"><span class="kw">ALGORITMO</span> PariODispari
+  <span class="io">LEGGI</span> N
+  <span class="kw">SE</span> (N % <span class="nu">2</span> = <span class="nu">0</span>) <span class="kw">ALLORA</span>
+    <span class="io">SCRIVI</span> <span class="cm">"il numero è pari"</span>
+  <span class="kw">ALTRIMENTI</span>
+    <span class="io">SCRIVI</span> <span class="cm">"il numero è dispari"</span>
+  <span class="kw">FINE SE</span>
+<span class="kw">FINE</span></pre>
+          <p class="lbl-s">Solo <strong>uno</strong> dei due rami viene eseguito: mai tutti e due, mai nessuno.</p>
+        </div>
+        <div class="ckt"><svg viewBox="0 0 300 330" aria-label="Diagramma di flusso della struttura condizionale: se il resto della divisione per due è zero il numero è pari, altrimenti è dispari">
+          <ellipse cx="150" cy="24" rx="44" ry="17" fill="color-mix(in srgb, #22c55e 18%, transparent)" stroke="#22c55e" stroke-width="2"/>
+          <text x="150" y="29" text-anchor="middle" class="lbl">inizio</text>
+          <line x1="150" y1="41" x2="150" y2="58" stroke="var(--text-soft)" stroke-width="2"/><polygon points="150,64 145,52 155,52" fill="var(--text-soft)"/>
+          <polygon points="105,66 195,66 183,98 93,98" fill="color-mix(in srgb, var(--gold) 18%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+          <text x="150" y="87" text-anchor="middle" class="lbl">leggi N</text>
+          <line x1="150" y1="98" x2="150" y2="112" stroke="var(--text-soft)" stroke-width="2"/><polygon points="150,118 145,106 155,106" fill="var(--text-soft)"/>
+          <polygon points="150,120 245,158 150,196 55,158" fill="color-mix(in srgb, var(--magenta) 18%, transparent)" stroke="var(--magenta)" stroke-width="2"/>
+          <text x="150" y="154" text-anchor="middle" class="lbl">N % 2</text>
+          <text x="150" y="172" text-anchor="middle" class="lbl">= 0 ?</text>
+          <line x1="55" y1="158" x2="30" y2="158" stroke="var(--text-soft)" stroke-width="2"/>
+          <line x1="30" y1="158" x2="30" y2="222" stroke="var(--text-soft)" stroke-width="2"/><polygon points="30,228 25,216 35,216" fill="var(--text-soft)"/>
+          <text x="42" y="150" class="lbl-s" fill="#22c55e">SÌ</text>
+          <line x1="245" y1="158" x2="270" y2="158" stroke="var(--text-soft)" stroke-width="2"/>
+          <line x1="270" y1="158" x2="270" y2="222" stroke="var(--text-soft)" stroke-width="2"/><polygon points="270,228 265,216 275,216" fill="var(--text-soft)"/>
+          <text x="238" y="150" class="lbl-s" fill="#e0705f">NO</text>
+          <polygon points="0,230 92,230 82,262 -10,262" fill="color-mix(in srgb, var(--gold) 18%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+          <text x="41" y="251" text-anchor="middle" class="lbl-s">scrivi "pari"</text>
+          <polygon points="212,230 310,230 300,262 202,262" fill="color-mix(in srgb, var(--gold) 18%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+          <text x="256" y="251" text-anchor="middle" class="lbl-s">scrivi "dispari"</text>
+          <line x1="30" y1="262" x2="30" y2="288" stroke="var(--text-soft)" stroke-width="2"/>
+          <line x1="270" y1="262" x2="270" y2="288" stroke="var(--text-soft)" stroke-width="2"/>
+          <line x1="30" y1="288" x2="270" y2="288" stroke="var(--text-soft)" stroke-width="2"/>
+          <line x1="150" y1="288" x2="150" y2="298" stroke="var(--text-soft)" stroke-width="2"/><polygon points="150,304 145,292 155,292" fill="var(--text-soft)"/>
+          <ellipse cx="150" cy="312" rx="44" ry="16" fill="color-mix(in srgb, #22c55e 18%, transparent)" stroke="#22c55e" stroke-width="2"/>
+          <text x="150" y="317" text-anchor="middle" class="lbl">fine</text>
+        </svg></div>
+      </div>
+
+      <div class="note">
+        <strong>Il rombo è una domanda con due sole risposte.</strong> Dal rombo escono sempre esattamente due
+        frecce: <strong>SÌ</strong> e <strong>NO</strong>. È il principio del terzo escluso della lezione 2 in
+        versione eseguibile — e infatti al posto della condizione si può mettere qualunque proposizione logica,
+        anche composta con <em>E</em> e <em>O</em>: «SE (N % 2 = 0) E (N maggiore di 100) ALLORA...».
+      </div>
+    </section>
+
+    <!-- 8 — STRUTTURA ITERATIVA -->
+    <section id="sec8">
+      <h2>8. La struttura iterativa: i cicli</h2>
+
+      <p>Ecco la struttura che dà ai computer il loro superpotere: la <strong>ripetizione</strong>. Un blocco di
+        istruzioni viene eseguito molte volte — mille, un milione di volte — senza che noi si debba riscriverlo.
+        Questi blocchi ripetuti si chiamano <strong>cicli</strong> (o <em>loop</em>), e ne esistono tre forme.</p>
+
+      <h3>8.1 — MENTRE ... FAI (<em>while-do</em>): controllo in testa</h3>
+      <p>Si controlla <strong>prima</strong> la condizione: finché è vera, si ripete il blocco. Se la condizione è
+        falsa fin da subito, il blocco <strong>non viene eseguito nemmeno una volta</strong>.</p>
+
+<pre class="pseudo"><span class="kw">ALGORITMO</span> StampaPrimiN
+  <span class="io">LEGGI</span> N
+  i <span class="kw">←</span> <span class="nu">1</span>
+  <span class="kw">MENTRE</span> (i ≤ N) <span class="kw">FAI</span>
+    <span class="io">SCRIVI</span> i
+    i <span class="kw">←</span> i + <span class="nu">1</span>        <span class="cm">// senza questo, il ciclo non finisce mai!</span>
+  <span class="kw">FINE MENTRE</span>
+<span class="kw">FINE</span></pre>
+
+      <div class="warning">
+        <strong>Il pericolo numero uno dei cicli.</strong> Se dimenticate l'istruzione che fa avanzare il contatore
+        (<code>i ← i + 1</code>), la condizione resta vera per sempre: il programma stampa <em>1, 1, 1, 1...</em>
+        all'infinito. È il famigerato <strong>ciclo infinito</strong> — e l'algoritmo perde la proprietà di
+        finitezza della sezione 4.
+      </div>
+
+      <h3>8.2 — RIPETI ... FINCHÉ (<em>do-while</em>): controllo in coda</h3>
+      <p>Qui il blocco si esegue <strong>almeno una volta</strong>, e solo <em>dopo</em> si controlla se ripetere.
+        Utile quando qualcosa va fatto comunque: per esempio chiedere una password, che va chiesta almeno una
+        volta.</p>
+
+<pre class="pseudo"><span class="kw">ALGORITMO</span> ChiediPassword
+  <span class="kw">RIPETI</span>
+    <span class="io">LEGGI</span> password
+  <span class="kw">FINCHÉ</span> (password ≠ <span class="cm">"segreto"</span>)
+  <span class="io">SCRIVI</span> <span class="cm">"Accesso consentito"</span>
+<span class="kw">FINE</span></pre>
+
+      <h3>8.3 — PER ... DA ... A (<em>for</em>): quando so quante volte</h3>
+      <p>È la forma più compatta, da usare quando si sa <strong>in anticipo quante ripetizioni servono</strong>. Il
+        contatore viene creato, incrementato e controllato automaticamente: tre cose in una riga sola.</p>
+
+<pre class="pseudo"><span class="kw">ALGORITMO</span> StampaPrimiN
+  <span class="io">LEGGI</span> N
+  <span class="kw">PER</span> i <span class="kw">DA</span> <span class="nu">1</span> <span class="kw">A</span> N <span class="kw">FAI</span>
+    <span class="io">SCRIVI</span> i
+  <span class="kw">FINE PER</span>
+<span class="kw">FINE</span></pre>
+
+      <p>Fa esattamente la stessa cosa del <em>while</em> di prima, ma in tre righe invece di cinque — e senza il
+        rischio di dimenticare l'incremento.</p>
+    </section>
+
+    <!-- 9 — LA SOMMA DEI PRIMI N -->
+    <section id="sec9">
+      <h2>9. Un algoritmo completo: la somma dei primi N numeri</h2>
+
+      <p>Mettiamo insieme tutto. Vogliamo un algoritmo che, dato un numero $N$, calcoli
+        $1 + 2 + 3 + \ldots + N$. Ci serve una variabile che faccia da "salvadanaio" (la chiamiamo $S$) in cui
+        accumulare i numeri man mano.</p>
+
+      <div class="code-flow">
+        <div>
+          <p class="lbl-s" style="margin:0 0 0.3rem;"><strong>Pseudocodice</strong></p>
+<pre class="pseudo"><span class="kw">ALGORITMO</span> SommaPrimiN
+  <span class="io">LEGGI</span> N
+  S <span class="kw">←</span> <span class="nu">0</span>            <span class="cm">// il salvadanaio parte vuoto</span>
+  <span class="kw">PER</span> i <span class="kw">DA</span> <span class="nu">1</span> <span class="kw">A</span> N <span class="kw">FAI</span>
+    S <span class="kw">←</span> S + i      <span class="cm">// aggiungo i al salvadanaio</span>
+  <span class="kw">FINE PER</span>
+  <span class="io">SCRIVI</span> S
+<span class="kw">FINE</span></pre>
+          <p class="lbl-s">Con $N = 5$: $S$ vale $0$, poi $1$, poi $3$, poi $6$, poi $10$, poi $15$. Scrive
+            <strong>15</strong> ✓</p>
+        </div>
+        <div class="ckt"><svg viewBox="0 0 300 390" aria-label="Diagramma di flusso dell'algoritmo che somma i primi N numeri con un ciclo">
+          <ellipse cx="150" cy="22" rx="42" ry="16" fill="color-mix(in srgb, #22c55e 18%, transparent)" stroke="#22c55e" stroke-width="2"/>
+          <text x="150" y="27" text-anchor="middle" class="lbl">inizio</text>
+          <line x1="150" y1="38" x2="150" y2="52" stroke="var(--text-soft)" stroke-width="2"/><polygon points="150,58 145,46 155,46" fill="var(--text-soft)"/>
+          <polygon points="108,60 192,60 181,90 97,90" fill="color-mix(in srgb, var(--gold) 18%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+          <text x="145" y="80" text-anchor="middle" class="lbl">leggi N</text>
+          <line x1="150" y1="90" x2="150" y2="104" stroke="var(--text-soft)" stroke-width="2"/><polygon points="150,110 145,98 155,98" fill="var(--text-soft)"/>
+          <rect x="92" y="112" width="116" height="36" rx="6" fill="color-mix(in srgb, var(--accent) 18%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+          <text x="150" y="128" text-anchor="middle" class="lbl-s">S ← 0</text>
+          <text x="150" y="142" text-anchor="middle" class="lbl-s">i ← 1</text>
+          <line x1="150" y1="148" x2="150" y2="164" stroke="var(--text-soft)" stroke-width="2"/><polygon points="150,170 145,158 155,158" fill="var(--text-soft)"/>
+          <polygon points="150,172 240,206 150,240 60,206" fill="color-mix(in srgb, var(--magenta) 18%, transparent)" stroke="var(--magenta)" stroke-width="2"/>
+          <text x="150" y="211" text-anchor="middle" class="lbl">i ≤ N ?</text>
+          <text x="163" y="256" class="lbl-s" fill="#22c55e">SÌ</text>
+          <line x1="150" y1="240" x2="150" y2="262" stroke="var(--text-soft)" stroke-width="2"/><polygon points="150,268 145,256 155,256" fill="var(--text-soft)"/>
+          <rect x="92" y="270" width="116" height="40" rx="6" fill="color-mix(in srgb, var(--accent) 18%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+          <text x="150" y="286" text-anchor="middle" class="lbl-s">S ← S + i</text>
+          <text x="150" y="302" text-anchor="middle" class="lbl-s">i ← i + 1</text>
+          <line x1="92" y1="290" x2="24" y2="290" stroke="var(--text-soft)" stroke-width="2"/>
+          <line x1="24" y1="290" x2="24" y2="206" stroke="var(--text-soft)" stroke-width="2"/>
+          <line x1="24" y1="206" x2="54" y2="206" stroke="var(--text-soft)" stroke-width="2"/><polygon points="60,206 48,201 48,211" fill="var(--text-soft)"/>
+          <text x="30" y="246" class="lbl-s" fill="var(--muted)">torna al test</text>
+          <line x1="240" y1="206" x2="268" y2="206" stroke="var(--text-soft)" stroke-width="2"/>
+          <line x1="268" y1="206" x2="268" y2="330" stroke="var(--text-soft)" stroke-width="2"/>
+          <text x="246" y="198" class="lbl-s" fill="#e0705f">NO</text>
+          <polygon points="216,332 300,332 289,362 205,362" fill="color-mix(in srgb, var(--gold) 18%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+          <text x="252" y="352" text-anchor="middle" class="lbl">scrivi S</text>
+          <line x1="268" y1="330" x2="268" y2="332" stroke="var(--text-soft)" stroke-width="2"/>
+          <line x1="252" y1="362" x2="252" y2="372" stroke="var(--text-soft)" stroke-width="2"/>
+          <line x1="252" y1="372" x2="150" y2="372" stroke="var(--text-soft)" stroke-width="2"/>
+          <line x1="150" y1="372" x2="150" y2="360" stroke="var(--text-soft)" stroke-width="2"/><polygon points="150,354 145,366 155,366" fill="var(--text-soft)"/>
+          <ellipse cx="150" cy="340" rx="42" ry="16" fill="color-mix(in srgb, #22c55e 18%, transparent)" stroke="#22c55e" stroke-width="2"/>
+          <text x="150" y="345" text-anchor="middle" class="lbl">fine</text>
+        </svg></div>
+      </div>
+
+      <div class="rule">
+        <strong>Prova tu a ingegnarti.</strong> Con una modifica minuscola questo algoritmo può fare molto di più:
+        <br>• come lo cambieresti per sommare <strong>solo i numeri pari</strong>? <em>(Suggerimento: dentro il
+        ciclo, un <strong>SE</strong> con l'operatore % della sezione 7... oppure, ancora più furbo, far partire
+        $i$ da 2 e farlo avanzare di 2 in 2!)</em>
+        <br>• e per sommare <strong>solo i dispari</strong>? <em>(Stessa idea, partendo da 1.)</em>
+        <br>• e per calcolare il <strong>prodotto</strong> dei primi $N$ numeri (il fattoriale)? <em>(Attenzione:
+        il salvadanaio deve partire da 1, non da 0! Perché?)</em>
+      </div>
+    </section>
+
+    <!-- 10 — COMPLESSITÀ -->
+    <section id="sec10">
+      <h2>10. Quanto costa un algoritmo? La complessità</h2>
+
+      <p>Il nostro algoritmo funziona. Ma <strong>quanto lavoro</strong> richiede? Contiamo le operazioni del ciclo:</p>
+
+      <table class="num-tab" style="border-collapse:collapse; margin:0.8rem auto;">
+        <tr><th style="border:1px solid var(--border); padding:0.4rem 1rem; background:var(--surface-2);">Se $N$ vale...</th><th style="border:1px solid var(--border); padding:0.4rem 1rem; background:var(--surface-2);">il ciclo gira...</th></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.4rem 1rem; text-align:center;">$10$</td><td style="border:1px solid var(--border); padding:0.4rem 1rem; text-align:center;">10 volte</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.4rem 1rem; text-align:center;">$100$</td><td style="border:1px solid var(--border); padding:0.4rem 1rem; text-align:center;">100 volte</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.4rem 1rem; text-align:center;">$100\,000$</td><td style="border:1px solid var(--border); padding:0.4rem 1rem; text-align:center;">100 000 volte</td></tr>
+        <tr><td style="border:1px solid var(--border); padding:0.4rem 1rem; text-align:center;">$1$ miliardo</td><td style="border:1px solid var(--border); padding:0.4rem 1rem; text-align:center;">1 miliardo di volte!</td></tr>
+      </table>
+
+      <div class="definition">
+        La <strong>complessità temporale</strong> di un algoritmo dice <strong>come cresce il numero di
+        operazioni</strong> al crescere della dimensione dei dati in ingresso. Il nostro algoritmo ha complessità
+        <strong>lineare</strong>: raddoppiando $N$, raddoppia il lavoro. Non è la stessa cosa di "quanti secondi
+        impiega": dipende dalla macchina. La complessità misura l'algoritmo, non il computer.
+      </div>
+
+      <p>Un miliardo di operazioni un computer le fa in circa un secondo — ma se dovessimo ripetere il calcolo un
+        milione di volte, o se $N$ fosse mille miliardi, sarebbero guai. <strong>Si può fare di meglio?</strong></p>
+
+      <h3>10.1 — La scorciatoia: la formula di Gauss</h3>
+
+      <div class="curiosita">
+        <strong>Il bambino che imbrogliò il maestro.</strong> Si racconta che intorno al 1785, in una scuola
+        elementare tedesca, il maestro — per tenere buona la classe — assegnò il compito di sommare tutti i numeri
+        da 1 a 100. Dopo pochi secondi un bambino di circa nove anni si alzò con la risposta: <strong>5050</strong>.
+        Si chiamava <strong>Carl Friedrich Gauss</strong> e sarebbe diventato uno dei più grandi matematici della
+        storia. Come aveva fatto? Non aveva sommato: aveva <strong>accoppiato</strong>. Il primo con l'ultimo:
+        $1 + 100 = 101$. Il secondo con il penultimo: $2 + 99 = 101$. Sempre 101! Le coppie sono $50$, quindi
+        $50 \times 101 = 5050$.
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">Formula di Gauss</div>
+        $$S = 1 + 2 + \ldots + N = \frac{N \times (N+1)}{2}$$
+        <p class="formula-note">Verifica con $N = 100$: $\dfrac{100 \times 101}{2} = 5050$ ✓ &nbsp; E con $N = 5$:
+          $\dfrac{5 \times 6}{2} = 15$ ✓, proprio il risultato del nostro ciclo.</p>
+      </div>
+
+      <p>Riscriviamo l'algoritmo usando la formula:</p>
+
+<pre class="pseudo"><span class="kw">ALGORITMO</span> SommaPrimiN_Gauss
+  <span class="io">LEGGI</span> N
+  S <span class="kw">←</span> N <span class="kw">×</span> (N + <span class="nu">1</span>) <span class="kw">/</span> <span class="nu">2</span>
+  <span class="io">SCRIVI</span> S
+<span class="kw">FINE</span></pre>
+
+      <div class="rule">
+        <strong>Il salto di qualità.</strong> Questo algoritmo esegue <strong>sempre tre operazioni</strong> — una
+        moltiplicazione, un'addizione, una divisione — <em>qualunque</em> sia $N$. Che si sommino i primi 10 numeri o
+        i primi mille miliardi, il costo è identico: si dice che ha complessità <strong>costante</strong>. Il ciclo
+        di prima, con $N$ = un miliardo, faceva un miliardo di operazioni; questo ne fa tre. <strong>Stesso
+        risultato, lavoro incomparabilmente minore</strong>: ecco perché studiare matematica rende i programmi più
+        veloci, e perché un buon informatico è prima di tutto un buon matematico.
+      </div>
+    </section>
+
+    <!-- 11 — TOP-DOWN -->
+    <section id="sec11">
+      <h2>11. Da dove si comincia? La scomposizione top-down</h2>
+
+      <p>Bene: sappiamo che cos'è un algoritmo e come si scrive. Ma resta la domanda più difficile di tutte:
+        <strong>come si fa a inventarlo?</strong> Ho davanti un problema concreto e complicato — da dove parto?</p>
+
+      <p>Matematici, fisici e informatici usano tutti lo stesso metodo, e ha un nome:</p>
+
+      <div class="definition">
+        La <strong>scomposizione top-down</strong> (dall'alto verso il basso) consiste nel prendere un problema
+        complesso, che <em>non</em> so risolvere, e <strong>spezzarlo in sottoproblemi più piccoli</strong> che so
+        risolvere. Se un sottoproblema è ancora troppo grande, lo si spezza di nuovo — finché non si arriva a passi
+        elementari.
+      </div>
+
+      <p>Un esempio che parla al cuore. Ho fame e voglio la <strong>carbonara</strong>. Se vi dico soltanto
+        «cucina», potreste bloccarvi: è un problema troppo grande. Ma se lo spezzo:</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 250" aria-label="Scomposizione top-down del problema cucinare la carbonara in sottoproblemi sempre più piccoli">
+        <rect x="220" y="12" width="200" height="42" rx="10" fill="color-mix(in srgb, var(--magenta) 20%, transparent)" stroke="var(--magenta)" stroke-width="2.5"/>
+        <text x="320" y="38" text-anchor="middle" class="lbl">🍝 Cucinare la carbonara</text>
+        <line x1="320" y1="54" x2="320" y2="70" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="110" y1="70" x2="530" y2="70" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="110" y1="70" x2="110" y2="88" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="320" y1="70" x2="320" y2="88" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="530" y1="70" x2="530" y2="88" stroke="var(--text-soft)" stroke-width="2"/>
+        <rect x="25" y="90" width="170" height="38" rx="8" fill="color-mix(in srgb, var(--accent) 16%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="110" y="114" text-anchor="middle" class="lbl-s">1. Preparare gli ingredienti</text>
+        <rect x="235" y="90" width="170" height="38" rx="8" fill="color-mix(in srgb, var(--accent) 16%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="320" y="114" text-anchor="middle" class="lbl-s">2. Cuocere la pasta</text>
+        <rect x="445" y="90" width="170" height="38" rx="8" fill="color-mix(in srgb, var(--accent) 16%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="530" y="114" text-anchor="middle" class="lbl-s">3. Mantecare e servire</text>
+        <line x1="110" y1="128" x2="110" y2="144" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="55" y1="144" x2="165" y2="144" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="55" y1="144" x2="55" y2="160" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="165" y1="144" x2="165" y2="160" stroke="var(--text-soft)" stroke-width="2"/>
+        <rect x="7" y="162" width="96" height="34" rx="7" fill="color-mix(in srgb, var(--gold) 16%, transparent)" stroke="var(--gold)" stroke-width="1.6"/>
+        <text x="55" y="183" text-anchor="middle" class="lbl-s" style="font-size:9px;">prendi le uova</text>
+        <rect x="117" y="162" width="96" height="34" rx="7" fill="color-mix(in srgb, var(--gold) 16%, transparent)" stroke="var(--gold)" stroke-width="1.6"/>
+        <text x="165" y="183" text-anchor="middle" class="lbl-s" style="font-size:9px;">taglia il guanciale</text>
+        <line x1="320" y1="128" x2="320" y2="144" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="270" y1="144" x2="380" y2="144" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="270" y1="144" x2="270" y2="160" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="380" y1="144" x2="380" y2="160" stroke="var(--text-soft)" stroke-width="2"/>
+        <rect x="222" y="162" width="96" height="34" rx="7" fill="color-mix(in srgb, var(--gold) 16%, transparent)" stroke="var(--gold)" stroke-width="1.6"/>
+        <text x="270" y="183" text-anchor="middle" class="lbl-s" style="font-size:9px;">metti l'acqua</text>
+        <rect x="332" y="162" width="96" height="34" rx="7" fill="color-mix(in srgb, var(--gold) 16%, transparent)" stroke="var(--gold)" stroke-width="1.6"/>
+        <text x="380" y="183" text-anchor="middle" class="lbl-s" style="font-size:9px;">butta la pasta</text>
+        <line x1="530" y1="128" x2="530" y2="160" stroke="var(--text-soft)" stroke-width="2"/>
+        <rect x="465" y="162" width="130" height="34" rx="7" fill="color-mix(in srgb, var(--gold) 16%, transparent)" stroke="var(--gold)" stroke-width="1.6"/>
+        <text x="530" y="183" text-anchor="middle" class="lbl-s" style="font-size:9px;">unisci fuori dal fuoco</text>
+        <text x="320" y="228" text-anchor="middle" class="lbl-s">più scendo, più i passi diventano semplici — fino a cose che so fare senza pensarci</text>
+      </svg></div>
+
+      <p>Ecco l'algoritmo della carbonara, top-down: <em>metti la pentola con l'acqua e il sale sul fuoco; intanto
+        prendi dal frigo uova e guanciale; taglia il guanciale a listarelle e mettilo in padella a fuoco basso;
+        separa i tuorli in una ciotola e sbattili col pecorino e il pepe; quando l'acqua bolle, butta la pasta;
+        scolala al dente tenendo da parte un mestolo d'acqua; togli la padella dal fuoco, unisci pasta e uova
+        mescolando velocemente (fuori dal fuoco, altrimenti frittata!); aggiusta con l'acqua di cottura e servi.</em>
+        Nessuno di questi passi, preso da solo, spaventa. Il piatto complicato è diventato una <strong>catena di
+        cose facili</strong>.</p>
+
+      <h3>11.1 — Lo stesso metodo, ovunque</h3>
+      <p>La cosa affascinante è che <em>questo</em> è il metodo, sempre. Cambia solo il problema:</p>
+      <ul>
+        <li><strong>Un'espressione algebrica</strong> (lezione 8): non «la risolvo», ma la spezzo — prima capisco
+          l'ordine imposto dalle parentesi, poi svolgo <em>una</em> operazione alla volta, un pezzo per volta, fino
+          alla fine. Ogni singolo passaggio è banale; è la catena a fare il risultato.</li>
+        <li><strong>Un tema di italiano</strong>: nessuno scrive un tema "tutto insieme". Si parte dalla
+          <strong>scaletta</strong> — cioè si spezza il problema in punti — e poi si sviluppa un punto alla volta.
+          È top-down puro, e la vostra professoressa di italiano ve lo insegna senza chiamarlo così.</li>
+        <li><strong>Un problema di fisica</strong>: dati, incognite, formule che le collegano, sostituzione. Sempre
+          spezzettare.</li>
+      </ul>
+
+      <h3>11.2 — Ma fin dove devo scendere?</h3>
+
+      <p>Sorge una domanda naturale: <strong>quando mi fermo?</strong> Fino a che punto devo continuare a spezzare
+        il problema? La risposta è secca e vale sempre: <strong>fino a quando i passi non sono elementari per chi
+        deve eseguirli</strong>.</p>
+
+      <p>Per un umano che sa cucinare, «taglia il guanciale» è già elementare: non serve spiegargli come si impugna
+        un coltello. Ma se l'esecutore è un <strong>computer</strong>, dobbiamo scendere fino a ciò che è elementare
+        <em>per lui</em> — e un computer, sotto sotto, sa fare pochissime cose.</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 250" aria-label="La scala dell'astrazione: dal problema al pseudocodice, al linguaggio di programmazione, alle istruzioni del processore, fino ai transistor">
+        <rect x="15" y="14" width="230" height="32" rx="8" fill="color-mix(in srgb, var(--magenta) 22%, transparent)" stroke="var(--magenta)" stroke-width="2"/>
+        <text x="130" y="34" text-anchor="middle" class="lbl-s" style="font-size:11px;">① il problema: «somma i primi N»</text>
+        <rect x="105" y="58" width="230" height="32" rx="8" fill="color-mix(in srgb, var(--magenta) 16%, transparent)" stroke="var(--magenta)" stroke-width="1.8"/>
+        <text x="220" y="78" text-anchor="middle" class="lbl-s" style="font-size:11px;">② algoritmo in pseudocodice</text>
+        <rect x="195" y="102" width="230" height="32" rx="8" fill="color-mix(in srgb, var(--accent) 18%, transparent)" stroke="var(--accent)" stroke-width="1.8"/>
+        <text x="310" y="122" text-anchor="middle" class="lbl-s" style="font-size:11px;">③ linguaggio (Python, C, Java…)</text>
+        <rect x="285" y="146" width="230" height="32" rx="8" fill="color-mix(in srgb, var(--gold) 18%, transparent)" stroke="var(--gold)" stroke-width="1.8"/>
+        <text x="400" y="166" text-anchor="middle" class="lbl-s" style="font-size:11px;">④ istruzioni del processore</text>
+        <rect x="375" y="190" width="240" height="32" rx="8" fill="color-mix(in srgb, var(--text-soft) 22%, transparent)" stroke="var(--text-soft)" stroke-width="1.8"/>
+        <text x="495" y="210" text-anchor="middle" class="lbl-s" style="font-size:11px;">⑤ transistor: passa / non passa</text>
+        <line x1="8" y1="20" x2="8" y2="216" stroke="var(--text-soft)" stroke-width="2"/>
+        <polygon points="8,222 3,210 13,210" fill="var(--text-soft)"/>
+        <text x="22" y="240" class="lbl-s">più si scende, più i passi diventano elementari — e più sono numerosi</text>
+      </svg></div>
+
+      <p>Al gradino ④ troviamo il cuore della faccenda. Un processore (la CPU della lezione 3) non "capisce" il
+        nostro linguaggio: sa eseguire solo un <strong>repertorio fisso e limitato di istruzioni</strong>, incise nei
+        suoi circuiti.</p>
+
+      <div class="definition">
+        Il <strong>set di istruzioni</strong> di un processore è l'elenco completo delle operazioni che quel
+        processore sa eseguire: cose come «carica un numero dalla memoria», «somma due numeri», «confronta»,
+        «salta a un'altra istruzione se il risultato è zero». Tutto il resto — un videogioco, un browser, questa
+        pagina — è costruito <strong>combinando</strong> queste poche istruzioni, a milioni.
+      </div>
+
+      <p>E qui, storicamente, gli ingegneri si sono divisi in <strong>due filosofie opposte</strong>:</p>
+
+      <div class="two-col">
+        <div class="definition" style="margin:0;">
+          <strong>CISC</strong> — processori con <strong>tante istruzioni</strong>, anche <strong>complesse</strong>:
+          una singola istruzione può fare parecchio lavoro in un colpo solo. Il programma risulta più corto, ma ogni
+          istruzione richiede più tempo e circuiti più complicati. È la famiglia <strong>x86</strong> di
+          Intel e AMD: i processori della maggior parte dei PC.
+        </div>
+        <div class="definition" style="margin:0;">
+          <strong>RISC</strong> — processori con <strong>poche istruzioni, tutte elementari</strong>, ma eseguite a
+          velocità impressionante. Per lo stesso compito servono più istruzioni, però ognuna vola. È la famiglia
+          <strong>ARM</strong> (smartphone, tablet, i Mac recenti) e <strong>RISC-V</strong>, che per giunta è
+          <em>open source</em> — ricordate la lezione 3?
+        </div>
+      </div>
+
+      <div class="curiosita">
+        <strong>Il robot da cucina e il cuoco velocissimo.</strong> Immaginate due cucine. Nella prima c'è un robot
+        multifunzione con il tasto «fai il pane»: premi e il pane esce, ma la macchina è costosa, ingombrante e ci
+        mette il suo tempo. Nella seconda ci sono solo ciotola, cucchiaio e forno — attrezzi elementari — ma il
+        cuoco è velocissimo e li usa in sequenza fulminea. <strong>Il pane esce da entrambe le cucine.</strong>
+        Cambia solo <em>quanto lavoro fa un singolo gesto</em>. (Curiosità: i processori x86 di oggi, dentro,
+        traducono al volo le loro istruzioni complesse in istruzioni elementari — hanno preso in prestito l'idea
+        dei rivali!)
+      </div>
+
+      <p>Che cosa significa tutto questo per noi che programmiamo? Che <strong>non dobbiamo scendere fino al gradino
+        ⑤</strong>, per fortuna: ci fermiamo al gradino ③. Quando scriviamo in un linguaggio di programmazione, la
+        nostra decomposizione top-down deve arrivare a ciò che è elementare <strong>per quel linguaggio</strong> —
+        cioè, in pratica, alle tre strutture della sezione 5: assegnazioni, condizioni, cicli. Poi ci pensa un
+        programma apposito (il <em>compilatore</em>) a tradurre tutto nelle istruzioni del processore. Ancora una
+        volta è la <strong>cipolla</strong> della lezione 3: ogni strato nasconde la complessità di quello sotto.</p>
+
+      <div class="note">
+        <strong>E oggi che ci sono le intelligenze artificiali?</strong> È vero: esistono <strong>agenti di
+        intelligenza artificiale</strong> capaci di scrivere codice, e si è diffuso perfino un modo di lavorare
+        chiamato <em>vibe coding</em> — si descrive a parole quello che si vuole, quasi come parlando con una
+        persona, e l'IA produce il programma. Sembrerebbe la fine del top-down... e invece è vero il contrario. Per
+        <strong>spiegare bene</strong> che cosa vuoi devi comunque aver spezzato il problema in parti chiare; e
+        soprattutto devi essere in grado di <strong>capire e verificare</strong> quello che ti viene restituito —
+        altrimenti torni a essere l'utente della "scatola nera" della lezione 1, che usa uno strumento senza sapere
+        cosa fa. La macchina scrive le righe; <strong>il ragionamento resta vostro</strong>.
+      </div>
+
+      <div class="curiosita">
+        <strong>Confessione del prof.</strong> Personalmente applico questo metodo a tutta la mia vita. Capita
+        spessissimo — per lavoro o a casa — che mi si chieda di fare cose che <strong>non so fare</strong>. Faccio
+        un lungo respiro, mi collego a internet, e comincio a spezzare il problema in parti sempre più piccole,
+        cercando ognuna di quelle parti finché non capisco come si risolve. Alla fine, un passo alla volta, tutto si
+        risolve. Non è questione di essere geni: è questione di <em>non farsi paralizzare dal problema intero</em>.
+        Vale per la carbonara, per le espressioni, per la vita.
+      </div>
+    </section>
+
+    <!-- 12 — CRITTOGRAFIA -->
+    <section id="sec12">
+      <h2>12. Un problema vero: la crittografia</h2>
+
+      <p>Proviamo il metodo su un problema serio, di quelli che riguardano la vostra vita quotidiana ogni volta che
+        pagate online: come faccio a <strong>mandare un messaggio segreto</strong> a qualcuno, sapendo che altri
+        potrebbero intercettarlo? È il problema della <strong>crittografia</strong>, ed è vecchio quanto la
+        scrittura.</p>
+
+      <h3>12.1 — Il cifrario di Cesare</h3>
+      <p>La prima soluzione documentata la usava <strong>Giulio Cesare</strong> per i dispacci militari, e l'idea è
+        di una semplicità disarmante: <strong>si sostituisce ogni lettera con quella che si trova $k$ posizioni più
+        avanti nell'alfabeto</strong>. Con chiave $k = 3$: la A diventa D, la B diventa E, la C diventa F... e
+        arrivati alla fine si ricomincia dall'inizio (la Z diventa C).</p>
+
+      <p>Il numero $k$ è la <strong>chiave</strong>: chi la conosce può decifrare (basta spostarsi all'indietro), chi
+        non la conosce vede solo lettere senza senso.</p>
+
+      <p>Nel widget qui sotto ci sono <strong>due modalità</strong>, che corrispondono ai due mestieri:</p>
+      <ul>
+        <li>🔒 <strong>cifra</strong> — sei <em>Cesare</em>: scrivi un messaggio in chiaro e ottieni il testo cifrato
+          da spedire;</li>
+        <li>🔓 <strong>decifra</strong> — sei il <em>destinatario</em>: incolli un testo cifrato e, sapendo la
+          chiave, riottieni il messaggio originale.</li>
+      </ul>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="cs-enc">🔒 cifra</button>
+          <button class="btn" id="cs-dec">🔓 decifra</button>
+        </div>
+        <div class="control-group" style="flex:1; min-width:260px;"><label id="cs-lab">messaggio in chiaro</label>
+          <input type="text" id="cs-in" style="width:100%;" value="ATTACCARE ALL ALBA"></div>
+        <div class="control-group"><label>chiave $k$</label><input type="range" id="cs-k" min="1" max="25" step="1" value="3"><span class="val-badge" id="cs-k-val">3</span></div>
+      </div>
+
+      <div class="ckt">
+        <p class="lbl-s" style="margin:0 0 0.3rem;">Con questa chiave, ogni lettera viene sostituita da quella sotto:</p>
+        <div class="cs-alpha" id="cs-map"></div>
+        <p class="lbl-s" id="cs-outlab" style="margin:0.7rem 0 0.2rem;">messaggio cifrato:</p>
+        <div class="cs-box" id="cs-out"></div>
+      </div>
+
+      <p>E adesso la parte divertente: mettiti nei panni di <strong>chi intercetta il messaggio</strong>. Non conosce
+        la chiave, ma sa che le chiavi possibili sono solo 25... quindi le prova <strong>tutte</strong>:</p>
+
+      <div class="ckt">
+        <p class="lbl-s" style="margin:0 0 0.3rem;">Testo intercettato (quello cifrato qui sopra):</p>
+        <div class="cs-box" id="cs-spy" style="color:var(--magenta);"></div>
+        <div class="controls" style="margin-top:0.5rem;">
+          <button class="btn" id="cs-break">💥 provale tutte e 25</button>
+        </div>
+        <div id="cs-list-wrap" style="display:none;">
+          <p class="lbl-s" style="margin:0.5rem 0 0.2rem;">Ecco le 25 decifrature possibili: <strong>una sola è
+            italiano</strong> — e chi spia la riconosce a colpo d'occhio.</p>
+          <div class="cs-list" id="cs-list"></div>
+        </div>
+      </div>
+
+      <div class="warning">
+        <strong>Perché il cifrario di Cesare non serve a niente (oggi).</strong> Le chiavi possibili sono soltanto
+        <strong>25</strong>: un computer le prova tutte in un milionesimo di secondo — l'avete appena visto col
+        pulsante. E anche a mano si rompe in fretta, grazie a un'idea potentissima: l'<strong>analisi delle
+        frequenze</strong>. In ogni lingua alcune lettere compaiono molto più spesso di altre: in italiano le più
+        frequenti sono <strong>E, A, I, O, N, L, R, T</strong>. Se in un messaggio cifrato la lettera più comune è
+        la <em>H</em>, è ragionevole che stia per una <em>E</em> — e da lì la chiave si scopre in un attimo. Questa
+        tecnica fu descritta già nel IX secolo dal matematico arabo <strong>al-Kindī</strong>: il cifrario di Cesare
+        era già insicuro mille anni fa.
+      </div>
+
+      <h3>12.2 — Il problema vero: come ci scambiamo la chiave?</h3>
+      <p>Ma c'è un guaio ancora più profondo, e riguarda <em>tutti</em> i cifrari di questo tipo. Per comunicare, io
+        e voi dobbiamo <strong>esserci accordati prima sulla chiave</strong>. E come facciamo a metterci d'accordo,
+        se il nostro canale è spiato? Se vi mando la chiave per messaggio, chi ci spia la legge e ha vinto.</p>
+
+      <p>Pensateci: quando comprate qualcosa online, il vostro telefono deve mandare al negozio il numero della carta
+        <em>in modo che nessuno lo legga</em>. Ma voi e il negozio <strong>non vi siete mai incontrati prima</strong>
+        per accordarvi su una chiave segreta! Per secoli questo è sembrato un ostacolo insuperabile.</p>
+
+      <h3>12.3 — La soluzione: due chiavi diverse (e i numeri primi)</h3>
+      <p>Negli anni '70 arriva un'idea rivoluzionaria: la <strong>crittografia a chiave pubblica</strong>. Invece di
+        una sola chiave segreta, ognuno ne ha <strong>due, diverse e legate tra loro</strong>:</p>
+
+      <div class="two-col">
+        <div class="definition" style="margin:0;">
+          🔓 <strong>Chiave pubblica</strong> — la si dà a <em>tutti</em>, si può stampare sul giornale. Serve solo
+          per <strong>chiudere</strong> il lucchetto: chiunque può cifrare un messaggio per me.
+        </div>
+        <div class="definition" style="margin:0;">
+          🔑 <strong>Chiave privata</strong> — non esce mai dal mio computer. È l'unica che <strong>apre</strong> il
+          lucchetto: solo io posso leggere i messaggi che mi arrivano.
+        </div>
+      </div>
+
+      <p>L'analogia perfetta: è come spedire in giro <strong>lucchetti aperti</strong> con il mio nome sopra.
+        Chiunque può prenderne uno, chiudere una scatola con dentro un messaggio e spedirmela. Ma per
+        <strong>aprire</strong> quel lucchetto serve la chiave, e la chiave ce l'ho solo io. Non serve più accordarsi
+        in anticipo su niente!</p>
+
+      <p>E qui entrano in scena i protagonisti di questa lezione: i <strong>numeri primi</strong> (lezione 4). Il
+        meccanismo si regge su un'asimmetria bellissima:</p>
+
+      <div class="rule">
+        <strong>Moltiplicare è facile, scomporre è difficilissimo.</strong>
+        <br>Se vi chiedo di calcolare $2\,617 \times 3\,491$, con carta e penna ci mettete un minuto.
+        <br>Se vi do il risultato, $9\,136\,947$, e vi chiedo <em>quali due numeri primi l'hanno generato</em>, siete
+        nei guai: dovete provare a dividere per 2, 3, 5, 7, 11... uno per uno.
+        <br>Con numeri di <strong>centinaia di cifre</strong> la differenza diventa abissale: moltiplicarli richiede
+        un istante, <strong>scomporli richiederebbe a tutti i computer del pianeta più tempo dell'età
+        dell'universo</strong>. La chiave pubblica contiene il prodotto; la chiave privata contiene i due fattori
+        primi. Chiunque può usare il prodotto per cifrare, ma solo chi conosce i fattori può decifrare.
+      </div>
+
+      <div class="curiosita">
+        <strong>Senza numeri primi non potreste comprare niente online.</strong> Sembra un'esagerazione e invece è
+        letteralmente vero: il lucchetto che vedete nella barra del browser, le app di messaggistica, i pagamenti con
+        la carta, le firme digitali — tutto poggia sulla difficoltà di scomporre in fattori primi. Quei numeri che vi
+        sembravano un capriccio da lezione di aritmetica sono l'infrastruttura invisibile che tiene in piedi
+        l'economia digitale. E badate: <strong>se qualcuno trovasse un algoritmo veloce per fattorizzare</strong>,
+        potrebbe leggere le comunicazioni di chiunque e svuotare i conti correnti del mondo. È il motivo per cui
+        questa è forse la domanda aperta più "costosa" della matematica.
+      </div>
+    </section>
+
+    <!-- 13 — RSA GIOCATTOLO (FACOLTATIVA) -->
+    <section id="sec13" class="optional">
+      <h2>13. Vediamolo davvero: RSA in miniatura</h2>
+
+      <p>Sezione per i più curiosi: proviamo a <strong>cifrare e decifrare per davvero</strong> un messaggio con il
+        metodo a chiave pubblica più famoso, l'<strong>RSA</strong> (dalle iniziali di Rivest, Shamir e Adleman, che
+        lo pubblicarono nel 1977). Nella realtà si usano primi di centinaia di cifre; noi useremo primi
+        ridicolmente piccoli, così i conti si possono seguire a mano — l'idea è identica.</p>
+
+      <p>Ci serve un solo strumento nuovo, che conoscete già dalla sezione 7: l'aritmetica del
+        <strong>resto</strong>. La scrittura $x \bmod n$ significa «il resto della divisione di $x$ per $n$».</p>
+
+      <div class="controls">
+        <div class="control-group"><label>lettera da spedire</label>
+          <select id="rsa-let" style="padding:0.35rem 0.6rem; border-radius:8px;"></select></div>
+        <button class="btn" id="rsa-go">▶ esegui il prossimo passo</button>
+        <button class="btn" id="rsa-reset">↺ ricomincia</button>
+      </div>
+      <div class="ckt" id="rsa-box" style="min-height:150px;"></div>
+      <p class="eq-out" id="rsa-out"></p>
+
+      <div class="note">
+        <strong>Dove sta il trucco?</strong> Chi intercetta il messaggio conosce la chiave pubblica — cioè
+        $n = 33$ e $e = 3$ — e il messaggio cifrato. Per decifrare gli servirebbe $d$, che si calcola solo
+        conoscendo $\varphi = (p-1)(q-1)$... e per conoscere $\varphi$ bisogna sapere quali sono $p$ e $q$: cioè
+        <strong>scomporre $n$ in fattori primi</strong>. Con $n = 33$ è un gioco da ragazzi (è $3 \times 11$!). Con
+        un $n$ di 600 cifre, è la muraglia di cui parlavamo. <em>Tutta</em> la sicurezza sta lì.
+      </div>
+
+      <div class="warning">
+        <strong>E se qualcuno costruisse una macchina capace di fattorizzare in fretta?</strong> Non è fantascienza:
+        si chiamano <strong>computer quantistici</strong>, sfruttano le leggi della meccanica quantistica e per certi
+        problemi ragionano in modo radicalmente diverso. Nel 1994 il matematico <strong>Peter Shor</strong> ha
+        dimostrato che un computer quantistico abbastanza grande potrebbe scomporre in fattori primi
+        <strong>enormemente più in fretta</strong> di qualunque computer classico — mandando in pezzi l'RSA. Macchine
+        del genere oggi esistono solo in versione piccola e imperfetta, ma i governi e le grandi aziende
+        <em>stanno già correndo ai ripari</em>: si chiama <strong>crittografia post-quantistica</strong>, e consiste
+        nel costruire lucchetti basati su problemi matematici che nemmeno un computer quantistico saprebbe forzare. È
+        una gara in corso <strong>proprio adesso</strong>, mentre leggete — e chi la vincerà deciderà chi potrà avere
+        dei segreti nei prossimi decenni.
+      </div>
+    </section>
+
+    <!-- 14 — QUIZ -->
+    <section id="quiz">
+      <h2>14. Quiz finale</h2>
+      <p>Dieci domande su algoritmi, cicli, complessità e crittografia. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 9 — Algoritmi e scomposizione top-down · Matematica · Primo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezioni 12 e 13: cifrario di Cesare e RSA giocattolo -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 12 — Cifrario di Cesare =====
+      (function () {
+        const inp = document.getElementById('cs-in');
+        if (!inp) return;
+        const sk = document.getElementById('cs-k'), out = document.getElementById('cs-out');
+        const bEnc = document.getElementById('cs-enc'), bDec = document.getElementById('cs-dec');
+        const listWrap = document.getElementById('cs-list-wrap'), list = document.getElementById('cs-list');
+        const lab = document.getElementById('cs-lab'), outlab = document.getElementById('cs-outlab');
+        const map = document.getElementById('cs-map'), spy = document.getElementById('cs-spy');
+        const LET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let mode = 'enc';
+        function shift(txt, k) {
+          let s = '';
+          const up = (txt || '').toUpperCase();
+          for (let i = 0; i < up.length; i++) {
+            const c = up.charCodeAt(i);
+            if (c >= 65 && c <= 90) s += LET[((c - 65 + k) % 26 + 26) % 26];
+            else s += up[i];
+          }
+          return s;
+        }
+        function draw() {
+          const k = +sk.value, enc = mode === 'enc';
+          document.getElementById('cs-k-val').textContent = k;
+          lab.textContent = enc ? 'messaggio in chiaro (scrivi qui)' : 'messaggio cifrato (incollalo qui)';
+          outlab.textContent = enc ? 'messaggio cifrato — questo è ciò che spedisci:' : 'messaggio in chiaro — ecco che cosa diceva:';
+          const res = shift(inp.value, enc ? k : -k);
+          out.textContent = res || '(scrivi qualcosa)';
+          // mappa delle sostituzioni
+          let top = '', bot = '';
+          for (let i = 0; i < 26; i++) { top += LET[i] + ' '; bot += LET[(i + k) % 26] + ' '; }
+          map.innerHTML = '<div><span class="tag">in chiaro</span>' + top + '</div>' +
+                          '<div><span class="tag">cifrato</span><span class="row-b">' + bot + '</span></div>';
+          // il testo "intercettato" è SEMPRE quello cifrato:
+          // in modalità cifra è il risultato, in modalità decifra è ciò che l'utente ha incollato
+          spy.textContent = (enc ? res : inp.value.toUpperCase()) || '(nessun messaggio)';
+          listWrap.style.display = 'none';
+        }
+        function breakIt() {
+          const cifrato = mode === 'enc' ? out.textContent : inp.value.toUpperCase();
+          const vera = mode === 'enc' ? +sk.value : null;
+          let h = '';
+          for (let k = 1; k <= 25; k++) {
+            const cand = shift(cifrato, -k);
+            const hit = (k === vera);
+            h += '<div>chiave <strong>' + (k < 10 ? '&nbsp;' + k : k) + '</strong> → ' +
+                 '<span class="' + (hit ? 'hit' : '') + '">' + cand + '</span>' + (hit ? ' &nbsp;← eccolo!' : '') + '</div>';
+          }
+          list.innerHTML = h;
+          listWrap.style.display = 'block';
+        }
+        inp.addEventListener('input', draw);
+        sk.addEventListener('input', draw);
+        bEnc.addEventListener('click', function () { mode = 'enc'; bEnc.classList.add('active'); bDec.classList.remove('active'); draw(); });
+        bDec.addEventListener('click', function () { mode = 'dec'; bDec.classList.add('active'); bEnc.classList.remove('active'); draw(); });
+        document.getElementById('cs-break').addEventListener('click', breakIt);
+        draw();
+      })();
+
+      // ===== 13 — RSA giocattolo =====
+      (function () {
+        const box = document.getElementById('rsa-box');
+        if (!box) return;
+        const sel = document.getElementById('rsa-let'), out = document.getElementById('rsa-out');
+        const P = 3, Q = 11, N = 33, PHI = 20, E = 3, D = 7;
+        const LET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        for (let i = 0; i < 26; i++) {
+          const o = document.createElement('option');
+          o.value = i + 1; o.textContent = LET[i] + '  (= ' + (i + 1) + ')';
+          if (LET[i] === 'E') o.selected = true;
+          sel.appendChild(o);
+        }
+        function powMod(b, e, n) { let r = 1; b = b % n; while (e > 0) { if (e % 2 === 1) r = (r * b) % n; b = (b * b) % n; e = Math.floor(e / 2); } return r; }
+        let step = 0;
+        function render() {
+          const m = +sel.value, c = powMod(m, E, N), back = powMod(c, D, N);
+          const S = [
+            { cls: 'priv', h: '<strong>Passo 1 — Bob sceglie due numeri primi (SEGRETI).</strong><br>$p = ' + P + '$ &nbsp;e&nbsp; $q = ' + Q + '$. Nessuno li conoscerà mai, tranne lui.' },
+            { cls: '', h: '<strong>Passo 2 — Bob calcola due numeri.</strong><br>$n = p \\times q = ' + N + '$ (sarà <em>pubblico</em>) &nbsp;e&nbsp; $\\varphi = (p-1)(q-1) = 2 \\times 10 = ' + PHI + '$ (resta <em>segreto</em>).' },
+            { cls: 'pub', h: '<strong>Passo 3 — La CHIAVE PUBBLICA.</strong><br>Bob sceglie $e = ' + E + '$ e pubblica la coppia $(n, e) = (' + N + ', ' + E + ')$: la può vedere chiunque, anche chi ci spia. 🔓' },
+            { cls: 'priv', h: '<strong>Passo 4 — La CHIAVE PRIVATA.</strong><br>Bob cerca il numero $d$ tale che $e \\times d$ diviso $\\varphi$ dia resto 1: qui $d = ' + D + '$, perché $3 \\times 7 = 21$ e $21 \\bmod 20 = 1$ ✓. Se lo tiene stretto. 🔑' },
+            { cls: 'pub', h: '<strong>Passo 5 — Alice cifra.</strong><br>Vuole spedire la lettera <strong>' + LET[m - 1] + '</strong>, cioè il numero $m = ' + m + '$. Usa <em>solo</em> la chiave pubblica:<br>$c = m^e \\bmod n = ' + m + '^{' + E + '} \\bmod ' + N + ' = ' + (m * m * m) + ' \\bmod ' + N + ' = \\mathbf{' + c + '}$<br>Spedisce <strong>' + c + '</strong>. Chi intercetta vede solo questo numero.' },
+            { cls: 'priv', h: '<strong>Passo 6 — Bob decifra.</strong><br>Solo lui ha $d = ' + D + '$:<br>$m = c^d \\bmod n = ' + c + '^{' + D + '} \\bmod ' + N + ' = \\mathbf{' + back + '}$<br>...che è proprio la lettera <strong>' + LET[back - 1] + '</strong> ✓ Messaggio ricevuto!' }
+          ];
+          let h = '';
+          for (let i = 0; i < step; i++)
+            h += '<div class="rsa-step ' + S[i].cls + '">' + S[i].h + '</div>';
+          if (step === 0) h = '<p class="lbl-s" style="margin:0.4rem 0;">Scegli una lettera e premi <strong>«esegui il prossimo passo»</strong>: seguiremo Alice e Bob mentre si scambiano un messaggio segreto sotto gli occhi di tutti.</p>';
+          box.innerHTML = h;
+          if (window.renderMathIn) window.renderMathIn(box);
+          if (step >= 6) out.innerHTML = '🎉 <strong>Fatto!</strong> Il messaggio ha viaggiato su un canale spiato, ma solo Bob ha potuto leggerlo — e Alice e Bob <strong>non si erano mai accordati su una chiave segreta</strong>. Cambia lettera e riprova!';
+          else if (step > 0) out.innerHTML = 'Passo ' + step + ' di 6.';
+          else out.innerHTML = '';
+        }
+        document.getElementById('rsa-go').addEventListener('click', function () { if (step < 6) step++; render(); });
+        document.getElementById('rsa-reset').addEventListener('click', function () { step = 0; render(); });
+        sel.addEventListener('change', function () { if (step > 4) step = 4; render(); });
+        render();
+      })();
+
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Che cos\'è un <strong>algoritmo</strong>?',
+        options: ['un tipo di computer', 'una sequenza di azioni che risolve un problema', 'un linguaggio di programmazione', 'un numero primo molto grande', 'un errore di programmazione'],
+        correct: 1, explain: 'La parola viene da al-Khwārizmī, il matematico persiano da cui deriva anche "algebra". Una ricetta di cucina è già un algoritmo, seppure "generico".' },
+      { type: 'mc', diff: 'easy', text: 'Perché una ricetta di cucina NON è un algoritmo matematico?',
+        options: ['perché è troppo lunga', 'perché è ambigua ("sale q.b.") e non deterministica (stessi ingredienti, risultati diversi)', 'perché non usa numeri', 'perché non ha un inizio e una fine', 'in realtà lo è'],
+        correct: 1, explain: 'Le due proprietà che mancano sono proprio la NON AMBIGUITÀ (quanto è "q.b."?) e il DETERMINISMO (la parmigiana di papà non si batte, pur con gli stessi ingredienti).' },
+      { type: 'mc', diff: 'easy', text: 'Quale proprietà in più deve avere un algoritmo <strong>informatico</strong> rispetto a uno matematico?',
+        options: ['deve essere scritto in inglese', 'deve essere finito: terminare dopo un numero finito di passi', 'deve usare almeno un ciclo', 'deve essere breve', 'deve funzionare solo con numeri interi'],
+        correct: 1, explain: 'La divisione 10 : 3 è un algoritmo matematico perfetto ma non finisce mai (3,333...). Una macchina resterebbe lì per sempre: serve la FINITEZZA.' },
+      { type: 'mc', diff: 'medium', text: 'Quali sono le tre strutture con cui si costruisce qualunque algoritmo?',
+        options: ['input, calcolo, output', 'sequenziale, condizionale, iterativa', 'somma, prodotto, divisione', 'if, print, end', 'pseudocodice, diagramma, programma'],
+        correct: 1, explain: 'Solo tre: istruzioni in fila (sequenziale), biforcazioni (condizionale) e ripetizioni (iterativa). Con queste si scrive qualunque programma esistente.' },
+      { type: 'mc', diff: 'medium', text: 'Nell\'algoritmo, la scrittura $N \\; \\% \\; 2 = 0$ significa:',
+        options: ['N è il 2% di qualcosa', 'il resto della divisione di N per 2 è zero, cioè N è pari', 'N è uguale a 2', 'N diviso 2 fa 0', 'N è dispari'],
+        correct: 1, explain: 'L\'operatore % (modulo) dà il RESTO della divisione. Resto zero dividendo per 2 = numero pari: è la definizione della lezione 4 tradotta in codice.' },
+      { type: 'mc', diff: 'medium', text: 'Che cosa succede se in un ciclo <em>MENTRE</em> ci si dimentica di incrementare il contatore?',
+        options: ['il ciclo non parte', 'il programma si chiude subito', 'la condizione resta sempre vera: si ottiene un ciclo infinito', 'il contatore si incrementa da solo', 'il risultato è sbagliato di 1'],
+        correct: 2, explain: 'È l\'errore classico: senza i ← i + 1 la condizione non diventa mai falsa e il programma "si pianta". L\'algoritmo perde la proprietà di finitezza.' },
+      { type: 'mc', diff: 'medium', text: 'L\'algoritmo che somma i primi $N$ numeri con un ciclo esegue circa $N$ operazioni. Usando la formula di Gauss $\\dfrac{N(N+1)}{2}$, quante operazioni servono?',
+        options: ['sempre le stesse tre, qualunque sia $N$', 'la metà, cioè $N/2$', 'il doppio', 'ancora $N$, ma più veloci', 'dipende dal computer'],
+        correct: 0, explain: 'Una moltiplicazione, un\'addizione, una divisione: tre operazioni sia per N = 10 sia per N = mille miliardi. Da complessità lineare a complessità costante — ecco perché la matematica rende i programmi più veloci.' },
+      { type: 'mc', diff: 'hard', text: 'In che cosa consiste la <strong>scomposizione top-down</strong>?',
+        options: ['scrivere il programma partendo dall\'ultima riga', 'ordinare i numeri dal più grande al più piccolo', 'spezzare un problema complesso in sottoproblemi più piccoli che so risolvere', 'usare solo cicli invece che condizioni', 'copiare la soluzione da internet'],
+        correct: 2, explain: 'È il metodo di matematici, fisici e informatici — ma anche di chi scrive un tema (la scaletta!) o cucina la carbonara. Nessuno dei singoli passi spaventa: è la catena a fare il risultato.' },
+      { type: 'mc', diff: 'hard', text: 'Su quale asimmetria si regge la crittografia a chiave pubblica?',
+        options: ['sommare è facile, sottrarre è difficile', 'moltiplicare due numeri primi è facile, ma scomporre il loro prodotto è difficilissimo', 'i numeri pari sono più dei dispari', 'i computer sono più veloci degli umani', 'le lettere hanno frequenze diverse'],
+        correct: 1, explain: 'La chiave pubblica contiene il prodotto, la privata i fattori primi. Con numeri di centinaia di cifre, fattorizzare richiederebbe più tempo dell\'età dell\'universo: è ciò che protegge pagamenti e messaggi.' },
+      { type: 'open', diff: 'hard', text: 'Spiega perché il cifrario di Cesare non è sicuro (almeno due motivi diversi) e come la crittografia a chiave pubblica risolve il problema dello scambio della chiave.',
+        keywords: ['25', 'chiavi', 'tutte', 'frequen', 'lettere', 'pubblica', 'privata', 'lucchetto', 'primi', 'scompor', 'accord', 'canale', 'brute'], requiredMatches: 4,
+        explain: 'Cesare è insicuro perché: (1) le chiavi possibili sono solo 25 e si provano tutte in un istante (forza bruta); (2) l\'analisi delle frequenze delle lettere (in italiano E, A, I, O sono le più comuni) permette di indovinare la sostituzione; (3) più in generale, mittente e destinatario devono essersi accordati PRIMA su una chiave segreta, cosa impossibile se il canale è spiato. La crittografia a chiave pubblica risolve tutto: ognuno ha una chiave pubblica che serve solo a CHIUDERE (come un lucchetto aperto distribuito a tutti) e una privata che serve ad APRIRE. Nessun accordo preventivo è necessario, e la sicurezza sta nella difficoltà di scomporre in fattori primi il numero contenuto nella chiave pubblica.' }
+    ];
+  </script>
+
+</body>
+
+</html>

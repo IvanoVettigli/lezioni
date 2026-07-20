@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 10 — La geometria piana euclidea</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .sym-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin: 0.9rem 0; }
+    .sym-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem 0.7rem; text-align: center; }
+    .sym-card .sym { font-size: 1.4rem; font-weight: 800; color: var(--accent); display: block; }
+    .sym-card .nome { font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; }
+    .sym-card .significa { font-size: 0.86rem; display: block; margin-top: 0.2rem; }
+    /* card dei postulati */
+    .post-card { background: var(--surface-2); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; padding: 0.8rem 1rem; margin: 0.8rem 0; }
+    .post-card.quinto { border-left-color: var(--magenta); background: color-mix(in srgb, var(--magenta) 7%, var(--surface-2)); }
+    .post-card .pnum { display: inline-block; background: var(--accent); color: #fff; font-weight: 800; border-radius: 999px; padding: 0.1rem 0.7rem; font-size: 0.85rem; margin-bottom: 0.35rem; }
+    .post-card.quinto .pnum { background: var(--magenta); }
+    .post-card .ptesto { font-style: italic; font-size: 1.02rem; margin: 0.3rem 0; }
+    .post-card svg { display: block; margin: 0.5rem auto; max-width: 320px; }
+    /* tabella formule */
+    .form-tab { border-collapse: collapse; width: 100%; margin: 0.8rem 0; }
+    .form-tab th, .form-tab td { border: 1px solid var(--border); padding: 0.45rem 0.7rem; text-align: center; }
+    .form-tab th { background: var(--surface-2); }
+    .form-tab td:first-child { text-align: left; font-weight: 600; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Primo anno · Lezione 10</div>
+    <h1>La geometria piana euclidea</h1>
+    <p>Il libro che ha insegnato a ragionare all'umanità: cinque postulati, e da lì tutto il resto</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Primo anno</a>
+    <span class="sep">/</span> Geometria piana euclidea
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Fin qui abbiamo lavorato con i numeri e con le lettere. Oggi cambiamo continente:
+      entriamo nella <strong>geometria</strong>, la matematica delle forme e dello spazio. Ma soprattutto incontriamo
+      il libro che, più di ogni altro, ha insegnato al genere umano <em>che cosa significa dimostrare</em>. Tutto
+      quello che abbiamo detto nella lezione 2 su assiomi, teoremi e dimostrazioni nasce da qui.
+    </div>
+
+    <!-- 1 — GLI ELEMENTI -->
+    <section id="sec1">
+      <h2>1. Il libro: gli <em>Elementi</em> di Euclide</h2>
+
+      <p>Alessandria d'Egitto, attorno al 300 a.C. Un matematico di cui sappiamo pochissimo — non conosciamo con
+        certezza né dove sia nato né quando sia morto — scrive tredici libri intitolati
+        <strong><em>Elementi</em></strong>. Si chiama <strong>Euclide</strong>, e ha appena prodotto uno dei testi
+        più influenti mai scritti.</p>
+
+      <div class="curiosita">
+        <strong>Quanto influente?</strong> Gli <em>Elementi</em> sono stati per oltre <strong>duemila anni</strong>
+        il libro di testo con cui si è studiata la geometria: copiato a mano per secoli, poi stampato in migliaia di
+        edizioni, usato nelle scuole fino all'Ottocento praticamente immutato. Per numero di copie e di lettori sta
+        nella stessa classifica della <strong>Bibbia</strong> e del <strong>Corano</strong> — con una differenza non
+        da poco: <em>nessuno, in tutta la storia, ha mai mosso guerra a qualcuno per un disaccordo sul triangolo
+        equilatero</em>. Le verità dimostrate hanno questo vantaggio: non hanno bisogno di essere difese, si
+        difendono da sole.
+      </div>
+
+      <p>Ma attenzione: Euclide <strong>non ha inventato la geometria</strong>. La geometria l'umanità la conosce
+        praticamente da sempre.</p>
+    </section>
+
+    <!-- 2 — DA SEMPRE -->
+    <section id="sec2">
+      <h2>2. Perché la geometria è antica quanto noi</h2>
+
+      <p>Facciamo un salto indietro di qualche milione di anni. I nostri antenati — non erano scimmie, attenzione:
+        noi e le scimmie attuali <strong>discendiamo da antenati comuni</strong>, l'evoluzione è una faccenda un po'
+        più raffinata di come la si racconta — avevano un bisogno vitale di geometria. <em>Quanto dista quel
+        predatore? Ce la faccio a lanciare la pietra fin lì? Quel ramo regge il mio peso, e a che angolo devo
+        saltare?</em> Valutare distanze, direzioni e forme non era cultura: era <strong>sopravvivenza</strong>, e il
+        nostro cervello si è modellato anche su questo.</p>
+
+      <p>Poi, circa diecimila anni fa, succede qualcosa di enorme: cominciamo a <strong>coltivare</strong>. E chi
+        coltiva deve <em>misurare</em>: quanto è grande il mio campo? Dove finisce il tuo e comincia il mio? Come
+        divido l'eredità tra tre figli? In Egitto, dopo ogni piena del Nilo che cancellava i confini, bisognava
+        ridisegnare i campi da capo — e da lì nasce una casta di specialisti, gli "stenditori di corda", con le loro
+        tecniche pratiche.</p>
+
+      <div class="sym-cards">
+        <div class="sym-card"><span class="sym">geo-metria</span><span class="nome">dal greco</span><span class="significa"><em>gê</em> = terra, <em>métron</em> = misura: letteralmente <strong>misura della terra</strong></span></div>
+      </div>
+
+      <p>Ecco il punto: prima di Euclide la geometria era una <strong>cassetta di ricette</strong> — utilissime,
+        collaudate, ma slegate: «per il campo rettangolare fai così», «per il triangolo fai cosà». Nessuno si
+        chiedeva <em>perché</em> funzionassero, né come fossero collegate tra loro.</p>
+
+      <div class="rule">
+        <strong>Il colpo di genio di Euclide.</strong> Prendere quel disordine di conoscenze sparse e trasformarlo
+        in una <strong>teoria logico-deduttiva</strong>: si parte da pochissime affermazioni accettate senza
+        dimostrazione (gli <strong>assiomi</strong> o <strong>postulati</strong>), e da quelle si
+        <em>deduce</em> tutto il resto — un teorema dopo l'altro, ciascuno dimostrato usando solo ciò che è già
+        stato dimostrato prima. È esattamente la struttura che abbiamo studiato nella lezione 2. Bella, essenziale,
+        inattaccabile.
+      </div>
+
+      <p>Non è solo un libro di geometria: è il <strong>modello</strong> di che cosa significa costruire il sapere in
+        modo rigoroso. Quel seme, piantato ad Alessandria, è stato coltivato per millenni dalle più grandi menti
+        umane — passando per gli arabi, il Rinascimento, Galileo, Newton — e la pianta che ne è cresciuta è la
+        società scientifica e tecnologica in cui vivete. Quando aprite il telefono, state usando i frutti di quel
+        seme.</p>
+    </section>
+
+    <!-- 3 — GLI ENTI FONDAMENTALI -->
+    <section id="sec3">
+      <h2>3. I mattoni: gli enti fondamentali</h2>
+
+      <p>Ogni teoria deve partire da qualcosa. In geometria i mattoni di base sono i cosiddetti <strong>enti
+        primitivi</strong>: oggetti così elementari che <em>non si definiscono</em> — si accettano e basta,
+        appoggiandosi all'intuizione. (Se ci pensate è inevitabile: per definire una parola servono altre parole, e
+        prima o poi bisogna fermarsi.)</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 250" aria-label="Gli enti fondamentali della geometria: punto, retta, semiretta, segmento, piano">
+        <circle cx="70" cy="40" r="5" fill="var(--magenta)"/>
+        <text x="82" y="45" class="lbl">A</text>
+        <text x="70" y="72" text-anchor="middle" class="lbl-s">punto: nessuna dimensione</text>
+        <line x1="220" y1="40" x2="420" y2="40" stroke="var(--accent)" stroke-width="2.5"/>
+        <polygon points="428,40 414,34 414,46" fill="var(--accent)"/>
+        <polygon points="212,40 226,34 226,46" fill="var(--accent)"/>
+        <text x="320" y="72" text-anchor="middle" class="lbl-s">retta: infinita nei due versi</text>
+        <line x1="500" y1="40" x2="610" y2="40" stroke="var(--gold)" stroke-width="2.5"/>
+        <circle cx="500" cy="40" r="4.5" fill="var(--gold)"/>
+        <polygon points="618,40 604,34 604,46" fill="var(--gold)"/>
+        <text x="558" y="72" text-anchor="middle" class="lbl-s">semiretta: ha un'origine</text>
+        <line x1="60" y1="130" x2="200" y2="130" stroke="#22c55e" stroke-width="3"/>
+        <circle cx="60" cy="130" r="4.5" fill="#22c55e"/><circle cx="200" cy="130" r="4.5" fill="#22c55e"/>
+        <text x="55" y="120" class="lbl-s">A</text><text x="200" y="120" class="lbl-s">B</text>
+        <text x="130" y="162" text-anchor="middle" class="lbl-s">segmento: ha due estremi</text>
+        <polygon points="300,110 560,110 610,160 350,160" fill="color-mix(in srgb, var(--accent) 12%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="455" y="140" text-anchor="middle" class="lbl">α</text>
+        <text x="455" y="185" text-anchor="middle" class="lbl-s">piano: si estende all'infinito in ogni direzione</text>
+        <text x="320" y="228" text-anchor="middle" class="lbl-s">(disegniamo un pezzetto di retta e di piano, ma nella nostra testa sono infiniti!)</text>
+      </svg></div>
+
+      <ul>
+        <li><strong>Punto</strong> — non ha dimensioni: è solo una <em>posizione</em>. Il puntino che disegnate ha
+          uno spessore, ma il punto vero no.</li>
+        <li><strong>Retta</strong> — infinita nei due versi, senza spessore e senza curve.</li>
+        <li><strong>Piano</strong> — una superficie piatta che si estende all'infinito in tutte le direzioni.</li>
+        <li><strong>Semiretta</strong> — quel che resta di una retta tagliata in un punto: ha un'origine e va
+          all'infinito da una parte sola.</li>
+        <li><strong>Segmento</strong> — la parte di retta compresa tra due punti (i suoi <em>estremi</em>). È
+          l'unico dei tre ad avere una <strong>lunghezza misurabile</strong>.</li>
+      </ul>
+
+      <h3>3.1 — Gli angoli</h3>
+      <p>Prendete due semirette con la <strong>stessa origine</strong>: dividono il piano in due parti. Ciascuna di
+        queste parti è un <strong>angolo</strong>, e la sua ampiezza si misura in <strong>gradi</strong>. Ecco la
+        famiglia al completo:</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 200" aria-label="Tipi di angolo: acuto, retto, ottuso, piatto e giro">
+        <g stroke="var(--accent)" stroke-width="2.5" fill="none">
+          <path d="M 40 150 L 130 150"/><path d="M 40 150 L 105 85"/>
+        </g>
+        <path d="M 70 150 A 30 30 0 0 0 61 129" fill="none" stroke="var(--magenta)" stroke-width="2"/>
+        <text x="85" y="175" text-anchor="middle" class="lbl-s">acuto</text>
+        <text x="85" y="192" text-anchor="middle" class="lbl-s" style="font-size:10px;">minore di 90°</text>
+        <g stroke="var(--accent)" stroke-width="2.5" fill="none">
+          <path d="M 170 150 L 260 150"/><path d="M 170 150 L 170 70"/>
+        </g>
+        <path d="M 170 130 L 190 130 L 190 150" fill="none" stroke="var(--magenta)" stroke-width="2"/>
+        <text x="215" y="175" text-anchor="middle" class="lbl-s">retto</text>
+        <text x="215" y="192" text-anchor="middle" class="lbl-s" style="font-size:10px;">esattamente 90°</text>
+        <g stroke="var(--accent)" stroke-width="2.5" fill="none">
+          <path d="M 320 150 L 410 150"/><path d="M 320 150 L 258 88"/>
+        </g>
+        <path d="M 350 150 A 30 30 0 0 1 299 129" fill="none" stroke="var(--magenta)" stroke-width="2"/>
+        <text x="345" y="175" text-anchor="middle" class="lbl-s">ottuso</text>
+        <text x="345" y="192" text-anchor="middle" class="lbl-s" style="font-size:10px;">tra 90° e 180°</text>
+        <g stroke="var(--accent)" stroke-width="2.5" fill="none">
+          <path d="M 440 150 L 560 150"/>
+        </g>
+        <circle cx="500" cy="150" r="4" fill="var(--accent)"/>
+        <path d="M 530 150 A 30 30 0 0 0 470 150" fill="none" stroke="var(--magenta)" stroke-width="2"/>
+        <text x="500" y="175" text-anchor="middle" class="lbl-s">piatto</text>
+        <text x="500" y="192" text-anchor="middle" class="lbl-s" style="font-size:10px;">180°</text>
+        <circle cx="605" cy="150" r="4" fill="var(--accent)"/>
+        <circle cx="605" cy="150" r="26" fill="none" stroke="var(--magenta)" stroke-width="2"/>
+        <text x="605" y="175" text-anchor="middle" class="lbl-s">giro</text>
+        <text x="605" y="192" text-anchor="middle" class="lbl-s" style="font-size:10px;">360°</text>
+      </svg></div>
+
+      <div class="note">
+        <strong>Perché 360?</strong> Non c'è nessuna ragione matematica: è un'eredità dei <strong>Babilonesi</strong>,
+        che contavano in base 60 (e il 360 è vicino ai giorni dell'anno, comodo per l'astronomia). Il 360 ha però un
+        vantaggio pratico enorme: è divisibile per 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 18, 20, 24... — provate a fare
+        lo stesso con 100! (Ricordate i divisori della lezione 4?)
+      </div>
+
+      <p>Per quest'anno restiamo nel <strong>piano</strong>, cioè in due dimensioni. Lo spazio a tre dimensioni —
+        solidi, volumi, poliedri — sarà il programma dell'anno prossimo.</p>
+    </section>
+
+    <!-- 4 — I POSTULATI -->
+    <section id="sec4">
+      <h2>4. I cinque postulati</h2>
+
+      <p>Ed eccoci al cuore della faccenda. Euclide parte da cinque affermazioni — i <strong>postulati</strong> —
+        che <strong>non dimostra</strong>: le assume come vere e basta. Non è pigrizia, è necessità logica (lezione
+        2: se volessimo dimostrare tutto, non potremmo cominciare da nulla). L'unica cosa che possiamo chiedere a un
+        postulato è di essere <em>ragionevole</em>: eccoli, ciascuno con un disegno che lo rende evidente.</p>
+
+      <div class="post-card">
+        <span class="pnum">I</span>
+        <p class="ptesto">«Tra due punti qualsiasi si può tracciare una e una sola retta.»</p>
+        <svg viewBox="0 0 320 70" aria-label="Per due punti passa una sola retta">
+          <line x1="20" y1="45" x2="300" y2="25" stroke="var(--accent)" stroke-width="2"/>
+          <circle cx="90" cy="40" r="5" fill="var(--magenta)"/><circle cx="230" cy="30" r="5" fill="var(--magenta)"/>
+          <text x="86" y="62" class="lbl-s">A</text><text x="226" y="22" class="lbl-s">B</text>
+        </svg>
+        <p style="margin:0;">Prova a disegnare due punti e a farci passare <em>due</em> rette diverse: non ci
+          riuscirai. È il motivo per cui bastano due chiodi per tenere ferma un'asse.</p>
+      </div>
+
+      <div class="post-card">
+        <span class="pnum">II</span>
+        <p class="ptesto">«Un segmento si può prolungare indefinitamente in linea retta.»</p>
+        <svg viewBox="0 0 320 60" aria-label="Un segmento si può prolungare all'infinito">
+          <line x1="120" y1="30" x2="200" y2="30" stroke="#22c55e" stroke-width="3"/>
+          <circle cx="120" cy="30" r="4" fill="#22c55e"/><circle cx="200" cy="30" r="4" fill="#22c55e"/>
+          <line x1="200" y1="30" x2="300" y2="30" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 4"/>
+          <line x1="20" y1="30" x2="120" y2="30" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 4"/>
+          <polygon points="308,30 294,24 294,36" fill="var(--accent)"/>
+          <polygon points="12,30 26,24 26,36" fill="var(--accent)"/>
+        </svg>
+        <p style="margin:0;">Lo spazio non finisce mai: non esiste un "bordo del foglio" oltre il quale la retta
+          debba fermarsi.</p>
+      </div>
+
+      <div class="post-card">
+        <span class="pnum">III</span>
+        <p class="ptesto">«Dato un punto e una lunghezza, si può tracciare una circonferenza con quel centro e quel raggio.»</p>
+        <svg viewBox="0 0 320 110" aria-label="Si può tracciare una circonferenza di centro e raggio qualsiasi">
+          <circle cx="160" cy="55" r="40" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          <circle cx="160" cy="55" r="4" fill="var(--magenta)"/>
+          <line x1="160" y1="55" x2="200" y2="55" stroke="var(--magenta)" stroke-width="2"/>
+          <text x="176" y="50" class="lbl-s">r</text>
+        </svg>
+        <p style="margin:0;">È il postulato del <strong>compasso</strong>: qualunque apertura, in qualunque punto.</p>
+      </div>
+
+      <div class="post-card">
+        <span class="pnum">IV</span>
+        <p class="ptesto">«Tutti gli angoli retti sono uguali tra loro.»</p>
+        <svg viewBox="0 0 320 90" aria-label="Tutti gli angoli retti sono uguali">
+          <g stroke="var(--accent)" stroke-width="2.5" fill="none">
+            <path d="M 40 70 L 110 70"/><path d="M 40 70 L 40 15"/>
+            <path d="M 210 70 L 280 40"/><path d="M 210 70 L 180 20"/>
+          </g>
+          <path d="M 40 55 L 55 55 L 55 70" fill="none" stroke="var(--magenta)" stroke-width="2"/>
+          <path d="M 197 62 L 210 55 L 204 43" fill="none" stroke="var(--magenta)" stroke-width="2"/>
+          <text x="160" y="50" text-anchor="middle" class="lbl">=</text>
+        </svg>
+        <p style="margin:0;">Sembra ovvio, ma è ciò che garantisce che lo spazio sia <strong>uniforme</strong>: un
+          angolo retto qui e uno dall'altra parte del mondo hanno la stessa ampiezza. Senza questo, misurare non
+          avrebbe senso.</p>
+      </div>
+
+      <div class="post-card quinto">
+        <span class="pnum">V</span>
+        <p class="ptesto">«Data una retta e un punto fuori da essa, esiste una e una sola retta parallela alla
+          prima passante per quel punto.»</p>
+        <svg viewBox="0 0 320 110" aria-label="Per un punto esterno passa una sola parallela a una retta data">
+          <line x1="20" y1="80" x2="300" y2="80" stroke="var(--accent)" stroke-width="2.5"/>
+          <text x="292" y="98" class="lbl-s">r</text>
+          <circle cx="160" cy="35" r="5" fill="var(--magenta)"/>
+          <text x="168" y="30" class="lbl-s">P</text>
+          <line x1="20" y1="35" x2="300" y2="35" stroke="var(--magenta)" stroke-width="2.5"/>
+          <line x1="20" y1="18" x2="300" y2="52" stroke="var(--text-soft)" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.55"/>
+          <line x1="20" y1="52" x2="300" y2="18" stroke="var(--text-soft)" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.55"/>
+        </svg>
+        <p style="margin:0;">Le altre rette per $P$ (tratteggiate) prima o poi incontrano $r$: <strong>una
+          sola</strong> non la incontra mai. Questa è la formulazione moderna, detta <em>assioma di Playfair</em>;
+          quella originale di Euclide è più contorta ma equivalente.</p>
+      </div>
+    </section>
+
+    <!-- 5 — IL QUINTO -->
+    <section id="sec5">
+      <h2>5. Il quinto postulato: il sassolino nella scarpa</h2>
+
+      <p>Rileggeteli. Notate niente? I primi quattro sono <strong>brevi, immediati, quasi banali</strong>: due punti
+        e una retta, prolunga un segmento, punta il compasso, gli angoli retti sono uguali. Il quinto invece è
+        <strong>lungo, complicato</strong>, e parla di ciò che accade <em>all'infinito</em> — perché dire che due
+        rette «non si incontrano mai» significa affermare qualcosa su una distanza che nessuno potrà mai
+        percorrere.</p>
+
+      <p>Se n'erano accorti tutti, fin dall'antichità. E per <strong>duemila anni</strong> i matematici hanno provato
+        a fare la cosa più naturale del mondo: <em>dimostrarlo</em> a partire dagli altri quattro, per declassarlo da
+        postulato a teorema e avere una teoria più elegante. Ci hanno provato i greci, gli arabi, gli europei. Alcuni
+        annunciarono di esserci riusciti.</p>
+
+      <div class="warning">
+        <strong>Fallirono tutti.</strong> Ogni "dimostrazione" nascondeva, sepolto tra le righe, un passaggio che
+        dava per scontato il quinto postulato stesso o qualcosa di equivalente. Migliaia di pagine, secoli di lavoro
+        delle migliori teste d'Europa: nulla.
+      </div>
+
+      <div class="curiosita">
+        <strong>Un fallimento che vale più di mille successi.</strong> Nell'Ottocento qualcuno ha finalmente
+        capito il perché di tutti quei fallimenti: il quinto postulato <strong>non si può dimostrare</strong> —
+        semplicemente perché <em>si può anche non assumerlo</em>. E se lo si sostituisce con qualcosa di diverso,
+        non si arriva a una contraddizione: si arriva a <strong>una geometria nuova, coerentissima e diversa</strong>.
+        Una in cui per un punto passano <em>infinite</em> parallele, una in cui non ne passa <em>nessuna</em>, una in
+        cui gli angoli di un triangolo non fanno 180°... Non un mondo alternativo: <strong>infiniti</strong> mondi.
+        <br><br>Roba da far girare la testa — e roba con conseguenze pesantissime: una di quelle geometrie
+        "impossibili" è esattamente quella che, un secolo dopo, Einstein userà per descrivere lo spazio-tempo
+        curvato dalla gravità. Ma questa è una storia bellissima che ci teniamo per un altro momento.
+      </div>
+
+      <p>Per ora restiamo con Euclide e con i suoi cinque postulati. Perché la domanda ora è: <strong>che cosa ce ne
+        facciamo?</strong></p>
+    </section>
+
+    <!-- 6 — DEDURRE -->
+    <section id="sec6">
+      <h2>6. Che cosa si fa con dei postulati? Si deducono verità</h2>
+
+      <p>La risposta è quella di sempre, l'unica cosa che si fa in una teoria matematica: si <strong>dimostrano
+        teoremi</strong>. Dai cinque postulati (più qualche nozione comune, tipo «due cose uguali a una terza sono
+        uguali tra loro») Euclide ricava, uno dopo l'altro, <strong>465 teoremi</strong> — dalla somma degli angoli
+        di un triangolo fino all'infinità dei numeri primi. Vediamo il caso più utile di tutti.</p>
+
+      <h3>6.1 — Due parallele tagliate da una trasversale</h3>
+      <p>Prendiamo due rette parallele $r$ e $s$, e tagliamole con una terza retta $t$ (la <strong>trasversale</strong>).
+        Si formano <strong>otto angoli</strong>, e la cosa notevole è che ne bastano <em>uno solo</em> per conoscerli
+        tutti.</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 300" aria-label="Due rette parallele tagliate da una trasversale formano otto angoli">
+        <line x1="60" y1="90" x2="580" y2="90" stroke="var(--accent)" stroke-width="2.5"/>
+        <line x1="60" y1="220" x2="580" y2="220" stroke="var(--accent)" stroke-width="2.5"/>
+        <text x="592" y="95" class="lbl">r</text><text x="592" y="225" class="lbl">s</text>
+        <line x1="200" y1="30" x2="420" y2="280" stroke="var(--magenta)" stroke-width="2.5"/>
+        <text x="428" y="290" class="lbl" fill="var(--magenta)">t</text>
+        <circle cx="253" cy="90" r="4" fill="var(--text)"/>
+        <circle cx="367" cy="220" r="4" fill="var(--text)"/>
+        <text x="228" y="78" class="lbl-s">1</text>
+        <text x="276" y="78" class="lbl-s">2</text>
+        <text x="228" y="112" class="lbl-s">3</text>
+        <text x="278" y="112" class="lbl-s">4</text>
+        <text x="342" y="208" class="lbl-s">5</text>
+        <text x="390" y="208" class="lbl-s">6</text>
+        <text x="342" y="242" class="lbl-s">7</text>
+        <text x="392" y="242" class="lbl-s">8</text>
+        <text x="320" y="284" text-anchor="middle" class="lbl-s">otto angoli — ma solo due valori diversi!</text>
+      </svg></div>
+
+      <p>I nomi che si usano (imparateli, tornano sempre):</p>
+      <ul>
+        <li><strong>Opposti al vertice</strong>: stanno allo stesso incrocio, uno di fronte all'altro (1 e 4; 2 e 3;
+          5 e 8; 6 e 7). Sono sempre <strong>uguali</strong>, e questo vale <em>anche senza</em> il parallelismo.</li>
+        <li><strong>Corrispondenti</strong>: occupano la stessa posizione ai due incroci (1 e 5; 2 e 6; 3 e 7; 4 e 8).
+          Sono <strong>uguali</strong>.</li>
+        <li><strong>Alterni interni</strong>: dentro le due parallele, da parti opposte della trasversale (3 e 6;
+          4 e 5). <strong>Uguali</strong>.</li>
+        <li><strong>Alterni esterni</strong>: fuori dalle parallele, da parti opposte (1 e 8; 2 e 7).
+          <strong>Uguali</strong>.</li>
+        <li><strong>Coniugati</strong> (interni: 4 e 6; 3 e 5): stessa parte della trasversale. Sono
+          <strong>supplementari</strong>, cioè la loro somma fa <strong>180°</strong>.</li>
+      </ul>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Dimostrazione — gli angoli opposti al vertice sono uguali</span><span class="difficulty medium">Medio</span></div>
+        <p>Perché gli angoli 1 e 4 della figura devono essere per forza uguali?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra la dimostrazione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Gli angoli 1 e 2 sono adiacenti: insieme formano un angolo
+            <strong>piatto</strong> (stanno sulla retta $r$). Quindi $\widehat{1} + \widehat{2} = 180°$.</p>
+          <p><span class="step-num">2</span>Anche gli angoli 2 e 4 sono adiacenti, stavolta lungo la trasversale
+            $t$: quindi $\widehat{2} + \widehat{4} = 180°$.</p>
+          <p><span class="step-num">3</span>Due quantità che sommate alla <em>stessa</em> cosa danno lo stesso
+            risultato devono essere uguali: da $\widehat{1} + \widehat{2} = \widehat{2} + \widehat{4}$ togliamo
+            $\widehat{2}$ da entrambe le parti.</p>
+          <div class="result-box"><span class="result-label">Conclusione</span><span class="result-value">$\widehat{1} = \widehat{4}$. C.V.D. — e notate: non abbiamo usato il quinto postulato, quindi vale per <em>qualunque</em> coppia di rette incidenti.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio guidato</span><span class="difficulty easy">Facile</span></div>
+        <p>Nella figura, l'angolo 1 misura $\mathbf{70°}$. Quanto misurano tutti gli altri sette angoli?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$\widehat{4} = 70°$ (opposto al vertice di 1); $\widehat{2}$ e
+            $\widehat{3}$ sono adiacenti a 1, quindi valgono $180° - 70° = 110°$.</p>
+          <p><span class="step-num">2</span>$\widehat{5} = \widehat{1} = 70°$ (corrispondenti), e con lo stesso
+            ragionamento $\widehat{8} = 70°$; $\widehat{6} = \widehat{7} = 110°$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">Quattro angoli da $70°$ (1, 4, 5, 8) e quattro da $110°$ (2, 3, 6, 7). Otto angoli, due soli valori — e la loro somma a coppie fa sempre $180°$.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — I POLIGONI -->
+    <section id="sec7">
+      <h2>7. I poligoni</h2>
+
+      <p>Unendo dei segmenti uno dopo l'altro fino a tornare al punto di partenza si ottiene una linea chiusa: la
+        figura racchiusa si chiama <strong>poligono</strong> — dal greco <em>polys</em> (molti) e <em>gonía</em>
+        (angolo): letteralmente <strong>"molti angoli"</strong>.</p>
+
+      <div class="definition">
+        I segmenti si chiamano <strong>lati</strong>, i punti in cui si incontrano <strong>vertici</strong>. Un
+        poligono si dice <strong>regolare</strong> quando ha <em>tutti i lati uguali e tutti gli angoli uguali</em>
+        (triangolo equilatero, quadrato, pentagono regolare, esagono regolare...). I nomi seguono il numero dei
+        lati: 3 triangolo, 4 quadrilatero, 5 pentagono, 6 esagono, 7 ettagono, 8 ottagono, 10 decagono.
+      </div>
+
+      <p>In ogni vertice si formano due angoli: quello <strong>interno</strong> (dentro il poligono) e quello
+        <strong>esterno</strong>, che si ottiene prolungando un lato. Insieme formano un angolo piatto, quindi sono
+        <strong>supplementari</strong>: interno + esterno = 180°. E su questi angoli valgono due teoremi
+        bellissimi.</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="pg-ext">angoli esterni</button>
+          <button class="btn" id="pg-int">angoli interni</button>
+        </div>
+        <div class="control-group"><label>numero di lati</label><input type="range" id="pg-n" min="3" max="12" step="1" value="5"><span class="val-badge" id="pg-n-val">5</span></div>
+        <div class="control-group" id="pg-row-shrink"><label>raggruppa gli angoli</label><input type="range" id="pg-t" min="0" max="100" step="1" value="0"><span class="val-badge" id="pg-t-val">0%</span></div>
+        <button class="btn" id="pg-plane">✈️ percorri il bordo</button>
+      </div>
+      <div class="ckt"><svg id="pg-svg" viewBox="0 0 640 340" aria-label="Poligono regolare con i suoi angoli interni ed esterni"></svg></div>
+      <p class="eq-out" id="pg-out"></p>
+
+      <h3>7.1 — La somma degli angoli esterni</h3>
+      <div class="rule">
+        <strong>Teorema.</strong> In <em>qualunque</em> poligono, la somma degli angoli esterni vale sempre
+        <strong>360°</strong> — un angolo giro. E non dipende dal numero di lati!
+        <br><br><strong>Perché?</strong> Due modi di vederlo, entrambi nella simulazione:
+        <br>• <strong>Raggruppandoli</strong>: trascina lo slider «raggruppa gli angoli» e guarda i vari angoli
+        esterni staccarsi dai vertici e impacchettarsi attorno a un punto: combaciano esattamente, senza buchi e
+        senza sovrapposizioni, formando un angolo giro. (È come se il poligono si stringesse fino a diventare un
+        punto: gli angoli restano quelli, e si vede che chiudono il giro.)
+        <br>• <strong>Facendo l'aeroplano</strong>: premi il pulsante ✈️ e segui il velivolo che percorre il bordo.
+        A ogni vertice deve <em>sterzare</em> di un angolo pari all'angolo esterno. Quando torna al punto di
+        partenza puntando nella direzione iniziale, ha fatto in tutto <strong>un giro completo</strong>: la somma
+        di tutte le sterzate è per forza 360°.
+      </div>
+
+      <h3>7.2 — La somma degli angoli interni</h3>
+      <p>Per gli angoli <em>interni</em>, invece, il numero di lati conta eccome. Passa alla scheda «angoli interni»:
+        tracciando le diagonali da un solo vertice, il poligono si spezza in <strong>triangoli</strong> — e di
+        triangoli ce ne sono sempre <strong>due in meno</strong> del numero dei lati. Siccome ogni triangolo ha gli
+        angoli interni che sommano a 180° (lo dimostreremo nella prossima lezione):</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Somma degli angoli interni di un poligono di $n$ lati</div>
+        $$S_i = (n - 2) \times 180°$$
+        <p class="formula-note">Triangolo ($n=3$): $1 \times 180° = 180°$. Quadrilatero: $2 \times 180° = 360°$.
+          Pentagono: $540°$. Esagono: $720°$. E se il poligono è <strong>regolare</strong>, ogni singolo angolo
+          interno misura $\dfrac{(n-2) \times 180°}{n}$ — per l'esagono regolare fa $120°$, un numero che ci
+          tornerà utilissimo nella prossima lezione, quando parleremo di api.</p>
+      </div>
+    </section>
+
+    <!-- 8 — I QUADRILATERI -->
+    <section id="sec8">
+      <h2>8. I quadrilateri: una famiglia con le idee chiare</h2>
+
+      <p>Fermiamoci sui poligoni a <strong>quattro lati</strong>, i più comuni nella vita quotidiana. Ma prima
+        dobbiamo metterci d'accordo su una cosa, perché qui si fa spesso confusione.</p>
+
+      <div class="warning">
+        <strong>Convenzione (importante).</strong> Spesso si sente dire «questo è un quadrato, quello è un
+        rettangolo», come se fossero cose <em>diverse</em>. Per noi non è così. Definiamo:
+        <br>• <strong>rettangolo</strong> = quadrilatero con <strong>tutti e quattro gli angoli retti</strong>;
+        <br>• <strong>quadrato</strong> = quadrilatero con <strong>tutti e quattro i lati uguali</strong> e gli
+        angoli retti.
+        <br>Ne segue che <strong>ogni quadrato è anche un rettangolo</strong> — un rettangolo particolarmente
+        fortunato, che ha pure i lati uguali. In linguaggio da lezione 2: i quadrati sono un
+        <strong>sottoinsieme</strong> dei rettangoli.
+      </div>
+
+      <p>Ecco la famiglia al completo, disegnata come una gerarchia di insiemi:</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 300" aria-label="Gerarchia dei quadrilateri: quadrilateri, trapezi, parallelogrammi, rettangoli, rombi e quadrati">
+        <rect x="20" y="14" width="600" height="272" rx="14" fill="none" stroke="var(--text-soft)" stroke-width="2"/>
+        <text x="36" y="36" class="lbl">QUADRILATERI &mdash; 4 lati</text>
+        <rect x="40" y="46" width="560" height="226" rx="12" fill="color-mix(in srgb, var(--accent) 5%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="56" y="68" class="lbl" fill="var(--accent)">TRAPEZI &mdash; almeno due lati paralleli</text>
+        <rect x="60" y="78" width="520" height="180" rx="12" fill="color-mix(in srgb, var(--gold) 6%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+        <text x="76" y="100" class="lbl" fill="var(--gold)">PARALLELOGRAMMI &mdash; lati opposti paralleli e uguali</text>
+        <rect x="82" y="112" width="308" height="132" rx="10" fill="color-mix(in srgb, #22c55e 9%, transparent)" stroke="#22c55e" stroke-width="2"/>
+        <rect x="250" y="112" width="320" height="132" rx="10" fill="color-mix(in srgb, var(--magenta) 9%, transparent)" stroke="var(--magenta)" stroke-width="2"/>
+        <text x="98" y="134" class="lbl" fill="#22c55e">RETTANGOLI</text>
+        <text x="98" y="152" class="lbl-s">4 angoli retti</text>
+        <rect x="100" y="178" width="56" height="36" fill="none" stroke="#22c55e" stroke-width="1.8"/>
+        <path d="M 100 206 L 108 206 L 108 214" fill="none" stroke="#22c55e" stroke-width="1.4"/>
+        <text x="406" y="134" class="lbl" fill="var(--magenta)">ROMBI</text>
+        <text x="406" y="152" class="lbl-s">4 lati uguali</text>
+        <polygon points="470,172 502,196 470,220 438,196" fill="none" stroke="var(--magenta)" stroke-width="1.8"/>
+        <rect x="262" y="168" width="116" height="66" rx="9" fill="color-mix(in srgb, var(--accent) 24%, transparent)" stroke="var(--text)" stroke-width="2.2"/>
+        <text x="320" y="190" text-anchor="middle" class="lbl">QUADRATI</text>
+        <text x="320" y="208" text-anchor="middle" class="lbl-s">4 lati uguali</text>
+        <text x="320" y="223" text-anchor="middle" class="lbl-s">+ 4 angoli retti</text>
+      </svg></div>
+
+      <p>Guardate bene i due insiemi «RETTANGOLI» e «ROMBI»: <strong>si sovrappongono</strong>, e non per caso. La
+        zona comune non è vuota, perché esistono figure che hanno <em>contemporaneamente</em> i quattro angoli retti
+        <em>e</em> i quattro lati uguali — e quelle figure sono esattamente i <strong>quadrati</strong>. Ecco perché
+        il quadrato sta disegnato lì in mezzo: <strong>è</strong> un rettangolo (ha gli angoli retti) <strong>ed
+        è</strong> un rombo (ha i lati uguali). In linguaggio insiemistico, i quadrati sono l'<strong>intersezione</strong>
+        tra l'insieme dei rettangoli e quello dei rombi. È il quadrilatero più simmetrico che esista.</p>
+
+      <p>Attenzione a leggere il disegno nel verso giusto: nella parte verde che resta <em>fuori</em> dalla
+        sovrapposizione ci sono i rettangoli «allungati» (angoli retti sì, lati tutti uguali no), e nella parte
+        magenta che resta fuori ci sono i rombi «schiacciati» (lati uguali sì, angoli retti no). Un quadrilatero
+        può insomma avere una proprietà senza avere l'altra: solo chi le ha tutte e due finisce al centro.</p>
+    </section>
+
+    <!-- 9 — PERIMETRI E AREE -->
+    <section id="sec9">
+      <h2>9. Perimetri e aree</h2>
+
+      <p>Due misure accompagnano ogni figura piana, e non vanno confuse:</p>
+      <div class="two-col">
+        <div class="definition" style="margin:0;">
+          Il <strong>perimetro</strong> è la lunghezza del <em>contorno</em>: quanto filo serve per recintare il
+          campo. Si misura in metri (m, cm, km...).
+        </div>
+        <div class="definition" style="margin:0;">
+          L'<strong>area</strong> è la misura della <em>superficie</em>: quanta erba c'è dentro il campo. Si misura
+          in metri <em>quadrati</em> (m², cm²...).
+        </div>
+      </div>
+
+      <table class="form-tab">
+        <tr><th>Figura</th><th>Perimetro</th><th>Area</th></tr>
+        <tr><td>Rettangolo (base $b$, altezza $h$)</td><td>$2(b + h)$</td><td>$b \times h$</td></tr>
+        <tr><td>Quadrato (lato $l$)</td><td>$4l$</td><td>$l^2$</td></tr>
+        <tr><td>Parallelogramma (base $b$, altezza $h$)</td><td>somma dei lati</td><td>$b \times h$</td></tr>
+        <tr><td>Rombo (lato $l$, diagonali $d_1$ e $d_2$)</td><td>$4l$</td><td>$\dfrac{d_1 \times d_2}{2}$</td></tr>
+        <tr><td>Trapezio (basi $B$ e $b$, altezza $h$)</td><td>somma dei lati</td><td>$\dfrac{(B + b) \times h}{2}$</td></tr>
+      </table>
+
+      <div class="note">
+        <strong>Perché quelle formule?</strong> Non sono magie da imparare a memoria: si <em>ricavano</em> tutte da
+        quella del rettangolo, tagliando e ricomponendo le figure. Il rombo, per esempio, sta esattamente in metà
+        del rettangolo che ha per lati le sue diagonali; il trapezio si trasforma in un rettangolo alto $h$ e largo
+        quanto la media delle due basi. Nella prossima lezione vedremo che <strong>tutte</strong> queste formule
+        discendono da quella del triangolo.
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Problema 1</span><span class="difficulty easy">Facile</span></div>
+        <p>Un campo rettangolare è lungo $45$ m e largo $28$ m. <strong>(a)</strong> Quanti metri di rete servono per
+          recintarlo? <strong>(b)</strong> Qual è la sua area? <strong>(c)</strong> Se il proprietario vuole lasciare
+          un cancello di 3 m, quanta rete acquista?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">a</span>Perimetro: $2 \times (45 + 28) = 2 \times 73 = \mathbf{146}$ m.</p>
+          <p><span class="step-num">b</span>Area: $45 \times 28 = \mathbf{1260}$ m².</p>
+          <p><span class="step-num">c</span>$146 - 3 = \mathbf{143}$ m di rete.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Problema 2</span><span class="difficulty medium">Medio</span></div>
+        <p>Un aquilone ha la forma di un rombo con le diagonali di $60$ cm e $80$ cm, e il lato di $50$ cm.
+          <strong>(a)</strong> Quanta stoffa serve per costruirlo? <strong>(b)</strong> Quanto cordoncino serve per
+          bordarlo tutt'attorno?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">a</span>La stoffa è l'<strong>area</strong>:
+            $\dfrac{60 \times 80}{2} = \dfrac{4800}{2} = \mathbf{2400}$ cm².</p>
+          <p><span class="step-num">b</span>Il cordoncino è il <strong>perimetro</strong>: il rombo ha 4 lati
+            uguali, quindi $4 \times 50 = \mathbf{200}$ cm (cioè 2 m).</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Problema 3</span><span class="difficulty medium">Medio</span></div>
+        <p>Un terrazzo ha la forma di un trapezio con le basi di $8$ m e $5$ m e l'altezza di $4$ m. Le piastrelle
+          costano $23$ € al metro quadrato. <strong>(a)</strong> Qual è l'area del terrazzo?
+          <strong>(b)</strong> Quanto si spende per piastrellarlo?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">a</span>$\dfrac{(8 + 5) \times 4}{2} = \dfrac{13 \times 4}{2} = \dfrac{52}{2} = \mathbf{26}$ m².</p>
+          <p><span class="step-num">b</span>$26 \times 23 = \mathbf{598}$ €.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Problema 4</span><span class="difficulty hard">Difficile</span></div>
+        <p>Un quadrato ha il perimetro di $36$ cm. <strong>(a)</strong> Quanto misura il suo lato?
+          <strong>(b)</strong> Qual è la sua area? <strong>(c)</strong> Un rettangolo ha lo <em>stesso</em>
+          perimetro ma la base doppia dell'altezza: qual è la sua area? Che cosa noti?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">a</span>$36 : 4 = \mathbf{9}$ cm.</p>
+          <p><span class="step-num">b</span>$9^2 = \mathbf{81}$ cm².</p>
+          <p><span class="step-num">c</span>Se l'altezza è $h$, la base è $2h$: perimetro $= 2(2h + h) = 6h = 36$,
+            quindi $h = 6$ cm e base $= 12$ cm. Area $= 12 \times 6 = \mathbf{72}$ cm².</p>
+          <p><span class="step-num">!</span>A <strong>parità di perimetro</strong> il quadrato ha area
+            <em>maggiore</em> del rettangolo (81 contro 72). Non è un caso: tra tutti i rettangoli con lo stesso
+            perimetro, il quadrato è quello che racchiude più superficie. Tenete a mente questa idea di
+            "figura che ottimizza": tornerà nella prossima lezione, con le api.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 — QUIZ -->
+    <section id="quiz">
+      <h2>10. Quiz finale</h2>
+      <p>Dieci domande su Euclide, postulati, angoli e quadrilateri. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 10 — La geometria piana euclidea · Matematica · Primo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezione 7: angoli interni ed esterni di un poligono -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      (function () {
+        const svg = document.getElementById('pg-svg');
+        if (!svg) return;
+        const out = document.getElementById('pg-out');
+        const sn = document.getElementById('pg-n'), st = document.getElementById('pg-t');
+        const bExt = document.getElementById('pg-ext'), bInt = document.getElementById('pg-int');
+        const rowShrink = document.getElementById('pg-row-shrink');
+        const btnPlane = document.getElementById('pg-plane');
+        let mode = 'ext', plane = null, raf = null, flying = false;
+        const CX = 235, CY = 170, R = 120, HUB = { x: 520, y: 150 };
+
+        function verts(n) {
+          const v = [];
+          for (let i = 0; i < n; i++) {
+            const a = -Math.PI / 2 + i * 2 * Math.PI / n;
+            v.push({ x: CX + R * Math.cos(a), y: CY + R * Math.sin(a) });
+          }
+          return v;
+        }
+        // settore circolare pieno
+        function wedge(cx, cy, r, a0, a1) {
+          const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+          const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+          const large = (a1 - a0) > Math.PI ? 1 : 0;
+          return 'M ' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' L ' + x0.toFixed(1) + ' ' + y0.toFixed(1) +
+                 ' A ' + r.toFixed(1) + ' ' + r.toFixed(1) + ' 0 ' + large + ' 1 ' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' Z';
+        }
+        // indice di vertice sempre valido, anche con indici negativi (in JS -1 % 5 fa -1, non 4)
+        function vAt(V, i) { const n = V.length; return V[((i % n) + n) % n]; }
+
+        function stopPlane() {
+          if (raf !== null) { cancelAnimationFrame(raf); raf = null; }
+          flying = false;
+          plane = null;
+          btnPlane.textContent = '✈️ percorri il bordo';
+        }
+
+        function draw() {
+          const n = +sn.value, t = +st.value / 100;
+          document.getElementById('pg-n-val').textContent = n;
+          document.getElementById('pg-t-val').textContent = Math.round(t * 100) + '%';
+          rowShrink.style.display = mode === 'ext' ? '' : 'none';
+          const V = verts(n);
+          const extDeg = 360 / n, intDeg = 180 - extDeg;
+          const side = 2 * R * Math.sin(Math.PI / n);
+          let h = '';
+          // poligono
+          const pts = V.map(function (p) { return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
+
+          if (mode === 'ext') {
+            h += '<polygon points="' + pts + '" fill="color-mix(in srgb, var(--accent) 10%, transparent)" stroke="var(--accent)" stroke-width="2.5"/>';
+            for (let i = 0; i < n; i++) {
+              const A = V[i], B = V[(i + 1) % n];
+              const aIn = Math.atan2(B.y - A.y, B.x - A.x);
+              const L = 34;
+              h += '<line x1="' + B.x.toFixed(1) + '" y1="' + B.y.toFixed(1) + '" x2="' + (B.x + L * Math.cos(aIn)).toFixed(1) +
+                   '" y2="' + (B.y + L * Math.sin(aIn)).toFixed(1) + '" stroke="var(--text-soft)" stroke-width="1.4" stroke-dasharray="4 3"/>';
+              const startA = aIn, endA = aIn + 2 * Math.PI / n;
+              const px = B.x + (HUB.x - B.x) * t, py = B.y + (HUB.y - B.y) * t;
+              const rot = t * (i * 2 * Math.PI / n - startA);
+              h += '<path d="' + wedge(px, py, 30, startA + rot, endA + rot) + '" fill="color-mix(in srgb, var(--magenta) ' + (26 + 14 * t) + '%, transparent)" stroke="var(--magenta)" stroke-width="1.6"/>';
+            }
+            if (t > 0.9) {
+              h += '<circle cx="' + HUB.x + '" cy="' + HUB.y + '" r="30" fill="none" stroke="var(--magenta)" stroke-width="2.5"/>';
+              h += '<text x="' + HUB.x + '" y="' + (HUB.y + 54) + '" text-anchor="middle" class="em">angolo giro = 360°</text>';
+            }
+          } else {
+            // triangolazione leggera, POI gli archi degli angoli interni sopra
+            for (let i = 1; i < n - 1; i++) {
+              const tri = [V[0], V[i], V[i + 1]].map(function (p) { return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
+              h += '<polygon points="' + tri + '" fill="color-mix(in srgb, var(--gold) ' + (i % 2 ? 16 : 8) + '%, transparent)" stroke="var(--gold)" stroke-width="1.3"/>';
+            }
+            h += '<polygon points="' + pts + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>';
+            // archi degli angoli interni
+            const rr = Math.max(13, Math.min(30, side * 0.32));
+            for (let i = 0; i < n; i++) {
+              const Vi = V[i], Vp = V[(i - 1 + n) % n], Vn = V[(i + 1) % n];
+              const aP = Math.atan2(Vp.y - Vi.y, Vp.x - Vi.x);
+              const aN = Math.atan2(Vn.y - Vi.y, Vn.x - Vi.x);
+              let a0 = aP, d = aN - aP;
+              while (d < 0) d += 2 * Math.PI;
+              if (d > Math.PI) { a0 = aN; d = 2 * Math.PI - d; }
+              h += '<path d="' + wedge(Vi.x, Vi.y, rr, a0, a0 + d) + '" fill="color-mix(in srgb, var(--magenta) 30%, transparent)" stroke="var(--magenta)" stroke-width="1.8"/>';
+              if (n <= 8) {
+                const am = a0 + d / 2, lr = rr + 17;
+                h += '<text x="' + (Vi.x + lr * Math.cos(am)).toFixed(1) + '" y="' + (Vi.y + lr * Math.sin(am) + 4).toFixed(1) +
+                     '" text-anchor="middle" class="lbl-s" fill="var(--magenta)" style="font-weight:700;">' + (Math.round(intDeg * 10) / 10) + '°</text>';
+              }
+            }
+            h += '<circle cx="' + V[0].x.toFixed(1) + '" cy="' + V[0].y.toFixed(1) + '" r="5" fill="var(--gold)"/>';
+            h += '<text x="' + HUB.x + '" y="112" text-anchor="middle" class="lbl" fill="var(--gold)">' + (n - 2) + ' triangoli</text>';
+            h += '<text x="' + HUB.x + '" y="142" text-anchor="middle" class="lbl">(' + n + ' &#8722; 2) × 180°</text>';
+            h += '<text x="' + HUB.x + '" y="176" text-anchor="middle" class="em" style="font-size:18px;">= ' + ((n - 2) * 180) + '°</text>';
+            h += '<text x="' + HUB.x + '" y="212" text-anchor="middle" class="lbl-s">ogni angolo interno:</text>';
+            h += '<text x="' + HUB.x + '" y="234" text-anchor="middle" class="lbl" fill="var(--magenta)">' + (Math.round(intDeg * 10) / 10) + '°</text>';
+          }
+
+          // aeroplano
+          if (plane) {
+            const A = vAt(V, plane.seg), B = vAt(V, plane.seg + 1);
+            const px = A.x + (B.x - A.x) * plane.f, py = A.y + (B.y - A.y) * plane.f;
+            let head = Math.atan2(B.y - A.y, B.x - A.x);
+            if (plane.turn > 0) {
+              const C = vAt(V, plane.seg + 2);
+              let dd = Math.atan2(C.y - B.y, C.x - B.x) - head;
+              while (dd > Math.PI) dd -= 2 * Math.PI;
+              while (dd < -Math.PI) dd += 2 * Math.PI;
+              head += dd * plane.turn;
+            }
+            // sagoma disegnata (non emoji: dev'essere visibile in entrambi i temi), punta verso +x
+            const PLANE = 'M 16 0 L -12 -11 L -6 0 L -12 11 Z';
+            const h0 = Math.atan2(V[1].y - V[0].y, V[1].x - V[0].x);
+            // scia del tratto già percorso
+            let trail = 'M ' + V[0].x.toFixed(1) + ' ' + V[0].y.toFixed(1);
+            if (plane.done) {
+              for (let i = 1; i <= n; i++) trail += ' L ' + vAt(V, i).x.toFixed(1) + ' ' + vAt(V, i).y.toFixed(1);
+            } else {
+              for (let i = 1; i <= Math.min(plane.seg, n); i++) trail += ' L ' + vAt(V, i).x.toFixed(1) + ' ' + vAt(V, i).y.toFixed(1);
+              trail += ' L ' + px.toFixed(1) + ' ' + py.toFixed(1);
+            }
+            h += '<path d="' + trail + '" fill="none" stroke="var(--magenta)" stroke-width="4.5" opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>';
+            // punto di partenza + sagoma fantasma
+            h += '<circle cx="' + V[0].x.toFixed(1) + '" cy="' + V[0].y.toFixed(1) + '" r="17" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="4 3"/>';
+            h += '<g transform="translate(' + V[0].x.toFixed(1) + ',' + V[0].y.toFixed(1) + ') rotate(' + (h0 * 180 / Math.PI).toFixed(1) + ')">' +
+                 '<path d="' + PLANE + '" fill="var(--text-soft)" opacity="0.35"/></g>';
+            h += '<text x="' + V[0].x.toFixed(1) + '" y="' + (V[0].y - 26).toFixed(1) + '" text-anchor="middle" class="lbl-s" fill="#22c55e">partenza</text>';
+            // il velivolo
+            h += '<g transform="translate(' + px.toFixed(1) + ',' + py.toFixed(1) + ') rotate(' + (head * 180 / Math.PI).toFixed(1) + ')">' +
+                 '<path d="' + PLANE + '" fill="var(--magenta)" stroke="var(--bg)" stroke-width="1.6" stroke-linejoin="round"/></g>';
+            const girato = (plane.seg + plane.turn) * extDeg;
+            h += '<text x="' + HUB.x + '" y="286" text-anchor="middle" class="lbl">sterzate: ' + (Math.round(girato)) + '°</text>';
+            if (plane.turn > 0 && !plane.done) {
+              h += '<path d="' + wedge(B.x, B.y, 26, Math.atan2(B.y - A.y, B.x - A.x), Math.atan2(B.y - A.y, B.x - A.x) + 2 * Math.PI / n) +
+                   '" fill="color-mix(in srgb, #22c55e 30%, transparent)" stroke="#22c55e" stroke-width="1.8"/>';
+            }
+          }
+          svg.innerHTML = h;
+
+          // testo esplicativo
+          if (plane && plane.done) {
+            out.innerHTML = '🎉 <strong>Giro completato!</strong> L\'aeroplano è tornato <strong>esattamente dove era partito</strong> (cerchietto verde) e punta di nuovo nella direzione iniziale. ' +
+              'Ha sterzato ' + n + ' volte di ' + (Math.round(extDeg * 10) / 10) + '°: in totale <strong>360°</strong>, un giro esatto. Ecco perché la somma degli angoli esterni è sempre un angolo giro.';
+          } else if (plane) {
+            out.innerHTML = '✈️ In volo lungo il lato <strong>' + (plane.seg + 1) + '</strong> di ' + n +
+              (plane.turn > 0 ? ' — <strong>sta sterzando</strong> di ' + (Math.round(extDeg * 10) / 10) + '° (angolo verde)' : '') +
+              '. Sterzate accumulate finora: <strong>' + Math.round((plane.seg + plane.turn) * extDeg) + '°</strong>.';
+          } else if (mode === 'ext') {
+            out.innerHTML = 'Poligono regolare di <strong>' + n + ' lati</strong>. Ogni angolo esterno misura ' +
+              '<strong>360° : ' + n + ' = ' + (Math.round(extDeg * 10) / 10) + '°</strong>, e ce ne sono ' + n +
+              ': in totale <strong>' + n + ' × ' + (Math.round(extDeg * 10) / 10) + '° = 360°</strong>. ' +
+              (t > 0.05 ? 'Guarda come si incastrano attorno a un punto: un angolo giro esatto, senza buchi né sovrapposizioni!'
+                        : 'Trascina «raggruppa gli angoli» per vederli impacchettarsi, oppure premi ✈️.');
+          } else {
+            out.innerHTML = 'Le diagonali tracciate dal vertice giallo spezzano il poligono in <strong>' + (n - 2) +
+              ' triangoli</strong> (sempre due in meno dei lati). Ogni triangolo porta 180°, quindi la somma degli angoli interni (in magenta) è <strong>' +
+              ((n - 2) * 180) + '°</strong>. Essendo regolare, ognuno di essi misura ' + ((n - 2) * 180) + '° : ' + n +
+              ' = <strong>' + (Math.round(intDeg * 10) / 10) + '°</strong>.';
+          }
+        }
+
+        function flyPlane() {
+          if (flying) { stopPlane(); draw(); return; }   // il pulsante fa da interruttore
+          stopPlane();                                    // riparte sempre da uno stato pulito
+          flying = true;
+          const TRAVEL = 950, PAUSE = 650, CYCLE = TRAVEL + PAUSE;
+          const nVoli = Math.max(3, +sn.value || 3);
+          const total = nVoli * CYCLE;
+          let t0 = null;                                  // fissato al PRIMO fotogramma, non adesso
+          btnPlane.textContent = '⏹ ferma';
+
+          function step(now) {
+            raf = null;
+            if (!flying) return;
+            if (t0 === null) t0 = now;                    // l'origine è la stessa scala di "now"
+            const el = Math.max(0, now - t0);             // mai negativo: eviterebbe indici < 0
+            if (el >= total) {
+              plane = { seg: 0, f: 0, turn: 0, done: true };
+              flying = false;
+              btnPlane.textContent = '✈️ percorri di nuovo';
+              draw();
+              return;
+            }
+            const idx = Math.min(nVoli - 1, Math.floor(el / CYCLE)), w = el - idx * CYCLE;
+            if (w <= TRAVEL) plane = { seg: idx, f: w / TRAVEL, turn: 0, done: false };
+            else plane = { seg: idx, f: 1, turn: Math.min(1, (w - TRAVEL) / PAUSE), done: false };
+            raf = requestAnimationFrame(step);            // riprogramma PRIMA di disegnare:
+            draw();                                       // così un errore di disegno non blocca il volo
+          }
+          raf = requestAnimationFrame(step);
+        }
+
+        bExt.addEventListener('click', function () { mode = 'ext'; bExt.classList.add('active'); bInt.classList.remove('active'); stopPlane(); draw(); });
+        bInt.addEventListener('click', function () { mode = 'int'; bInt.classList.add('active'); bExt.classList.remove('active'); stopPlane(); draw(); });
+        sn.addEventListener('input', function () { stopPlane(); draw(); });
+        st.addEventListener('input', draw);
+        btnPlane.addEventListener('click', flyPlane);
+        draw();
+      })();
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Che cosa sono i <strong>postulati</strong> di Euclide?',
+        options: ['teoremi particolarmente difficili', 'affermazioni di partenza accettate senza dimostrazione', 'formule per calcolare le aree', 'gli errori contenuti negli <em>Elementi</em>', 'le definizioni di punto e retta'],
+        correct: 1, explain: 'Sono il punto di partenza della teoria: non si dimostrano (bisogna pur cominciare da qualcosa), si assumono. Da lì si deducono tutti i teoremi.' },
+      { type: 'mc', diff: 'easy', text: 'La parola "geometria" significa letteralmente:',
+        options: ['studio delle forme', 'misura della terra', 'scienza dei triangoli', 'arte del disegno', 'misura del cielo'],
+        correct: 1, explain: 'Dal greco gê (terra) + métron (misura): nasce dall\'esigenza pratica di misurare i campi, soprattutto in Egitto dopo le piene del Nilo.' },
+      { type: 'mc', diff: 'easy', text: 'Un angolo che misura esattamente $90°$ si dice:',
+        options: ['acuto', 'ottuso', 'retto', 'piatto', 'giro'],
+        correct: 2, explain: 'Acuto è minore di 90°, ottuso è tra 90° e 180°, piatto è 180°, giro è 360°.' },
+      { type: 'mc', diff: 'medium', text: 'Che cosa afferma il <strong>quinto postulato</strong> (nella formulazione moderna)?',
+        options: ['tutti gli angoli retti sono uguali', 'per due punti passa una sola retta', 'per un punto esterno a una retta passa una sola parallela a quella retta', 'un segmento si può prolungare all\'infinito', 'la somma degli angoli interni di un triangolo è 180°'],
+        correct: 2, explain: 'È il postulato delle parallele: la sua unicità è ciò che rende "euclidea" questa geometria. Cambiandolo si ottengono le geometrie non euclidee.' },
+      { type: 'mc', diff: 'medium', text: 'Perché per duemila anni si è tentato di <em>dimostrare</em> il quinto postulato?',
+        options: ['perché era palesemente falso', 'perché è molto più complicato degli altri quattro e sembrava potesse discendere da essi', 'perché Euclide aveva chiesto di farlo', 'perché serviva a calcolare le aree', 'in realtà non è mai successo'],
+        correct: 1, explain: 'Tutti i tentativi fallirono: ogni "dimostrazione" nascondeva un\'ipotesi equivalente al postulato stesso. Nell\'Ottocento si capì che non è dimostrabile — e che negandolo nascono geometrie nuove e coerenti.' },
+      { type: 'mc', diff: 'medium', text: 'Due rette parallele tagliate da una trasversale formano otto angoli. Gli <strong>alterni interni</strong> sono:',
+        options: ['supplementari', 'uguali', 'complementari', 'sempre retti', 'sempre acuti'],
+        correct: 1, explain: 'Alterni interni, alterni esterni e corrispondenti sono UGUALI; i coniugati sono supplementari (somma 180°). In tutto ci sono solo due valori diversi di angolo.' },
+      { type: 'mc', diff: 'medium', text: 'Quanto vale la somma degli <strong>angoli esterni</strong> di un poligono?',
+        options: ['$180°$', '$360°$, qualunque sia il numero di lati', 'dipende dal numero di lati', '$(n-2) \\times 180°$', '$n \\times 90°$'],
+        correct: 1, explain: 'Sempre un angolo giro. Lo si vede raggruppando gli angoli attorno a un punto, oppure immaginando di percorrere il bordo: tornati al punto di partenza si è girato in tutto di 360°.' },
+      { type: 'mc', diff: 'hard', text: 'Quanto vale la somma degli <strong>angoli interni</strong> di un pentagono?',
+        options: ['$360°$', '$450°$', '$540°$', '$720°$', '$900°$'],
+        correct: 2, explain: 'Formula (n−2)·180°: con n = 5 si ottiene 3 × 180° = 540°. Infatti le diagonali da un vertice spezzano il pentagono in 3 triangoli.' },
+      { type: 'mc', diff: 'hard', text: 'Secondo la classificazione vista a lezione, quale affermazione è corretta?',
+        options: ['un quadrato non è un rettangolo', 'ogni quadrato è un rettangolo (e anche un rombo)', 'ogni rettangolo è un quadrato', 'i rombi non sono quadrilateri', 'un trapezio è sempre un parallelogramma'],
+        correct: 1, explain: 'Rettangolo = 4 angoli retti; rombo = 4 lati uguali. Il quadrato ha entrambe le proprietà, quindi appartiene a tutti e due gli insiemi: è un loro sottoinsieme.' },
+      { type: 'open', diff: 'hard', text: 'Spiega perché gli <em>Elementi</em> di Euclide sono considerati un\'opera rivoluzionaria, anche se la geometria esisteva già da millenni. Che cos\'è una teoria logico-deduttiva?',
+        keywords: ['assiom', 'postulat', 'dedu', 'dimostr', 'teorem', 'unific', 'ricette', 'ordin', 'rigor', 'partenza', 'logic'], requiredMatches: 4,
+        explain: 'Prima di Euclide la geometria era un insieme di regole pratiche scoperte per necessità (misurare i campi) ma slegate tra loro, senza dimostrazioni. Euclide le UNIFICA in una teoria logico-deduttiva: si parte da pochi postulati accettati senza dimostrazione e da quelli si DEDUCE ogni altra verità, con teoremi che si appoggiano solo su ciò che è già stato dimostrato. Non è solo geometria: è il modello di come si costruisce il sapere rigoroso, il seme del metodo scientifico.' }
+    ];
+  </script>
+
+</body>
+
+</html>

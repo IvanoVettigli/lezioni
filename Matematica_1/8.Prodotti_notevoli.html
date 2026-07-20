@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 8 — Prodotti notevoli</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* card dei simboli/formule notevoli */
+    .sym-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin: 0.9rem 0; }
+    .sym-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem 0.7rem; text-align: center; }
+    .sym-card .sym { font-size: 1.3rem; font-weight: 800; color: var(--accent); display: block; }
+    .sym-card .nome { font-size: 0.82rem; color: var(--muted); display: block; margin-top: 0.15rem; }
+    .sym-card .significa { font-size: 0.86rem; display: block; margin-top: 0.2rem; }
+    /* schema della divisione in colonna */
+    .polydiv { border-collapse: collapse; margin: 0.8rem auto; font-variant-numeric: tabular-nums; }
+    .polydiv td { padding: 0.3rem 1rem; white-space: nowrap; }
+    .polydiv td.work { text-align: right; }
+    .polydiv td.sub { border-bottom: 1.6px solid var(--text-soft); }
+    .polydiv td.divi { border-left: 2.5px solid var(--text-soft); text-align: left; }
+    .polydiv td.divi.bar { border-bottom: 1.6px solid var(--text-soft); }
+    .polydiv td.quo { color: var(--accent); font-weight: 700; }
+    .polydiv td.rest { color: var(--magenta); font-weight: 700; }
+    /* schema di Ruffini */
+    .ruffini { border-collapse: collapse; margin: 0.8rem auto; font-variant-numeric: tabular-nums; }
+    .ruffini td { padding: 0.35rem 1.1rem; text-align: center; min-width: 2.4rem; }
+    .ruffini td.acol { border-right: 2.5px solid var(--text-soft); font-weight: 800; color: var(--accent); min-width: 3rem; }
+    .ruffini tr.sum td { border-top: 2.5px solid var(--text-soft); font-weight: 700; }
+    .ruffini td.rest { border-left: 2.5px solid var(--magenta); color: var(--magenta); font-weight: 800; }
+    .ruffini td.quo { color: var(--accent); font-weight: 700; }
+    /* triangolo di Tartaglia */
+    .tt-row { display: flex; justify-content: center; gap: 0.35rem; margin: 0.22rem 0; flex-wrap: nowrap; }
+    .tt-cell { min-width: 2.1rem; padding: 0.25rem 0.35rem; text-align: center; border-radius: 7px; background: var(--surface-2); border: 1px solid var(--border); font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.9rem; transition: all .2s; }
+    .tt-cell.new { background: color-mix(in srgb, var(--accent) 30%, transparent); border-color: var(--accent); color: var(--accent); }
+    .tt-cell.par { background: color-mix(in srgb, var(--gold) 28%, transparent); border-color: var(--gold); }
+    .tt-cell.dia { background: color-mix(in srgb, var(--magenta) 24%, transparent); border-color: var(--magenta); }
+    .tt-wrap { overflow-x: auto; padding: 0.3rem 0; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Primo anno · Lezione 8</div>
+    <h1>I prodotti notevoli</h1>
+    <p>Moltiplicare polinomi in fretta: le formule da ricordare, viste con la geometria — più il triangolo di Tartaglia, la divisione e Ruffini</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Primo anno</a>
+    <span class="sep">/</span> I prodotti notevoli
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Nella lezione 7 abbiamo imparato a usare le lettere: monomi, polinomi, la messa in
+      evidenza. Oggi impariamo a <strong>far di conto</strong> con i polinomi — sommarli, moltiplicarli, dividerli —
+      e scopriamo alcune moltiplicazioni che tornano così spesso da meritarsi una formula tutta loro: i
+      <strong>prodotti notevoli</strong>. Sono scorciatoie: chi le conosce risolve in tre secondi ciò che agli altri
+      costa mezza pagina.
+    </div>
+
+    <!-- 1 — RIPASSO E SOMMA -->
+    <section id="sec1">
+      <h2>1. Ripasso: polinomi, grado e somma</h2>
+
+      <p>Ripartiamo dalle definizioni della lezione scorsa, perché tutto il resto si appoggia su queste.</p>
+
+      <div class="definition">
+        Un <strong>polinomio</strong> è la <strong>somma di due o più monomi</strong> non simili (cioè con parte
+        letterale diversa: se fossero simili li sommeremmo in uno solo). I monomi che lo compongono si chiamano
+        <strong>termini</strong>. Esempi: $2n + 1$, &nbsp; $3x^2 - 5x + 4$, &nbsp; $ab + b^2$.
+      </div>
+
+      <div class="definition">
+        Il <strong>grado</strong> di un polinomio è il <strong>grado più alto</strong> tra i suoi termini (e il grado
+        di un monomio è la somma degli esponenti della sua parte letterale). Esempio: in $3x^2 - 5x + 4$ i termini
+        hanno grado $2$, $1$ e $0$ → il polinomio ha grado $\mathbf{2}$.
+      </div>
+
+      <h3>1.1 — Sommare due polinomi</h3>
+      <p>Sommare due polinomi è la cosa più semplice del mondo: si tolgono le parentesi, si <strong>mettono insieme i
+        termini simili</strong> (quelli con la stessa parte letterale) e si sommano i loro coefficienti. Il risultato
+        è ancora un polinomio.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Esempio svolto</div>
+        $$(3x^2 - 5x + 4) + (x^2 + 2x - 9)$$
+        $$= \underbrace{3x^2 + x^2}_{\text{simili}} \; \underbrace{- \, 5x + 2x}_{\text{simili}} \; \underbrace{+ \, 4 - 9}_{\text{simili}} \; = \; 4x^2 - 3x - 5$$
+        <p class="formula-note">I termini in $x^2$ con i termini in $x^2$, quelli in $x$ con quelli in $x$, i numeri
+          con i numeri: mele con mele, pere con pere.</p>
+      </div>
+
+      <div class="warning">
+        <strong>Attenzione al meno davanti alla parentesi.</strong> Se dobbiamo <em>sottrarre</em> un polinomio, il
+        segno meno si distribuisce su <strong>tutti</strong> i termini dentro la parentesi:
+        $(5x + 3) - (2x - 7) = 5x + 3 - 2x + 7 = 3x + 10$. Quel $-7$ che diventa $+7$ è l'errore più frequente in
+        assoluto: occhio!
+      </div>
+    </section>
+
+    <!-- 2 — MOLTIPLICAZIONE -->
+    <section id="sec2">
+      <h2>2. Moltiplicare due polinomi</h2>
+
+      <p>Per moltiplicare due polinomi usiamo la <strong>proprietà distributiva</strong> della moltiplicazione
+        rispetto all'addizione (lezione 5): <strong>ogni termine del primo polinomio va moltiplicato per ogni termine
+        del secondo</strong>, e poi si sommano tutti i prodotti ottenuti (mettendo insieme gli eventuali simili).</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Lo schema "ogni con ogni"</div>
+        $$(a + b)(c + d) = a \cdot c + a \cdot d + b \cdot c + b \cdot d$$
+        <p class="formula-note">Due termini per due termini fanno quattro prodotti. Se il primo polinomio ha 2
+          termini e il secondo 3, i prodotti saranno $2 \times 3 = 6$: è la moltiplicazione "ogni con ogni" che
+          abbiamo visto con le mattonelle nella lezione 4.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 1</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola $(x + 3)(x + 5)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Moltiplico ogni termine per ogni termine:
+            $x \cdot x + x \cdot 5 + 3 \cdot x + 3 \cdot 5$.</p>
+          <p><span class="step-num">2</span>$= x^2 + 5x + 3x + 15$.</p>
+          <p><span class="step-num">3</span>Sommo i simili ($5x$ e $3x$): $\mathbf{x^2 + 8x + 15}$.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola $(2a - 1)(a + 4)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$2a \cdot a + 2a \cdot 4 + (-1) \cdot a + (-1) \cdot 4$.</p>
+          <p><span class="step-num">2</span>$= 2a^2 + 8a - a - 4$ (attenzione ai segni: regola dei segni della lezione 4).</p>
+          <p><span class="step-num">3</span>Simili: $8a - a = 7a$ → $\mathbf{2a^2 + 7a - 4}$.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola $(x + 2)(x^2 - 3x + 1)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Il primo ha 2 termini, il secondo 3: mi aspetto $2 \times 3 = 6$ prodotti.</p>
+          <p><span class="step-num">2</span>$x \cdot x^2 + x \cdot (-3x) + x \cdot 1 + 2 \cdot x^2 + 2 \cdot (-3x) + 2 \cdot 1$.</p>
+          <p><span class="step-num">3</span>$= x^3 - 3x^2 + x + 2x^2 - 6x + 2$.</p>
+          <p><span class="step-num">4</span>Simili: $-3x^2 + 2x^2 = -x^2$ e $x - 6x = -5x$ →
+            $\mathbf{x^3 - x^2 - 5x + 2}$.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 4</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola $(3m - 2n)(2m + n)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$3m \cdot 2m + 3m \cdot n + (-2n) \cdot 2m + (-2n) \cdot n$.</p>
+          <p><span class="step-num">2</span>$= 6m^2 + 3mn - 4mn - 2n^2$.</p>
+          <p><span class="step-num">3</span>Simili ($3mn$ e $-4mn$, stessa parte letterale $mn$):
+            $\mathbf{6m^2 - mn - 2n^2}$.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — QUADRATO DEL BINOMIO -->
+    <section id="sec3">
+      <h2>3. Il primo prodotto notevole: il quadrato del binomio</h2>
+
+      <p>Alcune moltiplicazioni ritornano <em>continuamente</em>: tanto vale calcolarle una volta per tutte e
+        imparare il risultato. Si chiamano <strong>prodotti notevoli</strong> — "notevole" nel senso di "degno di
+        nota", da ricordare. Il più famoso di tutti è il <strong>quadrato di un binomio</strong>, cioè
+        $(a + b)^2$.</p>
+
+      <p>Ricaviamolo con quello che già sappiamo: elevare al quadrato significa moltiplicare per se stesso, e poi si
+        applica "ogni con ogni":</p>
+
+      <div class="formula-box">
+        $$(a+b)^2 = (a+b)(a+b) = a \cdot a + a \cdot b + b \cdot a + b \cdot b = a^2 + \underbrace{ab + ab}_{\text{simili!}} + b^2$$
+        <div class="formula-title" style="margin-top:0.6rem;">Quadrato del binomio</div>
+        $$(a+b)^2 = a^2 + 2ab + b^2$$
+        <p class="formula-note">Il quadrato del primo, più il <strong>doppio prodotto</strong> dei due, più il
+          quadrato del secondo. Quel $2ab$ nasce dai due prodotti misti uguali che si sommano.</p>
+      </div>
+
+      <div class="warning">
+        <strong>L'errore più diffuso della storia della matematica.</strong> $(a+b)^2$ <strong>non</strong> fa
+        $a^2 + b^2$! Manca il doppio prodotto. Prova con i numeri: $(3+4)^2 = 7^2 = 49$, mentre
+        $3^2 + 4^2 = 9 + 16 = 25$. Diversissimi — e la differenza, $24$, è proprio $2 \cdot 3 \cdot 4$.
+      </div>
+
+      <h3>3.1 — Perché è così: guardiamolo con la geometria</h3>
+      <p>C'è un modo bellissimo di <em>vedere</em> questa formula, invece che ricordarla a memoria. Un quadrato di
+        lato $a$ ha area $a^2$. Se <strong>allungo</strong> i lati di una lunghezza $b$, il nuovo quadrato di lato
+        $a+b$ non contiene soltanto i due quadrati $a^2$ e $b^2$: contiene anche <strong>due rettangoli</strong>
+        $a \times b$. Ecco il doppio prodotto! Muovi gli slider e guarda:</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="qb-plus">allunga: $(a+b)^2$</button>
+          <button class="btn" id="qb-minus">accorcia: $(a-b)^2$</button>
+        </div>
+        <div class="control-group"><label>lato $a$</label><input type="range" id="qb-a" min="3" max="10" step="1" value="6"><span class="val-badge" id="qb-a-val">6</span></div>
+        <div class="control-group"><label>lunghezza $b$</label><input type="range" id="qb-b" min="1" max="6" step="1" value="3"><span class="val-badge" id="qb-b-val">3</span></div>
+      </div>
+      <div class="ckt"><svg id="qb-svg" viewBox="0 0 640 330" aria-label="Interpretazione geometrica del quadrato del binomio: il quadrato di lato a+b si scompone in due quadrati e due rettangoli"></svg></div>
+      <p class="eq-out" id="qb-out"></p>
+
+      <div class="rule">
+        <strong>E se accorcio invece di allungare?</strong> Passa alla scheda <em>«accorcia»</em>: parto dal quadrato
+        grande di lato $a$ e voglio il quadratino di lato $a - b$. Devo <strong>togliere</strong> due strisce
+        $a \times b$ (ecco il $-2ab$)... ma così ho tolto <strong>due volte</strong> il quadratino d'angolo $b^2$,
+        che quindi va <strong>riaggiunto</strong>:
+        $$(a-b)^2 = a^2 - 2ab + b^2$$
+        Il doppio prodotto cambia segno, il quadrato di $b$ resta positivo (è un quadrato: non può essere negativo!).
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 5</span><span class="difficulty easy">Facile</span></div>
+        <p>Sviluppa $(x + 3)^2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Quadrato del primo: $x^2$. Doppio prodotto: $2 \cdot x \cdot 3 = 6x$. Quadrato del secondo: $3^2 = 9$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$x^2 + 6x + 9$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 6</span><span class="difficulty easy">Facile</span></div>
+        <p>Sviluppa $(2a - 5)^2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Quadrato del primo: $(2a)^2 = 4a^2$ (attenzione: si eleva <em>tutto</em>, coefficiente compreso!).</p>
+          <p><span class="step-num">2</span>Doppio prodotto: $2 \cdot 2a \cdot 5 = 20a$, col segno meno perché il binomio è una differenza: $-20a$.</p>
+          <p><span class="step-num">3</span>Quadrato del secondo: $5^2 = 25$ (positivo).</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$4a^2 - 20a + 25$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 7</span><span class="difficulty medium">Medio</span></div>
+        <p>Sviluppa $(3x + 2y)^2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$(3x)^2 = 9x^2$; &nbsp; doppio prodotto $2 \cdot 3x \cdot 2y = 12xy$; &nbsp; $(2y)^2 = 4y^2$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$9x^2 + 12xy + 4y^2$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 8</span><span class="difficulty medium">Medio</span></div>
+        <p>Sviluppa $(x^2 - 1)^2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Il "primo" è $x^2$: il suo quadrato è $(x^2)^2 = x^4$ (potenza di potenza: esponenti si moltiplicano, lezione 7).</p>
+          <p><span class="step-num">2</span>Doppio prodotto: $2 \cdot x^2 \cdot 1 = 2x^2$, negativo: $-2x^2$. Quadrato del secondo: $1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$x^4 - 2x^2 + 1$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — SOMMA PER DIFFERENZA -->
+    <section id="sec4">
+      <h2>4. Somma per differenza</h2>
+
+      <p>Il secondo prodotto notevole è forse il più utile di tutti, perché <em>semplifica</em> invece di allungare.
+        Moltiplichiamo la <strong>somma</strong> di due termini per la loro <strong>differenza</strong>, cioè
+        $(a+b)(a-b)$, e guardiamo cosa succede facendo il conto normalmente:</p>
+
+      <div class="formula-box">
+        $$(a+b)(a-b) = a \cdot a - a \cdot b + b \cdot a - b \cdot b = a^2 \underbrace{- \, ab + ab}_{\text{si elidono!}} - b^2$$
+        <div class="formula-title" style="margin-top:0.6rem;">Somma per differenza</div>
+        $$(a+b)(a-b) = a^2 - b^2$$
+        <p class="formula-note">I due prodotti misti sono uguali e di segno opposto: si <strong>cancellano</strong>.
+          Restano solo il quadrato del termine che <em>non</em> cambia segno, meno il quadrato di quello che
+          <em>cambia</em> segno. Il risultato si chiama <strong>differenza di quadrati</strong>.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>Il trucco per il calcolo a mente.</strong> Quanto fa $102 \times 98$? Sembra un conto da carta e
+        penna, ma guardate: $102 = 100 + 2$ e $98 = 100 - 2$. È una somma per differenza!
+        $(100+2)(100-2) = 100^2 - 2^2 = 10\,000 - 4 = \mathbf{9996}$. Due secondi, a mente. Provate con
+        $53 \times 47$ (= $50^2 - 3^2 = 2500 - 9 = 2491$) e stupite i parenti.
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 9</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola $(x + 4)(x - 4)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>È una somma per differenza con $a = x$ e $b = 4$: quadrato del primo meno quadrato del secondo.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$x^2 - 16$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 10</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola $(2a - 3)(2a + 3)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>L'ordine non conta (la moltiplicazione è commutativa): il termine che non cambia segno è $2a$, quello che cambia segno è $3$.</p>
+          <p><span class="step-num">2</span>$(2a)^2 - 3^2 = 4a^2 - 9$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$4a^2 - 9$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 11</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola $(5 + x)(5 - x)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Qui il termine "fisso" è $5$ e quello che cambia segno è $x$: attenzione all'ordine!</p>
+          <p><span class="step-num">2</span>$5^2 - x^2 = 25 - x^2$. (Non $x^2 - 25$: sarebbe il risultato di $(x+5)(x-5)$.)</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$25 - x^2$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 12</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola $(3m + 2n)(3m - 2n)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$(3m)^2 = 9m^2$; &nbsp; $(2n)^2 = 4n^2$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$9m^2 - 4n^2$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — ALTRI PRODOTTI NOTEVOLI -->
+    <section id="sec5">
+      <h2>5. Altri prodotti notevoli</h2>
+
+      <p>La famiglia dei prodotti notevoli è più numerosa: eccone altri due che vale la pena avere in tasca.</p>
+
+      <h3>5.1 — Il quadrato del trinomio</h3>
+      <p>E se invece di due termini ne avessimo <strong>tre</strong>? La logica non cambia: si fa "ogni con ogni" e
+        si contano i doppi prodotti — che ora sono tre, uno per ogni <em>coppia</em> di termini.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Quadrato del trinomio</div>
+        $$(a+b+c)^2 = a^2 + b^2 + c^2 + 2ab + 2ac + 2bc$$
+        <p class="formula-note">La somma dei tre quadrati, più il doppio prodotto di <strong>ogni coppia</strong>:
+          $a$ con $b$, $a$ con $c$, $b$ con $c$. (Se un termine è negativo, porta il suo segno dentro i doppi
+          prodotti che lo riguardano.)</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 13</span><span class="difficulty easy">Facile</span></div>
+        <p>Sviluppa $(x + y + 1)^2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Quadrati: $x^2 + y^2 + 1$.</p>
+          <p><span class="step-num">2</span>Doppi prodotti delle tre coppie: $2xy$, &nbsp; $2 \cdot x \cdot 1 = 2x$, &nbsp; $2 \cdot y \cdot 1 = 2y$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$x^2 + y^2 + 1 + 2xy + 2x + 2y$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 14</span><span class="difficulty medium">Medio</span></div>
+        <p>Sviluppa $(a - b + 2)^2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Leggo i tre termini <em>col loro segno</em>: $a$, &nbsp; $-b$, &nbsp; $+2$.</p>
+          <p><span class="step-num">2</span>Quadrati: $a^2 + b^2 + 4$ (il quadrato di $-b$ è $+b^2$: esponente pari!).</p>
+          <p><span class="step-num">3</span>Doppi prodotti: $2 \cdot a \cdot (-b) = -2ab$; &nbsp; $2 \cdot a \cdot 2 = 4a$; &nbsp; $2 \cdot (-b) \cdot 2 = -4b$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$a^2 + b^2 + 4 - 2ab + 4a - 4b$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 15</span><span class="difficulty medium">Medio</span></div>
+        <p>Sviluppa $(2x + y - 3)^2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Termini: $2x$, &nbsp; $y$, &nbsp; $-3$. Quadrati: $4x^2 + y^2 + 9$.</p>
+          <p><span class="step-num">2</span>Doppi prodotti: $2 \cdot 2x \cdot y = 4xy$; &nbsp; $2 \cdot 2x \cdot (-3) = -12x$; &nbsp; $2 \cdot y \cdot (-3) = -6y$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$4x^2 + y^2 + 9 + 4xy - 12x - 6y$</span></div>
+        </div>
+      </div>
+
+      <h3>5.2 — Il cubo del binomio</h3>
+      <p>Saliamo di un piano: invece del quadrato, il <strong>cubo</strong>.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Cubo del binomio</div>
+        $$(a+b)^3 = a^3 + 3a^2b + 3ab^2 + b^3$$
+        $$(a-b)^3 = a^3 - 3a^2b + 3ab^2 - b^3$$
+        <p class="formula-note">Il cubo del primo, più il triplo del quadrato del primo per il secondo, più il triplo
+          del primo per il quadrato del secondo, più il cubo del secondo. Con la differenza, i segni si
+          <strong>alternano</strong>: $+ - + -$. Notate quei coefficienti $1, 3, 3, 1$: li ritroveremo tra pochissimo
+          in un posto sorprendente...</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 16</span><span class="difficulty easy">Facile</span></div>
+        <p>Sviluppa $(x + 2)^3$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$a = x$, $b = 2$. Cubo del primo: $x^3$.</p>
+          <p><span class="step-num">2</span>$3a^2b = 3 \cdot x^2 \cdot 2 = 6x^2$; &nbsp; $3ab^2 = 3 \cdot x \cdot 4 = 12x$; &nbsp; $b^3 = 8$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$x^3 + 6x^2 + 12x + 8$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 17</span><span class="difficulty medium">Medio</span></div>
+        <p>Sviluppa $(a - 1)^3$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>È una differenza: i segni si alternano $+ - + -$.</p>
+          <p><span class="step-num">2</span>$a^3 - 3a^2 \cdot 1 + 3a \cdot 1 - 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$a^3 - 3a^2 + 3a - 1$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 18</span><span class="difficulty medium">Medio</span></div>
+        <p>Sviluppa $(2x + y)^3$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$a = 2x$, $b = y$. Cubo del primo: $(2x)^3 = 8x^3$.</p>
+          <p><span class="step-num">2</span>$3(2x)^2 y = 3 \cdot 4x^2 \cdot y = 12x^2y$; &nbsp; $3 \cdot 2x \cdot y^2 = 6xy^2$; &nbsp; $y^3$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$8x^3 + 12x^2y + 6xy^2 + y^3$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — IL TRIANGOLO (FACOLTATIVA) -->
+    <section id="sec6" class="optional">
+      <h2>6. Il triangolo aritmetico</h2>
+
+      <p>Avete notato i coefficienti dei nostri prodotti notevoli? Nel quadrato $(a+b)^2$ sono $1, 2, 1$; nel cubo
+        $(a+b)^3$ sono $1, 3, 3, 1$. Non è un caso: sono le righe di una delle figure più celebri e più
+        <em>riscoperte</em> della matematica — il <strong>triangolo aritmetico</strong>.</p>
+
+      <p>Si costruisce con una regola di una semplicità disarmante: si parte da $1$; ai bordi si scrive sempre $1$; e
+        <strong>ogni numero è la somma dei due che stanno sopra di lui</strong>. Costruiscilo tu, riga per riga — e
+        clicca un numero qualsiasi per vedere da quali due nasce:</p>
+
+      <div class="controls">
+        <button class="btn" id="tt-add">➕ aggiungi una riga</button>
+        <button class="btn" id="tt-less">➖ togli una riga</button>
+        <div class="frame-tabs">
+          <button class="btn" id="tt-sum">Σ somma delle righe</button>
+          <button class="btn" id="tt-p11">potenze di 11</button>
+          <button class="btn" id="tt-diag">diagonali</button>
+        </div>
+      </div>
+      <div class="ckt"><div class="tt-wrap" id="tt-grid"></div></div>
+      <p class="eq-out" id="tt-out">Clicca un numero per vedere la somma che lo genera, o prova i pulsanti qui sopra.</p>
+
+      <h3>6.1 — Un triangolo, tanti nomi (e tanti popoli)</h3>
+      <p>Qui c'è una lezione di storia che vale quanto la matematica. Questo triangolo <strong>non è stato inventato
+        una volta sola</strong>: è stato scoperto (o inventato?) in modo indipendente da civiltà lontanissime tra
+        loro, che non si erano mai parlate.</p>
+
+      <ul>
+        <li><strong>India</strong>, attorno al II secolo a.C.: lo studioso <strong>Pingala</strong> ne descrive la
+          struttura studiando le combinazioni delle sillabe in poesia; i commentatori successivi la chiamano
+          <em>«la scala del monte Meru»</em>.</li>
+        <li><strong>Mondo persiano-arabo</strong>, attorno all'anno 1000: <strong>al-Karajī</strong> e poi
+          <strong>Omar Khayyām</strong> — sì, lo stesso che scriveva poesie — lo usano per le potenze dei binomi. In
+          Iran si chiama ancora oggi <em>triangolo di Khayyām</em>.</li>
+        <li><strong>Cina</strong>, XI-XIII secolo: <strong>Jia Xian</strong> e <strong>Yang Hui</strong> lo studiano
+          a fondo; in Cina è il <em>triangolo di Yang Hui</em>.</li>
+        <li><strong>Italia</strong>, 1556: <strong>Niccolò Fontana</strong>, detto <strong>Tartaglia</strong>, lo
+          pubblica — ed è il nome con cui lo conoscete voi.</li>
+        <li><strong>Francia</strong>, 1654: <strong>Blaise Pascal</strong> gli dedica un intero trattato; nel mondo
+          anglosassone e francese è <em>il triangolo di Pascal</em>.</li>
+      </ul>
+
+      <div class="curiosita">
+        <strong>Perché "Tartaglia"?</strong> Niccolò Fontana era un ragazzino di Brescia quando, nel 1512, i soldati
+        francesi saccheggiarono la città: una sciabolata al volto gli lasciò un difetto di pronuncia permanente. Da
+        lì il soprannome — <em>tartaglia</em>, cioè balbuziente — che lui stesso adottò firmando le proprie opere.
+        Uno dei più grandi matematici del Rinascimento portava come nome d'arte lo scherno dei compagni.
+      </div>
+
+      <div class="rule">
+        <strong>La morale.</strong> Popoli diversi, secoli diversi, lingue diverse: stessa identica figura. È un
+        indizio potente sulla domanda della lezione 1 — la matematica si <em>scopre</em> o si <em>inventa</em>? Se
+        fosse pura invenzione umana, perché indiani, persiani, cinesi, italiani e francesi avrebbero inventato
+        esattamente <strong>la stessa cosa</strong>?
+      </div>
+
+      <h3>6.2 — I tesori nascosti nel triangolo</h3>
+      <p>Questo triangolo è una miniera. Alcune delle sue proprietà (provale con i pulsanti della simulazione!):</p>
+      <ul>
+        <li><strong>La somma di ogni riga è una potenza di 2</strong>: $1, 2, 4, 8, 16, 32, \ldots$ La riga $n$ somma
+          esattamente $2^n$.</li>
+        <li><strong>Le righe sono le potenze di 11</strong>: $11^0 = 1$; $11^1 = 11$; $11^2 = 121$; $11^3 = 1331$;
+          $11^4 = 14641$ — leggete le righe come se fossero numeri! (Dalla quinta riga i numeri a due cifre
+          "sbordano" e bisogna fare i riporti; con le <strong>potenze di 101</strong> il gioco regge molto più a
+          lungo, perché ogni coefficiente ha due caselle a disposizione: $101^2 = 10201$, $101^3 = 1030301$,
+          $101^4 = 104060401$.)</li>
+        <li><strong>Le diagonali sono famiglie di numeri famosi</strong>: la prima è fatta di tutti $1$; la seconda
+          sono i <strong>numeri naturali</strong> $1, 2, 3, 4, \ldots$; la terza sono i <strong>numeri
+          triangolari</strong> $1, 3, 6, 10, 15$ (i pallini che formano un triangolo, come le bocce del biliardo);
+          la quarta i <strong>numeri tetraedrici</strong> $1, 4, 10, 20$ (le palline impilate a piramide).</li>
+        <li><strong>Le diagonali "oblique" nascondono Fibonacci</strong>: sommando i numeri lungo le diagonali
+          inclinate si ottiene $1, 1, 2, 3, 5, 8, 13, \ldots$ — la successione di Fibonacci, quella dei conigli e
+          delle spirali dei girasoli.</li>
+        <li><strong>La somma a segni alterni di ogni riga (dalla seconda in poi) fa zero</strong>: per esempio
+          $1 - 4 + 6 - 4 + 1 = 0$.</li>
+      </ul>
+
+      <h3>6.3 — Il coefficiente binomiale (e perché il triangolo ci serve)</h3>
+      <p>Ogni numero del triangolo ha un nome e un significato preciso.</p>
+
+      <div class="definition">
+        Il numero che sta nella riga $n$, posizione $k$ (contando da zero!) si chiama <strong>coefficiente
+        binomiale</strong> e si scrive $\binom{n}{k}$, che si legge <em>«n su k»</em>. Il suo significato è
+        concretissimo: è il <strong>numero di modi di scegliere $k$ oggetti tra $n$</strong>, senza tener conto
+        dell'ordine.
+      </div>
+
+      <p>Esempio: quante coppie diverse posso formare scegliendo 2 persone in un gruppo di 5? Guardo il triangolo,
+        riga 5, posizione 2: c'è scritto <strong>10</strong>. E infatti $\binom{5}{2} = 10$. Ecco perché questi
+        numeri sono importanti ben oltre l'algebra: servono ogni volta che bisogna <strong>contare le
+        possibilità</strong> — dalle combinazioni del Superenalotto alle probabilità in genetica.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il binomio di Newton</div>
+        $$(a+b)^n = \binom{n}{0}a^n + \binom{n}{1}a^{n-1}b + \binom{n}{2}a^{n-2}b^2 + \ldots + \binom{n}{n}b^n$$
+        <p class="formula-note">In parole: per elevare un binomio alla $n$, prendo i coefficienti dalla
+          <strong>riga $n$ del triangolo</strong>; gli esponenti di $a$ <em>scendono</em> da $n$ a $0$ mentre quelli
+          di $b$ <em>salgono</em> da $0$ a $n$. Verifica con la riga 3 ($1, 3, 3, 1$):
+          $(a+b)^3 = a^3 + 3a^2b + 3ab^2 + b^3$ — proprio il cubo del binomio della sezione 5! E con la riga 2
+          ($1, 2, 1$) esce il quadrato del binomio.</p>
+      </div>
+
+      <p>Morale pratica: <strong>non dovete imparare a memoria nessuna formula</strong> per $(a+b)^4$ o $(a+b)^5$. Vi
+        basta costruire il triangolo fino alla riga giusta — e ci arrivate con delle semplici somme.</p>
+    </section>
+
+    <!-- 7 — DIVISIONE TRA POLINOMI -->
+    <section id="sec7">
+      <h2>7. La divisione tra polinomi</h2>
+
+      <p>Sappiamo sommare e moltiplicare i polinomi. Manca la divisione — e funziona esattamente come la
+        <strong>divisione in colonna</strong> che fate dalle elementari con i numeri: si ottengono un
+        <strong>quoziente</strong> e un <strong>resto</strong>.</p>
+
+      <div class="definition">
+        Dividere il polinomio $A(x)$ (<em>dividendo</em>) per $B(x)$ (<em>divisore</em>) significa trovare due
+        polinomi $Q(x)$ (<em>quoziente</em>) e $R(x)$ (<em>resto</em>) tali che
+        $$A(x) = B(x) \cdot Q(x) + R(x)$$
+        con il grado di $R$ minore del grado di $B$. Se $R(x) = 0$ si dice che $A$ è <strong>divisibile</strong> per
+        $B$ — proprio come per i numeri interi (lezione 4).
+      </div>
+
+      <p>Il procedimento, passo per passo:</p>
+      <div class="rule">
+        <strong>1)</strong> Ordino entrambi i polinomi per potenze <strong>decrescenti</strong>.
+        <br><strong>2)</strong> Divido il primo termine del dividendo per il primo termine del divisore: ottengo il
+        primo termine del quoziente.
+        <br><strong>3)</strong> Moltiplico quel termine per <em>tutto</em> il divisore e <strong>sottraggo</strong>
+        il risultato dal dividendo.
+        <br><strong>4)</strong> Ripeto con quello che resta, finché il grado del resto diventa minore di quello del
+        divisore.
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">Esempio guidato: $(x^2 + 5x + 6) : (x + 2)$</div>
+        <table class="polydiv">
+          <tr>
+            <td class="work">$x^2 + 5x + 6$</td>
+            <td class="divi bar">$x + 2$</td>
+          </tr>
+          <tr>
+            <td class="work sub">$-(x^2 + 2x)$</td>
+            <td class="divi quo">$x + 3$ &nbsp;<span class="lbl-s" style="color:var(--muted); font-weight:400;">← quoziente</span></td>
+          </tr>
+          <tr>
+            <td class="work">$3x + 6$</td>
+            <td class="divi"></td>
+          </tr>
+          <tr>
+            <td class="work sub">$-(3x + 6)$</td>
+            <td class="divi"></td>
+          </tr>
+          <tr>
+            <td class="work rest">$0$ &nbsp;<span class="lbl-s" style="color:var(--muted); font-weight:400;">← resto</span></td>
+            <td class="divi"></td>
+          </tr>
+        </table>
+        <p class="formula-note">$x^2 : x = x$ (primo pezzo); $x(x+2) = x^2+2x$, sottraggo e resta $3x+6$;
+          $3x : x = 3$ (secondo pezzo); $3(x+2) = 3x+6$, sottraggo e resta $0$. Quindi
+          $(x^2+5x+6) : (x+2) = x+3$, senza resto. <strong>Controprova</strong>: $(x+2)(x+3) = x^2+5x+6$ ✓</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 19</span><span class="difficulty easy">Facile</span></div>
+        <p>Calcola $(2x^2 + 7x + 3) : (x + 3)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$2x^2 : x = 2x$ → primo termine del quoziente.</p>
+          <p><span class="step-num">2</span>$2x(x+3) = 2x^2 + 6x$; sottraggo: $(2x^2+7x+3) - (2x^2+6x) = x + 3$.</p>
+          <p><span class="step-num">3</span>$x : x = 1$ → secondo termine. $1 \cdot (x+3) = x+3$; sottraggo: $0$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">Quoziente $2x + 1$, resto $0$. &nbsp;(Controprova: $(x+3)(2x+1) = 2x^2+7x+3$ ✓)</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 20</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola $(x^3 - 1) : (x - 1)$. <em>(Attenzione: mancano i termini in $x^2$ e in $x$!)</em></p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Scrivo il dividendo <strong>completo</strong>, con gli "zeri" al posto dei termini mancanti: $x^3 + 0x^2 + 0x - 1$. È il trucco che evita quasi tutti gli errori.</p>
+          <p><span class="step-num">2</span>$x^3 : x = x^2$; &nbsp; $x^2(x-1) = x^3 - x^2$; sottraggo → $x^2 + 0x - 1$.</p>
+          <p><span class="step-num">3</span>$x^2 : x = x$; &nbsp; $x(x-1) = x^2 - x$; sottraggo → $x - 1$.</p>
+          <p><span class="step-num">4</span>$x : x = 1$; &nbsp; $1(x-1) = x-1$; sottraggo → $0$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">Quoziente $x^2 + x + 1$, resto $0$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 21</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola $(x^2 + 3x + 5) : (x + 1)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$x^2 : x = x$; &nbsp; $x(x+1) = x^2+x$; sottraggo → $2x + 5$.</p>
+          <p><span class="step-num">2</span>$2x : x = 2$; &nbsp; $2(x+1) = 2x+2$; sottraggo → $3$.</p>
+          <p><span class="step-num">3</span>Il resto è $3$: ha grado $0$, minore del grado del divisore (che è 1). Mi fermo.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">Quoziente $x + 2$, <strong>resto 3</strong>. &nbsp;Verifica: $(x+1)(x+2) + 3 = x^2+3x+2+3$ ✓</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 22</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola $(2x^3 + 3x^2 - 4x - 5) : (2x + 1)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$2x^3 : 2x = x^2$; &nbsp; $x^2(2x+1) = 2x^3 + x^2$; sottraggo → $2x^2 - 4x - 5$.</p>
+          <p><span class="step-num">2</span>$2x^2 : 2x = x$; &nbsp; $x(2x+1) = 2x^2 + x$; sottraggo → $-5x - 5$.</p>
+          <p><span class="step-num">3</span>$-5x : 2x = -\dfrac{5}{2}$; &nbsp; $-\dfrac{5}{2}(2x+1) = -5x - \dfrac{5}{2}$; sottraggo → $-5 + \dfrac{5}{2} = -\dfrac{5}{2}$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">Quoziente $x^2 + x - \dfrac{5}{2}$, resto $-\dfrac{5}{2}$. &nbsp;(I coefficienti frazionari sono perfettamente leciti: siamo nei razionali!)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — RUFFINI -->
+    <section id="sec8">
+      <h2>8. Il teorema di Ruffini</h2>
+
+      <p>La divisione in colonna funziona sempre, ma è lunga. Quando il divisore ha la forma particolarmente comune
+        $(x - a)$ — cioè $x$ meno un numero — esiste una scorciatoia spettacolare, dovuta al matematico italiano
+        <strong>Paolo Ruffini</strong> (1765-1822).</p>
+
+      <div class="rule">
+        <strong>Teorema del resto.</strong> Il resto della divisione di un polinomio $P(x)$ per $(x - a)$ è
+        semplicemente $P(a)$: il valore che il polinomio assume sostituendo $a$ al posto della $x$.
+        <br><br><strong>Teorema di Ruffini.</strong> Di conseguenza: $P(x)$ è <strong>divisibile</strong> per
+        $(x - a)$ (cioè il resto è zero) <strong>se e solo se</strong> $P(a) = 0$.
+      </div>
+
+      <div class="note">
+        <strong>Una nota di onestà.</strong> Qui il teorema ve lo diamo <strong>senza dimostrazione</strong>, per
+        brevità: fidatevi per ora. Ma la dimostrazione esiste, è breve ed elegante — chi è curioso può cercarla
+        (parte dalla definizione $P(x) = (x-a)Q(x) + R$ e sostituisce $x = a$...) oppure, meglio ancora, provare a
+        ricavarla da solo. Sarebbe il modo migliore di onorare la lezione 2!
+      </div>
+
+      <p>Il teorema si accompagna alla <strong>regola di Ruffini</strong>, uno schema che calcola quoziente e resto
+        con sole moltiplicazioni e addizioni. Si scrivono i coefficienti del dividendo (tutti, zeri compresi), a
+        sinistra il numero $a$, e poi: <em>abbasso il primo coefficiente; lo moltiplico per $a$ e lo sommo al
+        successivo; ripeto</em>. L'ultimo numero che esce è il resto, gli altri sono i coefficienti del
+        quoziente.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Esempio guidato: $(x^3 - 2x^2 - 5x + 6) : (x - 1)$</div>
+        <table class="ruffini">
+          <tr>
+            <td class="acol"></td>
+            <td>$1$</td><td>$-2$</td><td>$-5$</td><td>$6$</td>
+          </tr>
+          <tr>
+            <td class="acol">$1$</td>
+            <td></td><td>$+1$</td><td>$-1$</td><td>$-6$</td>
+          </tr>
+          <tr class="sum">
+            <td class="acol"></td>
+            <td class="quo">$1$</td><td class="quo">$-1$</td><td class="quo">$-6$</td><td class="rest">$0$</td>
+          </tr>
+        </table>
+        <p style="text-align:center; margin:0.2rem 0 0;" class="lbl-s">
+          <span style="color:var(--accent); font-weight:700;">↑ coefficienti del quoziente</span> &nbsp;·&nbsp;
+          <span style="color:var(--magenta); font-weight:700;">resto ↑</span></p>
+        <p class="formula-note">Nella prima riga i coefficienti del dividendo; a sinistra il valore $a = 1$.
+          Abbasso l'$1$; $1 \times 1 = 1$, lo scrivo sotto il $-2$ e sommo → $-1$; $-1 \times 1 = -1$, lo scrivo
+          sotto il $-5$ e sommo → $-6$; $-6 \times 1 = -6$, lo scrivo sotto il $6$ e sommo → $\mathbf{0}$: è il
+          <strong>resto</strong>. I numeri rimasti a sinistra della barretta, $1, -1, -6$, sono i coefficienti del
+          <strong>quoziente</strong>, che ha un grado in meno: $\mathbf{x^2 - x - 6}$.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 23</span><span class="difficulty easy">Facile</span></div>
+        <p>Usa Ruffini per calcolare $(x^3 + 3x^2 - 4) : (x + 2)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Il divisore è $x + 2 = x - (-2)$, quindi $a = \mathbf{-2}$ (attenzione al segno!).</p>
+          <p><span class="step-num">2</span>Coefficienti completi: $1, \; 3, \; 0, \; -4$ (manca il termine in $x$: metto 0).</p>
+          <p><span class="step-num">3</span>Abbasso $1$; $1 \cdot (-2) = -2$, sommo a $3$ → $1$; $1 \cdot (-2) = -2$, sommo a $0$ → $-2$; $-2 \cdot (-2) = 4$, sommo a $-4$ → $0$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">Quoziente $x^2 + x - 2$, resto $0$: il polinomio è divisibile.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 24</span><span class="difficulty medium">Medio</span></div>
+        <p>Usa Ruffini per calcolare $(2x^3 - 3x^2 + 1) : (x - 1)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$a = 1$. Coefficienti: $2, \; -3, \; 0, \; 1$.</p>
+          <p><span class="step-num">2</span>Abbasso $2$; $2 \cdot 1 = 2$, sommo a $-3$ → $-1$; $-1 \cdot 1 = -1$, sommo a $0$ → $-1$; $-1 \cdot 1 = -1$, sommo a $1$ → $0$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">Quoziente $2x^2 - x - 1$, resto $0$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 25</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola $(x^3 + x + 1) : (x - 2)$ con Ruffini. Il polinomio è divisibile?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$a = 2$. Coefficienti completi: $1, \; 0, \; 1, \; 1$.</p>
+          <p><span class="step-num">2</span>Abbasso $1$; $1 \cdot 2 = 2$, sommo a $0$ → $2$; $2 \cdot 2 = 4$, sommo a $1$ → $5$; $5 \cdot 2 = 10$, sommo a $1$ → $\mathbf{11}$.</p>
+          <p><span class="step-num">3</span>Il resto è $11 \ne 0$: <strong>non</strong> è divisibile. E infatti il teorema del resto lo prevedeva: $P(2) = 8 + 2 + 1 = 11$ ✓</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">Quoziente $x^2 + 2x + 5$, resto $11$.</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 26</span><span class="difficulty hard">Difficile</span></div>
+        <p>Senza fare nessuna divisione, stabilisci se $P(x) = x^3 - 4x^2 + x + 6$ è divisibile per $(x - 3)$. Poi, se
+          lo è, trova il quoziente.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Per il teorema di Ruffini basta calcolare $P(3)$:
+            $27 - 36 + 3 + 6 = \mathbf{0}$. Sì, è divisibile — e non ho fatto nessuna divisione!</p>
+          <p><span class="step-num">2</span>Ora il quoziente con lo schema ($a = 3$; coefficienti $1, -4, 1, 6$):
+            abbasso $1$; $3$ sommato a $-4$ → $-1$; $-3$ sommato a $1$ → $-2$; $-6$ sommato a $6$ → $0$ ✓</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">Divisibile; quoziente $x^2 - x - 2$.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 — LE ESPRESSIONI ALGEBRICHE -->
+    <section id="sec9">
+      <h2>9. Le espressioni algebriche: mettiamo tutto insieme</h2>
+
+      <p>Ed eccoci al gran finale, dove tutti gli attrezzi lavorano insieme. Un'<strong>espressione
+        algebrica</strong> è una lunga catena di operazioni con le lettere — parentesi, prodotti notevoli, potenze —
+        che va <strong>semplificata</strong> applicando le regole nell'ordine giusto (lezione 5!), fino ad arrivare a
+        un polinomio ridotto ai minimi termini.</p>
+
+      <div class="rule">
+        <strong>Il punto più importante di tutta la lezione.</strong> In ogni passaggio della semplificazione c'è
+        sempre il segno di <strong>uguale</strong>: l'espressione lunga e complicata dell'inizio e il polinomio corto
+        della fine sono <strong>la stessa identica cosa</strong>, scritta in due modi diversi. È come una frase
+        detta prima in modo contorto, con mille parole, e poi ripetuta «riassumendo»: il <em>significato</em> non
+        cambia mai. Semplificare non significa cambiare il valore: significa <strong>vestirlo meglio</strong> — come
+        le frazioni equivalenti della lezione 4.
+      </div>
+
+      <p>Vediamone una svolta per intero, passo per passo:</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Esempio completo</div>
+        $$(2x+1)^2 - (x-3)(x+3) - 3x(x+2) + 5$$
+        <p style="text-align:left; margin:0.6rem 0 0;"><strong>1.</strong> Sviluppo il <em>quadrato di binomio</em>:
+          $(2x+1)^2 = 4x^2 + 4x + 1$.</p>
+        <p style="text-align:left; margin:0.3rem 0 0;"><strong>2.</strong> Sviluppo la <em>somma per differenza</em>:
+          $(x-3)(x+3) = x^2 - 9$.</p>
+        <p style="text-align:left; margin:0.3rem 0 0;"><strong>3.</strong> Sviluppo il prodotto con la
+          <em>distributiva</em>: $3x(x+2) = 3x^2 + 6x$.</p>
+        <p style="text-align:left; margin:0.3rem 0 0;"><strong>4.</strong> Riscrivo tutto, <strong>attentissimo ai
+          segni meno davanti alle parentesi</strong>:</p>
+        $$= 4x^2 + 4x + 1 - x^2 + 9 - 3x^2 - 6x + 5$$
+        <p style="text-align:left; margin:0.3rem 0 0;"><strong>5.</strong> Raggruppo i termini simili:</p>
+        $$= \underbrace{(4 - 1 - 3)}_{= \, 0}x^2 + \underbrace{(4 - 6)}_{= \, -2}x + \underbrace{(1 + 9 + 5)}_{= \, 15}$$
+        <p style="text-align:left; margin:0.3rem 0 0;"><strong>6.</strong> I termini in $x^2$ si annullano
+          completamente:</p>
+        $$= -2x + 15$$
+        <p class="formula-note">Tutta quella roba iniziale <strong>è</strong> $-2x + 15$. Prova a verificarlo: metti
+          $x = 1$ nell'espressione di partenza (viene $9 - (-8) - 9 + 5 = 13$) e nel risultato
+          ($-2 + 15 = 13$) ✓ — stesso numero, come deve essere.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 27</span><span class="difficulty easy">Facile</span></div>
+        <p>Semplifica: $(x+2)^2 - (x+1)(x-1)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Quadrato di binomio: $(x+2)^2 = x^2 + 4x + 4$. Somma per differenza: $(x+1)(x-1) = x^2 - 1$.</p>
+          <p><span class="step-num">2</span>$x^2 + 4x + 4 - (x^2 - 1) = x^2 + 4x + 4 - x^2 + 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$4x + 5$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 28</span><span class="difficulty medium">Medio</span></div>
+        <p>Semplifica: $(a+b)^2 - (a-b)^2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>$(a+b)^2 = a^2 + 2ab + b^2$; &nbsp; $(a-b)^2 = a^2 - 2ab + b^2$.</p>
+          <p><span class="step-num">2</span>$a^2 + 2ab + b^2 - a^2 + 2ab - b^2$ (il meno cambia <em>tutti</em> i segni della seconda parentesi).</p>
+          <p><span class="step-num">3</span>Si annullano $a^2$ e $b^2$; restano $2ab + 2ab$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$4ab$ &nbsp;(un risultato elegantissimo: la differenza dei due quadrati di binomio è quattro volte il prodotto!)</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 29</span><span class="difficulty medium">Medio</span></div>
+        <p>Semplifica: $(2x-1)(2x+1) - (2x-1)^2$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Somma per differenza: $(2x-1)(2x+1) = 4x^2 - 1$.</p>
+          <p><span class="step-num">2</span>Quadrato di binomio: $(2x-1)^2 = 4x^2 - 4x + 1$.</p>
+          <p><span class="step-num">3</span>$4x^2 - 1 - 4x^2 + 4x - 1$.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$4x - 2$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 30</span><span class="difficulty hard">Difficile</span></div>
+        <p>Semplifica: $(x+1)^3 - (x+1)(x^2-x+1) - 3x(x+1)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Cubo del binomio: $(x+1)^3 = x^3 + 3x^2 + 3x + 1$.</p>
+          <p><span class="step-num">2</span>Il secondo prodotto, "ogni con ogni": $(x+1)(x^2-x+1) = x^3 - x^2 + x + x^2 - x + 1 = x^3 + 1$. <em>(È un altro prodotto notevole, la somma di due cubi: lo incontrerete presto!)</em></p>
+          <p><span class="step-num">3</span>Distributiva: $3x(x+1) = 3x^2 + 3x$.</p>
+          <p><span class="step-num">4</span>$x^3 + 3x^2 + 3x + 1 - x^3 - 1 - 3x^2 - 3x$: si annulla <strong>tutto</strong>.</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$0$ &nbsp;— quell'espressione lunghissima vale zero <em>per qualunque valore di $x$</em>. Provate con $x = 7$ per credere!</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 — TRADUZIONE AVANZATA -->
+    <section id="sec10">
+      <h2>10. Tradurre in matematichese (livello avanzato)</h2>
+
+      <p>Nella lezione 7 ci siamo allenati a tradurre frasi semplici in formule. Ora che sappiamo maneggiare quadrati,
+        cubi e prodotti notevoli, possiamo alzare l'asticella: frasi più insidiose, dove <strong>l'ordine delle
+        parole cambia tutto</strong>. Leggi, prova a scrivere la formula sul quaderno, poi rivela.</p>
+
+      <div class="controls">
+        <div class="frame-tabs">
+          <button class="btn active" id="tr2-it">🇮🇹 dall'italiano</button>
+          <button class="btn" id="tr2-mat">🔢 dal matematichese</button>
+        </div>
+      </div>
+      <div class="ckt" style="min-height:140px;">
+        <p id="tr2-q" style="font-weight:600;"></p>
+        <div class="controls"><button class="btn btn-toggle" id="tr2-btn">💡 Mostra la traduzione</button>
+          <button class="btn" id="tr2-new">🔀 altra frase</button></div>
+        <p id="tr2-a" class="eq-out" style="display:none;"></p>
+      </div>
+
+      <div class="warning">
+        <strong>Attenzione alle trappole del linguaggio.</strong> «Il <em>quadrato della somma</em>» è $(a+b)^2$, ma
+        «la <em>somma dei quadrati</em>» è $a^2 + b^2$: due cose diversissime (differiscono proprio per il doppio
+        prodotto $2ab$!). In italiano l'ordine delle parole conta; in matematica lo dicono le
+        <strong>parentesi</strong>. È per questo che si scrivono con tanta pignoleria.
+      </div>
+
+      <div class="note">
+        <strong>Fine del tour... per quest'anno.</strong> Il nostro breve viaggio nell'algebra finisce qui, e mi
+        dispiace quasi: eravamo appena entrati nel vivo. Ma niente paura — l'anno prossimo si riprende
+        <strong>esattamente da questo punto</strong>: scomposizione dei polinomi, frazioni algebriche, equazioni. In
+        pratica, tutto quello che avete imparato in queste due lezioni sarà la cassetta degli attrezzi che userete
+        ogni singolo giorno. Custoditela bene.
+      </div>
+    </section>
+
+    <!-- 11 — QUIZ -->
+    <section id="quiz">
+      <h2>11. Quiz finale</h2>
+      <p>Dieci domande su prodotti notevoli, triangolo, divisione e Ruffini. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 8 — I prodotti notevoli · Matematica · Primo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezione 3: quadrato del binomio geometrico -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      (function () {
+        const svg = document.getElementById('qb-svg');
+        if (!svg) return;
+        const out = document.getElementById('qb-out');
+        const sa = document.getElementById('qb-a'), sb = document.getElementById('qb-b');
+        const bPlus = document.getElementById('qb-plus'), bMinus = document.getElementById('qb-minus');
+        let mode = 'plus';
+        const C_A2 = 'color-mix(in srgb, var(--accent) 34%, transparent)';
+        const C_AB = 'color-mix(in srgb, var(--gold) 34%, transparent)';
+        const C_B2 = 'color-mix(in srgb, var(--magenta) 34%, transparent)';
+        function draw() {
+          let a = +sa.value, b = +sb.value;
+          if (mode === 'minus' && b >= a) { b = a - 1; sb.value = b; }
+          document.getElementById('qb-a-val').textContent = a;
+          document.getElementById('qb-b-val').textContent = b;
+          const X0 = 190, Y0 = 26, MAX = 250;
+          let h = '';
+          if (mode === 'plus') {
+            const k = MAX / (a + b), A = a * k, B = b * k;
+            h += '<rect x="' + X0 + '" y="' + Y0 + '" width="' + A + '" height="' + A + '" fill="' + C_A2 + '" stroke="var(--accent)" stroke-width="2"/>' +
+                 '<text x="' + (X0 + A / 2) + '" y="' + (Y0 + A / 2 + 5) + '" text-anchor="middle" class="lbl">a&#178;</text>';
+            h += '<rect x="' + (X0 + A) + '" y="' + Y0 + '" width="' + B + '" height="' + A + '" fill="' + C_AB + '" stroke="var(--gold)" stroke-width="2"/>' +
+                 '<text x="' + (X0 + A + B / 2) + '" y="' + (Y0 + A / 2 + 5) + '" text-anchor="middle" class="lbl">ab</text>';
+            h += '<rect x="' + X0 + '" y="' + (Y0 + A) + '" width="' + A + '" height="' + B + '" fill="' + C_AB + '" stroke="var(--gold)" stroke-width="2"/>' +
+                 '<text x="' + (X0 + A / 2) + '" y="' + (Y0 + A + B / 2 + 5) + '" text-anchor="middle" class="lbl">ab</text>';
+            h += '<rect x="' + (X0 + A) + '" y="' + (Y0 + A) + '" width="' + B + '" height="' + B + '" fill="' + C_B2 + '" stroke="var(--magenta)" stroke-width="2"/>' +
+                 '<text x="' + (X0 + A + B / 2) + '" y="' + (Y0 + A + B / 2 + 5) + '" text-anchor="middle" class="lbl">b&#178;</text>';
+            // quote
+            h += '<line x1="' + X0 + '" y1="' + (Y0 - 12) + '" x2="' + (X0 + A) + '" y2="' + (Y0 - 12) + '" stroke="var(--accent)" stroke-width="2"/>' +
+                 '<text x="' + (X0 + A / 2) + '" y="' + (Y0 - 17) + '" text-anchor="middle" class="lbl-s" fill="var(--accent)">a = ' + a + '</text>' +
+                 '<line x1="' + (X0 + A) + '" y1="' + (Y0 - 12) + '" x2="' + (X0 + A + B) + '" y2="' + (Y0 - 12) + '" stroke="var(--gold)" stroke-width="2"/>' +
+                 '<text x="' + (X0 + A + B / 2) + '" y="' + (Y0 - 17) + '" text-anchor="middle" class="lbl-s" fill="var(--gold)">b = ' + b + '</text>';
+            h += '<text x="20" y="140" class="lbl">lato totale:</text>' +
+                 '<text x="20" y="162" class="lbl" fill="var(--accent)">a + b = ' + (a + b) + '</text>' +
+                 '<text x="20" y="196" class="lbl">area totale:</text>' +
+                 '<text x="20" y="218" class="lbl" fill="var(--magenta)">(a+b)&#178; = ' + ((a + b) * (a + b)) + '</text>';
+            svg.innerHTML = h;
+            out.innerHTML = 'Il quadrato grande ha area <strong>(' + a + '+' + b + ')&#178; = ' + ((a + b) * (a + b)) + '</strong>. ' +
+              'Sommando i quattro pezzi: <strong>' + (a * a) + '</strong> (a&#178;) + <strong>' + (a * b) + '</strong> + <strong>' + (a * b) + '</strong> (i due rettangoli ab) + <strong>' + (b * b) + '</strong> (b&#178;) = ' +
+              (a * a) + ' + ' + (2 * a * b) + ' + ' + (b * b) + ' = <strong>' + ((a + b) * (a + b)) + '</strong> ✓ &nbsp;→&nbsp; <em>a&#178; + 2ab + b&#178;</em>';
+          } else {
+            const k = MAX / a, A = a * k, B = b * k, S = (a - b) * k;
+            // quadrato piccolo (a-b)^2
+            h += '<rect x="' + X0 + '" y="' + Y0 + '" width="' + S + '" height="' + S + '" fill="' + C_A2 + '" stroke="var(--accent)" stroke-width="2.5"/>' +
+                 '<text x="' + (X0 + S / 2) + '" y="' + (Y0 + S / 2 + 5) + '" text-anchor="middle" class="lbl">(a&#8722;b)&#178;</text>';
+            // striscia verticale destra (a x b) e orizzontale sotto
+            h += '<rect x="' + (X0 + S) + '" y="' + Y0 + '" width="' + B + '" height="' + S + '" fill="' + C_AB + '" stroke="var(--gold)" stroke-width="2"/>';
+            h += '<rect x="' + X0 + '" y="' + (Y0 + S) + '" width="' + S + '" height="' + B + '" fill="' + C_AB + '" stroke="var(--gold)" stroke-width="2"/>';
+            // angolo b^2 (tolto due volte)
+            h += '<rect x="' + (X0 + S) + '" y="' + (Y0 + S) + '" width="' + B + '" height="' + B + '" fill="' + C_B2 + '" stroke="var(--magenta)" stroke-width="2.5"/>' +
+                 '<text x="' + (X0 + S + B / 2) + '" y="' + (Y0 + S + B / 2 + 5) + '" text-anchor="middle" class="lbl">b&#178;</text>';
+            // contorno quadrato grande
+            h += '<rect x="' + X0 + '" y="' + Y0 + '" width="' + A + '" height="' + A + '" fill="none" stroke="var(--text-soft)" stroke-width="2" stroke-dasharray="6 4"/>';
+            h += '<line x1="' + X0 + '" y1="' + (Y0 - 12) + '" x2="' + (X0 + A) + '" y2="' + (Y0 - 12) + '" stroke="var(--text-soft)" stroke-width="2"/>' +
+                 '<text x="' + (X0 + A / 2) + '" y="' + (Y0 - 17) + '" text-anchor="middle" class="lbl-s">a = ' + a + '</text>';
+            h += '<text x="20" y="130" class="lbl">tolgo due strisce</text>' +
+                 '<text x="20" y="152" class="lbl" fill="var(--gold)">2 &#215; ab = ' + (2 * a * b) + '</text>' +
+                 '<text x="20" y="186" class="lbl">ma l\'angolo b&#178;</text>' +
+                 '<text x="20" y="208" class="lbl" fill="var(--magenta)">l\'ho tolto 2 volte!</text>' +
+                 '<text x="20" y="230" class="lbl-s">&rarr; va riaggiunto</text>';
+            svg.innerHTML = h;
+            const res = (a - b) * (a - b);
+            out.innerHTML = 'Parto da a&#178; = <strong>' + (a * a) + '</strong>, tolgo le due strisce ab (' + (a * b) + ' + ' + (a * b) + ' = ' + (2 * a * b) + ')... ' +
+              'ma così il quadratino b&#178; = ' + (b * b) + ' l\'ho tolto <strong>due volte</strong>: lo riaggiungo. ' +
+              (a * a) + ' &#8722; ' + (2 * a * b) + ' + ' + (b * b) + ' = <strong>' + res + '</strong> = (' + a + '&#8722;' + b + ')&#178; ✓ &nbsp;→&nbsp; <em>a&#178; &#8722; 2ab + b&#178;</em>';
+          }
+        }
+        bPlus.addEventListener('click', function () { mode = 'plus'; bPlus.classList.add('active'); bMinus.classList.remove('active'); draw(); });
+        bMinus.addEventListener('click', function () { mode = 'minus'; bMinus.classList.add('active'); bPlus.classList.remove('active'); draw(); });
+        sa.addEventListener('input', draw); sb.addEventListener('input', draw);
+        draw();
+      })();
+    });
+  </script>
+
+  <!-- Demo sezione 6: il triangolo aritmetico -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      (function () {
+        const grid = document.getElementById('tt-grid');
+        if (!grid) return;
+        const out = document.getElementById('tt-out');
+        let rows = 6, mode = 'none', sel = null;
+        const TRI = [];
+        function build(n) {
+          TRI.length = 0;
+          for (let r = 0; r < n; r++) {
+            const row = [1];
+            // gli elementi interni (k = 1 ... r-1) sono la somma dei due sopra
+            for (let k = 1; k < r; k++) row.push(TRI[r - 1][k - 1] + TRI[r - 1][k]);
+            if (r > 0) row.push(1);   // il bordo destro
+            TRI.push(row);
+          }
+        }
+        function cls(r, k) {
+          if (sel && r === sel.r && k === sel.k) return ' new';
+          if (sel && r === sel.r - 1 && (k === sel.k - 1 || k === sel.k)) return ' par';
+          if (mode === 'diag' && k === 1) return ' par';
+          if (mode === 'diag' && k === 2) return ' dia';
+          return '';
+        }
+        function render() {
+          build(rows);
+          let h = '';
+          for (let r = 0; r < rows; r++) {
+            h += '<div class="tt-row">';
+            for (let k = 0; k < TRI[r].length; k++)
+              h += '<div class="tt-cell' + cls(r, k) + '" data-r="' + r + '" data-k="' + k + '">' + TRI[r][k] + '</div>';
+            if (mode === 'sum') {
+              const s = TRI[r].reduce(function (x, y) { return x + y; }, 0);
+              h += '<div class="tt-cell" style="background:transparent; border:none; color:var(--magenta); min-width:5.5rem;">= ' + s + ' = 2<sup>' + r + '</sup></div>';
+            }
+            if (mode === 'p11')
+              h += '<div class="tt-cell" style="background:transparent; border:none; color:var(--gold); min-width:6.5rem;">11<sup>' + r + '</sup> = ' + Math.pow(11, r) + '</div>';
+            h += '</div>';
+          }
+          grid.innerHTML = h;
+        }
+        grid.addEventListener('click', function (e) {
+          const c = e.target.closest('.tt-cell[data-r]'); if (!c) return;
+          const r = +c.dataset.r, k = +c.dataset.k;
+          if (r === 0) { sel = null; out.innerHTML = 'Il vertice del triangolo: si parte sempre da <strong>1</strong>.'; render(); return; }
+          sel = { r: r, k: k };
+          render();
+          const left = (k - 1 >= 0) ? TRI[r - 1][k - 1] : 0, right = (k < TRI[r - 1].length) ? TRI[r - 1][k] : 0;
+          if (k === 0 || k === TRI[r].length - 1)
+            out.innerHTML = 'Sono ai bordi: qui si scrive sempre <strong>1</strong> (sopra c\'è un solo numero, e "fuori" vale zero: ' + (left + right) + ' + 0 = 1... o meglio, per convenzione il bordo è 1).';
+          else
+            out.innerHTML = 'Il numero <strong>' + TRI[r][k] + '</strong> nasce dai due che stanno sopra: <strong>' + left + ' + ' + right + ' = ' + TRI[r][k] + '</strong>. &nbsp;In simboli è il coefficiente binomiale <strong>C(' + r + ', ' + k + ')</strong>: i modi di scegliere ' + k + ' oggetti tra ' + r + '.';
+        });
+        document.getElementById('tt-add').addEventListener('click', function () {
+          if (rows < 11) { rows++; sel = null; render(); out.innerHTML = 'Riga <strong>' + (rows - 1) + '</strong> aggiunta: ogni numero è la somma dei due sopra di lui. Cliccane uno per vederlo.'; }
+          else out.innerHTML = 'Fermiamoci qui: i numeri diventano troppo larghi per lo schermo — ma il triangolo continua all\'infinito!';
+        });
+        document.getElementById('tt-less').addEventListener('click', function () {
+          if (rows > 3) { rows--; sel = null; render(); }
+        });
+        function toggle(id, m, label) {
+          const b = document.getElementById(id);
+          b.addEventListener('click', function () {
+            const on = mode === m;
+            mode = on ? 'none' : m;
+            ['tt-sum', 'tt-p11', 'tt-diag'].forEach(function (i) { document.getElementById(i).classList.remove('active'); });
+            if (!on) b.classList.add('active');
+            sel = null; render();
+            if (!on) out.innerHTML = label;
+          });
+        }
+        toggle('tt-sum', 'sum', 'La somma di ogni riga è una <strong>potenza di 2</strong>: 1, 2, 4, 8, 16... la riga n somma esattamente 2<sup>n</sup>.');
+        toggle('tt-p11', 'p11', 'Leggendo ogni riga come un numero si ottengono le <strong>potenze di 11</strong>! Funziona fino alla riga 4: poi i numeri a due cifre sbordano e servono i riporti (con le potenze di 101 il gioco regge più a lungo).');
+        toggle('tt-diag', 'diag', 'In <span style="color:var(--gold);">giallo</span> la diagonale dei <strong>numeri naturali</strong> (1, 2, 3, 4...); in <span style="color:var(--magenta);">magenta</span> quella dei <strong>numeri triangolari</strong> (1, 3, 6, 10, 15...), i pallini che formano un triangolo come le bocce del biliardo.');
+        render();
+      })();
+    });
+  </script>
+
+  <!-- Demo sezione 10: traduzione avanzata -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      (function () {
+        const q = document.getElementById('tr2-q'), a = document.getElementById('tr2-a'), btn = document.getElementById('tr2-btn');
+        if (!q) return;
+        const IT = [
+          { it: 'Il <strong>quadrato della somma</strong> di due numeri.', mat: '\\((a+b)^2 = a^2 + 2ab + b^2\\)' },
+          { it: 'La <strong>somma dei quadrati</strong> di due numeri. <em>(Occhio: non è la stessa cosa di prima!)</em>', mat: '\\(a^2 + b^2\\) — manca il doppio prodotto rispetto a \\((a+b)^2\\).' },
+          { it: 'Il prodotto della somma di due numeri per la loro differenza.', mat: '\\((a+b)(a-b) = a^2 - b^2\\)' },
+          { it: 'Il cubo della differenza tra un numero e 2.', mat: '\\((x-2)^3 = x^3 - 6x^2 + 12x - 8\\)' },
+          { it: 'L\'area di un quadrato il cui lato viene aumentato di 5 metri.', mat: '\\((l+5)^2 = l^2 + 10l + 25\\) — il terreno guadagnato è \\(10l + 25\\).' },
+          { it: 'Il quadrato di un numero, diminuito di 3. <em>(E se invece fosse "il quadrato di (un numero diminuito di 3)"?)</em>', mat: 'Primo caso: \\(x^2 - 3\\). Secondo caso: \\((x-3)^2 = x^2 - 6x + 9\\). Le parentesi cambiano tutto!' },
+          { it: 'Di quanto l\'area di un quadrato di lato \\(a\\) supera quella di un quadrato di lato \\(b\\).', mat: '\\(a^2 - b^2 = (a+b)(a-b)\\)' }
+        ];
+        const MAT = [
+          { mat: '\\((x+y)^2 - (x^2+y^2)\\)', it: 'Di quanto il quadrato della somma supera la somma dei quadrati. Semplificando: \\(2xy\\), il doppio prodotto.' },
+          { mat: '\\((n+1)^2 - n^2\\)', it: 'La differenza tra il quadrato di un numero e il quadrato del suo precedente. Vale \\(2n+1\\): sempre dispari!' },
+          { mat: '\\(2(b+h)\\)', it: 'Il perimetro di un rettangolo di base \\(b\\) e altezza \\(h\\) (il doppio della somma delle due dimensioni).' },
+          { mat: '\\((a+b)^3\\)', it: 'Il cubo della somma di due numeri: il volume di un cubo il cui spigolo è la somma di due lunghezze.' },
+          { mat: '\\(\\pi(R^2 - r^2)\\)', it: 'L\'area di una corona circolare (il "ciambellone" tra due cerchi concentrici): area del cerchio grande meno quella del piccolo.' },
+          { mat: '\\(P(a) = 0\\)', it: 'Il numero \\(a\\) è una radice del polinomio \\(P\\) — e per il teorema di Ruffini, \\(P(x)\\) è divisibile per \\((x-a)\\).' }
+        ];
+        let mode = 'it', i = 0;
+        function show() {
+          const arr = mode === 'it' ? IT : MAT, item = arr[i % arr.length];
+          q.innerHTML = (mode === 'it' ? '<span class="lbl-s">Traduci in matematichese:</span><br>' : '<span class="lbl-s">Che cosa significa, in italiano?</span><br>') +
+            (mode === 'it' ? item.it : item.mat);
+          a.style.display = 'none';
+          a.innerHTML = '➜ ' + (mode === 'it' ? item.mat : item.it);
+          btn.textContent = '💡 Mostra la traduzione';
+          if (window.renderMathIn) window.renderMathIn(q);
+        }
+        btn.addEventListener('click', function () {
+          const vis = a.style.display !== 'none';
+          a.style.display = vis ? 'none' : 'block';
+          btn.textContent = vis ? '💡 Mostra la traduzione' : '🙈 Nascondi';
+          if (!vis && window.renderMathIn) window.renderMathIn(a);
+        });
+        document.getElementById('tr2-it').addEventListener('click', function () {
+          mode = 'it'; i = 0; this.classList.add('active'); document.getElementById('tr2-mat').classList.remove('active'); show();
+        });
+        document.getElementById('tr2-mat').addEventListener('click', function () {
+          mode = 'mat'; i = 0; this.classList.add('active'); document.getElementById('tr2-it').classList.remove('active'); show();
+        });
+        document.getElementById('tr2-new').addEventListener('click', function () { i++; show(); });
+        show();
+      })();
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Quanto vale $(a+b)^2$?',
+        options: ['$a^2 + b^2$', '$a^2 + 2ab + b^2$', '$a^2 - 2ab + b^2$', '$2a + 2b$', '$a^2 \\cdot b^2$'],
+        correct: 1, explain: 'Quadrato del primo + doppio prodotto + quadrato del secondo. Dimenticare il 2ab è l\'errore più diffuso: (3+4)² = 49, non 9+16 = 25.' },
+      { type: 'mc', diff: 'easy', text: 'Quanto vale $(x + 5)(x - 5)$?',
+        options: ['$x^2 + 25$', '$x^2 - 10x + 25$', '$x^2 - 25$', '$x^2 + 10x - 25$', '$x^2 - 5$'],
+        correct: 2, explain: 'Somma per differenza: i prodotti misti (−5x e +5x) si elidono e resta la differenza di quadrati, x² − 25.' },
+      { type: 'mc', diff: 'easy', text: 'Sviluppando $(a - b)^2$, il doppio prodotto:',
+        options: ['sparisce', 'è positivo, come sempre', 'diventa negativo: $-2ab$', 'raddoppia', 'diventa $-b^2$'],
+        correct: 2, explain: 'Geometricamente: dal quadrato a² tolgo due strisce ab (ecco il −2ab), ma il quadratino d\'angolo b² l\'ho tolto due volte, quindi lo riaggiungo: a² − 2ab + b².' },
+      { type: 'mc', diff: 'medium', text: 'Nello sviluppo di $(a+b+c)^2$ quanti doppi prodotti compaiono?',
+        options: ['nessuno', 'uno solo', 'due', 'tre: uno per ogni coppia di termini', 'sei'],
+        correct: 3, explain: 'Le coppie sono ab, ac, bc: tre doppi prodotti, più i tre quadrati. In totale sei termini.' },
+      { type: 'mc', diff: 'medium', text: 'Quali sono i coefficienti dello sviluppo di $(a+b)^4$?',
+        options: ['$1, 4, 4, 1$', '$1, 2, 4, 2, 1$', '$1, 4, 6, 4, 1$', '$1, 3, 3, 1$', '$4, 4, 4, 4$'],
+        correct: 2, explain: 'Sono la riga 4 del triangolo di Tartaglia: 1, 4, 6, 4, 1. Non serve ricordare la formula: basta costruire il triangolo con delle somme.' },
+      { type: 'mc', diff: 'medium', text: 'La somma dei numeri di una riga del triangolo di Tartaglia:',
+        options: ['è sempre 1', 'è una potenza di 2: la riga $n$ somma $2^n$', 'è un numero primo', 'è sempre dispari', 'cresce di 1 ogni riga'],
+        correct: 1, explain: 'Riga 0: 1; riga 1: 1+1 = 2; riga 2: 1+2+1 = 4; riga 3: 8... sempre 2ⁿ. (Le righe lette come numeri danno invece le potenze di 11!)' },
+      { type: 'mc', diff: 'medium', text: 'Nella divisione tra polinomi $A = B \\cdot Q + R$, il resto $R$:',
+        options: ['è sempre zero', 'ha grado minore del grado del divisore $B$', 'ha grado maggiore di $A$', 'è sempre un numero negativo', 'ha lo stesso grado di $B$'],
+        correct: 1, explain: 'Ci si ferma quando il grado del resto scende sotto quello del divisore — esattamente come nella divisione tra numeri, dove il resto è minore del divisore. Se R = 0, A è divisibile per B.' },
+      { type: 'mc', diff: 'hard', text: 'Per il teorema di Ruffini, $P(x)$ è divisibile per $(x - a)$ se e solo se:',
+        options: ['$P(0) = a$', '$P(a) = 0$', '$a$ è un numero primo', 'il grado di $P$ è pari', '$P(a) = a$'],
+        correct: 1, explain: 'Il resto della divisione per (x−a) è proprio P(a): se vale zero, la divisione è esatta. Permette di scoprire la divisibilità con una sola sostituzione, senza fare la divisione.' },
+      { type: 'mc', diff: 'hard', text: 'Usando i prodotti notevoli, quanto fa $103 \\times 97$?',
+        options: ['$9991$', '$10\\,000$', '$9891$', '$10\\,009$', '$9997$'],
+        correct: 0, explain: 'È (100+3)(100−3), una somma per differenza: 100² − 3² = 10 000 − 9 = 9991. Calcolo a mente in due secondi.' },
+      { type: 'open', diff: 'hard', text: 'Spiega la formula del quadrato del binomio $(a+b)^2$ usando l\'interpretazione geometrica (il quadrato di lato $a+b$), e poi spiega perché nel caso $(a-b)^2$ il doppio prodotto diventa negativo mentre $b^2$ resta positivo.',
+        keywords: ['quadrat', 'area', 'lato', 'rettangol', 'doppio prodotto', '2ab', 'togli', 'due volte', 'riaggiun', 'strisc', 'angolo', 'positiv'], requiredMatches: 4,
+        explain: 'Il quadrato di lato a+b si scompone in quattro pezzi: il quadrato a², il quadrato b² e DUE rettangoli a×b — ecco il doppio prodotto 2ab. Nel caso (a−b)²: parto dal quadrato di lato a e devo togliere due strisce a×b per arrivare al quadratino di lato a−b (da cui −2ab); ma così il quadratino d\'angolo b² è stato tolto DUE volte, quindi va riaggiunto una volta: +b². Inoltre b² è un\'area (e il quadrato di un numero, con esponente pari) e quindi non può che essere positivo.' }
+    ];
+  </script>
+
+</body>
+
+</html>

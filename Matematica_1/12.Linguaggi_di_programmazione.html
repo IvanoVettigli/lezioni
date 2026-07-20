@@ -1,0 +1,2336 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 12 — Linguaggi di programmazione</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* ——— blocchi di codice ——— */
+    .codeblk { background: #0d1117; border: 1px solid var(--border); border-radius: 10px; margin: 0.7rem 0; overflow: hidden; }
+    .codeblk .head { background: #161b22; color: #8b949e; font-family: Consolas, monospace; font-size: 0.78rem;
+      padding: 0.35rem 0.85rem; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; gap: 0.6rem; }
+    .codeblk .head b { color: #d5dae3; font-weight: 700; }
+    .codeblk pre { margin: 0; padding: 0.75rem 1rem; overflow-x: auto; color: #d5dae3;
+      font-family: Consolas, 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6; }
+    .codeblk .kw { color: #ff9ec4; font-weight: 700; }
+    .codeblk .st { color: #a5d6ff; }
+    .codeblk .cm { color: #8b949e; font-style: italic; }
+    .codeblk .nu { color: #ffcf5e; }
+    .codeblk .fn { color: #7ee787; font-weight: 600; }
+    .codeblk .tg { color: #7ee787; }
+    .codeblk .at { color: #ffcf5e; }
+    .codeblk .hl { background: color-mix(in srgb, #ff9ec4 22%, transparent); border-radius: 3px; }
+    .term { background: #0d1117; color: #7ee787; font-family: Consolas, monospace; font-size: 0.9rem;
+      border: 1px solid var(--border); border-left: 4px solid #7ee787; border-radius: 0 8px 8px 0;
+      padding: 0.55rem 0.9rem; margin: 0.4rem 0 0.9rem; overflow-x: auto; }
+    .term .pr { color: #8b949e; }
+
+    /* ——— schede dei linguaggi ——— */
+    .lang-card { background: var(--surface-2); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+      border-radius: 10px; padding: 0.8rem 1rem; margin: 0.9rem 0; }
+    .lang-card h4 { margin: 0 0 0.15rem; color: var(--accent); font-size: 1.05rem; }
+    .lang-card .anno { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent);
+      color: var(--accent); border-radius: 6px; padding: 0.05rem 0.45rem; font-size: 0.78rem; font-weight: 700; margin-left: 0.4rem; }
+    .lang-card .motto { color: var(--muted); font-size: 0.88rem; font-style: italic; margin: 0 0 0.5rem; }
+    .lang-card .codeblk { margin-bottom: 0.4rem; }
+
+    /* ——— passi guidati del laboratorio ——— */
+    .lab-step { display: grid; grid-template-columns: 2.2rem 1fr; gap: 0.7rem; align-items: start;
+      background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+      padding: 0.7rem 0.9rem; margin: 0.6rem 0; }
+    .lab-step .num { background: var(--accent); color: #fff; font-weight: 800; border-radius: 50%;
+      width: 2.2rem; height: 2.2rem; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; }
+    .lab-step p { margin: 0.15rem 0; }
+    .lab-step .codeblk { margin: 0.5rem 0 0.2rem; }
+
+    /* ——— tabelle ——— */
+    .tp-tab { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.94rem; }
+    .tp-tab th, .tp-tab td { border: 1px solid var(--border); padding: 0.45rem 0.65rem; text-align: left; vertical-align: top; }
+    .tp-tab th { background: var(--surface-2); }
+    .tp-tab code, .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent);
+      border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+    .tp-tab td.si { background: color-mix(in srgb, #22c55e 12%, transparent); }
+    .tp-tab td.no { background: color-mix(in srgb, #ef4444 12%, transparent); }
+
+    /* ——— gara degli algoritmi ——— */
+    .race-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.8rem; margin: 0.9rem 0; }
+    .race-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem 0.7rem; }
+    .race-card h4 { margin: 0 0 0.35rem; font-size: 0.95rem; display: flex; justify-content: space-between; align-items: baseline; }
+    .race-card .cnt { font-family: Consolas, monospace; font-size: 0.82rem; color: var(--muted); font-weight: 400; }
+    .race-card svg { display: block; width: 100%; height: auto; }
+    .medal { font-size: 0.8rem; font-weight: 700; }
+
+    /* ——— torre di hanoi ——— */
+    .hanoi-wrap { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .hanoi-wrap svg { display: block; width: 100%; height: auto; max-width: 620px; margin: 0 auto; cursor: pointer; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Primo anno · Lezione 12</div>
+    <h1>Linguaggi di programmazione</h1>
+    <p>Dal Fortran a Python: come si è imparato a parlare alle macchine — e un laboratorio per provarci davvero</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Primo anno</a>
+    <span class="sep">/</span> Linguaggi di programmazione
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Nella lezione 9 abbiamo imparato a <em>progettare</em> un algoritmo: le tre
+      strutture, lo pseudocodice, la scomposizione top-down. Ma lo pseudocodice non lo capisce nessuna macchina:
+      è una lingua inventata da noi per ragionare. Oggi facciamo l'ultimo passo, quello che trasforma un'idea in
+      qualcosa che <strong>gira davvero</strong>: impariamo che cos'è un linguaggio di programmazione, come sono
+      nati, e poi — nella seconda metà della lezione — <strong>scriviamo del codice vero</strong>, insieme, senza
+      installare niente sul computer.
+    </div>
+
+    <!-- 1 — PARLARE ALLA MACCHINA -->
+    <section id="sec1">
+      <h2>1. Il problema: parlare a chi capisce solo 0 e 1</h2>
+
+      <p>Riprendiamo il filo della lezione 3. Dentro il processore non ci sono parole, non ci sono numeri decimali
+        e non c'è nessuna comprensione: ci sono <strong>interruttori</strong> che stanno accesi o spenti, e un
+        insieme ristretto di operazioni elementari — il <em>set di istruzioni</em> di cui abbiamo parlato nella
+        lezione 9. Tutto quello che il processore sa fare, alla fine, è roba del tipo «prendi il contenuto del
+        cassetto 4501, sommalo a quello del cassetto 4502, scrivi il risultato nel cassetto 4503».</p>
+
+      <p>E quelle istruzioni non sono nemmeno scritte a parole: sono <strong>numeri binari</strong>. Il vero
+        linguaggio del processore, il <strong>linguaggio macchina</strong>, assomiglia a questo:</p>
+
+      <div class="codeblk">
+        <div class="head"><span>linguaggio macchina</span><span>l'unica cosa che il processore capisce davvero</span></div>
+        <pre>10110000 01100001
+00000100 00000010
+11110100</pre>
+      </div>
+
+      <p>Programmare così è possibile — nei primi anni Cinquanta si faceva <em>esattamente</em> così — ma è una
+        tortura: un errore in una cifra e tutto salta, e per cambiare una riga in mezzo bisogna ricalcolare a mano
+        tutti gli indirizzi. Il primo passo avanti fu dare un <strong>nome</strong> a ciascuna istruzione:</p>
+
+      <div class="codeblk">
+        <div class="head"><span>assembly</span><span>gli stessi comandi, ma con nomi pronunciabili</span></div>
+        <pre><span class="kw">MOV</span> AL, <span class="nu">61h</span>   <span class="cm">; metti il valore 61 nel registro AL</span>
+<span class="kw">ADD</span> AL, <span class="nu">2</span>     <span class="cm">; aggiungici 2</span>
+<span class="kw">HLT</span>            <span class="cm">; fermati</span></pre>
+      </div>
+
+      <p>Meglio, ma non abbastanza: siamo sempre costretti a ragionare come ragiona la macchina, un cassetto alla
+        volta. Il salto vero arriva quando qualcuno si pone la domanda giusta: <em>e se fosse la macchina ad
+        adattarsi a noi, invece del contrario?</em></p>
+
+      <div class="definition">
+        Un <strong>linguaggio di programmazione</strong> è un linguaggio artificiale, con un vocabolario e una
+        grammatica precisi, che permette di descrivere un algoritmo in una forma <strong>comprensibile agli
+        esseri umani</strong> e allo stesso tempo <strong>traducibile automaticamente</strong> in linguaggio
+        macchina.
+      </div>
+
+      <p>Le due parole importanti sono <em>comprensibile</em> e <em>traducibile</em>. Un linguaggio di
+        programmazione sta a metà strada fra noi e il processore, e il lavoro di traduzione lo fa un altro
+        programma. Ci sono due modi di farlo, e la differenza conta:</p>
+
+      <div class="two-col">
+        <div class="rule" style="margin:0;">
+          <strong>Compilatore.</strong> Traduce <em>tutto il programma in una volta sola</em>, prima di eseguirlo,
+          e produce un file eseguibile. Come far tradurre un intero libro da un traduttore professionista: ci vuole
+          tempo, ma poi il libro lo leggi alla massima velocità. Così fanno C, C++ e (a modo suo) Java.
+        </div>
+        <div class="rule" style="margin:0;">
+          <strong>Interprete.</strong> Traduce ed esegue <em>una riga alla volta</em>, mentre il programma gira.
+          Come avere un interprete simultaneo accanto: si comincia subito e si può correggere al volo, ma si va
+          un po' più piano. Così fanno Python e JavaScript.
+        </div>
+      </div>
+
+      <p>Ecco perché un programma in C è tipicamente più veloce di uno in Python, e perché in Python si può provare
+        una riga e vedere subito il risultato. Sono due filosofie diverse — ne incontreremo altre, di coppie così:
+        in informatica quasi ogni scelta è un <strong>compromesso</strong>, mai un vantaggio gratuito.</p>
+    </section>
+
+    <!-- 2 — STORIA DEI LINGUAGGI -->
+    <section id="sec2">
+      <h2>2. Una piccola storia, con i saluti di rito</h2>
+
+      <p>C'è una tradizione, fra i programmatori: quando si impara un linguaggio nuovo, il primo programma che si
+        scrive stampa sullo schermo la scritta <strong>Hello, world!</strong> Non serve a niente, ed è proprio
+        questo il punto: serve solo a verificare che tutta la catena — scrivere, tradurre, eseguire — funzioni.
+        La useremo come metro di paragone: <em>quanto è faticoso, in questo linguaggio, dire la cosa più
+        semplice del mondo?</em></p>
+
+      <div class="ckt"><svg viewBox="0 0 640 210" aria-label="Linea del tempo dei principali linguaggi di programmazione dal 1957 a oggi">
+        <line x1="30" y1="112" x2="612" y2="112" stroke="var(--text-soft)" stroke-width="2"/>
+        <polygon points="612,112 602,107 602,117" fill="var(--text-soft)"/>
+
+        <circle cx="60" cy="112" r="6" fill="var(--accent)"/>
+        <line x1="60" y1="112" x2="60" y2="86" stroke="var(--accent)" stroke-width="1.4"/>
+        <text x="60" y="76" text-anchor="middle" class="lbl" fill="var(--accent)">Fortran</text>
+        <text x="60" y="58" text-anchor="middle" class="lbl-s">1957</text>
+        <text x="60" y="42" text-anchor="middle" class="lbl-s" style="font-size:10px;">i calcoli scientifici</text>
+
+        <circle cx="165" cy="112" r="6" fill="var(--gold)"/>
+        <line x1="165" y1="112" x2="165" y2="138" stroke="var(--gold)" stroke-width="1.4"/>
+        <text x="165" y="154" text-anchor="middle" class="lbl" fill="var(--gold)">C</text>
+        <text x="165" y="172" text-anchor="middle" class="lbl-s">1972</text>
+        <text x="165" y="188" text-anchor="middle" class="lbl-s" style="font-size:10px;">Unix e i sistemi</text>
+
+        <circle cx="270" cy="112" r="6" fill="var(--accent)"/>
+        <line x1="270" y1="112" x2="270" y2="86" stroke="var(--accent)" stroke-width="1.4"/>
+        <text x="270" y="76" text-anchor="middle" class="lbl" fill="var(--accent)">C++</text>
+        <text x="270" y="58" text-anchor="middle" class="lbl-s">1985</text>
+        <text x="270" y="42" text-anchor="middle" class="lbl-s" style="font-size:10px;">gli oggetti</text>
+
+        <circle cx="375" cy="112" r="7" fill="var(--magenta)"/>
+        <line x1="375" y1="112" x2="375" y2="138" stroke="var(--magenta)" stroke-width="1.4"/>
+        <text x="375" y="154" text-anchor="middle" class="lbl" fill="var(--magenta)">Python</text>
+        <text x="375" y="172" text-anchor="middle" class="lbl-s">1991</text>
+        <text x="375" y="188" text-anchor="middle" class="lbl-s" style="font-size:10px;">il nostro, fra poco</text>
+
+        <circle cx="480" cy="112" r="6" fill="var(--accent)"/>
+        <line x1="480" y1="112" x2="480" y2="86" stroke="var(--accent)" stroke-width="1.4"/>
+        <text x="480" y="76" text-anchor="middle" class="lbl" fill="var(--accent)">Java</text>
+        <text x="480" y="58" text-anchor="middle" class="lbl-s">1995</text>
+        <text x="480" y="42" text-anchor="middle" class="lbl-s" style="font-size:10px;">gira dappertutto</text>
+
+        <circle cx="570" cy="112" r="6" fill="var(--gold)"/>
+        <line x1="570" y1="112" x2="570" y2="138" stroke="var(--gold)" stroke-width="1.4"/>
+        <text x="570" y="154" text-anchor="middle" class="lbl" fill="var(--gold)">JavaScript</text>
+        <text x="570" y="172" text-anchor="middle" class="lbl-s">1995</text>
+        <text x="570" y="188" text-anchor="middle" class="lbl-s" style="font-size:10px;">il web</text>
+      </svg></div>
+
+      <div class="lang-card">
+        <h4>Fortran <span class="anno">1957</span></h4>
+        <p class="motto">«FORmula TRANslation»: tradurre le formule</p>
+        <p>Nasce all'IBM da un gruppo guidato da <strong>John Backus</strong>, ed è il primo linguaggio di alto
+          livello ad avere successo. L'idea era rivoluzionaria e semplicissima: <em>far scrivere al fisico la sua
+          formula com'è, e lasciare che sia il computer a tradurla</em>. Molti, all'epoca, erano convinti che il
+          codice prodotto da una macchina non sarebbe mai stato efficiente quanto quello scritto a mano da un buon
+          programmatore. Avevano torto — e da allora nessuno ha più programmato in binario per scelta.</p>
+        <div class="codeblk">
+          <div class="head"><span><b>Fortran</b></span><span>hello world</span></div>
+          <pre><span class="kw">PROGRAM</span> SALUTO
+  <span class="fn">PRINT</span> *, <span class="st">'Hello, world!'</span>
+<span class="kw">END PROGRAM</span> SALUTO</pre>
+        </div>
+        <p class="formula-note">Il Fortran non è affatto morto: gran parte dei programmi che calcolano le previsioni
+          del tempo e simulano il clima, ancora oggi, ha il cuore scritto in Fortran.</p>
+      </div>
+
+      <div class="lang-card">
+        <h4>C <span class="anno">1972</span></h4>
+        <p class="motto">Vicino alla macchina, ma scritto da esseri umani</p>
+        <p>Lo inventa <strong>Dennis Ritchie</strong> ai Bell Labs, e serve a scrivere <strong>Unix</strong> — il
+          sistema operativo di cui abbiamo parlato nella lezione 3, il nonno di Linux, Android e macOS. È il
+          capolavoro del compromesso: abbastanza «alto» da essere leggibile, abbastanza «basso» da poter maneggiare
+          direttamente la memoria. Ancora oggi il nucleo di Linux, di Windows e dei programmi che fanno funzionare
+          una lavatrice o un satellite è scritto in C.</p>
+        <div class="codeblk">
+          <div class="head"><span><b>C</b></span><span>hello world</span></div>
+          <pre><span class="cm">#include &lt;stdio.h&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="fn">printf</span>(<span class="st">"Hello, world!\n"</span>);
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</pre>
+        </div>
+        <p class="formula-note">Notate le <strong>parentesi graffe</strong> <span class="inline-code">{ }</span>:
+          servono a dire dove comincia e dove finisce un blocco di istruzioni. Torneremo su questo dettaglio, perché
+          è esattamente il punto in cui Python prende una strada diversa da tutti.</p>
+      </div>
+
+      <div class="lang-card">
+        <h4>C++ <span class="anno">1985</span></h4>
+        <p class="motto">Il C, più gli oggetti</p>
+        <p>Bjarne Stroustrup aggiunge al C la <strong>programmazione a oggetti</strong>: invece di avere da una parte
+          i dati e dall'altra le istruzioni, si costruiscono «oggetti» che si portano dietro i propri dati e le
+          proprie capacità. È l'idea che permette di gestire programmi enormi senza perdersi. Quasi tutti i
+          videogiochi che avete giocato hanno un motore scritto in C++.</p>
+        <div class="codeblk">
+          <div class="head"><span><b>C++</b></span><span>hello world</span></div>
+          <pre><span class="cm">#include &lt;iostream&gt;</span>
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    std::cout &lt;&lt; <span class="st">"Hello, world!"</span> &lt;&lt; std::endl;
+    <span class="kw">return</span> <span class="nu">0</span>;
+}</pre>
+        </div>
+      </div>
+
+      <div class="lang-card">
+        <h4>Python <span class="anno">1991</span></h4>
+        <p class="motto">«Il codice si legge molto più spesso di quanto si scriva»</p>
+        <p>L'olandese <strong>Guido van Rossum</strong> parte da un'idea diversa da tutte le precedenti: il problema
+          non è più la velocità della macchina — nel frattempo i computer sono diventati potentissimi — ma la
+          <strong>velocità dell'essere umano</strong>. Quindi: via il superfluo, via le graffe, via le dichiarazioni
+          obbligatorie. Il nome, per la cronaca, non viene dal serpente ma dai <em>Monty Python</em>, il gruppo
+          comico inglese di cui van Rossum era fan.</p>
+        <div class="codeblk">
+          <div class="head"><span><b>Python</b></span><span>hello world</span></div>
+          <pre><span class="fn">print</span>(<span class="st">"Hello, world!"</span>)</pre>
+        </div>
+        <p class="formula-note">Una riga. Nessuna intestazione, nessuna graffa, nessun punto e virgola. È
+          principalmente per questo che oggi Python è il linguaggio con cui quasi tutti imparano a programmare — ed
+          è il motivo per cui lo abbiamo scelto anche noi.</p>
+      </div>
+
+      <div class="lang-card">
+        <h4>Java <span class="anno">1995</span></h4>
+        <p class="motto">«Write once, run anywhere» — scrivi una volta, esegui ovunque</p>
+        <p>Il problema che Java vuole risolvere è questo: un programma compilato per Windows non gira su un Mac, e
+          viceversa. La soluzione è geniale: Java non si compila per <em>una</em> macchina, ma per una
+          <strong>macchina virtuale</strong> — un computer immaginario, di cui poi esiste una versione per ogni
+          sistema reale. Java è il linguaggio in cui sono scritte moltissime app Android e gran parte dei programmi
+          che gestiscono banche e grandi aziende.</p>
+        <div class="codeblk">
+          <div class="head"><span><b>Java</b></span><span>hello world</span></div>
+          <pre><span class="kw">public class</span> <span class="fn">Saluto</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        System.out.<span class="fn">println</span>(<span class="st">"Hello, world!"</span>);
+    }
+}</pre>
+        </div>
+        <p class="formula-note">Cinque righe e due livelli di graffe per stampare una frase. Non è cattiveria: è il
+          prezzo di un linguaggio pensato per programmi giganteschi, dove ogni cosa deve essere dichiarata
+          esplicitamente. <strong>Attenzione:</strong> Java e JavaScript, nonostante il nome, sono due linguaggi
+          <em>completamente diversi</em>. È un caso di omonimia commerciale che confonde le idee da trent'anni.</p>
+      </div>
+
+      <div class="lang-card">
+        <h4>JavaScript <span class="anno">1995</span></h4>
+        <p class="motto">Il linguaggio che vive dentro le pagine web</p>
+        <p>Scritto in dieci giorni da <strong>Brendan Eich</strong> per far muovere qualcosa dentro le pagine del
+          web, è oggi uno dei linguaggi più usati al mondo per un motivo semplice: è l'unico che <em>tutti</em> i
+          browser sanno eseguire. Ogni volta che su una pagina qualcosa si muove, reagisce a un click o si aggiorna
+          senza ricaricare, dietro c'è JavaScript. Ci torneremo fra due sezioni, perché ci riguarda da vicino.</p>
+        <div class="codeblk">
+          <div class="head"><span><b>JavaScript</b></span><span>hello world</span></div>
+          <pre><span class="fn">console</span>.<span class="fn">log</span>(<span class="st">"Hello, world!"</span>);</pre>
+        </div>
+      </div>
+
+      <div class="curiosita">
+        <strong>E la prima programmatrice della storia?</strong> Un secolo prima del Fortran.
+        <strong>Ada Lovelace</strong>, matematica inglese, nel 1843 scrisse quello che è considerato il primo
+        algoritmo destinato a essere eseguito da una macchina — la macchina analitica di Charles Babbage, che tra
+        l'altro non fu mai costruita. Fu anche la prima a capire una cosa che ai suoi contemporanei sfuggiva: che
+        una macchina del genere non serviva solo a fare conti, ma avrebbe potuto manipolare <em>qualunque</em> cosa
+        rappresentabile con dei simboli — musica compresa. Aveva ragione con 150 anni di anticipo, e oggi un
+        linguaggio di programmazione si chiama <strong>Ada</strong> in suo onore.
+      </div>
+
+      <div class="rule">
+        <strong>Il filo che li lega tutti.</strong> Guardate i sei «Hello, world!» qui sopra: fanno tutti
+        esattamente la stessa cosa. Cambia la <em>sintassi</em> — cioè le regole di scrittura — non l'idea. Le tre
+        strutture della lezione 9 (sequenza, condizione, ciclo) ci sono in tutti quanti, con parole diverse.
+        Imparare a programmare significa imparare <em>quelle</em>: i linguaggi, dopo, si cambiano come si cambia
+        una lingua straniera, con un po' di dizionario e un po' di pratica.
+      </div>
+    </section>
+
+    <!-- 3 — LINGUAGGI E METALINGUAGGI -->
+    <section id="sec3">
+      <h2>3. Linguaggi e metalinguaggi</h2>
+
+      <p>Tutti i linguaggi visti finora hanno una cosa in comune: <strong>descrivono azioni</strong>. Dicono alla
+        macchina <em>che cosa fare</em>: calcola, confronta, ripeti, stampa. Ma esiste un'altra famiglia di
+        linguaggi artificiali che fa un mestiere completamente diverso: non comanda niente, si limita a
+        <strong>descrivere com'è fatto un contenuto</strong>.</p>
+
+      <div class="definition">
+        Un <strong>metalinguaggio</strong> (o linguaggio di marcatura, in inglese <em>markup language</em>) non
+        serve a eseguire azioni, ma ad <strong>annotare un testo dicendo che cosa sono le sue parti</strong>:
+        questo è un titolo, questo un elenco, questa una parola in grassetto. Non è un programma: è un testo con
+        delle etichette.
+      </div>
+
+      <p>La differenza è la stessa che passa fra una <em>ricetta</em> («fai bollire l'acqua, butta la pasta») e
+        l'<em>etichetta di un prodotto</em> («nome: pasta; peso: 500 g; scadenza: 2027»). La prima dice cosa fare,
+        la seconda dice com'è fatta una cosa. Vediamone due che userete di sicuro.</p>
+
+      <div class="lang-card">
+        <h4>HTML <span class="anno">1991</span></h4>
+        <p class="motto">HyperText Markup Language — il linguaggio delle pagine web</p>
+        <p>Inventato da <strong>Tim Berners-Lee</strong> al CERN di Ginevra — sì, il laboratorio di fisica: il web
+          nasce come strumento per far scambiare documenti ai ricercatori. In HTML ogni pezzo di contenuto è chiuso
+          fra due <strong>tag</strong>, uno di apertura e uno di chiusura, che ne dichiarano il ruolo.</p>
+        <div class="codeblk">
+          <div class="head"><span><b>HTML</b></span><span>hello world</span></div>
+          <pre><span class="tg">&lt;html&gt;</span>
+  <span class="tg">&lt;body&gt;</span>
+    <span class="tg">&lt;h1&gt;</span>Hello, world!<span class="tg">&lt;/h1&gt;</span>
+    <span class="tg">&lt;p&gt;</span>Questo è un paragrafo.<span class="tg">&lt;/p&gt;</span>
+  <span class="tg">&lt;/body&gt;</span>
+<span class="tg">&lt;/html&gt;</span></pre>
+        </div>
+        <p class="formula-note">Il tag <span class="inline-code">&lt;h1&gt;</span> non dice «scrivi grande»: dice
+          «questo è il titolo principale». Che poi il titolo si veda grande è una conseguenza, e di quella si occupa
+          il CSS. La distinzione sembra sottile ma è fondamentale — un motore di ricerca o un lettore vocale per non
+          vedenti usano proprio quelle etichette per capire la pagina.</p>
+      </div>
+
+      <div class="lang-card">
+        <h4>Markdown <span class="anno">2004</span></h4>
+        <p class="motto">Le stesse etichette, ma scritte come si scriverebbe a mano</p>
+        <p>L'HTML è preciso ma verboso. Markdown fa la stessa cosa con una manciata di simboli, scelti in modo che
+          il testo resti <strong>leggibile anche senza essere tradotto</strong>. È il linguaggio con cui si scrivono
+          le note su moltissime app — e, come vedremo fra poco, le celle di testo di Colab.</p>
+        <div class="codeblk">
+          <div class="head"><span><b>Markdown</b></span><span>hello world</span></div>
+          <pre><span class="kw"># Hello, world!</span>
+
+Questo è un paragrafo con una parola in <span class="kw">**grassetto**</span>
+e una in <span class="kw">*corsivo*</span>.
+
+<span class="kw">-</span> primo punto di un elenco
+<span class="kw">-</span> secondo punto</pre>
+        </div>
+        <p class="formula-note">Il carattere <span class="inline-code">#</span> fa un titolo, gli asterischi fanno
+          grassetto e corsivo, il trattino fa un elenco. Confrontatelo con l'HTML qui sopra: dice le stesse cose in
+          un terzo dello spazio, ed è comprensibile anche a chi non sa cosa sia Markdown.</p>
+      </div>
+
+      <div class="warning">
+        <strong>Domanda da un milione: HTML è un linguaggio di programmazione?</strong> No — ed è una risposta che
+        vale un voto in più a chi la sa argomentare. In HTML non si può scrivere una condizione, non si può fare un
+        ciclo, non si può calcolare niente: mancano proprio le strutture della lezione 9. HTML <em>descrive</em>,
+        non <em>esegue</em>. Chi vi dirà «so programmare, conosco l'HTML» sta dicendo, più o meno, «so cucinare,
+        so leggere le etichette».
+      </div>
+    </section>
+
+    <!-- 4 — UN SITO È UN MISCUGLIO -->
+    <section id="sec4">
+      <h2>4. Il sito che state guardando</h2>
+
+      <p>Nella pratica, quasi nessun programma vero è scritto in un solo linguaggio: si mettono insieme i pezzi
+        migliori di ciascuno. E per capirlo non serve andare lontano — basta guardare <strong>la pagina che avete
+        aperto in questo momento</strong>, che è fatta di tre linguaggi diversi che lavorano insieme.</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 250" aria-label="I tre strati di una pagina web: HTML per la struttura, CSS per l'aspetto, JavaScript per il comportamento">
+        <rect x="30" y="30" width="180" height="180" rx="12" fill="color-mix(in srgb, var(--accent) 10%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="120" y="56" text-anchor="middle" class="lbl" fill="var(--accent)">HTML</text>
+        <text x="120" y="76" text-anchor="middle" class="lbl-s">la struttura</text>
+        <rect x="58" y="94" width="124" height="12" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.6"/>
+        <rect x="58" y="114" width="124" height="7" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
+        <rect x="58" y="128" width="124" height="7" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
+        <rect x="58" y="142" width="80" height="7" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.2"/>
+        <rect x="58" y="162" width="56" height="24" rx="5" fill="none" stroke="var(--accent)" stroke-width="1.4"/>
+        <text x="120" y="202" text-anchor="middle" class="lbl-s" style="font-size:10px;">lo scheletro nudo</text>
+
+        <rect x="230" y="30" width="180" height="180" rx="12" fill="color-mix(in srgb, var(--gold) 12%, transparent)" stroke="var(--gold)" stroke-width="2"/>
+        <text x="320" y="56" text-anchor="middle" class="lbl" fill="var(--gold)">CSS</text>
+        <text x="320" y="76" text-anchor="middle" class="lbl-s">l'aspetto</text>
+        <rect x="258" y="94" width="124" height="12" rx="3" fill="var(--gold)" opacity="0.85"/>
+        <rect x="258" y="114" width="124" height="7" rx="3" fill="var(--text-soft)" opacity="0.6"/>
+        <rect x="258" y="128" width="124" height="7" rx="3" fill="var(--text-soft)" opacity="0.6"/>
+        <rect x="258" y="142" width="80" height="7" rx="3" fill="var(--text-soft)" opacity="0.6"/>
+        <rect x="258" y="162" width="56" height="24" rx="12" fill="var(--gold)" opacity="0.85"/>
+        <text x="320" y="202" text-anchor="middle" class="lbl-s" style="font-size:10px;">colori, forme, spazi</text>
+
+        <rect x="430" y="30" width="180" height="180" rx="12" fill="color-mix(in srgb, var(--magenta) 10%, transparent)" stroke="var(--magenta)" stroke-width="2"/>
+        <text x="520" y="56" text-anchor="middle" class="lbl" fill="var(--magenta)">JavaScript</text>
+        <text x="520" y="76" text-anchor="middle" class="lbl-s">il comportamento</text>
+        <rect x="458" y="94" width="124" height="12" rx="3" fill="var(--gold)" opacity="0.85"/>
+        <rect x="458" y="114" width="124" height="7" rx="3" fill="var(--text-soft)" opacity="0.6"/>
+        <rect x="458" y="128" width="124" height="7" rx="3" fill="var(--text-soft)" opacity="0.6"/>
+        <rect x="458" y="142" width="80" height="7" rx="3" fill="var(--text-soft)" opacity="0.6"/>
+        <rect x="458" y="162" width="56" height="24" rx="12" fill="var(--magenta)"/>
+        <path d="M 500 178 L 512 172 L 508 180 L 516 178 L 504 190 Z" fill="var(--text)" stroke="var(--bg)" stroke-width="1"/>
+        <text x="520" y="202" text-anchor="middle" class="lbl-s" style="font-size:10px;">reagisce, calcola, cambia</text>
+
+        <text x="320" y="236" text-anchor="middle" class="em">tre linguaggi diversi, una pagina sola</text>
+      </svg></div>
+
+      <p>La divisione dei compiti è netta, ed è una delle idee più eleganti dell'informatica:</p>
+
+      <ul>
+        <li><strong>HTML</strong> dice <em>che cosa c'è</em>: qui un titolo, qui un paragrafo, qui un pulsante. È
+          lo scheletro, e da solo sarebbe una pagina bianca con del testo nero, come nel 1993.</li>
+        <li><strong>CSS</strong> (<em>Cascading Style Sheets</em>, «fogli di stile a cascata») dice <em>come deve
+          apparire</em>: i colori, i caratteri, i margini, gli angoli arrotondati dei riquadri, il fatto che su un
+          telefono le colonne diventino una sola. Tutto quello che vedete di «bello» in questa pagina è CSS. Ed è
+          anche il CSS che fa funzionare il pulsante chiaro/scuro in alto: cambiando poche variabili di colore,
+          l'intera pagina cambia aspetto senza che si tocchi una virgola del contenuto.</li>
+        <li><strong>JavaScript</strong> dice <em>che cosa succede</em>: quando premete «mostra soluzione», quando
+          trascinate uno slider e il disegno si aggiorna, quando il quiz vi dice se avete sbagliato. Tutte le
+          simulazioni che avete usato nelle lezioni precedenti — l'aeroplano che percorre il poligono, la ruota che
+          srotola la circonferenza — sono JavaScript.</li>
+      </ul>
+
+      <div class="rule">
+        <strong>Provate voi, adesso.</strong> Su un computer, premete <span class="inline-code">F12</span> (oppure
+        tasto destro → «Ispeziona»): si apre la <strong>console degli strumenti per sviluppatori</strong>. Nella
+        scheda <em>Elements</em> vedete l'HTML di questa pagina, nella scheda <em>Console</em> potete scrivere
+        istruzioni JavaScript ed eseguirle sul momento. Provate a scrivere
+        <span class="inline-code">console.log("Hello, world!")</span> e premete Invio: avete appena eseguito il
+        vostro primo programma, e non avete installato niente.
+        <br><br>
+        Da telefono o tablet <em>si può</em> fare, ma è tutt'altro che comodo: servono browser particolari o il
+        collegamento a un computer. È uno dei tanti motivi per cui chi programma lavora quasi sempre su un PC.
+      </div>
+
+      <div class="warning">
+        <strong>Regola d'oro della console.</strong> Se qualcuno — su un social, in una chat, in un video — vi
+        chiede di aprire la console e incollarci dentro del codice «per sbloccare qualcosa» o «per hackerare un
+        account», <strong>state per essere derubati</strong>. Quel codice gira con i vostri permessi, sulla vostra
+        sessione, e può rubare l'accesso ai vostri profili. È una truffa così comune che alcuni siti stampano un
+        avviso a caratteri cubitali proprio dentro la console. La console serve a guardare e a imparare: non
+        incollateci mai roba che non avete capito.
+      </div>
+
+      <h3>4.1 — E dietro le quinte: il back end</h3>
+
+      <p>C'è ancora un pezzo. Tutto quello di cui abbiamo parlato finora — HTML, CSS, JavaScript — gira
+        <strong>sul vostro dispositivo</strong>, dentro il browser: si chiama <strong>front end</strong>, la parte
+        davanti, quella che si vede. Ma pensate a un sito dove ci si registra, si fa il login, si comprano cose:
+        da qualche parte devono esserci gli utenti, le password, gli ordini. E non possono certo stare sul vostro
+        telefono.</p>
+
+      <div class="definition">
+        Il <strong>back end</strong> è la parte di un servizio che gira su un <strong>server</strong>, cioè su un
+        computer altrui sempre acceso: conserva i dati, controlla le password, esegue i calcoli che non vogliamo
+        (o non possiamo) far fare al dispositivo dell'utente. Il front end gli parla via rete e ne mostra i
+        risultati.
+      </div>
+
+      <p>Il back end si scrive con linguaggi «normali»: molto spesso <strong>Java</strong> o <strong>Python</strong>,
+        ma anche PHP, C# o JavaScript stesso. È lì che finiscono davvero i dati quando vi registrate da qualche
+        parte — motivo per cui la lezione 3 insisteva tanto sulle password e sulla privacy: quei dati non li avete
+        più in mano voi.</p>
+
+      <div class="curiosita">
+        <strong>Questo sito, invece, non ha nessun back end.</strong> È fatto solo di file HTML, CSS e JavaScript
+        appoggiati su un server che si limita a consegnarveli: non c'è nessun database, non c'è nessuna
+        registrazione, e nessuno raccoglie i vostri punteggi ai quiz — che infatti spariscono appena ricaricate la
+        pagina. Si chiama <strong>sito statico</strong>: è più semplice, più veloce, praticamente impossibile da
+        violare (non c'è niente da rubare) e costa quasi zero. Quando un problema si può risolvere senza back end,
+        di solito conviene farlo.
+      </div>
+    </section>
+
+    <!-- 5 — LABORATORIO: COLAB -->
+    <section id="sec5">
+      <h2>5. Laboratorio: mettiamo le mani sulla tastiera</h2>
+
+      <p>Basta teoria. Da qui in poi questa lezione è un <strong>laboratorio</strong>: seguite i passi uno per uno,
+        scrivete davvero quello che c'è scritto, e alla fine dell'ora avrete scritto e fatto girare i vostri primi
+        programmi. Il linguaggio è <strong>Python</strong>, per i motivi visti nella sezione 2.</p>
+
+      <p>Il primo ostacolo, di solito, è <em>installare</em> il linguaggio: mezz'ora di download, versioni che non
+        combaciano, e siamo già alla campanella. Lo saltiamo del tutto usando <strong>Google Colab</strong>, un
+        servizio che fa girare Python <em>su un computer di Google</em> e ce ne mostra i risultati nel browser.
+        Nessuna installazione, e il vostro lavoro si salva da solo sul vostro Drive.</p>
+
+      <div class="lab-step">
+        <div class="num">1</div>
+        <div>
+          <p><strong>Aprite il browser.</strong> Sui computer della scuola trovate quasi sempre
+            <strong>Google Chrome</strong>. Va bene anche Edge o Firefox, ma con Chrome sarete già dentro
+            l'ecosistema di Google e vi risparmierete un passaggio.</p>
+        </div>
+      </div>
+
+      <div class="lab-step">
+        <div class="num">2</div>
+        <div>
+          <p><strong>Accedete con l'account della scuola</strong>, non con quello personale: è quello che vi dà
+            accesso al Drive dell'istituto, dove il vostro lavoro verrà salvato.</p>
+          <p class="formula-note">Chi a questo punto alza la mano e dice «prof, non mi ricordo la password» sarà
+            <strong>severamente punito</strong>. La password dell'account scolastico è come le chiavi di casa: fa
+            parte del materiale scolastico esattamente come il libro e la penna. Chi le ha perse davvero venga a
+            dirlo <em>adesso</em>, non fra venti minuti quando la classe sta già lavorando.</p>
+        </div>
+      </div>
+
+      <div class="lab-step">
+        <div class="num">3</div>
+        <div>
+          <p><strong>Andate all'indirizzo</strong>
+            <a href="https://colab.research.google.com/" target="_blank" rel="noopener">colab.research.google.com</a>.
+            Si aprirà una finestra con l'elenco dei notebook recenti — la prima volta sarà vuota.</p>
+        </div>
+      </div>
+
+      <div class="lab-step">
+        <div class="num">4</div>
+        <div>
+          <p><strong>Create un nuovo notebook</strong>: in basso nella finestra che si apre trovate
+            <em>«Nuovo notebook»</em> (o <em>«New notebook»</em> se l'interfaccia è in inglese). In alternativa, dal
+            menu: <em>File → Nuovo notebook</em>.</p>
+          <p>Vi ritrovate davanti a un foglio quasi vuoto, con una casella grigia al centro. Quel foglio si chiama
+            <strong>notebook</strong>, e non è un programma nel senso classico: è un <em>quaderno</em> fatto di
+            blocchi che si chiamano <strong>celle</strong>, che potete eseguire una alla volta, nell'ordine che
+            volete, quante volte volete.</p>
+        </div>
+      </div>
+
+      <div class="ckt"><svg viewBox="0 0 640 300" aria-label="L'interfaccia di Google Colab: barra dei menu, pulsanti per aggiungere celle di codice e di testo, una cella di testo e una cella di codice con il pulsante di esecuzione">
+        <rect x="20" y="14" width="600" height="272" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1.6"/>
+        <rect x="20" y="14" width="600" height="30" rx="10" fill="var(--surface-2)"/>
+        <rect x="20" y="34" width="600" height="10" fill="var(--surface-2)"/>
+        <circle cx="38" cy="29" r="5" fill="var(--gold)"/>
+        <text x="56" y="34" class="lbl-s">Untitled0.ipynb</text>
+        <text x="200" y="34" class="lbl-s" style="font-size:11px;">File   Modifica   Visualizza   Inserisci   Runtime   Strumenti</text>
+        <text x="566" y="34" text-anchor="middle" class="lbl-s" style="font-size:10px;">connesso ✓</text>
+
+        <rect x="34" y="54" width="86" height="22" rx="11" fill="none" stroke="var(--accent)" stroke-width="1.6"/>
+        <text x="77" y="69" text-anchor="middle" class="lbl-s" fill="var(--accent)">+ Codice</text>
+        <rect x="128" y="54" width="80" height="22" rx="11" fill="none" stroke="var(--gold)" stroke-width="1.6"/>
+        <text x="168" y="69" text-anchor="middle" class="lbl-s" fill="var(--gold)">+ Testo</text>
+        <text x="228" y="69" class="lbl-s" style="font-size:10px;">← i due pulsanti che userete di più</text>
+
+        <rect x="34" y="92" width="572" height="70" rx="8" fill="color-mix(in srgb, var(--gold) 8%, transparent)" stroke="var(--gold)" stroke-width="1.6"/>
+        <text x="48" y="110" class="lbl-s" fill="var(--gold)">cella di TESTO — Markdown + LaTeX</text>
+        <text x="48" y="134" class="lbl" style="font-size:15px;">Il mio primo notebook</text>
+        <text x="48" y="152" class="lbl-s">spiegazioni, titoli, formule matematiche</text>
+
+        <rect x="34" y="176" width="572" height="94" rx="8" fill="#0d1117" stroke="var(--accent)" stroke-width="1.6"/>
+        <circle cx="58" cy="200" r="13" fill="none" stroke="#7ee787" stroke-width="1.8"/>
+        <polygon points="54,194 66,200 54,206" fill="#7ee787"/>
+        <text x="82" y="197" class="lbl-s" fill="#8b949e" style="font-size:11px;">cella di CODICE — Python</text>
+        <text x="82" y="218" style="fill:#a5d6ff; font-family:Consolas,monospace; font-size:13px;">print("Hello, world!")</text>
+        <line x1="82" y1="232" x2="590" y2="232" stroke="#30363d" stroke-width="1"/>
+        <text x="82" y="252" style="fill:#7ee787; font-family:Consolas,monospace; font-size:13px;">Hello, world!</text>
+        <text x="82" y="266" class="lbl-s" style="font-size:10px; fill:#8b949e;">↑ l'output compare qui sotto, dopo aver premuto ▶</text>
+      </svg></div>
+
+      <div class="rule">
+        <strong>Le due cose da ricordare sull'interfaccia.</strong>
+        <br>• I pulsanti <strong>+ Codice</strong> e <strong>+ Testo</strong> (in alto a sinistra) aggiungono una
+        cella nuova sotto quella selezionata. Sono gli unici due tipi di cella che esistono.
+        <br>• Per <strong>eseguire</strong> una cella si preme il pulsante ▶ che compare a sinistra passandoci
+        sopra col mouse, oppure — molto più comodo — la combinazione <strong>Maiusc + Invio</strong>, che esegue la
+        cella e passa alla successiva. Imparatela subito: la userete centinaia di volte.
+      </div>
+
+      <div class="curiosita">
+        <strong>Dove gira davvero il vostro programma?</strong> Non sul computer che avete davanti. Quando premete
+        ▶, il codice viene mandato a un computer di Google (in gergo si dice che vi collegate a un
+        <em>runtime</em>), lì viene eseguito, e torna indietro solo il risultato. È esattamente il <strong>cloud</strong>
+        di cui parlavamo nella lezione 3: potenza di calcolo che non è vostra, che usate quando vi serve. Il lato
+        scomodo è che serve la connessione, e che dopo un po' di inattività il collegamento cade e le variabili si
+        perdono — se succede, basta rieseguire le celle dall'inizio.
+      </div>
+    </section>
+
+    <!-- 6 — LA CELLA DI TESTO E LATEX -->
+    <section id="sec6">
+      <h2>6. La cella di testo: scrivere matematica con la tastiera</h2>
+
+      <p>Cominciamo dalla cella di testo, che è la più facile e serve a un mestiere prezioso: <strong>spiegare che
+        cosa fa il codice</strong>. Un notebook fatto bene alterna spiegazioni e programmi, come un buon quaderno
+        alterna teoria ed esercizi.</p>
+
+      <div class="lab-step">
+        <div class="num">5</div>
+        <div>
+          <p><strong>Premete «+ Testo»</strong> e nella cella che compare scrivete:</p>
+          <div class="codeblk">
+            <div class="head"><span><b>Markdown</b></span><span>in una cella di testo</span></div>
+            <pre># Il mio primo notebook
+
+Oggi imparo a programmare in **Python**.</pre>
+          </div>
+          <p>Poi premete <strong>Maiusc + Invio</strong>. La cella si «chiude» e mostra il testo formattato: un
+            titolo grande e un paragrafo con una parola in grassetto. Riconoscete la sintassi? È il
+            <strong>Markdown</strong> della sezione 3. Per tornare a modificarla, doppio click.</p>
+        </div>
+      </div>
+
+      <p>Fin qui niente di nuovo. La cosa interessante è che dentro il Markdown di Colab si può infilare anche
+        un <em>altro</em> metalinguaggio, specializzato in una cosa sola: la matematica.</p>
+
+      <div class="definition">
+        <strong>LaTeX</strong> (si pronuncia «làtec», non «làteks») è un linguaggio di composizione tipografica
+        creato negli anni Ottanta da <strong>Leslie Lamport</strong> sulla base del TeX di
+        <strong>Donald Knuth</strong>. Serve a scrivere documenti scientifici in cui le formule vengano
+        <strong>impaginate a regola d'arte</strong>, descrivendole con la sola tastiera.
+      </div>
+
+      <div class="curiosita">
+        <strong>Perché è nato.</strong> Nel 1978 Donald Knuth, uno dei più grandi informatici del secolo, ricevette
+        le bozze di un suo libro composte con la nuova tipografia elettronica e le trovò <em>brutte</em>: le formule
+        erano storte, i simboli sbagliati. Invece di lamentarsi, decise di scriversi da solo il programma per
+        comporle bene. Pensava di metterci sei mesi; ci mise dieci anni. Il risultato, TeX, è ancora oggi lo
+        standard con cui si scrivono gli articoli di matematica e di fisica in tutto il mondo — e anche tutte le
+        formule che vedete in queste lezioni, che passano da una libreria di nome KaTeX. Quando in fondo a ogni
+        pagina leggete «Realizzata con KaTeX», è di questo che si parla.
+      </div>
+
+      <p>La regola base è semplicissima: si scrive la formula <strong>fra due simboli di dollaro</strong>, e Colab
+        capisce che quel pezzo va composto come matematica invece che come testo normale.</p>
+
+      <div class="lab-step">
+        <div class="num">6</div>
+        <div>
+          <p><strong>Nella stessa cella di testo</strong>, aggiungete una riga e scrivete esattamente questo:</p>
+          <div class="codeblk">
+            <div class="head"><span><b>Markdown + LaTeX</b></span><span>in una cella di testo</span></div>
+            <pre>Il polinomio che studio è $3x^2 + 5x - 2$.
+
+E questo è un quadrato di binomio:
+
+$$(a + b)^2 = a^2 + 2ab + b^2$$</pre>
+          </div>
+          <p>Eseguite con <strong>Maiusc + Invio</strong>. Il risultato sarà:</p>
+          <div class="rule" style="margin-top:0.5rem;">
+            Il polinomio che studio è $3x^2 + 5x - 2$.
+            <br><br>E questo è un quadrato di binomio:
+            $$(a + b)^2 = a^2 + 2ab + b^2$$
+          </div>
+          <p class="formula-note">Notate la differenza: con <strong>un dollaro</strong> per parte la formula resta
+            <em>in linea</em> col testo; con <strong>due dollari</strong> va a capo, si centra e diventa più grande.
+            Ed è la stessa formula della lezione 8 — solo scritta con la tastiera invece che a mano.</p>
+        </div>
+      </div>
+
+      <p>I simboli si scrivono con dei comandi che cominciano con la barra rovesciata. Ecco i più utili per quello
+        che avete studiato quest'anno:</p>
+
+      <table class="tp-tab">
+        <tr><th>si scrive</th><th>viene fuori</th><th>si scrive</th><th>viene fuori</th></tr>
+        <tr>
+          <td><code class="inline-code">x^2</code></td><td>$x^2$</td>
+          <td><code class="inline-code">x_1</code></td><td>$x_1$</td>
+        </tr>
+        <tr>
+          <td><code class="inline-code">\frac{a}{b}</code></td><td>$\frac{a}{b}$</td>
+          <td><code class="inline-code">\sqrt{2}</code></td><td>$\sqrt{2}$</td>
+        </tr>
+        <tr>
+          <td><code class="inline-code">\sqrt[3]{x}</code></td><td>$\sqrt[3]{x}$</td>
+          <td><code class="inline-code">\pi</code></td><td>$\pi$</td>
+        </tr>
+        <tr>
+          <td><code class="inline-code">\cdot</code> oppure <code class="inline-code">\times</code></td><td>$a \cdot b$ &nbsp; $a \times b$</td>
+          <td><code class="inline-code">\le</code> &nbsp; <code class="inline-code">\ge</code> &nbsp; <code class="inline-code">\ne</code></td><td>$\le$ &nbsp; $\ge$ &nbsp; $\ne$</td>
+        </tr>
+        <tr>
+          <td><code class="inline-code">\in</code> &nbsp; <code class="inline-code">\subseteq</code></td><td>$\in$ &nbsp; $\subseteq$</td>
+          <td><code class="inline-code">\mathbb{N}</code> &nbsp; <code class="inline-code">\mathbb{R}</code></td><td>$\mathbb{N}$ &nbsp; $\mathbb{R}$</td>
+        </tr>
+      </table>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 1</span><span class="difficulty easy">Facile</span></div>
+        <p>In una cella di testo, scrivete in LaTeX queste tre cose: <strong>(a)</strong> la formula della somma per
+          differenza $(a+b)(a-b) = a^2 - b^2$; <strong>(b)</strong> il fatto che $\sqrt{2}$ non appartiene a
+          $\mathbb{Q}$; <strong>(c)</strong> l'area del cerchio in forma centrata.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="codeblk">
+            <div class="head"><span><b>Markdown + LaTeX</b></span><span>soluzione</span></div>
+            <pre>(a) $(a+b)(a-b) = a^2 - b^2$
+
+(b) $\sqrt{2} \notin \mathbb{Q}$
+
+(c) $$A = \pi r^2$$</pre>
+          </div>
+          <p>Il comando <code class="inline-code">\notin</code> è la negazione di <code class="inline-code">\in</code>:
+            quasi tutti i simboli matematici hanno la loro versione barrata ottenuta mettendo davanti
+            <code class="inline-code">\not</code>.</p>
+        </div>
+      </div>
+
+      <div class="warning">
+        <strong>Attenzione al dollaro «vero».</strong> Se in una cella di testo volete scrivere davvero un prezzo in
+        dollari, la formula impazzisce: il primo <code class="inline-code">$</code> apre la matematica e il testo
+        successivo viene composto storto. Per scrivere un dollaro letterale si mette una barra rovesciata davanti:
+        <code class="inline-code">\$</code>. È lo stesso principio del «carattere di escape» che troverete in tutti
+        i linguaggi: un simbolo che dice «il prossimo carattere prendilo alla lettera».
+      </div>
+    </section>
+
+    <!-- 7 — LA CELLA DI CODICE E L'INDENTAZIONE -->
+    <section id="sec7">
+      <h2>7. La cella di codice, e la stranezza di Python</h2>
+
+      <div class="lab-step">
+        <div class="num">7</div>
+        <div>
+          <p><strong>Premete «+ Codice»</strong> e scrivete, nella cella nera che compare:</p>
+          <div class="codeblk">
+            <div class="head"><span><b>Python</b></span><span>il rito di passaggio</span></div>
+            <pre><span class="fn">print</span>(<span class="st">"Hello, world!"</span>)</pre>
+          </div>
+          <p>Maiusc + Invio. Sotto la cella comparirà:</p>
+          <div class="term">Hello, world!</div>
+          <p>Congratulazioni: avete scritto, tradotto ed eseguito un programma. Da questo momento siete
+            ufficialmente programmatori — molto principianti, ma programmatori.</p>
+        </div>
+      </div>
+
+      <p>Analizziamo quella riga, perché c'è dentro più di quanto sembri. <code class="inline-code">print</code> è
+        una <strong>funzione</strong>: un pezzo di programma già scritto da qualcun altro, che noi
+        <em>chiamiamo</em> per nome. Le parentesi tonde contengono ciò che le passiamo — l'<strong>argomento</strong>.
+        Le virgolette dicono a Python che quello dentro è <em>testo</em> e non un comando: senza virgolette,
+        Python cercherebbe una cosa chiamata <code class="inline-code">Hello</code> e non la troverebbe.</p>
+
+      <h3>7.1 — L'indentazione: la vera differenza di Python</h3>
+
+      <p>Ed eccoci al punto in cui Python si distingue da tutti gli altri linguaggi visti nella sezione 2. Partiamo
+        dal problema che tutti devono risolvere. Ricordate la struttura condizionale della lezione 9: <em>se una
+        condizione è vera, fai queste cose</em>. Ma quali cose, esattamente? Dove finisce l'elenco delle cose «da
+        fare solo se»?</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>C</b>, Java, JavaScript…</span><span>il blocco è dentro le graffe</span></div>
+        <pre><span class="kw">if</span> (voto &gt;= <span class="nu">6</span>) <span class="hl">{</span>
+    <span class="fn">printf</span>(<span class="st">"Promosso\n"</span>);
+    <span class="fn">printf</span>(<span class="st">"Buone vacanze\n"</span>);
+<span class="hl">}</span>
+<span class="fn">printf</span>(<span class="st">"Fine\n"</span>);</pre>
+      </div>
+
+      <p>In C — e in Java, in C++, in JavaScript — la risposta sta nelle <strong>parentesi graffe</strong>: tutto
+        ciò che sta fra <code class="inline-code">{</code> e <code class="inline-code">}</code> appartiene al blocco.
+        Il fatto che le righe interne siano scritte un po' più a destra è solo <em>gentilezza</em> verso chi legge:
+        al compilatore non importa niente, potreste scrivere tutto su una riga sola e funzionerebbe uguale.</p>
+
+      <p>Python ribalta la faccenda. Guido van Rossum osservò una cosa ovvia che nessuno aveva preso sul serio:
+        <em>tutti i programmatori indentano già il codice, perché altrimenti non si capisce niente</em>. E allora,
+        perché scrivere l'informazione due volte — una con gli spazi per gli umani e una con le graffe per la
+        macchina? Via le graffe: <strong>conta lo spazio bianco</strong>.</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>Python</b></span><span>il blocco è ciò che è spostato a destra</span></div>
+        <pre><span class="kw">if</span> voto &gt;= <span class="nu">6</span>:
+<span class="hl">    </span><span class="fn">print</span>(<span class="st">"Promosso"</span>)
+<span class="hl">    </span><span class="fn">print</span>(<span class="st">"Buone vacanze"</span>)
+<span class="fn">print</span>(<span class="st">"Fine"</span>)</pre>
+      </div>
+
+      <div class="definition">
+        <strong>Indentare</strong> significa far cominciare una riga più a destra delle altre, lasciando degli spazi
+        vuoti all'inizio. In Python l'indentazione non è un abbellimento: è <strong>sintassi</strong>. Le righe
+        indentate allo stesso livello formano un <strong>blocco</strong>, cioè un gruppo di istruzioni che appartiene
+        all'<code class="inline-code">if</code>, al ciclo o alla funzione che le precede.
+      </div>
+
+      <p>Nell'esempio qui sopra: le due righe indentate vengono eseguite <em>solo se</em> il voto è almeno 6; la
+        riga <code class="inline-code">print("Fine")</code>, che è tornata a sinistra, è <em>fuori</em>
+        dall'<code class="inline-code">if</code> e viene eseguita sempre. Spostatela di quattro spazi a destra e il
+        significato del programma cambia. Non l'aspetto: il <strong>significato</strong>.</p>
+
+      <div class="rule">
+        <strong>Le regole pratiche dell'indentazione.</strong>
+        <br>• I due punti <code class="inline-code">:</code> alla fine della riga annunciano che sta per cominciare
+        un blocco. Se ci sono i due punti, la riga dopo <em>deve</em> essere indentata.
+        <br>• Si usano <strong>4 spazi</strong> per ogni livello. È una convenzione, non un obbligo — ma
+        seguitela, la segue tutto il mondo. Colab li inserisce da solo quando premete Invio dopo i due punti.
+        <br>• <strong>Non mescolate spazi e tabulazioni.</strong> Sembrano uguali sullo schermo ma per Python sono
+        cose diverse, e generano errori che fanno impazzire perché <em>non si vedono</em>.
+        <br>• Tutte le righe di uno stesso blocco devono essere indentate <strong>allo stesso modo</strong>.
+      </div>
+
+      <div class="codeblk">
+        <div class="head"><span><b>Python</b></span><span>che cosa succede se si sbaglia</span></div>
+        <pre><span class="kw">if</span> voto &gt;= <span class="nu">6</span>:
+<span class="fn">print</span>(<span class="st">"Promosso"</span>)</pre>
+      </div>
+      <div class="term"><span class="pr">&gt;&gt;&gt;</span> IndentationError: expected an indented block after 'if' statement</div>
+
+      <p>Tradotto: «mi aspettavo un blocco indentato dopo l'if». Python non prova nemmeno a indovinare — e questa,
+        a pensarci, è una fortuna. In un linguaggio con le graffe si può scrivere codice indentato in modo
+        ingannevole, che sembra dire una cosa e ne fa un'altra; in Python <strong>quello che vedete è quello che
+        succede</strong>.</p>
+
+      <div class="curiosita">
+        <strong>Un bug da 20 milioni di dollari per un'indentazione ingannevole.</strong> Nel 2014, in una libreria
+        di sicurezza usata da milioni di dispositivi Apple, comparve una riga <code class="inline-code">goto fail;</code>
+        ripetuta per sbaglio. Era indentata come se fosse dentro un <code class="inline-code">if</code>, ma le graffe
+        dicevano il contrario: veniva eseguita <em>sempre</em>, e faceva saltare il controllo dei certificati di
+        sicurezza. Per mesi, chiunque poteva intercettare connessioni che si credevano protette. In Python quel bug
+        sarebbe stato impossibile: lì l'occhio e il compilatore leggono la stessa cosa.
+      </div>
+    </section>
+
+    <!-- 8 — LE VARIABILI -->
+    <section id="sec8">
+      <h2>8. Le variabili: dare un nome alle cose</h2>
+
+      <p>Un programma che stampa sempre la stessa frase serve a poco. Per fare qualcosa di utile bisogna poter
+        <strong>conservare dei dati</strong> e riutilizzarli — e qui entra in scena una parola che conoscete già
+        dalla lezione 7, ma con un significato leggermente diverso.</p>
+
+      <div class="definition">
+        Una <strong>variabile</strong>, in informatica, è un <strong>nome</strong> associato a uno spazio di memoria
+        in cui è conservato un <strong>valore</strong>. Il valore può essere cambiato durante l'esecuzione del
+        programma — da cui il nome «variabile».
+      </div>
+
+      <div class="warning">
+        <strong>Non è la $x$ dell'algebra.</strong> In matematica, quando scriviamo $x + 3 = 7$, la $x$ è
+        un'<em>incognita</em>: un numero che c'è già, e che dobbiamo scoprire. In informatica invece
+        <code class="inline-code">x = 4</code> non è un'affermazione da verificare, è un <strong>ordine</strong>:
+        «metti il valore 4 nel cassetto che si chiama x». Tanto che una riga come
+        <code class="inline-code">x = x + 1</code>, che in algebra sarebbe una contraddizione (nessun numero è
+        uguale a sé stesso più uno), in programmazione è normalissima e vuol dire «prendi il valore che c'è in x,
+        aggiungici 1, rimettilo in x».
+      </div>
+
+      <h3>8.1 — Il cassetto in memoria</h3>
+
+      <p>Che cosa succede fisicamente quando scriviamo <code class="inline-code">eta = 15</code>? La memoria del
+        computer — la RAM di cui parlavamo nella lezione 3 — è una lunghissima fila di <strong>caselle
+        numerate</strong>. Ogni casella ha un <strong>indirizzo</strong>, cioè un numero che dice dove si trova, e
+        può contenere un byte (8 bit, lezione 6).</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 250" aria-label="La memoria come una fila di cassetti numerati: un intero occupa pochi cassetti, un numero a virgola mobile ne occupa di più">
+        <text x="20" y="24" class="lbl">la memoria: una fila di cassetti, ciascuno col suo indirizzo</text>
+
+        <g class="lbl-s" style="font-size:10px;">
+          <text x="70" y="46" text-anchor="middle">4500</text>
+          <text x="130" y="46" text-anchor="middle">4501</text>
+          <text x="190" y="46" text-anchor="middle">4502</text>
+          <text x="250" y="46" text-anchor="middle">4503</text>
+          <text x="310" y="46" text-anchor="middle">4504</text>
+          <text x="370" y="46" text-anchor="middle">4505</text>
+          <text x="430" y="46" text-anchor="middle">4506</text>
+          <text x="490" y="46" text-anchor="middle">4507</text>
+          <text x="550" y="46" text-anchor="middle">4508</text>
+        </g>
+        <g fill="none" stroke="var(--border)" stroke-width="1.6">
+          <rect x="40" y="54" width="60" height="46" rx="4"/>
+          <rect x="100" y="54" width="60" height="46" rx="4"/>
+          <rect x="160" y="54" width="60" height="46" rx="4"/>
+          <rect x="220" y="54" width="60" height="46" rx="4"/>
+          <rect x="280" y="54" width="60" height="46" rx="4"/>
+          <rect x="340" y="54" width="60" height="46" rx="4"/>
+          <rect x="400" y="54" width="60" height="46" rx="4"/>
+          <rect x="460" y="54" width="60" height="46" rx="4"/>
+          <rect x="520" y="54" width="60" height="46" rx="4"/>
+        </g>
+
+        <rect x="100" y="54" width="60" height="46" rx="4" fill="color-mix(in srgb, var(--accent) 22%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="130" y="83" text-anchor="middle" class="lbl" fill="var(--accent)">15</text>
+        <line x1="130" y1="100" x2="130" y2="124" stroke="var(--accent)" stroke-width="1.4"/>
+        <text x="130" y="140" text-anchor="middle" class="lbl" fill="var(--accent)">eta</text>
+        <text x="130" y="156" text-anchor="middle" class="lbl-s" style="font-size:10px;">un intero: 1 cassetto</text>
+
+        <rect x="340" y="54" width="240" height="46" rx="4" fill="color-mix(in srgb, var(--magenta) 20%, transparent)" stroke="var(--magenta)" stroke-width="2"/>
+        <text x="460" y="83" text-anchor="middle" class="lbl" fill="var(--magenta)">3,14159265358979</text>
+        <line x1="460" y1="100" x2="460" y2="124" stroke="var(--magenta)" stroke-width="1.4"/>
+        <text x="460" y="140" text-anchor="middle" class="lbl" fill="var(--magenta)">pi_greco</text>
+        <text x="460" y="156" text-anchor="middle" class="lbl-s" style="font-size:10px;">un numero a virgola mobile: 4 cassetti</text>
+
+        <rect x="40" y="182" width="560" height="50" rx="8" fill="color-mix(in srgb, var(--gold) 10%, transparent)" stroke="var(--gold)" stroke-width="1.6"/>
+        <text x="320" y="204" text-anchor="middle" class="lbl" fill="var(--gold)">il nome della variabile è un'etichetta incollata sul cassetto</text>
+        <text x="320" y="222" text-anchor="middle" class="lbl-s">noi scriviamo «eta», la macchina va all'indirizzo 4501 e legge quello che c'è dentro</text>
+      </svg></div>
+
+      <p>Ecco il punto: <strong>il nome della variabile serve solo a noi</strong>. Per la macchina esiste soltanto
+        l'indirizzo — quel «prendi il contenuto del cassetto 4501» del linguaggio macchina della sezione 1. Il
+        compilatore o l'interprete fa da tramite: tiene una tabella che dice «<em>eta</em> sta all'indirizzo 4501»
+        e sostituisce l'uno con l'altro. È un'astrazione, esattamente nel senso della lezione 9: qualcuno ha
+        nascosto un dettaglio scomodo perché noi potessimo pensare a cose più interessanti.</p>
+
+      <div class="rule">
+        <strong>E qui si capisce perché il tipo di una variabile conta.</strong> Un numero intero piccolo sta in un
+        cassetto solo; un numero con la virgola, per essere rappresentato con precisione, ne richiede quattro o
+        otto. Se dichiaro che una variabile è intera, il programma le riserva poco spazio e la maneggia con
+        istruzioni velocissime; se dichiaro che ha la virgola, occupa di più ed è più lenta da calcolare. Con una
+        variabile sola non cambia nulla; con <strong>dieci milioni</strong> di variabili — che è la normalità in una
+        simulazione o in un videogioco — è la differenza fra un programma che gira e uno che non ci sta in memoria.
+      </div>
+
+      <h3>8.2 — I tipi: numeri e parole</h3>
+
+      <p>Per ora ci bastano due grandi famiglie: le variabili <strong>numeriche</strong> e le variabili
+        <strong>stringa</strong> (cioè le parole). Dentro i numeri, però, Python distingue ancora:</p>
+
+      <table class="tp-tab">
+        <tr><th>tipo</th><th>che cos'è</th><th>esempi</th><th>quanto occupa</th></tr>
+        <tr>
+          <td><code class="inline-code">int</code></td>
+          <td><strong>intero</strong> — un numero senza virgola, positivo o negativo (gli $\mathbb{Z}$ della lezione 4)</td>
+          <td><code class="inline-code">15</code>, <code class="inline-code">-3</code>, <code class="inline-code">0</code></td>
+          <td>poco: tipicamente 4 byte</td>
+        </tr>
+        <tr>
+          <td><code class="inline-code">float</code></td>
+          <td><strong>virgola mobile</strong> — un numero con la parte decimale (l'inglese <em>floating point</em>)</td>
+          <td><code class="inline-code">3.14</code>, <code class="inline-code">-0.5</code>, <code class="inline-code">2.0</code></td>
+          <td>di più: 8 byte</td>
+        </tr>
+        <tr>
+          <td><code class="inline-code">str</code></td>
+          <td><strong>stringa</strong> — una sequenza di caratteri, cioè del testo</td>
+          <td><code class="inline-code">"ciao"</code>, <code class="inline-code">'3A'</code></td>
+          <td>dipende dalla lunghezza</td>
+        </tr>
+        <tr>
+          <td><code class="inline-code">bool</code></td>
+          <td><strong>booleano</strong> — solo due valori possibili, vero o falso (la logica della lezione 2)</td>
+          <td><code class="inline-code">True</code>, <code class="inline-code">False</code></td>
+          <td>pochissimo: in teoria 1 bit</td>
+        </tr>
+      </table>
+
+      <div class="warning">
+        <strong>Il punto al posto della virgola.</strong> In Python — e in praticamente tutti i linguaggi — i
+        decimali si scrivono <strong>col punto</strong>: si scrive <code class="inline-code">3.14</code>, non
+        <code class="inline-code">3,14</code>. È la convenzione anglosassone, e non c'è modo di cambiarla. Peggio:
+        <code class="inline-code">3,14</code> non dà nemmeno errore, perché Python lo interpreta come <em>due</em>
+        valori separati dalla virgola. È una delle prime fonti di risultati misteriosi.
+      </div>
+
+      <div class="lab-step">
+        <div class="num">8</div>
+        <div>
+          <p><strong>Nuova cella di codice.</strong> Usiamo Python come una calcolatrice, ma con la memoria:</p>
+          <div class="codeblk">
+            <div class="head"><span><b>Python</b></span><span>variabili numeriche</span></div>
+            <pre><span class="cm"># due variabili intere</span>
+base = <span class="nu">12</span>
+altezza = <span class="nu">7</span>
+
+<span class="cm"># le uso per calcolare l'area di un rettangolo</span>
+area = base * altezza
+<span class="fn">print</span>(area)
+
+<span class="cm"># e quella del triangolo con la stessa base e altezza</span>
+area_triangolo = base * altezza / <span class="nu">2</span>
+<span class="fn">print</span>(area_triangolo)</pre>
+          </div>
+          <div class="term">84
+42.0</div>
+          <p class="formula-note">Guardate bene i due risultati: il primo è <code class="inline-code">84</code>, il
+            secondo <code class="inline-code">42.0</code> con lo zero decimale. Perché? Perché in Python la divisione
+            <code class="inline-code">/</code> produce <em>sempre</em> un <code class="inline-code">float</code>,
+            anche quando il conto viene esatto. Python ha cambiato il tipo per noi, senza chiedere permesso: è
+            comodo, ma bisogna saperlo.</p>
+        </div>
+      </div>
+
+      <p>Gli operatori aritmetici sono quelli che vi aspettate, con due aggiunte utili che avete già incontrato
+        nella lezione 9:</p>
+
+      <table class="tp-tab">
+        <tr><th>operatore</th><th>che cosa fa</th><th>esempio</th><th>risultato</th></tr>
+        <tr><td><code class="inline-code">+ - *</code></td><td>somma, differenza, prodotto</td><td><code class="inline-code">7 * 3</code></td><td><code class="inline-code">21</code></td></tr>
+        <tr><td><code class="inline-code">/</code></td><td>divisione (dà sempre un float)</td><td><code class="inline-code">7 / 2</code></td><td><code class="inline-code">3.5</code></td></tr>
+        <tr><td><code class="inline-code">//</code></td><td>divisione intera: quoziente senza resto</td><td><code class="inline-code">7 // 2</code></td><td><code class="inline-code">3</code></td></tr>
+        <tr><td><code class="inline-code">%</code></td><td>modulo: il <strong>resto</strong> della divisione</td><td><code class="inline-code">7 % 2</code></td><td><code class="inline-code">1</code></td></tr>
+        <tr><td><code class="inline-code">**</code></td><td>elevamento a potenza</td><td><code class="inline-code">2 ** 10</code></td><td><code class="inline-code">1024</code></td></tr>
+      </table>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2</span><span class="difficulty easy">Facile</span></div>
+        <p>Scrivete un programma che, date le due diagonali di un rombo salvate in due variabili
+          (<code class="inline-code">d1 = 60</code> e <code class="inline-code">d2 = 80</code>), calcoli e stampi
+          l'area. Poi, usando l'operatore <code class="inline-code">%</code>, fate stampare il resto della divisione
+          di 2026 per 4 (serve a sapere se l'anno è bisestile).</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="codeblk">
+            <div class="head"><span><b>Python</b></span><span>soluzione</span></div>
+            <pre>d1 = <span class="nu">60</span>
+d2 = <span class="nu">80</span>
+area = d1 * d2 / <span class="nu">2</span>
+<span class="fn">print</span>(area)
+
+<span class="fn">print</span>(<span class="nu">2026</span> % <span class="nu">4</span>)</pre>
+          </div>
+          <div class="term">2400.0
+2</div>
+          <p>Il resto è 2, diverso da zero: il 2026 non è bisestile. La formula del rombo è quella della lezione 10,
+            $A = \dfrac{d_1 \cdot d_2}{2}$.</p>
+        </div>
+      </div>
+
+      <h3>8.3 — Le stringhe: fare i conti con le parole</h3>
+
+      <p>Una <strong>stringa</strong> è del testo, e si scrive fra virgolette (doppie o singole, per Python è
+        uguale). La cosa sorprendente è che anche sulle parole si possono fare delle operazioni — solo che
+        significano altro.</p>
+
+      <div class="lab-step">
+        <div class="num">9</div>
+        <div>
+          <p><strong>Nuova cella.</strong> Proviamo a «sommare» delle parole:</p>
+          <div class="codeblk">
+            <div class="head"><span><b>Python</b></span><span>concatenazione di stringhe</span></div>
+            <pre>nome = <span class="st">"Ada"</span>
+cognome = <span class="st">"Lovelace"</span>
+
+completo = nome + <span class="st">" "</span> + cognome
+<span class="fn">print</span>(completo)
+
+<span class="cm"># anche la moltiplicazione funziona, a modo suo</span>
+<span class="fn">print</span>(<span class="st">"ah"</span> * <span class="nu">3</span>)
+
+<span class="cm"># e si può chiedere quanto è lunga una stringa</span>
+<span class="fn">print</span>(<span class="fn">len</span>(completo))</pre>
+          </div>
+          <div class="term">Ada Lovelace
+ahahah
+12</div>
+          <p class="formula-note">Il <code class="inline-code">+</code> fra due stringhe non somma niente: le
+            <strong>concatena</strong>, cioè le attacca una dopo l'altra. Notate che abbiamo dovuto aggiungere a
+            mano <code class="inline-code">" "</code>, uno spazio: il computer non lo mette da solo, perché non sa
+            che stiamo unendo un nome e un cognome. E <code class="inline-code">len</code> conta 12 caratteri —
+            spazio compreso.</p>
+        </div>
+      </div>
+
+      <div class="warning">
+        <strong>L'errore che farete tutti, almeno una volta.</strong> Provate a eseguire
+        <code class="inline-code">print("3" + 5)</code>. Non funziona:
+        <div class="term" style="margin-top:0.5rem;"><span class="pr">&gt;&gt;&gt;</span> TypeError: can only concatenate str (not "int") to str</div>
+        Il messaggio dice: «posso concatenare a una stringa solo un'altra stringa, non un intero». Il
+        <code class="inline-code">3</code> fra virgolette <strong>non è il numero tre</strong>: è il
+        <em>carattere</em> tre, come il disegno di un tre su un cartello. Python si rifiuta di indovinare che cosa
+        volessimo fare — sommarli o attaccarli? — e ci ferma. Le soluzioni sono due:
+        <code class="inline-code">int("3") + 5</code> dà <code class="inline-code">8</code>, mentre
+        <code class="inline-code">"3" + str(5)</code> dà <code class="inline-code">"35"</code>.
+      </div>
+
+      <div class="rule">
+        <strong>Scegliere il tipo giusto è una decisione, non un dettaglio.</strong> Un numero di telefono va tenuto
+        come <strong>stringa</strong>, non come intero: comincia spesso per zero (e uno zero iniziale, in un numero,
+        sparisce) e non ci farete mai delle addizioni sopra. Un codice fiscale, un CAP, un numero di matricola:
+        tutte stringhe. Un prezzo, invece, va tenuto come numero — ma attenzione ai float, che con i decimali fanno
+        piccoli errori di arrotondamento: provate a far stampare
+        <code class="inline-code">0.1 + 0.2</code> e scoprirete che Python risponde
+        <code class="inline-code">0.30000000000000004</code>. Non è un bug: è la conseguenza del fatto che 0,1 in
+        base 2 (lezione 6) è periodico, e va troncato. Per i soldi, i programmi seri usano tipi apposta.
+      </div>
+
+      <p>Se avete un dubbio su che cosa stiate maneggiando, Python ve lo dice: la funzione
+        <code class="inline-code">type()</code> risponde con il tipo di una variabile. Provate:</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>Python</b></span><span>chiedere il tipo</span></div>
+        <pre><span class="fn">print</span>(<span class="fn">type</span>(<span class="nu">15</span>))
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="nu">3.14</span>))
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="st">"ciao"</span>))
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="nu">3</span> &gt; <span class="nu">5</span>))</pre>
+      </div>
+      <div class="term">&lt;class 'int'&gt;
+&lt;class 'float'&gt;
+&lt;class 'str'&gt;
+&lt;class 'bool'&gt;</div>
+
+      <div class="curiosita">
+        <strong>Python è «gentile», ma non sempre è un bene.</strong> In C o in Java il tipo di una variabile va
+        <em>dichiarato</em> prima di usarla — si scrive <code class="inline-code">int eta = 15;</code> — e da quel
+        momento in quel cassetto possono entrare solo interi. Python no: capisce da solo il tipo guardando il valore,
+        e permette perfino di cambiarlo in corsa. È comodissimo mentre si impara, ed è uno dei motivi del suo
+        successo. Ma è anche il motivo per cui certi errori in Python vengono scoperti soltanto quando il programma
+        è già in esecuzione, magari davanti al cliente, mentre in Java il compilatore li avrebbe bloccati il giorno
+        prima. Ancora una volta: nessun vantaggio è gratis.
+      </div>
+    </section>
+
+    <!-- 9 — VARIABILI STRUTTURATE -->
+    <section id="sec9">
+      <h2>9. Variabili strutturate: liste e vettori</h2>
+
+      <p>Finora ogni variabile conteneva <em>una</em> cosa: un numero, una parola. Ma provate a immaginare di dover
+        gestire i voti di una classe. Ventisette variabili, <code class="inline-code">voto1</code>,
+        <code class="inline-code">voto2</code>, <code class="inline-code">voto3</code>… e poi come si fa la media?
+        Ventisette addizioni scritte a mano? E se l'anno prossimo la classe ha ventotto alunni, si riscrive tutto?</p>
+
+      <p>Ci vuole un'idea diversa: <strong>un solo nome per tanti valori</strong>, e un modo per riferirsi al
+        singolo valore attraverso la sua <em>posizione</em>. Sono le <strong>variabili strutturate</strong>.</p>
+
+      <div class="definition">
+        Una <strong>lista</strong> (in altri linguaggi: <strong>vettore</strong>, o <em>array</em>) è una collezione
+        <strong>ordinata</strong> di valori, identificati da un <strong>indice</strong> che ne indica la posizione.
+        Il nome è uno solo; l'indice, scritto fra parentesi quadre, sceglie l'elemento.
+      </div>
+
+      <div class="ckt"><svg viewBox="0 0 640 200" aria-label="Una lista di sei voti con i rispettivi indici da 0 a 5">
+        <text x="20" y="26" class="lbl">voti = [7, 5, 9, 6, 8, 4]</text>
+        <g class="lbl-s" style="font-size:11px;">
+          <text x="90" y="58" text-anchor="middle">indice 0</text>
+          <text x="180" y="58" text-anchor="middle">indice 1</text>
+          <text x="270" y="58" text-anchor="middle">indice 2</text>
+          <text x="360" y="58" text-anchor="middle">indice 3</text>
+          <text x="450" y="58" text-anchor="middle">indice 4</text>
+          <text x="540" y="58" text-anchor="middle">indice 5</text>
+        </g>
+        <g fill="color-mix(in srgb, var(--accent) 14%, transparent)" stroke="var(--accent)" stroke-width="2">
+          <rect x="50" y="68" width="80" height="52" rx="6"/>
+          <rect x="140" y="68" width="80" height="52" rx="6"/>
+          <rect x="230" y="68" width="80" height="52" rx="6"/>
+          <rect x="320" y="68" width="80" height="52" rx="6"/>
+          <rect x="410" y="68" width="80" height="52" rx="6"/>
+          <rect x="500" y="68" width="80" height="52" rx="6"/>
+        </g>
+        <g class="lbl" style="font-size:20px;" text-anchor="middle">
+          <text x="90" y="102">7</text><text x="180" y="102">5</text><text x="270" y="102">9</text>
+          <text x="360" y="102">6</text><text x="450" y="102">8</text><text x="540" y="102">4</text>
+        </g>
+        <line x1="270" y1="120" x2="270" y2="146" stroke="var(--magenta)" stroke-width="1.6"/>
+        <text x="270" y="164" text-anchor="middle" class="em">voti[2] vale 9</text>
+        <text x="320" y="188" text-anchor="middle" class="lbl-s">attenzione: il primo elemento ha indice ZERO, non uno</text>
+      </svg></div>
+
+      <div class="warning">
+        <strong>Si conta da zero.</strong> È la prima cosa che spiazza chiunque cominci a programmare, e la prima
+        fonte di errori: <code class="inline-code">voti[0]</code> è il <em>primo</em> voto,
+        <code class="inline-code">voti[2]</code> è il <em>terzo</em>. Non è un capriccio: l'indice, in origine, non
+        indicava «il numero d'ordine» ma <strong>di quanto spostarsi dall'inizio</strong>. Il primo elemento sta
+        proprio all'inizio, quindi lo scostamento è zero. Una lista di 6 elementi ha dunque indici da 0 a
+        <strong>5</strong>, e chiedere <code class="inline-code">voti[6]</code> dà errore.
+      </div>
+
+      <div class="lab-step">
+        <div class="num">10</div>
+        <div>
+          <p><strong>Nuova cella.</strong> Costruiamo la nostra prima lista e giochiamoci un po':</p>
+          <div class="codeblk">
+            <div class="head"><span><b>Python</b></span><span>la lista</span></div>
+            <pre><span class="cm"># si crea con le parentesi QUADRE, valori separati da virgole</span>
+voti = [<span class="nu">7</span>, <span class="nu">5</span>, <span class="nu">9</span>, <span class="nu">6</span>, <span class="nu">8</span>, <span class="nu">4</span>]
+
+<span class="fn">print</span>(voti)          <span class="cm"># tutta la lista</span>
+<span class="fn">print</span>(voti[<span class="nu">0</span>])       <span class="cm"># il primo elemento</span>
+<span class="fn">print</span>(voti[<span class="nu">2</span>])       <span class="cm"># il terzo</span>
+<span class="fn">print</span>(voti[-<span class="nu">1</span>])      <span class="cm"># l'ultimo (indice negativo: si conta da destra!)</span>
+<span class="fn">print</span>(<span class="fn">len</span>(voti))     <span class="cm"># quanti elementi ci sono</span>
+
+<span class="cm"># si può modificare un elemento...</span>
+voti[<span class="nu">1</span>] = <span class="nu">7</span>
+<span class="cm"># ...e aggiungerne in fondo</span>
+voti.<span class="fn">append</span>(<span class="nu">10</span>)
+<span class="fn">print</span>(voti)</pre>
+          </div>
+          <div class="term">[7, 5, 9, 6, 8, 4]
+7
+9
+4
+6
+[7, 7, 9, 6, 8, 4, 10]</div>
+        </div>
+      </div>
+
+      <h3>9.1 — Liste e vettori: la stessa idea, due mestieri diversi</h3>
+
+      <p>La parola «vettore» e la parola «lista» vengono spesso usate come sinonimi, ma per un informatico indicano
+        due cose <strong>tecnicamente diverse</strong>, e la differenza sta — ancora una volta — in come sono
+        sistemate in memoria.</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 260" aria-label="Confronto fra un vettore, i cui elementi sono contigui in memoria, e una lista, i cui elementi sono sparsi e collegati da rimandi">
+        <text x="20" y="24" class="lbl" fill="var(--accent)">VETTORE — celle attaccate, tutte della stessa misura</text>
+        <g fill="color-mix(in srgb, var(--accent) 16%, transparent)" stroke="var(--accent)" stroke-width="1.8">
+          <rect x="40" y="36" width="60" height="40"/><rect x="100" y="36" width="60" height="40"/>
+          <rect x="160" y="36" width="60" height="40"/><rect x="220" y="36" width="60" height="40"/>
+          <rect x="280" y="36" width="60" height="40"/><rect x="340" y="36" width="60" height="40"/>
+        </g>
+        <g class="lbl" text-anchor="middle"><text x="70" y="62">7</text><text x="130" y="62">5</text><text x="190" y="62">9</text><text x="250" y="62">6</text><text x="310" y="62">8</text><text x="370" y="62">4</text></g>
+        <g class="lbl-s" style="font-size:10px;" text-anchor="middle">
+          <text x="70" y="90">4500</text><text x="130" y="90">4504</text><text x="190" y="90">4508</text>
+          <text x="250" y="90">4512</text><text x="310" y="90">4516</text><text x="370" y="90">4520</text>
+        </g>
+        <text x="420" y="56" class="lbl-s">l'indirizzo del 4° elemento?</text>
+        <text x="420" y="74" class="em" style="font-size:12px;">4500 + 3×4 = 4512 — un conto solo</text>
+
+        <text x="20" y="132" class="lbl" fill="var(--magenta)">LISTA — elementi sparsi, ognuno indica dov'è il prossimo</text>
+        <g fill="color-mix(in srgb, var(--magenta) 16%, transparent)" stroke="var(--magenta)" stroke-width="1.8">
+          <rect x="40" y="146" width="58" height="38" rx="5"/>
+          <rect x="150" y="182" width="58" height="38" rx="5"/>
+          <rect x="260" y="144" width="58" height="38" rx="5"/>
+          <rect x="370" y="188" width="58" height="38" rx="5"/>
+          <rect x="480" y="150" width="58" height="38" rx="5"/>
+        </g>
+        <g class="lbl" text-anchor="middle"><text x="69" y="171">7</text><text x="179" y="207">5</text><text x="289" y="169">9</text><text x="399" y="213">6</text><text x="509" y="175">8</text></g>
+        <g fill="none" stroke="var(--magenta)" stroke-width="1.6" stroke-dasharray="4 3">
+          <path d="M 98 165 C 120 165 130 201 148 201"/>
+          <path d="M 208 201 C 230 201 240 163 258 163"/>
+          <path d="M 318 163 C 340 163 350 207 368 207"/>
+          <path d="M 428 207 C 450 207 460 169 478 169"/>
+        </g>
+        <text x="320" y="246" text-anchor="middle" class="lbl-s">per arrivare al 4° elemento bisogna seguire tre rimandi, uno alla volta</text>
+      </svg></div>
+
+      <table class="tp-tab">
+        <tr><th></th><th>vettore (array)</th><th>lista</th></tr>
+        <tr><td><strong>in memoria</strong></td><td class="si">celle contigue, una attaccata all'altra</td><td class="no">elementi sparsi, collegati da rimandi</td></tr>
+        <tr><td><strong>tipo degli elementi</strong></td><td>tutti uguali (tutti interi, tutti float…)</td><td>anche misti: numeri, parole, altre liste</td></tr>
+        <tr><td><strong>dimensione</strong></td><td>fissata quando lo si crea</td><td class="si">cresce e si accorcia quando serve</td></tr>
+        <tr><td><strong>leggere l'elemento <em>i</em></strong></td><td class="si">immediato: un solo conto sull'indirizzo</td><td>più lento: bisogna arrivarci</td></tr>
+        <tr><td><strong>aggiungere in mezzo</strong></td><td class="no">costoso: bisogna spostare tutto il resto</td><td class="si">facile: basta cambiare due rimandi</td></tr>
+      </table>
+
+      <p>Il vettore è una fila di banchi tutti uguali in un'aula: sapendo dov'è il primo e quanto è largo un banco,
+        si calcola <em>al volo</em> dov'è il quindicesimo. La lista è una caccia al tesoro: ogni biglietto dice dove
+        trovare il prossimo, e per arrivare al quindicesimo bisogna passare per tutti gli altri quattordici.</p>
+
+      <div class="rule">
+        <strong>E Python?</strong> Python, fedele alla sua filosofia, ha scelto la <strong>comodità</strong>: quelle
+        che chiamiamo liste sono flessibili, possono contenere tipi diversi, crescono quanto vogliono. Il prezzo è
+        la velocità. Quando però bisogna macinare milioni di numeri — un'immagine, un modello del clima, una rete
+        neurale — quel prezzo diventa insostenibile. La soluzione è aggiungere una <strong>libreria</strong>:
+        <strong>NumPy</strong>, che introduce in Python i veri vettori, contigui in memoria e con tutti gli elementi
+        dello stesso tipo. Il calcolo diventa anche <em>cento volte</em> più veloce.
+      </div>
+
+      <div class="definition">
+        Una <strong>libreria</strong> è una raccolta di codice già scritto, provato e ottimizzato da altri, che si
+        può importare nel proprio programma e usare come se fosse parte del linguaggio. È la scomposizione top-down
+        della lezione 9 portata all'estremo: se il sottoproblema lo ha già risolto qualcuno, non lo risolviamo di
+        nuovo.
+      </div>
+
+      <div class="lab-step">
+        <div class="num">11</div>
+        <div>
+          <p><strong>Nuova cella.</strong> Sommiamo due vettori — e guardiamo la differenza:</p>
+          <div class="codeblk">
+            <div class="head"><span><b>Python</b></span><span>liste normali contro vettori NumPy</span></div>
+            <pre><span class="cm"># --- con le liste normali: il + le ATTACCA, non le somma! ---</span>
+a = [<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>]
+b = [<span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>]
+<span class="fn">print</span>(a + b)
+
+<span class="cm"># --- con NumPy: il + somma elemento per elemento ---</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+va = np.<span class="fn">array</span>([<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>])
+vb = np.<span class="fn">array</span>([<span class="nu">10</span>, <span class="nu">20</span>, <span class="nu">30</span>])
+<span class="fn">print</span>(va + vb)
+<span class="fn">print</span>(va * <span class="nu">2</span>)</pre>
+          </div>
+          <div class="term">[1, 2, 3, 10, 20, 30]
+[11 22 33]
+[2 4 6]</div>
+          <p class="formula-note">Ecco la differenza in una riga di output. Per le liste, <code class="inline-code">+</code>
+            è la concatenazione (come per le stringhe!); per i vettori NumPy è la <strong>somma componente per
+            componente</strong> — esattamente la somma dei vettori che incontrerete in fisica. La riga
+            <code class="inline-code">import numpy as np</code> vuol dire: «carica la libreria numpy e d'ora in poi
+            chiamala np, che è più corto».</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3</span><span class="difficulty easy">Facile</span></div>
+        <p><strong>(a)</strong> Create una lista con le vostre cinque materie preferite. <strong>(b)</strong> Fate
+          stampare la terza. <strong>(c)</strong> Aggiungetene una sesta in fondo e stampate quante sono in tutto.
+          <strong>(d)</strong> Create due vettori NumPy con le basi e le altezze di tre rettangoli e fate calcolare
+          le tre aree con una sola moltiplicazione.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="codeblk">
+            <div class="head"><span><b>Python</b></span><span>soluzione</span></div>
+            <pre>materie = [<span class="st">"matematica"</span>, <span class="st">"fisica"</span>, <span class="st">"storia"</span>, <span class="st">"inglese"</span>, <span class="st">"arte"</span>]
+<span class="fn">print</span>(materie[<span class="nu">2</span>])          <span class="cm"># la TERZA ha indice 2</span>
+
+materie.<span class="fn">append</span>(<span class="st">"informatica"</span>)
+<span class="fn">print</span>(<span class="fn">len</span>(materie))
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+basi    = np.<span class="fn">array</span>([<span class="nu">3</span>, <span class="nu">5</span>, <span class="nu">8</span>])
+altezze = np.<span class="fn">array</span>([<span class="nu">4</span>, <span class="nu">2</span>, <span class="nu">10</span>])
+<span class="fn">print</span>(basi * altezze)</pre>
+          </div>
+          <div class="term">storia
+6
+[12 10 80]</div>
+          <p>Una sola moltiplicazione ha calcolato tre aree. Con tre rettangoli non impressiona; con tre milioni,
+            questa è la differenza fra un programma che finisce e uno che non finisce mai.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 — LE STRUTTURE DI CONTROLLO SUI VETTORI -->
+    <section id="sec10">
+      <h2>10. Le tre strutture, finalmente in codice vero</h2>
+
+      <p>Nella lezione 9 avevamo detto che qualunque algoritmo si costruisce con tre sole strutture: <strong>
+        sequenziale</strong>, <strong>condizionale</strong> e <strong>iterativa</strong>. Allora erano
+        pseudocodice: parole nostre, su carta. Adesso le scriviamo per davvero, e le facciamo lavorare sulle liste.</p>
+
+      <h3>10.1 — La struttura condizionale: <code class="inline-code">if</code></h3>
+
+      <div class="codeblk">
+        <div class="head"><span><b>Python</b></span><span>la condizione, con tutte le sue varianti</span></div>
+        <pre>voto = <span class="nu">5</span>
+
+<span class="kw">if</span> voto &gt;= <span class="nu">6</span>:
+    <span class="fn">print</span>(<span class="st">"sufficiente"</span>)
+<span class="kw">elif</span> voto == <span class="nu">5</span>:
+    <span class="fn">print</span>(<span class="st">"quasi, ma no"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"insufficiente"</span>)</pre>
+      </div>
+
+      <p>Tre parole chiave: <code class="inline-code">if</code> (se), <code class="inline-code">elif</code>
+        (abbreviazione di <em>else if</em>: altrimenti, se…) ed <code class="inline-code">else</code> (altrimenti).
+        Notate i due punti alla fine di ogni riga e l'indentazione dei blocchi: è tutto quello che avete imparato
+        nella sezione 7.</p>
+
+      <div class="warning">
+        <strong>Un uguale o due?</strong> Ecco un errore che farete di sicuro. Il simbolo
+        <code class="inline-code">=</code> (uno solo) <strong>assegna</strong>: «metti questo valore nel cassetto».
+        Il simbolo <code class="inline-code">==</code> (doppio) <strong>confronta</strong>: «è uguale a?», e la
+        risposta è <code class="inline-code">True</code> o <code class="inline-code">False</code>. Scrivere
+        <code class="inline-code">if voto = 6:</code> è un errore di sintassi. Gli altri confronti sono
+        <code class="inline-code">!=</code> (diverso), <code class="inline-code">&lt;</code>,
+        <code class="inline-code">&gt;</code>, <code class="inline-code">&lt;=</code>,
+        <code class="inline-code">&gt;=</code>.
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 4 — condizionale</span><span class="difficulty easy">Facile</span></div>
+        <p>Scrivete un programma che, data una lista di voti, controlli <strong>il primo voto</strong> e stampi
+          «promosso» se è almeno 6, «rimandato» altrimenti. Provate a cambiare il valore e a rieseguire.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="codeblk">
+            <div class="head"><span><b>Python</b></span><span>soluzione</span></div>
+            <pre>voti = [<span class="nu">7</span>, <span class="nu">5</span>, <span class="nu">9</span>, <span class="nu">6</span>, <span class="nu">8</span>, <span class="nu">4</span>]
+
+<span class="kw">if</span> voti[<span class="nu">0</span>] &gt;= <span class="nu">6</span>:
+    <span class="fn">print</span>(<span class="st">"promosso"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"rimandato"</span>)</pre>
+          </div>
+          <div class="term">promosso</div>
+        </div>
+      </div>
+
+      <h3>10.2 — La struttura iterativa: <code class="inline-code">for</code></h3>
+
+      <p>Qui Python fa una cosa bellissima. Negli altri linguaggi, per scorrere un vettore, si scrive un ciclo con
+        un contatore che va da 0 alla lunghezza meno uno, e si usa il contatore come indice. In Python si può fare
+        anche così, ma c'è una scorciatoia che si legge come l'italiano:</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>Python</b></span><span>«per ogni voto nella lista dei voti…»</span></div>
+        <pre>voti = [<span class="nu">7</span>, <span class="nu">5</span>, <span class="nu">9</span>, <span class="nu">6</span>, <span class="nu">8</span>, <span class="nu">4</span>]
+
+<span class="kw">for</span> voto <span class="kw">in</span> voti:
+    <span class="fn">print</span>(voto)</pre>
+      </div>
+
+      <p>Sei righe di output, una per voto. La variabile <code class="inline-code">voto</code> non esiste prima:
+        la crea il ciclo, e a ogni giro ci mette dentro l'elemento successivo. Quando gli elementi finiscono, il
+        ciclo finisce — automaticamente. Ricordate il problema della lezione 9, il ciclo infinito perché ci si
+        dimentica di incrementare il contatore? Con questa forma <strong>non può succedere</strong>.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 5 — iterativa</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcolate la <strong>somma</strong> e la <strong>media</strong> dei voti, scorrendo la lista con un
+          ciclo. (Sì, esiste una funzione già pronta che lo fa; ma il senso dell'esercizio è scriverlo voi.)</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="codeblk">
+            <div class="head"><span><b>Python</b></span><span>soluzione</span></div>
+            <pre>voti = [<span class="nu">7</span>, <span class="nu">5</span>, <span class="nu">9</span>, <span class="nu">6</span>, <span class="nu">8</span>, <span class="nu">4</span>]
+
+somma = <span class="nu">0</span>              <span class="cm"># l'accumulatore parte da zero</span>
+<span class="kw">for</span> voto <span class="kw">in</span> voti:
+    somma = somma + voto   <span class="cm"># si può abbreviare in: somma += voto</span>
+
+media = somma / <span class="fn">len</span>(voti)
+<span class="fn">print</span>(<span class="st">"somma:"</span>, somma)
+<span class="fn">print</span>(<span class="st">"media:"</span>, media)</pre>
+          </div>
+          <div class="term">somma: 39
+media: 6.5</div>
+          <p>Il trucco dell'<strong>accumulatore</strong> — una variabile che parte da zero e si ingrossa a ogni
+            giro — è lo stesso identico dell'algoritmo che sommava i primi $N$ numeri nella lezione 9. Cambia il
+            linguaggio, non l'idea. E notate: se domani la lista avesse cento elementi, questo programma
+            funzionerebbe <em>senza cambiare una virgola</em>. È esattamente ciò che ventisette variabili separate
+            non permettevano di fare.</p>
+        </div>
+      </div>
+
+      <h3>10.3 — Le due strutture insieme</h3>
+
+      <p>Il vero potere arriva quando si mette una condizione <em>dentro</em> un ciclo: si esamina ogni elemento,
+        e si fa qualcosa solo per quelli che soddisfano una certa proprietà. Guardate i due livelli di
+        indentazione — sono la mappa visiva di quello che sta succedendo.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 6 — condizionale + iterativa</span><span class="difficulty medium">Medio</span></div>
+        <p>Contate quanti voti sono <strong>insufficienti</strong> e, allo stesso tempo, trovate il voto
+          <strong>più alto</strong> della lista — senza usare funzioni già pronte.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="codeblk">
+            <div class="head"><span><b>Python</b></span><span>soluzione</span></div>
+            <pre>voti = [<span class="nu">7</span>, <span class="nu">5</span>, <span class="nu">9</span>, <span class="nu">6</span>, <span class="nu">8</span>, <span class="nu">4</span>]
+
+insufficienti = <span class="nu">0</span>
+massimo = voti[<span class="nu">0</span>]        <span class="cm"># il campione in carica: per ora il primo</span>
+
+<span class="kw">for</span> voto <span class="kw">in</span> voti:
+    <span class="kw">if</span> voto &lt; <span class="nu">6</span>:
+        insufficienti = insufficienti + <span class="nu">1</span>
+    <span class="kw">if</span> voto &gt; massimo:
+        massimo = voto     <span class="cm"># nuovo campione</span>
+
+<span class="fn">print</span>(<span class="st">"insufficienze:"</span>, insufficienti)
+<span class="fn">print</span>(<span class="st">"voto più alto:"</span>, massimo)</pre>
+          </div>
+          <div class="term">insufficienze: 2
+voto più alto: 9</div>
+          <p>L'algoritmo del massimo merita attenzione, perché è un classico assoluto: si nomina «campione» il primo
+            elemento, si sfidano tutti gli altri uno per uno, e chi vince prende il posto. Alla fine del giro il
+            campione è il massimo. <strong>Attenzione all'errore classico</strong>: far partire
+            <code class="inline-code">massimo = 0</code> funziona solo per caso, perché qui i voti sono positivi;
+            con una lista di temperature invernali darebbe una risposta sbagliata. Partire dal <em>primo elemento</em>
+            è sempre corretto.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 — LO SWAP E L'ORDINAMENTO -->
+    <section id="sec11">
+      <h2>11. Mettere in ordine</h2>
+
+      <p>Guardate lo schermo di un telefono. I contatti sono in ordine alfabetico, le foto in ordine di data, i
+        messaggi dal più recente, i risultati di una ricerca dal più pertinente, le canzoni per numero di ascolti.
+        <strong>Non esiste praticamente nessuna schermata di nessun programma in cui i dati siano nell'ordine in
+        cui sono arrivati.</strong> Ordinare è una delle cose che i computer fanno più spesso in assoluto — ed è per
+        questo che è uno dei problemi più studiati della storia dell'informatica.</p>
+
+      <p>E c'è un secondo motivo, meno ovvio: <strong>su dati ordinati si cerca infinitamente più in fretta</strong>.
+        Per trovare un nome in un elenco disordinato di un milione di righe bisogna guardarle tutte; in un elenco
+        ordinato bastano venti confronti, dimezzando ogni volta — è quello che facciamo istintivamente con un
+        vocabolario cartaceo. Ordinare una volta per cercare mille volte è quasi sempre un affare.</p>
+
+      <h3>11.1 — Prima però: come si scambiano due variabili</h3>
+
+      <p>Qualunque algoritmo di ordinamento, alla fine, non fa che una cosa: <strong>scambiare di posto due
+        elementi</strong> finché non sono a posto. E scambiare due variabili è un problemino delizioso, perché la
+        soluzione ingenua non funziona.</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>Python</b></span><span>il tentativo che NON funziona</span></div>
+        <pre>a = <span class="nu">5</span>
+b = <span class="nu">9</span>
+
+a = b     <span class="cm"># ora a vale 9... ma il 5 è andato PERDUTO</span>
+b = a     <span class="cm"># e qui b prende 9, cioè sé stesso</span>
+
+<span class="fn">print</span>(a, b)</pre>
+      </div>
+      <div class="term">9 9</div>
+
+      <p>Il 5 è sparito. Il motivo è chiarissimo se si ripensa ai cassetti della sezione 8: scrivendo
+        <code class="inline-code">a = b</code> abbiamo <em>sovrascritto</em> il contenuto del cassetto
+        <code class="inline-code">a</code>, e quello che c'era prima non esiste più. È lo stesso problema di chi
+        vuole travasare il contenuto di due bicchieri l'uno nell'altro: serve un terzo bicchiere.</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 220" aria-label="Lo scambio di due variabili con una terza variabile di appoggio, in tre passi">
+        <g class="lbl-s" style="font-size:11px;" text-anchor="middle">
+          <text x="105" y="26">PASSO 1</text><text x="320" y="26">PASSO 2</text><text x="535" y="26">PASSO 3</text>
+        </g>
+        <g class="em" style="font-size:11px;" text-anchor="middle">
+          <text x="105" y="44">tmp = a</text><text x="320" y="44">a = b</text><text x="535" y="44">b = tmp</text>
+        </g>
+
+        <g fill="none" stroke="var(--border)" stroke-width="1.8">
+          <rect x="40" y="60" width="54" height="46" rx="5"/><rect x="112" y="60" width="54" height="46" rx="5"/><rect x="76" y="130" width="54" height="46" rx="5"/>
+          <rect x="255" y="60" width="54" height="46" rx="5"/><rect x="327" y="60" width="54" height="46" rx="5"/><rect x="291" y="130" width="54" height="46" rx="5"/>
+          <rect x="470" y="60" width="54" height="46" rx="5"/><rect x="542" y="60" width="54" height="46" rx="5"/><rect x="506" y="130" width="54" height="46" rx="5"/>
+        </g>
+        <g class="lbl-s" style="font-size:10px;" text-anchor="middle">
+          <text x="67" y="120">a</text><text x="139" y="120">b</text><text x="103" y="192">tmp</text>
+          <text x="282" y="120">a</text><text x="354" y="120">b</text><text x="318" y="192">tmp</text>
+          <text x="497" y="120">a</text><text x="569" y="120">b</text><text x="533" y="192">tmp</text>
+        </g>
+        <g class="lbl" style="font-size:19px;" text-anchor="middle">
+          <text x="67" y="90">5</text><text x="139" y="90">9</text><text x="103" y="160" fill="var(--gold)">5</text>
+          <text x="282" y="90" fill="var(--magenta)">9</text><text x="354" y="90">9</text><text x="318" y="160" fill="var(--gold)">5</text>
+          <text x="497" y="90">9</text><text x="569" y="90" fill="var(--magenta)">5</text><text x="533" y="160" fill="var(--gold)">5</text>
+        </g>
+        <path d="M 60 106 L 88 130" fill="none" stroke="var(--gold)" stroke-width="2" marker-end="url(#arrsw)"/>
+        <path d="M 330 84 L 306 84" fill="none" stroke="var(--magenta)" stroke-width="2" marker-end="url(#arrsw)"/>
+        <path d="M 546 150 L 566 112" fill="none" stroke="var(--magenta)" stroke-width="2" marker-end="url(#arrsw)"/>
+        <defs><marker id="arrsw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--magenta)"/></marker></defs>
+        <text x="320" y="212" text-anchor="middle" class="lbl-s">il terzo cassetto «tmp» serve solo a non perdere il valore di partenza</text>
+      </svg></div>
+
+      <div class="rule">
+        <strong>Lo scambio (in inglese <em>swap</em>) in tre passi.</strong> Serve una <strong>variabile di
+        appoggio</strong>, che per tradizione si chiama <code class="inline-code">tmp</code> o
+        <code class="inline-code">temp</code> (da <em>temporary</em>):
+        <br>1. <code class="inline-code">tmp = a</code> — metto al sicuro il valore di a;
+        <br>2. <code class="inline-code">a = b</code> — ora posso sovrascrivere a senza perdere niente;
+        <br>3. <code class="inline-code">b = tmp</code> — e recupero il valore messo da parte.
+      </div>
+
+      <div class="codeblk">
+        <div class="head"><span><b>Python</b></span><span>lo scambio, finalmente giusto</span></div>
+        <pre>a = <span class="nu">5</span>
+b = <span class="nu">9</span>
+
+tmp = a
+a = b
+b = tmp
+
+<span class="fn">print</span>(a, b)</pre>
+      </div>
+      <div class="term">9 5</div>
+
+      <div class="curiosita">
+        <strong>La scorciatoia di Python (da usare sapendo cosa c'è sotto).</strong> Python permette di scrivere lo
+        scambio in una riga sola: <code class="inline-code">a, b = b, a</code>. Funziona, è elegante, e quasi
+        nessun altro linguaggio ce l'ha. Ma attenzione: la variabile di appoggio non è sparita — se la crea Python
+        di nascosto. È una <em>astrazione</em>, come quelle della lezione 9: qualcuno ha nascosto il meccanismo per
+        farci lavorare più in fretta. Va benissimo usarla, purché si sappia che cosa sta succedendo dietro. Chi non
+        lo sa, il giorno che dovrà scrivere uno scambio in C sarà nei guai.
+      </div>
+
+      <h3>11.2 — Il primo algoritmo di ordinamento: il <em>bubble sort</em></h3>
+
+      <p>Adesso abbiamo tutto: le liste, il ciclo, la condizione, lo scambio. Costruiamo un algoritmo che ordina.
+        Il più semplice da capire si chiama <strong>ordinamento a bolle</strong> (<em>bubble sort</em>), e l'idea è
+        di una ingenuità disarmante:</p>
+
+      <div class="pseudo-note rule">
+        <strong>L'idea.</strong> Scorri la lista dall'inizio alla fine confrontando ogni elemento con il suo vicino
+        di destra: se sono nell'ordine sbagliato, scambiali. Alla fine di una passata, l'elemento più grande sarà
+        <em>sicuramente</em> finito in fondo — è «salito a galla» come una bolla. Ripeti finché non fai più nessuno
+        scambio: a quel punto è tutto in ordine.
+      </div>
+
+      <div class="codeblk">
+        <div class="head"><span><b>Python</b></span><span>bubble sort</span></div>
+        <pre>lista = [<span class="nu">7</span>, <span class="nu">5</span>, <span class="nu">9</span>, <span class="nu">6</span>, <span class="nu">8</span>, <span class="nu">4</span>]
+n = <span class="fn">len</span>(lista)
+
+<span class="kw">for</span> giro <span class="kw">in</span> <span class="fn">range</span>(n):
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n - <span class="nu">1</span>):
+        <span class="kw">if</span> lista[i] &gt; lista[i + <span class="nu">1</span>]:
+            tmp = lista[i]              <span class="cm"># lo swap, riga per riga</span>
+            lista[i] = lista[i + <span class="nu">1</span>]
+            lista[i + <span class="nu">1</span>] = tmp
+
+<span class="fn">print</span>(lista)</pre>
+      </div>
+      <div class="term">[4, 5, 6, 7, 8, 9]</div>
+
+      <p>Due cicli uno dentro l'altro (si dice <strong>annidati</strong>), e dentro il più interno una condizione
+        che decide se scambiare. Tre livelli di indentazione: rileggete il codice guardando <em>solo</em> i
+        rientri, e vedrete la struttura dell'algoritmo senza nemmeno leggere le parole. Questo è il regalo che
+        Python vi fa.</p>
+
+      <p><code class="inline-code">range(n)</code> è il modo di dire «i numeri da 0 a n−1»: serve quando il ciclo
+        deve contare invece che scorrere degli elementi. Qui ci serve l'indice <code class="inline-code">i</code>
+        perché dobbiamo confrontare l'elemento con <em>quello dopo</em>.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 7</span><span class="difficulty hard">Difficile</span></div>
+        <p>Modificate il bubble sort in modo che ordini <strong>dal più grande al più piccolo</strong>. Poi
+          aggiungete un contatore che conti <strong>quanti scambi</strong> ha fatto in tutto, e fatelo stampare.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="codeblk">
+            <div class="head"><span><b>Python</b></span><span>soluzione</span></div>
+            <pre>lista = [<span class="nu">7</span>, <span class="nu">5</span>, <span class="nu">9</span>, <span class="nu">6</span>, <span class="nu">8</span>, <span class="nu">4</span>]
+n = <span class="fn">len</span>(lista)
+scambi = <span class="nu">0</span>
+
+<span class="kw">for</span> giro <span class="kw">in</span> <span class="fn">range</span>(n):
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n - <span class="nu">1</span>):
+        <span class="kw">if</span> lista[i] &lt; lista[i + <span class="nu">1</span>]:      <span class="cm"># basta girare il verso!</span>
+            tmp = lista[i]
+            lista[i] = lista[i + <span class="nu">1</span>]
+            lista[i + <span class="nu">1</span>] = tmp
+            scambi = scambi + <span class="nu">1</span>
+
+<span class="fn">print</span>(lista)
+<span class="fn">print</span>(<span class="st">"scambi effettuati:"</span>, scambi)</pre>
+          </div>
+          <div class="term">[9, 8, 7, 6, 5, 4]
+scambi effettuati: 6</div>
+          <p>Per invertire l'ordine è bastato cambiare un simbolo: <code class="inline-code">&gt;</code> diventa
+            <code class="inline-code">&lt;</code>. Tenete d'occhio quel numero di scambi: nella prossima sezione
+            diventerà il metro con cui giudicheremo chi è il più bravo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 — LA GARA DEGLI ALGORITMI -->
+    <section id="sec12">
+      <h2>12. La gara: quale algoritmo ordina meglio?</h2>
+
+      <p>Il bubble sort funziona, ma è lento — e «lento» qui non è un'opinione: è una cosa che si misura. Nella
+        lezione 9 avevamo introdotto la <strong>complessità</strong> di un algoritmo confrontando due modi di
+        sommare i primi $N$ numeri: uno con un ciclo, che faceva $N$ operazioni, e la formula di Gauss, che ne
+        faceva sempre tre. Ordinare è la stessa storia, ma con posta in gioco molto più alta, perché ordinare lo si
+        fa continuamente e su quantità enormi di dati.</p>
+
+      <p>Prima di correre, presentiamo i concorrenti. Sono tutti algoritmi veri, e i primi tre li potete scrivere
+        oggi stesso con quello che sapete.</p>
+
+      <div class="lang-card">
+        <h4>Bubble sort <span class="anno">a bolle</span></h4>
+        <p>Confronta ogni elemento col vicino e li scambia se sono in disordine. Ripete finché serve. È il più
+          facile da capire e il più lento di tutti: il suo unico pregio è essere ovvio.</p>
+      </div>
+
+      <div class="lang-card">
+        <h4>Selection sort <span class="anno">per selezione</span></h4>
+        <p>È il metodo con cui quasi tutti ordinerebbero delle carte da gioco: cerca il più piccolo di tutti e
+          mettilo al primo posto; poi cerca il più piccolo di quelli che restano e mettilo al secondo; e così via.
+          Fa tantissimi confronti ma pochissimi scambi — <strong>esattamente uno per giro</strong>.</p>
+      </div>
+
+      <div class="lang-card">
+        <h4>Insertion sort <span class="anno">per inserimento</span></h4>
+        <p>È il metodo con cui quasi tutti ordinerebbero delle carte <em>tenendole in mano</em>: si prende la carta
+          nuova e la si infila al posto giusto fra quelle già sistemate, facendo scorrere le altre. Su una lista
+          già quasi ordinata è <strong>velocissimo</strong>, perché quasi non deve spostare niente.</p>
+      </div>
+
+      <div class="lang-card">
+        <h4>Merge sort <span class="anno">per fusione</span></h4>
+        <p>Il campione. Usa la scomposizione top-down della lezione 9 in modo spettacolare: <em>spezza la lista in
+          due metà, ordina ciascuna metà (allo stesso modo!) e poi fondi le due metà ordinate</em>. Fondere due
+          liste già ordinate è facilissimo: si guardano i due primi elementi e si prende il minore. Inventato da
+          <strong>John von Neumann</strong> nel 1945 — sì, quello dell'architettura della lezione 3.</p>
+      </div>
+
+      <p>E adesso facciamoli correre <strong>sulla stessa identica lista</strong>, alla stessa velocità: chi arriva
+        prima ha fatto meno lavoro. Provate a cambiare la disposizione di partenza, perché lì c'è la sorpresa.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>quanti numeri</label><input type="range" id="so-n" min="8" max="28" step="1" value="16"><span class="val-badge" id="so-n-val">16</span></div>
+        <div class="control-group"><label>come partono</label>
+          <select id="so-arr" class="btn">
+            <option value="rand">in disordine (a caso)</option>
+            <option value="quasi">quasi ordinati</option>
+            <option value="rev">al contrario</option>
+          </select>
+        </div>
+        <button class="btn" id="so-go">🏁 via alla gara</button>
+      </div>
+      <div id="so-cards" class="race-grid"></div>
+      <p class="eq-out" id="so-out"></p>
+
+      <div class="rule">
+        <strong>Che cosa contiamo.</strong> I <strong>confronti</strong> sono le domande del tipo «questo è più
+        grande di quello?»; gli <strong>spostamenti</strong> sono le scritture in memoria. Attenzione: uno scambio
+        vale <strong>tre</strong> spostamenti, perché — come abbiamo visto nella sezione 11 — serve la variabile di
+        appoggio. Ecco perché il selection sort, che di scambi ne fa pochissimi, resta competitivo pur facendo
+        moltissimi confronti: dipende da quale delle due operazioni costa di più.
+      </div>
+
+      <div class="warning">
+        <strong>La sorpresa: non esiste un vincitore assoluto.</strong> Rifate la gara scegliendo «quasi ordinati» e
+        guardate l'<em>insertion sort</em>: stravince, batte perfino il merge sort. Poi scegliete «al contrario» e
+        guardatelo crollare all'ultimo posto. Il merge sort, invece, se ne infischia: impiega più o meno lo stesso
+        tempo in tutti e tre i casi. <strong>Questa è la vera differenza fra un algoritmo specializzato e uno
+        robusto</strong>, ed è il motivo per cui la ricerca del «migliore» non finisce mai: migliore <em>per quali
+        dati</em>?
+      </div>
+
+      <h3>12.1 — Mettere un numero sulla lentezza</h3>
+
+      <p>Facciamo il conto per il bubble sort. Con $n$ elementi si fanno $n$ giri, e in ogni giro circa $n$
+        confronti: in tutto qualcosa come $n^2$ operazioni. Il selection sort e l'insertion sort, nel caso
+        peggiore, fanno lo stesso. Il merge sort invece dimezza il problema a ogni passo, e il numero di
+        dimezzamenti di $n$ è il suo <em>logaritmo</em>: fa circa $n$ operazioni per ciascuno dei $\log n$ livelli.
+        La differenza sembra tecnica. Guardate che cosa significa in pratica:</p>
+
+      <table class="tp-tab">
+        <tr><th>elementi da ordinare</th><th>bubble/selection/insertion ($n^2$)</th><th>merge sort ($n \log n$)</th><th>quante volte più veloce</th></tr>
+        <tr><td>100</td><td>10 000</td><td>≈ 660</td><td>15 volte</td></tr>
+        <tr><td>10 000</td><td>100 milioni</td><td>≈ 130 000</td><td>750 volte</td></tr>
+        <tr><td>1 milione</td><td>1000 miliardi</td><td>≈ 20 milioni</td><td>50 000 volte</td></tr>
+      </table>
+
+      <p>Con un milione di elementi — che è poca roba: è l'elenco dei clienti di un negozio online medio — un
+        computer che facesse un miliardo di operazioni al secondo impiegherebbe <strong>oltre un quarto d'ora</strong>
+        col bubble sort e <strong>due centesimi di secondo</strong> col merge sort. Non è una differenza di
+        efficienza: è la differenza fra «si può fare» e «non si può fare».</p>
+
+      <div class="rule">
+        <strong>E qui arriva la seconda risorsa: la memoria.</strong> Nella lezione 9 contavamo solo le operazioni,
+        cioè il <strong>tempo</strong>. Ma un algoritmo consuma anche <strong>spazio</strong>, e le due cose si
+        scambiano: quasi sempre, per andare più veloci bisogna occupare più memoria. Il merge sort è l'esempio
+        perfetto: per fondere le due metà ordinate ha bisogno di un <em>secondo</em> vettore grande quanto il primo.
+        Il bubble sort no: lavora sul posto, e oltre alla lista non gli serve altro che la variabilina
+        <code class="inline-code">tmp</code>.
+      </div>
+
+      <p>Con un milione di numeri la memoria in più non è un problema. Ma provate a immaginare di dover ordinare un
+        archivio da cento gigabyte su un computer che ne ha otto: il merge sort «classico» semplicemente
+        <strong>non ci sta</strong>, per quanto sia veloce. È per questo che gli informatici non chiedono mai «qual
+        è l'algoritmo migliore?», ma sempre <em>«migliore rispetto a che cosa, e sotto quali vincoli?»</em>.</p>
+
+      <div class="curiosita">
+        <strong>Che cosa usa davvero il vostro telefono.</strong> Quando in Python scrivete
+        <code class="inline-code">lista.sort()</code>, dietro non c'è nessuno dei quattro algoritmi di cui abbiamo
+        parlato: c'è <strong>Timsort</strong>, inventato nel 2002 da Tim Peters proprio per Python. È un ibrido:
+        usa il merge sort per la struttura generale, ma appena riconosce un pezzo già quasi ordinato passa
+        all'insertion sort, che lì è imbattibile. In pratica ha capito la lezione del riquadro qui sopra e ha
+        deciso di prendere il meglio dei due mondi. Funziona così bene che oggi è l'ordinamento standard anche di
+        Java e di Android. Morale: gli algoritmi che studiate non sono pezzi da museo — sono i mattoni con cui si
+        costruiscono quelli veri.
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 8</span><span class="difficulty medium">Medio</span></div>
+        <p>Un archivio contiene 20 000 schede. L'algoritmo A fa $n^2$ operazioni e non usa memoria in più;
+          l'algoritmo B ne fa $n \log n$ ma richiede un secondo archivio della stessa dimensione.
+          <strong>(a)</strong> Quante operazioni fa ciascuno, all'incirca ($\log_2 20\,000 \approx 14{,}3$)?
+          <strong>(b)</strong> Se il computer ha memoria sufficiente, quale conviene? <strong>(c)</strong> E se
+          l'archivio occupasse esattamente metà della memoria disponibile?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">a</span>A: $20\,000^2 = 400$ milioni di operazioni. B: $20\,000 \times 14{,}3
+            \approx 286\,000$ operazioni. B ne fa circa <strong>1400 volte</strong> di meno.</p>
+          <p><span class="step-num">b</span>Senza dubbio <strong>B</strong>: la memoria in più c'è, e il guadagno in
+            tempo è enorme.</p>
+          <p><span class="step-num">c</span>Qui la risposta si ribalta. Se l'archivio occupa metà della memoria, il
+            secondo archivio richiesto da B occuperebbe l'altra metà esatta: non resterebbe spazio per nient'altro,
+            e con ogni probabilità il programma si fermerebbe. <strong>Conviene A</strong>, che è lentissimo ma
+            <em>finisce</em>. Un algoritmo che non può girare ha velocità zero.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 — TORRE DI HANOI (FACOLTATIVA) -->
+    <section id="sec13" class="optional">
+      <h2>13. La Torre di Hanoi</h2>
+
+      <p>Sezione per curiosi. Chiudiamo con un gioco che sembra un passatempo per bambini e invece è uno degli
+        esempi più eleganti di tutta l'informatica — quello con cui, in ogni università del mondo, si spiega l'idea
+        più vertiginosa della programmazione.</p>
+
+      <div class="rule">
+        <strong>Le regole.</strong> Ci sono tre paletti e una pila di dischi di dimensioni diverse, infilati sul
+        primo paletto dal più grande (in basso) al più piccolo (in alto). Bisogna <strong>spostare tutta la pila sul
+        terzo paletto</strong> rispettando due regole:
+        <br>1. si sposta <strong>un disco alla volta</strong>, e solo quello in cima a un paletto;
+        <br>2. <strong>non si può mai appoggiare un disco su uno più piccolo</strong>.
+      </div>
+
+      <p>Provateci. Con tre dischi ci si arriva a intuito; con quattro si comincia a sudare; con cinque bisogna
+        aver capito il trucco. Cliccate su un paletto per prendere il disco in cima, poi su un altro per posarlo.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>numero di dischi</label><input type="range" id="ha-n" min="3" max="6" step="1" value="3"><span class="val-badge" id="ha-n-val">3</span></div>
+        <button class="btn" id="ha-reset">↺ ricomincia</button>
+        <button class="btn" id="ha-solve">🤖 risolvila tu, macchina</button>
+      </div>
+      <div class="hanoi-wrap"><svg id="ha-svg" viewBox="0 0 620 250" aria-label="Torre di Hanoi: tre paletti con dischi da spostare"></svg></div>
+      <p class="eq-out" id="ha-out"></p>
+
+      <h3>13.1 — Il trucco: risolvere il problema con sé stesso</h3>
+
+      <p>Come si fa a spostare una torre di 5 dischi? Sembra difficilissimo. Ma proviamo a ragionare come nella
+        lezione 9, cioè <strong>scomponendo</strong>. Per spostare 5 dischi dal paletto A al paletto C:</p>
+
+      <div class="lab-step">
+        <div class="num">1</div>
+        <div><p>Sposto i <strong>4 dischi</strong> di sopra da A a B (il paletto di appoggio). Non chiedetemi come:
+          per ora fingiamo che qualcuno sappia farlo.</p></div>
+      </div>
+      <div class="lab-step">
+        <div class="num">2</div>
+        <div><p>Ora il disco più grande è da solo su A, e C è libero: lo sposto da A a C. <strong>Una mossa
+          sola.</strong></p></div>
+      </div>
+      <div class="lab-step">
+        <div class="num">3</div>
+        <div><p>Sposto i <strong>4 dischi</strong> da B a C, sopra al grande. Anche qui: fingiamo che qualcuno sappia
+          farlo.</p></div>
+      </div>
+
+      <p>Sembra una truffa — ho risolto il problema dei 5 dischi ammettendo di saper risolvere quello dei 4. Ma non
+        lo è, perché il problema dei 4 lo risolvo <em>allo stesso identico modo</em>: sposto 3, poi il grande, poi
+        di nuovo 3. E quello dei 3 lo risolvo spostandone 2. E quello dei 2 spostandone 1. E spostare
+        <strong>un</strong> disco lo so fare davvero: lo prendo e lo metto. Da lì, la catena si riavvolge
+        all'indietro e il problema è risolto.</p>
+
+      <div class="definition">
+        Un algoritmo si dice <strong>ricorsivo</strong> quando, per risolvere un problema, <strong>richiama sé
+        stesso</strong> su un problema più piccolo dello stesso tipo. Perché funzioni servono due ingredienti: che
+        il problema diventi ogni volta un po' più piccolo, e che ci sia un <strong>caso base</strong> — un caso
+        talmente semplice da poter essere risolto direttamente, senza richiamarsi.
+      </div>
+
+      <div class="codeblk">
+        <div class="head"><span><b>Python</b></span><span>la Torre di Hanoi, per intero</span></div>
+        <pre><span class="kw">def</span> <span class="fn">hanoi</span>(n, partenza, arrivo, appoggio):
+    <span class="kw">if</span> n == <span class="nu">1</span>:                       <span class="cm"># CASO BASE: un disco solo</span>
+        <span class="fn">print</span>(<span class="st">"sposta un disco da"</span>, partenza, <span class="st">"a"</span>, arrivo)
+        <span class="kw">return</span>
+
+    <span class="fn">hanoi</span>(n - <span class="nu">1</span>, partenza, appoggio, arrivo)   <span class="cm"># 1. i piccoli si tolgono di mezzo</span>
+    <span class="fn">print</span>(<span class="st">"sposta un disco da"</span>, partenza, <span class="st">"a"</span>, arrivo)   <span class="cm"># 2. il grande</span>
+    <span class="fn">hanoi</span>(n - <span class="nu">1</span>, appoggio, arrivo, partenza)   <span class="cm"># 3. i piccoli tornano sopra</span>
+
+
+<span class="fn">hanoi</span>(<span class="nu">3</span>, <span class="st">"A"</span>, <span class="st">"C"</span>, <span class="st">"B"</span>)</pre>
+      </div>
+      <div class="term">sposta un disco da A a C
+sposta un disco da A a B
+sposta un disco da C a B
+sposta un disco da A a C
+sposta un disco da B a A
+sposta un disco da B a C
+sposta un disco da A a C</div>
+
+      <p>Sette mosse, e sono le stesse che avete faticato a trovare a mano. Fermatevi un attimo su quel codice:
+        <strong>sei righe</strong> risolvono un problema che a mano, con 20 dischi, richiederebbe più di un milione
+        di mosse. La parola <code class="inline-code">def</code> serve a definire una funzione nostra — esattamente
+        come <code class="inline-code">print</code>, ma scritta da noi — e la cosa strabiliante è che dentro la
+        definizione di <code class="inline-code">hanoi</code> compare la parola <code class="inline-code">hanoi</code>.</p>
+
+      <div class="warning">
+        <strong>Il caso base non è un dettaglio.</strong> Provate a togliere le prime tre righe della funzione,
+        quelle dell'<code class="inline-code">if n == 1</code>. Il programma non si ferma più: continua a chiamare
+        sé stesso con $n$ sempre più piccolo, poi negativo, all'infinito — finché Python non si arrende con un
+        <code class="inline-code">RecursionError</code>. È l'equivalente ricorsivo del ciclo infinito della lezione
+        9, e viola la stessa proprietà: la <strong>finitezza</strong>.
+      </div>
+
+      <h3>13.2 — Quante mosse servono davvero</h3>
+
+      <p>Contiamo. Chiamiamo $M(n)$ il numero minimo di mosse per $n$ dischi. Il ragionamento di prima dice che per
+        spostare $n$ dischi servono: le mosse per spostarne $n-1$, più una, più di nuovo quelle per spostarne
+        $n-1$. Cioè:</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il numero minimo di mosse</div>
+        $$M(n) = 2 \cdot M(n-1) + 1 \qquad\text{con}\qquad M(1) = 1$$
+        <p class="formula-note">Da cui: $M(2) = 3$, $M(3) = 7$, $M(4) = 15$, $M(5) = 31$… Riconoscete la sequenza?
+          Sono le potenze di 2 meno uno — i numeri che in binario si scrivono con tutti 1 (lezione 6):
+          $$M(n) = 2^n - 1$$</p>
+      </div>
+
+      <p>E qui il gioco smette di essere un gioco. Perché $2^n$ è una <strong>crescita esponenziale</strong>, e
+        l'esponenziale è il nemico giurato dell'informatica: ogni disco in più <em>raddoppia</em> il lavoro. Con 10
+        dischi servono 1023 mosse; con 30 dischi più di un miliardo; con 64 dischi…</p>
+
+      <div class="curiosita">
+        <strong>La leggenda dei monaci di Benares.</strong> Il gioco fu inventato nel 1883 dal matematico francese
+        <strong>Édouard Lucas</strong>, che lo vendeva accompagnato da una storia (inventata da lui, ma bellissima):
+        in un tempio di Benares, nell'India, alcuni monaci starebbero spostando da sempre una torre di
+        <strong>64 dischi d'oro</strong>, una mossa alla volta, seguendo esattamente queste regole. Quando avranno
+        finito, dice la leggenda, il mondo finirà.
+        <br><br>Facciamo il conto, che è il modo migliore di leggere una leggenda: $2^{64} - 1$ è circa
+        <strong>18 miliardi di miliardi</strong> di mosse. Anche spostando un disco al secondo, senza mai fermarsi,
+        servirebbero circa <strong>585 miliardi di anni</strong> — più di quaranta volte l'età dell'universo. Potete
+        dormire tranquilli. E potete anche capire, con un esempio solo, perché un algoritmo esponenziale è
+        considerato <em>inutilizzabile</em> per definizione: non importa quanto sia veloce il computer, basta
+        aggiungere qualche dato in più e nessuna macchina immaginabile ce la farà mai.
+      </div>
+
+      <div class="rule">
+        <strong>Perché a informatica ci tengono tanto.</strong> La Torre di Hanoi mette in scena, in un gioco che si
+        spiega in trenta secondi, tre idee grosse tutte insieme: la <strong>ricorsione</strong> (un problema
+        risolto con sé stesso), il <strong>caso base</strong> (senza il quale non si finisce mai), e la
+        <strong>complessità esponenziale</strong> (che rende alcuni problemi impossibili a prescindere dalla
+        macchina). Sono le stesse tre idee che ritroverete, in forma seria, in qualunque corso di informatica —
+        e la crittografia RSA della lezione 9 sta in piedi proprio perché scomporre in fattori primi è, per quanto
+        ne sappiamo, un problema di quel tipo.
+      </div>
+    </section>
+
+    <!-- 14 — QUIZ -->
+    <section id="quiz">
+      <h2>14. Quiz finale</h2>
+      <p>Dieci domande su linguaggi, Python, variabili, liste e algoritmi. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 12 — Linguaggi di programmazione · Matematica · Primo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo sezioni 12 e 13: la gara degli algoritmi di ordinamento e la Torre di Hanoi -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== 12 — La gara degli algoritmi di ordinamento =====
+      (function () {
+        const host = document.getElementById('so-cards');
+        if (!host) return;
+        const out = document.getElementById('so-out');
+        const sn = document.getElementById('so-n'), sa = document.getElementById('so-arr');
+        const btn = document.getElementById('so-go');
+        const ALG = [
+          { id: 'bub', nome: 'Bubble sort' },
+          { id: 'sel', nome: 'Selection sort' },
+          { id: 'ins', nome: 'Insertion sort' },
+          { id: 'mrg', nome: 'Merge sort' }
+        ];
+        let frames = {}, raf = null, dati = [];
+
+        // ——— ogni algoritmo registra una fotografia a ogni confronto ———
+        function reg(f, a, cmp, mov, hi) {
+          f.push({ a: a.slice(), c: cmp, m: mov, h: hi || [] });
+        }
+        function bubble(src) {
+          const a = src.slice(), n = a.length, f = []; let c = 0, m = 0;
+          reg(f, a, c, m);
+          for (let g = 0; g < n - 1; g++) {
+            let fatto = true;
+            for (let i = 0; i < n - 1 - g; i++) {
+              c++;
+              if (a[i] > a[i + 1]) { const t = a[i]; a[i] = a[i + 1]; a[i + 1] = t; m += 3; fatto = false; }
+              reg(f, a, c, m, [i, i + 1]);
+            }
+            if (fatto) break;
+          }
+          reg(f, a, c, m);
+          return f;
+        }
+        function selection(src) {
+          const a = src.slice(), n = a.length, f = []; let c = 0, m = 0;
+          reg(f, a, c, m);
+          for (let i = 0; i < n - 1; i++) {
+            let min = i;
+            for (let j = i + 1; j < n; j++) {
+              c++;
+              if (a[j] < a[min]) min = j;
+              reg(f, a, c, m, [min, j]);
+            }
+            if (min !== i) { const t = a[i]; a[i] = a[min]; a[min] = t; m += 3; }
+            reg(f, a, c, m, [i]);
+          }
+          reg(f, a, c, m);
+          return f;
+        }
+        function insertion(src) {
+          const a = src.slice(), n = a.length, f = []; let c = 0, m = 0;
+          reg(f, a, c, m);
+          for (let i = 1; i < n; i++) {
+            const x = a[i]; m++;
+            let j = i - 1;
+            while (j >= 0) {
+              c++;
+              if (a[j] <= x) { reg(f, a, c, m, [j, i]); break; }
+              a[j + 1] = a[j]; m++; j--;
+              reg(f, a, c, m, [j + 1, i]);
+            }
+            a[j + 1] = x; m++;
+            reg(f, a, c, m, [j + 1]);
+          }
+          reg(f, a, c, m);
+          return f;
+        }
+        function merge(src) {
+          const a = src.slice(), n = a.length, f = []; let c = 0, m = 0;
+          reg(f, a, c, m);
+          const buf = new Array(n);
+          function fondi(lo, mid, hi) {
+            let i = lo, j = mid, k = lo;
+            while (i < mid && j < hi) {
+              c++;
+              if (a[i] <= a[j]) buf[k++] = a[i++]; else buf[k++] = a[j++];
+              m++;
+            }
+            while (i < mid) { buf[k++] = a[i++]; m++; }
+            while (j < hi) { buf[k++] = a[j++]; m++; }
+            for (let q = lo; q < hi; q++) { a[q] = buf[q]; reg(f, a, c, m, [q]); }
+          }
+          function ms(lo, hi) {
+            if (hi - lo < 2) return;
+            const mid = (lo + hi) >> 1;
+            ms(lo, mid); ms(mid, hi); fondi(lo, mid, hi);
+          }
+          ms(0, n);
+          reg(f, a, c, m);
+          return f;
+        }
+
+        function genera() {
+          const n = +sn.value;
+          document.getElementById('so-n-val').textContent = n;
+          const v = [];
+          for (let i = 1; i <= n; i++) v.push(i);
+          const mo = sa.value;
+          if (mo === 'rev') v.reverse();
+          else if (mo === 'quasi') {
+            for (let k = 0; k < Math.max(1, Math.round(n / 8)); k++) {
+              const i = Math.floor(Math.random() * n), j = Math.floor(Math.random() * n);
+              const t = v[i]; v[i] = v[j]; v[j] = t;
+            }
+          } else {
+            for (let i = n - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              const t = v[i]; v[i] = v[j]; v[j] = t;
+            }
+          }
+          dati = v;
+          frames = { bub: bubble(v), sel: selection(v), ins: insertion(v), mrg: merge(v) };
+        }
+
+        function barre(arr, hi, n) {
+          const W = 300, H = 96, w = W / n;
+          let s = '';
+          for (let i = 0; i < n; i++) {
+            const h = 6 + (arr[i] / n) * (H - 10);
+            const acceso = hi.indexOf(i) >= 0;
+            s += '<rect x="' + (i * w + 0.6).toFixed(2) + '" y="' + (H - h).toFixed(2) +
+                 '" width="' + Math.max(1, w - 1.2).toFixed(2) + '" height="' + h.toFixed(2) +
+                 '" rx="1" fill="' + (acceso ? 'var(--magenta)' : 'var(--accent)') +
+                 '" opacity="' + (acceso ? '1' : '0.75') + '"/>';
+          }
+          return '<svg viewBox="0 0 300 96">' + s + '</svg>';
+        }
+
+        function disegna(idx) {
+          const n = dati.length;
+          let h = '', esiti = [];
+          ALG.forEach(function (al) {
+            const f = frames[al.id];
+            const k = Math.min(idx, f.length - 1);
+            const st = f[k], finito = idx >= f.length - 1;
+            esiti.push({ nome: al.nome, ops: f[f.length - 1].c + f[f.length - 1].m, len: f.length, finito: finito });
+            h += '<div class="race-card">' +
+                 '<h4>' + al.nome + (finito ? ' <span class="medal" style="color:#22c55e;">✔ fatto</span>' : '') +
+                 '<span class="cnt">' + st.c + ' confronti · ' + st.m + ' spost.</span></h4>' +
+                 barre(st.a, finito ? [] : st.h, n) + '</div>';
+          });
+          host.innerHTML = h;
+          return esiti;
+        }
+
+        function classifica() {
+          const cl = ALG.map(function (al) {
+            const u = frames[al.id][frames[al.id].length - 1];
+            return { nome: al.nome, c: u.c, m: u.m, tot: u.c + u.m };
+          }).sort(function (x, y) { return x.tot - y.tot; });
+          const med = ['🥇', '🥈', '🥉', '4º'];
+          let s = '<strong>Classifica finale</strong> (' + dati.length + ' numeri, ' +
+                  (sa.value === 'rev' ? 'partenza al contrario' : sa.value === 'quasi' ? 'partenza quasi ordinata' : 'partenza a caso') + '):<br>';
+          cl.forEach(function (r, i) {
+            s += med[i] + ' <strong>' + r.nome + '</strong> — ' + r.c + ' confronti + ' + r.m +
+                 ' spostamenti = <strong>' + r.tot + '</strong> operazioni<br>';
+          });
+          out.innerHTML = s;
+        }
+
+        function stop() { if (raf) { cancelAnimationFrame(raf); raf = null; } btn.textContent = '🏁 via alla gara'; }
+
+        function via() {
+          if (raf) { stop(); disegna(1e9); classifica(); return; }
+          genera();
+          const totale = Math.max(frames.bub.length, frames.sel.length, frames.ins.length, frames.mrg.length);
+          const DUR = 7000;
+          btn.textContent = '⏹ ferma';
+          out.innerHTML = 'Tutti e quattro macinano operazioni <strong>alla stessa velocità</strong>: chi finisce prima ne ha fatte di meno.';
+          const t0 = performance.now();
+          (function passo(now) {
+            const u = Math.min(1, (now - t0) / DUR);
+            disegna(Math.floor(u * totale));
+            if (u < 1) raf = requestAnimationFrame(passo);
+            else { stop(); classifica(); }
+          })(t0);
+        }
+
+        sn.addEventListener('input', function () { stop(); genera(); disegna(0); out.innerHTML = 'Premi <strong>via alla gara</strong>.'; });
+        sa.addEventListener('change', function () { stop(); genera(); disegna(0); out.innerHTML = 'Premi <strong>via alla gara</strong>.'; });
+        btn.addEventListener('click', via);
+        genera(); disegna(0);
+        out.innerHTML = 'Quattro algoritmi, la <strong>stessa lista</strong> di partenza. Premi <strong>via alla gara</strong>.';
+      })();
+
+      // ===== 13 — Torre di Hanoi =====
+      (function () {
+        const svg = document.getElementById('ha-svg');
+        if (!svg) return;
+        const out = document.getElementById('ha-out'), sn = document.getElementById('ha-n');
+        const bReset = document.getElementById('ha-reset'), bSolve = document.getElementById('ha-solve');
+        const PX = [130, 310, 490], BASE = 206, DH = 22, NOMI = ['A', 'B', 'C'];
+        let torri = [[], [], []], preso = -1, mosse = 0, n = 3, raf = null, vinto = false;
+
+        function init() {
+          n = +sn.value;
+          document.getElementById('ha-n-val').textContent = n;
+          torri = [[], [], []];
+          for (let i = n; i >= 1; i--) torri[0].push(i);
+          preso = -1; mosse = 0; vinto = false;
+          disegna();
+        }
+        function larghezza(d) { return 40 + (d - 1) * (110 / Math.max(1, n - 1 || 1)); }
+
+        function disegna() {
+          let h = '';
+          h += '<rect x="30" y="' + BASE + '" width="560" height="12" rx="4" fill="var(--text-soft)" opacity="0.5"/>';
+          for (let p = 0; p < 3; p++) {
+            h += '<rect x="' + (PX[p] - 4) + '" y="56" width="8" height="' + (BASE - 56) + '" rx="4" fill="var(--text-soft)" opacity="0.55"/>';
+            h += '<text x="' + PX[p] + '" y="240" text-anchor="middle" class="lbl">' + NOMI[p] + '</text>';
+            if (preso === p) {
+              h += '<rect x="' + (PX[p] - 88) + '" y="48" width="176" height="' + (BASE - 44) +
+                   '" rx="10" fill="color-mix(in srgb, var(--magenta) 8%, transparent)" stroke="var(--magenta)" stroke-width="2" stroke-dasharray="5 4"/>';
+            }
+            for (let k = 0; k < torri[p].length; k++) {
+              const d = torri[p][k], w = larghezza(d);
+              const y = BASE - (k + 1) * DH;
+              const inMano = (preso === p && k === torri[p].length - 1);
+              h += '<rect x="' + (PX[p] - w / 2).toFixed(1) + '" y="' + (inMano ? 12 : y) + '" width="' + w.toFixed(1) +
+                   '" height="' + (DH - 3) + '" rx="6" fill="' + (inMano ? 'var(--magenta)' : 'var(--accent)') +
+                   '" opacity="' + (inMano ? '1' : (0.45 + 0.55 * d / n)).toFixed(2) + '" stroke="var(--bg)" stroke-width="1.5"/>';
+              h += '<text x="' + PX[p] + '" y="' + ((inMano ? 12 : y) + DH - 9) + '" text-anchor="middle" class="lbl-s" style="fill:var(--bg); font-weight:700;">' + d + '</text>';
+            }
+            h += '<rect x="' + (PX[p] - 88) + '" y="40" width="176" height="' + (BASE - 34) + '" fill="transparent" data-p="' + p + '" style="cursor:pointer;"/>';
+          }
+          h += '<rect x="' + (PX[2] - 92) + '" y="36" width="184" height="' + (BASE - 26) + '" rx="12" fill="none" stroke="#22c55e" stroke-width="' + (vinto ? 3 : 1.5) + '" stroke-dasharray="' + (vinto ? '0' : '6 5') + '" opacity="' + (vinto ? 1 : 0.5) + '"/>';
+          h += '<text x="' + PX[2] + '" y="30" text-anchor="middle" class="lbl-s" fill="#22c55e">arrivo</text>';
+          svg.innerHTML = h;
+          testo();
+        }
+
+        function testo() {
+          const min = Math.pow(2, n) - 1;
+          if (vinto) {
+            out.innerHTML = '🎉 <strong>Risolta in ' + mosse + ' mosse!</strong> Il minimo possibile con ' + n +
+              ' dischi è <strong>2<sup>' + n + '</sup> − 1 = ' + min + '</strong>' +
+              (mosse === min ? ' — e ci sei riuscito con il minimo assoluto. Perfetto.' : ', quindi ne hai fatte ' + (mosse - min) + ' in più. Riprova!');
+          } else if (preso >= 0) {
+            out.innerHTML = 'Hai in mano il disco <strong>' + torri[preso][torri[preso].length - 1] +
+              '</strong> dal paletto <strong>' + NOMI[preso] + '</strong>. Clicca il paletto dove vuoi posarlo (o di nuovo su ' +
+              NOMI[preso] + ' per rimetterlo giù).';
+          } else {
+            out.innerHTML = 'Mosse: <strong>' + mosse + '</strong> — il minimo con ' + n + ' dischi è <strong>' + min +
+              '</strong>. Clicca un paletto per prendere il disco in cima.';
+          }
+        }
+
+        function click(p) {
+          if (vinto || raf) return;
+          if (preso < 0) {
+            if (torri[p].length === 0) { out.innerHTML = '⚠️ Il paletto <strong>' + NOMI[p] + '</strong> è vuoto: non c\'è niente da prendere.'; return; }
+            preso = p; disegna(); return;
+          }
+          if (p === preso) { preso = -1; disegna(); return; }
+          const d = torri[preso][torri[preso].length - 1];
+          const cima = torri[p].length ? torri[p][torri[p].length - 1] : 999;
+          if (d > cima) {
+            out.innerHTML = '🚫 <strong>Mossa vietata:</strong> il disco ' + d + ' è più grande del ' + cima +
+              ' che sta in cima a ' + NOMI[p] + '. Non si può mai appoggiare un disco su uno più piccolo.';
+            return;
+          }
+          torri[preso].pop(); torri[p].push(d); preso = -1; mosse++;
+          if (torri[2].length === n) vinto = true;
+          disegna();
+        }
+
+        function risolvi() {
+          if (raf) { cancelAnimationFrame(raf); raf = null; bSolve.textContent = '🤖 risolvila tu, macchina'; return; }
+          init();
+          const seq = [];
+          (function h(k, a, c, b) {
+            if (k === 0) return;
+            h(k - 1, a, b, c); seq.push([a, c]); h(k - 1, b, c, a);
+          })(n, 0, 2, 1);
+          bSolve.textContent = '⏹ ferma';
+          let i = 0, ultimo = performance.now();
+          const passo = Math.max(180, 1600 / seq.length + 120);
+          (function tick(now) {
+            if (now - ultimo >= passo) {
+              ultimo = now;
+              const mv = seq[i++];
+              torri[mv[1]].push(torri[mv[0]].pop());
+              mosse++;
+              if (i >= seq.length) { vinto = true; disegna(); raf = null; bSolve.textContent = '🤖 risolvila tu, macchina'; return; }
+              disegna();
+              out.innerHTML = '🤖 Mossa <strong>' + i + '</strong> di ' + seq.length + ': da <strong>' +
+                NOMI[mv[0]] + '</strong> a <strong>' + NOMI[mv[1]] + '</strong>.';
+            }
+            raf = requestAnimationFrame(tick);
+          })(performance.now());
+        }
+
+        svg.addEventListener('click', function (e) {
+          const t = e.target.getAttribute && e.target.getAttribute('data-p');
+          if (t !== null && t !== undefined) click(+t);
+        });
+        sn.addEventListener('input', function () { if (raf) { cancelAnimationFrame(raf); raf = null; bSolve.textContent = '🤖 risolvila tu, macchina'; } init(); });
+        bReset.addEventListener('click', function () { if (raf) { cancelAnimationFrame(raf); raf = null; bSolve.textContent = '🤖 risolvila tu, macchina'; } init(); });
+        bSolve.addEventListener('click', risolvi);
+        init();
+      })();
+
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Che cos\'è un <strong>linguaggio di programmazione</strong>?',
+        options: ['un programma che traduce i siti in altre lingue', 'un linguaggio artificiale comprensibile agli umani e traducibile automaticamente in linguaggio macchina', 'il modo in cui il processore comunica con la memoria', 'un insieme di comandi scritti in binario', 'una libreria di funzioni già pronte'],
+        correct: 1, explain: 'Sta a metà strada fra noi e il processore: abbastanza vicino a noi da essere leggibile, abbastanza preciso da poter essere tradotto da una macchina in 0 e 1.' },
+      { type: 'mc', diff: 'easy', text: 'Qual è la differenza fra un <strong>compilatore</strong> e un <strong>interprete</strong>?',
+        options: ['il compilatore è più moderno', 'il compilatore traduce tutto il programma prima di eseguirlo, l\'interprete traduce ed esegue una riga alla volta', 'l\'interprete funziona solo su Windows', 'il compilatore serve per i siti web', 'non c\'è differenza, sono sinonimi'],
+        correct: 1, explain: 'Come far tradurre un intero libro (compilatore: lento a prepararsi, poi velocissimo) oppure avere un interprete simultaneo accanto (si parte subito, ma si va più piano). C e Java compilano, Python e JavaScript interpretano.' },
+      { type: 'mc', diff: 'easy', text: 'Perché <strong>HTML non è</strong> un linguaggio di programmazione?',
+        options: ['perché è troppo vecchio', 'perché non permette di scrivere condizioni, cicli o calcoli: descrive un contenuto, non esegue azioni', 'perché lo capiscono solo i browser', 'perché usa i tag invece delle parentesi graffe', 'in realtà lo è'],
+        correct: 1, explain: 'HTML è un METALINGUAGGIO (linguaggio di marcatura): annota un testo dicendo che cosa sono le sue parti. Mancano proprio le tre strutture della lezione 9.' },
+      { type: 'mc', diff: 'medium', text: 'In Python, che cosa succede se si sbaglia l\'<strong>indentazione</strong>?',
+        options: ['niente, è solo una questione estetica', 'il programma cambia significato o dà errore, perché l\'indentazione stabilisce quali istruzioni formano un blocco', 'il codice diventa più lento', 'Python la corregge da solo', 'si perde solo la leggibilità'],
+        correct: 1, explain: 'È la grande differenza fra Python e i linguaggi con le parentesi graffe: lì l\'indentazione è gentilezza verso il lettore, in Python è SINTASSI. Spostare una riga di quattro spazi cambia che cosa fa il programma.' },
+      { type: 'mc', diff: 'medium', text: 'Quanto vale <code>voti[1]</code> se <code>voti = [7, 5, 9, 6]</code>?',
+        options: ['7', '5', '9', '1', 'dà errore'],
+        correct: 1, explain: 'Si conta da ZERO: voti[0] vale 7, voti[1] vale 5. L\'indice non è «il numero d\'ordine» ma «di quanto spostarsi dall\'inizio». Una lista di 4 elementi ha indici da 0 a 3.' },
+      { type: 'mc', diff: 'medium', text: 'Perché per <strong>scambiare</strong> due variabili serve una terza variabile di appoggio?',
+        options: ['per rendere il codice più leggibile', 'perché scrivendo a = b si sovrascrive il contenuto di a, e il suo valore originale andrebbe perduto', 'perché Python lo richiede', 'per contare quanti scambi si fanno', 'non serve davvero, è una convenzione'],
+        correct: 1, explain: 'È il problema dei due bicchieri pieni: serve un terzo bicchiere. tmp = a mette al sicuro il valore, poi a = b e infine b = tmp. Uno scambio costa quindi TRE spostamenti in memoria.' },
+      { type: 'mc', diff: 'medium', text: 'Che differenza c\'è, tecnicamente, fra un <strong>vettore</strong> e una <strong>lista</strong>?',
+        options: ['nessuna, sono sinonimi', 'il vettore ha gli elementi contigui in memoria e tutti dello stesso tipo, la lista li ha sparsi e collegati da rimandi', 'il vettore può contenere solo numeri interi', 'la lista è più veloce in tutto', 'il vettore esiste solo in Python'],
+        correct: 1, explain: 'Dalla contiguità viene tutto il resto: nel vettore l\'indirizzo dell\'elemento i si CALCOLA (accesso immediato), nella lista bisogna seguire i rimandi. In compenso la lista cresce e si accorcia liberamente. NumPy porta i veri vettori in Python.' },
+      { type: 'mc', diff: 'hard', text: 'Un algoritmo che fa $n^2$ operazioni contro uno che ne fa $n \\log n$: con $n = 1$ milione, quanto è più veloce il secondo?',
+        options: ['circa il doppio', 'circa 100 volte', 'circa 50 000 volte', 'sono praticamente uguali', 'dipende solo dal computer'],
+        correct: 2, explain: 'Mille miliardi di operazioni contro venti milioni: circa 50 000 volte. Su un computer da un miliardo di operazioni al secondo sono oltre un quarto d\'ora contro due centesimi di secondo — la differenza fra «si può fare» e «non si può fare».' },
+      { type: 'mc', diff: 'hard', text: 'Perché nella scelta di un algoritmo non conta solo la velocità?',
+        options: ['perché i computer sono tutti diversi', 'perché conta anche la memoria occupata: un algoritmo velocissimo che non ci sta in memoria non può essere eseguito', 'perché gli algoritmi veloci sono più difficili da scrivere', 'perché la velocità dipende dal linguaggio usato', 'perché conta soprattutto l\'ordine alfabetico'],
+        correct: 1, explain: 'Tempo e spazio sono due risorse distinte, e spesso si scambiano l\'una con l\'altra. Il merge sort è velocissimo ma richiede un secondo vettore grande quanto il primo: se la memoria non basta, conviene un algoritmo lento che però FINISCE.' },
+      { type: 'open', diff: 'hard', text: 'Spiega che cos\'è un algoritmo <strong>ricorsivo</strong> usando la Torre di Hanoi come esempio, di\' perché serve il <strong>caso base</strong>, e spiega perché con 64 dischi il gioco non si può finire.',
+        keywords: ['richiama', 'sé stess', 'se stess', 'piccolo', 'caso base', 'ferma', 'infinit', 'sposto', 'grande', '2', 'esponenzial', 'raddoppia', 'miliardi', 'universo'], requiredMatches: 4,
+        explain: 'Un algoritmo è RICORSIVO quando per risolvere un problema richiama sé stesso su un problema più piccolo dello stesso tipo. Per spostare n dischi da A a C: sposto gli n−1 dischi di sopra da A a B (con lo stesso metodo), sposto il disco grande da A a C con una sola mossa, e rimetto gli n−1 dischi da B a C. Il CASO BASE (un solo disco: lo prendo e lo metto) è indispensabile, perché è l\'unico passo che si risolve senza richiamarsi: senza di esso la funzione continuerebbe a chiamare sé stessa all\'infinito, violando la proprietà di finitezza vista nella lezione 9. Il numero minimo di mosse soddisfa M(n) = 2·M(n−1) + 1, cioè M(n) = 2^n − 1: una crescita ESPONENZIALE, in cui ogni disco in più raddoppia il lavoro. Con 64 dischi servirebbero circa 18 miliardi di miliardi di mosse, cioè — a una mossa al secondo — circa 585 miliardi di anni, oltre quaranta volte l\'età dell\'universo. Nessun computer, per quanto veloce, può battere una crescita esponenziale.' }
+    ];
+  </script>
+
+</body>
+
+</html>
