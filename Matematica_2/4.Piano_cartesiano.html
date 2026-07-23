@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 4 — Il piano cartesiano</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent);
+      border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+
+    /* piano cartesiano (SVG theme-aware) */
+    .plane { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 0.6rem 0; }
+    .plane svg { display: block; width: 100%; max-width: 340px; aspect-ratio: 1 / 1; height: auto; margin: 0 auto; touch-action: manipulation; }
+    .plane .cap { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 0.3rem; }
+
+    /* esercizi interattivi sui punti */
+    .pt-ex { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1rem; margin: 1.1rem 0; }
+    .pt-prompt { font-size: 1.05rem; margin-bottom: 0.2rem; }
+    .pt-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.55rem; margin-top: 0.7rem; }
+    .pt-input { width: 4.4rem; padding: 0.35rem 0.5rem; border: 1px solid var(--border); border-radius: 8px;
+      background: var(--surface); color: var(--text); font-size: 1rem; font-variant-numeric: tabular-nums; }
+    .pt-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .pt-lab { font-weight: 800; font-style: italic; color: var(--muted); }
+    .pt-fb { min-height: 1.4em; margin-top: 0.6rem; font-weight: 700; font-size: 0.95rem; }
+    .pt-fb.ok { color: #16a34a; }
+    .pt-fb.no { color: #dc2626; }
+
+    /* tabellina delle terne / valori */
+    .mini-tab { border-collapse: collapse; margin: 0.6rem auto; font-variant-numeric: tabular-nums; }
+    .mini-tab th, .mini-tab td { border: 1px solid var(--border); padding: 0.3rem 0.7rem; text-align: center; }
+    .mini-tab th { background: var(--surface-2); }
+
+    /* blocchi di codice Python */
+    .codeblk { background: #0d1117; border: 1px solid var(--border); border-radius: 10px; margin: 0.7rem 0; overflow: hidden; }
+    .codeblk .head { background: #161b22; color: #8b949e; font-family: Consolas, monospace; font-size: 0.78rem;
+      padding: 0.35rem 0.85rem; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; gap: 0.6rem; }
+    .codeblk .head b { color: #d5dae3; font-weight: 700; }
+    .codeblk pre { margin: 0; padding: 0.75rem 1rem; overflow-x: auto; color: #d5dae3;
+      font-family: Consolas, 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6; }
+    .codeblk .kw { color: #ff9ec4; font-weight: 700; }
+    .codeblk .st { color: #a5d6ff; }
+    .codeblk .cm { color: #8b949e; font-style: italic; }
+    .codeblk .nu { color: #ffcf5e; }
+    .codeblk .fn { color: #7ee787; font-weight: 600; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Secondo anno · Lezione 4</div>
+    <h1>Il piano cartesiano</h1>
+    <p>Dove la geometria e l'algebra si danno la mano: ogni punto diventa una coppia di numeri</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Secondo anno</a>
+    <span class="sep">/</span> Il piano cartesiano
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Finora abbiamo tenuto due mondi separati: la <em>geometria</em>, fatta di punti,
+      rette e figure che si disegnano con riga e compasso, e l'<em>algebra</em>, fatta di lettere, equazioni e
+      numeri. In questa lezione costruiamo il ponte che li unisce — un'idea semplice ma rivoluzionaria, che porta il
+      nome del filosofo e matematico <strong>René Descartes</strong> (in italiano <em>Cartesio</em>): il
+      <strong>piano cartesiano</strong>.
+    </div>
+
+    <!-- 1 — CHE COS'È IL PIANO CARTESIANO -->
+    <section id="sec1">
+      <h2>1. Un ponte tra geometria e algebra</h2>
+
+      <p>L'idea di partenza la conosciamo già. Su una <strong>retta</strong> abbiamo imparato ad associare a ogni
+        punto un numero: scegliamo un'origine, un verso e un'unità di misura, e da quel momento ogni punto della retta
+        «ha un nome», che è un numero. È la <em>retta dei numeri</em> che abbiamo usato per le disequazioni.</p>
+
+      <p>Ma un numero solo ci inchioda sulla retta: come facciamo a raggiungere <em>tutti</em> i punti di un
+        <strong>piano</strong>? La mossa geniale di Cartesio è questa: prendiamo <strong>due rette
+        ortogonali</strong> (cioè perpendicolari, che si incrociano formando quattro angoli retti) e su
+        <em>ciascuna</em> associamo a ogni punto un numero, come abbiamo appena fatto. Il punto in cui si incrociano
+        è l'<strong>origine</strong>, e le fa partire entrambe da $0$.</p>
+
+      <p>A questo punto succede la magia. Un punto qualsiasi del piano si può individuare guardando <strong>due
+        numeri</strong>: quanto è spostato lungo la prima retta e quanto lungo la seconda. Allora ogni punto della
+        geometria diventa una <strong>coppia di numeri</strong>! E viceversa: ogni coppia di numeri indica uno e un
+        solo punto. Geometria e algebra, da qui in avanti, sono la stessa cosa vista da due lati.</p>
+
+      <div class="definition">
+        Chiamiamo <strong>assi cartesiani</strong> le due rette ortogonali orientate. Per convenzione l'asse
+        <strong>orizzontale</strong> è l'<strong>asse delle ascisse</strong> e lo indichiamo con la lettera
+        <strong>$x$</strong>; l'asse <strong>verticale</strong> è l'<strong>asse delle ordinate</strong> e lo
+        indichiamo con la lettera <strong>$y$</strong>. Il loro punto d'incontro è l'<strong>origine</strong> $O$,
+        di coordinate $O(0;\,0)$.
+      </div>
+
+      <p>Un punto $P$ si scrive allora $P(x;\,y)$, dove <strong>prima</strong> viene sempre l'ascissa e
+        <strong>poi</strong> l'ordinata: l'ordine conta! I punti li indichiamo con le <strong>lettere maiuscole</strong>
+        dell'alfabeto latino ($A$, $B$, $C$, $P$, $Q$, ...). Nel disegno qui sotto il punto $P(3;\,2)$: partiamo
+        dall'origine, ci spostiamo di $3$ verso destra e di $2$ verso l'alto. Le due linee tratteggiate mostrano le
+        <em>proiezioni</em> sui due assi.</p>
+
+      <div class="plane"><div id="intro-plane"></div>
+        <div class="cap">I due assi dividono il piano in quattro <strong>quadranti</strong> (numerati in senso antiorario).</div>
+      </div>
+
+      <p>Nota i <strong>segni</strong>: a destra dell'origine le ascisse sono positive, a sinistra negative; sopra
+        l'origine le ordinate sono positive, sotto negative. Ecco perché i quattro quadranti hanno «combinazioni di
+        segno» diverse: nel primo $(+;+)$, nel secondo $(-;+)$, nel terzo $(-;-)$, nel quarto $(+;-)$.</p>
+    </section>
+
+    <!-- 2 — INDIVIDUARE I PUNTI (interattivo) -->
+    <section id="sec2">
+      <h2>2. Individuare i punti: mettiamoci alla prova</h2>
+
+      <p>Il legame «punto ↔ coppia di numeri» si impara facendolo. Ci sono due giochi complementari: <strong>date le
+        coordinate, trova il punto</strong> e, al contrario, <strong>dato il punto, scrivi le coordinate</strong>.
+        Provali entrambi — puoi generare quante sfide vuoi.</p>
+
+      <div class="pt-ex">
+        <div class="pt-prompt" id="place-prompt">...</div>
+        <div class="plane"><div id="place-plane"></div></div>
+        <div class="pt-fb" id="place-fb"></div>
+        <div class="pt-controls">
+          <button class="btn" id="place-new">🎲 Nuova sfida</button>
+          <span style="color:var(--muted);font-size:0.85rem;">Clicca sull'incrocio giusto della griglia.</span>
+        </div>
+      </div>
+
+      <div class="pt-ex">
+        <div class="pt-prompt">Quali sono le coordinate del punto <strong>$P$</strong> segnato sul piano?</div>
+        <div class="plane"><div id="read-plane"></div></div>
+        <div class="pt-controls">
+          <span class="pt-lab">x =</span><input class="pt-input" id="read-x" type="number" inputmode="numeric" aria-label="ascissa">
+          <span class="pt-lab">y =</span><input class="pt-input" id="read-y" type="number" inputmode="numeric" aria-label="ordinata">
+          <button class="btn" id="read-check">✓ Controlla</button>
+          <button class="btn" id="read-new">🎲 Nuovo punto</button>
+        </div>
+        <div class="pt-fb" id="read-fb"></div>
+      </div>
+
+      <p class="formula-note">Suggerimento: le linee tratteggiate ti aiutano a «leggere» dove cade il punto sui due
+        assi. La proiezione sull'asse $x$ ti dà l'ascissa, quella sull'asse $y$ l'ordinata.</p>
+    </section>
+
+    <!-- 3 — LA DISTANZA TRA DUE PUNTI -->
+    <section id="sec3">
+      <h2>3. La distanza tra due punti</h2>
+
+      <p>Ora che ogni punto è una coppia di numeri, possiamo <em>calcolare</em>, non solo disegnare. Prima domanda
+        naturale: <strong>quanto distano due punti?</strong> Partiamo dal caso più semplice.</p>
+
+      <p>Prendiamo l'origine $O(0;\,0)$ e un punto $P(3;\,0)$ sull'asse delle $x$. Quanto vale la distanza $OP$? Beh,
+        facile: il punto è spostato di $3$ unità lungo l'asse, quindi la distanza è <strong>$3$</strong>. Allo stesso
+        modo, il punto $Q(0;\,4)$ sull'asse delle $y$ dista <strong>$4$</strong> dall'origine. Su un asse, la distanza
+        dall'origine è semplicemente il numero (il suo valore assoluto).</p>
+
+      <p>Ma quanto vale la distanza tra <strong>$P$ e $Q$</strong>, che non stanno sullo stesso asse? Qui entra in
+        gioco proprio il fatto che gli assi sono <strong>ortogonali</strong>.</p>
+
+      <div class="plane"><div id="pq-plane"></div>
+        <div class="cap">Il segmento $PQ$ è l'ipotenusa di un triangolo rettangolo con i cateti sugli assi.</div>
+      </div>
+
+      <p>Gli assi avrebbero potuto essere disegnati con un angolo qualsiasi tra loro; invece li abbiamo scelti apposta
+        <strong>perpendicolari</strong>. Guarda il disegno: il triangolo $OPQ$ ha l'angolo retto nell'origine, i due
+        cateti $OP = 3$ e $OQ = 4$ sugli assi, e il segmento $PQ$ è proprio l'<strong>ipotenusa</strong>. E per
+        l'ipotenusa abbiamo uno strumento potentissimo: il <strong>teorema di Pitagora</strong>. Sì, ancora lui!</p>
+
+      <div class="formula-box">
+        $$\overline{PQ}^{\,2} = \overline{OP}^{\,2} + \overline{OQ}^{\,2} = 3^2 + 4^2 = 9 + 16 = 25
+        \quad\Rightarrow\quad \overline{PQ} = \sqrt{25} = 5$$
+        <p class="formula-note">Non a caso: $3$, $4$ e $5$ formano la <strong>prima terna pitagorica</strong>.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>🔺 Le terne pitagoriche.</strong> Una <em>terna pitagorica</em> è una terna di numeri interi
+        $(a;\,b;\,c)$ per cui vale $a^2 + b^2 = c^2$: sono le misure dei lati di un triangolo rettangolo tutte intere.
+        La più celebre è $(3;\,4;\,5)$, già nota agli antichi Egizi, che con una corda a $12$ nodi tracciavano angoli
+        retti perfetti. Altre terne «primitive» sono $(5;\,12;\,13)$, $(8;\,15;\,17)$, $(7;\,24;\,25)$; e ogni
+        multiplo di una terna è ancora una terna, come $(6;\,8;\,10)$. Quando in un esercizio ne riconosci una, la
+        radice quadrata «viene bella» e il conto è immediato.
+      </div>
+
+      <p>Il ragionamento non dipende dal fatto che $P$ e $Q$ fossero sugli assi. Presi <strong>due punti
+        qualsiasi</strong> $A(x_A;\,y_A)$ e $B(x_B;\,y_B)$, costruiamo il triangolo rettangolo con i cateti paralleli
+        agli assi: un cateto è la differenza delle ascisse, $x_B - x_A$, l'altro la differenza delle ordinate,
+        $y_B - y_A$. L'ipotenusa è il segmento $AB$, e Pitagora ci dà la formula generale.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Distanza tra due punti</div>
+        $$d(A,\,B) = \overline{AB} = \sqrt{(x_B - x_A)^2 + (y_B - y_A)^2}$$
+        <p class="formula-note">Le differenze vanno al quadrato: così non importa in che ordine sottrai (un numero e
+          il suo opposto hanno lo stesso quadrato) e il risultato è sempre positivo, com'è giusto per una distanza.</p>
+      </div>
+
+      <h3>Esercizi — calcola la distanza</h3>
+      <p>Per ciascuna coppia di punti, calcola la distanza. Prova da solo, poi controlla.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Distanza 1</span><span class="difficulty easy">Facile</span></div>
+        <p>$A(1;\,2)$ e $B(4;\,6)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$$d = \sqrt{(4-1)^2 + (6-2)^2} = \sqrt{3^2 + 4^2} = \sqrt{9+16} = \sqrt{25} = 5$$</p>
+          <div class="result-box"><span class="result-label">Distanza</span><span class="result-value">$5$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Distanza 2</span><span class="difficulty easy">Facile</span></div>
+        <p>$A(-2;\,1)$ e $B(4;\,9)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$$d = \sqrt{(4-(-2))^2 + (9-1)^2} = \sqrt{6^2 + 8^2} = \sqrt{36+64} = \sqrt{100} = 10$$</p>
+          <div class="result-box"><span class="result-label">Distanza</span><span class="result-value">$10$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Distanza 3</span><span class="difficulty medium">Medio</span></div>
+        <p>$A(0;\,0)$ e $B(5;\,12)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$$d = \sqrt{5^2 + 12^2} = \sqrt{25 + 144} = \sqrt{169} = 13$$</p>
+          <p class="formula-note">$(5;\,12;\,13)$ è un'altra terna pitagorica.</p>
+          <div class="result-box"><span class="result-label">Distanza</span><span class="result-value">$13$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Distanza 4</span><span class="difficulty medium">Medio</span></div>
+        <p>$A(3;\,-2)$ e $B(3;\,5)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>I due punti hanno la <strong>stessa ascissa</strong>: il segmento è verticale e la distanza è la sola
+            differenza delle ordinate.</p>
+          <p>$$d = \sqrt{(3-3)^2 + (5-(-2))^2} = \sqrt{0 + 7^2} = \sqrt{49} = 7$$</p>
+          <div class="result-box"><span class="result-label">Distanza</span><span class="result-value">$7$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Distanza 5</span><span class="difficulty hard">Difficile</span></div>
+        <p>$A(-1;\,2)$ e $B(2;\,4)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$$d = \sqrt{(2-(-1))^2 + (4-2)^2} = \sqrt{3^2 + 2^2} = \sqrt{9+4} = \sqrt{13}$$</p>
+          <p class="formula-note">Qui la radice non è «bella»: la distanza è $\sqrt{13} \approx 3{,}61$. Va benissimo
+            lasciare la risposta come radice — è il valore <em>esatto</em>. Le distanze non sono sempre numeri interi!</p>
+          <div class="result-box"><span class="result-label">Distanza</span><span class="result-value">$\sqrt{13}$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — IL PUNTO MEDIO -->
+    <section id="sec4">
+      <h2>4. Il punto medio di un segmento</h2>
+
+      <p>E se volessi trovare il <strong>punto medio</strong> di un segmento, quello esattamente a metà strada tra due
+        estremi? In geometria con riga e compasso era una piccola costruzione: si puntavano due circonferenze dello
+        stesso raggio nei due estremi, si univano le loro intersezioni e la retta ottenuta (l'asse del segmento)
+        tagliava il segmento proprio a metà. Nel piano cartesiano, invece, basta un conto:
+        <strong>la media aritmetica delle coordinate</strong>.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Punto medio del segmento $AB$</div>
+        $$M = \left( \frac{x_A + x_B}{2} \;;\; \frac{y_A + y_B}{2} \right)$$
+        <p class="formula-note">Ascissa di $M$ = media delle ascisse; ordinata di $M$ = media delle ordinate.</p>
+      </div>
+
+      <div class="note">
+        <strong>Attenzione!</strong> Il punto medio è un <strong>punto</strong>, non un numero: la risposta è sempre una
+        <strong>coppia</strong> di valori $(x_M;\,y_M)$. Un errore tipico è calcolare una sola media e fermarsi:
+        servono <em>due</em> conti, uno per l'ascissa e uno per l'ordinata.
+      </div>
+
+      <p>Esempio: il punto medio di $A(-2;\,1)$ e $B(4;\,5)$ è
+        $M\!\left(\dfrac{-2+4}{2};\ \dfrac{1+5}{2}\right) = M\!\left(\dfrac{2}{2};\ \dfrac{6}{2}\right) = M(1;\,3)$.</p>
+
+      <p><strong>Ma perché funziona?</strong> L'idea intuitiva è semplice: la media di due numeri cade esattamente a
+        metà strada tra loro. Quindi l'ascissa di $M$ è a metà tra le ascisse di $A$ e $B$, e la sua ordinata a metà
+        tra le ordinate: $M$ è «in mezzo» in entrambe le direzioni. Ma possiamo anche <strong>dimostrarlo</strong> con
+        il calcolo, usando la formula della distanza e lavorando <em>soltanto con le lettere</em>: facciamo la prova
+        verificando che $M$ sia davvero <strong>equidistante</strong> dai due estremi.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">La prova: $M$ è proprio a metà tra $A$ e $B$</div>
+        <p>Le differenze di coordinate tra $A$ e $M$ valgono</p>
+        $$x_M - x_A = \frac{x_A + x_B}{2} - x_A = \frac{x_B - x_A}{2}, \qquad
+          y_M - y_A = \frac{y_A + y_B}{2} - y_A = \frac{y_B - y_A}{2},$$
+        <p>e quindi la distanza da $A$ a $M$ è</p>
+        $$d(A,M) = \sqrt{\left(\frac{x_B - x_A}{2}\right)^2 + \left(\frac{y_B - y_A}{2}\right)^2}
+          = \frac{1}{2}\sqrt{(x_B - x_A)^2 + (y_B - y_A)^2} = \frac{1}{2}\,d(A,B).$$
+        <p>Rifacendo lo stesso conto dall'altro estremo si trova $x_B - x_M = \dfrac{x_B - x_A}{2}$ e
+          $y_B - y_M = \dfrac{y_B - y_A}{2}$, dunque</p>
+        $$d(M,B) = \frac{1}{2}\sqrt{(x_B - x_A)^2 + (y_B - y_A)^2} = \frac{1}{2}\,d(A,B) = d(A,M).$$
+        <p class="formula-note">$M$ dista da $A$ esattamente quanto dista da $B$, e ciascuna distanza è la
+          <strong>metà</strong> dell'intero segmento $AB$: $M$ è davvero il punto di mezzo. Ecco perché la formula è
+          proprio quella!</p>
+      </div>
+
+      <h3>Esercizi — trova il punto medio</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Punto medio 1</span><span class="difficulty easy">Facile</span></div>
+        <p>$A(2;\,4)$ e $B(6;\,8)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$$M = \left( \frac{2+6}{2} \;;\; \frac{4+8}{2} \right) = \left( \frac{8}{2} \;;\; \frac{12}{2} \right) = (4;\,6)$$</p>
+          <div class="result-box"><span class="result-label">Punto medio</span><span class="result-value">$M(4;\,6)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Punto medio 2</span><span class="difficulty easy">Facile</span></div>
+        <p>$A(-3;\,2)$ e $B(5;\,-4)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$$M = \left( \frac{-3+5}{2} \;;\; \frac{2+(-4)}{2} \right) = \left( \frac{2}{2} \;;\; \frac{-2}{2} \right) = (1;\,-1)$$</p>
+          <div class="result-box"><span class="result-label">Punto medio</span><span class="result-value">$M(1;\,-1)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Punto medio 3</span><span class="difficulty medium">Medio</span></div>
+        <p>$A(0;\,0)$ e $B(7;\,3)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$$M = \left( \frac{0+7}{2} \;;\; \frac{0+3}{2} \right) = \left( \frac{7}{2} \;;\; \frac{3}{2} \right) = (3{,}5;\ 1{,}5)$$</p>
+          <p class="formula-note">Il punto medio può avere coordinate «con la virgola»: nessun problema.</p>
+          <div class="result-box"><span class="result-label">Punto medio</span><span class="result-value">$M\!\left(\tfrac{7}{2};\ \tfrac{3}{2}\right)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Punto medio 4</span><span class="difficulty medium">Medio</span></div>
+        <p>$A(-5;\,-1)$ e $B(1;\,7)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$$M = \left( \frac{-5+1}{2} \;;\; \frac{-1+7}{2} \right) = \left( \frac{-4}{2} \;;\; \frac{6}{2} \right) = (-2;\,3)$$</p>
+          <div class="result-box"><span class="result-label">Punto medio</span><span class="result-value">$M(-2;\,3)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Punto medio 5</span><span class="difficulty hard">Difficile</span></div>
+        <p>Il punto medio del segmento $AB$ è $M(3;\,2)$ e un estremo è $A(-1;\,-2)$. Trova l'altro estremo $B$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Qui la formula si legge «al contrario». Da $x_M = \dfrac{x_A + x_B}{2}$ ricaviamo $x_B = 2x_M - x_A$
+            (e analogamente per $y$):</p>
+          <p>$$x_B = 2\cdot 3 - (-1) = 6 + 1 = 7, \qquad y_B = 2\cdot 2 - (-2) = 4 + 2 = 6$$</p>
+          <div class="result-box"><span class="result-label">Estremo</span><span class="result-value">$B(7;\,6)$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — PERIMETRO E AREA DI UN TRIANGOLO -->
+    <section id="sec5">
+      <h2>5. Perimetro e area di un triangolo</h2>
+
+      <p>Mettiamo insieme tutto. Con la distanza sappiamo misurare i lati; con un po' di attenzione sappiamo trovare
+        anche l'area. Consideriamo il triangolo di vertici</p>
+
+      <p style="text-align:center;">$A(-4;\,1)$, &nbsp; $B(4;\,1)$, &nbsp; $C(0;\,4)$.</p>
+
+      <div class="plane"><div id="tri-plane"></div>
+        <div class="cap">Il lato $AB$ è parallelo all'asse $x$: è la <strong>base</strong>. L'altezza è la distanza
+          (verticale, tratteggiata) del vertice $C$ dalla base.</div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Perimetro e area</span><span class="difficulty medium">Medio</span></div>
+        <p>Calcola il perimetro e l'area del triangolo $ABC$ di vertici $A(-4;\,1)$, $B(4;\,1)$, $C(0;\,4)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>I lati.</strong> Il lato $AB$ ha i due estremi con la <em>stessa ordinata</em> ($y = 1$): è
+            orizzontale, quindi la sua lunghezza è la differenza delle ascisse.</p>
+          <p>$$\overline{AB} = |4 - (-4)| = 8$$</p>
+          <p>Gli altri due lati con la formula della distanza:</p>
+          <p>$$\overline{AC} = \sqrt{(0-(-4))^2 + (4-1)^2} = \sqrt{16 + 9} = \sqrt{25} = 5$$</p>
+          <p>$$\overline{BC} = \sqrt{(0-4)^2 + (4-1)^2} = \sqrt{16 + 9} = \sqrt{25} = 5$$</p>
+          <p>(il triangolo è <em>isoscele</em>: $\overline{AC} = \overline{BC} = 5$).</p>
+          <p><strong>Perimetro.</strong> $\;2p = \overline{AB} + \overline{AC} + \overline{BC} = 8 + 5 + 5 = 18$.</p>
+          <p><strong>Area.</strong> Prendiamo $AB$ come base ($= 8$). Poiché la base è orizzontale (sulla retta
+            $y = 1$), l'altezza è semplicemente quanto il vertice $C$ è più in alto: la differenza delle ordinate
+            $\text{altezza} = |4 - 1| = 3$.</p>
+          <p>$$\text{Area} = \frac{\text{base} \times \text{altezza}}{2} = \frac{8 \times 3}{2} = 12$$</p>
+          <div class="result-box"><span class="result-label">Perimetro</span><span class="result-value">$18$</span></div>
+          <div class="result-box"><span class="result-label">Area</span><span class="result-value">$12$</span></div>
+          <p class="formula-note">Il trucco: quando un lato è parallelo a un asse, scegliilo come base — la sua
+            lunghezza e l'altezza si leggono «a occhio» come differenze di coordinate, senza radici.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — FACOLTATIVA: 3 DIMENSIONI E OLTRE -->
+    <section id="sec6">
+      <h2>6. ★ Tre dimensioni... e oltre <span class="difficulty easy" style="vertical-align:middle;">facoltativo</span></h2>
+
+      <p>Abbiamo unito due rette ortogonali e abbiamo ottenuto il piano. Chi ci vieta di aggiungerne una terza? Se
+        piantiamo un terzo asse (di solito lo chiamiamo $z$) <strong>ortogonale ai primi due</strong>, che «esce
+        diritto» dal foglio verso di noi, otteniamo lo <strong>spazio tridimensionale</strong>. Adesso a ogni punto
+        non bastano più due numeri: ne servono <strong>tre</strong>, e scriviamo $P(x;\,y;\,z)$.</p>
+
+      <div class="plane"><svg viewBox="0 0 320 240" role="img" aria-label="tre assi ortogonali nello spazio con un punto" style="aspect-ratio:auto;max-width:360px;">
+        <!-- assi -->
+        <line x1="150" y1="180" x2="150" y2="30" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="150" y1="180" x2="300" y2="180" stroke="var(--text-soft)" stroke-width="2"/>
+        <line x1="150" y1="180" x2="44" y2="230" stroke="var(--text-soft)" stroke-width="2"/>
+        <polygon points="150,26 146,36 154,36" fill="var(--text-soft)"/>
+        <polygon points="304,180 294,176 294,184" fill="var(--text-soft)"/>
+        <polygon points="40,232 50,224 52,232" fill="var(--text-soft)"/>
+        <text x="156" y="34" style="fill:var(--muted);font-size:13px;font-style:italic;">z</text>
+        <text x="298" y="197" style="fill:var(--muted);font-size:13px;font-style:italic;">x</text>
+        <text x="34" y="228" style="fill:var(--muted);font-size:13px;font-style:italic;">y</text>
+        <text x="138" y="196" style="fill:var(--muted);font-size:12px;">O</text>
+        <!-- punto P(4;3;3) proiettato in obliquo -->
+        <line x1="150" y1="180" x2="238" y2="180" stroke="var(--accent)" stroke-width="1.3" stroke-dasharray="4 3"/>
+        <line x1="238" y1="180" x2="205" y2="196" stroke="var(--accent)" stroke-width="1.3" stroke-dasharray="4 3"/>
+        <line x1="205" y1="196" x2="205" y2="120" stroke="var(--accent)" stroke-width="1.3" stroke-dasharray="4 3"/>
+        <circle cx="205" cy="120" r="6" fill="var(--magenta)"/>
+        <text x="213" y="116" style="fill:var(--text);font-size:13px;font-weight:700;">P(x; y; z)</text>
+      </svg>
+        <div class="cap">Un terzo asse ortogonale ai primi due: lo spazio a tre dimensioni.</div>
+      </div>
+
+      <p>Pensa a un <strong>videogioco</strong>. In quelli <em>2D</em> il personaggio si muove sullo schermo — su/giù,
+        destra/sinistra — ma non esiste una «profondità»: due numeri bastano a dire dov'è. Nei giochi <em>3D</em>,
+        invece, servono tre numeri per ogni punto, ma in cambio si può simulare il movimento in tutte e tre le
+        direzioni dello spazio, avanti e indietro compreso.</p>
+
+      <p>La cosa bella è che la distanza <strong>si calcola ancora con Pitagora</strong>, applicato due volte: ai due
+        punti si aggiunge semplicemente il quadrato della differenza delle terze coordinate, sotto la stessa radice.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Distanza nello spazio (3D)</div>
+        $$d(A,\,B) = \sqrt{(x_B - x_A)^2 + (y_B - y_A)^2 + (z_B - z_A)^2}$$
+      </div>
+
+      <p>E se volessi aggiungere una <strong>quarta</strong> dimensione? Dal punto di vista <em>geometrico</em> è
+        impossibile: come trovo una quarta direzione ortogonale alle prime tre, se noi stessi siamo esseri che vivono
+        in tre dimensioni spaziali? Non riusciamo nemmeno a immaginarla. Eppure, dal punto di vista
+        <strong>matematico</strong>, nulla ce lo vieta: la formula della distanza continua a funzionare aggiungendo
+        termini sotto la radice. Possiamo dire che a un punto associamo una <strong>ennupla</strong> di $n$ coordinate,
+        $A(a_1;\,a_2;\,\dots;\,a_n)$, e misurare le distanze in dimensione $n$ qualunque.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Distanza in dimensione $n$</div>
+        $$d(A,\,B) = \sqrt{(b_1 - a_1)^2 + (b_2 - a_2)^2 + \dots + (b_n - a_n)^2} = \sqrt{\sum_{i=1}^{n} (b_i - a_i)^2}$$
+      </div>
+
+      <p>Ma a che serve, se non possiamo «vederle»? Il punto è che le coordinate <strong>non devono per forza essere
+        direzioni dello spazio</strong>. In informatica e in fisica capita spesso: le $n$ coordinate di un punto
+        potrebbero essere <em>tutte le grandezze fisiche</em> necessarie a descrivere un oggetto — quindi anche la
+        temperatura e la massa, per esempio. Ricordi il
+        <a href="3.Data_base.html">database del negozio di vestiti</a>? Un capo d'abbigliamento ha un prezzo, una
+        taglia, un peso, un colore, un punteggio di recensione... ognuna è una «coordinata». Così ogni capo diventa un
+        punto in uno spazio a <strong>tante dimensioni quante sono le sue caratteristiche</strong>, e la «distanza»
+        tra due capi misura quanto si somigliano. È proprio così che i sistemi di raccomandazione ti propongono
+        articoli «vicini» a quelli che ti piacciono!</p>
+
+      <div class="curiosita">
+        <strong>📖 Flatland.</strong> Nel 1884 lo scrittore <strong>Edwin Abbott</strong> pubblicò <em>Flatlandia</em>,
+        un racconto ambientato in un mondo puramente <strong>bidimensionale</strong>, abitato da segmenti, triangoli,
+        quadrati e poligoni che scivolano su un piano. Un giorno il protagonista, un Quadrato, viene visitato da una
+        <strong>Sfera</strong> proveniente dal mondo a tre dimensioni. La Sfera gli mostra cose che nel suo piatto
+        universo sono <em>letteralmente</em> inimmaginabili: il Quadrato «vede» il mondo tridimensionale pur essendo
+        solo un essere bidimensionale. Ovviamente, tornato a casa, nessuno gli crede — sono cose che si fa fatica
+        persino a immaginare. E allora, con un po' di vertigine: riusciresti tu a immaginare un essere
+        <strong>quadridimensionale</strong> che ci guarda dall'alto della sua dimensione in più?</p>
+      </div>
+    </section>
+
+    <!-- 7 — FORMULA DI GAUSS -->
+    <section id="sec7">
+      <h2>7. La formula di Gauss: l'area di qualsiasi poligono</h2>
+
+      <p>Nella sezione 5 abbiamo calcolato l'area di un triangolo con base e altezza. Ma quel metodo era comodo solo
+        perché un lato era parallelo a un asse; per un triangolo «storto», o peggio per un poligono con tanti lati,
+        diventerebbe un incubo. Esiste una scorciatoia meravigliosa, la <strong>formula di Gauss</strong> (nota anche
+        come <em>shoelace</em>, «laccio delle scarpe», per come si intrecciano i prodotti): calcola l'area di
+        <strong>qualsiasi</strong> poligono conoscendo solo le <strong>coordinate dei vertici</strong>, senza bisogno
+        di alcuna altezza.</p>
+
+      <p>Partiamo dai casi più frequenti, con le formule «pronte all'uso». Per un <strong>triangolo</strong> di vertici
+        $A$, $B$, $C$ (presi in ordine, girando attorno alla figura):</p>
+      <div class="formula-box">
+        <div class="formula-title">Area di un triangolo (3 vertici)</div>
+        $$\text{Area} = \frac{1}{2}\,\bigl|\,x_A(y_B - y_C) + x_B(y_C - y_A) + x_C(y_A - y_B)\,\bigr|$$
+        <p class="formula-note">Ogni ascissa moltiplica la <em>differenza</em> tra l'ordinata del vertice successivo e
+          quella del precedente. Le due barre verticali sono il <strong>valore assoluto</strong>: l'area è sempre
+          positiva.</p>
+      </div>
+
+      <p>Per un <strong>quadrilatero</strong> di vertici $A$, $B$, $C$, $D$ (sempre in ordine) la formula ha
+        semplicemente un termine in più, con la stessa logica:</p>
+      <div class="formula-box">
+        <div class="formula-title">Area di un quadrilatero (4 vertici)</div>
+        $$\text{Area} = \frac{1}{2}\,\bigl|\,x_A(y_B - y_D) + x_B(y_C - y_A) + x_C(y_D - y_B) + x_D(y_A - y_C)\,\bigr|$$
+      </div>
+
+      <p><strong>Verifichiamo che funziona.</strong> Sul triangolo della sezione 5, $A(-4;\,1)$, $B(4;\,1)$,
+        $C(0;\,4)$, di cui già sappiamo che l'area vale $12$:</p>
+      <div class="formula-box">
+        $$\tfrac{1}{2}\bigl|\,(-4)(1-4) + 4(4-1) + 0(1-1)\,\bigr| = \tfrac{1}{2}\bigl|\,(-4)(-3) + 4\cdot 3 + 0\,\bigr| = \tfrac{1}{2}\,|12 + 12| = \tfrac{24}{2} = 12\ \checkmark$$
+      </div>
+      <p>Stesso $12$ trovato con base e altezza, ma in una riga sola! Proviamo anche su un <strong>quadrato</strong> di
+        lato $4$, vertici $(1;\,1),(5;\,1),(5;\,5),(1;\,5)$:</p>
+      <div class="formula-box">
+        $$\tfrac{1}{2}\bigl|\,1(1-5) + 5(5-1) + 5(5-1) + 1(1-5)\,\bigr| = \tfrac{1}{2}\bigl|\,{-4} + 20 + 20 - 4\,\bigr| = \tfrac{32}{2} = 16\ \checkmark$$
+      </div>
+      <p>E $16$ è proprio $4\times 4$, l'area del quadrato. Le due prove tornano!</p>
+
+      <div class="note">
+        <strong>Un momento: questa è davvero una «dimostrazione»?</strong> Abbiamo controllato la formula su due
+        esempi — un triangolo e un quadrato — e ha funzionato. Ma a un <strong>vero matematico</strong> basterebbe
+        questo per essere <em>certo</em> che funzioni <strong>sempre</strong>, per qualunque poligono?
+        <strong>No!</strong> Provare due (o anche mille) casi particolari non dimostra niente in generale: magari al
+        poligono successivo qualcosa va storto. Quella che abbiamo fatto è solo una <em>verifica su esempi</em>, non
+        una dimostrazione. Se vuoi convincerti sul serio, ecco la sfida: cerca in rete — o, meglio ancora, prova a
+        costruirla da solo — una <strong>vera dimostrazione</strong> della formula di Gauss, valida per ogni numero
+        di lati.
+      </div>
+
+      <p>E se i vertici sono $5$, $7$, $100$? Basta continuare con lo stesso ritmo: la <strong>formula generale</strong>
+        per un poligono di $n$ vertici si scrive comodamente sommando i prodotti «in diagonale»
+        $x_i \cdot y_{i+1}$ e sottraendo quelli $x_{i+1}\cdot y_i$, ricordando che dopo l'ultimo vertice si torna al
+        primo per «chiudere il giro»:</p>
+      <div class="formula-box">
+        <div class="formula-title">Formula di Gauss per $n$ vertici</div>
+        $$\text{Area} = \frac{1}{2}\,\bigl|\,(x_1 y_2 - x_2 y_1) + (x_2 y_3 - x_3 y_2) + \dots + (x_n y_1 - x_1 y_n)\,\bigr|$$
+        <p class="formula-note">È la stessa formula dei casi a 3 e 4 vertici, solo scritta per un numero qualsiasi di
+          lati. Un indizio per la dimostrazione che ti abbiamo lasciato in sfida: si basa sulla somma
+          <em>con segno</em> delle aree dei trapezi sotto ogni lato — una lettura affascinante.</p>
+      </div>
+
+      <h3>Esercizi — area col metodo di Gauss</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Triangolo (3 vertici) — A</span><span class="difficulty easy">Facile</span></div>
+        <p>Vertici $A(1;\,1),\ B(5;\,2),\ C(3;\,6)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$\tfrac{1}{2}\bigl|\,1(2-6) + 5(6-1) + 3(1-2)\,\bigr| = \tfrac{1}{2}\bigl|\,-4 + 25 - 3\,\bigr| = \tfrac{18}{2} = 9$.</p>
+          <div class="result-box"><span class="result-label">Area</span><span class="result-value">$9$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Triangolo (3 vertici) — B</span><span class="difficulty easy">Facile</span></div>
+        <p>Vertici $A(2;\,1),\ B(6;\,2),\ C(4;\,7)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$\tfrac{1}{2}\bigl|\,2(2-7) + 6(7-1) + 4(1-2)\,\bigr| = \tfrac{1}{2}\bigl|\,-10 + 36 - 4\,\bigr| = \tfrac{22}{2} = 11$.</p>
+          <div class="result-box"><span class="result-label">Area</span><span class="result-value">$11$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quadrilatero (4 vertici) — A</span><span class="difficulty medium">Medio</span></div>
+        <p>Vertici $A(0;\,0),\ B(5;\,0),\ C(6;\,4),\ D(1;\,3)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$\tfrac{1}{2}\bigl|\,0(0-3) + 5(4-0) + 6(3-0) + 1(0-4)\,\bigr| = \tfrac{1}{2}\bigl|\,0 + 20 + 18 - 4\,\bigr| = \tfrac{34}{2} = 17$.</p>
+          <div class="result-box"><span class="result-label">Area</span><span class="result-value">$17$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Quadrilatero (4 vertici) — B</span><span class="difficulty medium">Medio</span></div>
+        <p>Vertici $A(0;\,0),\ B(6;\,1),\ C(5;\,5),\ D(1;\,4)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$\tfrac{1}{2}\bigl|\,0(1-4) + 6(5-0) + 5(4-1) + 1(0-5)\,\bigr| = \tfrac{1}{2}\bigl|\,0 + 30 + 15 - 5\,\bigr| = \tfrac{40}{2} = 20$.</p>
+          <div class="result-box"><span class="result-label">Area</span><span class="result-value">$20$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Pentagono (5 vertici)</span><span class="difficulty hard">Difficile</span></div>
+        <p>Vertici $(0;\,0),\ (4;\,0),\ (5;\,3),\ (2;\,5),\ (-1;\,3)$. Con $5$ vertici conviene la formula generale.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$(0\cdot 0 - 4\cdot 0) + (4\cdot 3 - 5\cdot 0) + (5\cdot 5 - 2\cdot 3) + (2\cdot 3 - (-1)\cdot 5) + ((-1)\cdot 0 - 0\cdot 3) = 0 + 12 + 19 + 11 + 0 = 42$.</p>
+          <p>Area $= \dfrac{|42|}{2} = 21$.</p>
+          <div class="result-box"><span class="result-label">Area</span><span class="result-value">$21$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Ettagono (7 vertici)</span><span class="difficulty hard">Difficile</span></div>
+        <p>Vertici $(0;\,0),\ (4;\,0),\ (6;\,3),\ (4;\,6),\ (1;\,6),\ (-2;\,3),\ (-1;\,1)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Sommo i sette termini (girando in ordine):</p>
+          <p>$0 + (4\cdot 3 - 6\cdot 0) + (6\cdot 6 - 4\cdot 3) + (4\cdot 6 - 1\cdot 6) + (1\cdot 3 - (-2)\cdot 6) + ((-2)\cdot 1 - (-1)\cdot 3) + 0 = 0 + 12 + 24 + 18 + 15 + 1 + 0 = 70$.</p>
+          <p>Area $= \dfrac{|70|}{2} = 35$.</p>
+          <div class="result-box"><span class="result-label">Area</span><span class="result-value">$35$</span></div>
+        </div>
+      </div>
+
+      <h3>Facciamolo fare a Python</h3>
+      <p>Con tanti vertici, sommare a mano tutti quei prodotti è noioso e si sbaglia facilmente. Come abbiamo fatto
+        nella <a href="2.Sistemi.html">lezione 2</a> con la regola di Cramer, facciamo scrivere il conto al computer.
+        Costruiamo lo script <strong>un pezzo alla volta</strong>: prima la funzione che calcola l'area, poi il
+        programmino che la mette al lavoro.</p>
+
+      <h4>Pezzo 1 — la funzione che calcola l'area</h4>
+      <p>Rappresentiamo il poligono come una <strong>lista di vertici</strong>, e ogni vertice come una coppia
+        <code class="inline-code">[x, y]</code>. La funzione <code class="inline-code">area_gauss</code> scorre i
+        vertici uno per uno, per ciascuno prende anche il <strong>successivo</strong> (e dopo l'ultimo torna al primo),
+        e accumula i prodotti «in diagonale». Il trucco per «tornare al primo» è l'operatore
+        <code class="inline-code">%</code> (il <strong>resto</strong> della divisione): quando l'indice arriva a
+        $n$, <code class="inline-code">n % n</code> vale $0$ e si riparte dal vertice iniziale.</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>pezzo 1</b></span><span>l'area col metodo di Gauss</span></div>
+        <pre><span class="kw">def</span> <span class="fn">area_gauss</span>(P):
+    n = <span class="fn">len</span>(P)                    <span class="cm"># numero di vertici</span>
+    somma = <span class="nu">0</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+        x1, y1 = P[i]                <span class="cm"># vertice corrente</span>
+        x2, y2 = P[(i + <span class="nu">1</span>) % n]      <span class="cm"># vertice successivo (dopo l'ultimo si torna al primo)</span>
+        somma += x1 * y2 - x2 * y1   <span class="cm"># prodotto "in diagonale"</span>
+    <span class="kw">return</span> <span class="fn">abs</span>(somma) / <span class="nu">2</span>       <span class="cm"># metà del valore assoluto</span></pre>
+      </div>
+
+      <p>Il cuore è la riga <code class="inline-code">somma += x1 * y2 - x2 * y1</code>: è esattamente il termine
+        generico della formula, $x_i y_{i+1} - x_{i+1} y_i$, ripetuto per ogni vertice grazie al ciclo
+        <code class="inline-code">for</code>. Alla fine <code class="inline-code">abs(...) / 2</code> prende la metà
+        del valore assoluto, proprio come le due barre e il $\tfrac12$ della formula.</p>
+
+      <h4>Pezzo 2 — il programma che la usa</h4>
+      <p>Basta scrivere i vertici in ordine e chiamare la funzione. Riproviamo il triangolo della sezione 5 (area
+        $12$) e l'ettagono degli esercizi (area $35$): il computer non batte ciglio nemmeno con tanti vertici.</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>pezzo 2</b></span><span>proviamola su triangolo ed ettagono</span></div>
+        <pre>triangolo = [[-<span class="nu">4</span>, <span class="nu">1</span>], [<span class="nu">4</span>, <span class="nu">1</span>], [<span class="nu">0</span>, <span class="nu">4</span>]]
+<span class="fn">print</span>(<span class="fn">area_gauss</span>(triangolo))     <span class="cm"># stampa 12.0</span>
+
+ettagono = [[<span class="nu">0</span>, <span class="nu">0</span>], [<span class="nu">4</span>, <span class="nu">0</span>], [<span class="nu">6</span>, <span class="nu">3</span>], [<span class="nu">4</span>, <span class="nu">6</span>], [<span class="nu">1</span>, <span class="nu">6</span>], [-<span class="nu">2</span>, <span class="nu">3</span>], [-<span class="nu">1</span>, <span class="nu">1</span>]]
+<span class="fn">print</span>(<span class="fn">area_gauss</span>(ettagono))      <span class="cm"># stampa 35.0</span></pre>
+      </div>
+
+      <h4>Lo script completo</h4>
+      <p>Rimontiamo i due pezzi in un unico file: copialo su Colab, premi ▶ e prova a cambiare i vertici. Questo
+        programma calcola l'area di un poligono con un numero <em>qualsiasi</em> di lati — proprio quello davanti a
+        cui i conti a mano ti farebbero venire il mal di testa.</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>area_gauss.py</b></span><span>area di un poligono qualsiasi</span></div>
+        <pre><span class="kw">def</span> <span class="fn">area_gauss</span>(P):
+    <span class="cm"># P è la lista dei vertici, in ordine: [[x1, y1], [x2, y2], ...]</span>
+    n = <span class="fn">len</span>(P)
+    somma = <span class="nu">0</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+        x1, y1 = P[i]
+        x2, y2 = P[(i + <span class="nu">1</span>) % n]
+        somma += x1 * y2 - x2 * y1
+    <span class="kw">return</span> <span class="fn">abs</span>(somma) / <span class="nu">2</span>
+
+<span class="cm"># --- prova ---</span>
+poligono = [[<span class="nu">0</span>, <span class="nu">0</span>], [<span class="nu">4</span>, <span class="nu">0</span>], [<span class="nu">5</span>, <span class="nu">3</span>], [<span class="nu">2</span>, <span class="nu">5</span>], [-<span class="nu">1</span>, <span class="nu">3</span>]]   <span class="cm"># il pentagono</span>
+<span class="fn">print</span>(<span class="st">"Area ="</span>, <span class="fn">area_gauss</span>(poligono))              <span class="cm"># stampa Area = 21.0</span></pre>
+      </div>
+    </section>
+
+    <!-- 8 — QUIZ -->
+    <section id="quiz">
+      <h2>8. Quiz finale</h2>
+      <p>Undici domande su tutta la lezione: coordinate e quadranti, distanza, punto medio, aree e le dimensioni oltre
+        la terza. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <!-- Widget interattivi: piano cartesiano -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const N = 5, W = 320, O = 160, U = 28;
+      function Xp(dx) { return O + dx * U; }
+      function Yp(dy) { return O - dy * U; }
+      function rndInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+      function fmt(n) { return n < 0 ? ('−' + (-n)) : ('' + n); }
+
+      // Griglia + assi (stringa SVG), theme-aware tramite variabili CSS
+      function axesSVG() {
+        let s = '';
+        for (let i = -N; i <= N; i++) {
+          s += '<line x1="' + Xp(i) + '" y1="' + Yp(-N) + '" x2="' + Xp(i) + '" y2="' + Yp(N) + '" stroke="var(--border)" stroke-width="1" opacity="0.55"/>';
+          s += '<line x1="' + Xp(-N) + '" y1="' + Yp(i) + '" x2="' + Xp(N) + '" y2="' + Yp(i) + '" stroke="var(--border)" stroke-width="1" opacity="0.55"/>';
+        }
+        // assi con freccia
+        s += '<line x1="' + Xp(-N) + '" y1="' + O + '" x2="' + (Xp(N) + 8) + '" y2="' + O + '" stroke="var(--text-soft)" stroke-width="2"/>';
+        s += '<line x1="' + O + '" y1="' + Yp(-N) + '" x2="' + O + '" y2="' + (Yp(N) - 8) + '" stroke="var(--text-soft)" stroke-width="2"/>';
+        s += '<polygon points="' + (Xp(N) + 8) + ',' + O + ' ' + Xp(N) + ',' + (O - 4) + ' ' + Xp(N) + ',' + (O + 4) + '" fill="var(--text-soft)"/>';
+        s += '<polygon points="' + O + ',' + (Yp(N) - 8) + ' ' + (O - 4) + ',' + Yp(N) + ' ' + (O + 4) + ',' + Yp(N) + '" fill="var(--text-soft)"/>';
+        s += '<text x="' + (Xp(N) + 5) + '" y="' + (O + 15) + '" style="fill:var(--muted);font-size:12px;font-style:italic;">x</text>';
+        s += '<text x="' + (O - 13) + '" y="' + (Yp(N) - 3) + '" style="fill:var(--muted);font-size:12px;font-style:italic;">y</text>';
+        // numeri sulle tacche
+        for (let i = -N; i <= N; i++) {
+          if (i === 0) continue;
+          s += '<text x="' + Xp(i) + '" y="' + (O + 13) + '" text-anchor="middle" style="fill:var(--muted);font-size:9px;">' + i + '</text>';
+          s += '<text x="' + (O - 7) + '" y="' + (Yp(i) + 3) + '" text-anchor="end" style="fill:var(--muted);font-size:9px;">' + i + '</text>';
+        }
+        s += '<text x="' + (O - 6) + '" y="' + (O + 13) + '" text-anchor="end" style="fill:var(--muted);font-size:9px;">O</text>';
+        return s;
+      }
+      function svgWrap(inner, label) {
+        return '<svg viewBox="0 0 ' + W + ' ' + W + '" role="img" aria-label="' + label + '">' + inner + '</svg>';
+      }
+
+      // ---- Diagramma introduttivo: quadranti + punto P(3;2) ----
+      (function () {
+        const host = document.getElementById('intro-plane');
+        if (!host) return;
+        let s = axesSVG();
+        const quad = [[2.6, 2.6, 'I'], [-2.6, 2.6, 'II'], [-2.6, -2.6, 'III'], [2.6, -2.6, 'IV']];
+        quad.forEach(function (q) {
+          s += '<text x="' + Xp(q[0]) + '" y="' + Yp(q[1]) + '" text-anchor="middle" style="fill:var(--muted);font-size:12px;font-weight:700;opacity:0.6;">' + q[2] + '</text>';
+        });
+        s += '<line x1="' + Xp(3) + '" y1="' + Yp(2) + '" x2="' + Xp(3) + '" y2="' + O + '" stroke="var(--accent)" stroke-width="1.3" stroke-dasharray="4 3" opacity="0.75"/>';
+        s += '<line x1="' + Xp(3) + '" y1="' + Yp(2) + '" x2="' + O + '" y2="' + Yp(2) + '" stroke="var(--accent)" stroke-width="1.3" stroke-dasharray="4 3" opacity="0.75"/>';
+        s += '<circle cx="' + Xp(3) + '" cy="' + Yp(2) + '" r="6" fill="var(--magenta)"/>';
+        s += '<text x="' + (Xp(3) + 8) + '" y="' + (Yp(2) - 8) + '" style="fill:var(--text);font-size:13px;font-weight:700;">P(3; 2)</text>';
+        host.innerHTML = svgWrap(s, 'piano cartesiano con i quattro quadranti e il punto P(3; 2)');
+      })();
+
+      // ---- Diagramma distanza P(3;0) Q(0;4) ----
+      (function () {
+        const host = document.getElementById('pq-plane');
+        if (!host) return;
+        let s = axesSVG();
+        // triangolo OPQ
+        s += '<polygon points="' + Xp(0) + ',' + Yp(0) + ' ' + Xp(3) + ',' + Yp(0) + ' ' + Xp(0) + ',' + Yp(4) + '" fill="var(--accent)" fill-opacity="0.16" stroke="none"/>';
+        // ipotenusa PQ
+        s += '<line x1="' + Xp(3) + '" y1="' + Yp(0) + '" x2="' + Xp(0) + '" y2="' + Yp(4) + '" stroke="var(--magenta)" stroke-width="2.6"/>';
+        // angolo retto in O
+        s += '<path d="M ' + (Xp(0) + 12) + ' ' + Yp(0) + ' L ' + (Xp(0) + 12) + ' ' + (Yp(0) - 12) + ' L ' + Xp(0) + ' ' + (Yp(0) - 12) + '" fill="none" stroke="var(--text-soft)" stroke-width="1.2"/>';
+        // punti
+        s += '<circle cx="' + Xp(3) + '" cy="' + Yp(0) + '" r="5.5" fill="var(--accent)"/>';
+        s += '<circle cx="' + Xp(0) + '" cy="' + Yp(4) + '" r="5.5" fill="var(--accent)"/>';
+        s += '<text x="' + (Xp(3) + 6) + '" y="' + (Yp(0) + 16) + '" style="fill:var(--text);font-size:13px;font-weight:700;">P(3; 0)</text>';
+        s += '<text x="' + (Xp(0) + 8) + '" y="' + (Yp(4) - 6) + '" style="fill:var(--text);font-size:13px;font-weight:700;">Q(0; 4)</text>';
+        // etichette lati
+        s += '<text x="' + Xp(1.5) + '" y="' + (Yp(0) - 5) + '" text-anchor="middle" style="fill:var(--muted);font-size:11px;">3</text>';
+        s += '<text x="' + (Xp(0) - 8) + '" y="' + Yp(2) + '" text-anchor="end" style="fill:var(--muted);font-size:11px;">4</text>';
+        s += '<text x="' + (Xp(1.7) + 6) + '" y="' + (Yp(2.2)) + '" style="fill:var(--magenta);font-size:12px;font-weight:700;">5</text>';
+        host.innerHTML = svgWrap(s, 'triangolo rettangolo di cateti 3 e 4 e ipotenusa PQ uguale a 5');
+      })();
+
+      // ---- Diagramma triangolo ABC ----
+      (function () {
+        const host = document.getElementById('tri-plane');
+        if (!host) return;
+        const A = { x: -4, y: 1 }, B = { x: 4, y: 1 }, C = { x: 0, y: 4 };
+        let s = axesSVG();
+        s += '<polygon points="' + Xp(A.x) + ',' + Yp(A.y) + ' ' + Xp(B.x) + ',' + Yp(B.y) + ' ' + Xp(C.x) + ',' + Yp(C.y) + '" fill="var(--accent)" fill-opacity="0.18" stroke="var(--accent)" stroke-width="2.5"/>';
+        // altezza tratteggiata da C al piede (0;1)
+        s += '<line x1="' + Xp(0) + '" y1="' + Yp(4) + '" x2="' + Xp(0) + '" y2="' + Yp(1) + '" stroke="var(--magenta)" stroke-width="1.5" stroke-dasharray="4 3"/>';
+        s += '<path d="M ' + (Xp(0) + 10) + ' ' + Yp(1) + ' L ' + (Xp(0) + 10) + ' ' + (Yp(1) - 10) + ' L ' + Xp(0) + ' ' + (Yp(1) - 10) + '" fill="none" stroke="var(--magenta)" stroke-width="1"/>';
+        s += '<text x="' + (Xp(0) + 6) + '" y="' + Yp(2.6) + '" style="fill:var(--magenta);font-size:11px;font-weight:700;">h=3</text>';
+        // vertici + etichette
+        const V = [['A(-4; 1)', A, 'end', -8, 16], ['B(4; 1)', B, 'start', 8, 16], ['C(0; 4)', C, 'middle', 0, -10]];
+        V.forEach(function (v) {
+          s += '<circle cx="' + Xp(v[1].x) + '" cy="' + Yp(v[1].y) + '" r="5.5" fill="var(--accent)"/>';
+          s += '<text x="' + (Xp(v[1].x) + v[3]) + '" y="' + (Yp(v[1].y) + v[4]) + '" text-anchor="' + v[2] + '" style="fill:var(--text);font-size:12px;font-weight:700;">' + v[0] + '</text>';
+        });
+        host.innerHTML = svgWrap(s, 'triangolo di vertici A(-4;1) B(4;1) C(0;4) con base AB e altezza da C');
+      })();
+
+      // ---- Esercizio interattivo: posiziona il punto ----
+      (function () {
+        const host = document.getElementById('place-plane');
+        if (!host) return;
+        const promptEl = document.getElementById('place-prompt');
+        const fbEl = document.getElementById('place-fb');
+        const letters = ['A', 'B', 'C', 'P', 'Q', 'R', 'S', 'T'];
+        let target = null, letter = 'A';
+
+        function render(marker) {
+          let s = axesSVG();
+          if (marker) {
+            const col = marker.ok ? '#16a34a' : '#dc2626';
+            s += '<circle cx="' + Xp(marker.x) + '" cy="' + Yp(marker.y) + '" r="6.5" fill="' + col + '"/>';
+          }
+          host.innerHTML = svgWrap(s, 'griglia su cui posizionare il punto');
+          const svg = host.querySelector('svg');
+          svg.style.cursor = 'crosshair';
+          svg.addEventListener('click', onClick);
+        }
+        function onClick(e) {
+          const svg = e.currentTarget, r = svg.getBoundingClientRect();
+          const vx = (e.clientX - r.left) / r.width * W, vy = (e.clientY - r.top) / r.height * W;
+          let dx = Math.round((vx - O) / U), dy = Math.round((O - vy) / U);
+          dx = Math.max(-N, Math.min(N, dx)); dy = Math.max(-N, Math.min(N, dy));
+          const ok = (dx === target.x && dy === target.y);
+          render({ x: dx, y: dy, ok: ok });
+          if (ok) {
+            fbEl.textContent = '✓ Esatto! Hai posizionato ' + letter + '(' + fmt(target.x) + '; ' + fmt(target.y) + ').';
+            fbEl.className = 'pt-fb ok';
+          } else {
+            fbEl.textContent = '✗ Hai cliccato (' + fmt(dx) + '; ' + fmt(dy) + '). Ricorda: prima l\'ascissa (spostamento orizzontale), poi l\'ordinata (verticale). Riprova.';
+            fbEl.className = 'pt-fb no';
+          }
+        }
+        function newChallenge() {
+          let tx, ty;
+          do { tx = rndInt(-N, N); ty = rndInt(-N, N); } while (tx === 0 && ty === 0);
+          target = { x: tx, y: ty };
+          letter = letters[rndInt(0, letters.length - 1)];
+          promptEl.innerHTML = 'Posiziona sul piano il punto <strong>' + letter + '(' + fmt(tx) + '; ' + fmt(ty) + ')</strong>.';
+          fbEl.textContent = ''; fbEl.className = 'pt-fb';
+          render();
+        }
+        document.getElementById('place-new').addEventListener('click', newChallenge);
+        newChallenge();
+      })();
+
+      // ---- Esercizio interattivo: leggi le coordinate ----
+      (function () {
+        const host = document.getElementById('read-plane');
+        if (!host) return;
+        const ix = document.getElementById('read-x'), iy = document.getElementById('read-y');
+        const fb = document.getElementById('read-fb');
+        let pt = null;
+
+        function newPoint() {
+          let x, y;
+          do { x = rndInt(-N, N); y = rndInt(-N, N); } while (x === 0 && y === 0);
+          pt = { x: x, y: y };
+          ix.value = ''; iy.value = ''; fb.textContent = ''; fb.className = 'pt-fb';
+          let s = axesSVG();
+          s += '<line x1="' + Xp(x) + '" y1="' + Yp(y) + '" x2="' + Xp(x) + '" y2="' + O + '" stroke="var(--accent)" stroke-width="1.3" stroke-dasharray="4 3" opacity="0.75"/>';
+          s += '<line x1="' + Xp(x) + '" y1="' + Yp(y) + '" x2="' + O + '" y2="' + Yp(y) + '" stroke="var(--accent)" stroke-width="1.3" stroke-dasharray="4 3" opacity="0.75"/>';
+          s += '<circle cx="' + Xp(x) + '" cy="' + Yp(y) + '" r="6.5" fill="var(--magenta)"/>';
+          s += '<text x="' + (Xp(x) + 8) + '" y="' + (Yp(y) - 8) + '" style="fill:var(--text);font-size:13px;font-weight:700;">P</text>';
+          host.innerHTML = svgWrap(s, 'punto P di cui leggere le coordinate');
+        }
+        function check() {
+          const gx = parseInt(ix.value, 10), gy = parseInt(iy.value, 10);
+          if (Number.isNaN(gx) || Number.isNaN(gy)) {
+            fb.textContent = 'Inserisci due numeri interi per l\'ascissa e l\'ordinata.'; fb.className = 'pt-fb'; return;
+          }
+          if (gx === pt.x && gy === pt.y) {
+            fb.textContent = '✓ Esatto! Le coordinate sono P(' + fmt(pt.x) + '; ' + fmt(pt.y) + ').'; fb.className = 'pt-fb ok';
+          } else {
+            fb.textContent = '✗ Non ancora. Guarda dove cadono le proiezioni tratteggiate sull\'asse x e sull\'asse y.'; fb.className = 'pt-fb no';
+          }
+        }
+        document.getElementById('read-check').addEventListener('click', check);
+        document.getElementById('read-new').addEventListener('click', newPoint);
+        ix.addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+        iy.addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+        newPoint();
+      })();
+
+    });
+  </script>
+
+  <!-- Script condivisi -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Nel piano cartesiano, come si individua un punto?',
+        options: ['con un solo numero', 'con una coppia ordinata di numeri (ascissa e ordinata)', 'con un angolo', 'con una lettera', 'con tre numeri'],
+        correct: 1, explain: 'Servono due numeri: quanto è spostato lungo l\'asse x e quanto lungo l\'asse y.' },
+      { type: 'mc', diff: 'easy', text: 'Come si chiama l\'asse <strong>orizzontale</strong> e con quale lettera si indica?',
+        options: ['asse delle ordinate, $y$', 'asse delle ascisse, $x$', 'asse delle altezze, $z$', 'asse dei numeri, $n$', 'asse origine, $O$'],
+        correct: 1, explain: 'Orizzontale = ascisse = $x$; verticale = ordinate = $y$.' },
+      { type: 'mc', diff: 'easy', text: 'Quali sono le coordinate dell\'<strong>origine</strong> $O$?',
+        options: ['$(1;\\,1)$', '$(0;\\,0)$', '$(0;\\,1)$', 'non ha coordinate', 'dipende dal disegno'],
+        correct: 1, explain: 'L\'origine è il punto d\'incontro degli assi: entrambe le coordinate valgono $0$.' },
+      { type: 'mc', diff: 'medium', text: 'Il punto $A(-3;\\,2)$ si trova nel:',
+        options: ['primo quadrante $(+;+)$', 'secondo quadrante $(-;+)$', 'terzo quadrante $(-;-)$', 'quarto quadrante $(+;-)$', 'sull\'asse $x$'],
+        correct: 1, explain: 'Ascissa negativa e ordinata positiva: è il secondo quadrante.' },
+      { type: 'mc', diff: 'medium', text: 'La distanza tra $A(1;\\,1)$ e $B(4;\\,5)$ vale:',
+        options: ['$3$', '$4$', '$5$', '$7$', '$\\sqrt{7}$'],
+        correct: 2, explain: '$d = \\sqrt{(4-1)^2+(5-1)^2} = \\sqrt{9+16} = \\sqrt{25} = 5$ (terna $3,4,5$).' },
+      { type: 'mc', diff: 'medium', text: 'Su quale teorema si basa la formula della distanza tra due punti?',
+        options: ['sul teorema di Talete', 'sul teorema di Pitagora', 'sulla regola di Cramer', 'sul teorema di Euclide', 'sul teorema del resto'],
+        correct: 1, explain: 'Il segmento è l\'ipotenusa di un triangolo rettangolo con i cateti paralleli agli assi: Pitagora.' },
+      { type: 'mc', diff: 'medium', text: 'Il punto medio di $A(2;\\,4)$ e $B(6;\\,10)$ è:',
+        options: ['$(8;\\,14)$', '$(4;\\,7)$', '$(2;\\,3)$', '$(4;\\,6)$', '$(3;\\,5)$'],
+        correct: 1, explain: 'Medie: $\\frac{2+6}{2}=4$ e $\\frac{4+10}{2}=7$, quindi $M(4;\\,7)$.' },
+      { type: 'mc', diff: 'hard', text: 'Il punto medio di un segmento è sempre:',
+        options: ['un solo numero', 'una coppia di numeri (un punto)', 'la distanza tra gli estremi', 'la somma delle coordinate', 'l\'origine'],
+        correct: 1, explain: 'È un punto: servono DUE medie, una per l\'ascissa e una per l\'ordinata.' },
+      { type: 'mc', diff: 'hard', text: 'In un triangolo con un lato parallelo all\'asse $x$, perché conviene scegliere quel lato come base?',
+        options: ['perché è sempre il più lungo', 'perché base e altezza si leggono come differenze di coordinate, senza radici', 'perché l\'area diventa nulla', 'perché è obbligatorio dalla formula', 'non conviene affatto'],
+        correct: 1, explain: 'La lunghezza della base è la differenza delle ascisse e l\'altezza è la differenza delle ordinate: niente radici.' },
+      { type: 'mc', diff: 'hard', text: 'Con la formula di Gauss, l\'area del triangolo di vertici $(1;\\,1),(5;\\,2),(3;\\,6)$ è:',
+        options: ['$18$', '$9$', '$36$', '$12$', '$6$'],
+        correct: 1, explain: '$\\tfrac{1}{2}|1(2-6)+5(6-1)+3(1-2)| = \\tfrac{1}{2}|-4+25-3| = \\tfrac{18}{2} = 9$.' },
+      { type: 'open', diff: 'hard', text: 'In fisica e informatica si usano spesso spazi a <strong>tante dimensioni</strong>, anche più di tre, pur vivendo noi in tre dimensioni. Come è possibile? Che cosa rappresentano allora le coordinate?',
+        keywords: ['caratteristic', 'non', 'spazio', 'grandezz', 'misura', 'dato', 'prezzo', 'proprietà', 'formula', 'numer', 'astr'], requiredMatches: 2,
+        explain: 'Le coordinate non devono essere per forza direzioni geometriche dello spazio: possono essere le caratteristiche o le grandezze di un oggetto (prezzo, peso, taglia, punteggio...). Ogni caratteristica è una «dimensione», e la formula della distanza continua a funzionare per un numero qualsiasi di coordinate, anche se non possiamo «disegnarle».' }
+    ];
+  </script>
+
+</body>
+
+</html>

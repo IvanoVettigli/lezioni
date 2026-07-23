@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 5 — La retta</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- Librerie per i grafici -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent);
+      border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+
+    /* piano cartesiano (SVG theme-aware) */
+    .plane { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 0.6rem 0; }
+    .plane svg { display: block; width: 100%; max-width: 380px; aspect-ratio: 1 / 1; height: auto; margin: 0 auto; touch-action: manipulation; }
+    .plane .cap { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 0.3rem; }
+
+    /* tabellina x/y e coordinate */
+    .mini-tab { border-collapse: collapse; margin: 0.7rem auto; font-variant-numeric: tabular-nums; }
+    .mini-tab th, .mini-tab td { border: 1px solid var(--border); padding: 0.35rem 0.9rem; text-align: center; }
+    .mini-tab th { background: var(--surface-2); }
+    .mini-tab caption { caption-side: top; color: var(--muted); font-size: 0.85rem; margin-bottom: 0.3rem; }
+
+    /* equazione della retta mostrata in grande sopra gli slider */
+    .line-eq { text-align: center; font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em; color: var(--accent); background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.5rem; margin-bottom: 0.6rem; }
+    .out-line { margin-top: 0.5rem; font-size: 0.95rem; }
+
+    /* input per il simulatore di funzioni */
+    .fn-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0.5rem 0; }
+    .fn-input { flex: 1; min-width: 12rem; padding: 0.45rem 0.6rem; border: 1px solid var(--border);
+      border-radius: 8px; background: var(--surface); color: var(--text); font-family: Consolas, monospace; font-size: 1rem; }
+    .fn-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .preset-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.4rem; }
+    .badge-fac { display: inline-block; background: color-mix(in srgb, var(--gold) 22%, transparent); color: var(--gold-ink, var(--gold));
+      border: 1px solid color-mix(in srgb, var(--gold) 45%, transparent); border-radius: 999px; padding: 0.05rem 0.6rem;
+      font-size: 0.72rem; font-weight: 700; vertical-align: middle; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Secondo anno · Lezione 5</div>
+    <h1>La retta</h1>
+    <p>La più semplice delle curve — e perché le equazioni di primo grado si chiamano «lineari»</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Secondo anno</a>
+    <span class="sep">/</span> La retta
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Nelle prime lezioni abbiamo chiamato le equazioni di primo grado
+      <em>«lineari»</em>, senza spiegare bene perché. Nella lezione scorsa abbiamo costruito il piano cartesiano, dove
+      ogni punto è una coppia di numeri. È arrivato il momento di unire le due cose: scopriremo che dietro quel nome
+      si nasconde una <strong>linea diritta</strong>, e che la retta è il modello matematico più usato al mondo.
+    </div>
+
+    <!-- 1 — LA RETTA COME FUNZIONE -->
+    <section id="sec1">
+      <h2>1. Un'equazione, infiniti punti: nasce la retta</h2>
+
+      <p>Prendiamo questa scrittura:</p>
+      <div class="formula-box">$$y = 2x + 1$$</div>
+
+      <p>È una <strong>sola</strong> equazione, ma questa volta ha <strong>due</strong> incognite, la $x$ e la $y$.
+        Per quali valori è vera? Nella lezione 1, con una sola incognita, la risposta era un numero solo. Qui invece
+        le soluzioni sono <strong>infinite</strong>: per <em>ogni</em> valore che diamo alla $x$ ne esce uno per la
+        $y$. Mettiamole in tabella. Nella prima colonna scegliamo la $x$ (la <strong>variabile
+        indipendente</strong>, quella che decidiamo noi); nella seconda calcoliamo la $y$ (la <strong>variabile
+        dipendente</strong>, che «ubbidisce»).</p>
+
+      <ul>
+        <li>Se $x = 0$: &nbsp; $y = 2\cdot 0 + 1 = 1$</li>
+        <li>Se $x = 1$: &nbsp; $y = 2\cdot 1 + 1 = 3$</li>
+        <li>Se $x = -1$: &nbsp; $y = 2\cdot(-1) + 1 = -1$</li>
+      </ul>
+
+      <p>E così via, per tutti gli infiniti valori di $x$. Nella tabella ne fissiamo cinque:</p>
+
+      <table class="mini-tab">
+        <caption>Alcune soluzioni di $y = 2x + 1$</caption>
+        <tr><th>$x$</th><td>$-2$</td><td>$-1$</td><td>$0$</td><td>$1$</td><td>$2$</td></tr>
+        <tr><th>$y$</th><td>$-3$</td><td>$-1$</td><td>$1$</td><td>$3$</td><td>$5$</td></tr>
+      </table>
+
+      <p>Ogni colonna è una <strong>coppia</strong> $(x;\,y)$: un punto del piano cartesiano. Se $x$ vale quel numero,
+        allora $y$ <em>deve</em> valere quell'altro perché l'equazione sia vera. Portiamo questi punti sul piano — a
+        ogni coppia il suo punto — e uniamoli. Che cosa otteniamo?</p>
+
+      <div class="plane"><div id="line-intro"></div>
+        <div class="cap">I cinque punti della tabella non sono sparsi a caso: stanno tutti in fila su una <strong>retta</strong>.</div>
+      </div>
+
+      <p><strong>Una retta!</strong> Ecco finalmente perché le equazioni di primo grado si chiamano
+        <strong>lineari</strong>: rappresentate sul piano cartesiano danno una <em>linea diritta</em>. E se sopra la
+        $x$ ci fosse un quadratino, cioè $y = x^2$? Allora la linea si incurverebbe in una <strong>parabola</strong> —
+        ma questa è un'altra storia, che vi racconteremo l'anno prossimo.</p>
+
+      <div class="curiosita">
+        <strong>↩️ Ricordi le funzioni?</strong> L'anno scorso abbiamo parlato di <em>funzioni</em>: una macchina che
+        a ogni ingresso associa una sola uscita. Ebbene, $y = 2x + 1$ <strong>è</strong> una funzione! Il
+        <strong>dominio</strong> sono tutti i valori possibili della $x$, il <strong>codominio</strong> i
+        corrispondenti valori della $y$, e il piano cartesiano è il modo per vedere la funzione «tutta insieme», in
+        un colpo d'occhio. Studiare la retta significa studiare questa funzione nel dettaglio.
+      </div>
+    </section>
+
+    <!-- 2 — PENDENZA E INTERCETTA -->
+    <section id="sec2">
+      <h2>2. Pendenza e intercetta: i due numeri che contano</h2>
+
+      <p>Prendiamo due punti qualsiasi della retta, $P$ e $Q$. Tra loro c'è una distanza orizzontale, che chiamiamo
+        <strong>$\Delta x$</strong>, e una verticale, che chiamiamo <strong>$\Delta y$</strong>. Non spaventatevi dei
+        simboli nuovi: $\Delta$ è la lettera greca maiuscola <em>delta</em>, e la usiamo perché stiamo calcolando una
+        <strong>differenza</strong> — la differenza tra le ascisse di $P$ e $Q$, e quella tra le loro ordinate.</p>
+
+      <div class="formula-box">
+        $$\Delta x = x_Q - x_P \qquad\qquad \Delta y = y_Q - y_P$$
+      </div>
+
+      <p>Che cosa succede se faccio il <strong>rapporto</strong> tra queste due grandezze? Ottengo di quante unità
+        salgo (o scendo) lungo $y$ per ogni unità che avanzo lungo $x$. Questa grandezza è la
+        <strong>pendenza</strong> della retta (detta anche <em>inclinazione</em> o <strong>coefficiente
+        angolare</strong>), e si indica con la lettera $m$:</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Pendenza (coefficiente angolare)</div>
+        $$m = \frac{\Delta y}{\Delta x} = \frac{y_Q - y_P}{x_Q - x_P}$$
+      </div>
+
+      <p>La cosa sorprendente è questa: <strong>su una retta la pendenza è sempre la stessa</strong>, qualunque coppia
+        di punti $P$ e $Q$ tu scelga. Prova a giocare con il grafico qui sotto — sposta $P$ e $Q$ e guarda: $\Delta x$
+        e $\Delta y$ cambiano, ma il loro rapporto $m$ resta identico. È proprio questo «avanzare sempre con la stessa
+        inclinazione» che rende la linea <em>diritta</em>.</p>
+
+      <div class="pt-ex" style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1rem;">
+        <div class="plane" style="margin:0;border:none;padding:0;background:none;"><div id="slope-plane"></div></div>
+        <div class="controls" style="margin-top:0.6rem;">
+          <div class="control-group"><label>Punto $P$ — ascissa $x_P$: <span class="val" id="sl-p-val">-2</span></label>
+            <input type="range" id="sl-p" min="-5" max="5" step="1" value="-2"></div>
+          <div class="control-group"><label>Punto $Q$ — ascissa $x_Q$: <span class="val" id="sl-q-val">4</span></label>
+            <input type="range" id="sl-q" min="-5" max="5" step="1" value="4"></div>
+        </div>
+        <p class="out-line" id="slope-out"></p>
+      </div>
+
+      <p>C'è poi un punto speciale della retta, quello che le fa da «firma»: l'<strong>intercetta</strong> (o
+        <strong>termine noto</strong>), indicata con $q$. Che cosa succede quando $x = 0$? Se non mi sposto né a
+        destra né a sinistra dall'origine, mi trovo esattamente <strong>sull'asse delle $y$</strong>. Dunque il valore
+        che la retta assume in $x = 0$ è proprio il punto in cui essa <strong>incontra l'asse delle $y$</strong>. Nella
+        nostra $y = 2x + 1$, ponendo $x = 0$ si ottiene $y = 1$: la retta taglia l'asse $y$ in $(0;\,1)$.</p>
+
+      <p>E se invece pongo $y = 0$? Ottengo un'equazione di quelle che sappiamo già risolvere dalle prime lezioni,
+        $0 = 2x + 1$, da cui $x = -\dfrac{1}{2}$: è il punto in cui la retta <strong>incontra l'asse delle
+        $x$</strong>, cioè $\left(-\dfrac{1}{2};\,0\right)$.</p>
+
+      <div class="definition">
+        Ogni retta (non verticale) si scrive nella forma <strong>$y = mx + q$</strong>, dove $m$ è la
+        <strong>pendenza</strong> (quanto è inclinata) e $q$ è l'<strong>intercetta</strong> (dove taglia l'asse $y$).
+        Conoscere una retta significa conoscere <strong>questi due numeri</strong>.
+      </div>
+    </section>
+
+    <!-- 3 — IL LABORATORIO DELLA RETTA -->
+    <section id="sec3">
+      <h2>3. Il laboratorio della retta: <span style="font-family:Consolas,monospace;">y = mx + q</span></h2>
+
+      <p>Il modo migliore per capire il ruolo di $m$ e $q$ è muoverli e guardare cosa succede. In alto vedi
+        l'equazione della retta; muovi i due cursori e osserva: $m$ la fa ruotare (più è grande, più è ripida; se è
+        negativa scende), $q$ la fa scorrere su e giù senza cambiarne l'inclinazione.</p>
+
+      <div class="two-col">
+        <div>
+          <div class="line-eq" id="mq-eq">y = x</div>
+          <div class="controls">
+            <div class="control-group"><label>Pendenza $m$: <span class="val" id="mq-m-val">1</span></label>
+              <input type="range" id="mq-m" min="-3" max="3" step="0.5" value="1"></div>
+            <div class="control-group"><label>Intercetta $q$: <span class="val" id="mq-q-val">0</span></label>
+              <input type="range" id="mq-q" min="-5" max="5" step="0.5" value="0"></div>
+            <label class="toggle-row"><input type="checkbox" id="mq-lock" checked> 🔒 Blocca la scala</label>
+          </div>
+          <p class="out-line" id="mq-out"></p>
+        </div>
+        <div><div class="plot" id="mq-plot"></div></div>
+      </div>
+      <div class="rule">Quando $m = 0$ la retta è <strong>orizzontale</strong> (parallela all'asse $x$): la $y$ vale
+        sempre $q$, qualunque sia $x$.</div>
+    </section>
+
+    <!-- 4 — LA RETTA COME MODELLO -->
+    <section id="sec4">
+      <h2>4. La retta come modello della realtà</h2>
+
+      <p>La retta non è solo un disegno: è uno strumento per <strong>modellare</strong>, cioè per descrivere con la
+        matematica situazioni reali. La usiamo tutte le volte che due quantità dipendono l'una dall'altra <em>in modo
+        lineare</em> — quello che alle medie avete probabilmente chiamato <strong>direttamente proporzionale</strong>,
+        con in più una «partenza» diversa da zero (l'intercetta).</p>
+
+      <p>Esempio: l'abbonamento in palestra. Due palestre, due offerte:</p>
+      <ul>
+        <li><strong>Palestra A</strong>: iscrizione $30$ € una tantum, poi $20$ € al mese &nbsp;→&nbsp;
+          $y = 20x + 30$</li>
+        <li><strong>Palestra B</strong>: iscrizione gratis, ma $30$ € al mese &nbsp;→&nbsp; $y = 30x$</li>
+      </ul>
+      <p>(qui $x$ è il numero di mesi, $y$ la spesa totale). In entrambi i casi la spesa cresce lungo una
+        <strong>retta</strong>: la pendenza è la quota mensile, l'intercetta è la spesa iniziale.</p>
+
+      <div class="two-col">
+        <div><div class="plot" id="gym-plot"></div></div>
+        <div>
+          <p>Le due rette si <strong>incontrano</strong> in un punto. Che cosa rappresenta? È il mese in cui le due
+            palestre costano <em>uguale</em>. Ma aspetta: una coppia $(x;\,y)$ che soddisfa <strong>entrambe</strong>
+            le equazioni contemporaneamente... come l'abbiamo chiamata nella lezione sui sistemi? La
+            <strong>soluzione di un sistema</strong>!</p>
+          <div class="formula-box">
+            $$\begin{cases} y = 20x + 30 \\ y = 30x \end{cases}$$
+            <p class="formula-note">Per sostituzione: $30x = 20x + 30 \Rightarrow 10x = 30 \Rightarrow x = 3$, e
+              $y = 90$. Si incontrano dopo $3$ mesi, a $90$ €.</p>
+          </div>
+          <p>E a che serve? A <strong>decidere</strong>: per un abbonamento breve (meno di $3$ mesi) conviene la
+            palestra B (niente iscrizione); se invece punti a restare a lungo, conviene la A, che ha la retta mensile
+            più bassa.</p>
+        </div>
+      </div>
+
+      <div class="curiosita">
+        <strong>⚡ Leggi lineari in natura.</strong> Forse avete già sentito nominare la <strong>legge di Ohm</strong>
+        per i circuiti ($V = R\,I$: la tensione è proporzionale alla corrente) o la <strong>legge di Hooke</strong>
+        per le molle ($F = k\,x$: la forza è proporzionale all'allungamento). Sono tutte relazioni
+        <strong>lineari</strong>: il loro grafico è una retta. La retta è davvero il modello più diffuso in fisica,
+        economia e informatica.
+      </div>
+    </section>
+
+    <!-- 5 — FORMA ESPLICITA E FORMA IMPLICITA -->
+    <section id="sec5">
+      <h2>5. Due modi di scrivere una retta</h2>
+
+      <p>Prima di metterci a intersecare rette, un avviso: non sempre una retta ci viene consegnata nella comoda forma
+        $y = mx + q$ (detta forma <strong>esplicita</strong>, perché la $y$ è «esplicitata», isolata). A volte la
+        trovate scritta così:</p>
+      <div class="formula-box">$$ax + by + c = 0 \qquad \text{(forma \textbf{implicita})}$$</div>
+
+      <p>Le due scritture dicono la stessa cosa, ma noi preferiamo di gran lunga la forma esplicita, perché ci mostra
+        subito pendenza e intercetta. Per passare dall'una all'altra bastano i <strong>principi di equivalenza</strong>
+        della lezione 1: isoliamo la $y$. Esempio: da $3x - y + 6 = 0$ portiamo la $y$ da sola →
+        $-y = -3x - 6$ → cambiando i segni → $y = 3x + 6$.</p>
+
+      <h3>Esercizi — porta in forma esplicita</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Forma esplicita 1</span><span class="difficulty easy">Facile</span></div>
+        <p>$$2x + y - 4 = 0$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row"><span class="eqn">$2x + y - 4 = 0$</span><span class="op">isolo $y$</span></div>
+            <div class="row good"><span class="eqn">$y = -2x + 4$</span><span class="op">$m=-2,\ q=4$</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Forma esplicita 2</span><span class="difficulty easy">Facile</span></div>
+        <p>$$x - y + 3 = 0$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row"><span class="eqn">$-y = -x - 3$</span><span class="op">porto $x$ e $3$ a destra</span></div>
+            <div class="row good"><span class="eqn">$y = x + 3$</span><span class="op">cambio i segni ($\times(-1)$)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Forma esplicita 3</span><span class="difficulty medium">Medio</span></div>
+        <p>$$3x + 2y - 6 = 0$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row"><span class="eqn">$2y = -3x + 6$</span><span class="op">isolo il termine con $y$</span></div>
+            <div class="row good"><span class="eqn">$y = -\dfrac{3}{2}x + 3$</span><span class="op">divido tutto per $2$</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Forma esplicita 4</span><span class="difficulty medium">Medio</span></div>
+        <p>$$4x - 2y + 5 = 0$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row"><span class="eqn">$-2y = -4x - 5$</span><span class="op">porto gli altri termini a destra</span></div>
+            <div class="row"><span class="eqn">$2y = 4x + 5$</span><span class="op">cambio i segni</span></div>
+            <div class="row good"><span class="eqn">$y = 2x + \dfrac{5}{2}$</span><span class="op">divido per $2$</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — INTERSEZIONE DI DUE RETTE -->
+    <section id="sec6">
+      <h2>6. Dove si incontrano due rette</h2>
+
+      <p>Abbiamo scoperto con le palestre che il punto d'incontro di due rette è la soluzione del <strong>sistema</strong>
+        formato dalle loro equazioni. Quando entrambe sono in forma esplicita, il metodo di
+        <strong>sostituzione</strong> è immediato: poiché $y$ è uguale a due espressioni, le uguagliamo tra loro e
+        risolviamo in $x$; poi ricaviamo $y$.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Esempio</div>
+        $$\begin{cases} y = 2x + 1 \\ y = -x + 4 \end{cases} \;\Rightarrow\; 2x + 1 = -x + 4 \;\Rightarrow\; 3x = 3
+        \;\Rightarrow\; x = 1,\ \ y = 3$$
+        <p class="formula-note">Le due rette si incontrano nel punto $(1;\,3)$.</p>
+      </div>
+
+      <h3>Esercizi — trova il punto d'intersezione</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Intersezione 1</span><span class="difficulty easy">Facile</span></div>
+        <p>$$\begin{cases} y = 2x + 1 \\ y = -x + 4 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$2x + 1 = -x + 4 \Rightarrow 3x = 3 \Rightarrow x = 1$; &nbsp; $y = 2\cdot 1 + 1 = 3$.</p>
+          <div class="result-box"><span class="result-label">Intersezione</span><span class="result-value">$(1;\,3)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Intersezione 2</span><span class="difficulty easy">Facile</span></div>
+        <p>$$\begin{cases} y = x - 2 \\ y = 3x + 2 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$x - 2 = 3x + 2 \Rightarrow -4 = 2x \Rightarrow x = -2$; &nbsp; $y = -2 - 2 = -4$.</p>
+          <div class="result-box"><span class="result-label">Intersezione</span><span class="result-value">$(-2;\,-4)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Intersezione 3</span><span class="difficulty medium">Medio</span></div>
+        <p>$$\begin{cases} y = -2x + 5 \\ y = x - 1 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$-2x + 5 = x - 1 \Rightarrow 6 = 3x \Rightarrow x = 2$; &nbsp; $y = 2 - 1 = 1$.</p>
+          <div class="result-box"><span class="result-label">Intersezione</span><span class="result-value">$(2;\,1)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Intersezione 4</span><span class="difficulty medium">Medio</span></div>
+        <p>$$\begin{cases} y = \dfrac{1}{2}x + 3 \\ y = -x + 6 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$\dfrac{1}{2}x + 3 = -x + 6 \Rightarrow \dfrac{3}{2}x = 3 \Rightarrow x = 2$; &nbsp; $y = -2 + 6 = 4$.</p>
+          <div class="result-box"><span class="result-label">Intersezione</span><span class="result-value">$(2;\,4)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Intersezione 5</span><span class="difficulty hard">Difficile</span></div>
+        <p>Le rette sono in forma implicita: portale prima in forma esplicita.
+          $$\begin{cases} 3x - y - 4 = 0 \\ 2x + y - 6 = 0 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Esplicito: $y = 3x - 4$ e $y = -2x + 6$.</p>
+          <p>$3x - 4 = -2x + 6 \Rightarrow 5x = 10 \Rightarrow x = 2$; &nbsp; $y = 3\cdot 2 - 4 = 2$.</p>
+          <div class="result-box"><span class="result-label">Intersezione</span><span class="result-value">$(2;\,2)$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — LA RETTA PER DUE PUNTI -->
+    <section id="sec7">
+      <h2>7. La retta che passa per due punti</h2>
+
+      <p>La geometria ci insegna una cosa fondamentale: <strong>per due punti passa una e una sola retta</strong>.
+        Quindi, dati due punti sul piano, dobbiamo essere in grado di trovare la sua equazione. Esistono formule
+        pronte per $m$ e $q$, ma io preferisco un metodo che non richiede di ricordare nulla a memoria.</p>
+
+      <div class="steps-box">
+        <strong>Il metodo:</strong>
+        <ol>
+          <li>Partiamo dalla forma generica $y = mx + q$: le incognite ora sono $m$ e $q$.</li>
+          <li>Abbiamo due punti, cioè due valori di $x$ e due di $y$: sostituiamoli, uno per volta, nell'equazione.</li>
+          <li>Otteniamo un <strong>sistema di due equazioni</strong> nelle incognite $m$ e $q$.</li>
+          <li>Lo risolviamo (per sottrazione o sostituzione): abbiamo trovato la retta!</li>
+        </ol>
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">Esempio: retta per $A(1;\,2)$ e $B(3;\,8)$</div>
+        $$\begin{cases} 2 = m\cdot 1 + q \\ 8 = m\cdot 3 + q \end{cases}
+        \;\xrightarrow{\text{sottraggo}}\; 6 = 2m \;\Rightarrow\; m = 3,\quad q = 2 - 3 = -1$$
+        <p class="formula-note">La retta è $y = 3x - 1$.</p>
+      </div>
+
+      <h3>Esercizi — trova la retta per due punti</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Retta per 2 punti 1</span><span class="difficulty easy">Facile</span></div>
+        <p>$A(0;\,1)$ e $B(2;\,5)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Da $A$: $1 = q$. Da $B$: $5 = 2m + 1 \Rightarrow m = 2$.</p>
+          <div class="result-box"><span class="result-label">Retta</span><span class="result-value">$y = 2x + 1$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Retta per 2 punti 2</span><span class="difficulty easy">Facile</span></div>
+        <p>$A(1;\,2)$ e $B(3;\,8)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$\begin{cases} 2 = m + q \\ 8 = 3m + q \end{cases}$ &nbsp;→ sottraendo: $6 = 2m \Rightarrow m = 3$,
+            $q = 2 - 3 = -1$.</p>
+          <div class="result-box"><span class="result-label">Retta</span><span class="result-value">$y = 3x - 1$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Retta per 2 punti 3</span><span class="difficulty medium">Medio</span></div>
+        <p>$A(-1;\,4)$ e $B(2;\,-2)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$\begin{cases} 4 = -m + q \\ -2 = 2m + q \end{cases}$ &nbsp;→ sottraggo la prima dalla seconda:
+            $-6 = 3m \Rightarrow m = -2$. Sostituisco nella prima: $4 = -(-2) + q = 2 + q \Rightarrow q = 2$.</p>
+          <div class="result-box"><span class="result-label">Retta</span><span class="result-value">$y = -2x + 2$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Retta per 2 punti 4</span><span class="difficulty medium">Medio</span></div>
+        <p>$A(-2;\,1)$ e $B(4;\,4)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$\begin{cases} 1 = -2m + q \\ 4 = 4m + q \end{cases}$ &nbsp;→ sottraendo: $3 = 6m \Rightarrow m = \dfrac{1}{2}$; &nbsp; $q = 1 + 2m = 1 + 1 = 2$.</p>
+          <div class="result-box"><span class="result-label">Retta</span><span class="result-value">$y = \dfrac{1}{2}x + 2$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Retta per 2 punti 5</span><span class="difficulty hard">Difficile</span></div>
+        <p>$A(1;\,-1)$ e $B(4;\,5)$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$\begin{cases} -1 = m + q \\ 5 = 4m + q \end{cases}$ &nbsp;→ sottraendo: $6 = 3m \Rightarrow m = 2$;
+            &nbsp; $q = -1 - m = -3$.</p>
+          <div class="result-box"><span class="result-label">Retta</span><span class="result-value">$y = 2x - 3$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — PARALLELE E PERPENDICOLARI -->
+    <section id="sec8">
+      <h2>8. Rette parallele e perpendicolari</h2>
+
+      <p>Due rette sono <strong>parallele</strong> se non si incontrano mai. Sul piano cartesiano, che cosa significa?
+        Che hanno la <strong>stessa inclinazione</strong>, cioè lo stesso coefficiente angolare:</p>
+      <div class="formula-box">
+        <div class="formula-title">Rette parallele</div>
+        $$r \parallel s \iff m_r = m_s$$
+      </div>
+
+      <p>Due rette sono invece <strong>perpendicolari</strong> (o ortogonali) quando si incrociano formando quattro
+        angoli retti. Qui la condizione è più curiosa: il coefficiente angolare di una è l'<strong>opposto del
+        reciproco</strong> dell'altra.</p>
+      <div class="formula-box">
+        <div class="formula-title">Rette perpendicolari</div>
+        $$r \perp s \iff m_r = -\frac{1}{m_s} \iff m_r \cdot m_s = -1$$
+      </div>
+
+      <p>Qualche esempio per fissare l'idea: se una retta ha $m = 2$, la perpendicolare ha $m = -\dfrac{1}{2}$; se
+        $m = -3$, la perpendicolare ha $m = \dfrac{1}{3}$; se $m = \dfrac{2}{3}$, la perpendicolare ha
+        $m = -\dfrac{3}{2}$. Si «capovolge» la frazione e si cambia il segno.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">★ Perché il prodotto fa $-1$?</span><span class="badge-fac">facoltativo</span></div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-label-show="🔎 Mostra la dimostrazione" data-label-hide="🙈 Nascondi">🔎 Mostra la dimostrazione</button></div>
+        <div class="solution">
+          <p>Prendiamo una retta per l'origine $y = mx$ e ruotiamola di $90°$. Un punto della retta, avanzando di $1$
+            lungo $x$, sale di $m$ lungo $y$: chiamiamolo $P(1;\,m)$. Ruotare di $90°$ (in senso antiorario) attorno
+            all'origine trasforma un punto $(a;\,b)$ nel punto $(-b;\,a)$ — un quarto di giro scambia le coordinate e
+            cambia un segno. Quindi $P(1;\,m)$ finisce in $P'(-m;\,1)$.</p>
+          <p>La retta perpendicolare passa per l'origine e per $P'(-m;\,1)$, quindi il suo coefficiente angolare è</p>
+          $$m' = \frac{1 - 0}{-m - 0} = -\frac{1}{m}.$$
+          <p>Ecco perché $m \cdot m' = m \cdot \left(-\dfrac{1}{m}\right) = -1$.</p>
+        </div>
+      </div>
+
+      <p>Negli esercizi seguenti il metodo è sempre lo stesso: scriviamo la retta cercata come $y = mx + q$. La
+        <strong>$m$ la conosciamo subito</strong> grazie all'informazione sul parallelismo o sulla perpendicolarità;
+        resta un'unica incognita, la $q$, che troviamo imponendo il passaggio per il punto dato. Ricordate: trovare
+        una retta significa trovare la <strong>coppia</strong> $(m;\,q)$.</p>
+
+      <h3>Esercizi — parallele</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Parallela 1</span><span class="difficulty easy">Facile</span></div>
+        <p>Retta parallela a $y = 2x - 1$ e passante per $P(1;\,5)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Parallela ⟹ stesso $m$: $m = 2$. Impongo il passaggio per $P$: $5 = 2\cdot 1 + q \Rightarrow q = 3$.</p>
+          <div class="result-box"><span class="result-label">Retta</span><span class="result-value">$y = 2x + 3$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Parallela 2</span><span class="difficulty medium">Medio</span></div>
+        <p>Retta parallela a $y = -3x + 2$ e passante per $P(2;\,1)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$m = -3$. &nbsp; $1 = -3\cdot 2 + q \Rightarrow 1 = -6 + q \Rightarrow q = 7$.</p>
+          <div class="result-box"><span class="result-label">Retta</span><span class="result-value">$y = -3x + 7$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Parallela 3</span><span class="difficulty medium">Medio</span></div>
+        <p>Retta parallela a $y = \dfrac{1}{2}x + 4$ e passante per $P(4;\,3)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$m = \dfrac{1}{2}$. &nbsp; $3 = \dfrac{1}{2}\cdot 4 + q \Rightarrow 3 = 2 + q \Rightarrow q = 1$.</p>
+          <div class="result-box"><span class="result-label">Retta</span><span class="result-value">$y = \dfrac{1}{2}x + 1$</span></div>
+        </div>
+      </div>
+
+      <h3>Esercizi — perpendicolari</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Perpendicolare 1</span><span class="difficulty medium">Medio</span></div>
+        <p>Retta perpendicolare a $y = 2x + 1$ e passante per $P(4;\,1)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Perpendicolare ⟹ opposto del reciproco: da $m = 2$ ottengo $m' = -\dfrac{1}{2}$. &nbsp;
+            $1 = -\dfrac{1}{2}\cdot 4 + q \Rightarrow 1 = -2 + q \Rightarrow q = 3$.</p>
+          <div class="result-box"><span class="result-label">Retta</span><span class="result-value">$y = -\dfrac{1}{2}x + 3$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Perpendicolare 2</span><span class="difficulty medium">Medio</span></div>
+        <p>Retta perpendicolare a $y = -x + 3$ e passante per $P(2;\,5)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Da $m = -1$: &nbsp; $m' = -\dfrac{1}{-1} = 1$. &nbsp; $5 = 1\cdot 2 + q \Rightarrow q = 3$.</p>
+          <div class="result-box"><span class="result-label">Retta</span><span class="result-value">$y = x + 3$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Perpendicolare 3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Retta perpendicolare a $y = \dfrac{2}{3}x + 1$ e passante per $P(4;\,-1)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Da $m = \dfrac{2}{3}$ capovolgo e cambio segno: $m' = -\dfrac{3}{2}$. &nbsp;
+            $-1 = -\dfrac{3}{2}\cdot 4 + q \Rightarrow -1 = -6 + q \Rightarrow q = 5$.</p>
+          <div class="result-box"><span class="result-label">Retta</span><span class="result-value">$y = -\dfrac{3}{2}x + 5$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 — PERIMETRO E AREA CON LA PERPENDICOLARITÀ -->
+    <section id="sec9">
+      <h2>9. Perimetro e area di un triangolo «storto»</h2>
+
+      <p>Nella lezione scorsa abbiamo calcolato l'area di un triangolo con un lato parallelo a un asse: base e altezza
+        si leggevano direttamente. Ma se <strong>nessun lato</strong> è parallelo agli assi? Il perimetro non è un
+        problema (bastano tre distanze), ma per l'area serve l'altezza — e qui entra in gioco tutto quello che abbiamo
+        imparato sulla <strong>perpendicolarità</strong>.</p>
+
+      <p class="formula-note">Per la sola area conosciamo già una scorciatoia: la <a href="4.Piano_cartesiano.html#sec7">formula
+        di Gauss</a> vista nella lezione 4, che la calcola dai soli vertici. Qui però prendiamo la strada «lunga» apposta,
+        per esercitare la perpendicolarità e trovare esplicitamente l'altezza — un ottimo ripasso di tutto il capitolo.</p>
+
+      <p>Consideriamo il triangolo $A(0;\,0)$, $B(6;\,6)$, $C(5;\,-1)$: nessun lato è orizzontale o verticale.</p>
+
+      <div class="plane"><div id="tri9-plane"></div>
+        <div class="cap">L'altezza relativa alla base $AB$ è il segmento perpendicolare che scende da $C$ fino alla
+          retta $AB$, nel piede $H$.</div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Triangolo storto — worked</span><span class="difficulty hard">Difficile</span></div>
+        <p>Calcola perimetro e area del triangolo $A(0;\,0)$, $B(6;\,6)$, $C(5;\,-1)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>Perimetro</strong> — tre distanze:</p>
+          <p>$\overline{AB} = \sqrt{6^2 + 6^2} = \sqrt{72} = 6\sqrt{2}$; &nbsp;
+            $\overline{BC} = \sqrt{(6-5)^2 + (6+1)^2} = \sqrt{1 + 49} = \sqrt{50} = 5\sqrt{2}$; &nbsp;
+            $\overline{CA} = \sqrt{5^2 + 1^2} = \sqrt{26}$.</p>
+          <p>$2p = 6\sqrt{2} + 5\sqrt{2} + \sqrt{26} = 11\sqrt{2} + \sqrt{26} \approx 20{,}66$.</p>
+          <p><strong>Area</strong> — scelgo $AB$ come base ($= 6\sqrt{2}$) e cerco l'altezza da $C$:</p>
+          <ol>
+            <li><strong>Retta $AB$</strong>: passa per l'origine con $m = \dfrac{6-0}{6-0} = 1$, quindi $y = x$.</li>
+            <li><strong>Retta dell'altezza</strong>: perpendicolare ad $AB$ (quindi $m' = -1$) e passante per
+              $C(5;\,-1)$: $-1 = -1\cdot 5 + q \Rightarrow q = 4$, cioè $y = -x + 4$.</li>
+            <li><strong>Piede $H$</strong>: interseco le due rette. $x = -x + 4 \Rightarrow x = 2,\ y = 2$, dunque
+              $H(2;\,2)$.</li>
+            <li><strong>Altezza</strong>: $\overline{CH} = \sqrt{(5-2)^2 + (-1-2)^2} = \sqrt{9 + 9} = \sqrt{18} = 3\sqrt{2}$.</li>
+          </ol>
+          <p>$$\text{Area} = \frac{\overline{AB}\cdot \overline{CH}}{2} = \frac{6\sqrt{2}\cdot 3\sqrt{2}}{2} =
+          \frac{6\cdot 3\cdot 2}{2} = 18.$$</p>
+          <div class="result-box"><span class="result-label">Perimetro</span><span class="result-value">$11\sqrt{2}+\sqrt{26}\approx 20{,}66$</span></div>
+          <div class="result-box"><span class="result-label">Area</span><span class="result-value">$18$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Triangolo storto 2</span><span class="difficulty hard">Difficile</span></div>
+        <p>Perimetro e area del triangolo $A(0;\,0)$, $B(4;\,8)$, $C(6;\,2)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>Perimetro</strong>: $\overline{AB} = \sqrt{16 + 64} = \sqrt{80} = 4\sqrt{5}$;
+            $\overline{BC} = \sqrt{4 + 36} = \sqrt{40} = 2\sqrt{10}$;
+            $\overline{CA} = \sqrt{36 + 4} = \sqrt{40} = 2\sqrt{10}$. &nbsp;
+            $2p = 4\sqrt{5} + 4\sqrt{10} \approx 21{,}59$.</p>
+          <p><strong>Area</strong>: base $AB = 4\sqrt{5}$. Retta $AB$: $m = 2$, $y = 2x$. Altezza da $C$:
+            $m' = -\dfrac{1}{2}$, $2 = -\dfrac{1}{2}\cdot 6 + q \Rightarrow q = 5$, cioè $y = -\dfrac{1}{2}x + 5$.
+            Piede: $2x = -\dfrac{1}{2}x + 5 \Rightarrow \dfrac{5}{2}x = 5 \Rightarrow x = 2$, $H(2;\,4)$.
+            $\overline{CH} = \sqrt{(6-2)^2 + (2-4)^2} = \sqrt{20} = 2\sqrt{5}$.</p>
+          <p>$$\text{Area} = \frac{4\sqrt{5}\cdot 2\sqrt{5}}{2} = \frac{8\cdot 5}{2} = 20.$$</p>
+          <div class="result-box"><span class="result-label">Perimetro</span><span class="result-value">$4\sqrt{5}+4\sqrt{10}\approx 21{,}59$</span></div>
+          <div class="result-box"><span class="result-label">Area</span><span class="result-value">$20$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Triangolo storto 3</span><span class="difficulty hard">Difficile</span></div>
+        <p>Perimetro e area del triangolo $A(0;\,6)$, $B(4;\,-2)$, $C(8;\,5)$.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>Perimetro</strong>: $\overline{AB} = \sqrt{16 + 64} = 4\sqrt{5}$;
+            $\overline{BC} = \sqrt{16 + 49} = \sqrt{65}$; $\overline{CA} = \sqrt{64 + 1} = \sqrt{65}$. &nbsp;
+            $2p = 4\sqrt{5} + 2\sqrt{65} \approx 25{,}07$.</p>
+          <p><strong>Area</strong>: base $AB = 4\sqrt{5}$. Retta $AB$: $m = \dfrac{-2-6}{4-0} = -2$, $y = -2x + 6$.
+            Altezza da $C$: $m' = \dfrac{1}{2}$, $5 = \dfrac{1}{2}\cdot 8 + q \Rightarrow q = 1$, cioè
+            $y = \dfrac{1}{2}x + 1$. Piede: $-2x + 6 = \dfrac{1}{2}x + 1 \Rightarrow \dfrac{5}{2}x = 5 \Rightarrow x = 2$, $H(2;\,2)$. $\overline{CH} = \sqrt{(8-2)^2 + (5-2)^2} = \sqrt{45} = 3\sqrt{5}$.</p>
+          <p>$$\text{Area} = \frac{4\sqrt{5}\cdot 3\sqrt{5}}{2} = \frac{12\cdot 5}{2} = 30.$$</p>
+          <div class="result-box"><span class="result-label">Perimetro</span><span class="result-value">$4\sqrt{5}+2\sqrt{65}\approx 25{,}07$</span></div>
+          <div class="result-box"><span class="result-label">Area</span><span class="result-value">$30$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 — DISEGNARE CON LE FUNZIONI -->
+    <section id="sec10">
+      <h2>10. ★ Disegnare con le funzioni <span class="badge-fac">facoltativo</span></h2>
+
+      <p>Abbiamo visto che una funzione, disegnata sul piano cartesiano, diventa una linea. Ma con le funzioni
+        «giuste» possiamo disegnare <strong>qualsiasi cosa</strong> — non solo rette e parabole. È esattamente così
+        che il computer disegna sullo schermo: dietro ogni curva, ogni carattere, ogni personaggio di un videogioco
+        ci sono delle funzioni matematiche.</p>
+
+      <p>Ecco un piccolo simulatore. Di default disegna un <strong>cuore</strong>; puoi anche scrivere tu una funzione
+        di $x$ (per esempio <span class="inline-code">x^2 - 3</span>, <span class="inline-code">sin(x)*3</span>,
+        <span class="inline-code">abs(x)-4</span>) e premere «Disegna», oppure provare i disegni pronti.</p>
+
+      <div class="pt-ex" style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1rem;">
+        <div class="fn-bar">
+          <span class="pt-lab" style="font-style:normal;">y =</span>
+          <input class="fn-input" id="art-input" type="text" value="sin(x)*3" aria-label="funzione di x" spellcheck="false">
+          <button class="btn" id="art-draw">✏️ Disegna</button>
+        </div>
+        <div class="preset-row">
+          <button class="btn" id="art-heart">❤️ Cuore</button>
+          <button class="btn" id="art-rose">🌹 Rosa</button>
+          <button class="btn" id="art-butterfly">🦋 Farfalla</button>
+          <button class="btn" id="art-spiral">🌀 Spirale</button>
+        </div>
+        <p class="out-line" id="art-out"></p>
+        <div class="plot" id="art-plot" style="min-height:420px;"></div>
+      </div>
+
+      <p class="formula-note">Il cuore e gli altri disegni non sono semplici funzioni $y = f(x)$ (fallirebbero la
+        «prova della retta verticale»): sono <strong>curve parametriche</strong>, in cui sia $x$ sia $y$ dipendono da
+        un terzo numero che scorre, l'angolo. È il segreto per disegnare curve chiuse — ne riparlerete negli anni
+        futuri!</p>
+    </section>
+
+    <!-- 11 — QUIZ -->
+    <section id="quiz">
+      <h2>11. Quiz finale</h2>
+      <p>Nove domande su tutta la lezione: pendenza e intercetta, forma esplicita, intersezioni, retta per due punti
+        e rette parallele e perpendicolari. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <!-- Grafici e widget interattivi -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { linspace, update, draw, themeColors } = Plt;
+
+      // ===== Helper: piano cartesiano in SVG (theme-aware) =====
+      const N = 6, W = 360, O = 180, U = 26;
+      function Xp(dx) { return O + dx * U; }
+      function Yp(dy) { return O - dy * U; }
+      function axesSVG() {
+        let s = '';
+        for (let i = -N; i <= N; i++) {
+          s += '<line x1="' + Xp(i) + '" y1="' + Yp(-N) + '" x2="' + Xp(i) + '" y2="' + Yp(N) + '" stroke="var(--border)" stroke-width="1" opacity="0.5"/>';
+          s += '<line x1="' + Xp(-N) + '" y1="' + Yp(i) + '" x2="' + Xp(N) + '" y2="' + Yp(i) + '" stroke="var(--border)" stroke-width="1" opacity="0.5"/>';
+        }
+        s += '<line x1="' + Xp(-N) + '" y1="' + O + '" x2="' + (Xp(N) + 8) + '" y2="' + O + '" stroke="var(--text-soft)" stroke-width="2"/>';
+        s += '<line x1="' + O + '" y1="' + Yp(-N) + '" x2="' + O + '" y2="' + (Yp(N) - 8) + '" stroke="var(--text-soft)" stroke-width="2"/>';
+        s += '<polygon points="' + (Xp(N) + 8) + ',' + O + ' ' + Xp(N) + ',' + (O - 4) + ' ' + Xp(N) + ',' + (O + 4) + '" fill="var(--text-soft)"/>';
+        s += '<polygon points="' + O + ',' + (Yp(N) - 8) + ' ' + (O - 4) + ',' + Yp(N) + ' ' + (O + 4) + ',' + Yp(N) + '" fill="var(--text-soft)"/>';
+        s += '<text x="' + (Xp(N) + 5) + '" y="' + (O + 15) + '" style="fill:var(--muted);font-size:12px;font-style:italic;">x</text>';
+        s += '<text x="' + (O - 13) + '" y="' + (Yp(N) - 3) + '" style="fill:var(--muted);font-size:12px;font-style:italic;">y</text>';
+        for (let i = -N; i <= N; i++) {
+          if (i === 0) continue;
+          s += '<text x="' + Xp(i) + '" y="' + (O + 12) + '" text-anchor="middle" style="fill:var(--muted);font-size:8px;">' + i + '</text>';
+          s += '<text x="' + (O - 6) + '" y="' + (Yp(i) + 3) + '" text-anchor="end" style="fill:var(--muted);font-size:8px;">' + i + '</text>';
+        }
+        return s;
+      }
+      function svgWrap(inner, label) {
+        return '<svg viewBox="0 0 ' + W + ' ' + W + '" role="img" aria-label="' + label + '">' + inner + '</svg>';
+      }
+      function lineAcross(m, q) {
+        // segmento della retta y=mx+q attraverso tutta la griglia (clip a -N..N)
+        let x0 = -N, x1 = N, y0 = m * x0 + q, y1 = m * x1 + q;
+        // clip verticale semplice
+        function clip(xa, ya, xb, yb) {
+          const pts = [];
+          // interseca con i bordi y=±N
+          [-N, N].forEach(function (yb2) {
+            const xi = (yb2 - q) / m;
+            if (m !== 0 && xi >= -N && xi <= N) pts.push([xi, yb2]);
+          });
+          [-N, N].forEach(function (xb2) {
+            const yi = m * xb2 + q;
+            if (yi >= -N && yi <= N) pts.push([xb2, yi]);
+          });
+          return pts;
+        }
+        const pts = clip();
+        if (pts.length >= 2) { x0 = pts[0][0]; y0 = pts[0][1]; x1 = pts[1][0]; y1 = pts[1][1]; }
+        return '<line x1="' + Xp(x0) + '" y1="' + Yp(y0) + '" x2="' + Xp(x1) + '" y2="' + Yp(y1) + '" stroke="var(--accent)" stroke-width="2.5"/>';
+      }
+
+      // ===== sec1 — i 5 punti di y=2x+1 su una retta =====
+      (function () {
+        const host = document.getElementById('line-intro');
+        if (!host) return;
+        let s = axesSVG();
+        s += lineAcross(2, 1);
+        [-2, -1, 0, 1, 2].forEach(function (x) {
+          const y = 2 * x + 1;
+          s += '<circle cx="' + Xp(x) + '" cy="' + Yp(y) + '" r="5" fill="var(--magenta)"/>';
+        });
+        host.innerHTML = svgWrap(s, 'i cinque punti della tabella allineati sulla retta y=2x+1');
+      })();
+
+      // ===== sec2 — pendenza costante (slider su P e Q) =====
+      (function () {
+        const host = document.getElementById('slope-plane');
+        if (!host) return;
+        const sP = document.getElementById('sl-p'), sQ = document.getElementById('sl-q');
+        const vP = document.getElementById('sl-p-val'), vQ = document.getElementById('sl-q-val');
+        const out = document.getElementById('slope-out');
+        const m = 0.5, q = 1;               // retta fissa y = x/2 + 1
+        function fmt(n) { return (Math.round(n * 10) / 10).toString().replace('.', ','); }
+        function go() {
+          let xP = +sP.value, xQ = +sQ.value;
+          if (xP === xQ) { xQ = xP + 1; sQ.value = xQ; }   // evita Δx=0
+          vP.textContent = xP; vQ.textContent = xQ;
+          const yP = m * xP + q, yQ = m * xQ + q;
+          let s = axesSVG();
+          s += lineAcross(m, q);
+          // scaletta Δx, Δy
+          s += '<line x1="' + Xp(xP) + '" y1="' + Yp(yP) + '" x2="' + Xp(xQ) + '" y2="' + Yp(yP) + '" stroke="var(--gold)" stroke-width="2" stroke-dasharray="5 3"/>';
+          s += '<line x1="' + Xp(xQ) + '" y1="' + Yp(yP) + '" x2="' + Xp(xQ) + '" y2="' + Yp(yQ) + '" stroke="#16a34a" stroke-width="2" stroke-dasharray="5 3"/>';
+          s += '<text x="' + Xp((xP + xQ) / 2) + '" y="' + (Yp(yP) + 15) + '" text-anchor="middle" style="fill:var(--gold);font-size:12px;font-weight:700;">Δx</text>';
+          s += '<text x="' + (Xp(xQ) + 8) + '" y="' + Yp((yP + yQ) / 2) + '" style="fill:#16a34a;font-size:12px;font-weight:700;">Δy</text>';
+          // punti
+          s += '<circle cx="' + Xp(xP) + '" cy="' + Yp(yP) + '" r="6" fill="var(--magenta)"/>';
+          s += '<circle cx="' + Xp(xQ) + '" cy="' + Yp(yQ) + '" r="6" fill="var(--primary)"/>';
+          s += '<text x="' + (Xp(xP) - 6) + '" y="' + (Yp(yP) - 8) + '" text-anchor="end" style="fill:var(--text);font-size:12px;font-weight:700;">P</text>';
+          s += '<text x="' + (Xp(xQ) + 8) + '" y="' + (Yp(yQ) - 8) + '" style="fill:var(--text);font-size:12px;font-weight:700;">Q</text>';
+          host.innerHTML = svgWrap(s, 'retta con due punti P e Q e la scaletta di Delta x e Delta y');
+          const dx = xQ - xP, dy = yQ - yP;
+          out.innerHTML = 'Δx = ' + dx + ', &nbsp; Δy = ' + fmt(dy) + ' &nbsp;⟹&nbsp; ' +
+            'pendenza <strong>m = Δy / Δx = ' + fmt(dy) + ' / ' + dx + ' = <span style="color:var(--accent);">' + fmt(dy / dx) + '</span></strong> ' +
+            '<span style="color:var(--muted);">(sposta P e Q: resta sempre ' + fmt(m) + '!)</span>';
+        }
+        sP.addEventListener('input', go); sQ.addEventListener('input', go); go();
+      })();
+
+      // ===== sec9 — triangolo storto con altezza =====
+      (function () {
+        const host = document.getElementById('tri9-plane');
+        if (!host) return;
+        const A = { x: 0, y: 0 }, B = { x: 6, y: 6 }, C = { x: 5, y: -1 }, H = { x: 2, y: 2 };
+        let s = axesSVG();
+        s += '<polygon points="' + Xp(A.x) + ',' + Yp(A.y) + ' ' + Xp(B.x) + ',' + Yp(B.y) + ' ' + Xp(C.x) + ',' + Yp(C.y) + '" fill="var(--accent)" fill-opacity="0.16" stroke="var(--accent)" stroke-width="2.5"/>';
+        // altezza CH (perpendicolare ad AB)
+        s += '<line x1="' + Xp(C.x) + '" y1="' + Yp(C.y) + '" x2="' + Xp(H.x) + '" y2="' + Yp(H.y) + '" stroke="var(--magenta)" stroke-width="2" stroke-dasharray="5 3"/>';
+        // segnetto di angolo retto in H
+        s += '<path d="M ' + Xp(1.3) + ' ' + Yp(2.7) + ' L ' + Xp(1.9) + ' ' + Yp(3.3) + '" fill="none" stroke="var(--magenta)" stroke-width="1"/>';
+        const V = [['A', A, 'end', -8, 16], ['B', B, 'start', 8, 0], ['C', C, 'start', 8, 6], ['H', H, 'end', -8, -6]];
+        V.forEach(function (v) {
+          s += '<circle cx="' + Xp(v[1].x) + '" cy="' + Yp(v[1].y) + '" r="5" fill="var(--primary)"/>';
+          s += '<text x="' + (Xp(v[1].x) + v[3]) + '" y="' + (Yp(v[1].y) + v[4]) + '" text-anchor="' + v[2] + '" style="fill:var(--text);font-size:13px;font-weight:700;">' + v[0] + '</text>';
+        });
+        host.innerHTML = svgWrap(s, 'triangolo ABC con altezza da C al piede H sulla retta AB');
+      })();
+
+      // ===== sec3 — laboratorio y = m x + q (Plotly + blocca scala) =====
+      (function () {
+        const sM = document.getElementById('mq-m'), sQ = document.getElementById('mq-q');
+        const vM = document.getElementById('mq-m-val'), vQ = document.getElementById('mq-q-val');
+        const eq = document.getElementById('mq-eq'), out = document.getElementById('mq-out'), lock = document.getElementById('mq-lock');
+        if (!sM) return;
+        function num(v) { return (Math.round(v * 100) / 100).toString().replace('.', ','); }
+        function fmtLine(m, q) {
+          let mm = (m === 1) ? '' : (m === -1) ? '−' : num(m);
+          let s = 'y = ' + mm + 'x';
+          if (q > 0) s += ' + ' + num(q);
+          else if (q < 0) s += ' − ' + num(-q);
+          return s;
+        }
+        function go() {
+          const m = +sM.value, q = +sQ.value;
+          vM.textContent = num(m); vQ.textContent = num(q);
+          eq.textContent = fmtLine(m, q);
+          const C = themeColors();
+          const R = 8;
+          const xs = linspace(-R, R, 60);
+          const ys = xs.map(function (x) { return m * x + q; });
+          const traces = [{ x: xs, y: ys, type: 'scatter', mode: 'lines', line: { color: C.accent, width: 3 } }];
+          // intercetta (0, q)
+          traces.push({ x: [0], y: [q], type: 'scatter', mode: 'markers', marker: { color: C.curve, size: 9 }, hovertext: ['intercetta (0; ' + num(q) + ')'], hoverinfo: 'text' });
+          const lay = { xaxis: { range: [-R, R], zeroline: true }, yaxis: { zeroline: true } };
+          if (lock.checked) lay.yaxis.range = [-R, R];
+          update('mq-plot', traces, lay);
+          const xint = (m !== 0) ? (' e taglia l\'asse x in (' + num(-q / m) + '; 0)') : ' ed è orizzontale';
+          out.innerHTML = 'La retta ha pendenza <strong>' + num(m) + '</strong>, taglia l\'asse y in <strong>(0; ' + num(q) + ')</strong>' + xint + '.';
+        }
+        sM.addEventListener('input', go); sQ.addEventListener('input', go); lock.addEventListener('change', go); go();
+      })();
+
+      // ===== sec4 — palestre (due rette + intersezione) =====
+      (function () {
+        const host = document.getElementById('gym-plot');
+        if (!host) return;
+        const C = themeColors();
+        const xs = linspace(0, 8, 40);
+        const A = xs.map(function (x) { return 20 * x + 30; });
+        const B = xs.map(function (x) { return 30 * x; });
+        const traces = [
+          { x: xs, y: A, type: 'scatter', mode: 'lines', name: 'Palestra A: 20x+30', line: { color: C.primary, width: 3 } },
+          { x: xs, y: B, type: 'scatter', mode: 'lines', name: 'Palestra B: 30x', line: { color: C.curve, width: 3 } },
+          { x: [3], y: [90], type: 'scatter', mode: 'markers+text', text: ['(3; 90)'], textposition: 'top center', textfont: { color: C.font }, marker: { color: C.gold || '#f5b400', size: 11 }, name: 'pareggio' }
+        ];
+        draw('gym-plot', traces, {
+          xaxis: { title: 'mesi', range: [0, 8], zeroline: true },
+          yaxis: { title: 'spesa (€)', range: [0, 260], zeroline: true },
+          showlegend: true, legend: { x: 0.02, y: 0.98 }
+        });
+      })();
+
+      // ===== sec11 — disegnare con le funzioni (cuore di default) =====
+      (function () {
+        const host = document.getElementById('art-plot');
+        if (!host) return;
+        const inp = document.getElementById('art-input'), out = document.getElementById('art-out');
+        const C = themeColors();
+        function param(fn, tmax, npt, scale, label) {
+          const xs = [], ys = [];
+          for (let i = 0; i <= npt; i++) {
+            const t = i / npt * tmax;
+            const p = fn(t);
+            xs.push(p[0] * scale); ys.push(p[1] * scale);
+          }
+          drawArt(xs, ys, label, true);
+        }
+        function drawArt(xs, ys, label, equal) {
+          const tr = [{ x: xs, y: ys, type: 'scatter', mode: 'lines', line: { color: C.curve, width: 2.5 }, hoverinfo: 'skip' }];
+          const lay = { margin: { t: 10, b: 30, l: 30, r: 10 }, xaxis: { zeroline: true }, yaxis: { zeroline: true } };
+          if (equal) lay.yaxis.scaleanchor = 'x', lay.yaxis.scaleratio = 1;
+          draw('art-plot', tr, lay);
+          out.innerHTML = label;
+        }
+        const presets = {
+          heart: function () {
+            param(function (t) {
+              return [16 * Math.pow(Math.sin(t), 3),
+                13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)];
+            }, 2 * Math.PI, 400, 1, '❤️ Un cuore, disegnato con seni e coseni.');
+          },
+          rose: function () {
+            param(function (t) { const r = Math.cos(4 * t); return [r * Math.cos(t), r * Math.sin(t)]; },
+              2 * Math.PI, 600, 10, '🌹 Una rosa a otto petali: r = cos(4·angolo).');
+          },
+          butterfly: function () {
+            param(function (t) {
+              const k = Math.exp(Math.cos(t)) - 2 * Math.cos(4 * t) - Math.pow(Math.sin(t / 12), 5);
+              return [Math.sin(t) * k, Math.cos(t) * k];
+            }, 12 * Math.PI, 2000, 3, '🦋 La celebre «curva della farfalla» di Temple Fay.');
+          },
+          spiral: function () {
+            param(function (t) { return [t * Math.cos(t), t * Math.sin(t)]; },
+              6 * Math.PI, 800, 0.5, '🌀 Una spirale di Archimede: cresce di raggio a ogni giro.');
+          }
+        };
+        function drawFn() {
+          const expr = inp.value.trim();
+          let compiled;
+          try { compiled = math.parse(expr).compile(); }
+          catch (e) { out.innerHTML = '<span style="color:#dc2626;">Non riesco a leggere questa funzione. Riprova (es. x^2-3).</span>'; return; }
+          const R = 10;
+          const xs = linspace(-R, R, 500);
+          const ys = xs.map(function (x) {
+            try { const v = compiled.evaluate({ x: x }); return (typeof v === 'number' && isFinite(v)) ? v : null; }
+            catch (e) { return null; }
+          });
+          const tr = [{ x: xs, y: ys, type: 'scatter', mode: 'lines', line: { color: C.accent, width: 2.5 }, connectgaps: false, hoverinfo: 'x+y' }];
+          draw('art-plot', tr, { xaxis: { range: [-R, R], zeroline: true }, yaxis: { zeroline: true } });
+          out.innerHTML = 'Grafico di <strong>y = ' + expr + '</strong>.';
+        }
+        document.getElementById('art-draw').addEventListener('click', drawFn);
+        inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') drawFn(); });
+        document.getElementById('art-heart').addEventListener('click', presets.heart);
+        document.getElementById('art-rose').addEventListener('click', presets.rose);
+        document.getElementById('art-butterfly').addEventListener('click', presets.butterfly);
+        document.getElementById('art-spiral').addEventListener('click', presets.spiral);
+        presets.heart();   // di default: il cuore
+      })();
+
+    });
+  </script>
+
+  <!-- Script condivisi -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Perché le equazioni di primo grado si chiamano <strong>lineari</strong>?',
+        options: ['perché hanno una sola incognita', 'perché rappresentate sul piano cartesiano danno una linea diritta', 'perché si scrivono su una riga', 'perché hanno infinite soluzioni', 'perché contengono frazioni'],
+        correct: 1, explain: 'Le coppie $(x;y)$ che le soddisfano, messe sul piano, si allineano su una retta.' },
+      { type: 'mc', diff: 'easy', text: 'Nella retta $y = mx + q$, che cosa rappresenta $q$?',
+        options: ['la pendenza', 'il punto in cui la retta taglia l\'asse $y$ (intercetta)', 'il punto in cui taglia l\'asse $x$', 'l\'angolo con l\'asse $x$', 'la lunghezza della retta'],
+        correct: 1, explain: 'Ponendo $x=0$ si ottiene $y=q$: è l\'ordinata del punto d\'incontro con l\'asse $y$.' },
+      { type: 'mc', diff: 'medium', text: 'Il coefficiente angolare $m$ della retta per $P(1;\\,2)$ e $Q(3;\\,8)$ vale:',
+        options: ['$2$', '$3$', '$\\dfrac{1}{3}$', '$6$', '$4$'],
+        correct: 1, explain: '$m = \\dfrac{\\Delta y}{\\Delta x} = \\dfrac{8-2}{3-1} = \\dfrac{6}{2} = 3$.' },
+      { type: 'mc', diff: 'medium', text: 'La retta $3x + 2y - 6 = 0$ in forma esplicita è:',
+        options: ['$y = 3x - 6$', '$y = -\\dfrac{3}{2}x + 3$', '$y = \\dfrac{3}{2}x + 3$', '$y = -3x + 6$', '$y = 2x - 3$'],
+        correct: 1, explain: 'Isolo: $2y = -3x + 6 \\Rightarrow y = -\\dfrac{3}{2}x + 3$.' },
+      { type: 'mc', diff: 'medium', text: 'Per trovare il punto in cui due rette si incontrano, che cosa si risolve?',
+        options: ['una sola equazione', 'il sistema formato dalle loro due equazioni', 'la formula della distanza', 'la formula del punto medio', 'un\'equazione fratta'],
+        correct: 1, explain: 'Il punto comune soddisfa entrambe le equazioni: è la soluzione del sistema.' },
+      { type: 'mc', diff: 'medium', text: 'Due rette sono <strong>parallele</strong> quando:',
+        options: ['hanno la stessa intercetta $q$', 'hanno lo stesso coefficiente angolare $m$', 'il prodotto dei coefficienti angolari è $-1$', 'passano per l\'origine', 'hanno pendenze opposte'],
+        correct: 1, explain: 'Stessa inclinazione, quindi $m_1 = m_2$: non si incontrano mai.' },
+      { type: 'mc', diff: 'hard', text: 'La perpendicolare a una retta con $m = \\dfrac{2}{3}$ ha coefficiente angolare:',
+        options: ['$\\dfrac{2}{3}$', '$-\\dfrac{3}{2}$', '$\\dfrac{3}{2}$', '$-\\dfrac{2}{3}$', '$\\dfrac{1}{2}$'],
+        correct: 1, explain: 'Opposto del reciproco: si capovolge la frazione e si cambia segno → $-\\dfrac{3}{2}$ (infatti $\\dfrac{2}{3}\\cdot\\left(-\\dfrac{3}{2}\\right) = -1$).' },
+      { type: 'mc', diff: 'medium', text: 'Trovare l\'equazione di una retta significa trovare:',
+        options: ['un solo numero', 'la coppia di valori $(m;\\,q)$: pendenza e intercetta', 'tre numeri', 'due punti qualsiasi', 'l\'area sottesa'],
+        correct: 1, explain: 'Una retta (non verticale) è individuata dai suoi due parametri $m$ e $q$.' },
+      { type: 'open', diff: 'hard', text: 'Due palestre: A costa $20x + 30$ €, B costa $30x$ € (con $x$ = mesi). Spiega che cosa rappresenta il punto in cui le due rette si incontrano e come lo si calcola.',
+        keywords: ['sistema', 'uguale', 'stesso', 'costo', 'spesa', 'mesi', 'sostituzione', 'conviene', 'pareggio', '3'], requiredMatches: 2,
+        explain: 'È il mese in cui le due palestre costano uguale (il «pareggio»). Lo si trova mettendo le due equazioni a sistema: $30x = 20x + 30 \\Rightarrow x = 3$ mesi, con spesa $y = 90$ €. Prima di 3 mesi conviene B, dopo conviene A.' }
+    ];
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 6 — Il disegno assistito dal computer</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent);
+      border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+
+    .demo { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1rem; margin: 1.1rem 0; }
+    .demo .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: center; }
+    @media (max-width: 640px) { .demo .panels { grid-template-columns: 1fr; } }
+    .svg-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem; }
+    .svg-box svg { display: block; width: 100%; height: auto; }
+    .svg-box.iso svg { max-width: 240px; margin: 0 auto; }
+    .svg-box.board svg { max-width: 330px; margin: 0 auto; }
+    .box-cap { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 0.35rem; }
+
+    .step-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 0.8rem; }
+    .step-text { margin-top: 0.7rem; min-height: 3.2em; line-height: 1.5; }
+    .step-badge { display: inline-block; background: var(--accent); color: #fff; border-radius: 999px;
+      padding: 0.06rem 0.65rem; font-weight: 800; font-size: 0.8rem; margin-right: 0.4rem; }
+
+    .thumbs { display: flex; gap: 0.9rem; flex-wrap: wrap; margin: 0.7rem 0; }
+    .thumb { background: var(--surface); border: 2px solid var(--border); border-radius: 10px; padding: 0.5rem;
+      cursor: pointer; width: 104px; transition: border-color 0.15s, transform 0.15s; }
+    .thumb:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .thumb svg { display: block; width: 100%; height: auto; }
+    .thumb.ok { border-color: #16a34a; background: color-mix(in srgb, #16a34a 10%, var(--surface)); }
+    .thumb.no { border-color: #dc2626; }
+    .thumb .cap { text-align: center; font-size: 0.78rem; color: var(--muted); margin-top: 0.35rem; }
+    .mini-fb { min-height: 1.5em; font-weight: 700; margin-top: 0.4rem; font-size: 0.95rem; }
+    .mini-fb.ok { color: #16a34a; }
+    .mini-fb.no { color: #dc2626; }
+
+    .rot-sliders { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.6rem; }
+    .rot-sliders label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--muted); }
+    .rot-sliders input[type="range"] { flex: 1; accent-color: var(--accent); }
+
+    .cad-list li { margin: 0.35rem 0; }
+    .legenda { display: flex; flex-wrap: wrap; gap: 1.2rem; justify-content: center; font-size: 0.82rem; color: var(--muted); margin-top: 0.4rem; }
+    .legenda span { display: inline-flex; align-items: center; gap: 0.35rem; }
+    .lg-line { display: inline-block; width: 26px; height: 0; border-top: 2px solid var(--accent); }
+    .lg-dash { display: inline-block; width: 26px; height: 0; border-top: 2px dashed var(--accent); }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Secondo anno · Lezione 6</div>
+    <h1>Il disegno assistito dal computer</h1>
+    <p>Dal foglio squadrato al CAD: quando la geometria diventa numeri, a disegnare ci pensa la macchina</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Secondo anno</a>
+    <span class="sep">/</span> Il disegno assistito dal computer
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Nelle ultime lezioni abbiamo scoperto una cosa potente: sul piano cartesiano
+      <em>ogni</em> forma geometrica si traduce in numeri e formule (un punto è una coppia, una retta è
+      $y = mx + q$, e con le funzioni giuste — ricordi il cuore? — si disegna qualsiasi cosa). Se una figura è fatta
+      di numeri, allora un <strong>computer</strong> la può calcolare, disegnare e modificare per noi. È l'idea alla
+      base di un'intera famiglia di tecnologie: il <strong>disegno assistito</strong>.
+    </div>
+
+    <!-- 1 — DAL FOGLIO AL COMPUTER -->
+    <section id="sec1">
+      <h2>1. Dal foglio da disegno al computer</h2>
+
+      <p>Alle scuole medie avete fatto <strong>disegno tecnico</strong>? Avete <em>squadrato</em> un foglio A4 (quei
+        bordi tracciati con riga e squadra prima di cominciare)? Avete disegnato le <strong>proiezioni
+        ortogonali</strong> di un oggetto, con matita, riga, squadra e compasso? È un lavoro bellissimo ma anche
+        lento e pieno di insidie: basta una linea storta, una misura sbagliata, e si ricomincia.</p>
+
+      <p>Eppure noi ora sappiamo qualcosa di nuovo. Se il piano cartesiano <strong>traduce qualsiasi forma in numeri
+        e formule algebriche</strong>, perché continuare a tribolare con la matita? Perché non farci
+        <strong>aiutare dal computer</strong>, che con i numeri è imbattibile? Un rettangolo sono quattro coppie di
+        coordinate; una circonferenza è un'equazione; una parete di una casa è un segmento con una lunghezza precisa.
+        Alla macchina possiamo chiedere di tenere il conto di tutto — e di ridisegnarlo in un istante.</p>
+    </section>
+
+    <!-- 2 — I SOFTWARE CAD -->
+    <section id="sec2">
+      <h2>2. I software CAD</h2>
+
+      <p>È esattamente ciò che fanno i software di <strong>CAD</strong>, sigla inglese per <em>Computer Aided
+        Design</em>: «progettazione (o disegno) assistita dal computer». Al posto di matita e squadra usi il mouse (o
+        una penna digitale): tracci linee, cerchi, quote, e il programma calcola tutto con precisione assoluta,
+        conserva le misure, e ti lascia <strong>modificare</strong> il disegno quante volte vuoi senza ricominciare
+        da capo.</p>
+
+      <p>Di software CAD ne esistono <strong>moltissimi</strong>: alcuni completamente <strong>gratuiti</strong>,
+        altri <strong>a pagamento</strong> (spesso costosi, perché usati dai professionisti), altri ancora
+        «<strong>freemium</strong>»: le funzioni di base sono gratis, quelle più avanzate si sbloccano pagando.
+        Cercane qualcuno in rete e provalo: molti permettono di costruire anche <strong>modelli 3D</strong>, non solo
+        disegni piani — è il modo migliore per esercitarsi davvero.</p>
+
+      <p>A cosa servono? A tutto ciò che va progettato prima di essere costruito:</p>
+      <ul class="cad-list">
+        <li>modellazioni «semplici», come i <strong>prototipi</strong> da mandare a una <strong>stampante 3D</strong>
+          (un oggetto disegnato al computer diventa un pezzo di plastica vero);</li>
+        <li>progetti complessi, come le <strong>piante di una casa</strong> o di un enorme
+          <strong>capannone industriale</strong>, con muri, impianti, misure al millimetro.</li>
+      </ul>
+
+      <div class="curiosita">
+        <strong>🏗️ Un mestiere cambiato per sempre.</strong> Una volta, per progettare un edificio, c'erano
+        disegnatori e geometri che tracciavano ogni disegno a mano — e quando serviva una copia, dovevano
+        <strong>ricopiarlo tutto daccapo</strong>, riga per riga. Oggi con il CAD si duplica, si modifica e si stampa
+        in pochi secondi: un'enorme comodità. Ma ogni rivoluzione tecnologica ha un prezzo: tante persone che facevano
+        quel lavoro «a mano» hanno dovuto <strong>reinventarsi</strong> e imparare mestieri nuovi. La tecnologia
+        semplifica, ma cambia anche il mondo del lavoro — è giusto esserne consapevoli.
+      </div>
+    </section>
+
+    <!-- 3 — PERCORSO GUIDATO: PROIEZIONI ORTOGONALI -->
+    <section id="sec3">
+      <h2>3. Percorso guidato: dalle 3 dimensioni alle proiezioni</h2>
+
+      <p>Prima di lasciare fare tutto alla macchina, capiamo <em>cosa</em> le stiamo chiedendo. Il problema classico
+        del disegno tecnico è questo: ho un oggetto <strong>tridimensionale</strong> e devo rappresentarlo su un
+        foglio <strong>piatto</strong>. La soluzione sono le <strong>proiezioni ortogonali</strong>: lo «guardo» da
+        tre direzioni — <strong>da davanti</strong>, <strong>dall'alto</strong> e <strong>da sinistra</strong> — e di
+        ognuna disegno la sagoma che vedo. Tre viste piatte che, insieme, descrivono senza ambiguità il solido.</p>
+
+      <p>In Italia si usa il <strong>metodo europeo</strong> (primo diedro), che dispone le viste in un ordine preciso:
+        il <strong>prospetto</strong> (vista da davanti) in alto; la <strong>pianta</strong> (vista dall'alto)
+        <em>sotto</em> il prospetto; la <strong>vista laterale</strong> sinistra a <em>destra</em> del prospetto. Le
+        viste si <strong>allineano</strong>: pianta e prospetto hanno la stessa larghezza, prospetto e vista laterale
+        la stessa altezza.</p>
+
+      <p>Segui il percorso: a sinistra c'è il solido in assonometria, a destra il tuo «foglio». Prima di svelare ogni
+        vista, prova a <strong>tracciarla tu</strong> su un foglio vero — poi controlla.</p>
+
+      <div class="demo">
+        <div class="panels">
+          <div>
+            <div class="svg-box iso"><div id="iso-solid"></div></div>
+            <div class="box-cap">Il solido, guardato da davanti / dall'alto / da sinistra.</div>
+          </div>
+          <div>
+            <div class="svg-box board"><div id="proj-board"></div></div>
+            <div class="box-cap">Il foglio (metodo europeo). Le viste compaiono una alla volta.</div>
+          </div>
+        </div>
+        <div class="legenda">
+          <span><span class="lg-line"></span> spigolo visibile</span>
+          <span><span class="lg-dash"></span> spigolo nascosto</span>
+        </div>
+        <p class="step-text" id="proj-text"></p>
+        <div class="step-controls">
+          <button class="btn" id="proj-prev">◀ Indietro</button>
+          <button class="btn btn-primary" id="proj-next">▶ Prossima vista</button>
+          <button class="btn" id="proj-reset">↺ Ricomincia</button>
+        </div>
+      </div>
+
+      <p>Nota lo <strong>scalino</strong>: nella pianta appare come una linea piena (uno spigolo che vediamo davvero
+        dall'alto), mentre nella vista laterale diventa una linea <strong>tratteggiata</strong>, perché quello spigolo
+        è <em>nascosto</em> dietro la parte alta del solido. Gli spigoli nascosti si disegnano sempre tratteggiati:
+        è una delle regole d'oro del disegno tecnico.</p>
+
+      <h3>Tocca a te</h3>
+      <p>Guarda questo <strong>cilindro</strong> in piedi. Se lo guardi <strong>dall'alto</strong> (la pianta), quale
+        di queste sagome ottieni? Clicca quella giusta.</p>
+
+      <div class="demo">
+        <div class="panels">
+          <div>
+            <div class="svg-box iso"><div id="iso-cyl"></div></div>
+            <div class="box-cap">Un cilindro appoggiato in piedi.</div>
+          </div>
+          <div>
+            <div class="thumbs" id="cyl-thumbs">
+              <div class="thumb" data-correct="0">
+                <svg viewBox="0 0 80 60" aria-label="rettangolo"><rect x="15" y="12" width="50" height="36" fill="none" stroke="var(--accent)" stroke-width="2.2"/></svg>
+                <div class="cap">rettangolo</div>
+              </div>
+              <div class="thumb" data-correct="1">
+                <svg viewBox="0 0 80 60" aria-label="cerchio"><circle cx="40" cy="30" r="21" fill="none" stroke="var(--accent)" stroke-width="2.2"/></svg>
+                <div class="cap">cerchio</div>
+              </div>
+              <div class="thumb" data-correct="0">
+                <svg viewBox="0 0 80 60" aria-label="triangolo"><polygon points="40,10 64,48 16,48" fill="none" stroke="var(--accent)" stroke-width="2.2"/></svg>
+                <div class="cap">triangolo</div>
+              </div>
+            </div>
+            <p class="mini-fb" id="cyl-fb"></p>
+          </div>
+        </div>
+      </div>
+
+      <p>Curioso, vero? Di fronte il cilindro è un <strong>rettangolo</strong>, ma dall'alto è un
+        <strong>cerchio</strong>: le superfici curve, proiettate, cambiano faccia. Con un software CAD tutto questo è
+        automatico: disegni il modello 3D una volta sola e il programma ricava le proiezioni da solo, in un istante.
+        Vai a cercarne uno in rete e prova a modellare un oggetto: capirai queste idee molto meglio «toccandole».</p>
+
+      <h3>Esercizi: ruota e proietta</h3>
+      <p>Adesso tocca a te tracciare le proiezioni. In ognuno di questi esercizi puoi <strong>ruotare il solido</strong>
+        con due cursori — uno orizzontale e uno verticale — per osservarlo da ogni angolazione e coglierne bene la
+        forma. Poi disegna su un foglio le tre viste (prospetto, pianta, vista laterale) e confrontale con la
+        soluzione.</p>
+
+      <div class="note">
+        <strong>Occhio:</strong> ruotare serve solo a <em>capire</em> com'è fatto il solido. Le proiezioni si
+        disegnano <strong>sempre</strong> dalle tre direzioni fisse — davanti, dall'alto, da sinistra — qualunque sia
+        l'inclinazione con cui lo stai guardando.
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Ruota e proietta — il prisma</span><span class="difficulty easy">Facile</span></div>
+        <p>Un prisma a base triangolare (un «Toblerone»). Ruotalo, poi traccia le tre viste.</p>
+        <div class="demo">
+          <div class="panels">
+            <div>
+              <div class="svg-box iso"><div id="rot-prisma"></div></div>
+              <div class="rot-sliders">
+                <label>↔ orizzontale <input type="range" id="rot-prisma-yaw" min="-180" max="180" value="30"></label>
+                <label>↕ verticale <input type="range" id="rot-prisma-pitch" min="-80" max="80" value="18"></label>
+              </div>
+            </div>
+            <div class="toggle-target" id="proj-prisma-wrap">
+              <div class="svg-box board"><div id="proj-prisma"></div></div>
+              <div class="box-cap">Prospetto = triangolo · Pianta = rettangolo con lo spigolo del vertice · Vista laterale = rettangolo.</div>
+            </div>
+          </div>
+          <div class="ex-actions"><button class="btn btn-toggle" data-target="#proj-prisma-wrap" data-label-show="💡 Mostra le proiezioni" data-label-hide="🙈 Nascondi le proiezioni">💡 Mostra le proiezioni</button></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Ruota e proietta — la piramide</span><span class="difficulty medium">Medio</span></div>
+        <p>Una piramide a base quadrata. Attenzione alla vista dall'alto: è la più sorprendente!</p>
+        <div class="demo">
+          <div class="panels">
+            <div>
+              <div class="svg-box iso"><div id="rot-piram"></div></div>
+              <div class="rot-sliders">
+                <label>↔ orizzontale <input type="range" id="rot-piram-yaw" min="-180" max="180" value="35"></label>
+                <label>↕ verticale <input type="range" id="rot-piram-pitch" min="-80" max="80" value="22"></label>
+              </div>
+            </div>
+            <div class="toggle-target" id="proj-piram-wrap">
+              <div class="svg-box board"><div id="proj-piram"></div></div>
+              <div class="box-cap">Dall'alto la piramide è un quadrato con le quattro diagonali che vanno al vertice (la punta).</div>
+            </div>
+          </div>
+          <div class="ex-actions"><button class="btn btn-toggle" data-target="#proj-piram-wrap" data-label-show="💡 Mostra le proiezioni" data-label-hide="🙈 Nascondi le proiezioni">💡 Mostra le proiezioni</button></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Ruota e proietta — la casetta</span><span class="difficulty hard">Difficile</span></div>
+        <p>Un prisma a forma di casa (con il tetto). Di fronte è una casetta... ma di lato? Preparati a una sorpresa.</p>
+        <div class="demo">
+          <div class="panels">
+            <div>
+              <div class="svg-box iso"><div id="rot-casa"></div></div>
+              <div class="rot-sliders">
+                <label>↔ orizzontale <input type="range" id="rot-casa-yaw" min="-180" max="180" value="28"></label>
+                <label>↕ verticale <input type="range" id="rot-casa-pitch" min="-80" max="80" value="16"></label>
+              </div>
+            </div>
+            <div class="toggle-target" id="proj-casa-wrap">
+              <div class="svg-box board"><div id="proj-casa"></div></div>
+              <div class="box-cap">Di fronte è la sagoma della casa; di lato, con il tetto «di taglio», diventa un rettangolo con la linea della gronda!</div>
+            </div>
+          </div>
+          <div class="ex-actions"><button class="btn btn-toggle" data-target="#proj-casa-wrap" data-label-show="💡 Mostra le proiezioni" data-label-hide="🙈 Nascondi le proiezioni">💡 Mostra le proiezioni</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — IL DISEGNO ARTISTICO -->
+    <section id="sec4">
+      <h2>4. Non solo tecnica: il disegno artistico</h2>
+
+      <p>Il computer non serve solo a progettare oggetti e case. Ha conquistato anche il <strong>disegno
+        artistico</strong>. Ormai è raro che i prodotti d'animazione — i cartoni animati, i videogiochi — vengano
+        realizzati a mano su carta: si disegna direttamente <strong>al computer</strong>, spesso con le
+        <strong>tavolette grafiche</strong>, superfici sensibili su cui si traccia con una penna digitale come su un
+        foglio, ma il segno finisce dritto nello schermo.</p>
+
+      <p>E qui torna la nostra grande idea: anche la forma più libera, più complessa, più <strong>artisticamente
+        commovente</strong> — il volto di un personaggio, la piega di un mantello, un cielo al tramonto — una volta
+        entrata nel computer diventa un <strong>insieme di numeri</strong>. Coordinate di punti, curve descritte da
+        equazioni, colori scritti come terne di valori. Esattamente come quando, nella lezione scorsa, abbiamo
+        <a href="5.Retta.html#sec10">disegnato un cuore con una funzione</a>: dietro ogni immagine digitale, per
+        quanto poetica, c'è sempre della matematica al lavoro.</p>
+
+      <div class="curiosita">
+        <strong>🎨 Arte e numeri, alleati.</strong> Non è una brutta notizia per l'arte, anzi! Avere gli strumenti
+        matematici giusti non toglie nulla alla creatività: la <em>amplifica</em>. L'artista continua a immaginare e
+        a scegliere; la matematica gli dà pennelli infinitamente precisi, che non si consumano e non sbagliano mai un
+        colore. Geometria e fantasia, insieme, disegnano il mondo digitale.
+      </div>
+    </section>
+
+    <!-- 5 — QUIZ -->
+    <section id="quiz">
+      <h2>5. Quiz finale</h2>
+      <p>Nove domande su disegno assistito, software CAD, proiezioni ortogonali e disegno digitale. Difficoltà
+        crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <!-- Widget interattivi: assonometria e proiezioni -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ================= SOLIDO A "L" IN ASSONOMETRIA =================
+      // profilo a L (front, in x-z), estruso in profondità y = 0..2
+      (function () {
+        const host = document.getElementById('iso-solid');
+        if (!host) return;
+        const OX = 24, OY = 150, U = 30, k = 0.5;   // assonometria cavaliera (profondità a 45°, fattore 0.5)
+        function P(x, y, z) { return [(OX + (x + y * k) * U).toFixed(1), (OY - (z + y * k) * U).toFixed(1)]; }
+        function poly(pts, op) {
+          const s = pts.map(function (p) { const q = P(p[0], p[1], p[2]); return q[0] + ',' + q[1]; }).join(' ');
+          return '<polygon points="' + s + '" fill="var(--accent)" fill-opacity="' + op + '" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/>';
+        }
+        let s = '';
+        // ordine pittorico: facce in fondo prima, faccia frontale per ultima
+        s += poly([[0, 0, 3], [2, 0, 3], [2, 2, 3], [0, 2, 3]], 0.13);   // top alto
+        s += poly([[2, 0, 1], [4, 0, 1], [4, 2, 1], [2, 2, 1]], 0.13);   // top basso
+        s += poly([[4, 0, 0], [4, 0, 1], [4, 2, 1], [4, 2, 0]], 0.32);   // faccia destra (x=4)
+        s += poly([[2, 0, 1], [2, 0, 3], [2, 2, 3], [2, 2, 1]], 0.32);   // alzata dello scalino (x=2)
+        s += poly([[0, 0, 0], [4, 0, 0], [4, 0, 1], [2, 0, 1], [2, 0, 3], [0, 0, 3]], 0.22); // faccia frontale a L
+        host.innerHTML = '<svg viewBox="0 0 200 180" role="img" aria-label="solido a L in assonometria">' + s + '</svg>';
+      })();
+
+      // ================= PROIEZIONI (STEPPER) =================
+      (function () {
+        const board = document.getElementById('proj-board');
+        const txt = document.getElementById('proj-text');
+        const bPrev = document.getElementById('proj-prev'), bNext = document.getElementById('proj-next'), bReset = document.getElementById('proj-reset');
+        if (!board) return;
+        const u = 28;
+        const F = { x: 40, y: 30, w: 4 * u, h: 3 * u };   // prospetto (in alto a sinistra)
+        const T = { x: 40, y: 156, w: 4 * u, h: 2 * u };  // pianta (sotto)
+        const S = { x: 194, y: 30, w: 2 * u, h: 3 * u };  // vista laterale (a destra)
+        function placeholder(b) {
+          return '<rect x="' + b.x + '" y="' + b.y + '" width="' + b.w + '" height="' + b.h + '" fill="none" stroke="var(--border)" stroke-dasharray="4 4"/>';
+        }
+        function label(b, t, on) {
+          return '<text x="' + (b.x + b.w / 2) + '" y="' + (b.y - 7) + '" text-anchor="middle" style="fill:' + (on ? 'var(--accent)' : 'var(--muted)') + ';font-size:11px;font-weight:700;">' + t + '</text>';
+        }
+        // mappe locali
+        function fx(x) { return F.x + x * u; } function fz(z) { return F.y + F.h - z * u; }
+        function tx(x) { return T.x + x * u; } function ty(y) { return T.y + y * u; }
+        function sy(y) { return S.x + y * u; } function sz(z) { return S.y + S.h - z * u; }
+        const ACC = 'var(--accent)';
+        function frontView() {
+          const p = [[0, 0], [4, 0], [4, 1], [2, 1], [2, 3], [0, 3]].map(function (c) { return fx(c[0]) + ',' + fz(c[1]); }).join(' ');
+          return '<polygon points="' + p + '" fill="var(--accent)" fill-opacity="0.12" stroke="' + ACC + '" stroke-width="2" stroke-linejoin="round"/>';
+        }
+        function topView() {
+          let s = '<rect x="' + tx(0) + '" y="' + ty(0) + '" width="' + (4 * u) + '" height="' + (2 * u) + '" fill="var(--accent)" fill-opacity="0.12" stroke="' + ACC + '" stroke-width="2"/>';
+          s += '<line x1="' + tx(2) + '" y1="' + ty(0) + '" x2="' + tx(2) + '" y2="' + ty(2) + '" stroke="' + ACC + '" stroke-width="2"/>'; // scalino visibile
+          return s;
+        }
+        function sideView() {
+          let s = '<rect x="' + sy(0) + '" y="' + sz(3) + '" width="' + (2 * u) + '" height="' + (3 * u) + '" fill="var(--accent)" fill-opacity="0.12" stroke="' + ACC + '" stroke-width="2"/>';
+          s += '<line x1="' + sy(0) + '" y1="' + sz(1) + '" x2="' + sy(2) + '" y2="' + sz(1) + '" stroke="' + ACC + '" stroke-width="1.6" stroke-dasharray="5 4"/>'; // scalino nascosto
+          return s;
+        }
+        function guides() {
+          // allineamenti (compaiono alla fine): larghezza prospetto↔pianta, altezza prospetto↔laterale
+          let s = '';
+          [0, 2, 4].forEach(function (x) {
+            s += '<line x1="' + fx(x) + '" y1="' + (F.y + F.h) + '" x2="' + fx(x) + '" y2="' + T.y + '" stroke="var(--muted)" stroke-width="1" stroke-dasharray="2 3" opacity="0.5"/>';
+          });
+          [1, 3].forEach(function (z) {
+            s += '<line x1="' + (F.x + F.w) + '" y1="' + fz(z) + '" x2="' + S.x + '" y2="' + fz(z) + '" stroke="var(--muted)" stroke-width="1" stroke-dasharray="2 3" opacity="0.5"/>';
+          });
+          return s;
+        }
+        const steps = [
+          'Ecco il solido in assonometria (a sinistra). Immagina di guardarlo da davanti, dall\'alto e da sinistra: sono le tre viste che dobbiamo disegnare. Prova a tracciarle su un foglio, poi premi «Prossima vista».',
+          '<span class="step-badge">Prospetto</span> La vista <strong>da davanti</strong> è la sagoma a <strong>L</strong>. La disegniamo in alto a sinistra: sarà il riferimento per le altre due.',
+          '<span class="step-badge">Pianta</span> La vista <strong>dall\'alto</strong> è un rettangolo con la linea dello <strong>scalino</strong> (spigolo visibile). Va <strong>sotto</strong> il prospetto, allineata alla stessa larghezza.',
+          '<span class="step-badge">Vista laterale</span> La vista <strong>da sinistra</strong> è un rettangolo; lo scalino, ora <em>nascosto</em>, è una linea <strong>tratteggiata</strong>. Va a <strong>destra</strong> del prospetto, alla stessa altezza. Le linee grigie mostrano gli allineamenti: ecco le proiezioni ortogonali complete!'
+        ];
+        let state = 0;
+        function render() {
+          let s = placeholder(F) + placeholder(T) + placeholder(S);
+          if (state >= 3) s += guides();
+          if (state >= 1) s += frontView() + label(F, 'Prospetto', true);
+          if (state >= 2) s += topView() + label(T, 'Pianta', true);
+          if (state >= 3) s += sideView() + label(S, 'Vista laterale (sx)', true);
+          board.innerHTML = '<svg viewBox="0 0 300 270" role="img" aria-label="foglio con le proiezioni ortogonali">' + s + '</svg>';
+          txt.innerHTML = steps[state];
+          bPrev.disabled = (state === 0);
+          bNext.disabled = (state === 3);
+          if (typeof renderMathIn === 'function') renderMathIn(txt);
+        }
+        bNext.addEventListener('click', function () { if (state < 3) { state++; render(); } });
+        bPrev.addEventListener('click', function () { if (state > 0) { state--; render(); } });
+        bReset.addEventListener('click', function () { state = 0; render(); });
+        render();
+      })();
+
+      // ================= CILINDRO + AUTOVERIFICA =================
+      (function () {
+        const host = document.getElementById('iso-cyl');
+        if (host) {
+          let s = '';
+          // corpo
+          s += '<line x1="35" y1="46" x2="35" y2="132" stroke="var(--accent)" stroke-width="2"/>';
+          s += '<line x1="125" y1="46" x2="125" y2="132" stroke="var(--accent)" stroke-width="2"/>';
+          // base inferiore: arco davanti (pieno) + dietro (tratteggiato)
+          s += '<path d="M 35 132 A 45 15 0 0 0 125 132" fill="none" stroke="var(--accent)" stroke-width="2"/>';
+          s += '<path d="M 35 132 A 45 15 0 0 1 125 132" fill="none" stroke="var(--accent)" stroke-width="1.4" stroke-dasharray="5 4"/>';
+          // faccia superiore (ellisse piena)
+          s += '<ellipse cx="80" cy="46" rx="45" ry="15" fill="var(--accent)" fill-opacity="0.14" stroke="var(--accent)" stroke-width="2"/>';
+          host.innerHTML = '<svg viewBox="0 0 160 175" role="img" aria-label="cilindro in piedi">' + s + '</svg>';
+        }
+        const thumbs = document.getElementById('cyl-thumbs'), fb = document.getElementById('cyl-fb');
+        if (!thumbs) return;
+        thumbs.querySelectorAll('.thumb').forEach(function (el) {
+          el.addEventListener('click', function () {
+            thumbs.querySelectorAll('.thumb').forEach(function (t) { t.classList.remove('ok', 'no'); });
+            if (el.dataset.correct === '1') {
+              el.classList.add('ok');
+              fb.textContent = '✓ Esatto! Dall\'alto un cilindro in piedi è un cerchio: vedi la sua faccia circolare.';
+              fb.className = 'mini-fb ok';
+            } else {
+              el.classList.add('no');
+              fb.textContent = '✗ Non proprio. Quella è come lo vedresti di fronte o di lato. Dall\'alto guardi la faccia tonda...';
+              fb.className = 'mini-fb no';
+            }
+          });
+        });
+      })();
+
+      // ================= MOTORE 3D RUOTABILE + PROIEZIONI =================
+      const S3 = { s: 20, ox: 100, oy: 104, vb: 200 };
+      function rot3(p, yaw, pitch) {
+        let x = p[0], y = p[1], z = p[2];
+        const cy = Math.cos(yaw), sy = Math.sin(yaw);
+        const x2 = x * cy - y * sy, y2 = x * sy + y * cy; x = x2; y = y2;   // yaw attorno all'asse verticale z
+        const cp = Math.cos(pitch), sp = Math.sin(pitch);
+        const y3 = y * cp - z * sp, z3 = y * sp + z * cp; y = y3; z = z3;   // pitch attorno all'asse x
+        return [x, y, z];
+      }
+      function newell(R, f) {   // normale di una faccia (metodo di Newell)
+        let nx = 0, ny = 0, nz = 0;
+        for (let i = 0; i < f.length; i++) {
+          const a = R[f[i]], b = R[f[(i + 1) % f.length]];
+          nx += (a[1] - b[1]) * (a[2] + b[2]); ny += (a[2] - b[2]) * (a[0] + b[0]); nz += (a[0] - b[0]) * (a[1] + b[1]);
+        }
+        return [nx, ny, nz];
+      }
+      function attach3D(svgId, yawId, pitchId, verts, faces) {
+        const svg = document.getElementById(svgId), yEl = document.getElementById(yawId), pEl = document.getElementById(pitchId);
+        if (!svg) return;
+        const c = [0, 0, 0];
+        verts.forEach(function (v) { c[0] += v[0]; c[1] += v[1]; c[2] += v[2]; });
+        c[0] /= verts.length; c[1] /= verts.length; c[2] /= verts.length;
+        const V = verts.map(function (v) { return [v[0] - c[0], v[1] - c[1], v[2] - c[2]]; });   // centrato nell'origine
+        function draw() {
+          const yaw = (+yEl.value) * Math.PI / 180, pitch = (+pEl.value) * Math.PI / 180;
+          const R = V.map(function (v) { return rot3(v, yaw, pitch); });
+          const items = faces.map(function (f) {
+            let n = newell(R, f);
+            const fc = [0, 0, 0]; f.forEach(function (i) { fc[0] += R[i][0]; fc[1] += R[i][1]; fc[2] += R[i][2]; });
+            fc[0] /= f.length; fc[1] /= f.length; fc[2] /= f.length;
+            if (n[0] * fc[0] + n[1] * fc[1] + n[2] * fc[2] < 0) { n = [-n[0], -n[1], -n[2]]; }   // normale verso l'esterno
+            return { f: f, n: n, dep: fc[1] };
+          }).filter(function (o) { return o.n[1] < 0; })    // solo le facce rivolte verso di noi
+            .sort(function (a, b) { return b.dep - a.dep; }); // le più lontane per prime
+          let s = '';
+          items.forEach(function (o) {
+            const pts = o.f.map(function (i) { const p = R[i]; return (S3.ox + p[0] * S3.s).toFixed(1) + ',' + (S3.oy - p[2] * S3.s).toFixed(1); }).join(' ');
+            const len = Math.hypot(o.n[0], o.n[1], o.n[2]) || 1;
+            const op = (0.12 + 0.26 * (0.5 + 0.5 * (o.n[2] / len))).toFixed(2);   // facce verso l'alto più chiare
+            s += '<polygon points="' + pts + '" fill="var(--accent)" fill-opacity="' + op + '" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>';
+          });
+          svg.innerHTML = '<svg viewBox="0 0 ' + S3.vb + ' ' + S3.vb + '" role="img" aria-label="solido 3D ruotabile">' + s + '</svg>';
+        }
+        yEl.addEventListener('input', draw); pEl.addEventListener('input', draw); draw();
+      }
+      function drawProj(boardId, spec) {
+        const host = document.getElementById(boardId); if (!host) return;
+        const u = 20, mx = 34, my = 22, gap = 32;
+        const fw = spec.fw, fh = spec.fh, d = spec.d;
+        const Fx0 = mx, Fy0 = my, Ty0 = my + fh * u + gap, Sx0 = mx + fw * u + gap;
+        function FX(x) { return Fx0 + x * u; } function FZ(z) { return Fy0 + fh * u - z * u; }
+        function TX(x) { return mx + x * u; } function TY(y) { return Ty0 + y * u; }
+        function SX(y) { return Sx0 + y * u; } function SZ(z) { return Fy0 + fh * u - z * u; }
+        function lines(arr, fX, fY, dash) {
+          let s = ''; (arr || []).forEach(function (l) {
+            const pts = l.map(function (p) { return fX(p[0]).toFixed(1) + ',' + fY(p[1]).toFixed(1); }).join(' ');
+            s += '<polyline points="' + pts + '" fill="none" stroke="var(--accent)" stroke-width="1.8"' + (dash ? ' stroke-dasharray="5 4"' : '') + ' stroke-linejoin="round"/>';
+          }); return s;
+        }
+        function lbl(x, y, t) { return '<text x="' + x + '" y="' + y + '" text-anchor="middle" style="fill:var(--muted);font-size:10px;font-weight:700;">' + t + '</text>'; }
+        let s = '';
+        s += lbl(Fx0 + fw * u / 2, Fy0 - 6, 'Prospetto');
+        s += lbl(mx + fw * u / 2, Ty0 - 6, 'Pianta');
+        s += lbl(Sx0 + d * u / 2, Fy0 - 6, 'Vista lat. sx');
+        s += lines(spec.front, FX, FZ, false) + lines(spec.frontDash, FX, FZ, true);
+        s += lines(spec.top, TX, TY, false) + lines(spec.topDash, TX, TY, true);
+        s += lines(spec.side, SX, SZ, false) + lines(spec.sideDash, SX, SZ, true);
+        const W = Sx0 + d * u + mx, H = Ty0 + d * u + my;
+        host.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="le tre proiezioni ortogonali">' + s + '</svg>';
+      }
+
+      // prisma triangolare
+      attach3D('rot-prisma', 'rot-prisma-yaw', 'rot-prisma-pitch',
+        [[0, 0, 0], [4, 0, 0], [2, 0, 3], [0, 3, 0], [4, 3, 0], [2, 3, 3]],
+        [[0, 1, 2], [3, 4, 5], [0, 1, 4, 3], [1, 2, 5, 4], [2, 0, 3, 5]]);
+      drawProj('proj-prisma', {
+        fw: 4, fh: 3, d: 3,
+        front: [[[0, 0], [4, 0], [2, 3], [0, 0]]],
+        top: [[[0, 0], [4, 0], [4, 3], [0, 3], [0, 0]], [[2, 0], [2, 3]]],
+        side: [[[0, 0], [3, 0], [3, 3], [0, 3], [0, 0]]]
+      });
+
+      // piramide a base quadrata
+      attach3D('rot-piram', 'rot-piram-yaw', 'rot-piram-pitch',
+        [[0, 0, 0], [4, 0, 0], [4, 4, 0], [0, 4, 0], [2, 2, 4]],
+        [[0, 1, 2, 3], [0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4]]);
+      drawProj('proj-piram', {
+        fw: 4, fh: 4, d: 4,
+        front: [[[0, 0], [4, 0], [2, 4], [0, 0]]],
+        top: [[[0, 0], [4, 0], [4, 4], [0, 4], [0, 0]], [[0, 0], [2, 2]], [[4, 0], [2, 2]], [[4, 4], [2, 2]], [[0, 4], [2, 2]]],
+        side: [[[0, 0], [4, 0], [2, 4], [0, 0]]]
+      });
+
+      // casetta (prisma a base pentagonale)
+      attach3D('rot-casa', 'rot-casa-yaw', 'rot-casa-pitch',
+        [[0, 0, 0], [4, 0, 0], [4, 0, 3], [2, 0, 4], [0, 0, 3], [0, 3, 0], [4, 3, 0], [4, 3, 3], [2, 3, 4], [0, 3, 3]],
+        [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9], [0, 1, 6, 5], [1, 2, 7, 6], [2, 3, 8, 7], [3, 4, 9, 8], [4, 0, 5, 9]]);
+      drawProj('proj-casa', {
+        fw: 4, fh: 4, d: 3,
+        front: [[[0, 0], [4, 0], [4, 3], [2, 4], [0, 3], [0, 0]]],
+        top: [[[0, 0], [4, 0], [4, 3], [0, 3], [0, 0]], [[2, 0], [2, 3]]],
+        side: [[[0, 0], [3, 0], [3, 4], [0, 4], [0, 0]], [[0, 3], [3, 3]]]
+      });
+
+    });
+  </script>
+
+  <!-- Script condivisi -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Che cosa significa la sigla <strong>CAD</strong>?',
+        options: ['Calcolo Automatico dei Dati', 'Computer Aided Design (disegno assistito dal computer)', 'Copia Anche i Disegni', 'Centro Artistico Digitale', 'Codice Ausiliario di Disegno'],
+        correct: 1, explain: 'CAD = Computer Aided Design: la progettazione (o disegno) assistita dal computer.' },
+      { type: 'mc', diff: 'easy', text: 'Perché il computer può aiutarci a disegnare figure geometriche con precisione?',
+        options: ['perché ha una matita più sottile', 'perché sul piano cartesiano ogni forma diventa numeri e formule, e coi numeri il computer è imbattibile', 'perché disegna a caso finché non indovina', 'perché non serve la geometria', 'perché usa il righello'],
+        correct: 1, explain: 'Tradotte le forme in coordinate ed equazioni, calcolarle e ridisegnarle è compito perfetto per una macchina.' },
+      { type: 'mc', diff: 'easy', text: 'Quante viste principali si disegnano di solito nelle <strong>proiezioni ortogonali</strong>?',
+        options: ['una', 'due', 'tre (prospetto, pianta, vista laterale)', 'cinque', 'dipende dal colore'],
+        correct: 2, explain: 'Si guarda l\'oggetto da davanti, dall\'alto e da sinistra: tre viste che insieme lo descrivono senza ambiguità.' },
+      { type: 'mc', diff: 'medium', text: 'Nel metodo europeo, dove va la <strong>pianta</strong> (vista dall\'alto) rispetto al prospetto?',
+        options: ['sopra', 'sotto', 'a sinistra', 'sovrapposta', 'a destra'],
+        correct: 1, explain: 'Nel primo diedro (metodo europeo) la pianta si disegna sotto il prospetto, allineata alla stessa larghezza.' },
+      { type: 'mc', diff: 'medium', text: 'In una proiezione, che cosa indica una linea <strong>tratteggiata</strong>?',
+        options: ['un errore di disegno', 'uno spigolo o un contorno nascosto, che da quella vista non si vede', 'il bordo del foglio', 'una misura in centimetri', 'una linea colorata'],
+        correct: 1, explain: 'Gli spigoli nascosti (dietro il solido) si disegnano tratteggiati, quelli visibili con linea piena.' },
+      { type: 'mc', diff: 'medium', text: 'La vista <strong>dall\'alto</strong> (pianta) di un cilindro appoggiato in piedi è:',
+        options: ['un rettangolo', 'un triangolo', 'un cerchio', 'una L', 'un quadrato'],
+        correct: 2, explain: 'Dall\'alto vedi la sua faccia circolare: un cerchio. Di fronte, invece, sarebbe un rettangolo.' },
+      { type: 'mc', diff: 'medium', text: 'Con quale strumento si disegna oggi, tipicamente, al computer in ambito artistico?',
+        options: ['il compasso elettronico', 'la tavoletta grafica con penna digitale', 'la fotocopiatrice', 'la stampante 3D', 'il proiettore'],
+        correct: 1, explain: 'La tavoletta grafica: una superficie sensibile su cui si traccia con una penna, ma il segno finisce nello schermo.' },
+      { type: 'mc', diff: 'hard', text: 'Qual è un grande <strong>vantaggio</strong> del CAD rispetto al disegno a mano dei geometri di una volta?',
+        options: ['costa sempre di più', 'si può modificare, copiare e riusare il disegno in un istante, senza ridisegnare tutto daccapo', 'serve più carta', 'i disegni sono meno precisi', 'non permette il 3D'],
+        correct: 1, explain: 'Prima ogni copia andava ricalcata a mano; col CAD duplicare e modificare è immediato — anche se questo ha cambiato molti mestieri.' },
+      { type: 'open', diff: 'hard', text: 'Spiega perché anche un disegno artistico complesso e «commovente», realizzato con una tavoletta grafica, dentro il computer è in realtà fatto di <strong>numeri</strong>.',
+        keywords: ['coordinat', 'numer', 'punt', 'pixel', 'formul', 'equazion', 'color', 'curv', 'piano'], requiredMatches: 2,
+        explain: 'Dentro il computer ogni immagine è memorizzata come numeri: coordinate dei punti, curve descritte da equazioni, colori scritti come terne di valori (i pixel). Per quanto poetica appaia, dietro c\'è sempre matematica — come quando abbiamo disegnato un cuore con una funzione.' }
+    ];
+  </script>
+
+</body>
+
+</html>
