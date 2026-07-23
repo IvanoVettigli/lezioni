@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 2 — I sistemi</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.6rem; margin: 1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 640px; margin: 0 auto; }
+    .ckt .lbl { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 12px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .eq-out { font-size: 1.05rem; margin-top: 0.6rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+
+    /* catena di passaggi, con l'operazione annotata a destra */
+    .eqsteps { margin: 0.9rem 0; font-variant-numeric: tabular-nums; }
+    .eqsteps .row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+      padding: 0.3rem 0.7rem; border-left: 3px solid transparent; }
+    .eqsteps .row .eqn { font-size: 1.05rem; }
+    .eqsteps .row .op { color: var(--muted); font-size: 0.85rem; font-style: italic; text-align: right; }
+    .eqsteps .row.hl { background: color-mix(in srgb, var(--accent) 9%, transparent); border-left-color: var(--accent); border-radius: 0 6px 6px 0; }
+    .eqsteps .row.good { background: color-mix(in srgb, #22c55e 10%, transparent); border-left-color: #22c55e; border-radius: 0 6px 6px 0; }
+    .eqsteps .row.bad { background: color-mix(in srgb, #ef4444 12%, transparent); border-left-color: #ef4444; border-radius: 0 6px 6px 0; }
+
+    /* etichette vero/falso e procedure numerate */
+    .tv { display: inline-block; border-radius: 6px; padding: 0.02rem 0.5rem; font-weight: 700; font-size: 0.85rem; }
+    .tv.t { background: color-mix(in srgb, #22c55e 20%, transparent); color: #16a34a; }
+    .tv.f { background: color-mix(in srgb, #ef4444 20%, transparent); color: #dc2626; }
+    .steps-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.4rem 0.9rem; margin: 1rem 0; }
+    .steps-box ol { margin: 0.6rem 0; padding-left: 0; list-style: none; counter-reset: st; }
+    .steps-box li { counter-increment: st; position: relative; padding: 0.35rem 0 0.35rem 2.6rem; border-top: 1px dashed var(--border); }
+    .steps-box li:first-child { border-top: none; }
+    .steps-box li::before { content: counter(st); position: absolute; left: 0; top: 0.35rem;
+      width: 1.9rem; height: 1.9rem; background: var(--accent); color: #fff; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; }
+
+    /* blocchi di codice */
+    .codeblk { background: #0d1117; border: 1px solid var(--border); border-radius: 10px; margin: 0.7rem 0; overflow: hidden; }
+    .codeblk .head { background: #161b22; color: #8b949e; font-family: Consolas, monospace; font-size: 0.78rem;
+      padding: 0.35rem 0.85rem; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; gap: 0.6rem; }
+    .codeblk .head b { color: #d5dae3; font-weight: 700; }
+    .codeblk pre { margin: 0; padding: 0.75rem 1rem; overflow-x: auto; color: #d5dae3;
+      font-family: Consolas, 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6; }
+    .codeblk .kw { color: #ff9ec4; font-weight: 700; }
+    .codeblk .st { color: #a5d6ff; }
+    .codeblk .cm { color: #8b949e; font-style: italic; }
+    .codeblk .nu { color: #ffcf5e; }
+    .codeblk .fn { color: #7ee787; font-weight: 600; }
+
+    /* rette e schemi dei segni */
+    .numline, .sysline, .signchart { margin: 0.6rem 0 0.2rem; }
+    .numline svg { display: block; width: 100%; height: auto; max-width: 560px; }
+    .sysline svg { display: block; width: 100%; height: auto; max-width: 580px; }
+    .signchart svg { display: block; width: 100%; height: auto; max-width: 600px; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent);
+      border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Secondo anno · Lezione 2</div>
+    <h1>I sistemi</h1>
+    <p>Quando una sola equazione non basta: risolverne tante — e tutte insieme</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Secondo anno</a>
+    <span class="sep">/</span> I sistemi
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Nella lezione 1 abbiamo imparato a risolvere <em>una</em> equazione (o
+      disequazione) con <em>una</em> incognita. Ma la vita reale è più intrecciata: spesso ci sono più cose che non
+      conosciamo, legate tra loro da più condizioni <strong>tutte vere allo stesso tempo</strong>. Non basterà più
+      risolvere una sola equazione: dovremo risolverle <strong>tutte insieme</strong>. Benvenuti nel mondo dei
+      <strong>sistemi</strong>.
+    </div>
+
+    <!-- 1 — CHE COS'È UN SISTEMA -->
+    <section id="sec1">
+      <h2>1. Che cos'è un sistema</h2>
+
+      <p>Partiamo da un piccolo giallo familiare. <em>Un padre e suo figlio insieme hanno $40$ anni; il padre ne ha
+        $30$ più del figlio. Quanti anni ha ciascuno?</em> Chiamiamo $p$ gli anni del padre e $f$ quelli del figlio.
+        La prima informazione dice $p + f = 40$; la seconda dice $p - f = 30$. Ma attenzione:</p>
+
+      <p><strong>Una sola di queste equazioni non basta.</strong> Se sapessi soltanto che $p + f = 40$, il padre
+        potrebbe avere $35$ anni e il figlio $5$, oppure $30$ e $10$, oppure $39$ e $1$... <strong>infinite</strong>
+        possibilità. Serve la <em>seconda</em> condizione per inchiodare la risposta. Due incognite, due equazioni:
+        ecco un <strong>sistema</strong>, che scriviamo con una <strong>graffa</strong> a legare le equazioni.</p>
+
+      <div class="formula-box">
+        $$\begin{cases} p + f = 40 \\ p - f = 30 \end{cases}$$
+        <p class="formula-note">La graffa si legge «e»: cerchiamo i valori di $p$ e $f$ che rendono vere la prima
+          equazione <strong>e</strong> la seconda, contemporaneamente.</p>
+      </div>
+
+      <div class="definition">
+        Un <strong>sistema</strong> è un insieme di due o più equazioni (nelle stesse incognite) che devono valere
+        <strong>tutte contemporaneamente</strong>. Una <strong>soluzione</strong> del sistema è una scelta di valori
+        per le incognite che soddisfa <strong>tutte</strong> le equazioni insieme. Di regola servono
+        <strong>tante equazioni quante sono le incognite</strong>.
+      </div>
+
+      <p>Perché «tante equazioni quante incognite»? C'è una ragione geometrica bellissima. Un'equazione di primo grado
+        in due incognite, come $p + f = 40$, disegnata su un piano rappresenta una <strong>retta</strong> (il
+        <em>perché</em> venga fuori proprio una retta ci sarà più chiaro nelle prossime lezioni, quando studieremo il
+        <strong>piano cartesiano</strong>): ogni punto della retta è una soluzione, e i punti sono infiniti. Due
+        equazioni sono <strong>due rette</strong>, e la soluzione del sistema è il loro <strong>punto
+        d'incontro</strong>.</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 210" aria-label="Tre casi: due rette che si incrociano in un punto (determinato), due rette parallele (impossibile), due rette sovrapposte (indeterminato)">
+        <!-- determinato -->
+        <rect x="30" y="30" width="160" height="130" rx="8" fill="none" stroke="var(--border)" stroke-width="1"/>
+        <line x1="45" y1="145" x2="175" y2="50" stroke="var(--accent)" stroke-width="2.5"/>
+        <line x1="45" y1="55" x2="175" y2="150" stroke="var(--magenta)" stroke-width="2.5"/>
+        <circle cx="110" cy="100" r="5" fill="var(--gold)"/>
+        <text x="110" y="182" text-anchor="middle" class="lbl">determinato</text>
+        <text x="110" y="200" text-anchor="middle" class="lbl-s">1 soluzione (si incrociano)</text>
+        <!-- impossibile -->
+        <rect x="240" y="30" width="160" height="130" rx="8" fill="none" stroke="var(--border)" stroke-width="1"/>
+        <line x1="255" y1="140" x2="385" y2="55" stroke="var(--accent)" stroke-width="2.5"/>
+        <line x1="255" y1="160" x2="385" y2="75" stroke="var(--magenta)" stroke-width="2.5"/>
+        <text x="320" y="182" text-anchor="middle" class="lbl">impossibile</text>
+        <text x="320" y="200" text-anchor="middle" class="lbl-s">nessuna (parallele)</text>
+        <!-- indeterminato -->
+        <rect x="450" y="30" width="160" height="130" rx="8" fill="none" stroke="var(--border)" stroke-width="1"/>
+        <line x1="465" y1="150" x2="595" y2="55" stroke="var(--accent)" stroke-width="5" opacity="0.5"/>
+        <line x1="465" y1="150" x2="595" y2="55" stroke="var(--magenta)" stroke-width="2" stroke-dasharray="6 5"/>
+        <text x="530" y="182" text-anchor="middle" class="lbl">indeterminato</text>
+        <text x="530" y="200" text-anchor="middle" class="lbl-s">infinite (sovrapposte)</text>
+      </svg></div>
+
+      <p>Da qui i <strong>tre destini</strong> di un sistema — gli stessi tre nomi delle equazioni della lezione 1,
+        non è un caso:</p>
+
+      <div class="two-col">
+        <div class="formula-box">
+          <div class="formula-title">① Determinato</div>
+          <p>Le rette si <strong>incrociano</strong> in un punto: <strong>una sola</strong> soluzione.</p>
+          $$\begin{cases} x + y = 10 \\ x - y = 4 \end{cases} \;\Rightarrow\; (7,\,3)$$
+        </div>
+        <div class="formula-box">
+          <div class="formula-title">② Impossibile</div>
+          <p>Rette <strong>parallele</strong>: nessun punto in comune, <strong>nessuna</strong> soluzione.</p>
+          $$\begin{cases} x + y = 5 \\ x + y = 8 \end{cases} \;\Rightarrow\; \varnothing$$
+        </div>
+        <div class="formula-box">
+          <div class="formula-title">③ Indeterminato</div>
+          <p>La stessa retta scritta due volte: <strong>infinite</strong> soluzioni.</p>
+          $$\begin{cases} x + y = 5 \\ 2x + 2y = 10 \end{cases}$$
+        </div>
+      </div>
+
+      <p>Nell'impossibile, le due equazioni si <em>contraddicono</em> ($x+y$ non può valere $5$ e $8$ insieme); nell'
+        indeterminato, la seconda equazione è solo la prima <em>travestita</em> (moltiplicata per $2$): non aggiunge
+        nessuna informazione nuova. Nella stragrande maggioranza dei casi, però, avremo a che fare con sistemi
+        <strong>determinati</strong> — ed è ora di imparare a risolverli.</p>
+    </section>
+
+    <!-- 2 — METODO DI SOSTITUZIONE -->
+    <section id="sec2">
+      <h2>2. Il metodo di sostituzione</h2>
+
+      <p>Il metodo più <strong>intuitivo</strong> per risolvere un sistema si chiama <strong>sostituzione</strong>.
+        L'idea è furba: se da un'equazione ricavo «una incognita = tutto il resto», posso <strong>infilare</strong>
+        quel «tutto il resto» al posto dell'incognita nelle altre equazioni. Così faccio <em>sparire</em>
+        un'incognita per volta, finché non ne resta una sola — e quella la sappiamo già risolvere (lezione 1!).</p>
+
+      <div class="steps-box">
+        <strong>La ricetta in 6 passi.</strong>
+        <ol>
+          <li>Scelgo <strong>una incognita</strong> in <strong>una</strong> delle equazioni (conviene sceglierla
+            dove ha coefficiente $1$, così i conti sono più puliti).</li>
+          <li><strong>Risolvo quell'equazione rispetto a quell'incognita</strong>: la isolo, ottenendo «incognita
+            $=$ tutto il resto».</li>
+          <li><strong>Sostituisco</strong> quel «tutto il resto» al posto dell'incognita in <strong>tutte le altre</strong>
+            equazioni.</li>
+          <li><strong>Risolvo</strong> le altre equazioni: ora hanno un'incognita in meno.</li>
+          <li>Trovato un <strong>valore preciso</strong> per un'incognita, lo <strong>risostituisco</strong> nella
+            relazione del passo 2.</li>
+          <li><strong>Calcolo</strong> anche il valore della prima incognita. Fine: ho tutti i valori.</li>
+        </ol>
+      </div>
+
+      <p>Proviamola sul giallo del padre e del figlio, $\begin{cases} p + f = 40 \\ p - f = 30 \end{cases}$</p>
+
+      <div class="eqsteps">
+        <div class="row hl"><span class="eqn">dalla 2ª: $\;p = 30 + f$</span><span class="op">passi 1-2: isolo $p$ (ha coefficiente 1)</span></div>
+        <div class="row"><span class="eqn">$(30 + f) + f = 40$</span><span class="op">passo 3: sostituisco $p$ nella 1ª equazione</span></div>
+        <div class="row"><span class="eqn">$30 + 2f = 40$</span><span class="op">passo 4: risolvo...</span></div>
+        <div class="row good"><span class="eqn">$f = 5$</span><span class="op">...il figlio ha 5 anni</span></div>
+        <div class="row"><span class="eqn">$p = 30 + 5$</span><span class="op">passi 5-6: risostituisco nel passo 2</span></div>
+        <div class="row good"><span class="eqn">$p = 35$</span><span class="op">il padre ha 35 anni</span></div>
+      </div>
+
+      <p>Soluzione: $p = 35$, $f = 5$. <strong>Controllo sempre</strong> nelle equazioni di partenza: $35 + 5 = 40$
+        ✓ e $35 - 5 = 30$ ✓. Perfetto. La soluzione di un sistema si scrive come <strong>coppia ordinata</strong>:
+        $(p,\,f) = (35,\,5)$.</p>
+
+      <div class="note">
+        <strong>Ogni singolo passo è facile</strong> — sono tutte cose della lezione 1. La difficoltà, semmai, sta nel
+        <em>non perdersi</em> quando i numeri si fanno brutti o le incognite aumentano. L'unico modo per prenderci la
+        mano è... farne un po'. Andiamo.
+      </div>
+    </section>
+
+    <!-- 3 — ESERCITAZIONE: 10 SISTEMI -->
+    <section id="sec3">
+      <h2>3. Esercitazione: 10 sistemi per sostituzione</h2>
+      <p>Difficoltà crescente: i primi sei sono $2 \times 2$ (due equazioni, due incognite), poi si sale a
+        $3 \times 3$ e, alla fine, addirittura a un $4 \times 4$. Prova prima da solo, poi controlla. Tieni d'occhio
+        una cosa: <strong>più il sistema è grande, più il metodo diventa lungo</strong>. Ne riparleremo.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema 1</span><span class="difficulty easy">Facile</span></div>
+        <p>Due numeri hanno somma $10$ e differenza $4$. $$\begin{cases} x + y = 10 \\ x - y = 4 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$x = 10 - y$</span><span class="op">isolo $x$ dalla 1ª</span></div>
+            <div class="row"><span class="eqn">$(10 - y) - y = 4$</span><span class="op">sostituisco nella 2ª</span></div>
+            <div class="row"><span class="eqn">$10 - 2y = 4 \;\Rightarrow\; y = 3$</span><span class="op">risolvo</span></div>
+            <div class="row good"><span class="eqn">$x = 10 - 3 = 7$</span><span class="op">risostituisco</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Determinato</span><span class="result-value">$(x,\,y) = (7,\,3)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema 2</span><span class="difficulty easy">Facile</span></div>
+        <p>$$\begin{cases} y = 2x \\ x + y = 12 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$y = 2x$</span><span class="op">la 1ª è già pronta!</span></div>
+            <div class="row"><span class="eqn">$x + 2x = 12$</span><span class="op">sostituisco $y$ nella 2ª</span></div>
+            <div class="row"><span class="eqn">$3x = 12 \;\Rightarrow\; x = 4$</span><span class="op">risolvo</span></div>
+            <div class="row good"><span class="eqn">$y = 2 \cdot 4 = 8$</span><span class="op">risostituisco</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Determinato</span><span class="result-value">$(4,\,8)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema 3</span><span class="difficulty easy">Facile</span></div>
+        <p>$$\begin{cases} 2x + y = 11 \\ x + 3y = 13 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$y = 11 - 2x$</span><span class="op">isolo $y$ dalla 1ª (ha coeff. 1)</span></div>
+            <div class="row"><span class="eqn">$x + 3(11 - 2x) = 13$</span><span class="op">sostituisco nella 2ª</span></div>
+            <div class="row"><span class="eqn">$x + 33 - 6x = 13 \;\Rightarrow\; -5x = -20$</span><span class="op">risolvo</span></div>
+            <div class="row"><span class="eqn">$x = 4$</span><span class="op"></span></div>
+            <div class="row good"><span class="eqn">$y = 11 - 8 = 3$</span><span class="op">risostituisco</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Determinato</span><span class="result-value">$(4,\,3)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema 4</span><span class="difficulty medium">Medio</span></div>
+        <p>$$\begin{cases} 3x - y = 5 \\ x + y = 7 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$y = 7 - x$</span><span class="op">isolo $y$ dalla 2ª</span></div>
+            <div class="row"><span class="eqn">$3x - (7 - x) = 5$</span><span class="op">sostituisco nella 1ª (occhio al meno!)</span></div>
+            <div class="row"><span class="eqn">$4x - 7 = 5 \;\Rightarrow\; x = 3$</span><span class="op">risolvo</span></div>
+            <div class="row good"><span class="eqn">$y = 7 - 3 = 4$</span><span class="op">risostituisco</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Determinato</span><span class="result-value">$(3,\,4)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema 5</span><span class="difficulty medium">Medio</span></div>
+        <p>$$\begin{cases} 2x + 3y = 12 \\ x - y = 1 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$x = 1 + y$</span><span class="op">isolo $x$ dalla 2ª</span></div>
+            <div class="row"><span class="eqn">$2(1 + y) + 3y = 12$</span><span class="op">sostituisco nella 1ª</span></div>
+            <div class="row"><span class="eqn">$2 + 5y = 12 \;\Rightarrow\; y = 2$</span><span class="op">risolvo</span></div>
+            <div class="row good"><span class="eqn">$x = 1 + 2 = 3$</span><span class="op">risostituisco</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Determinato</span><span class="result-value">$(3,\,2)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema 6</span><span class="difficulty medium">Medio</span></div>
+        <p>$$\begin{cases} \dfrac{x}{2} + y = 5 \\[4pt] x - y = 1 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$x = 1 + y$</span><span class="op">isolo $x$ dalla 2ª</span></div>
+            <div class="row"><span class="eqn">$\dfrac{1 + y}{2} + y = 5$</span><span class="op">sostituisco nella 1ª</span></div>
+            <div class="row"><span class="eqn">$(1 + y) + 2y = 10$</span><span class="op">moltiplico per $2$</span></div>
+            <div class="row"><span class="eqn">$1 + 3y = 10 \;\Rightarrow\; y = 3$</span><span class="op">risolvo</span></div>
+            <div class="row good"><span class="eqn">$x = 1 + 3 = 4$</span><span class="op">risostituisco</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Determinato</span><span class="result-value">$(4,\,3)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema 7</span><span class="difficulty hard">Difficile</span></div>
+        <p>Tre incognite, tre equazioni. $$\begin{cases} x + y + z = 6 \\ x - y + z = 2 \\ x + y - z = 0 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$x = 6 - y - z$</span><span class="op">isolo $x$ dalla 1ª</span></div>
+            <div class="row"><span class="eqn">$(6 - y - z) - y + z = 2$</span><span class="op">sostituisco nella 2ª</span></div>
+            <div class="row"><span class="eqn">$6 - 2y = 2 \;\Rightarrow\; y = 2$</span><span class="op">la $z$ si è cancellata!</span></div>
+            <div class="row"><span class="eqn">$(6 - y - z) + y - z = 0$</span><span class="op">sostituisco nella 3ª</span></div>
+            <div class="row"><span class="eqn">$6 - 2z = 0 \;\Rightarrow\; z = 3$</span><span class="op">stavolta si cancella la $y$</span></div>
+            <div class="row good"><span class="eqn">$x = 6 - 2 - 3 = 1$</span><span class="op">risostituisco</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Determinato</span><span class="result-value">$(x,\,y,\,z) = (1,\,2,\,3)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema 8</span><span class="difficulty hard">Difficile</span></div>
+        <p>$$\begin{cases} x + y = 5 \\ y + z = 7 \\ x + z = 6 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$x = 5 - y \quad$ e $\quad z = 7 - y$</span><span class="op">isolo $x$ e $z$ dalle prime due</span></div>
+            <div class="row"><span class="eqn">$(5 - y) + (7 - y) = 6$</span><span class="op">sostituisco entrambe nella 3ª</span></div>
+            <div class="row"><span class="eqn">$12 - 2y = 6 \;\Rightarrow\; y = 3$</span><span class="op">risolvo</span></div>
+            <div class="row good"><span class="eqn">$x = 5 - 3 = 2, \quad z = 7 - 3 = 4$</span><span class="op">risostituisco</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Determinato</span><span class="result-value">$(2,\,3,\,4)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema 9</span><span class="difficulty hard">Difficile</span></div>
+        <p>$$\begin{cases} 2x + y + z = 9 \\ x + 2y - z = 3 \\ x - y + 3z = 8 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$x = 3 - 2y + z$</span><span class="op">isolo $x$ dalla 2ª (coeff. 1)</span></div>
+            <div class="row"><span class="eqn">$2(3 - 2y + z) + y + z = 9$</span><span class="op">sostituisco nella 1ª</span></div>
+            <div class="row"><span class="eqn">$-3y + 3z = 3 \;\Rightarrow\; z = y + 1$</span><span class="op">semplifico</span></div>
+            <div class="row"><span class="eqn">$(3 - 2y + z) - y + 3z = 8$</span><span class="op">sostituisco nella 3ª</span></div>
+            <div class="row"><span class="eqn">$-3y + 4z = 5$</span><span class="op">e con $z = y + 1$...</span></div>
+            <div class="row"><span class="eqn">$-3y + 4(y + 1) = 5 \;\Rightarrow\; y = 1$</span><span class="op">risolvo</span></div>
+            <div class="row good"><span class="eqn">$z = 2, \quad x = 3 - 2 + 2 = 3$</span><span class="op">risostituisco a ritroso</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Determinato</span><span class="result-value">$(3,\,1,\,2)$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema 10</span><span class="difficulty hard">Difficile</span></div>
+        <p>Il gran finale: <strong>quattro</strong> equazioni, <strong>quattro</strong> incognite.
+          $$\begin{cases} x + y + z + t = 10 \\ x + y + z - t = 2 \\ x + y - z + t = 4 \\ x - y + z + t = 6 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$x = 10 - y - z - t$</span><span class="op">isolo $x$ dalla 1ª</span></div>
+            <div class="row"><span class="eqn">$(10 - y - z - t) + y + z - t = 2$</span><span class="op">sostituisco nella 2ª</span></div>
+            <div class="row"><span class="eqn">$10 - 2t = 2 \;\Rightarrow\; t = 4$</span><span class="op">restano solo i $t$</span></div>
+            <div class="row"><span class="eqn">nella 3ª: $\;10 - 2z = 4 \;\Rightarrow\; z = 3$</span><span class="op">sostituisco $x$ nella 3ª</span></div>
+            <div class="row"><span class="eqn">nella 4ª: $\;10 - 2y = 6 \;\Rightarrow\; y = 2$</span><span class="op">sostituisco $x$ nella 4ª</span></div>
+            <div class="row good"><span class="eqn">$x = 10 - 2 - 3 - 4 = 1$</span><span class="op">risostituisco</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Determinato</span><span class="result-value">$(x,\,y,\,z,\,t) = (1,\,2,\,3,\,4)$</span></div>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Avrai notato una cosa.</strong> Ogni singolo passaggio è facile, ma con $3$ o $4$ incognite i
+        passaggi si <strong>moltiplicano</strong>, e la probabilità di sbagliare un segno cresce. Qui i numeri erano
+        gentili; con coefficienti brutti, la sostituzione diventa davvero <strong>prolissa</strong>. Per questo, nei
+        secoli, si sono cercati metodi più rapidi. Ne vediamo tre.
+      </div>
+    </section>
+
+    <!-- 4 — SOTTRAZIONE E CONFRONTO -->
+    <section id="sec4">
+      <h2>4. Due scorciatoie: sottrazione e confronto</h2>
+      <p>Per i sistemi $2 \times 2$, quando le equazioni hanno una forma "fortunata", ci sono due metodi più
+        rapidi della sostituzione. Attenzione: sono comodi solo in <strong>casi specifici</strong> — ma quando
+        capitano, sono un regalo.</p>
+
+      <h3>4.1 — Il metodo di sottrazione (o riduzione)</h3>
+      <p>L'idea: <strong>allineo</strong> le due equazioni una sotto l'altra e faccio in modo che
+        <strong>un'incognita se ne vada da sola</strong>. Se ha lo <em>stesso</em> coefficiente in entrambe, le
+        <strong>sottraggo</strong> e sparisce; se ha coefficienti <em>opposti</em>, le <strong>sommo</strong>.</p>
+
+      <div class="two-col">
+        <div class="exercise" style="margin:0;">
+          <div class="ex-header"><span class="ex-title">Esempio A — si sottrae</span></div>
+          <p>$$\begin{cases} 2x + 3y = 13 \\ 2x + y = 7 \end{cases}$$</p>
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$(2x + 3y) - (2x + y) = 13 - 7$</span><span class="op">sottraggo: il $2x$ sparisce</span></div>
+            <div class="row"><span class="eqn">$2y = 6 \;\Rightarrow\; y = 3$</span><span class="op"></span></div>
+            <div class="row good"><span class="eqn">$2x + 3 = 7 \;\Rightarrow\; x = 2$</span><span class="op">rimetto $y$ in una equazione</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$(2,\,3)$</span></div>
+        </div>
+        <div class="exercise" style="margin:0;">
+          <div class="ex-header"><span class="ex-title">Esempio B — si somma</span></div>
+          <p>$$\begin{cases} 4x + 3y = 18 \\ 4x - 3y = 6 \end{cases}$$</p>
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$(4x + 3y) + (4x - 3y) = 18 + 6$</span><span class="op">sommo: i $\pm 3y$ si elidono</span></div>
+            <div class="row"><span class="eqn">$8x = 24 \;\Rightarrow\; x = 3$</span><span class="op"></span></div>
+            <div class="row good"><span class="eqn">$12 + 3y = 18 \;\Rightarrow\; y = 2$</span><span class="op">rimetto $x$ in una equazione</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$(3,\,2)$</span></div>
+        </div>
+      </div>
+      <p class="formula-note">Funziona a colpo d'occhio quando un'incognita ha già coefficienti uguali o opposti.
+        (Se non li ha, si possono <em>rendere</em> uguali moltiplicando un'equazione per un numero — ed è il seme del
+        metodo generale di eliminazione che vedrete più avanti.)</p>
+
+      <h3>4.2 — Il metodo del confronto</h3>
+      <p>L'idea è nel nome: <strong>con-fronto</strong>, «metto a confronto». Ricavo la <strong>stessa</strong>
+        incognita da <em>tutte e due</em> le equazioni, e poiché le due espressioni valgono la stessa cosa, le
+        <strong>eguaglio</strong>.</p>
+
+      <div class="two-col">
+        <div class="exercise" style="margin:0;">
+          <div class="ex-header"><span class="ex-title">Esempio A</span></div>
+          <p>$$\begin{cases} y = 2x + 1 \\ y = -x + 7 \end{cases}$$</p>
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$2x + 1 = -x + 7$</span><span class="op">le due $y$ sono uguali fra loro</span></div>
+            <div class="row"><span class="eqn">$3x = 6 \;\Rightarrow\; x = 2$</span><span class="op"></span></div>
+            <div class="row good"><span class="eqn">$y = 2 \cdot 2 + 1 = 5$</span><span class="op"></span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$(2,\,5)$</span></div>
+        </div>
+        <div class="exercise" style="margin:0;">
+          <div class="ex-header"><span class="ex-title">Esempio B</span></div>
+          <p>$$\begin{cases} x = 3y - 2 \\ x = y + 4 \end{cases}$$</p>
+          <div class="eqsteps">
+            <div class="row hl"><span class="eqn">$3y - 2 = y + 4$</span><span class="op">le due $x$ sono uguali fra loro</span></div>
+            <div class="row"><span class="eqn">$2y = 6 \;\Rightarrow\; y = 3$</span><span class="op"></span></div>
+            <div class="row good"><span class="eqn">$x = 3 + 4 = 7$</span><span class="op"></span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$(7,\,3)$</span></div>
+        </div>
+      </div>
+      <p class="formula-note">È il metodo perfetto quando le equazioni sono già nella forma «incognita $=$ ...»
+        (com'era nel Sistema 2 dell'esercitazione).</p>
+    </section>
+
+    <!-- 5 — CRAMER -->
+    <section id="sec5">
+      <h2>5. Il metodo di Cramer (e un assaggio di programmazione)</h2>
+
+      <p>La sostituzione funziona <em>sempre</em> ma è prolissa; sottrazione e confronto sono rapidi solo in casi
+        fortunati. Esiste un metodo che funziona <strong>sempre</strong> ed è <strong>completamente meccanico</strong>
+        — cioè fatto di formule da applicare senza pensare, ideale per una macchina. Si chiama <strong>metodo di
+        Cramer</strong>. E qui parte la domanda: <em>conoscete qualcuno che sa programmare in Python?</em> Perché
+        Cramer è una gioia da programmare — ci arriviamo tra un attimo.</p>
+
+      <h3>5.1 — Le formule (per un sistema 2×2)</h3>
+      <p>Preso il sistema $\;\begin{cases} a_1 x + b_1 y = c_1 \\ a_2 x + b_2 y = c_2 \end{cases}$, tutto ruota
+        attorno a un numero, il <strong>determinante</strong>, che si calcola da una tabella $2 \times 2$ come
+        «prodotto della diagonale <em>meno</em> prodotto dell'antidiagonale»:</p>
+
+      <div class="formula-box">
+        $$D = \begin{vmatrix} a_1 & b_1 \\ a_2 & b_2 \end{vmatrix} = a_1 b_2 - a_2 b_1$$
+        <p class="formula-note">$D$ usa solo i coefficienti delle incognite. Se $D = 0$ il sistema
+          <strong>non</strong> è determinato (è impossibile oppure indeterminato).</p>
+      </div>
+
+      <p>Poi si costruiscono altri due determinanti, $D_x$ e $D_y$, sostituendo nella tabella la colonna
+        dell'incognita con la colonna dei <strong>termini noti</strong> $c$:</p>
+
+      <div class="formula-box">
+        $$D_x = \begin{vmatrix} c_1 & b_1 \\ c_2 & b_2 \end{vmatrix} = c_1 b_2 - c_2 b_1
+          \qquad\qquad
+          D_y = \begin{vmatrix} a_1 & c_1 \\ a_2 & c_2 \end{vmatrix} = a_1 c_2 - a_2 c_1$$
+        $$\boxed{\; x = \dfrac{D_x}{D} \qquad y = \dfrac{D_y}{D} \;}$$
+      </div>
+
+      <p>Tutto qui: tre determinanti e due divisioni. Non spieghiamo <em>perché</em> funziona (i curiosi cerchino
+        online «dimostrazione regola di Cramer»): a noi interessa <strong>saperlo applicare</strong> — e poi farlo
+        fare al computer.</p>
+
+      <div class="two-col">
+        <div class="exercise" style="margin:0;">
+          <div class="ex-header"><span class="ex-title">Esempio A</span></div>
+          <p>$$\begin{cases} 2x + 3y = 8 \\ x - y = -1 \end{cases}$$</p>
+          <div class="eqsteps">
+            <div class="row"><span class="eqn">$D = 2 \cdot (-1) - 1 \cdot 3 = -5$</span><span class="op">diagonale − antidiagonale</span></div>
+            <div class="row"><span class="eqn">$D_x = 8 \cdot (-1) - (-1) \cdot 3 = -5$</span><span class="op">colonna $x \to$ termini noti</span></div>
+            <div class="row"><span class="eqn">$D_y = 2 \cdot (-1) - 1 \cdot 8 = -10$</span><span class="op">colonna $y \to$ termini noti</span></div>
+            <div class="row good"><span class="eqn">$x = \dfrac{-5}{-5} = 1, \quad y = \dfrac{-10}{-5} = 2$</span><span class="op"></span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$(1,\,2)$</span></div>
+        </div>
+        <div class="exercise" style="margin:0;">
+          <div class="ex-header"><span class="ex-title">Esempio B</span></div>
+          <p>$$\begin{cases} 3x + 2y = 12 \\ x + 4y = 14 \end{cases}$$</p>
+          <div class="eqsteps">
+            <div class="row"><span class="eqn">$D = 3 \cdot 4 - 1 \cdot 2 = 10$</span><span class="op"></span></div>
+            <div class="row"><span class="eqn">$D_x = 12 \cdot 4 - 14 \cdot 2 = 20$</span><span class="op"></span></div>
+            <div class="row"><span class="eqn">$D_y = 3 \cdot 14 - 1 \cdot 12 = 30$</span><span class="op"></span></div>
+            <div class="row good"><span class="eqn">$x = \dfrac{20}{10} = 2, \quad y = \dfrac{30}{10} = 3$</span><span class="op"></span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$(2,\,3)$</span></div>
+        </div>
+      </div>
+
+      <h3>5.2 — E per i sistemi più grandi? Cramer n×n</h3>
+      <p>La cosa più bella di Cramer è che la ricetta <strong>non cambia mai</strong>, qualunque sia la dimensione.
+        Per un sistema di $n$ equazioni in $n$ incognite $x_1, x_2, \ldots, x_n$ le formule sono le stesse:</p>
+
+      <div class="formula-box">
+        $$x_1 = \frac{D_{x_1}}{D}, \qquad x_2 = \frac{D_{x_2}}{D}, \qquad \ldots \qquad x_n = \frac{D_{x_n}}{D}$$
+        <p class="formula-note">$D$ è il determinante della matrice dei coefficienti; ogni $D_{x_i}$ si ottiene
+          sostituendo la colonna $i$-esima con i termini noti. Serve sempre $D \ne 0$. Rispetto al $2 \times 2$
+          cambia una cosa sola: <strong>quanto è grande la tabella di cui calcolare il determinante</strong>.</p>
+      </div>
+
+      <p>E allora la vera domanda diventa una sola: <strong>come si calcola il determinante di una matrice più
+        grande di $2 \times 2$?</strong> La risposta è un'idea elegantissima: si <strong>scompone</strong> il
+        determinante grande in tanti determinanti più piccoli, che sappiamo già affrontare.</p>
+
+      <h4>Il determinante di un 3×3</h4>
+      <p>Si sceglie una riga (di solito la prima) e la si «percorre». Ogni elemento della riga si moltiplica per il
+        determinante $2 \times 2$ che rimane <strong>cancellando la sua riga e la sua colonna</strong> (quel
+        $2 \times 2$ si chiama <em>minore</em>). E i segni si <strong>alternano</strong>: $+, -, +$.</p>
+
+      <div class="formula-box">
+        $$\begin{vmatrix} a_1 & b_1 & c_1 \\ a_2 & b_2 & c_2 \\ a_3 & b_3 & c_3 \end{vmatrix}
+          = a_1 \begin{vmatrix} b_2 & c_2 \\ b_3 & c_3 \end{vmatrix}
+          - b_1 \begin{vmatrix} a_2 & c_2 \\ a_3 & c_3 \end{vmatrix}
+          + c_1 \begin{vmatrix} a_2 & b_2 \\ a_3 & b_3 \end{vmatrix}$$
+        <p class="formula-note">Tre determinanti $2 \times 2$ — e quelli li sappiamo già fare («diagonale meno
+          antidiagonale»). Occhio ai segni $+ \; - \; +$.</p>
+      </div>
+
+      <p>Proviamo con una matrice vera: quella dei coefficienti del <strong>Sistema 9</strong> dell'esercitazione.</p>
+
+      <div class="eqsteps">
+        <div class="row"><span class="eqn">$\begin{vmatrix} 2 & 1 & 1 \\ 1 & 2 & -1 \\ 1 & -1 & 3 \end{vmatrix}$</span><span class="op">sviluppo lungo la prima riga</span></div>
+        <div class="row"><span class="eqn">$= 2\begin{vmatrix} 2 & -1 \\ -1 & 3 \end{vmatrix} - 1\begin{vmatrix} 1 & -1 \\ 1 & 3 \end{vmatrix} + 1\begin{vmatrix} 1 & 2 \\ 1 & -1 \end{vmatrix}$</span><span class="op">cancello riga e colonna di ogni elemento</span></div>
+        <div class="row"><span class="eqn">$= 2(6 - 1) - 1(3 + 1) + 1(-1 - 2)$</span><span class="op">calcolo i tre $2 \times 2$</span></div>
+        <div class="row good"><span class="eqn">$= 10 - 4 - 3 = 3$</span><span class="op">il determinante vale $3$</span></div>
+      </div>
+
+      <p>Da qui Cramer prosegue <em>identico</em> al caso $2 \times 2$: per trovare $x$ si calcola $D_x$ sostituendo
+        la <strong>prima colonna</strong> con i termini noti $(9,\,3,\,8)$, e viene $D_x = 9$; quindi
+        $x = \dfrac{D_x}{D} = \dfrac{9}{3} = 3$. (È proprio la soluzione $(3,\,1,\,2)$ che avevamo trovato per
+        sostituzione: stessa risposta, strada completamente diversa.)</p>
+
+      <h4>E per un n×n qualsiasi?</h4>
+      <p>Lo stesso identico gioco, a cascata. Il determinante di una matrice $n \times n$ si riscrive come somma di
+        $n$ determinanti $(n-1) \times (n-1)$ (con i segni alternati); ognuno di quelli si spezza in determinanti
+        ancora più piccoli; e così via, <strong>finché non si arriva ai $2 \times 2$</strong>. Un problema grande
+        risolto spezzandolo, gradino dopo gradino, in copie più piccole di sé stesso — ti ricorda qualcosa? È la
+        stessa idea della Torre di Hanoi (informatica, lezione 12).</p>
+
+      <div class="curiosita">
+        <strong>Bello in teoria, un incubo in pratica.</strong> C'è però un problema: questa scomposizione
+        <strong>esplode</strong>. Un $3 \times 3$ sono $3$ determinanti $2 \times 2$; un $4 \times 4$ ne fa
+        $4 \times 3 = 12$; un $5 \times 5$ ben $60$; un $10 \times 10$ <strong>oltre un milione</strong>! Calcolarli
+        a mano diventa impossibile in un lampo. Ed è esattamente il tipo di lavoro noioso, ripetitivo e meccanico in
+        cui il <strong>computer</strong> ci stravince. Facciamoglielo fare.
+      </div>
+
+      <h3>5.3 — Facciamolo fare a Python</h3>
+      <p>Ricordate il laboratorio di Python su Colab dell'anno scorso (informatica, lezione 12)? È il momento di
+        rispolverarlo. Costruiamo lo script <strong>un pezzo alla volta</strong>: prima capiamo che cos'è una
+        funzione, poi scriviamo la funzione che calcola il determinante, poi quella che applica Cramer, e infine le
+        montiamo insieme. Farlo a pezzi non è pignoleria: è <em>esattamente</em> come si programma sul serio — un
+        mattoncino per volta, controllando che ognuno funzioni prima di passare al successivo.</p>
+
+      <h4>Prima di tutto: che cos'è una funzione?</h4>
+      <p>Una <strong>funzione</strong>, in Python, è un piccolo programma con un <strong>nome</strong>: riceve dei
+        dati in ingresso (i <strong>parametri</strong>) e <strong>restituisce</strong> un risultato. L'avete già
+        usata senza saperlo — <code class="inline-code">print(...)</code> è una funzione! — ma possiamo anche
+        costruircene di nostre. La struttura è sempre questa:</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>la struttura di una funzione</b></span></div>
+        <pre><span class="kw">def</span> <span class="fn">nome_funzione</span>(parametri):
+    <span class="cm"># corpo: le istruzioni, rientrate (indentate)</span>
+    <span class="kw">return</span> risultato       <span class="cm"># il valore che la funzione "consegna"</span></pre>
+      </div>
+
+      <p>Le <strong>parole chiave</strong> sono due: <code class="inline-code">def</code> (dall'inglese
+        <em>define</em>, «definisci»: annuncia che sto creando una funzione) e <code class="inline-code">return</code>
+        («restituisci»: dice quale valore mandare indietro). Fai attenzione ai <strong>due punti</strong> e al
+        <strong>rientro</strong> (l'indentazione della lezione 12: in Python è ciò che dice «queste righe stanno
+        <em>dentro</em> la funzione»). Un esempio banale:</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>esempio</b></span><span>una funzione che calcola l'area di un rettangolo</span></div>
+        <pre><span class="kw">def</span> <span class="fn">area_rettangolo</span>(base, altezza):
+    <span class="kw">return</span> base * altezza
+
+<span class="fn">print</span>(<span class="fn">area_rettangolo</span>(<span class="nu">5</span>, <span class="nu">3</span>))    <span class="cm"># stampa 15</span></pre>
+      </div>
+
+      <p>Chiamando <code class="inline-code">area_rettangolo(5, 3)</code>, la funzione riceve
+        <code class="inline-code">base = 5</code> e <code class="inline-code">altezza = 3</code>, calcola $5 \cdot 3$
+        e <em>restituisce</em> $15$. Scritta una volta, la puoi riusare quante volte vuoi. Ecco a cosa servono le
+        funzioni: <strong>impacchettare</strong> un pezzo di lavoro e dargli un nome, per poi richiamarlo quando
+        serve.</p>
+
+      <h4>Pezzo 1 — la funzione che calcola il determinante</h4>
+      <p>La prima funzione, <code class="inline-code">det</code>, riceve una matrice (una tabella di numeri, scritta
+        come «lista di liste») e restituisce il suo determinante. Il cuore è la riga del caso $2 \times 2$: è
+        <strong>esattamente la vostra formula</strong>, «diagonale meno antidiagonale».</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>pezzo 1</b></span><span>il determinante</span></div>
+        <pre><span class="kw">def</span> <span class="fn">det</span>(M):
+    n = <span class="fn">len</span>(M)                 <span class="cm"># quanto è grande la matrice</span>
+    <span class="kw">if</span> n == <span class="nu">2</span>:
+        <span class="kw">return</span> M[<span class="nu">0</span>][<span class="nu">0</span>] * M[<span class="nu">1</span>][<span class="nu">1</span>] - M[<span class="nu">0</span>][<span class="nu">1</span>] * M[<span class="nu">1</span>][<span class="nu">0</span>]   <span class="cm"># diagonale − antidiagonale</span>
+    <span class="kw">if</span> n == <span class="nu">1</span>:
+        <span class="kw">return</span> M[<span class="nu">0</span>][<span class="nu">0</span>]
+    tot = <span class="nu">0</span>                     <span class="cm"># matrici più grandi: le scompongo</span>
+    <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(n):
+        minore = [riga[:j] + riga[j+<span class="nu">1</span>:] <span class="kw">for</span> riga <span class="kw">in</span> M[<span class="nu">1</span>:]]
+        tot += ((-<span class="nu">1</span>) ** j) * M[<span class="nu">0</span>][j] * <span class="fn">det</span>(minore)
+    <span class="kw">return</span> tot</pre>
+      </div>
+
+      <p>Le due righe con <code class="inline-code">if</code> gestiscono i casi facili ($2 \times 2$ e $1 \times 1$).
+        Per matrici più grandi la funzione fa una cosa sorprendente: <strong>richiama sé stessa</strong> su pezzi più
+        piccoli (la riga con <code class="inline-code">det(minore)</code>). Si chiama <strong>ricorsione</strong>, e
+        l'avete già incontrata con la Torre di Hanoi (lezione 12): un problema grande risolto delegandolo a copie più
+        piccole di sé stesso.</p>
+
+      <h4>Pezzo 2 — la funzione che applica Cramer</h4>
+      <p>La seconda funzione, <code class="inline-code">cramer</code>, riceve la matrice dei coefficienti
+        <code class="inline-code">A</code> e la lista dei termini noti <code class="inline-code">b</code>. Calcola
+        $D$; se è zero, avvisa che non c'è un'unica soluzione; altrimenti, per ogni incognita, <strong>copia</strong>
+        la matrice, ne sostituisce una colonna con i termini noti, e calcola quel determinante diviso $D$.</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>pezzo 2</b></span><span>la regola di Cramer</span></div>
+        <pre><span class="kw">def</span> <span class="fn">cramer</span>(A, b):
+    D = <span class="fn">det</span>(A)
+    <span class="kw">if</span> D == <span class="nu">0</span>:
+        <span class="kw">return</span> <span class="st">"D = 0: il sistema non ha una sola soluzione."</span>
+    soluzione = []
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(b)):
+        Ai = [riga[:] <span class="kw">for</span> riga <span class="kw">in</span> A]     <span class="cm"># copio A</span>
+        <span class="kw">for</span> r <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(b)):
+            Ai[r][i] = b[r]                <span class="cm"># colonna i -&gt; termini noti</span>
+        soluzione.<span class="fn">append</span>(<span class="fn">det</span>(Ai) / D)   <span class="cm"># D_i / D</span>
+    <span class="kw">return</span> soluzione</pre>
+      </div>
+
+      <p>Guarda come <code class="inline-code">cramer</code> <strong>usa</strong> <code class="inline-code">det</code>:
+        le funzioni si chiamano a vicenda, come mattoncini che si incastrano. È per questo che le abbiamo scritte
+        separate — ognuna fa <em>una</em> cosa sola, e la fa bene.</p>
+
+      <h4>Pezzo 3 — il programma che le mette al lavoro</h4>
+      <p>La matrice si scrive come lista di righe, i termini noti come una lista. Poi basta chiamare
+        <code class="inline-code">cramer</code> e stampare il risultato.</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>pezzo 3</b></span><span>risolve 2x + 3y = 8 ; x − y = −1</span></div>
+        <pre>A = [[<span class="nu">2</span>, <span class="nu">3</span>],
+     [<span class="nu">1</span>, -<span class="nu">1</span>]]
+b = [<span class="nu">8</span>, -<span class="nu">1</span>]
+<span class="fn">print</span>(<span class="fn">cramer</span>(A, b))       <span class="cm"># stampa [1.0, 2.0]</span></pre>
+      </div>
+
+      <h3>5.4 — Lo script completo, in un'unica finestra</h3>
+      <p>Rimontiamo i tre pezzi in un unico file. Copia tutto su Colab, premi ▶ e prova a cambiare $A$ e $b$: questo
+        programma risolve sistemi di <em>qualunque</em> dimensione — $4 \times 4$, $10 \times 10$... — proprio quelli
+        davanti a cui la sostituzione a mano ti farebbe piangere. (È lo stesso codice, tutto assieme, che hai appena
+        costruito pezzo per pezzo.)</p>
+
+      <div class="codeblk">
+        <div class="head"><span><b>cramer.py</b></span><span>risolve un sistema n×n con la regola di Cramer</span></div>
+            <pre><span class="kw">def</span> <span class="fn">det</span>(M):
+    <span class="cm"># determinante di una matrice quadrata (sviluppo di Laplace)</span>
+    n = <span class="fn">len</span>(M)
+    <span class="kw">if</span> n == <span class="nu">1</span>:
+        <span class="kw">return</span> M[<span class="nu">0</span>][<span class="nu">0</span>]
+    <span class="kw">if</span> n == <span class="nu">2</span>:
+        <span class="kw">return</span> M[<span class="nu">0</span>][<span class="nu">0</span>] * M[<span class="nu">1</span>][<span class="nu">1</span>] - M[<span class="nu">0</span>][<span class="nu">1</span>] * M[<span class="nu">1</span>][<span class="nu">0</span>]
+    tot = <span class="nu">0</span>
+    <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(n):
+        minore = [riga[:j] + riga[j+<span class="nu">1</span>:] <span class="kw">for</span> riga <span class="kw">in</span> M[<span class="nu">1</span>:]]
+        tot += ((-<span class="nu">1</span>) ** j) * M[<span class="nu">0</span>][j] * <span class="fn">det</span>(minore)
+    <span class="kw">return</span> tot
+
+<span class="kw">def</span> <span class="fn">cramer</span>(A, b):
+    D = <span class="fn">det</span>(A)
+    <span class="kw">if</span> D == <span class="nu">0</span>:
+        <span class="kw">return</span> <span class="st">"D = 0: il sistema non ha una sola soluzione."</span>
+    soluzione = []
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(b)):
+        Ai = [riga[:] <span class="kw">for</span> riga <span class="kw">in</span> A]     <span class="cm"># copia di A</span>
+        <span class="kw">for</span> r <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(b)):
+            Ai[r][i] = b[r]                <span class="cm"># colonna i -&gt; termini noti</span>
+        soluzione.<span class="fn">append</span>(<span class="fn">det</span>(Ai) / D)
+    <span class="kw">return</span> soluzione
+
+<span class="cm"># esempio:  2x + 3y = 8 ;  x - y = -1</span>
+A = [[<span class="nu">2</span>, <span class="nu">3</span>], [<span class="nu">1</span>, -<span class="nu">1</span>]]
+b = [<span class="nu">8</span>, -<span class="nu">1</span>]
+<span class="fn">print</span>(<span class="fn">cramer</span>(A, b))     <span class="cm"># stampa [1.0, 2.0]</span></pre>
+      </div>
+
+      <div class="curiosita">
+        <strong>Dalla matematica al codice, e ritorno.</strong> Nota che cosa è successo: un problema di
+        <em>matematica</em> (risolvere un sistema) è diventato un problema di <em>informatica</em> (scrivere due
+        funzioni), e la soluzione informatica funziona per sistemi enormi, impensabili a mano. È esattamente questo
+        il mestiere di chi programma: tradurre un procedimento in istruzioni, e poi lasciare che la macchina lo
+        ripeta milioni di volte senza stancarsi.
+      </div>
+    </section>
+
+    <!-- 6 — SISTEMI DI DISEQUAZIONI -->
+    <section id="sec6">
+      <h2>6. Sistemi di disequazioni</h2>
+
+      <p>Cambiamo scenario. Un <strong>sistema di disequazioni</strong> ha una novità rispetto ai sistemi di
+        equazioni: le disequazioni possono essere tante, ma l'<strong>incognita resta una sola</strong> (la nostra
+        $x$). La graffa vuol sempre dire «e»: cerchiamo i valori di $x$ che rendono vere <strong>tutte</strong> le
+        disequazioni <strong>insieme</strong>.</p>
+
+      <div class="definition">
+        Per risolvere un sistema di disequazioni: <strong>(1)</strong> risolvo <strong>ogni disequazione da sola</strong>
+        (lezione 1), ottenendo un intervallo per ciascuna; <strong>(2)</strong> ne faccio l'<strong>intersezione</strong>
+        sulla retta dei numeri, cioè tengo solo i valori che stanno <strong>in tutte le zone colorate insieme</strong>.
+      </div>
+
+      <p>L'intersezione è la parte in cui le soluzioni si <strong>sovrappongono</strong>. Se non c'è sovrapposizione,
+        il sistema è <strong>impossibile</strong> (nessun valore accontenta tutti). Vediamolo su cinque casi.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema di disequazioni 1</span><span class="difficulty easy">Facile</span></div>
+        <p>$$\begin{cases} 2x + 1 \gt 5 \\ x - 3 \lt 2 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Risolvo separatamente: &nbsp; 1ª: $\;2x \gt 4 \Rightarrow x \gt 2$; &nbsp; 2ª: $\;x \lt 5$.</p>
+          <p>Interseco sulla retta: tengo solo dove valgono <strong>entrambe</strong>.</p>
+          <div class="sysline" data-cons="gt 2 | lt 5"></div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$2 \lt x \lt 5$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema di disequazioni 2</span><span class="difficulty easy">Facile</span></div>
+        <p>$$\begin{cases} 3x \ge 6 \\ x + 2 \le 7 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>1ª: $\;x \ge 2$; &nbsp; 2ª: $\;x \le 5$. &nbsp; (Estremi <strong>compresi</strong>: pallini pieni.)</p>
+          <div class="sysline" data-cons="ge 2 | le 5"></div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$2 \le x \le 5$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema di disequazioni 3</span><span class="difficulty medium">Medio</span></div>
+        <p>$$\begin{cases} x + 1 \gt 0 \\ 2x - 1 \gt 5 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>1ª: $\;x \gt -1$; &nbsp; 2ª: $\;2x \gt 6 \Rightarrow x \gt 3$. &nbsp; Vince la condizione
+            <strong>più severa</strong>.</p>
+          <div class="sysline" data-cons="gt -1 | gt 3"></div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$x \gt 3$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema di disequazioni 4</span><span class="difficulty medium">Medio</span></div>
+        <p>$$\begin{cases} 5 - x \gt 1 \\ x \ge -2 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>1ª: $\;-x \gt -4 \Rightarrow x \lt 4$ (diviso per $-1$: <strong>verso ribaltato!</strong>); &nbsp;
+            2ª: $\;x \ge -2$.</p>
+          <div class="sysline" data-cons="lt 4 | ge -2"></div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$-2 \le x \lt 4$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sistema di disequazioni 5</span><span class="difficulty hard">Difficile</span></div>
+        <p>$$\begin{cases} x - 2 \gt 3 \\ 2x \lt 6 \end{cases}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>1ª: $\;x \gt 5$; &nbsp; 2ª: $\;x \lt 3$. &nbsp; Ma non esiste nessun numero che sia
+            <strong>contemporaneamente</strong> maggiore di $5$ e minore di $3$: le due zone <strong>non si
+            toccano</strong>.</p>
+          <div class="sysline" data-cons="gt 5 | lt 3"></div>
+          <div class="result-box"><span class="result-label">Impossibile</span><span class="result-value">nessuna soluzione ($\varnothing$)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — EQUAZIONI FRATTE -->
+    <section id="sec7">
+      <h2>7. Le equazioni fratte</h2>
+
+      <p>Un'equazione è <strong>fratta</strong> quando l'incognita compare in un <strong>denominatore</strong>. Come
+        $\dfrac{x+1}{x-2} = 3$. Qui si nasconde una trappola che conosciamo benissimo: il denominatore
+        <strong>non può valere zero</strong> (lezione 1: non si divide per zero!). Quindi, prima di tutto, dobbiamo
+        metterci al sicuro.</p>
+
+      <div class="steps-box">
+        <strong>Come si risolve un'equazione fratta.</strong>
+        <ol>
+          <li><strong>Condizioni di esistenza (C.E.).</strong> Prendo <em>ogni</em> denominatore, lo pongo
+            <strong>uguale a zero</strong> e trovo per quali $x$ si annulla: quei valori sono <strong>vietati</strong>
+            e li metto da parte fin da subito.</li>
+          <li><strong>Elimino le frazioni</strong> moltiplicando tutto per i denominatori: restano solo i numeratori,
+            e ottengo un'equazione normale.</li>
+          <li><strong>Risolvo</strong> l'equazione ottenuta.</li>
+          <li><strong>Controllo</strong> la soluzione con le C.E.: se coincide con un valore vietato, la
+            <strong>scarto</strong>.</li>
+        </ol>
+      </div>
+
+      <div class="warning">
+        <strong>Perché si scarta?</strong> Moltiplicare per il denominatore è lecito (secondo principio) <em>solo
+        se</em> quel denominatore non è zero. Se la soluzione trovata annulla un denominatore, vuol dire che abbiamo
+        moltiplicato per zero — vietato! Ricordi il ragionamento della lezione 1? Prendi $2 = 3$ (falsa) e moltiplica
+        entrambi i membri per $0$: ottieni $0 = 0$ (vera). Proprio per questo il secondo principio <strong>esclude lo
+        zero</strong>. Una "soluzione" che azzera un denominatore è un <strong>falso positivo</strong>: va buttata.
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Equazione fratta 1</span><span class="difficulty easy">Facile</span></div>
+        <p>$$\frac{x + 1}{x - 2} = 3$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>C.E.:</strong> $x - 2 \ne 0 \Rightarrow x \ne 2$.</p>
+          <div class="eqsteps">
+            <div class="row"><span class="eqn">$x + 1 = 3(x - 2)$</span><span class="op">moltiplico per $(x - 2)$</span></div>
+            <div class="row"><span class="eqn">$x + 1 = 3x - 6 \;\Rightarrow\; -2x = -7$</span><span class="op">risolvo</span></div>
+            <div class="row good"><span class="eqn">$x = \dfrac{7}{2}$</span><span class="op">e $\frac{7}{2} \ne 2$: va bene ✓</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$x = \dfrac{7}{2}$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Equazione fratta 2</span><span class="difficulty easy">Facile</span></div>
+        <p>$$\frac{1}{x} + \frac{1}{2} = 1$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>C.E.:</strong> $x \ne 0$.</p>
+          <div class="eqsteps">
+            <div class="row"><span class="eqn">$2 + x = 2x$</span><span class="op">moltiplico tutto per $2x$</span></div>
+            <div class="row good"><span class="eqn">$x = 2$</span><span class="op">e $2 \ne 0$: va bene ✓</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$x = 2$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Equazione fratta 3</span><span class="difficulty medium">Medio</span></div>
+        <p>La trappola in azione: $$\frac{x}{x - 3} = \frac{3}{x - 3}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>C.E.:</strong> $x - 3 \ne 0 \Rightarrow x \ne 3$.</p>
+          <div class="eqsteps">
+            <div class="row"><span class="eqn">$x = 3$</span><span class="op">moltiplico per $(x - 3)$: i denominatori sono uguali</span></div>
+            <div class="row bad"><span class="eqn">$x = 3$ &nbsp; ma &nbsp; $x \ne 3$!</span><span class="op">la soluzione è un valore <strong>vietato</strong></span></div>
+          </div>
+          <p>L'unica candidata, $x = 3$, è proprio il valore che annulla il denominatore: va
+            <strong>scartata</strong>. Non resta nessuna soluzione valida.</p>
+          <div class="result-box"><span class="result-label">Impossibile</span><span class="result-value">nessuna soluzione</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Equazione fratta 4</span><span class="difficulty medium">Medio</span></div>
+        <p>$$\frac{2}{x - 1} = \frac{1}{x + 1}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>C.E.:</strong> $x \ne 1$ e $x \ne -1$.</p>
+          <div class="eqsteps">
+            <div class="row"><span class="eqn">$2(x + 1) = 1(x - 1)$</span><span class="op">moltiplico "in croce" per $(x-1)(x+1)$</span></div>
+            <div class="row"><span class="eqn">$2x + 2 = x - 1$</span><span class="op">svolgo</span></div>
+            <div class="row good"><span class="eqn">$x = -3$</span><span class="op">e $-3 \ne \pm 1$: va bene ✓</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$x = -3$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Equazione fratta 5</span><span class="difficulty hard">Difficile</span></div>
+        <p>$$\frac{x - 4}{x + 2} = \frac{1}{2}$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>C.E.:</strong> $x + 2 \ne 0 \Rightarrow x \ne -2$. &nbsp;(Il denominatore $2$ a destra è un numero,
+            non dà condizioni.)</p>
+          <div class="eqsteps">
+            <div class="row"><span class="eqn">$2(x - 4) = 1(x + 2)$</span><span class="op">moltiplico in croce</span></div>
+            <div class="row"><span class="eqn">$2x - 8 = x + 2$</span><span class="op">svolgo</span></div>
+            <div class="row good"><span class="eqn">$x = 10$</span><span class="op">e $10 \ne -2$: va bene ✓</span></div>
+          </div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$x = 10$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — DISEQUAZIONI FRATTE -->
+    <section id="sec8">
+      <h2>8. Le disequazioni fratte</h2>
+
+      <p>Ultima tappa, la più elegante. Una <strong>disequazione fratta</strong> chiede: <em>quando il rapporto tra
+        due quantità è positivo (o negativo)?</em> Come $\dfrac{x - 1}{x + 2} \gt 0$. E qui torna utile una vecchia
+        conoscenza: la <strong>regola dei segni</strong> della divisione.</p>
+
+      <div class="rule">
+        <strong>Il segno di una frazione.</strong> Una frazione $\dfrac{N}{D}$ è
+        <strong><span style="color:#16a34a">positiva</span></strong> quando numeratore e denominatore sono
+        <strong>concordi</strong> (stesso segno: $+/+$ oppure $-/-$), ed è
+        <strong><span style="color:#dc2626">negativa</span></strong> quando sono <strong>discordi</strong> (segni
+        opposti). Tutto qui — basta scoprire il segno di $N$ e quello di $D$, e combinarli.
+      </div>
+
+      <div class="steps-box">
+        <strong>Come si risolve.</strong>
+        <ol>
+          <li>Studio il segno del <strong>numeratore</strong>: pongo $N \gt 0$ e vedo dove è positivo (e dove
+            negativo).</li>
+          <li>Studio il segno del <strong>denominatore</strong>: pongo $D \gt 0$. <strong>Sempre col maggiore
+            stretto</strong>, anche se la disequazione aveva $\ge$ o $\le$: il denominatore non può mai essere zero!</li>
+          <li>Riporto tutto su uno <strong>schema dei segni</strong>: una retta con i segni di $N$ e di $D$ in ogni
+            zona.</li>
+          <li><strong>Combino</strong> i segni (concordi $\to +$, discordi $\to -$) e prendo le zone che hanno il
+            segno richiesto dalla disequazione.</li>
+        </ol>
+        <p class="formula-note" style="padding:0 0.5rem 0.4rem;">Nel disegno: <strong>linea continua</strong> dove il
+          fattore è positivo, <strong>tratteggiata</strong> dove è negativo. Il punto dove $N = 0$ si
+          <strong>include</strong> (pallino pieno) se la disequazione è $\ge$ o $\le$; il punto dove $D = 0$ si
+          <strong>esclude sempre</strong> (pallino vuoto).</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Disequazione fratta 1</span><span class="difficulty easy">Facile</span></div>
+        <p>$$\frac{x - 1}{x + 2} \gt 0$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Segno di $N = x - 1$: &nbsp; $N \gt 0 \Rightarrow x \gt 1$. &nbsp;&nbsp; Segno di $D = x + 2$: &nbsp;
+            $D \gt 0 \Rightarrow x \gt -2$.</p>
+          <div class="signchart" data-nz="1" data-nsign="r" data-dz="-2" data-dsign="r" data-want="pos" data-incl="0"></div>
+          <p>La frazione è positiva dove $N$ e $D$ sono <strong>concordi</strong> (le due «$+$» o le due «$-$»).</p>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$x \lt -2$ &nbsp;oppure&nbsp; $x \gt 1$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Disequazione fratta 2</span><span class="difficulty easy">Facile</span></div>
+        <p>$$\frac{x + 3}{x - 1} \lt 0$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$N = x + 3 \gt 0 \Rightarrow x \gt -3$. &nbsp;&nbsp; $D = x - 1 \gt 0 \Rightarrow x \gt 1$.</p>
+          <div class="signchart" data-nz="-3" data-nsign="r" data-dz="1" data-dsign="r" data-want="neg" data-incl="0"></div>
+          <p>Stavolta cerchiamo il segno <strong>negativo</strong>: dove $N$ e $D$ sono <strong>discordi</strong>.</p>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$-3 \lt x \lt 1$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Disequazione fratta 3</span><span class="difficulty medium">Medio</span></div>
+        <p>$$\frac{2x - 4}{x + 1} \ge 0$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$N = 2x - 4 \gt 0 \Rightarrow x \gt 2$ &nbsp;(qui $N = 0$ in $x = 2$ è <strong>incluso</strong>, la
+            disequazione è $\ge$). &nbsp;&nbsp; $D = x + 1 \gt 0 \Rightarrow x \gt -1$ &nbsp;($x = -1$ sempre escluso).</p>
+          <div class="signchart" data-nz="2" data-nsign="r" data-dz="-1" data-dsign="r" data-want="pos" data-incl="1"></div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$x \lt -1$ &nbsp;oppure&nbsp; $x \ge 2$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Disequazione fratta 4</span><span class="difficulty medium">Medio</span></div>
+        <p>$$\frac{x}{x - 3} \le 0$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>$N = x \gt 0 \Rightarrow x \gt 0$ &nbsp;($x = 0$ <strong>incluso</strong>, è $\le$). &nbsp;&nbsp;
+            $D = x - 3 \gt 0 \Rightarrow x \gt 3$ &nbsp;($x = 3$ escluso).</p>
+          <div class="signchart" data-nz="0" data-nsign="r" data-dz="3" data-dsign="r" data-want="neg" data-incl="1"></div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$0 \le x \lt 3$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Disequazione fratta 5</span><span class="difficulty hard">Difficile</span></div>
+        <p>$$\frac{5 - x}{x + 2} \gt 0$$</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Attenzione al numeratore: $N = 5 - x \gt 0 \Rightarrow -x \gt -5 \Rightarrow x \lt 5$ (verso
+            ribaltato!). Quindi $N$ è positivo a <strong>sinistra</strong> di $5$. &nbsp;&nbsp;
+            $D = x + 2 \gt 0 \Rightarrow x \gt -2$.</p>
+          <div class="signchart" data-nz="5" data-nsign="l" data-dz="-2" data-dsign="r" data-want="pos" data-incl="0"></div>
+          <div class="result-box"><span class="result-label">Soluzione</span><span class="result-value">$-2 \lt x \lt 5$</span></div>
+        </div>
+      </div>
+
+      <div class="curiosita">
+        <strong>Un ponte verso il futuro.</strong> Lo schema dei segni che hai appena imparato non serve solo per le
+        frazioni: è lo stesso strumento con cui, negli anni prossimi, studierai il segno di prodotti, di polinomi
+        scomposti e — soprattutto — il comportamento delle <em>funzioni</em>. Quello che oggi sembra un trucchetto è
+        in realtà uno degli attrezzi più usati di tutta la matematica del liceo.
+      </div>
+    </section>
+
+    <!-- 9 — QUIZ -->
+    <section id="quiz">
+      <h2>9. Quiz finale</h2>
+      <p>Dieci domande su sistemi, metodi di risoluzione, disequazioni ed equazioni fratte. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  </main>
+
+  <footer>
+    <p>Lezione 2 — I sistemi · Matematica · Secondo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Demo: intersezione dei sistemi di disequazioni e schema dei segni -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      // ===== Sistemi di disequazioni: intersezione sulla retta =====
+      (function () {
+        const nodes = document.querySelectorAll('.sysline');
+        if (!nodes.length) return;
+        const W = 560, PADX = 34, SYM = { gt: '>', lt: '<', ge: '≥', le: '≤' };
+        nodes.forEach(function (el) {
+          const cons = el.dataset.cons.split('|').map(function (s) {
+            const p = s.trim().split(/\s+/); return { op: p[0], val: parseFloat(p[1]) };
+          });
+          const vals = cons.map(function (c) { return c.val; });
+          const lo = Math.floor(Math.min.apply(null, vals)) - 2, hi = Math.ceil(Math.max.apply(null, vals)) + 2;
+          function X(v) { return PADX + (v - lo) / (hi - lo) * (W - 2 * PADX); }
+          let L = -Infinity, Li = true, U = Infinity, Ui = true;
+          cons.forEach(function (c) {
+            if (c.op === 'gt' || c.op === 'ge') { const inc = c.op === 'ge';
+              if (c.val > L) { L = c.val; Li = inc; } else if (c.val === L) { Li = Li && inc; }
+            } else { const inc = c.op === 'le';
+              if (c.val < U) { U = c.val; Ui = inc; } else if (c.val === U) { Ui = Ui && inc; }
+            }
+          });
+          const empty = (L > U) || (L === U && !(Li && Ui));
+          const N = cons.length, rowY = function (i) { return 26 + i * 26; };
+          const AXY = 26 + N * 26 + 14, H = AXY + 38, acc = 'var(--accent)';
+          let h = '';
+          cons.forEach(function (c, i) {
+            const y = rowY(i), cx = X(c.val), right = (c.op === 'gt' || c.op === 'ge'), closed = (c.op === 'ge' || c.op === 'le');
+            const end = right ? (W - PADX) : PADX;
+            h += '<text x="6" y="' + (y + 4) + '" style="fill:var(--muted);font-size:11px;">x ' + SYM[c.op] + ' ' + c.val + '</text>';
+            h += '<line x1="' + PADX + '" y1="' + y + '" x2="' + (W - PADX) + '" y2="' + y + '" stroke="var(--border)" stroke-width="1"/>';
+            h += '<line x1="' + cx.toFixed(1) + '" y1="' + y + '" x2="' + end + '" y2="' + y + '" stroke="' + acc + '" stroke-width="3.5" opacity="0.5"/>';
+            h += '<circle cx="' + cx.toFixed(1) + '" cy="' + y + '" r="4.5" fill="' + (closed ? acc : 'var(--surface)') + '" stroke="' + acc + '" stroke-width="2"/>';
+          });
+          h += '<line x1="' + PADX + '" y1="' + AXY + '" x2="' + (W - PADX) + '" y2="' + AXY + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          h += '<polygon points="' + (W - PADX) + ',' + AXY + ' ' + (W - PADX - 8) + ',' + (AXY - 4) + ' ' + (W - PADX - 8) + ',' + (AXY + 4) + '" fill="var(--text-soft)"/>';
+          for (let t = lo; t <= hi; t++) {
+            const xt = X(t);
+            h += '<line x1="' + xt.toFixed(1) + '" y1="' + AXY + '" x2="' + xt.toFixed(1) + '" y2="' + (AXY + 5) + '" stroke="var(--text-soft)" stroke-width="1"/>';
+            h += '<text x="' + xt.toFixed(1) + '" y="' + (AXY + 19) + '" text-anchor="middle" style="fill:var(--muted);font-size:11px;">' + t + '</text>';
+          }
+          h += '<text x="6" y="' + (AXY - 9) + '" style="fill:var(--text);font-size:12px;font-weight:700;">∩</text>';
+          if (empty) {
+            h += '<text x="' + (W / 2) + '" y="' + (AXY - 9) + '" text-anchor="middle" style="fill:#dc2626;font-size:13px;font-weight:700;">∅  nessuna soluzione</text>';
+          } else {
+            const xL = (L === -Infinity) ? PADX : X(L), xU = (U === Infinity) ? (W - PADX) : X(U);
+            h += '<line x1="' + xL.toFixed(1) + '" y1="' + AXY + '" x2="' + xU.toFixed(1) + '" y2="' + AXY + '" stroke="' + acc + '" stroke-width="6" opacity="0.85"/>';
+            if (L !== -Infinity) h += '<circle cx="' + xL.toFixed(1) + '" cy="' + AXY + '" r="5.5" fill="' + (Li ? acc : 'var(--surface)') + '" stroke="' + acc + '" stroke-width="2.2"/>';
+            if (U !== Infinity) h += '<circle cx="' + xU.toFixed(1) + '" cy="' + AXY + '" r="5.5" fill="' + (Ui ? acc : 'var(--surface)') + '" stroke="' + acc + '" stroke-width="2.2"/>';
+          }
+          el.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="intersezione delle disequazioni sulla retta">' + h + '</svg>';
+        });
+      })();
+
+      // ===== Disequazioni fratte: schema dei segni =====
+      (function () {
+        const nodes = document.querySelectorAll('.signchart');
+        if (!nodes.length) return;
+        const W = 560, PADX = 46, acc = 'var(--accent)', mut = 'var(--text-soft)';
+        nodes.forEach(function (el) {
+          const nz = parseFloat(el.dataset.nz), dz = parseFloat(el.dataset.dz);
+          const nsign = el.dataset.nsign, dsign = el.dataset.dsign;
+          const want = el.dataset.want, incl = el.dataset.incl === '1';
+          function Ns(x) { return (nsign === 'r') ? (x > nz ? 1 : -1) : (x < nz ? 1 : -1); }
+          function Ds(x) { return (dsign === 'r') ? (x > dz ? 1 : -1) : (x < dz ? 1 : -1); }
+          const c = [nz, dz].slice().sort(function (a, b) { return a - b; });
+          const lo = Math.floor(c[0]) - 2, hi = Math.ceil(c[1]) + 2;
+          function X(v) { return PADX + (v - lo) / (hi - lo) * (W - 2 * PADX); }
+          const Ny = 34, Dy = 68, Fy = 110, BOT = 130, H = 150;
+          const reps = [(lo + c[0]) / 2, (c[0] + c[1]) / 2, (c[1] + hi) / 2];
+          const bx = [[X(lo), X(c[0])], [X(c[0]), X(c[1])], [X(c[1]), X(hi)]];
+          let h = '';
+          [nz, dz].forEach(function (v) {
+            h += '<line x1="' + X(v).toFixed(1) + '" y1="18" x2="' + X(v).toFixed(1) + '" y2="' + BOT + '" stroke="var(--border)" stroke-width="1" stroke-dasharray="3 3"/>';
+            h += '<text x="' + X(v).toFixed(1) + '" y="' + (BOT + 15) + '" text-anchor="middle" style="fill:var(--muted);font-size:11px;">' + v + '</text>';
+          });
+          h += '<text x="8" y="' + (Ny + 4) + '" style="fill:var(--text);font-size:12px;font-weight:700;">N</text>';
+          h += '<text x="8" y="' + (Dy + 4) + '" style="fill:var(--text);font-size:12px;font-weight:700;">D</text>';
+          h += '<text x="4" y="' + (Fy + 4) + '" style="fill:var(--text);font-size:12px;font-weight:700;">N/D</text>';
+          function rowFactor(y, sgn, zx) {
+            let s = '';
+            for (let r = 0; r < 3; r++) {
+              const pos = sgn(reps[r]) > 0;
+              s += '<line x1="' + bx[r][0].toFixed(1) + '" y1="' + y + '" x2="' + bx[r][1].toFixed(1) + '" y2="' + y + '" stroke="' + (pos ? acc : mut) + '" stroke-width="' + (pos ? 2.6 : 1.6) + '" ' + (pos ? '' : 'stroke-dasharray="5 4"') + '/>';
+              s += '<text x="' + ((bx[r][0] + bx[r][1]) / 2).toFixed(1) + '" y="' + (y - 8) + '" text-anchor="middle" style="fill:' + (pos ? '#16a34a' : '#dc2626') + ';font-size:13px;font-weight:700;">' + (pos ? '+' : '−') + '</text>';
+            }
+            s += '<circle cx="' + X(zx).toFixed(1) + '" cy="' + y + '" r="4.5" fill="var(--surface)" stroke="' + acc + '" stroke-width="2"/>';
+            return s;
+          }
+          h += rowFactor(Ny, Ns, nz);
+          h += rowFactor(Dy, Ds, dz);
+          h += '<line x1="' + PADX + '" y1="' + Fy + '" x2="' + (W - PADX) + '" y2="' + Fy + '" stroke="var(--border)" stroke-width="1"/>';
+          for (let r = 0; r < 3; r++) {
+            const fs = Ns(reps[r]) * Ds(reps[r]);
+            const isSol = (want === 'pos' && fs > 0) || (want === 'neg' && fs < 0);
+            h += '<text x="' + ((bx[r][0] + bx[r][1]) / 2).toFixed(1) + '" y="' + (Fy - 8) + '" text-anchor="middle" style="fill:' + (fs > 0 ? '#16a34a' : '#dc2626') + ';font-size:14px;font-weight:800;">' + (fs > 0 ? '+' : '−') + '</text>';
+            if (isSol) h += '<line x1="' + bx[r][0].toFixed(1) + '" y1="' + Fy + '" x2="' + bx[r][1].toFixed(1) + '" y2="' + Fy + '" stroke="' + acc + '" stroke-width="6" opacity="0.85"/>';
+          }
+          h += '<circle cx="' + X(nz).toFixed(1) + '" cy="' + Fy + '" r="5" fill="' + (incl ? acc : 'var(--surface)') + '" stroke="' + acc + '" stroke-width="2.2"/>';
+          h += '<circle cx="' + X(dz).toFixed(1) + '" cy="' + Fy + '" r="5" fill="var(--surface)" stroke="' + acc + '" stroke-width="2.2"/>';
+          el.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="schema dei segni della frazione">' + h + '</svg>';
+        });
+      })();
+
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Che cos\'è un <strong>sistema</strong> di equazioni?',
+        options: ['una lista di equazioni da risolvere una alla volta', 'un insieme di equazioni che devono valere tutte contemporaneamente', 'un\'equazione con più di un uguale', 'un\'equazione con le frazioni', 'un metodo di calcolo'],
+        correct: 1, explain: 'La graffa si legge «e»: la soluzione deve rendere vere tutte le equazioni insieme.' },
+      { type: 'mc', diff: 'easy', text: 'In generale, per determinare <strong>3 incognite</strong> quante equazioni servono?',
+        options: ['1', '2', '3', '6', 'dipende dai numeri'],
+        correct: 2, explain: 'Di regola: tante equazioni quante incognite. Con meno equazioni il sistema resta indeterminato.' },
+      { type: 'mc', diff: 'easy', text: 'Un sistema le cui equazioni corrispondono a due <strong>rette parallele</strong> è:',
+        options: ['determinato', 'impossibile', 'indeterminato', 'fratto', 'di primo grado'],
+        correct: 1, explain: 'Rette parallele non si incontrano mai: nessun punto in comune, quindi nessuna soluzione.' },
+      { type: 'mc', diff: 'medium', text: 'Nel metodo di <strong>sostituzione</strong>, qual è il primo passo?',
+        options: ['sommare le due equazioni', 'calcolare un determinante', 'isolare un\'incognita in una delle equazioni', 'disegnare le rette', 'moltiplicare per il denominatore'],
+        correct: 2, explain: 'Si ricava «un\'incognita = tutto il resto» da un\'equazione, e la si sostituisce nelle altre.' },
+      { type: 'mc', diff: 'medium', text: 'Il metodo di <strong>sottrazione</strong> (riduzione) è più comodo quando:',
+        options: ['le equazioni hanno le frazioni', 'un\'incognita ha già coefficienti uguali o opposti nelle due equazioni', 'ci sono tre incognite', 'il sistema è impossibile', 'i numeri sono tutti negativi'],
+        correct: 1, explain: 'Se un\'incognita ha lo stesso coefficiente, sottraendo sparisce; se opposti, sommando sparisce.' },
+      { type: 'mc', diff: 'medium', text: 'Con la regola di Cramer, il determinante $D$ del sistema $\\begin{cases} 2x + 3y = 8 \\\\ x - y = -1 \\end{cases}$ vale:',
+        options: ['$5$', '$-5$', '$1$', '$-1$', '$6$'],
+        correct: 1, explain: '$D = a_1 b_2 - a_2 b_1 = 2 \\cdot (-1) - 1 \\cdot 3 = -2 - 3 = -5$ (diagonale meno antidiagonale).' },
+      { type: 'mc', diff: 'medium', text: 'Nella regola di Cramer, se il determinante $D = 0$ allora il sistema:',
+        options: ['ha una sola soluzione', 'non è determinato (è impossibile oppure indeterminato)', 'ha esattamente due soluzioni', 'è sempre impossibile', 'va risolto per sostituzione'],
+        correct: 1, explain: 'La divisione per $D$ non si può fare se $D = 0$: quel caso segnala che non c\'è un\'unica soluzione.' },
+      { type: 'mc', diff: 'medium', text: 'In un <strong>sistema di disequazioni</strong> (in una sola incognita), come si combinano le soluzioni delle singole disequazioni?',
+        options: ['si sommano', 'si fa l\'unione', 'si fa l\'intersezione: si tengono i valori che le soddisfano tutte insieme', 'si prende la prima', 'si moltiplicano'],
+        correct: 2, explain: 'La graffa vuol dire «e»: la soluzione è la zona in cui tutte le disequazioni sono vere contemporaneamente.' },
+      { type: 'mc', diff: 'hard', text: 'In un\'<strong>equazione fratta</strong>, se la soluzione trovata coincide con un valore che annulla il denominatore, allora:',
+        options: ['va bene lo stesso', 'va scartata, perché equivarrebbe ad aver moltiplicato per zero (vietato dal secondo principio)', 'si moltiplica per due', 'diventa la soluzione doppia', 'il sistema è indeterminato'],
+        correct: 1, explain: 'Moltiplicare per un denominatore è lecito solo se è diverso da zero. Una "soluzione" che lo azzera è un falso positivo e va buttata.' },
+      { type: 'open', diff: 'hard', text: 'Nelle <strong>disequazioni fratte</strong>, quando studiamo il segno del <strong>denominatore</strong> lo poniamo sempre con il <strong>maggiore stretto</strong> ($D \\gt 0$), anche se la disequazione di partenza aveva $\\ge$ o $\\le$. Spiega perché.',
+        keywords: ['zero', 'denominatore', 'divis', 'non si può', 'esclus', 'annull', 'vietato', 'esiste', 'definit'], requiredMatches: 3,
+        explain: 'Perché il denominatore non può MAI valere zero: se lo fosse, la frazione non esisterebbe (dividere per zero è vietato). Quindi il valore che azzera il denominatore è sempre escluso dalla soluzione, indipendentemente dal fatto che la disequazione fosse col maggiore stretto o col maggiore-o-uguale. L\'uguale può includere al più lo zero del NUMERATORE (dove la frazione vale 0), mai quello del denominatore.' }
+    ];
+  </script>
+
+</body>
+
+</html>
