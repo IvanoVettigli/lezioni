@@ -58,6 +58,13 @@
     .rsa-step { border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 8px 8px 0; padding: 0.55rem 0.8rem; margin: 0.45rem 0; }
     .rsa-step.pub { border-left-color: #22c55e; background: color-mix(in srgb, #22c55e 8%, transparent); }
     .rsa-step.priv { border-left-color: var(--magenta); background: color-mix(in srgb, var(--magenta) 8%, transparent); }
+    /* tabella ASCII */
+    .ascii-wrap { overflow-x: auto; }
+    .ascii-tab { border-collapse: collapse; margin: 0.7rem 0; font-size: 0.86rem; font-variant-numeric: tabular-nums; }
+    .ascii-tab th, .ascii-tab td { border: 1px solid var(--border); padding: 0.28rem 0.6rem; text-align: center; }
+    .ascii-tab th { background: var(--surface-2); }
+    .ascii-tab td.ch { font-weight: 800; color: var(--accent); }
+    .ascii-tab td.bin { font-family: Consolas, monospace; color: var(--muted); }
   </style>
 </head>
 
@@ -921,9 +928,127 @@
       </div>
     </section>
 
-    <!-- 14 — QUIZ -->
+    <!-- 14 — I CODICI QR -->
+    <section id="sec14">
+      <h2>14. I codici QR: disegni che parlano</h2>
+
+      <p>Chiudiamo con un algoritmo che hai in tasca e usi ogni giorno senza accorgertene. Quei quadrati pieni di
+        puntini bianchi e neri — i <strong>codici QR</strong> — sono un modo per <strong>codificare</strong> un
+        messaggio in un disegno, e poi <strong>decodificarlo</strong>: due algoritmi, uno l'inverso dell'altro,
+        proprio come cifrare e decifrare della sezione scorsa.</p>
+
+      <h3>14.1 — Da dove vengono</h3>
+      <p>Il codice QR nasce in <strong>Giappone nel 1994</strong>, inventato da <strong>Masahiro Hara</strong> per la
+        <em>Denso Wave</em> (un'azienda del gruppo Toyota). Il problema era pratico: in fabbrica bisognava
+        <strong>tracciare i tanti pezzi delle automobili</strong>, ma i comuni codici a barre (quelli a righe) ci
+        stavano pochi caratteri e andavano letti diritti, uno alla volta. Serviva qualcosa che contenesse
+        <strong>molti più dati</strong> e si leggesse <strong>velocissimo da qualsiasi angolazione</strong> — anche
+        storto o capovolto. Da qui il nome <strong>QR</strong>, «Quick Response» (risposta rapida). L'idea della
+        griglia di quadratini bianchi e neri, si dice, venne guardando il gioco da tavolo del <strong>Go</strong>.</p>
+
+      <h3>14.2 — Come funzionano</h3>
+      <p>Un QR è una <strong>griglia di quadratini</strong> (i «moduli»): ognuno può essere <strong>pieno o
+        vuoto</strong>, cioè vale <strong>1 oppure 0</strong>. È di nuovo il <strong>linguaggio binario</strong>! Lo
+        scanner fotografa la griglia, legge i pieni e i vuoti come una sequenza di bit, li raggruppa e li ritraduce in
+        lettere. I tre <strong>grandi quadrati agli angoli</strong> servono al telefono per <em>trovare</em> e
+        <em>orientare</em> il codice in un istante, da qualunque parte lo guardi.</p>
+
+      <div class="ckt"><svg viewBox="0 0 520 250" role="img" aria-label="Anatomia di un codice QR: tre quadrati d'angolo per orientarsi e la zona dei dati">
+        <rect x="30" y="30" width="190" height="190" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>
+        <rect x="38" y="38" width="42" height="42" fill="var(--text)"/><rect x="45" y="45" width="28" height="28" fill="var(--surface)"/><rect x="52" y="52" width="14" height="14" fill="var(--text)"/>
+        <rect x="170" y="38" width="42" height="42" fill="var(--text)"/><rect x="177" y="45" width="28" height="28" fill="var(--surface)"/><rect x="184" y="52" width="14" height="14" fill="var(--text)"/>
+        <rect x="38" y="170" width="42" height="42" fill="var(--text)"/><rect x="45" y="177" width="28" height="28" fill="var(--surface)"/><rect x="52" y="184" width="14" height="14" fill="var(--text)"/>
+        <rect x="120" y="120" width="22" height="22" fill="var(--text)"/><rect x="164" y="120" width="22" height="22" fill="var(--text)"/><rect x="186" y="120" width="22" height="22" fill="var(--text)"/>
+        <rect x="142" y="142" width="22" height="22" fill="var(--text)"/><rect x="186" y="142" width="22" height="22" fill="var(--text)"/>
+        <rect x="120" y="164" width="22" height="22" fill="var(--text)"/><rect x="142" y="164" width="22" height="22" fill="var(--text)"/>
+        <rect x="142" y="186" width="22" height="22" fill="var(--text)"/><rect x="164" y="186" width="22" height="22" fill="var(--text)"/>
+        <line x1="292" y1="58" x2="216" y2="58" stroke="var(--text-soft)" stroke-width="1.5"/>
+        <polygon points="212,58 222,53 222,63" fill="var(--text-soft)"/>
+        <text x="300" y="54" class="lbl">I 3 quadrati agli angoli</text>
+        <text x="300" y="72" class="lbl-s">aiutano a orientare il codice</text>
+        <line x1="292" y1="165" x2="200" y2="165" stroke="var(--text-soft)" stroke-width="1.5"/>
+        <polygon points="196,165 206,160 206,170" fill="var(--text-soft)"/>
+        <text x="300" y="161" class="lbl">La zona dei dati</text>
+        <text x="300" y="179" class="lbl-s">un quadratino pieno o vuoto = 1 o 0</text>
+      </svg></div>
+
+      <div class="curiosita">
+        <strong>🛡️ Il trucco geniale: la correzione degli errori.</strong> Un QR non contiene solo i dati «nudi»: ci
+        aggiunge dei quadratini <strong>ridondanti</strong>, calcolati con un algoritmo furbo (Reed–Solomon). Il
+        risultato è che il codice si legge <strong>anche se è sporco, sgualcito o coperto in parte</strong> — fino a
+        circa il 30%! È per questo che a volte al centro di un QR c'è un <strong>logo</strong>: sta «mangiando» un
+        pezzo di codice, ma gli altri quadratini bastano a ricostruirlo.
+      </div>
+
+      <h3>14.3 — La tabella ASCII: come i numeri diventano lettere</h3>
+      <p>C'è un dettaglio da chiarire. Un computer, dentro, conosce <strong>solo numeri</strong> (anzi, solo $0$ e
+        $1$). E allora come fa a memorizzare una <strong>lettera</strong>, per esempio la «P»? Con un
+        <strong>accordo</strong>. Tanti anni fa, nel <strong>1963</strong>, si stabilì una tabella-standard che
+        assegna a ogni carattere un <strong>numero</strong>: è la <strong>tabella ASCII</strong> (dall'inglese
+        <em>American Standard Code for Information Interchange</em>, «codice standard americano per lo scambio di
+        informazioni»).</p>
+      <p>Ogni carattere ha il suo codice: la <strong>A</strong> è il $65$, la <strong>B</strong> il $66$... fino alla
+        <strong>Z</strong> ($90$); le lettere minuscole partono dal $97$, le cifre dal $48$, lo spazio è il $32$, e
+        c'è posto anche per la punteggiatura. Con soli $7$ bit si ottengono $128$ codici: abbastanza per l'alfabeto,
+        i numeri e i simboli. Ecco la parte che ci serve — le <strong>lettere maiuscole</strong>, con il codice e la
+        sua scrittura in binario a $8$ bit (proprio come le righe del codice qui sotto):</p>
+
+      <div class="ascii-wrap"><table class="ascii-tab">
+        <tr><th>Lett.</th><th>Cod.</th><th>Binario</th><th>Lett.</th><th>Cod.</th><th>Binario</th></tr>
+        <tr><td class="ch">A</td><td>65</td><td class="bin">01000001</td><td class="ch">N</td><td>78</td><td class="bin">01001110</td></tr>
+        <tr><td class="ch">B</td><td>66</td><td class="bin">01000010</td><td class="ch">O</td><td>79</td><td class="bin">01001111</td></tr>
+        <tr><td class="ch">C</td><td>67</td><td class="bin">01000011</td><td class="ch">P</td><td>80</td><td class="bin">01010000</td></tr>
+        <tr><td class="ch">D</td><td>68</td><td class="bin">01000100</td><td class="ch">Q</td><td>81</td><td class="bin">01010001</td></tr>
+        <tr><td class="ch">E</td><td>69</td><td class="bin">01000101</td><td class="ch">R</td><td>82</td><td class="bin">01010010</td></tr>
+        <tr><td class="ch">F</td><td>70</td><td class="bin">01000110</td><td class="ch">S</td><td>83</td><td class="bin">01010011</td></tr>
+        <tr><td class="ch">G</td><td>71</td><td class="bin">01000111</td><td class="ch">T</td><td>84</td><td class="bin">01010100</td></tr>
+        <tr><td class="ch">H</td><td>72</td><td class="bin">01001000</td><td class="ch">U</td><td>85</td><td class="bin">01010101</td></tr>
+        <tr><td class="ch">I</td><td>73</td><td class="bin">01001001</td><td class="ch">V</td><td>86</td><td class="bin">01010110</td></tr>
+        <tr><td class="ch">J</td><td>74</td><td class="bin">01001010</td><td class="ch">W</td><td>87</td><td class="bin">01010111</td></tr>
+        <tr><td class="ch">K</td><td>75</td><td class="bin">01001011</td><td class="ch">X</td><td>88</td><td class="bin">01011000</td></tr>
+        <tr><td class="ch">L</td><td>76</td><td class="bin">01001100</td><td class="ch">Y</td><td>89</td><td class="bin">01011001</td></tr>
+        <tr><td class="ch">M</td><td>77</td><td class="bin">01001101</td><td class="ch">Z</td><td>90</td><td class="bin">01011010</td></tr>
+      </table></div>
+
+      <div class="curiosita">
+        <strong>🌐 Perché è così importante?</strong> La tabella ASCII è il <strong>vocabolario comune</strong> che
+        permette ai computer di <strong>mettersi d'accordo</strong> sul testo. Quando premi «P» sulla tastiera, parte
+        il numero $80$; viene salvato come $80$; se lo invii a un altro computer, arriva $80$, e quello lo cerca nella
+        <em>sua</em> tabella ASCII e mostra di nuovo «P». Senza uno standard condiviso, l'«$80$» di un computer
+        potrebbe voler dire una cosa e quello di un altro un'altra: i testi non si potrebbero né salvare, né inviare,
+        né rileggere. L'ASCII è la <strong>base</strong> di tutto il testo digitale — file, messaggi, pagine web,
+        codice dei programmi. Oggi si usa una tabella più ampia (<strong>Unicode / UTF-8</strong>, che aggiunge
+        lettere accentate, altri alfabeti ed emoji 😀), ma i suoi primi $128$ codici sono <em>ancora</em> quelli
+        dell'ASCII: è rimasta la spina dorsale di tutto.
+      </div>
+
+      <h3>14.4 — Proviamo a tradurne uno piccolo</h3>
+      <p>Facciamone uno in miniatura, semplificato. Qui ogni <strong>riga</strong> di 8 quadratini è un
+        <strong>byte</strong>, cioè una lettera: basta <strong>sommare i valori</strong> scritti in cima alle colonne
+        (128, 64, 32, 16, 8, 4, 2, 1) là dove il quadratino è <strong>pieno</strong>, e il numero che ottieni è il
+        codice della lettera nella tabella ASCII qui sopra. Guarda la prima riga: i pieni stanno sotto il $64$ e il $16$, quindi
+        $64 + 16 = 80$ — e il carattere numero $80$ è la <strong>P</strong>! Prova a decodificare le altre righe, poi
+        traduci tutto.</p>
+
+      <div class="ckt"><svg id="qr-grid" viewBox="0 0 420 230" role="img" aria-label="Griglia di quadratini da decodificare in lettere"></svg></div>
+      <div class="controls"><button class="btn" id="qr-btn">🔍 Traduci il codice</button></div>
+      <p class="eq-out" id="qr-out"></p>
+      <p class="formula-note">(Un vero QR è più sofisticato: legge la griglia in due dimensioni, usa la correzione
+        degli errori e altri caratteri. Ma il cuore è proprio questo: pieni e vuoti che diventano numeri, e numeri che
+        diventano lettere.)</p>
+
+      <h3>14.5 — E dove porta quella frase? 🍕</h3>
+      <p>Nella nostra griglia era nascosta una parola. Ma un codice QR vero, di solito, non nasconde una parola: nasconde
+        un <strong>indirizzo internet</strong> (una URL). Ecco allora che cosa succede quando, seduto in pizzeria,
+        <strong>inquadri il QR</strong> stampato sul tavolo: il telefono legge la griglia di quadratini, la traduce
+        (bit per bit, byte per byte) in un indirizzo web, apre quella pagina... e <strong>compare il menu con tutte le
+        pizze!</strong> Un disegno di quadratini che, decodificato, ti fa venire l'acquolina in bocca. Non male, per un
+        algoritmo.</p>
+    </section>
+
+    <!-- 15 — QUIZ -->
     <section id="quiz">
-      <h2>14. Quiz finale</h2>
+      <h2>15. Quiz finale</h2>
       <p>Dieci domande su algoritmi, cicli, complessità e crittografia. Difficoltà crescente.</p>
       <div id="quiz-app"></div>
     </section>
@@ -940,6 +1065,48 @@
   <script defer src="../Style/interactive.js"></script>
   <script defer src="../Style/quiz.js"></script>
   <script defer src="../Style/toc.js"></script>
+
+  <!-- Sezione 14: decodifica di un mini codice QR -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const svg = document.getElementById('qr-grid');
+      if (!svg) return;
+      const btn = document.getElementById('qr-btn'), out = document.getElementById('qr-out');
+      const vals = [128, 64, 32, 16, 8, 4, 2, 1];
+      const rows = [
+        { bits: [0, 1, 0, 1, 0, 0, 0, 0], letter: 'P' },
+        { bits: [0, 1, 0, 0, 1, 0, 0, 1], letter: 'I' },
+        { bits: [0, 1, 0, 1, 1, 0, 1, 0], letter: 'Z' },
+        { bits: [0, 1, 0, 1, 1, 0, 1, 0], letter: 'Z' },
+        { bits: [0, 1, 0, 0, 0, 0, 0, 1], letter: 'A' }
+      ];
+      let shown = false;
+      function draw() {
+        const x0 = 64, y0 = 46, cs = 32;
+        let h = '';
+        for (let c = 0; c < 8; c++) h += `<text x="${x0 + c * cs + cs / 2}" y="${y0 - 8}" text-anchor="middle" class="lbl-s">${vals[c]}</text>`;
+        rows.forEach(function (row, r) {
+          for (let c = 0; c < 8; c++) {
+            const on = row.bits[c];
+            h += `<rect x="${x0 + c * cs}" y="${y0 + r * cs}" width="${cs}" height="${cs}" fill="${on ? 'var(--text)' : 'var(--surface)'}" stroke="var(--border)" stroke-width="1"/>`;
+          }
+          if (shown) {
+            const sum = row.bits.reduce(function (a, b, i) { return a + b * vals[i]; }, 0);
+            h += `<text x="${x0 + 8 * cs + 16}" y="${y0 + r * cs + cs / 2 + 5}" class="lbl" fill="var(--accent)">= ${sum} → ${row.letter}</text>`;
+          } else {
+            h += `<text x="${x0 + 8 * cs + 16}" y="${y0 + r * cs + cs / 2 + 5}" class="lbl-s">→ ?</text>`;
+          }
+        });
+        svg.innerHTML = h;
+      }
+      btn.addEventListener('click', function () {
+        shown = !shown; draw();
+        btn.textContent = shown ? '↺ Nascondi' : '🔍 Traduci il codice';
+        out.innerHTML = shown ? 'Lettera dopo lettera: <strong>P · I · Z · Z · A</strong> → la parola nascosta è <strong style="color:var(--accent);">PIZZA</strong>! 🍕' : '';
+      });
+      draw();
+    });
+  </script>
 
   <!-- Demo sezioni 12 e 13: cifrario di Cesare e RSA giocattolo -->
   <script>
