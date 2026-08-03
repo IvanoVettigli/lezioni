@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 9 — Il foglio di calcolo</title>
+
+  <!-- Tema (senza defer: applica il tema prima del paint) -->
+  <script src="../Style/theme.js"></script>
+
+  <!-- Grafici -->
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <!-- KaTeX: formule -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <!-- Stili condivisi -->
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent);
+      border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; white-space: nowrap; }
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; }
+    .sim-out { margin-top: 0.6rem; font-size: 1rem; min-height: 1.5em; }
+    .plot { min-height: 320px; }
+
+    /* passi numerati del laboratorio */
+    .steps-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.4rem 0.9rem; margin: 1rem 0; }
+    .steps-box ol { margin: 0.6rem 0; padding-left: 0; list-style: none; counter-reset: st; }
+    .steps-box li { counter-increment: st; position: relative; padding: 0.4rem 0 0.4rem 2.6rem; border-top: 1px dashed var(--border); }
+    .steps-box li:first-child { border-top: none; }
+    .steps-box li::before { content: counter(st); position: absolute; left: 0; top: 0.4rem;
+      width: 1.9rem; height: 1.9rem; background: var(--accent); color: #fff; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; }
+
+    /* tasti e percorsi di menu */
+    .keycap { display: inline-block; font-family: Consolas, monospace; font-size: 0.82em; font-weight: 700;
+      background: var(--surface); border: 1px solid var(--border); border-bottom-width: 3px; border-radius: 6px;
+      padding: 0.05rem 0.4rem; margin: 0 0.1rem; white-space: nowrap; }
+    .menupath { font-weight: 600; color: var(--accent); white-space: nowrap; }
+
+    /* schede dei software */
+    .swgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.7rem; margin: 1rem 0; }
+    .swcard { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem 0.85rem; }
+    .swcard .ico { font-size: 1.7rem; line-height: 1; margin-bottom: 0.25rem; }
+    .swcard .nm { font-weight: 700; display: block; margin-bottom: 0.2rem; }
+    .swcard p { margin: 0; font-size: 0.88rem; color: var(--muted); }
+
+    /* ===== mini foglio di calcolo ===== */
+    .ss { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .ss-bar { display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.5rem; }
+    .ss-ref { font-family: Consolas, monospace; font-weight: 700; color: var(--accent); background: var(--surface);
+      border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.5rem; min-width: 3rem; text-align: center; }
+    .ss-fx { font-family: 'Times New Roman', Georgia, serif; font-style: italic; font-weight: 700; color: var(--muted); padding: 0 0.15rem; }
+    .ss-formula { flex: 1; min-width: 0; font-family: Consolas, monospace; font-size: 0.88rem; color: var(--text);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 0.3rem 0.55rem;
+      white-space: nowrap; overflow-x: auto; min-height: 1.75rem; }
+    .ss-wrap { overflow-x: auto; border-radius: 8px; }
+    table.ss-grid { border-collapse: collapse; font-size: 0.87rem; background: var(--surface); }
+    .ss-grid th { background: var(--surface-2); color: var(--muted); font-weight: 700; font-size: 0.78rem;
+      text-align: center; border: 1px solid var(--border); padding: 0.12rem 0.35rem; }
+    .ss-grid th.ss-hi { background: color-mix(in srgb, var(--accent) 28%, var(--surface)); color: var(--text); }
+    .ss-grid td { border: 1px solid var(--border); padding: 0; }
+    .ss-grid td.lk { background: color-mix(in srgb, var(--muted) 12%, transparent); }
+    .ss-grid input { width: 100%; min-width: 6.2rem; box-sizing: border-box; border: none; background: transparent;
+      color: var(--text); font: inherit; font-family: inherit; padding: 0.26rem 0.42rem; outline: none; }
+    .ss-grid input.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .ss-grid input.err { color: #ef4444; font-weight: 700; text-align: center; }
+    .ss-grid input:focus { box-shadow: inset 0 0 0 2px var(--accent); }
+    .ss-msg { margin-top: 0.5rem; font-size: 0.95rem; min-height: 1.4em; }
+    .ss-msg.ok { color: var(--green); font-weight: 600; }
+    .ss-msg.no { color: #ef4444; font-weight: 600; }
+    .ss-hint { font-size: 0.88rem; color: var(--muted); margin: 0.35rem 0 0; }
+
+    /* riempimento automatico */
+    .fd-wrap { display: flex; gap: 1.2rem; flex-wrap: wrap; align-items: flex-start; }
+    .fd-col { display: inline-block; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--surface); }
+    .fd-cell { width: 8.5rem; padding: 0.28rem 0.5rem; border-bottom: 1px solid var(--border); font-family: Consolas, monospace;
+      font-size: 0.88rem; min-height: 1.65rem; color: var(--text); }
+    .fd-cell:last-child { border-bottom: none; }
+    .fd-cell.seed { background: color-mix(in srgb, var(--accent) 16%, transparent); font-weight: 700; }
+    .fd-cell.done { background: color-mix(in srgb, var(--green) 14%, transparent); }
+    .fd-seedin { width: 5rem; font-family: Consolas, monospace; padding: 0.25rem 0.4rem; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+
+    /* tabella dei dati da copiare */
+    .tsvtab { border-collapse: collapse; font-size: 0.88rem; margin: 0.6rem 0; }
+    .tsvtab th, .tsvtab td { border: 1px solid var(--border); padding: 0.28rem 0.6rem; }
+    .tsvtab th { background: var(--surface-2); }
+    .tsvtab td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Secondo anno · Lezione 9 · Informatica</div>
+    <h1>Il foglio di calcolo</h1>
+    <p>Il quaderno a quadretti che fa i conti da solo — laboratorio guidato su Google Fogli</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Secondo anno</a>
+    <span class="sep">/</span> Il foglio di calcolo
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Una lezione da fare col computer acceso.</strong> Questa non è una lezione da guardare: è una lezione da
+      <em>fare</em>. Apriremo un foglio di calcolo vero e, passo dopo passo, impareremo a farci lavorare al posto
+      nostro — sommare, unire testi, cercare dati in una tabella, disegnare grafici. È lo strumento più usato al mondo
+      negli uffici, nei laboratori e nelle scuole, e dopo la lezione sui <a href="3.Data_base.html">database</a> e
+      quella sulla <a href="8.Statistica.html">statistica</a> hai già in tasca tutte le idee che servono.
+      In fondo alla pagina trovi un <strong>mini foglio di calcolo funzionante</strong>: puoi esercitarti direttamente
+      qui, anche senza computer della scuola.
+    </div>
+
+    <!-- 1 — CHE COS'È -->
+    <section id="sec1">
+      <h2>1. Che cos'è un foglio di calcolo</h2>
+
+      <p>Immagina un enorme quaderno a quadretti, ma con un superpotere: <strong>i quadretti sanno fare i conti</strong>.
+        Tu scrivi i dati, poi spieghi al foglio <em>che cosa</em> vuoi ottenere, e lui calcola. E se domani cambi un
+        dato, tutti i risultati si aggiornano da soli, all'istante.</p>
+
+      <div class="definition">
+        Un <strong>foglio di calcolo</strong> (in inglese <em>spreadsheet</em>) è un programma che organizza i dati in
+        una <strong>tabella</strong> di righe e colonne, e permette di associare a ogni casella non solo un valore, ma
+        anche una <strong>formula</strong> che calcola quel valore a partire dagli altri. Se cambiano i dati di
+        partenza, i risultati si <strong>ricalcolano automaticamente</strong>.
+      </div>
+
+      <h3>1.1 — La struttura: righe, colonne e celle</h3>
+      <p>La struttura è sempre la stessa, in qualunque programma:</p>
+      <ul>
+        <li>le <strong>colonne</strong> sono verticali e si identificano con una <strong>lettera</strong>: A, B, C, …
+          (dopo la Z si riparte con AA, AB, AC…);</li>
+        <li>le <strong>righe</strong> sono orizzontali e si identificano con un <strong>numero</strong>: 1, 2, 3, …;</li>
+        <li>l'incrocio tra una riga e una colonna è una <strong>cella</strong>, la casella dove si scrive.</li>
+      </ul>
+
+      <div class="formula-box">
+        <div class="formula-title">Il riferimento di cella</div>
+        <p style="margin:0;">Ogni cella ha un <strong>nome</strong> (si dice <em>riferimento</em>) formato dalla
+          <strong>lettera della sua colonna</strong> seguita dal <strong>numero della sua riga</strong>: la cella
+          <span class="inline-code">B7</span> è quella che sta nella colonna B, alla riga 7. Prima la lettera, poi il
+          numero: sempre, senza spazi.</p>
+        <p class="formula-note">Un gruppo rettangolare di celle si chiama <strong>intervallo</strong> e si scrive con
+          i <strong>due punti</strong>: <span class="inline-code">B2:B9</span> significa «da B2 fino a B9», cioè tutta
+          quella fetta di colonna. È come dire «dalla cella … alla cella …».</p>
+      </div>
+
+      <p>È esattamente l'idea della <strong>battaglia navale</strong>, o delle coordinate del
+        <a href="4.Piano_cartesiano.html">piano cartesiano</a>: due informazioni (una orizzontale e una verticale)
+        individuano un punto solo. Clicca le celle qui sotto e osserva come cambia il riferimento in alto a sinistra:</p>
+
+      <div id="ss-explore"></div>
+      <p class="sim-out" id="ex-out">Clicca una cella qualsiasi della griglia.</p>
+
+      <h3>1.2 — Tanti programmi, la stessa idea</h3>
+      <p>Di fogli di calcolo ne esistono parecchi: cambiano il colore dei pulsanti e qualche dettaglio, ma i concetti
+        che impari oggi valgono per <strong>tutti</strong>.</p>
+      <div class="swgrid">
+        <div class="swcard">
+          <div class="ico">📗</div><span class="nm">Microsoft Excel</span>
+          <p>Il più famoso, di Microsoft. È a pagamento e fa parte del pacchetto Office. Quasi un sinonimo di «foglio
+            di calcolo».</p>
+        </div>
+        <div class="swcard">
+          <div class="ico">📄</div><span class="nm">Google Fogli</span>
+          <p><em>Google Sheets</em> in inglese. Gratuito, funziona nel browser, salva da solo e permette a più persone
+            di lavorare <strong>insieme</strong> sullo stesso file. È quello che useremo.</p>
+        </div>
+        <div class="swcard">
+          <div class="ico">📘</div><span class="nm">LibreOffice Calc</span>
+          <p>Gratuito e <strong>libero</strong> (open source): il codice è pubblico e chiunque può studiarlo. Si
+            installa sul computer e apre anche i file di Excel.</p>
+        </div>
+        <div class="swcard">
+          <div class="ico">📙</div><span class="nm">Apple Numbers</span>
+          <p>Quello di Apple, incluso su Mac, iPhone e iPad.</p>
+        </div>
+      </div>
+      <p>Un file di foglio di calcolo si chiama <strong>cartella di lavoro</strong> e può contenere più
+        <strong>fogli</strong> (le linguette in basso), un po' come un quaderno con più sezioni: un foglio per i voti,
+        uno per le spese, uno per i grafici.</p>
+    </section>
+
+    <!-- 2 — PREPARIAMO IL LABORATORIO -->
+    <section id="sec2">
+      <h2>2. Prepariamo il laboratorio</h2>
+      <p>Mettiamoci al lavoro sul serio. Useremo <strong>Google Fogli</strong> perché non va installato, è gratuito e
+        ognuno di voi ha già un account con cui accedere: quello <strong>istituzionale</strong> della scuola.</p>
+
+      <div class="steps-box">
+        <ol>
+          <li>Apri il browser e vai su <span class="inline-code">google.it</span>. In alto a destra controlla di essere
+            entrato con il tuo <strong>account istituzionale</strong> (l'indirizzo che ti ha dato la scuola). Se sei
+            entrato con un altro account, clicca sull'icona del profilo e cambia account.</li>
+          <li>Vai su <span class="inline-code">drive.google.com</span>: è il tuo «armadio» online, dove restano
+            salvati tutti i file.</li>
+          <li>Clicca <span class="menupath">+ Nuovo → Fogli Google → Foglio di lavoro vuoto</span>.
+            <br><span class="ss-hint">Scorciatoia: scrivi <span class="inline-code">sheets.new</span> nella barra
+            degli indirizzi e premi <span class="keycap">Invio</span>. Nasce subito un foglio nuovo.</span></li>
+          <li>In alto a sinistra c'è la scritta <em>Foglio di lavoro senza titolo</em>: cliccaci sopra e dai un nome
+            al file, per esempio <strong>Laboratorio foglio di calcolo</strong>.</li>
+          <li>Non devi salvare nulla: Google Fogli <strong>salva da solo</strong>, a ogni modifica. Comparirà la
+            scritta «Tutte le modifiche sono state salvate in Drive».</li>
+        </ol>
+      </div>
+
+      <div class="curiosita">
+        <strong>🤝 Si lavora in due (o in venti).</strong> Il pulsante <span class="menupath">Condividi</span> in alto
+        a destra permette di dare il file a un compagno o al professore: potete scrivere <strong>nello stesso
+        momento</strong>, e vedrete i cursori degli altri muoversi colorati sullo schermo. Attenzione a chi date il
+        permesso di <em>modificare</em>: chi ha il link può cambiare i dati. Per far solo guardare, scegliete
+        «Visualizzatore».
+      </div>
+
+      <p class="ss-hint">Se in laboratorio non c'è connessione, va benissimo anche <strong>LibreOffice Calc</strong>
+        o <strong>Excel</strong>: i comandi sono quasi identici e le formule si scrivono allo stesso modo. Oppure usa
+        il mini foglio di calcolo di questa pagina.</p>
+    </section>
+
+    <!-- 3 — NUMERI O TESTO -->
+    <section id="sec3">
+      <h2>3. Attenzione: numeri o testo?</h2>
+
+      <p>Prima ancora di calcolare qualsiasi cosa, dobbiamo capire una distinzione che sembra banale e invece è la
+        causa di metà degli errori: <strong>che cosa</strong> abbiamo scritto in una cella. Il foglio di calcolo, ogni
+        volta che scrivi, si fa una domanda: «questo è un <em>numero</em> o è del <em>testo</em>?».</p>
+
+      <div class="definition">
+        Una cella può contenere un <strong>valore numerico</strong> (una quantità con cui si possono fare i conti:
+        <span class="inline-code">120</span>, <span class="inline-code">2,5</span>, <span class="inline-code">-7</span>)
+        oppure un <strong>valore letterale</strong>, cioè testo (una sequenza di caratteri:
+        <span class="inline-code">Pullman</span>, <span class="inline-code">P03</span>,
+        <span class="inline-code">45 euro</span>). Sono due <strong>tipi di dato</strong> diversi, e il programma li
+        tratta in modo completamente diverso.
+      </div>
+
+      <p>Il punto è questo: <strong>«45 euro» non è il numero 45</strong>. Per noi è ovvio che significhi
+        quarantacinque euro, ma per il computer è una parola come «ciao», perché contiene delle lettere. E con le
+        parole non si fanno le addizioni.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">La spia che ti salva: l'allineamento</div>
+        <p style="margin:0;">Il foglio ti dice sempre come ha interpretato ciò che hai scritto, con un piccolo segnale
+          che quasi nessuno nota: <strong>i numeri si allineano a destra</strong>, <strong>il testo si allinea a
+          sinistra</strong>. Se scrivi quello che credi sia un numero e lo vedi comparire a sinistra,
+          <em>fermati</em>: il foglio l'ha capito come testo.</p>
+      </div>
+
+      <p>Proviamo. Nel mini foglio qui sotto ci sono le spese di una gita, ma la cella <span class="inline-code">B3</span>
+        contiene <span class="inline-code">45 euro</span> (con la parola «euro»). Guarda i due risultati in fondo e
+        confrontali:</p>
+
+      <div id="ss-tipi"></div>
+      <p class="sim-out" id="tipi-out"></p>
+
+      <div class="warnbox">
+        <strong>⚠️ L'errore visibile e quello invisibile.</strong> Osserva bene i due comportamenti, perché sono
+        diversissimi:
+        <ul style="margin:0.5rem 0 0;">
+          <li>La formula con il <strong>più</strong> (<span class="inline-code">=B2+B3+B4</span>) restituisce
+            <span class="inline-code">#VALORE!</span>: è un <strong>messaggio di errore</strong>, il programma ti sta
+            urlando «non posso sommare del testo!». Fastidioso, ma <em>onesto</em>.</li>
+          <li>La formula <span class="inline-code">=SOMMA(B2:B4)</span> invece non protesta: <strong>salta</strong> le
+            celle di testo e somma solo le altre. Ti dà 150 invece di 195, senza dirti niente. È l'errore
+            <strong>pericoloso</strong>: quello che non vedi.</li>
+        </ul>
+        <p style="margin:0.5rem 0 0;">Morale: prima di fidarti di un totale, controlla che i tuoi dati siano davvero
+          numeri.</p>
+      </div>
+
+      <p>Come si scrivono bene i numeri, allora? Poche regole d'oro:</p>
+      <ul>
+        <li><strong>Niente unità di misura dentro la cella.</strong> Scrivi <span class="inline-code">45</span>, non
+          <span class="inline-code">45 euro</span>. L'unità si mette nell'<em>intestazione</em> della colonna
+          («Importo (€)») oppure con la formattazione (<span class="menupath">Formato → Numero → Valuta</span>), che
+          fa <em>vedere</em> «45,00 €» lasciando dentro il numero 45.</li>
+        <li><strong>La virgola per i decimali.</strong> In italiano si scrive <span class="inline-code">2,5</span>.
+          Attento: se scrivi <span class="inline-code">2.5</span> con il punto, alcuni fogli lo interpretano come una
+          <em>data</em> o come testo!</li>
+        <li><strong>Niente spazi</strong> prima o dopo il numero, e niente puntini per separare le migliaia scritti a
+          mano.</li>
+        <li><strong>Vuoi proprio del testo?</strong> Se hai bisogno che un numero resti testo (per esempio un codice
+          come <span class="inline-code">007</span>, che altrimenti diventerebbe 7), scrivi un
+          <strong>apostrofo</strong> davanti: <span class="inline-code">'007</span>. L'apostrofo non si vede nella
+          cella, ma dice al foglio «tratta tutto come testo».</li>
+      </ul>
+
+      <div class="curiosita">
+        <strong>🧬 Quando il tipo sbagliato manda in tilt la scienza.</strong> Nel 2020 un gruppo di genetisti ha
+        dovuto <strong>rinominare 27 geni umani</strong>. Il motivo? Excel trasformava automaticamente le loro sigle in
+        date: il gene <em>SEPT1</em> diventava «1 settembre», <em>MARCH1</em> diventava «1 marzo», e migliaia di
+        tabelle scientifiche risultavano rovinate. Poiché convincere Excel era impossibile, hanno cambiato il nome ai
+        geni. Non è una leggenda: la conversione automatica dei tipi è una delle trappole più famose dell'informatica.
+      </div>
+    </section>
+
+    <!-- 4 — COMPLETAMENTO AUTOMATICO -->
+    <section id="sec4">
+      <h2>4. Il completamento automatico</h2>
+
+      <p>Immagina di dover numerare 300 righe, o di scrivere tutti i giorni del mese. A mano sarebbe un incubo. Ma il
+        foglio di calcolo è pigro per natura — e la pigrizia, in informatica, è una virtù: se gli fai vedere
+        <strong>l'inizio</strong> di una sequenza, lui <strong>indovina come continua</strong>.</p>
+
+      <div class="definition">
+        Il <strong>riempimento automatico</strong> (o completamento automatico) è la funzione che estende una serie di
+        dati: si scrivono i primi valori, si selezionano, e trascinando il piccolo <strong>quadratino blu</strong>
+        nell'angolo in basso a destra della selezione il foglio genera da solo tutti i valori successivi, riconoscendo
+        la regola.
+      </div>
+
+      <div class="steps-box">
+        <ol>
+          <li>Nella cella <span class="inline-code">A1</span> scrivi <strong>1</strong> e premi
+            <span class="keycap">Invio</span>; in <span class="inline-code">A2</span> scrivi <strong>2</strong>.</li>
+          <li>Seleziona <strong>entrambe</strong> le celle: clicca A1 e, tenendo premuto, trascina fino ad A2.</li>
+          <li>In basso a destra della selezione compare un <strong>quadratino</strong>. Avvicina il mouse: il cursore
+            diventa una crocetta <span class="keycap">+</span>.</li>
+          <li><strong>Trascina il quadratino verso il basso</strong> fino alla riga 20 e lascia: compaiono i numeri da
+            1 a 20. Non li hai scritti tu!</li>
+          <li>Prova ora con <strong>5</strong> e <strong>10</strong>: otterrai 15, 20, 25… Il foglio ha capito che il
+            passo è 5. E con <strong>lunedì</strong>? Ti scrive tutta la settimana.</li>
+        </ol>
+      </div>
+
+      <p>Perché funziona? Perché il foglio calcola la <strong>differenza</strong> tra i due valori che gli hai dato e
+        la ripete: è una <strong>progressione aritmetica</strong>, la stessa idea delle successioni. Con due soli
+        esempi gli hai insegnato una regola. Provalo qui:</p>
+
+      <div class="ss">
+        <div class="fd-wrap">
+          <div>
+            <p style="margin:0 0 0.4rem; font-weight:600;">I primi due valori:</p>
+            <input class="fd-seedin" id="fd-a" value="1"> &nbsp;
+            <input class="fd-seedin" id="fd-b" value="2">
+            <div class="sim-btns">
+              <button class="btn btn-primary" id="fd-go">⬇ Trascina il quadratino</button>
+              <button class="btn" id="fd-reset">↺ azzera</button>
+            </div>
+            <p style="margin:0.2rem 0 0.35rem; font-size:0.9rem; color:var(--muted);">Oppure prova un esempio:</p>
+            <div class="sim-btns" id="fd-presets"></div>
+          </div>
+          <div>
+            <div class="fd-col" id="fd-col"></div>
+          </div>
+        </div>
+        <p class="sim-out" id="fd-out">Scegli i primi due valori e premi il pulsante.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>⌨️ Altre scorciatoie che fanno risparmiare ore.</strong>
+        <ul style="margin:0.4rem 0 0;">
+          <li><strong>Doppio clic</strong> sul quadratino blu: riempie da solo fino in fondo, senza trascinare, se
+            nella colonna accanto ci sono dei dati.</li>
+          <li>Le serie riconosciute non sono solo numeriche: <em>lunedì, martedì…</em>, <em>gennaio, febbraio…</em>,
+            <em>01/01/2026, 02/01/2026…</em>, e perfino <em>Gruppo 1, Gruppo 2…</em></li>
+          <li><span class="keycap">Ctrl</span>+<span class="keycap">C</span> e
+            <span class="keycap">Ctrl</span>+<span class="keycap">V</span> funzionano come dappertutto; con
+            <span class="keycap">Ctrl</span>+<span class="keycap">Z</span> annulli l'ultima mossa (usalissimo!).</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5 — L'UGUALE E LE FUNZIONI -->
+    <section id="sec5">
+      <h2>5. Il segno «=» e le funzioni</h2>
+
+      <p>Fin qui abbiamo solo <em>scritto</em> dei dati: qualunque quaderno lo sa fare. Adesso arriva il superpotere.
+        Tutto comincia da un carattere solo, il segno <strong>uguale</strong>.</p>
+
+      <div class="definition">
+        Quando il contenuto di una cella comincia con <strong>=</strong>, il foglio di calcolo smette di considerarlo
+        testo e lo interpreta come una <strong>formula</strong>, cioè un <strong>calcolo da eseguire</strong>. Nella
+        cella non vedrai la formula, ma il suo <strong>risultato</strong>.
+      </div>
+
+      <p>Provalo subito: in una cella scrivi <span class="inline-code">3+2</span> e premi
+        <span class="keycap">Invio</span> → resta lì, scritto, inerte. Cancella e scrivi
+        <span class="inline-code">=3+2</span> → compare <strong>5</strong>. La formula c'è ancora, ma è
+        <em>dietro</em> il risultato: clicca la cella e la ritrovi nella <strong>barra della formula</strong>, in
+        alto. È una cosa importante da capire: <strong>ogni cella ha due facce</strong>, quello che contiene e quello
+        che mostra.</p>
+
+      <p>Gli operatori sono quelli che conosci, con le stesse precedenze della matematica (prima moltiplicazioni e
+        divisioni, poi somme e sottrazioni, e le parentesi comandano su tutto):</p>
+      <table class="tsvtab">
+        <tr><th>Operazione</th><th>Simbolo</th><th>Esempio</th></tr>
+        <tr><td>addizione</td><td><span class="inline-code">+</span></td><td><span class="inline-code">=B2+B3</span></td></tr>
+        <tr><td>sottrazione</td><td><span class="inline-code">-</span></td><td><span class="inline-code">=B2-B3</span></td></tr>
+        <tr><td>moltiplicazione</td><td><span class="inline-code">*</span></td><td><span class="inline-code">=B2*3</span></td></tr>
+        <tr><td>divisione</td><td><span class="inline-code">/</span></td><td><span class="inline-code">=B2/25</span></td></tr>
+        <tr><td>elevamento a potenza</td><td><span class="inline-code">^</span></td><td><span class="inline-code">=B2^2</span></td></tr>
+      </table>
+
+      <h3>5.1 — La vera magia: le formule parlano di celle</h3>
+      <p>Potresti scrivere <span class="inline-code">=120+45</span>, ma sarebbe uno spreco. La cosa potente è
+        scrivere <span class="inline-code">=B2+B3</span>: la formula non nomina i <em>numeri</em>, nomina le
+        <strong>celle</strong> che li contengono. Così, se domani il pullman costa 130 invece di 120, ti basta
+        correggere quel dato e <strong>tutti</strong> i risultati che dipendono da lui si aggiornano da soli, in un
+        istante.</p>
+      <p>Ti ricorda qualcosa? È la stessa idea delle <strong>lettere al posto dei numeri</strong> che usi in algebra
+        dalla prima: <span class="inline-code">B2</span> è una <strong>variabile</strong>, un contenitore con un nome.
+        Il riferimento di cella è il modo in cui il foglio di calcolo scrive le variabili.</p>
+
+      <h3>5.2 — Che cos'è una funzione</h3>
+      <p>Scrivere <span class="inline-code">=B2+B3+B4+B5+B6+B7+B8+B9</span> funziona, ma è lungo e fragile. Per questo
+        esistono le <strong>funzioni</strong>: operazioni già pronte, scritte una volta per tutte da chi ha
+        programmato il foglio, che tu puoi richiamare per nome.</p>
+
+      <div class="definition">
+        Una <strong>funzione</strong> è una «macchina» che riceve dei dati in <strong>ingresso</strong> (gli
+        <strong>argomenti</strong>) e restituisce <strong>un</strong> risultato in uscita. È esattamente l'idea di
+        funzione che hai visto con la <a href="5.Retta.html">retta</a>: dai un valore alla macchina, la macchina
+        applica la sua regola e ti dà il valore corrispondente. Qui, invece di $y = f(x)$, si scrive
+        <span class="inline-code">=NOME(argomenti)</span>.
+      </div>
+
+      <div class="formula-box" style="text-align:center;">
+        <div style="font-family:Consolas,monospace; font-size:1.6rem; letter-spacing:0.04em; margin:0.2rem 0 0.6rem;">
+          <span style="color:var(--magenta); font-weight:800;">=</span><span
+            style="color:var(--accent); font-weight:800;">SOMMA</span><span
+            style="color:var(--muted);">(</span><span
+            style="color:var(--green); font-weight:800;">B2:B9</span><span style="color:var(--muted);">)</span>
+        </div>
+        <ul style="text-align:left; margin:0;">
+          <li><span style="color:var(--magenta); font-weight:800; font-family:Consolas,monospace;">=</span> &nbsp;
+            «attenzione, quello che segue è un calcolo».</li>
+          <li><span style="color:var(--accent); font-weight:800; font-family:Consolas,monospace;">SOMMA</span> &nbsp;
+            il <strong>nome</strong> della funzione: <em>quale</em> macchina voglio usare.</li>
+          <li><span style="color:var(--muted); font-family:Consolas,monospace;">( )</span> &nbsp; le parentesi, sempre
+            obbligatorie: dentro ci vanno gli argomenti.</li>
+          <li><span style="color:var(--green); font-weight:800; font-family:Consolas,monospace;">B2:B9</span> &nbsp;
+            l'<strong>argomento</strong>: su quali dati deve lavorare. Qui è un intervallo di 8 celle.</li>
+        </ul>
+        <p class="formula-note" style="text-align:left;">Se gli argomenti sono più di uno si separano con il
+          <strong>punto e virgola</strong>: <span class="inline-code">=SOMMA(B2:B9;D2;D5)</span> somma l'intervallo
+          B2:B9 <em>più</em> le celle D2 e D5.</p>
+      </div>
+
+      <p>Il vantaggio di dare in pasto alla funzione un <strong>intervallo</strong> è enorme: la formula diventa corta,
+        leggibile, e continua a funzionare anche se domani i dati diventano cento. Ecco le funzioni che useremo oggi
+        (i nomi sono in italiano su un foglio in italiano; tra parentesi la versione inglese):</p>
+
+      <table class="tsvtab">
+        <tr><th>Funzione</th><th>Che cosa fa</th><th>Esempio</th></tr>
+        <tr><td><span class="inline-code">SOMMA</span> <span style="color:var(--muted);">(SUM)</span></td>
+            <td>somma tutti i numeri</td><td><span class="inline-code">=SOMMA(B2:B9)</span></td></tr>
+        <tr><td><span class="inline-code">MEDIA</span> <span style="color:var(--muted);">(AVERAGE)</span></td>
+            <td>la media aritmetica</td><td><span class="inline-code">=MEDIA(B2:B9)</span></td></tr>
+        <tr><td><span class="inline-code">MAX</span> / <span class="inline-code">MIN</span></td>
+            <td>il valore più grande / più piccolo</td><td><span class="inline-code">=MAX(B2:B9)</span></td></tr>
+        <tr><td><span class="inline-code">CONTA.NUMERI</span> <span style="color:var(--muted);">(COUNT)</span></td>
+            <td>quante celle contengono numeri</td><td><span class="inline-code">=CONTA.NUMERI(B2:B9)</span></td></tr>
+        <tr><td><span class="inline-code">ARROTONDA</span> <span style="color:var(--muted);">(ROUND)</span></td>
+            <td>arrotonda a tot decimali</td><td><span class="inline-code">=ARROTONDA(B10;2)</span></td></tr>
+      </table>
+
+      <div class="curiosita">
+        <strong>💡 Non devi impararle a memoria.</strong> Appena scrivi <span class="inline-code">=</span> e le prime
+        lettere, il foglio apre da solo un <strong>menu di suggerimenti</strong> con tutte le funzioni che iniziano
+        così, e ti mostra una descrizione di quello che fa e degli argomenti che vuole. Premi
+        <span class="keycap">Tab</span> per accettare il suggerimento. C'è anche il pulsante
+        <span class="menupath">Σ</span> nella barra degli strumenti, con le funzioni più comuni già pronte.
+        Le funzioni disponibili sono <strong>centinaia</strong>: nessuno le conosce tutte.
+      </div>
+
+      <h3>5.3 — Esercitazione: il bilancio della gita</h3>
+      <p>Ecco le spese di una gita scolastica. Le voci e gli importi sono già scritti (le celle grigie non si toccano):
+        tocca a te <strong>completare le celle bianche</strong> con le formule giuste. Scrivi la formula, premi
+        <span class="keycap">Invio</span>, poi premi <strong>Controlla</strong>.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 1 — Somma, media e massimo</span><span class="difficulty easy">Facile</span></div>
+        <ul>
+          <li><span class="inline-code">B10</span>: il <strong>totale</strong> delle spese (usa
+            <span class="inline-code">SOMMA</span> su tutto l'intervallo degli importi);</li>
+          <li><span class="inline-code">B11</span>: la <strong>spesa media</strong> per voce;</li>
+          <li><span class="inline-code">B12</span>: la <strong>voce più cara</strong>;</li>
+          <li><span class="inline-code">B13</span>: quanto paga <strong>ogni studente</strong>, se la classe è di 25
+            studenti (dividi il totale che hai già calcolato in B10 — non riscriverlo!).</li>
+        </ul>
+        <div id="ss-somma"></div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra le formule</button></div>
+        <div class="solution">
+          <p><span class="inline-code">B10 → =SOMMA(B2:B9)</span> restituisce 360.<br>
+            <span class="inline-code">B11 → =MEDIA(B2:B9)</span> restituisce 45.<br>
+            <span class="inline-code">B12 → =MAX(B2:B9)</span> restituisce 120.<br>
+            <span class="inline-code">B13 → =B10/25</span> restituisce 14,4.</p>
+          <p>Nota l'eleganza dell'ultima: invece di riscrivere la somma, <strong>riusa</strong> il risultato già
+            calcolato in B10. Se domani cambia una spesa, si aggiorna tutta la catena. E prova a modificare un
+            importo: guarda i quattro risultati cambiare insieme, all'istante.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — CONCATENARE -->
+    <section id="sec6">
+      <h2>6. Unire il testo: la concatenazione</h2>
+
+      <p>Le formule non servono solo per i numeri. Una delle cose più utili — e che nella vita d'ufficio si fa in
+        continuazione — è <strong>unire</strong> pezzi di testo che stanno in celle diverse.</p>
+
+      <div class="definition">
+        <strong>Concatenare</strong> significa attaccare due o più testi uno di seguito all'altro per formarne uno
+        solo. In un foglio di calcolo si fa con la funzione <span class="inline-code">CONCATENA</span> oppure, più
+        rapidamente, con l'operatore <strong>&amp;</strong> (la <em>e commerciale</em>, che si legge «and»).
+      </div>
+
+      <p>Immagina un elenco con il <strong>nome</strong> in colonna A e il <strong>cognome</strong> in colonna B, e di
+        volere in colonna C il <strong>nome completo</strong>. Le due formule seguenti sono equivalenti:</p>
+      <div class="formula-box">
+        <div style="font-family:Consolas,monospace; font-size:1.05rem; line-height:2;">
+          =CONCATENA(A2;" ";B2)<br>
+          =A2&amp;" "&amp;B2
+        </div>
+        <p class="formula-note">Entrambe, se A2 contiene <em>Anna</em> e B2 contiene <em>Rossi</em>, restituiscono
+          <strong>Anna Rossi</strong>.</p>
+      </div>
+
+      <p>Attenzione a quel <span class="inline-code">" "</span> in mezzo: è uno <strong>spazio scritto a mano</strong>,
+        e ci vuole per forza. Il computer non aggiunge nulla di sua iniziativa: se scrivi
+        <span class="inline-code">=A2&amp;B2</span> ottieni <strong>AnnaRossi</strong>, tutto attaccato. Le
+        <strong>virgolette</strong> servono a dire «questo è testo che ti do io, non un riferimento di cella»: puoi
+        metterci dentro qualunque cosa, uno spazio, una virgola, un trattino, una frase intera.</p>
+
+      <p>Due funzioni compagne, comodissime quando i dati sono scritti in modo disordinato:</p>
+      <ul>
+        <li><span class="inline-code">MINUSC(A2)</span> — trasforma tutto in <strong>minuscolo</strong> (in inglese
+          <em>LOWER</em>);</li>
+        <li><span class="inline-code">MAIUSC(A2)</span> — trasforma tutto in <strong>MAIUSCOLO</strong> (in inglese
+          <em>UPPER</em>).</li>
+      </ul>
+
+      <h3>6.1 — Esercitazione: la lista della classe</h3>
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2 — Nome completo ed e-mail</span><span class="difficulty medium">Medio</span></div>
+        <p>Nel foglio ci sono nomi e cognomi. Completa:</p>
+        <ul>
+          <li><span class="inline-code">C2</span>: il <strong>nome completo</strong> («Anna Rossi»), con lo spazio in
+            mezzo;</li>
+          <li><span class="inline-code">D2</span>: l'<strong>indirizzo e-mail</strong> della scuola, costruito così:
+            nome, punto, cognome, chiocciola, <span class="inline-code">scuola.it</span> — <strong>tutto in
+            minuscolo</strong>. Deve venire <span class="inline-code">anna.rossi@scuola.it</span>.</li>
+        </ul>
+        <p class="ss-hint">Poi clicca su <span class="inline-code">C2</span> e premi <strong>Ricopia in basso</strong>
+          (e ripeti da <span class="inline-code">D2</span>): vedrai la formula scendere e adattarsi da sola a ogni
+          riga. È così che si compilano mille indirizzi in due secondi.</p>
+        <div id="ss-concat"></div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra le formule</button></div>
+        <div class="solution">
+          <p><span class="inline-code">C2 → =A2&amp;" "&amp;B2</span> &nbsp;oppure&nbsp;
+            <span class="inline-code">=CONCATENA(A2;" ";B2)</span></p>
+          <p><span class="inline-code">D2 → =MINUSC(A2)&amp;"."&amp;MINUSC(B2)&amp;"@scuola.it"</span></p>
+          <p>Qui i pezzi sono quattro: il nome in minuscolo, il punto, il cognome in minuscolo e la parte fissa
+            dell'indirizzo. Nota che <span class="inline-code">"@scuola.it"</span> è uguale per tutti, quindi si scrive
+            tra virgolette una volta sola: il foglio la ripeterà su ogni riga.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — CERCA.VERT -->
+    <section id="sec7">
+      <h2>7. CERCA.VERT: far dialogare due tabelle</h2>
+
+      <p>Ed eccoci alla funzione che, da sola, vale il prezzo del biglietto. È quella che trasforma un foglio di
+        calcolo da «calcolatrice grande» a vero strumento di lavoro, ed è la prima che ti chiederanno di saper usare
+        in qualunque ufficio.</p>
+
+      <p>Il problema è questo. Hai <strong>due tabelle</strong>: da una parte il <strong>listino</strong> del
+        magazzino (codice, prodotto, prezzo); dall'altra gli <strong>ordini</strong> arrivati, dove per risparmiare
+        tempo è stato scritto solo il <em>codice</em> del prodotto. Ora ti serve, accanto a ogni ordine, il nome e il
+        prezzo. Copiarli a mano? Con quattro ordini si può fare; con quattromila no — e a mano si sbaglia.</p>
+
+      <div class="curiosita">
+        <strong>🔗 L'hai già incontrato.</strong> Due tabelle, un <strong>codice</strong> che fa da collegamento…
+        è esattamente la <strong>chiave</strong> dei <a href="3.Data_base.html">database</a>! Il codice prodotto è la
+        <em>chiave primaria</em> nel listino e diventa <em>chiave esterna</em> nella tabella degli ordini. Quello che
+        in SQL si chiama <em>JOIN</em>, nel foglio di calcolo si chiama <strong>CERCA.VERT</strong>: stessa identica
+        idea, due vestiti diversi.
+      </div>
+
+      <div class="definition">
+        <span class="inline-code">CERCA.VERT</span> (in inglese <em>VLOOKUP</em>, da <em>vertical lookup</em>) cerca
+        un valore nella <strong>prima colonna</strong> di una tabella, scendendo verticalmente; quando lo trova, si
+        sposta <strong>a destra</strong> di un certo numero di colonne e restituisce il valore che trova lì.
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">La sintassi</div>
+        <div style="font-family:Consolas,monospace; font-size:1.02rem; margin-bottom:0.5rem;">
+          =CERCA.VERT(<span style="color:var(--magenta);">chiave</span>;
+          <span style="color:var(--accent);">intervallo</span>;
+          <span style="color:var(--green);">indice</span>;
+          <span style="color:var(--gold);">ordinato</span>)
+        </div>
+        <ul style="margin:0;">
+          <li><span style="color:var(--magenta); font-weight:700;">chiave</span> — <em>che cosa</em> cerco: di solito
+            il riferimento di una cella (per esempio <span class="inline-code">B2</span>, il codice dell'ordine).</li>
+          <li><span style="color:var(--accent); font-weight:700;">intervallo</span> — <em>dove</em> lo cerco: la
+            tabella in cui guardare. <strong>Regola d'oro:</strong> la colonna che contiene i codici deve essere la
+            <strong>prima</strong> dell'intervallo.</li>
+          <li><span style="color:var(--green); font-weight:700;">indice</span> — <em>che cosa mi riporti indietro</em>:
+            il numero della colonna da restituire, <strong>contando dalla prima dell'intervallo</strong> (che è la
+            numero 1, non la 0!).</li>
+          <li><span style="color:var(--gold); font-weight:700;">ordinato</span> — scrivi sempre
+            <span class="inline-code">FALSO</span>: significa «voglio la corrispondenza <strong>esatta</strong>».
+            Con <span class="inline-code">VERO</span> il foglio si accontenta del valore più vicino, e sui codici
+            combina disastri.</li>
+        </ul>
+      </div>
+
+      <p>Se il codice cercato <strong>non esiste</strong> nel listino, la funzione restituisce
+        <span class="inline-code">#N/D</span>, che si legge «non disponibile»: non è un capriccio, è la funzione che ti
+        avvisa onestamente «quel codice non l'ho trovato».</p>
+
+      <h3>7.1 — Riferimenti relativi e assoluti (il dollaro che blocca)</h3>
+      <p>C'è un dettaglio da capire <em>prima</em> di provare, altrimenti l'esercizio non funzionerà. Quando ricopi una
+        formula verso il basso, il foglio <strong>sposta automaticamente</strong> i riferimenti: da
+        <span class="inline-code">B2</span> passa a <span class="inline-code">B3</span>, poi
+        <span class="inline-code">B4</span>… Si chiamano <strong>riferimenti relativi</strong>, e di solito è proprio
+        quello che vogliamo: ogni riga deve guardare il <em>suo</em> codice.</p>
+      <p>Ma il <strong>listino no</strong>: quello deve restare fermo! Se lasci l'intervallo relativo, ricopiando la
+        formula diventa E3:G8, poi E4:G9… e a un certo punto il listino «scivola fuori» dalla finestra e ti ritrovi
+        pieno di <span class="inline-code">#N/D</span>. Per inchiodarlo si usa il simbolo del
+        <strong>dollaro</strong>:</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il dollaro blocca ciò che lo segue</div>
+        <table class="tsvtab" style="margin:0.3rem 0;">
+          <tr><th>Scrittura</th><th>Che cosa succede ricopiando</th><th>Nome</th></tr>
+          <tr><td><span class="inline-code">E2</span></td><td>si spostano sia la colonna sia la riga</td><td>relativo</td></tr>
+          <tr><td><span class="inline-code">&#36;E2</span></td><td>la colonna E resta fissa, la riga si sposta</td><td>misto</td></tr>
+          <tr><td><span class="inline-code">E&#36;2</span></td><td>la colonna si sposta, la riga 2 resta fissa</td><td>misto</td></tr>
+          <tr><td><span class="inline-code">&#36;E&#36;2</span></td><td><strong>non si sposta niente</strong>: sempre E2</td><td>assoluto</td></tr>
+        </table>
+        <p class="formula-note">Non serve scrivere i dollari a mano: seleziona il riferimento nella barra della
+          formula e premi <span class="keycap">F4</span> (su Google Fogli anche
+          <span class="keycap">Fn</span>+<span class="keycap">F4</span>): a ogni pressione ruota tra le quattro
+          possibilità.</p>
+      </div>
+
+      <p>La formula giusta, quindi, è questa — codice relativo, listino assoluto:</p>
+      <div class="formula-box" style="text-align:center;">
+        <span style="font-family:Consolas,monospace; font-size:1.05rem;">=CERCA.VERT(B2;&#36;E&#36;2:&#36;G&#36;7;2;FALSO)</span>
+      </div>
+
+      <h3>7.2 — Esercitazione: gli ordini della cartoleria</h3>
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3 — Il magazzino</span><span class="difficulty hard">Difficile</span></div>
+        <p>A sinistra gli ordini (con il solo codice), a destra il listino. Completa:</p>
+        <ul>
+          <li><span class="inline-code">C2</span>: il <strong>nome del prodotto</strong> corrispondente al codice in
+            B2 (indice 2);</li>
+          <li><span class="inline-code">D2</span>: il suo <strong>prezzo</strong> (indice 3);</li>
+          <li>poi clicca su <span class="inline-code">C2</span> e premi <strong>Ricopia in basso</strong>, e ripeti
+            da <span class="inline-code">D2</span>, per completare i quattro ordini (funziona solo se hai usato i
+            dollari!);</li>
+          <li>infine <span class="inline-code">D6</span>: il <strong>totale</strong> dell'ordine.</li>
+        </ul>
+        <div id="ss-vlookup"></div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra le formule</button></div>
+        <div class="solution">
+          <p><span class="inline-code">C2 → =CERCA.VERT(B2;&#36;E&#36;2:&#36;G&#36;7;2;FALSO)</span> → Zaino<br>
+            <span class="inline-code">D2 → =CERCA.VERT(B2;&#36;E&#36;2:&#36;G&#36;7;3;FALSO)</span> → 34,9<br>
+            <span class="inline-code">D6 → =SOMMA(D2:D5)</span> → 50,6</p>
+          <p>Le due formule sono <strong>identiche</strong> tranne che per l'indice: 2 chiede la seconda colonna del
+            listino (il prodotto), 3 chiede la terza (il prezzo). Prova a cambiare un codice in colonna B: nome e
+            prezzo si aggiornano da soli. E se scrivi un codice inesistente, per esempio
+            <span class="inline-code">P99</span>, compare <span class="inline-code">#N/D</span>.</p>
+          <p class="ss-hint">Vuoi vedere il disastro annunciato? Riscrivi C2 <em>senza</em> i dollari
+            (<span class="inline-code">=CERCA.VERT(B2;E2:G7;2;FALSO)</span>) e ricopia in basso: comincia a
+            comparire <span class="inline-code">#N/D</span>, perché a ogni riga il listino scivola più in giù e i
+            codici finiscono fuori dall'intervallo. E attenzione: qualche riga potrebbe risultare
+            <strong>giusta per puro caso</strong> (se il codice cercato è rimasto dentro la finestra scivolata) —
+            il che è ancora più insidioso, perché una tabella metà giusta e metà sbagliata è molto più difficile da
+            smascherare di una tutta sbagliata.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — I GRAFICI -->
+    <section id="sec8">
+      <h2>8. Disegnare i dati: i grafici</h2>
+
+      <p>Nella <a href="8.Statistica.html">lezione sulla statistica</a> abbiamo detto che un elenco di numeri non dice
+        niente all'occhio, mentre un grafico si capisce in un istante. Il bello è che il foglio di calcolo li disegna
+        <strong>da solo</strong>: tu selezioni i dati, lui fa il resto — e se i dati cambiano, il grafico si aggiorna.</p>
+
+      <p>Ecco i dati di un'indagine fatta in una classe: per ogni studente, quante <strong>ore a settimana</strong>
+        dedica allo studio della matematica e che <strong>voto</strong> ha preso all'ultima verifica. Copiali e
+        incollali nel tuo foglio, in un foglio nuovo (linguetta <span class="menupath">+</span> in basso a sinistra),
+        partendo dalla cella <span class="inline-code">A1</span>.</p>
+
+      <div class="sim-btns">
+        <button class="btn btn-primary" id="copy-dati">📋 Copia i dati</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="tsvtab" id="dati-tab"></table>
+      </div>
+      <p class="ss-hint">Dopo aver premuto il pulsante, clicca su A1 nel tuo foglio e premi
+        <span class="keycap">Ctrl</span>+<span class="keycap">V</span>. Le tre colonne si sistemeranno da sole:
+        incollando un testo separato da tabulazioni, il foglio capisce dove finisce una colonna e inizia l'altra.</p>
+
+      <h3>8.1 — Il grafico a barre (o a colonne)</h3>
+      <p>Serve a <strong>confrontare</strong> tra loro delle quantità: quanto è alto questo rispetto a quello. Ogni
+        barra è un elemento, l'altezza è il suo valore.</p>
+      <div class="steps-box">
+        <ol>
+          <li>Seleziona i dati che ti interessano: la colonna dei <strong>nomi</strong> e quella dei
+            <strong>voti</strong>. Sono lontane, quindi seleziona <span class="inline-code">A1:A13</span>, poi tieni
+            premuto <span class="keycap">Ctrl</span> e seleziona anche <span class="inline-code">C1:C13</span>.</li>
+          <li>Vai su <span class="menupath">Inserisci → Grafico</span>.</li>
+          <li>Si apre il pannello <strong>Editor grafico</strong> a destra. Google prova a indovinare il tipo: alla
+            voce <span class="menupath">Tipo di grafico</span> scegli <strong>Grafico a colonne</strong>.</li>
+          <li>Passa alla scheda <span class="menupath">Personalizza</span> per dare un titolo
+            («Voti della classe») e per cambiare i colori.</li>
+        </ol>
+      </div>
+      <p>Dovresti ottenere qualcosa di molto simile a questo:</p>
+      <div class="ss"><div class="plot" id="bar-plot"></div></div>
+      <p>Si legge a colpo d'occhio: Paolo ha il voto più alto, Anna il più basso. Le barre vanno benissimo per
+        confrontare <strong>categorie</strong> (persone, materie, mesi, squadre).</p>
+
+      <h3>8.2 — Il grafico a dispersione (scatter)</h3>
+      <p>Questo è più interessante, ed è quello che serve alla scienza. Non confronta categorie: mette in relazione
+        <strong>due grandezze numeriche</strong> per capire se «vanno insieme». Ogni studente diventa un
+        <strong>punto</strong>, con le ore sull'asse orizzontale e il voto su quello verticale — proprio come i punti
+        del <a href="4.Piano_cartesiano.html">piano cartesiano</a>.</p>
+      <div class="steps-box">
+        <ol>
+          <li>Seleziona <span class="inline-code">B1:C13</span> (ore e voti: le due colonne <em>numeriche</em>,
+            stavolta vicine).</li>
+          <li><span class="menupath">Inserisci → Grafico</span>, e come tipo scegli <strong>Grafico a
+            dispersione</strong>.</li>
+          <li>Ora la parte bella: nell'editor vai su <span class="menupath">Personalizza → Serie</span> e attiva la
+            casella <strong>Linea di tendenza</strong>.</li>
+          <li>Sempre lì, alla voce <span class="menupath">Etichetta</span> scegli <strong>Usa equazione</strong>, e
+            spunta <strong>Mostra R²</strong>.</li>
+        </ol>
+      </div>
+      <div class="ss"><div class="plot" id="scatter-plot"></div></div>
+
+      <p>Il foglio ha appena fatto per te un lavoro non banale: ha trovato la <strong>retta che passa meglio</strong>
+        in mezzo alla nuvola di punti. La sua equazione è</p>
+      <div class="formula-box">
+        $$y = 0{,}65\,x + 4{,}37$$
+        <p class="formula-note">ed è una vecchia conoscenza: è la <a href="5.Retta.html">retta</a>
+          $y = mx + q$! Qui l'intercetta $q = 4{,}37$ è il voto «di partenza» stimato per chi non studia affatto, e il
+          coefficiente angolare $m = 0{,}65$ dice che, in media, <strong>ogni ora di studio in più vale circa due
+          terzi di punto</strong> in più sul voto.</p>
+      </div>
+
+      <p>Il numero $R^2 = 0{,}94$ indica quanto i punti sono «vicini» alla retta: vale al massimo 1, e più è alto più
+        la relazione è stretta. Qui è altissimo, quindi la nuvola è quasi allineata.</p>
+
+      <div class="warnbox">
+        <strong>⚠️ E adesso il ragionamento importante.</strong> Il grafico dice che ore di studio e voti sono
+        fortemente <strong>correlati</strong>. Ma, come abbiamo imparato nella <a href="8.Statistica.html">lezione
+        sulla statistica</a>, <strong>correlazione non significa causalità</strong>: questi dati da soli non
+        dimostrano che studiare <em>causi</em> il voto alto. Potrebbe esserci una causa comune (chi ha più interesse
+        studia di più <em>e</em> capisce meglio), o il verso potrebbe essere rovesciato (chi va bene si appassiona e
+        studia di più). Il foglio di calcolo disegna la retta anche su dati completamente insensati: la matematica
+        obbedisce sempre, il senso critico devi metterlo tu.
+      </div>
+
+      <div class="curiosita">
+        <strong>📊 Quale grafico si sceglie?</strong> Una regola pratica: <strong>barre</strong> per confrontare
+        categorie separate; <strong>dispersione</strong> per cercare una relazione tra due grandezze numeriche;
+        <strong>torta</strong> solo per mostrare come un intero si divide in poche fette (se le fette sono venti,
+        diventa illeggibile); <strong>linee</strong> per seguire l'andamento di qualcosa nel tempo. Scegliere il
+        grafico sbagliato non è solo brutto: <em>nasconde</em> l'informazione.
+      </div>
+    </section>
+
+
+    <!-- 9 — FACOLTATIVA -->
+    <section id="sec9" class="optional">
+      <h2>9. Il programma che vendette i computer</h2>
+
+      <p>Nel 1979 i personal computer erano oggetti per appassionati: costavano quanto un'automobile usata e la
+        domanda che tutti facevano era «sì, ma <em>per farci cosa</em>?». La risposta arrivò da due studenti,
+        <strong>Dan Bricklin</strong> e <strong>Bob Frankston</strong>, che scrissero <strong>VisiCalc</strong>: il
+        primo foglio di calcolo della storia.</p>
+      <p>L'idea era nata a lezione, guardando un professore che riempiva la lavagna di tabelle: ogni volta che
+        sbagliava un numero doveva cancellare e rifare <em>tutti</em> i conti a valle. Bricklin immaginò «una lavagna
+        magica che ricalcola da sola». Il successo fu tale che migliaia di persone comprarono un
+        <strong>Apple II</strong> solo per poter usare VisiCalc: nacque così l'espressione
+        <strong><em>killer application</em></strong>, il programma così utile da vendere da solo la macchina su cui
+        gira. In un certo senso, il foglio di calcolo ha fatto entrare il computer negli uffici di tutto il mondo.</p>
+
+      <h3>9.1 — È programmazione, questa?</h3>
+      <p>Domanda seria. Quando scrivi <span class="inline-code">=SOMMA(B2:B9)</span> non stai dando ordini passo passo
+        come in Python: non dici <em>come</em> sommare, con quale ciclo, in che ordine. Dici soltanto
+        <strong>che cosa</strong> vuoi ottenere, e il programma si arrangia. Questo modo di programmare si chiama
+        <strong>dichiarativo</strong>, ed è lo stesso spirito dell'<strong>SQL</strong> dei database.</p>
+      <p>C'è di più: il foglio costruisce dietro le quinte un <strong>grafo delle dipendenze</strong> (chi dipende da
+        chi) e, quando cambi una cella, ricalcola <em>solo</em> quelle che ne dipendono, nell'ordine giusto. È lo
+        stesso meccanismo che oggi fa funzionare le interfacce dei siti web moderni. E dal 2021, con l'arrivo delle
+        funzioni <span class="inline-code">LAMBDA</span>, i fogli di calcolo sono ufficialmente
+        <strong>Turing-completi</strong>: in linea di principio possono calcolare tutto ciò che calcola un qualsiasi
+        linguaggio di programmazione. Il foglio di calcolo è, senza esagerare, <strong>l'ambiente di programmazione
+        più usato del pianeta</strong> — da milioni di persone che giurano di non saper programmare.</p>
+
+      <h3>9.2 — Quando il foglio di calcolo fa danni</h3>
+      <p>Proprio perché è potente e facile, ci si fida troppo. Due storie vere, da tenere a mente:</p>
+      <ul>
+        <li><strong>16 000 casi Covid spariti.</strong> Nell'ottobre 2020, in Gran Bretagna, quasi
+          <strong>16 000 positivi</strong> non vennero comunicati ai servizi di tracciamento per giorni. La causa? I
+          dati erano gestiti con un vecchio formato di file Excel che si ferma a <strong>65 536 righe</strong>
+          (cioè $2^{16}$): superato il limite, le righe in più venivano semplicemente <em>buttate via</em>, senza
+          alcun avviso. Migliaia di contatti non furono mai rintracciati.</li>
+      </ul>
+
+      <p>La seconda storia merita di essere raccontata per esteso, perché è la più istruttiva di tutte.</p>
+
+      <p><strong>Un intervallo sbagliato e una politica economica.</strong> Nel 2010 due economisti di Harvard,
+        <strong>Carmen Reinhart</strong> e <strong>Kenneth Rogoff</strong>, pubblicarono un articolo intitolato
+        <em>Growth in a Time of Debt</em> («La crescita in tempo di debito»). Avevano raccolto due secoli di dati su
+        venti Paesi avanzati e ne ricavavano una conclusione netta: quando il <strong>debito pubblico</strong> supera
+        il <strong>90% del PIL</strong>, la crescita economica non rallenta soltanto — <em>crolla</em>, diventando in
+        media addirittura <strong>negativa</strong> (circa $-0{,}1\%$).</p>
+      <p>Era il periodo successivo alla crisi del 2008 e quel numero, il <strong>90%</strong>, divenne
+        <strong>famosissimo</strong>: fu citato in Parlamento, nei documenti di bilancio, dai commissari europei e da
+        ministri di mezzo mondo per sostenere la necessità di <strong>tagliare la spesa pubblica</strong> — cioè
+        scuola, sanità, pensioni, investimenti — per far scendere il debito sotto quella soglia. Poche tabelle hanno
+        avuto tanta influenza sulla vita di tante persone.</p>
+      <p>Nel <strong>2013</strong>, <strong>Thomas Herndon</strong>, uno studente di dottorato dell'Università del
+        Massachusetts, ricevette un compito che sembrava innocuo: <em>rifai i conti di uno studio famoso e verifica
+        che tornino</em>. Scelse quello di Reinhart e Rogoff. E i conti non tornavano. Provò e riprovò, poi fece la
+        cosa più semplice: <strong>chiese agli autori il loro foglio di calcolo</strong>. Glielo mandarono — ed è qui
+        che la storia diventa una lezione di informatica. Nel foglio, la formula che calcolava la media si estendeva
+        <strong>dalla riga 30 alla riga 44</strong> invece che fino alla <strong>49</strong>: <strong>cinque Paesi
+        restavano fuori dalla selezione</strong> (Australia, Austria, Belgio, Canada e Danimarca). La media di venti
+        Paesi era in realtà la media di <strong>quindici</strong>.</p>
+      <p>Insieme al selezionare l'intervallo sbagliato c'erano altre scelte discutibili sui dati; ma già la sola
+        correzione dell'errore cambiava il risultato in modo clamoroso: la crescita media dei Paesi con debito oltre
+        il 90% non era $-0{,}1\%$, bensì <strong>$+2{,}2\%$</strong>. Il «precipizio» al 90% semplicemente
+        <strong>non esisteva</strong>: restava una relazione più debole e molto più discutibile. Gli autori
+        riconobbero l'errore nel foglio di calcolo, pur continuando a difendere la loro tesi generale, e fra gli
+        economisti il dibattito sul rapporto tra debito e crescita è ancora aperto.</p>
+      <p>Restano due lezioni. La prima è tecnica: <strong>un intervallo selezionato male non fa rumore</strong>. Non
+        c'è nessun messaggio d'errore quando una formula prende quindici righe invece di venti — il risultato compare
+        pulito, allineato a destra, con tutta l'aria di essere giusto. La seconda è civica, ed è la ragione per cui
+        vale la pena saper leggere un foglio di calcolo: quel numero è stato usato per <strong>decidere</strong>, e a
+        smascherarlo non è stato un premio Nobel, ma <strong>uno studente che ha voluto rifare i conti</strong>.</p>
+
+      <div class="curiosita">
+        <strong>🐔 E la media che ne è uscita?</strong> Anche corretta, restava pur sempre <em>una media</em>: un solo
+        numero al posto di venti Paesi e due secoli di storia. Vale la pena rileggersi, a questo punto, il
+        <strong>pollo di Trilussa</strong> nella <a href="8.Statistica.html#sec2">lezione sulla statistica</a>: davanti
+        a un numero che sta per diventare una decisione, le domande da farsi sono sempre le stesse —
+        <em>media di che cosa? calcolata su chi? e che cosa c'è sotto quella media?</em>
+      </div>
+      <div class="warnbox">
+        <strong>La morale.</strong> Un foglio di calcolo non ti dice mai «guarda che stai sbagliando»: esegue e basta,
+        in silenzio, anche quando la formula è assurda. Controlla sempre gli intervalli, verifica che i totali siano
+        <em>ragionevoli</em> (un totale di 150 dove ti aspettavi 195 deve farti sospettare!) e ricordati che dietro
+        ogni numero perfettamente allineato c'è un essere umano che può aver sbagliato a selezionare. È lo stesso
+        <strong>senso critico</strong> di cui parlavamo con la statistica: lo strumento è potente, ma la
+        responsabilità resta tua.
+      </div>
+    </section>
+
+    <!-- 10 — QUIZ -->
+    <section id="quiz">
+      <h2>10. Quiz finale</h2>
+      <p>Dieci domande su celle e riferimenti, tipi di dato, formule e funzioni, CERCA.VERT e grafici.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 9 — Il foglio di calcolo · Matematica (Informatica) · Secondo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX e Plotly.</p>
+  </footer>
+
+  <!-- Logica condivisa -->
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <!-- Mini foglio di calcolo + widget -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      /* ============================================================
+         MOTORE DEL MINI FOGLIO DI CALCOLO
+         Valuta formule tipo  =SOMMA(B2:B9)  =A2&" "&B2  =CERCA.VERT(...)
+         ============================================================ */
+      const ERR = { VAL: '#VALORE!', NAME: '#NOME?', REF: '#RIF!', ND: '#N/D', DIV: '#DIV/0!' };
+      function isErr(v) { return typeof v === 'string' && v.charAt(0) === '#'; }
+      function colLetter(i) { return String.fromCharCode(65 + i); }
+      function refName(c, r) { return colLetter(c) + (r + 1); }
+
+      function parseRef(s) {
+        const m = /^\$?([A-Z]+)\$?([0-9]+)$/.exec(String(s).toUpperCase());
+        if (!m) { return null; }
+        let c = 0;
+        for (let i = 0; i < m[1].length; i++) { c = c * 26 + (m[1].charCodeAt(i) - 64); }
+        return { c: c - 1, r: parseInt(m[2], 10) - 1 };
+      }
+      function strToNum(s) {
+        const t = String(s).trim();
+        if (t === '') { return null; }
+        if (!/^-?[0-9]+([.,][0-9]+)?$/.test(t)) { return null; }
+        return parseFloat(t.replace(',', '.'));
+      }
+      function toNum(v) {
+        if (typeof v === 'number') { return v; }
+        if (typeof v === 'boolean') { return v ? 1 : 0; }
+        if (v === '' || v === null || v === undefined) { return 0; }
+        if (typeof v === 'string') { return strToNum(v); }
+        return null;
+      }
+      function isNumeric(v) {
+        return typeof v === 'number' || (typeof v === 'string' && strToNum(v) !== null);
+      }
+      function fmtNum(n) {
+        if (!isFinite(n)) { return ERR.DIV; }
+        return String(Math.round(n * 1e6) / 1e6).replace('.', ',');
+      }
+      function toStr(v) {
+        if (v === '' || v === null || v === undefined) { return ''; }
+        if (typeof v === 'boolean') { return v ? 'VERO' : 'FALSO'; }
+        if (typeof v === 'number') { return fmtNum(v); }
+        return String(v);
+      }
+
+      // --- funzioni disponibili ---
+      function flat(args) {
+        const out = [];
+        args.forEach(function (a) {
+          if (a && a.__range) {
+            a.cells.forEach(function (row) { row.forEach(function (v) { out.push(v); }); });
+          } else { out.push(a); }
+        });
+        return out;
+      }
+      function nums(args) {
+        const out = [];
+        flat(args).forEach(function (v) { if (isNumeric(v)) { out.push(toNum(v)); } });
+        return out;
+      }
+      function sameKey(a, b) {
+        if (isNumeric(a) && isNumeric(b)) { return toNum(a) === toNum(b); }
+        return toStr(a).trim().toLowerCase() === toStr(b).trim().toLowerCase();
+      }
+      function vlookup(args) {
+        const key = args[0], rng = args[1];
+        if (!rng || !rng.__range) { return ERR.VAL; }
+        const idx = Math.trunc(toNum(args[2]));
+        if (!idx || idx < 1 || idx > rng.cells[0].length) { return ERR.VAL; }
+        for (let i = 0; i < rng.cells.length; i++) {
+          if (sameKey(rng.cells[i][0], key)) { return rng.cells[i][idx - 1]; }
+        }
+        // ricerca approssimata (quarto argomento VERO oppure omesso)
+        if (args.length < 4 || args[3] === true) {
+          const k = toNum(key);
+          let best = null;
+          if (k !== null) {
+            for (let i = 0; i < rng.cells.length; i++) {
+              const v = toNum(rng.cells[i][0]);
+              if (v !== null && v <= k) { best = rng.cells[i][idx - 1]; }
+            }
+          }
+          if (best !== null) { return best; }
+        }
+        return ERR.ND;
+      }
+      const FN = {
+        SOMMA: function (a) { return nums(a).reduce(function (s, v) { return s + v; }, 0); },
+        MEDIA: function (a) {
+          const v = nums(a);
+          if (!v.length) { return ERR.DIV; }
+          return v.reduce(function (s, x) { return s + x; }, 0) / v.length;
+        },
+        MAX: function (a) { const v = nums(a); return v.length ? Math.max.apply(null, v) : 0; },
+        MIN: function (a) { const v = nums(a); return v.length ? Math.min.apply(null, v) : 0; },
+        'CONTA.NUMERI': function (a) { return nums(a).length; },
+        'CONTA.VALORI': function (a) {
+          return flat(a).filter(function (v) { return v !== '' && v !== null && v !== undefined; }).length;
+        },
+        CONCATENA: function (a) { return flat(a).map(toStr).join(''); },
+        MAIUSC: function (a) { return toStr(a[0]).toUpperCase(); },
+        MINUSC: function (a) { return toStr(a[0]).toLowerCase(); },
+        ARROTONDA: function (a) {
+          const x = toNum(a[0]);
+          if (x === null) { return ERR.VAL; }
+          const d = a.length > 1 ? Math.trunc(toNum(a[1])) : 0;
+          const k = Math.pow(10, d);
+          return Math.round(x * k) / k;
+        },
+        'CERCA.VERT': vlookup
+      };
+      FN.SUM = FN.SOMMA; FN.AVERAGE = FN.MEDIA; FN.COUNT = FN['CONTA.NUMERI'];
+      FN.COUNTA = FN['CONTA.VALORI']; FN.CONCAT = FN.CONCATENA; FN.ROUND = FN.ARROTONDA;
+      FN.UPPER = FN.MAIUSC; FN.LOWER = FN.MINUSC; FN.VLOOKUP = vlookup;
+
+      // --- analisi della formula (tokenizzatore + parser a discesa ricorsiva) ---
+      function tokenize(src) {
+        const t = [];
+        let i = 0;
+        while (i < src.length) {
+          const ch = src.charAt(i);
+          if (ch === ' ') { i++; continue; }
+          if (ch >= '0' && ch <= '9') {
+            let j = i;
+            while (j < src.length && src.charAt(j) >= '0' && src.charAt(j) <= '9') { j++; }
+            const p1 = src.charAt(j), p2 = src.charAt(j + 1);
+            if ((p1 === '.' || p1 === ',') && p2 >= '0' && p2 <= '9') {
+              j++;
+              while (j < src.length && src.charAt(j) >= '0' && src.charAt(j) <= '9') { j++; }
+            }
+            t.push({ k: 'num', v: parseFloat(src.slice(i, j).replace(',', '.')) });
+            i = j; continue;
+          }
+          if (ch === '"') {
+            let j = i + 1, s = '';
+            while (j < src.length && src.charAt(j) !== '"') { s += src.charAt(j); j++; }
+            t.push({ k: 'str', v: s });
+            i = j + 1; continue;
+          }
+          if (/[A-Za-z_$]/.test(ch)) {
+            let j = i;
+            while (j < src.length && /[A-Za-z0-9_.$]/.test(src.charAt(j))) { j++; }
+            t.push({ k: 'id', v: src.slice(i, j) });
+            i = j; continue;
+          }
+          t.push({ k: 'op', v: ch });
+          i++;
+        }
+        return t;
+      }
+
+      function evalFormula(src, api) {
+        const t = tokenize(src);
+        let p = 0;
+        function isOp(v) { const x = t[p]; return !!x && x.k === 'op' && x.v === v; }
+        function arith(a, b, op) {
+          if (isErr(a)) { return a; }
+          if (isErr(b)) { return b; }
+          const x = toNum(a), y = toNum(b);
+          if (x === null || y === null) { return ERR.VAL; }
+          if (op === '+') { return x + y; }
+          if (op === '-') { return x - y; }
+          if (op === '*') { return x * y; }
+          if (op === '/') { return y === 0 ? ERR.DIV : x / y; }
+          if (op === '^') { return Math.pow(x, y); }
+          return ERR.VAL;
+        }
+        function pPrimary() {
+          const x = t[p];
+          if (!x) { return ERR.VAL; }
+          if (x.k === 'num') { p++; return x.v; }
+          if (x.k === 'str') { p++; return x.v; }
+          if (x.k === 'op' && x.v === '(') {
+            p++;
+            const v = pExpr();
+            if (isOp(')')) { p++; }
+            return v;
+          }
+          if (x.k === 'id') {
+            const name = x.v.toUpperCase();
+            if (t[p + 1] && t[p + 1].k === 'op' && t[p + 1].v === '(') {
+              p += 2;
+              const args = [];
+              if (!isOp(')')) {
+                args.push(pExpr());
+                while (isOp(';') || isOp(',')) { p++; args.push(pExpr()); }
+              }
+              if (isOp(')')) { p++; }
+              for (let q = 0; q < args.length; q++) { if (isErr(args[q])) { return args[q]; } }
+              const f = FN[name];
+              if (!f) { return ERR.NAME; }
+              return f(args);
+            }
+            if (name === 'VERO' || name === 'TRUE') { p++; return true; }
+            if (name === 'FALSO' || name === 'FALSE') { p++; return false; }
+            const r1 = parseRef(x.v);
+            if (!r1) { p++; return ERR.NAME; }
+            p++;
+            if (isOp(':') && t[p + 1] && t[p + 1].k === 'id') {
+              const r2 = parseRef(t[p + 1].v);
+              if (!r2) { return ERR.REF; }
+              p += 2;
+              return api.range(r1, r2);
+            }
+            return api.get(r1);
+          }
+          p++;
+          return ERR.VAL;
+        }
+        function pUnary() {
+          if (isOp('-')) { p++; return arith(0, pUnary(), '-'); }
+          if (isOp('+')) { p++; return pUnary(); }
+          return pPrimary();
+        }
+        function pPow() {
+          const a = pUnary();
+          if (isOp('^')) { p++; return arith(a, pPow(), '^'); }
+          return a;
+        }
+        function pMul() {
+          let a = pPow();
+          while (isOp('*') || isOp('/')) { const op = t[p].v; p++; a = arith(a, pPow(), op); }
+          return a;
+        }
+        function pAdd() {
+          let a = pMul();
+          while (isOp('+') || isOp('-')) { const op = t[p].v; p++; a = arith(a, pMul(), op); }
+          return a;
+        }
+        function pConcat() {
+          let a = pAdd();
+          while (isOp('&')) {
+            p++;
+            const b = pAdd();
+            if (isErr(a)) { return a; }
+            if (isErr(b)) { return b; }
+            if ((a && a.__range) || (b && b.__range)) { return ERR.VAL; }
+            a = toStr(a) + toStr(b);
+          }
+          return a;
+        }
+        function pExpr() { return pConcat(); }
+        return pExpr();
+      }
+
+      // sposta i riferimenti relativi quando si ricopia una formula (i $ bloccano)
+      function shiftFormula(src, dr, dc) {
+        const parts = src.split('"');
+        for (let i = 0; i < parts.length; i += 2) {
+          parts[i] = parts[i].replace(/(\$?)([A-Za-z]+)(\$?)([0-9]+)/g, function (m, d1, col, d2, row) {
+            const up = col.toUpperCase();
+            let c = 0;
+            for (let j = 0; j < up.length; j++) { c = c * 26 + (up.charCodeAt(j) - 64); }
+            c = c - 1;
+            let r = parseInt(row, 10) - 1;
+            if (!d1) { c += dc; }
+            if (!d2) { r += dr; }
+            if (c < 0 || r < 0) { return ERR.REF; }
+            return d1 + colLetter(c) + d2 + (r + 1);
+          });
+        }
+        return parts.join('"');
+      }
+
+      /* ============================================================
+         WIDGET: costruisce una griglia interattiva
+         ============================================================ */
+      function makeSheet(hostId, cfg) {
+        const host = document.getElementById(hostId);
+        if (!host) { return null; }
+        const nc = cfg.cols, nr = cfg.rows;
+        const initial = cfg.data || {};
+        const locked = cfg.locked || {};
+        const raw = {};
+        Object.keys(initial).forEach(function (k) { raw[k] = initial[k]; });
+        let sel = cfg.start || 'A1';
+        let cache = {}, busy = {};
+
+        function value(ref) {
+          if (Object.prototype.hasOwnProperty.call(cache, ref)) { return cache[ref]; }
+          if (busy[ref]) { return ERR.REF; }
+          const src = (raw[ref] || '').trim();
+          let v;
+          if (src === '') { v = ''; }
+          else if (src.charAt(0) === '=') {
+            busy[ref] = 1;
+            v = evalFormula(src.slice(1), api);
+            delete busy[ref];
+          } else if (src.charAt(0) === "'") { v = src.slice(1); }
+          else {
+            const n = strToNum(src);
+            v = (n === null) ? src : n;
+          }
+          cache[ref] = v;
+          return v;
+        }
+        const api = {
+          get: function (rc) {
+            if (rc.c < 0 || rc.c >= nc || rc.r < 0 || rc.r >= nr) { return ERR.REF; }
+            return value(refName(rc.c, rc.r));
+          },
+          range: function (a, b) {
+            const r0 = Math.min(a.r, b.r), r1 = Math.max(a.r, b.r);
+            const c0 = Math.min(a.c, b.c), c1 = Math.max(a.c, b.c);
+            const cells = [];
+            for (let r = r0; r <= r1; r++) {
+              const row = [];
+              for (let c = c0; c <= c1; c++) { row.push(api.get({ c: c, r: r })); }
+              cells.push(row);
+            }
+            return { __range: true, cells: cells };
+          }
+        };
+
+        // --- costruzione del DOM ---
+        const wrap = document.createElement('div');
+        wrap.className = 'ss';
+        const bar = document.createElement('div');
+        bar.className = 'ss-bar';
+        const refBox = document.createElement('span');
+        refBox.className = 'ss-ref';
+        const fxLbl = document.createElement('span');
+        fxLbl.className = 'ss-fx';
+        fxLbl.textContent = 'fx';
+        const fBox = document.createElement('div');
+        fBox.className = 'ss-formula';
+        bar.appendChild(refBox); bar.appendChild(fxLbl); bar.appendChild(fBox);
+        wrap.appendChild(bar);
+
+        const tw = document.createElement('div');
+        tw.className = 'ss-wrap';
+        const tab = document.createElement('table');
+        tab.className = 'ss-grid';
+        const headRow = document.createElement('tr');
+        headRow.appendChild(document.createElement('th'));
+        const colTh = [];
+        for (let c = 0; c < nc; c++) {
+          const th = document.createElement('th');
+          th.textContent = colLetter(c);
+          headRow.appendChild(th);
+          colTh.push(th);
+        }
+        tab.appendChild(headRow);
+
+        const inputs = {}, rowTh = [];
+        for (let r = 0; r < nr; r++) {
+          const tr = document.createElement('tr');
+          const th = document.createElement('th');
+          th.textContent = String(r + 1);
+          tr.appendChild(th);
+          rowTh.push(th);
+          for (let c = 0; c < nc; c++) {
+            const ref = refName(c, r);
+            const td = document.createElement('td');
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.setAttribute('autocomplete', 'off');
+            inp.spellcheck = false;
+            inp.setAttribute('aria-label', 'cella ' + ref);
+            if (cfg.readonly || locked[ref]) { inp.readOnly = true; td.className = 'lk'; }
+            inp.addEventListener('focus', function () {
+              sel = ref;
+              inp.value = raw[ref] || '';
+              paintSel();
+            });
+            inp.addEventListener('blur', function () {
+              raw[ref] = inp.value;
+              render();
+            });
+            inp.addEventListener('keydown', function (e) {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                const nxt = inputs[refName(c, Math.min(r + 1, nr - 1))];
+                inp.blur();
+                if (nxt) { nxt.focus(); }
+              } else if (e.key === 'Escape') {
+                inp.value = raw[ref] || '';
+                inp.blur();
+              }
+            });
+            td.appendChild(inp);
+            tr.appendChild(td);
+            inputs[ref] = inp;
+          }
+          tab.appendChild(tr);
+        }
+        tw.appendChild(tab);
+        wrap.appendChild(tw);
+
+        function paintSel() {
+          refBox.textContent = sel;
+          fBox.textContent = raw[sel] || '';
+          for (let c = 0; c < nc; c++) { colTh[c].className = ''; }
+          for (let r = 0; r < nr; r++) { rowTh[r].className = ''; }
+          const rc = parseRef(sel);
+          if (rc) {
+            if (colTh[rc.c]) { colTh[rc.c].className = 'ss-hi'; }
+            if (rowTh[rc.r]) { rowTh[rc.r].className = 'ss-hi'; }
+          }
+          if (cfg.onSelect) { cfg.onSelect(sel, raw[sel] || '', value(sel)); }
+        }
+        function render() {
+          cache = {}; busy = {};
+          for (let r = 0; r < nr; r++) {
+            for (let c = 0; c < nc; c++) {
+              const ref = refName(c, r), inp = inputs[ref];
+              if (document.activeElement === inp) { continue; }
+              const v = value(ref);
+              inp.value = toStr(v);
+              inp.className = isErr(v) ? 'err' : (typeof v === 'number' ? 'num' : '');
+            }
+          }
+          paintSel();
+          if (cfg.onRender) { cfg.onRender(value); }
+        }
+
+        // --- pulsanti ---
+        const msg = document.createElement('p');
+        msg.className = 'ss-msg';
+        if (cfg.checks || cfg.fillTo) {
+          const btns = document.createElement('div');
+          btns.className = 'sim-btns';
+          if (cfg.fillTo) {
+            const bf = document.createElement('button');
+            bf.className = 'btn';
+            bf.textContent = '⬇ Ricopia in basso';
+            bf.addEventListener('click', function () {
+              const rc = parseRef(sel);
+              const src = (raw[sel] || '').trim();
+              if (!rc || src === '') {
+                msg.className = 'ss-msg no';
+                msg.innerHTML = 'Prima clicca sulla cella che contiene la formula da ricopiare.';
+                return;
+              }
+              let k = 0;
+              for (let r = rc.r + 1; r < cfg.fillTo; r++) {
+                const ref = refName(rc.c, r);
+                if (locked[ref]) { continue; }
+                raw[ref] = (src.charAt(0) === '=') ? shiftFormula(src, r - rc.r, 0) : src;
+                k++;
+              }
+              render();
+              msg.className = 'ss-msg';
+              msg.innerHTML = k
+                ? ('Formula di <strong>' + sel + '</strong> ricopiata in ' + k + ' celle sotto. Clicca una di quelle celle e guarda come si è adattata!')
+                : 'Non c\'è niente da riempire sotto questa cella.';
+            });
+            btns.appendChild(bf);
+          }
+          if (cfg.checks) {
+            const bc = document.createElement('button');
+            bc.className = 'btn btn-primary';
+            bc.textContent = '✅ Controlla';
+            bc.addEventListener('click', function () {
+              const bad = [];
+              cfg.checks.forEach(function (ck) {
+                const v = value(ck.ref);
+                const src = (raw[ck.ref] || '').trim();
+                let ok;
+                if (typeof ck.value === 'number') {
+                  ok = (typeof v === 'number') && Math.abs(v - ck.value) < 1e-6;
+                } else {
+                  ok = toStr(v).trim().toLowerCase() === String(ck.value).trim().toLowerCase();
+                }
+                if (ok && src.charAt(0) !== '=') {
+                  bad.push('<strong>' + ck.ref + '</strong>: il risultato è giusto, ma va ottenuto con una <em>formula</em> (che comincia con «=»), non scrivendo il numero a mano.');
+                } else if (!ok) {
+                  bad.push('<strong>' + ck.ref + '</strong>: ' + (ck.hint || 'non ci siamo ancora.'));
+                }
+              });
+              if (!bad.length) {
+                msg.className = 'ss-msg ok';
+                msg.innerHTML = '🎉 Perfetto! ' + (cfg.okMsg || 'Esercizio completato.');
+              } else {
+                msg.className = 'ss-msg no';
+                msg.innerHTML = bad.join('<br>');
+              }
+            });
+            btns.appendChild(bc);
+          }
+          const br = document.createElement('button');
+          br.className = 'btn';
+          br.textContent = '↺ Ricomincia';
+          br.addEventListener('click', function () {
+            Object.keys(raw).forEach(function (k) { delete raw[k]; });
+            Object.keys(initial).forEach(function (k) { raw[k] = initial[k]; });
+            msg.className = 'ss-msg';
+            msg.innerHTML = '';
+            render();
+          });
+          btns.appendChild(br);
+          wrap.appendChild(btns);
+          wrap.appendChild(msg);
+        }
+
+        host.appendChild(wrap);
+        render();
+        return { render: render, value: value };
+      }
+
+      /* ===== 1 — griglia esplorativa ===== */
+      (function () {
+        const out = document.getElementById('ex-out');
+        makeSheet('ss-explore', {
+          cols: 5, rows: 6, readonly: true, start: 'A1',
+          data: {
+            A1: 'Studente', B1: 'Voto 1', C1: 'Voto 2', D1: 'Media',
+            A2: 'Anna', B2: '7', C2: '8', D2: '=MEDIA(B2:C2)',
+            A3: 'Luca', B3: '6', C3: '5', D3: '=MEDIA(B3:C3)',
+            A4: 'Sara', B4: '9', C4: '8', D4: '=MEDIA(B4:C4)',
+            A5: 'Marco', B5: '5', C5: '7', D5: '=MEDIA(B5:C5)'
+          },
+          onSelect: function (ref, src, val) {
+            if (!out) { return; }
+            const rc = parseRef(ref);
+            let che;
+            if (src === '') { che = 'ed è <strong>vuota</strong>.'; }
+            else if (src.charAt(0) === '=') {
+              che = 'e contiene la <strong>formula</strong> <span class="inline-code">' + src +
+                '</span>, che mostra il risultato <strong>' + toStr(val) + '</strong>.';
+            } else if (typeof val === 'number') {
+              che = 'e contiene il <strong>numero</strong> ' + toStr(val) + ' (allineato a destra).';
+            } else {
+              che = 'e contiene il <strong>testo</strong> «' + toStr(val) + '» (allineato a sinistra).';
+            }
+            out.innerHTML = 'Hai selezionato la cella <strong>' + ref + '</strong>: colonna <strong>' +
+              colLetter(rc.c) + '</strong>, riga <strong>' + (rc.r + 1) + '</strong>, ' + che;
+          }
+        });
+      })();
+
+      /* ===== 3 — numeri o testo ===== */
+      (function () {
+        const out = document.getElementById('tipi-out');
+        makeSheet('ss-tipi', {
+          cols: 2, rows: 7, start: 'B3',
+          data: {
+            A1: 'Voce', B1: 'Importo',
+            A2: 'Pullman', B2: '120',
+            A3: 'Ingresso museo', B3: '45 euro',
+            A4: 'Pranzo', B4: '30',
+            A6: 'Totale con SOMMA', B6: '=SOMMA(B2:B4)',
+            A7: 'Totale con il +', B7: '=B2+B3+B4'
+          },
+          locked: {
+            A1: 1, B1: 1, A2: 1, B2: 1, A3: 1, A4: 1, B4: 1,
+            A5: 1, B5: 1, A6: 1, B6: 1, A7: 1, B7: 1
+          },
+          onRender: function (value) {
+            if (!out) { return; }
+            if (typeof value('B3') === 'number') {
+              out.innerHTML = '✅ Ora B3 è un <strong>numero</strong> (guarda: si è spostato a destra!) e i due totali ' +
+                'concordano: <strong>195</strong>. Ecco perché le unità di misura non si scrivono dentro la cella.';
+            } else {
+              out.innerHTML = '⬅ Nota che «45 euro» è allineato a <strong>sinistra</strong>: per il foglio è testo. ' +
+                'Risultato: <span class="inline-code">SOMMA</span> lo salta in silenzio e dice <strong>150</strong>, ' +
+                'mentre il <strong>+</strong> protesta con <span class="inline-code">#VALORE!</span>. ' +
+                'Prova a correggere B3 scrivendo <strong>45</strong>.';
+            }
+          }
+        });
+      })();
+
+      /* ===== 4 — riempimento automatico ===== */
+      (function () {
+        const col = document.getElementById('fd-col');
+        if (!col) { return; }
+        const inA = document.getElementById('fd-a'), inB = document.getElementById('fd-b');
+        const out = document.getElementById('fd-out'), pres = document.getElementById('fd-presets');
+        const GIORNI = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
+        const MESI = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
+          'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+        const N = 10;
+        let timer = null;
+
+        function paint(vals, filled) {
+          let s = '';
+          for (let i = 0; i < N; i++) {
+            const cls = (i < 2) ? 'fd-cell seed' : (i < filled ? 'fd-cell done' : 'fd-cell');
+            const txt = (i < filled) ? String(vals[i] === undefined ? '' : vals[i]) : '';
+            s += '<div class="' + cls + '">' + txt + '</div>';
+          }
+          col.innerHTML = s;
+        }
+        function serie(a, b) {
+          const na = strToNum(a), nb = strToNum(b);
+          if (na !== null && nb !== null) {
+            const step = nb - na, v = [];
+            for (let i = 0; i < N; i++) { v.push(fmtNum(na + i * step)); }
+            return {
+              vals: v,
+              msg: 'Il foglio ha fatto la sottrazione <strong>' + fmtNum(nb) + ' − ' + fmtNum(na) +
+                ' = ' + fmtNum(step) + '</strong> e ha continuato aggiungendo sempre ' + fmtNum(step) +
+                ': è una <strong>progressione aritmetica</strong>.'
+            };
+          }
+          const la = String(a).trim().toLowerCase(), lb = String(b).trim().toLowerCase();
+          let lista = null;
+          if (GIORNI.indexOf(la) >= 0) { lista = GIORNI; }
+          else if (MESI.indexOf(la) >= 0) { lista = MESI; }
+          if (lista && lista.indexOf(lb) === (lista.indexOf(la) + 1) % lista.length) {
+            const i0 = lista.indexOf(la), v = [];
+            for (let i = 0; i < N; i++) { v.push(lista[(i0 + i) % lista.length]); }
+            return {
+              vals: v,
+              msg: 'Qui non c\'è nessuna sottrazione da fare: il foglio ha riconosciuto un <strong>elenco che già ' +
+                'conosce</strong> e lo prosegue in ordine (e quando finisce, ricomincia da capo).'
+            };
+          }
+          const v = [];
+          for (let i = 0; i < N; i++) { v.push(i % 2 === 0 ? a : b); }
+          return {
+            vals: v,
+            msg: 'Il foglio non ha riconosciuto nessuna regola, quindi si limita a <strong>ripetere</strong> ' +
+              'i due valori che gli hai dato.'
+          };
+        }
+        function run() {
+          if (timer) { clearInterval(timer); timer = null; }
+          const a = inA.value.trim(), b = inB.value.trim();
+          if (a === '' || b === '') {
+            out.innerHTML = 'Scrivi due valori di partenza nelle due caselle.';
+            return;
+          }
+          const s = serie(a, b);
+          let filled = 2;
+          paint(s.vals, filled);
+          out.innerHTML = s.msg;
+          timer = setInterval(function () {
+            filled++;
+            paint(s.vals, filled);
+            if (filled >= N) { clearInterval(timer); timer = null; }
+          }, 110);
+        }
+        function reset() {
+          if (timer) { clearInterval(timer); timer = null; }
+          paint([inA.value.trim(), inB.value.trim()], 2);
+          out.innerHTML = 'Scegli i primi due valori e premi il pulsante.';
+        }
+        [['1 e 2', '1', '2'], ['5 e 10', '5', '10'], ['0 e 0,5', '0', '0,5'],
+         ['100 e 90', '100', '90'], ['lunedì', 'lunedì', 'martedì']].forEach(function (p) {
+          const b = document.createElement('button');
+          b.className = 'btn';
+          b.textContent = p[0];
+          b.addEventListener('click', function () { inA.value = p[1]; inB.value = p[2]; run(); });
+          pres.appendChild(b);
+        });
+        document.getElementById('fd-go').addEventListener('click', run);
+        document.getElementById('fd-reset').addEventListener('click', reset);
+        reset();
+      })();
+
+      /* ===== 5 — esercitazione SOMMA ===== */
+      (function () {
+        const voci = [['Pullman', '120'], ['Ingresso museo', '45'], ['Pranzo', '30'], ['Guida', '25'],
+          ['Ostello', '60'], ['Biglietti metro', '15'], ['Cena', '40'], ['Souvenir', '25']];
+        const data = { A1: 'Voce', B1: 'Importo (€)' };
+        const locked = { A1: 1, B1: 1 };
+        voci.forEach(function (v, i) {
+          data['A' + (i + 2)] = v[0];
+          data['B' + (i + 2)] = v[1];
+          locked['A' + (i + 2)] = 1;
+          locked['B' + (i + 2)] = 1;
+        });
+        data.A10 = 'TOTALE'; data.A11 = 'Spesa media'; data.A12 = 'Voce più cara'; data.A13 = 'A testa (25 studenti)';
+        locked.A10 = 1; locked.A11 = 1; locked.A12 = 1; locked.A13 = 1;
+        makeSheet('ss-somma', {
+          cols: 2, rows: 13, start: 'B10', data: data, locked: locked,
+          okMsg: 'Il bilancio della gita è completo. Ora prova a cambiare un importo: guarda i quattro risultati aggiornarsi tutti insieme.',
+          checks: [
+            { ref: 'B10', value: 360, hint: 'usa <span class="inline-code">=SOMMA(B2:B9)</span>, cioè tutto l\'intervallo degli importi.' },
+            { ref: 'B11', value: 45, hint: 'la funzione per la media si chiama <span class="inline-code">MEDIA</span>, e lavora sullo stesso intervallo.' },
+            { ref: 'B12', value: 120, hint: 'per il valore più grande esiste <span class="inline-code">MAX</span>.' },
+            { ref: 'B13', value: 14.4, hint: 'dividi il totale già calcolato: <span class="inline-code">=B10/25</span>.' }
+          ]
+        });
+      })();
+
+      /* ===== 6 — esercitazione CONCATENA ===== */
+      (function () {
+        const gente = [['Anna', 'Rossi'], ['Luca', 'Bianchi'], ['Sara', 'Verdi'],
+          ['Marco', 'Esposito'], ['Giulia', 'Conti']];
+        const data = { A1: 'Nome', B1: 'Cognome', C1: 'Nome completo', D1: 'E-mail' };
+        const locked = { A1: 1, B1: 1, C1: 1, D1: 1 };
+        gente.forEach(function (g, i) {
+          data['A' + (i + 2)] = g[0];
+          data['B' + (i + 2)] = g[1];
+          locked['A' + (i + 2)] = 1;
+          locked['B' + (i + 2)] = 1;
+        });
+        makeSheet('ss-concat', {
+          cols: 4, rows: 6, start: 'C2', data: data, locked: locked, fillTo: 6,
+          okMsg: 'Nome completo ed e-mail costruiti dalle formule. Ora clicca C2 e premi «Ricopia in basso», poi fai lo stesso da D2.',
+          checks: [
+            { ref: 'C2', value: 'Anna Rossi', hint: 'servono tre pezzi: il nome, uno spazio tra virgolette e il cognome.' },
+            { ref: 'D2', value: 'anna.rossi@scuola.it', hint: 'ricorda MINUSC per il minuscolo, il punto tra nome e cognome e la parte fissa "@scuola.it".' }
+          ]
+        });
+      })();
+
+      /* ===== 7 — esercitazione CERCA.VERT ===== */
+      (function () {
+        const listino = [['P01', 'Quaderno', '2,5'], ['P02', 'Penna', '1,2'], ['P03', 'Zaino', '34,9'],
+          ['P04', 'Astuccio', '9,9'], ['P05', 'Calcolatrice', '12'], ['P06', 'Righello', '1,8']];
+        const ordini = ['P03', 'P01', 'P05', 'P02'];
+        const data = {
+          A1: 'Ordine', B1: 'Codice', C1: 'Prodotto', D1: 'Prezzo (€)',
+          E1: 'Codice', F1: 'Prodotto', G1: 'Prezzo', C6: 'TOTALE'
+        };
+        const locked = { A1: 1, B1: 1, C1: 1, D1: 1, E1: 1, F1: 1, G1: 1, C6: 1, A6: 1, B6: 1 };
+        ordini.forEach(function (cod, i) {
+          data['A' + (i + 2)] = String(i + 1);
+          data['B' + (i + 2)] = cod;
+          locked['A' + (i + 2)] = 1;
+          locked['B' + (i + 2)] = 1;
+        });
+        listino.forEach(function (p, i) {
+          data['E' + (i + 2)] = p[0];
+          data['F' + (i + 2)] = p[1];
+          data['G' + (i + 2)] = p[2];
+          locked['E' + (i + 2)] = 1;
+          locked['F' + (i + 2)] = 1;
+          locked['G' + (i + 2)] = 1;
+        });
+        makeSheet('ss-vlookup', {
+          cols: 7, rows: 7, start: 'C2', data: data, locked: locked, fillTo: 5,
+          okMsg: 'Le due tabelle ora dialogano! Prova a cambiare un codice in colonna B: nome e prezzo si aggiornano da soli.',
+          checks: [
+            { ref: 'C2', value: 'Zaino', hint: 'cerca B2 nel listino e chiedi la colonna numero 2. Non dimenticare FALSO alla fine.' },
+            { ref: 'D2', value: 34.9, hint: 'stessa formula di C2, ma con indice 3 (la terza colonna del listino).' },
+            { ref: 'D6', value: 50.6, hint: 'è la somma dei quattro prezzi: prima ricopia le formule in basso, poi usa SOMMA(D2:D5).' }
+          ]
+        });
+      })();
+
+      /* ===== 8 — dati, copia e grafici ===== */
+      (function () {
+        const RIGHE = [['Anna', 1, 5], ['Bruno', 2, 5.5], ['Carla', 2, 6], ['Dario', 3, 6],
+          ['Elena', 3, 6.5], ['Fabio', 4, 6.5], ['Giulia', 4, 7.5], ['Luca', 5, 7],
+          ['Marta', 5, 8], ['Nicola', 6, 8.5], ['Sara', 7, 9], ['Paolo', 8, 9.5]];
+        const INTEST = ['Studente', 'Ore di studio', 'Voto'];
+
+        const tab = document.getElementById('dati-tab');
+        if (tab) {
+          let h = '<tr><th>' + INTEST.join('</th><th>') + '</th></tr>';
+          RIGHE.forEach(function (r) {
+            h += '<tr><td>' + r[0] + '</td><td class="num">' + r[1] +
+              '</td><td class="num">' + fmtNum(r[2]) + '</td></tr>';
+          });
+          tab.innerHTML = h;
+        }
+
+        const btn = document.getElementById('copy-dati');
+        if (btn) {
+          const tsv = [INTEST.join('\t')].concat(RIGHE.map(function (r) {
+            return r[0] + '\t' + fmtNum(r[1]) + '\t' + fmtNum(r[2]);
+          })).join('\n');
+          btn.addEventListener('click', function () {
+            function ok() {
+              btn.textContent = '✅ Copiato! Ora incolla in A1';
+              setTimeout(function () { btn.textContent = '📋 Copia i dati'; }, 2200);
+            }
+            function fallback() {
+              const ta = document.createElement('textarea');
+              ta.value = tsv;
+              ta.style.position = 'fixed';
+              ta.style.opacity = '0';
+              document.body.appendChild(ta);
+              ta.select();
+              try { document.execCommand('copy'); ok(); }
+              catch (e) { btn.textContent = '⚠️ Copia non riuscita'; }
+              document.body.removeChild(ta);
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(tsv).then(ok, fallback);
+            } else { fallback(); }
+          });
+        }
+
+        if (!window.Plt) { return; }
+        const C = window.Plt.themeColors();
+
+        window.Plt.draw('bar-plot', [{
+          x: RIGHE.map(function (r) { return r[0]; }),
+          y: RIGHE.map(function (r) { return r[2]; }),
+          type: 'bar',
+          marker: { color: C.accent },
+          hovertemplate: '%{x}: %{y}<extra></extra>'
+        }], {
+          title: { text: 'Voti della classe', font: { size: 14, color: C.font } },
+          xaxis: { title: 'studente', zeroline: false },
+          yaxis: { title: 'voto', range: [0, 10], dtick: 2, zeroline: false },
+          margin: { t: 40, b: 60, l: 50, r: 20 }
+        });
+
+        const xs = RIGHE.map(function (r) { return r[1]; });
+        const ys = RIGHE.map(function (r) { return r[2]; });
+        const m = 0.651, q = 4.3708;
+        window.Plt.draw('scatter-plot', [
+          {
+            x: xs, y: ys, type: 'scatter', mode: 'markers', name: 'studenti',
+            marker: { color: C.accent, size: 11 },
+            text: RIGHE.map(function (r) { return r[0]; }),
+            hovertemplate: '%{text}: %{x} ore, voto %{y}<extra></extra>'
+          },
+          {
+            x: [0, 9], y: [q, m * 9 + q], type: 'scatter', mode: 'lines', name: 'linea di tendenza',
+            line: { color: C.curve, width: 2.5, dash: 'dash' }, hoverinfo: 'skip'
+          }
+        ], {
+          title: { text: 'y = 0,65x + 4,37   (R² = 0,94)', font: { size: 14, color: C.font } },
+          xaxis: { title: 'ore di studio a settimana', range: [0, 9], zeroline: false },
+          yaxis: { title: 'voto', range: [3, 10.5], zeroline: false },
+          margin: { t: 40, b: 55, l: 50, r: 20 }
+        });
+      })();
+
+    });
+  </script>
+
+  <!-- Quiz -->
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Nel foglio di calcolo, la cella <strong>D7</strong> si trova:',
+        options: ['nella riga D, colonna 7', 'nella colonna D, riga 7', 'nel foglio D, pagina 7', 'a metà tra D e 7', 'dipende dal programma'],
+        correct: 1, explain: 'Il riferimento è sempre lettera della colonna + numero della riga: prima la colonna D, poi la riga 7.' },
+      { type: 'mc', diff: 'easy', text: 'Che cosa deve scrivere per prima cosa in una cella, se vuoi che il foglio esegua un calcolo?',
+        options: ['il simbolo +', 'il simbolo =', 'la parola CALCOLA', 'una parentesi', 'niente, lo capisce da solo'],
+        correct: 1, explain: 'Il segno = dice al foglio «quello che segue non è testo, è una formula da eseguire».' },
+      { type: 'mc', diff: 'easy', text: 'Quale di questi <strong>non</strong> è un foglio di calcolo?',
+        options: ['Microsoft Excel', 'Google Fogli', 'LibreOffice Calc', 'Adobe Photoshop', 'Apple Numbers'],
+        correct: 3, explain: 'Photoshop è un programma di fotoritocco. Gli altri quattro sono tutti fogli di calcolo.' },
+      { type: 'mc', diff: 'easy', text: 'Scrivi <code class="inline-code">45 euro</code> in una cella. Il foglio lo considera:',
+        options: ['un numero, perché comincia con 45', 'del testo, perché contiene delle lettere', 'una data', 'una formula', 'un errore'],
+        correct: 1, explain: 'Basta una lettera per rendere tutto testo. La spia è l\'allineamento: i numeri vanno a destra, il testo a sinistra.' },
+      { type: 'mc', diff: 'medium', text: 'In <code class="inline-code">=SOMMA(B2:B9)</code>, che cosa significano i <strong>due punti</strong>?',
+        options: ['una divisione', 'un intervallo: tutte le celle da B2 a B9', 'solo le due celle B2 e B9', 'una sottrazione', 'un rapporto'],
+        correct: 1, explain: 'I due punti indicano un intervallo, cioè il blocco di celle compreso tra le due indicate (qui 8 celle).' },
+      { type: 'mc', diff: 'medium', text: 'La colonna B contiene 120, «45 euro» e 30. Che cosa restituisce <code class="inline-code">=SOMMA(B2:B4)</code>?',
+        options: ['195', '150, perché salta la cella di testo', '#VALORE!', '0', '#N/D'],
+        correct: 1, explain: 'SOMMA ignora in silenzio le celle di testo: dà 150 senza avvisare. È l\'errore più insidioso, perché non si vede.' },
+      { type: 'mc', diff: 'medium', text: 'A2 contiene «Anna» e B2 contiene «Rossi». Quale formula dà esattamente <strong>Anna Rossi</strong>?',
+        options: ['=A2+B2', '=A2&B2', '=A2&" "&B2', '=CONCATENA(A2 B2)', '=SOMMA(A2:B2)'],
+        correct: 2, explain: 'Servono tre pezzi: A2, uno spazio scritto tra virgolette e B2. Senza lo spazio otterresti «AnnaRossi».' },
+      { type: 'mc', diff: 'medium', text: 'In <code class="inline-code">=CERCA.VERT(B2;E2:G7;3;FALSO)</code>, che cosa indica il <strong>3</strong>?',
+        options: ['quante righe cercare', 'la terza colonna dell\'intervallo, quella da restituire', 'la riga 3 del foglio', 'quante volte ripetere la ricerca', 'il numero massimo di errori'],
+        correct: 1, explain: 'È l\'indice della colonna da riportare indietro, contato a partire dalla prima colonna dell\'intervallo (che vale 1).' },
+      { type: 'mc', diff: 'hard', text: 'Perché nella formula si scrive l\'intervallo del listino come <code class="inline-code">&#36;E&#36;2:&#36;G&#36;7</code> invece che <code class="inline-code">E2:G7</code>?',
+        options: ['perché costa meno memoria', 'perché i dollari indicano che si tratta di prezzi', 'perché così l\'intervallo resta fisso quando la formula viene ricopiata in basso', 'perché senza dollari la funzione non esiste', 'per rendere la formula più leggibile'],
+        correct: 2, explain: 'Il dollaro rende il riferimento assoluto. Senza, ricopiando la formula l\'intervallo scivolerebbe (E3:G8, E4:G9…) e comparirebbero #N/D.' },
+      { type: 'open', diff: 'hard', text: 'Hai i dati di 12 studenti: ore di studio e voto. Spiega quale grafico useresti per <strong>confrontare i voti dei singoli studenti</strong> e quale per <strong>capire se studiare di più si accompagna a voti più alti</strong>, e perché.',
+        keywords: ['barr', 'colonn', 'confront', 'disperso', 'dispersione', 'scatter', 'punt', 'relazion', 'due grandezze', 'correlaz', 'tendenza'], requiredMatches: 3,
+        explain: 'Per confrontare i voti dei singoli studenti si usa il grafico a barre (o a colonne): ogni barra è uno studente e l\'altezza è il suo voto, quindi il confronto tra categorie separate è immediato. Per studiare la relazione tra due grandezze numeriche si usa il grafico a dispersione (scatter): ogni studente diventa un punto di coordinate (ore, voto) e la nuvola di punti mostra se al crescere delle ore crescono i voti; la linea di tendenza riassume l\'andamento con una retta. Attenzione però: anche una correlazione forte non dimostra un rapporto di causa ed effetto.' }
+    ];
+  </script>
+
+</body>
+
+</html>

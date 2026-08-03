@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 8 — La statistica</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+    .simbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1rem; margin: 1.1rem 0; }
+    .simbox svg { display: block; width: 100%; height: auto; margin: 0.3rem auto; }
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; }
+    .sim-out { margin-top: 0.6rem; min-height: 1.4em; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.7rem; text-align: center; }
+    .stat .n { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .stat .l { font-size: 0.78rem; color: var(--muted); }
+    .steps { border-collapse: collapse; width: 100%; margin: 0.7rem 0; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+    .steps th, .steps td { border: 1px solid var(--border); padding: 0.35rem 0.6rem; text-align: center; }
+    .steps th { background: var(--surface-2); }
+    .steps td.lab { text-align: left; font-weight: 600; }
+    .gtypes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 0.8rem 0; }
+    .plot { min-height: 300px; }
+    .fonte { font-size: 0.84rem; color: var(--muted); margin: 0.45rem 0 0; line-height: 1.5;
+      border-top: 1px dashed var(--border); padding-top: 0.45rem; }
+    /* triangolo di Tartaglia interattivo */
+    .tri { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; margin: 0.6rem 0; overflow-x: auto; }
+    .tri-row { display: flex; gap: 0.25rem; justify-content: center; align-items: center; }
+    .tri-lab { font-size: 0.72rem; color: var(--muted); min-width: 2.6rem; text-align: right; padding-right: 0.3rem; white-space: nowrap; }
+    .tri-cell { min-width: 2.5rem; padding: 0.22rem 0.35rem; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text); font-family: inherit; font-variant-numeric: tabular-nums;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: transform .1s, background .1s; }
+    .tri-cell:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .tri-cell.sel { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .tri-cell.par { background: color-mix(in srgb, var(--accent) 22%, transparent); border-color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Secondo anno · Lezione 8</div>
+    <h1>La statistica</h1>
+    <p>Descrivere tanti dati con pochi numeri — dalla media alla curva a campana</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Secondo anno</a>
+    <span class="sep">/</span> La statistica
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> La probabilità (lezione 7) ci diceva cosa <em>aspettarci</em> dal caso, prima di
+      agire. La <strong>statistica</strong> fa il cammino inverso: parte dai dati che abbiamo <em>già raccolto</em> —
+      voti, altezze, gol, sondaggi — e cerca di leggerli, riassumerli e capirli. È l'arte di trasformare una montagna
+      di numeri in poche informazioni utili... e di non farsi ingannare.
+    </div>
+
+    <!-- 1 — CAMPIONE -->
+    <section id="sec1">
+      <h2>1. Il campione: descrivere tanti dati con pochi numeri</h2>
+      <p>Immagina di voler sapere l'altezza media degli italiani. Misurarli tutti (60 milioni!) è impossibile. La
+        soluzione è studiare un <strong>campione</strong>: un sottoinsieme, più piccolo e maneggevole, dell'intera
+        popolazione.</p>
+      <div class="definition">
+        Un <strong>campione</strong> si dice <strong>significativo</strong> (o rappresentativo) quando «assomiglia»
+        alla popolazione intera: è abbastanza <strong>grande</strong> e scelto senza <strong>distorsioni</strong>. Se
+        per l'altezza degli italiani intervistassi solo giocatori di basket, il campione sarebbe grande ma
+        <em>sbagliato</em>: non rappresenta tutti.
+      </div>
+      <p>Anche con un buon campione, però, resta il problema opposto: i dati sono <em>troppi</em>. Non possiamo
+        girare con in tasca la lista di mille altezze. Serve <strong>riassumerle con pochi parametri</strong> — un
+        numero per «dove stanno» i dati, uno per «quanto sono sparpagliati» — che ne catturino l'essenza. È tutto il
+        mestiere della <strong>statistica descrittiva</strong>.</p>
+
+      <h3>1.1 — Variabili qualitative e quantitative</h3>
+      <p>I dati che raccogliamo (le <strong>variabili statistiche</strong>) sono di due grandi famiglie:</p>
+      <div class="two-col">
+        <div class="formula-box"><div class="formula-title">Quantitative (numeri)</div>
+          <p>Si misurano con un numero: altezza, voto, numero di gol, temperatura, età. Su di esse si possono fare i
+            conti — medie, somme, differenze.</p></div>
+        <div class="formula-box"><div class="formula-title">Qualitative (categorie)</div>
+          <p>Descrivono una qualità, non un numero: colore degli occhi, squadra del cuore, città di nascita, sì/no. Si
+            possono <em>contare</em> per categoria, ma non «mediare».</p></div>
+      </div>
+      <p>In questa lezione ci concentreremo soprattutto sulle variabili <strong>quantitative</strong> — quelle su cui
+        ha senso calcolare una media (la moda e la mediana, come vedremo, funzionano anche per le qualitative in
+        ordine).</p>
+    </section>
+
+    <!-- 2 — MEDIA MODA MEDIANA -->
+    <section id="sec2">
+      <h2>2. Dove stanno i dati: media, moda, mediana</h2>
+      <p>I primi tre parametri rispondono alla domanda «attorno a quale valore si concentrano i dati?». Prendiamo i
+        voti di uno studente: $4,\ 6,\ 6,\ 7,\ 8,\ 9,\ 9,\ 9$.</p>
+      <div class="gtypes">
+        <div class="formula-box"><div class="formula-title">Media (aritmetica)</div>
+          <p>Somma di tutti i valori diviso il loro numero: $\bar{x} = \dfrac{\sum x_i}{N}$.</p>
+          <p>$\dfrac{4+6+6+7+8+9+9+9}{8} = \dfrac{58}{8} = 7{,}25$.</p></div>
+        <div class="formula-box"><div class="formula-title">Moda</div>
+          <p>Il valore <strong>più frequente</strong> (quello che compare più volte).</p>
+          <p>Qui la moda è <strong>9</strong> (compare tre volte).</p></div>
+        <div class="formula-box"><div class="formula-title">Mediana</div>
+          <p>Il valore <strong>centrale</strong>, dopo aver ordinato i dati (se sono pari, la media dei due centrali).</p>
+          <p>Ordinati, i due centrali sono $7$ e $8$: mediana $= 7{,}5$.</p></div>
+      </div>
+      <p>Perché tre indici diversi? Perché raccontano cose diverse — e la media, da sola, può ingannare. Aggiungi un
+        valore <strong>anomalo</strong> (un <em>outlier</em>) e guarda: la media schizza via, la mediana quasi non si
+        muove. Per questo lo stipendio «mediano» è più onesto dello stipendio «medio», che pochi super-ricchi gonfiano.</p>
+      <div class="simbox">
+        <div class="controls"><div class="control-group"><label>Aggiungo un nono voto pari a: <span class="val" id="ce-x-val">9</span></label>
+          <input type="range" id="ce-x" min="0" max="30" step="1" value="9"></div></div>
+        <div id="ce-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="ce-mean">—</div><div class="l">media</div></div>
+          <div class="stat"><div class="n" id="ce-med">—</div><div class="l">mediana</div></div>
+          <div class="stat"><div class="n" id="ce-mode">—</div><div class="l">moda</div></div>
+        </div>
+        <p class="sim-out" id="ce-out"></p>
+      </div>
+
+      <h3>2.1 — La media ponderata</h3>
+      <p>A volte non tutti i valori «pesano» uguale. All'esame di maturità lo scritto conta più dell'orale; agli
+        esami universitari un corso da 12 crediti conta più di uno da 3. In questi casi si usa la <strong>media
+        ponderata</strong>: ogni valore $x_i$ viene moltiplicato per il suo <strong>peso</strong> $p_i$, e si divide
+        per la somma dei pesi.</p>
+      <div class="formula-box">
+        <div class="formula-title">Media ponderata</div>
+        $$\bar{x}_p = \frac{x_1 p_1 + x_2 p_2 + \dots + x_n p_n}{p_1 + p_2 + \dots + p_n}$$
+      </div>
+      <p><strong>Esempio.</strong> Uno studente prende $8$ in un esame da $12$ crediti e $5$ in uno da $3$ crediti. La
+        media semplice sarebbe $\dfrac{8+5}{2} = 6{,}5$; ma quella <em>ponderata</em>, che è la più giusta, è
+        $\dfrac{8\cdot 12 + 5\cdot 3}{12 + 3} = \dfrac{96 + 15}{15} = \dfrac{111}{15} = 7{,}4$. Il voto alto conta di
+        più perché vale più crediti.</p>
+
+      <h3>2.2 — Scegliere il parametro giusto (e il pollo di Trilussa)</h3>
+      <p>Riassumendo: abbiamo tre indici, e <strong>nessuno dei tre è «quello giusto» in assoluto</strong>. Scegliere
+        quale usare non è un dettaglio tecnico, è la decisione più importante di tutta la descrizione: un parametro
+        scelto male non è <em>sbagliato</em> — è <em>vero e fuorviante insieme</em>, che è molto peggio, perché non
+        lascia niente da correggere.</p>
+      <p>Lo ha detto meglio di qualunque manuale un poeta romano, <strong>Trilussa</strong> — pseudonimo (e anagramma)
+        di Carlo Alberto Salustri — in quattordici versi intitolati proprio <em>La statistica</em>:</p>
+
+      <div class="curiosita">
+        <div style="font-family:Georgia,'Times New Roman',serif; font-style:italic; font-size:1.02rem; line-height:1.75;
+                    border-left:3px solid var(--gold); padding:0.2rem 0 0.2rem 1rem; margin:0.2rem 0 0.9rem;">
+          Sai ched'è la statistica? È 'na cosa<br>
+          che serve pe' fa' un conto in generale<br>
+          de la gente che nasce, che sta male,<br>
+          che more, che va in carcere e che sposa.<br><br>
+          Ma pe' me la statistica curiosa<br>
+          è dove c'entra la percentuale,<br>
+          pe' via che, lì, la media è sempre eguale<br>
+          puro co' la persona bisognosa.<br><br>
+          Me spiego: da li conti che se fanno<br>
+          secondo le statistiche d'adesso<br>
+          risulta che te tocca un pollo all'anno:<br><br>
+          e, se nun entra ne le spese tue,<br>
+          t'entra ne la statistica lo stesso<br>
+          perché c'è un antro che ne magna due.
+        </div>
+        <p style="margin-bottom:0;">Due persone, due polli: <strong>in media</strong> ne tocca uno a testa. Il conto è
+          giusto, la media è vera — e descrive una situazione che <strong>non esiste</strong>, perché uno ha mangiato
+          due polli e l'altro è rimasto a digiuno. È lo stesso meccanismo dello stipendio «medio» gonfiato da pochi
+          super-ricchi: la media non mente, ma da sola non basta. Trilussa l'aveva capito un secolo fa, e senza foglio
+          di calcolo.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>🤔 Una pulce nell'orecchio.</strong> E allora domandiamocelo per una statistica che ti riguarda da
+        vicino: <strong>la media dei voti è davvero il parametro migliore per descrivere come va uno studente?</strong>
+        Prima di rispondere «certo, si è sempre fatto così», prova a ragionare su questi casi:
+        <ul style="margin:0.55rem 0 0;">
+          <li><strong>Il tempo non conta?</strong> Anna prende $4,\ 5,\ 6,\ 7,\ 8$; Bruno prende $8,\ 7,\ 6,\ 5,\ 4$.
+            Stessa media, $6$. Ma Anna ha <em>imparato</em> e Bruno si è perso per strada: la media, che somma tutto
+            in un mucchio, <strong>butta via l'ordine</strong> — e in una cosa che si chiama «apprendimento» l'ordine
+            è forse la cosa più importante.</li>
+          <li><strong>E una giornata storta?</strong> Chi prende $7,\ 7,\ 8,\ 7$ e poi un $2$ (interrogato con la
+            febbre, o nel giorno sbagliato) si ritrova una media di $6{,}2$. La <strong>mediana</strong> direbbe $7$.
+            Quale delle due descrive meglio quello studente?</li>
+          <li><strong>Tutte le prove pesano uguale?</strong> Un test di ripasso di dieci minuti e una verifica di due
+            ore valgono lo stesso? Se no, serve la <strong>media ponderata</strong> — e allora bisogna decidere
+            <em>quali</em> pesi, che è già una scelta, non un calcolo.</li>
+          <li><strong>La distanza tra i voti è sempre la stessa?</strong> Sommare i voti dà per scontato che il salto
+            da $4$ a $5$ «valga» quanto quello da $8$ a $9$. Chiedi a chi ci è passato se è proprio così.</li>
+          <li><strong>Un numero solo può bastare?</strong> Due studenti con media $7$: uno oscilla tra $4$ e $10$,
+            l'altro prende sempre $7$. Per distinguerli serve la <strong>dispersione</strong> — quella che impareremo
+            a misurare nella prossima sezione.</li>
+        </ul>
+        <p style="margin:0.6rem 0 0;">Non c'è una risposta «giusta» in fondo alla pagina, e la media resta uno
+          strumento comodo e difendibile: il punto non è buttarla via, è <strong>sapere che cosa nasconde</strong>.
+          Chi conosce la statistica non è chi calcola più in fretta: è chi, davanti a un numero, sa ancora chiedersi
+          <em>chi sta descrivendo, e chi sta lasciando fuori</em>.</p>
+      </div>
+    </section>
+
+    <!-- 3 — DISPERSIONE -->
+    <section id="sec3">
+      <h2>3. Quanto sono sparpagliati: la dispersione</h2>
+      <p>Sapere «dove» stanno i dati non basta. Due classi con la stessa media di $6$ possono essere diversissime: in
+        una tutti presi $6$, nell'altra metà $3$ e metà $9$. Serve un secondo tipo di parametro: la
+        <strong>dispersione</strong>, che misura quanto i dati sono «larghi».</p>
+
+      <h3>3.1 — Semidispersione e percentili</h3>
+      <p>La misura più rozza è la <strong>semidispersione</strong>: $\dfrac{x_{\max} - x_{\min}}{2}$, cioè metà della
+        differenza tra il valore più grande e il più piccolo. Semplice, ma la rovina un solo outlier.</p>
+      <p>Più robusti sono i <strong>percentili</strong>: ordino i dati e li taglio in fette uguali. I
+        <strong>quartili</strong> li dividono in $4$ parti ($25\%$, $50\%$, $75\%$: il secondo quartile è proprio la
+        mediana!), i <strong>terzili</strong> in $3$, i <strong>decili</strong> in $10$, e i <strong>percentili</strong>
+        in $100$. Dire «sei nel 90° percentile in matematica» significa: sei più bravo del $90\%$ dei tuoi coetanei.</p>
+
+      <h3>3.2 — Lo scarto quadratico medio (deviazione standard)</h3>
+      <p>La misura di dispersione più usata di tutte è lo <strong>scarto quadratico medio</strong> $\sigma$ (detto
+        anche <strong>deviazione standard</strong>): in media, quanto ogni dato si discosta dalla media. Costruiamola
+        <strong>passo per passo</strong> sui voti $4,\ 8,\ 6,\ 5,\ 7$ (la cui media è $\bar{x} = 6$).</p>
+      <table class="steps">
+        <tr><th>valore $x_i$</th><td>4</td><td>8</td><td>6</td><td>5</td><td>7</td><th>somma</th></tr>
+        <tr><td class="lab">① scarto $x_i - \bar{x}$</td><td>−2</td><td>+2</td><td>0</td><td>−1</td><td>+1</td><td><strong>0</strong></td></tr>
+        <tr><td class="lab">② scarto al quadrato $(x_i-\bar{x})^2$</td><td>4</td><td>4</td><td>0</td><td>1</td><td>1</td><td><strong>10</strong></td></tr>
+      </table>
+      <ol>
+        <li><strong>Gli scarti</strong>: la differenza tra ogni valore e la media. Nota che la loro somma fa
+          <strong>sempre 0</strong> (i positivi e i negativi si annullano: è proprio ciò che significa «media»). Se ci
+          fermassimo qui, otterremmo zero per <em>qualunque</em> insieme di dati: inutile!</li>
+        <li><strong>Al quadrato</strong>: eleviamo ogni scarto al quadrato, così spariscono i segni e restano solo
+          grandezze positive. (Potremmo anche prendere il <em>valore assoluto</em>, ma di solito si usa il quadrato:
+          il <strong>perché</strong> lo capiremo alla fine della lezione — c'entra la curva a campana.)</li>
+        <li><strong>Sommiamo</strong> i quadrati: qui $4+4+0+1+1 = 10$.</li>
+        <li><strong>Dividiamo per $N-1$</strong> (non per $N$!): $\dfrac{10}{5-1} = \dfrac{10}{4} = 2{,}5$. Questo
+          numero si chiama <strong>varianza</strong>. Perché $N-1$ e non $N$? Perché la media $\bar{x}$ l'abbiamo
+          ricavata <em>dagli stessi dati</em>: uno dei valori non è più «libero» (conoscendo la media e gli altri, è
+          determinato). Dividere per $N-1$ corregge questa piccola furbizia e dà una stima migliore della dispersione
+          della popolazione.</li>
+        <li><strong>Radice quadrata</strong>: $\sigma = \sqrt{2{,}5} \approx 1{,}58$. La radice «disfa» il quadrato e
+          ci riporta all'unità di misura dei dati (voti, non voti-al-quadrato).</li>
+      </ol>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Sfida: dimostralo per <em>tutti</em> i casi!</span><span class="difficulty medium">Medio</span></div>
+        <p>Nella tabella la somma degli scarti è venuta esattamente $0$, ma quello era un caso particolare (i voti
+          $4,\ 8,\ 6,\ 5,\ 7$). Sarà davvero sempre così, per <strong>qualunque</strong> insieme di dati? Non fidarti:
+          provalo con l'algebra! Chiama i dati $x_1, x_2, \dots, x_N$ e usa solo la definizione di media.
+          <em>Suggerimento:</em> parti da $\sum_i (x_i - \bar{x})$ e «spezza» la somma in due pezzi.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra la dimostrazione</button></div>
+        <div class="solution">
+          <p>Per <strong>definizione</strong> la media è $\bar{x} = \dfrac{x_1 + x_2 + \dots + x_N}{N}$; moltiplicando
+            entrambi i membri per $N$ otteniamo un fatto che ci servirà:</p>
+          $$x_1 + x_2 + \dots + x_N \;=\; \sum_{i=1}^{N} x_i \;=\; N\,\bar{x}.$$
+          <p>Ora calcoliamo la somma degli scarti, spezzandola in due (la somma di una differenza è la differenza
+            delle somme):</p>
+          $$\sum_{i=1}^{N}(x_i - \bar{x}) \;=\; \sum_{i=1}^{N} x_i \;-\; \sum_{i=1}^{N}\bar{x}.$$
+          <p>Il primo pezzo vale $N\bar{x}$ (l'abbiamo appena visto). Il secondo è la somma di $\bar{x}$ ripetuta $N$
+            volte — è una costante, non dipende da $i$! — quindi vale anch'esso $N\bar{x}$. Perciò:</p>
+          $$\sum_{i=1}^{N}(x_i - \bar{x}) \;=\; N\bar{x} - N\bar{x} \;=\; 0.$$
+          <div class="result-box"><span class="result-label">Conclusione</span><span class="result-value">La somma degli scarti è $0$ per <strong>ogni</strong> insieme di dati.</span></div>
+          <p>Ecco perché al passo ① non possiamo usarla come misura di dispersione: si azzera sempre, a prescindere da
+            quanto i dati siano sparpagliati. È proprio questo che ci costringe, al passo ②, a elevare al quadrato.</p>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">Scarto quadratico medio (deviazione standard)</div>
+        $$\sigma = \sqrt{\frac{\sum_{i}(x_i - \bar{x})^2}{N-1}}$$
+      </div>
+      <p>Trascina il cursore per vedere lo scarto quadratico medio crescere man mano che i dati si «allargano»
+        attorno alla media:</p>
+      <div class="simbox">
+        <div class="controls"><div class="control-group"><label>Quanto sono sparpagliati i dati: <span class="val" id="sp-s-val">3</span></label>
+          <input type="range" id="sp-s" min="0" max="10" step="0.5" value="3"></div></div>
+        <div id="sp-svg"></div>
+        <p class="sim-out" id="sp-out"></p>
+      </div>
+    </section>
+
+    <!-- 4 — I GRAFICI -->
+    <section id="sec4">
+      <h2>4. Vedere i dati: i grafici</h2>
+      <p>Un elenco di mille numeri non dice niente all'occhio. Un <strong>grafico</strong>, invece, lo capisci in un
+        istante: è il modo più immediato e onesto (se fatto bene!) per descrivere un campione. Ecco i tre tipi
+        fondamentali.</p>
+
+      <h3>4.1 — Il grafico a torta</h3>
+      <p>Serve per le variabili <strong>qualitative</strong>: mostra come un tutto ($100\%$) si divide in fette. Ogni
+        spicchio è una categoria; l'ampiezza dell'angolo è proporzionale alla percentuale.</p>
+      <div class="simbox"><div class="plot" id="pie-plot"></div></div>
+
+      <h3>4.2 — Il grafico a dispersione</h3>
+      <p>Mette in relazione <strong>due</strong> variabili quantitative: ogni punto è un individuo (qui: ore di studio
+        e voto). Se i punti seguono un andamento, spesso li si <strong>interpola</strong> con una linea continua che
+        riassume la tendenza (ne riparleremo con la correlazione).</p>
+      <div class="simbox"><div class="plot" id="scatter-plot"></div></div>
+
+      <h3>4.3 — L'istogramma</h3>
+      <p>È il re della statistica. Divide i valori in <strong>classi</strong> (intervalli) e disegna una barra alta
+        quanto la <strong>frequenza</strong> di ciascuna classe. Mostra a colpo d'occhio la «forma» della
+        distribuzione: dove si concentrano i dati, quanto sono sparsi, se sono simmetrici. È così importante che gli
+        dedichiamo il resto della lezione.</p>
+
+      <p>Ma <strong>attenzione a cosa mettiamo sull'asse verticale</strong>: ci sono due modi diversi di misurare
+        l'altezza delle barre, ed è importante non confonderli.</p>
+      <table class="steps">
+        <tr><th>Sull'asse verticale</th><th>Che cos'è</th><th>Dipende da $N$?</th><th>Somma delle barre</th></tr>
+        <tr>
+          <td class="lab">Numero di uscite<br><span style="font-weight:400; color:var(--muted);">(frequenza assoluta)</span></td>
+          <td>Quante volte si è verificata ciascuna classe: un <strong>conteggio</strong>, un numero intero.</td>
+          <td><strong>Sì:</strong> se raddoppi i dati, tutte le barre raddoppiano di altezza.</td>
+          <td>Uguale a $N$ (il totale dei dati).</td>
+        </tr>
+        <tr>
+          <td class="lab">Frequenza relativa<br><span style="font-weight:400; color:var(--muted);">(spesso scritta in %)</span></td>
+          <td>Il numero di uscite <strong>diviso il totale</strong> $N$: una proporzione, un numero tra $0$ e $1$.</td>
+          <td><strong>No:</strong> la forma resta identica con 100 o con 10 000 dati.</td>
+          <td>Sempre $1$, cioè $100\%$.</td>
+        </tr>
+      </table>
+      <p>La <strong>forma</strong> dell'istogramma è la stessa nei due casi: cambiano solo la <em>scala</em> e
+        l'<em>etichetta</em> dell'asse verticale. Ma la frequenza relativa ha due vantaggi enormi. Primo: permette di
+        <strong>confrontare</strong> campioni di dimensioni diverse (100 lanci contro un milione), perché è già
+        «normalizzata». Secondo, e più profondo: quando $N$ diventa grandissimo, la frequenza relativa si
+        <strong>avvicina alla probabilità</strong> — è la legge dei grandi numeri che hai visto nella lezione sulla
+        probabilità. Così l'istogramma delle frequenze relative diventa, al limite, la <strong>distribuzione di
+        probabilità</strong>: è il ponte che, tra poche pagine, ci porterà dai dati veri alla curva a campana.</p>
+      <p class="formula-note">Nei prossimi esperimenti incontrerai entrambe le versioni: l'istogramma della moneta qui
+        sotto conta il <em>numero di uscite</em>, mentre il simulatore dei due dadi (lezione sulla probabilità) usava la
+        <em>frequenza relativa</em>, confrontandola col valore teorico. Stesso grafico, asse verticale «tarato» in due
+        modi diversi.</p>
+    </section>
+
+    <!-- 5 — BINOMIALE -->
+    <section id="sec5">
+      <h2>5. L'istogramma della moneta: la distribuzione binomiale</h2>
+      <p>Facciamo un esperimento. Lanciamo <strong>10 monete</strong> insieme e contiamo quante teste escono (da $0$
+        a $10$). Ripetiamolo tantissime volte e costruiamo l'istogramma di «quante teste». Che forma viene fuori?</p>
+      <div class="simbox">
+        <div class="sim-btns">
+          <button class="btn" id="bn-100">🪙 lancia 100 gruppi</button>
+          <button class="btn" id="bn-2000">lancia 2000 gruppi</button>
+          <button class="btn" id="bn-reset">↺ azzera</button>
+        </div>
+        <div id="bn-svg"></div>
+        <p class="sim-out" id="bn-out">Ogni barra: quante volte sono uscite esattamente quelle teste (su 10 monete).</p>
+      </div>
+      <p>Viene fuori una campana simmetrica, altissima al centro ($5$ teste, il caso più probabile) e bassa agli
+        estremi ($0$ o $10$ teste, rarissimi). Questa è la <strong>distribuzione binomiale</strong>. Il nome ti
+        ricorda qualcosa? <strong>Il binomio di Newton</strong>, dalla lezione sui prodotti notevoli dell'anno scorso!
+        Le altezze delle barre sono <em>esattamente</em> i coefficienti dello sviluppo di $(T + C)^{10}$ — i numeri del
+        <strong>triangolo di Tartaglia</strong>: $1, 10, 45, 120, 210, 252, 210, 120, 45, 10, 1$.</p>
+
+      <div class="curiosita">
+        <strong>🎯 La macchina di Galton.</strong> Nell'Ottocento Francis Galton costruì una macchina che «disegna» da
+        sola la binomiale: una pallina cade e a ogni chiodo va a destra o a sinistra (come testa/croce), finché
+        atterra in una casella in basso. Lasciandone cadere migliaia, si accumulano nella forma a campana. Provala:</p>
+      </div>
+      <div class="simbox">
+        <div class="sim-btns">
+          <button class="btn" id="ga-1">⚫ 1 pallina</button>
+          <button class="btn" id="ga-500">500 palline</button>
+          <button class="btn" id="ga-reset">↺ azzera</button>
+        </div>
+        <div id="ga-svg"></div>
+        <p class="sim-out" id="ga-out"></p>
+      </div>
+
+      <h3>5.1 — Un simbolo nuovo: come si legge $\binom{n}{k}$</h3>
+      <p>Per parlare comodamente di questi numeri serve una <strong>notazione</strong>. È un simbolo che incontrerai
+        moltissime volte, quindi vale la pena presentarlo per bene: due numeri incolonnati dentro una parentesi tonda.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il coefficiente binomiale</div>
+        $$\binom{n}{k}$$
+        <p style="margin:0.4rem 0 0;">Si legge <strong>«n su k»</strong> (per esteso: <em>coefficiente binomiale di n
+          su k</em>). Il numero <strong>in alto</strong> è il totale degli oggetti a disposizione; quello
+          <strong>in basso</strong> è quanti se ne prendono.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>⚠️ Non è una frazione!</strong> È l'errore che fanno tutti la prima volta. Guarda bene: tra i due
+        numeri <strong>non c'è la linea di frazione</strong>, e la parentesi è tonda e grande. Quindi
+        $\binom{5}{2}$ <strong>non</strong> vale $2{,}5$: come vedremo tra un attimo, vale $10$. Se ci fosse la
+        lineetta sarebbe $\dfrac{5}{2}$, tutt'altra cosa.
+      </div>
+
+      <p>E che cosa significa? Una cosa molto concreta:</p>
+      <div class="definition">
+        $\binom{n}{k}$ è il numero di <strong>modi diversi</strong> in cui si possono scegliere $k$ oggetti presi da
+        un gruppo di $n$, <strong>senza tenere conto dell'ordine</strong>. In matematica queste scelte si chiamano
+        <strong>combinazioni</strong>.
+      </div>
+
+      <p>Nel nostro caso della moneta, $n$ è il <strong>numero di lanci</strong> e $k$ il <strong>numero di
+        teste</strong>: allora $\binom{n}{k}$ risponde alla domanda «<em>in quanti modi diversi possono uscire
+        esattamente $k$ teste su $n$ lanci?</em>». Ed è esattamente l'altezza della barra dell'istogramma!</p>
+
+      <p>Per calcolarlo c'è una formula, che usa il <strong>fattoriale</strong>:</p>
+      <div class="formula-box">
+        <div class="formula-title">Come si calcola</div>
+        $$\binom{n}{k} = \frac{n!}{k!\,(n-k)!}$$
+        <p class="formula-note">Ricorda che il <strong>fattoriale</strong> $n!$ (si legge «n fattoriale») è il
+          prodotto di tutti i numeri interi da $1$ a $n$: per esempio $5! = 5\cdot4\cdot3\cdot2\cdot1 = 120$. Per
+          convenzione $0! = 1$: sembra strano, ma serve proprio perché la formula qui sopra funzioni anche ai bordi.</p>
+      </div>
+
+      <p>Proviamola con le <strong>2 teste su 5 lanci</strong>:</p>
+      <div class="formula-box">
+        $$\binom{5}{2} = \frac{5!}{2!\,(5-2)!} = \frac{5!}{2!\,3!} = \frac{120}{2 \cdot 6} = \frac{120}{12} = 10$$
+      </div>
+      <p>Dieci. Ma non fidarti della formula: <strong>contiamoli</strong>. Ecco tutte le sequenze di 5 lanci con
+        esattamente due teste (T) e tre croci (C):</p>
+      <p style="font-family:Consolas,monospace; font-size:0.95rem; text-align:center; line-height:1.9;">
+        TTCCC &nbsp; TCTCC &nbsp; TCCTC &nbsp; TCCCT &nbsp; CTTCC<br>
+        CTCTC &nbsp; CTCCT &nbsp; CCTTC &nbsp; CCTCT &nbsp; CCCTT
+      </p>
+      <p>Esattamente <strong>dieci</strong>: la formula aveva ragione. E si capisce anche perché l'ordine non
+        conta — «due teste» è due teste, che escano al primo e al secondo lancio o al quarto e al quinto.</p>
+
+      <p>Tre proprietà che vale la pena notare subito, perché spiegano la forma della campana:</p>
+      <ul>
+        <li>$\binom{n}{0} = \binom{n}{n} = 1$ — c'è <strong>un solo modo</strong> di fare zero teste (tutte croci) e
+          un solo modo di farle tutte teste. Ecco perché le barre agli estremi dell'istogramma sono
+          <strong>bassissime</strong>: quei risultati si ottengono in un modo soltanto.</li>
+        <li>$\binom{n}{1} = n$ — se vuoi <em>una</em> sola testa, puoi sceglierne il lancio in $n$ modi.</li>
+        <li><strong>Simmetria:</strong> $\binom{n}{k} = \binom{n}{n-k}$ — scegliere <em>quali $k$ prendere</em> equivale
+          a scegliere <em>quali $n-k$ lasciare</em>. È questa proprietà che rende l'istogramma della moneta
+          <strong>perfettamente simmetrico</strong>.</li>
+      </ul>
+
+      <p>E il triangolo di Tartaglia? È semplicemente la <strong>tabella di tutti i coefficienti binomiali</strong>:
+        nella riga $n$ ci sono, in ordine, $\binom{n}{0}, \binom{n}{1}, \dots, \binom{n}{n}$. Cliccane uno qualsiasi
+        per vedere che cosa significa:</p>
+
+      <div class="simbox">
+        <div class="tri" id="tri-wrap"></div>
+        <p class="sim-out" id="tri-out">Clicca un numero del triangolo.</p>
+      </div>
+
+      <p class="formula-note">Nota la regola che costruisce il triangolo: ogni numero è la <strong>somma dei due che
+        stanno sopra di lui</strong>, cioè $\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}$. Quando clicchi un
+        numero, i suoi due «genitori» si illuminano.</p>
+
+      <h3>5.2 — Esercizi guidati: il binomio di Newton per calcolare probabilità</h3>
+      <p>Poiché le altezze della binomiale sono i coefficienti $\binom{n}{k}$ dello sviluppo di $(T+C)^n$, possiamo
+        usarli per calcolare probabilità. La probabilità di ottenere <em>esattamente</em> $k$ teste in $n$ lanci è
+        $P = \dfrac{\binom{n}{k}}{2^n}$ (casi favorevoli su casi possibili).</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 1</span><span class="difficulty easy">Facile</span></div>
+        <p>Lancio <strong>4 monete</strong>. Qual è la probabilità di ottenere <strong>esattamente 2 teste</strong>?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Lo sviluppo $(T+C)^4$ ha coefficienti $1, 4, 6, 4, 1$ (quinta riga di Tartaglia). Il coefficiente di «2
+            teste» è $\binom{4}{2} = 6$; i casi totali sono $2^4 = 16$.</p>
+          <div class="result-box"><span class="result-label">Probabilità</span><span class="result-value">$\dfrac{6}{16} = \dfrac{3}{8} = 37{,}5\%$</span></div>
+        </div>
+      </div>
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2</span><span class="difficulty medium">Medio</span></div>
+        <p>Lancio <strong>5 monete</strong>. Qual è la probabilità di ottenere <strong>almeno 3 teste</strong>?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p>Coefficienti di $(T+C)^5$: $1, 5, 10, 10, 5, 1$. «Almeno 3 teste» = $3$ oppure $4$ oppure $5$ teste:
+            $\binom{5}{3} + \binom{5}{4} + \binom{5}{5} = 10 + 5 + 1 = 16$. Casi totali $2^5 = 32$.</p>
+          <div class="result-box"><span class="result-label">Probabilità</span><span class="result-value">$\dfrac{16}{32} = \dfrac{1}{2} = 50\%$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — SKEWNESS -->
+    <section id="sec6">
+      <h2>6. Quando la campana è storta: l'asimmetria</h2>
+      <p>Non tutti i fenomeni danno una campana simmetrica. Prendi i <strong>gol segnati da un attaccante</strong> in
+        una partita: quasi sempre $0$, $1$ o $2$; ogni tanto $3$; rarissimamente $5$; ma <strong>mai meno di
+        zero</strong>. C'è un «muro» a sinistra: non si può scendere sotto lo $0$. Il risultato è una curva
+        <strong>asimmetrica</strong>, con una lunga coda a destra.</p>
+      <div class="simbox"><div class="plot" id="skew-plot"></div></div>
+      <p>Questa asimmetria si chiama <strong>skewness</strong> (dall'inglese <em>skew</em>, «storto»). La stessa forma
+        compare in tanti fenomeni con un limite naturale: la velocità delle molecole di un gas (la celebre
+        <strong>distribuzione di Maxwell</strong>), i tempi di attesa, gli stipendi. Quando una curva è asimmetrica,
+        <strong>media, moda e mediana non coincidono più</strong>: la moda (il picco) sta a sinistra, la media viene
+        «tirata» a destra dalla coda lunga, e la mediana sta nel mezzo.</p>
+    </section>
+
+    <!-- 7 — GAUSSIANA -->
+    <section id="sec7">
+      <h2>7. La regina di tutte: la distribuzione gaussiana</h2>
+      <p>E se prendiamo un fenomeno <em>qualsiasi</em>? La cosa sorprendente è che, il più delle volte, viene fuori
+        <strong>sempre la stessa curva</strong>: la <strong>distribuzione gaussiana</strong> (o <strong>normale</strong>,
+        o <strong>a campana</strong>). L'altezza delle persone, gli errori di misura, i punteggi di un test, il peso
+        alla nascita: tutte campane simmetriche. Perché proprio lei, così spesso?</p>
+      <div class="simbox"><div class="plot" id="gauss-plot"></div></div>
+
+      <div class="definition">
+        <strong>Il teorema del limite centrale</strong> (imparentato con la «legge dei grandi numeri»). Se un
+        fenomeno è la <strong>somma di tante piccole cause casuali indipendenti</strong>, oppure se ripetiamo una
+        misura un numero $N$ di volte sempre più grande, la distribuzione dei risultati tende alla
+        <strong>gaussiana</strong> — qualunque fosse la distribuzione di partenza. È il motivo per cui la campana è
+        <em>ovunque</em>: in natura quasi tutto è la somma di tanti piccoli effetti.
+      </div>
+      <p>Guardiamolo in azione: sommiamo il risultato di più dadi. Un dado solo dà una distribuzione «piatta»
+        (uniforme); ma già sommandone due, tre, quattro... la forma diventa una campana. Aumenta $N$ e osserva:</p>
+      <div class="simbox">
+        <div class="controls"><div class="control-group"><label>Quanti dadi sommo: <span class="val" id="clt-n-val">1</span></label>
+          <input type="range" id="clt-n" min="1" max="12" step="1" value="1"></div></div>
+        <div id="clt-svg"></div>
+        <p class="sim-out" id="clt-out"></p>
+      </div>
+      <p>Anticipiamo una cosa che studierete al quinto anno: se $N$ diventa <strong>sempre più grande</strong> (in
+        matematica si dice «tende all'infinito», $N \to \infty$), le barre dell'istogramma si stringono fino a
+        diventare così fitte da fondersi in una <strong>curva continua</strong>: la distribuzione da
+        <strong>discreta</strong> (a gradini) diventa <strong>continua</strong> (liscia). È il ponte tra la statistica
+        di oggi e l'analisi matematica dell'ultimo anno.</p>
+
+      <h3>7.1 — Ecco perché si usa il quadrato</h3>
+      <p>Torniamo alla promessa della sezione 3: perché nello scarto quadratico medio usiamo il <strong>quadrato</strong>
+        e non il valore assoluto? Ora possiamo rispondere: perché la curva che salta fuori quasi sempre è la
+        <strong>gaussiana</strong>, e la sua formula è costruita proprio sul <em>quadrato</em> dello scarto (nel suo
+        esponente compare $-(x-\bar{x})^2$). Il quadrato è la misura di dispersione «naturale» per la campana — oltre
+        ad avere proprietà matematiche più comode del valore assoluto. Nella gaussiana la deviazione standard $\sigma$
+        ha un significato geometrico preciso: è, all'incirca, la <strong>semi-larghezza della campana a metà della sua
+        altezza</strong>, e segna i punti in cui la curva cambia concavità.</p>
+      <div class="formula-box">
+        <div class="formula-title">La regola 68 – 95 – 99,7</div>
+        <p style="margin:0;">In una distribuzione normale, l'intervallo di:</p>
+        <ul style="margin:0.4rem 0 0;">
+          <li><strong>1 deviazione standard</strong> attorno alla media ($\bar{x} \pm \sigma$) contiene circa il
+            <strong>68%</strong> dei casi;</li>
+          <li><strong>2 deviazioni standard</strong> ($\bar{x} \pm 2\sigma$) circa il <strong>95%</strong>;</li>
+          <li><strong>3 deviazioni standard</strong> ($\bar{x} \pm 3\sigma$) oltre il <strong>99,7%</strong>.</li>
+        </ul>
+      </div>
+      <p>Ecco perché, in statistica, si dice spesso che è «<strong>normale</strong>» ciò che cade entro un certo numero
+        di deviazioni standard, e «anomalo» ciò che se ne discosta di molte (un valore a $4$ o $5\,\sigma$ è
+        rarissimo). Attenzione però: è soltanto una <strong>definizione matematica</strong> di «normale» — non un
+        giudizio su cosa <em>debba</em> essere normale nella vita.</p>
+
+      <div class="curiosita">
+        <strong>📊 Riepilogo delle tre curve.</strong> <strong>Binomiale</strong> (moneta): simmetrica, discreta,
+        media = moda = mediana al centro. <strong>Asimmetrica</strong> (gol, Maxwell): storta, con moda, mediana e
+        media <em>separate</em>. <strong>Gaussiana</strong> (normale): simmetrica e continua, media = moda = mediana,
+        con la regola 68-95-99,7. La binomiale, per tanti lanci, diventa quasi indistinguibile dalla gaussiana: sono
+        parenti strette.</p>
+      </div>
+    </section>
+
+    <!-- 8 — CORRELAZIONE E CAUSALITÀ -->
+    <section id="sec8">
+      <h2>8. Correlazione non è causalità (e la statistica non è ideologia)</h2>
+      <p>Chiudiamo con l'insegnamento più importante di tutta la lezione — un antidoto contro le bugie travestite da
+        numeri. Quando due variabili «si muovono insieme» (crescono o calano di pari passo), diciamo che sono
+        <strong>correlate</strong>. Nel grafico a dispersione, i punti si allineano lungo una tendenza:</p>
+      <p>Ecco una piccola <strong>galleria di correlazioni</strong>. Tre di questi grafici riportano
+        <strong>dati veri, presi da studi pubblicati</strong> (la fonte è indicata sotto ciascuno): non sono
+        esagerazioni inventate per far ridere. Guardali e, per ognuno, prova a chiederti: <em>che cosa sta davvero
+        succedendo qui?</em></p>
+      <div class="simbox">
+        <div class="sim-btns" id="corr-btns"></div>
+        <div class="plot" id="corr-plot"></div>
+        <p class="sim-out" id="corr-out"></p>
+        <p class="fonte" id="corr-src"></p>
+      </div>
+
+      <p>Messe in fila, si riconoscono <strong>quattro trappole diverse</strong> — e vale la pena saperle distinguere,
+        perché sono i modi in cui si viene ingannati:</p>
+      <table class="steps">
+        <tr><th>Trappola</th><th>Che cosa succede</th><th>Esempio</th></tr>
+        <tr>
+          <td class="lab">Causa comune</td>
+          <td>Una <strong>terza</strong> variabile nascosta (detta <em>confondente</em>) muove entrambe.</td>
+          <td>Gelati e annegamenti (il caldo); cicogne e nascite (l'estensione del Paese); cioccolato e Nobel (la ricchezza)</td>
+        </tr>
+        <tr>
+          <td class="lab">Causa invertita</td>
+          <td>Il legame c'è, ma va nel <strong>verso opposto</strong> a quello che sembra.</td>
+          <td>Più pompieri, più danni: non sono i pompieri a causare i danni — è l'incendio grande a richiamare i pompieri</td>
+        </tr>
+        <tr>
+          <td class="lab">Pura coincidenza</td>
+          <td>Nessun legame di alcun tipo: con <strong>tantissime</strong> coppie di dati, qualcuna «combacia» per caso.</td>
+          <td>Margarina e divorzi nel Maine ($r = 0{,}99$!)</td>
+        </tr>
+        <tr>
+          <td class="lab">Legame plausibile<br><span style="font-weight:400; color:var(--muted);">(ma non dimostrato)</span></td>
+          <td>Una causa c'è probabilmente davvero — ma <strong>il grafico da solo non la prova</strong>.</td>
+          <td>Ore di studio e voto</td>
+        </tr>
+      </table>
+      <div class="warnbox">
+        <strong>⚠ La regola d'oro: correlazione ≠ causalità.</strong> Il fatto che due fenomeni si muovano insieme
+        <strong>non</strong> significa che uno sia la <em>causa</em> dell'altro. E attenzione: <strong>non serve a
+        niente che la correlazione sia fortissima</strong> — la margarina e i divorzi hanno $r = 0{,}99$, quasi il
+        massimo possibile, e non c'entrano assolutamente nulla l'una con gli altri.
+        <p style="margin:0.6rem 0 0;">Come ci si difende? Con tre domande, ogni volta che qualcuno ti mostra un
+          grafico:</p>
+        <ol style="margin:0.4rem 0 0;">
+          <li>Esiste una <strong>terza causa</strong> che potrebbe muovere entrambe le grandezze?</li>
+          <li>Il verso non potrebbe essere <strong>invertito</strong>?</li>
+          <li>Quante altre coppie di dati sono state provate prima di trovare proprio questa? (Se ne provi mille,
+            una che «funziona» la trovi di sicuro.)</li>
+        </ol>
+        <p style="margin:0.6rem 0 0;">Per dimostrare davvero una causa non basta osservare: servono un
+          <strong>esperimento</strong> — cambiare <em>una</em> cosa sola e vedere che succede — oppure un
+          meccanismo che spieghi <em>perché</em>. Il grafico è l'indizio che fa nascere la domanda, non la risposta.</p>
+      </div>
+      <p>E qui la lezione diventa civica. La matematica e la scienza sono strumenti potentissimi, ma vanno usati per
+        quello che sanno fare: <strong>descrivere ciò che accade</strong> e mostrare <strong>quali scenari</strong>
+        sono possibili in base alle scelte che facciamo. Ma <em>quali</em> scenari considerare accettabili, <em>quali</em>
+        rischi correre, <em>quali</em> valori mettere davanti agli altri — questa è <strong>ideologia</strong>, non
+        scienza. Diffida di chi brandisce «un grafico» o «lo dice la statistica» per importi le sue idee: sta usando
+        l'autorità della scienza per mascherare una scelta di valori. La statistica ti dà i numeri; che cosa
+        <em>farne</em> resta una decisione umana, di cui siamo responsabili noi.</p>
+    </section>
+
+    <!-- 9 — QUIZ -->
+    <section id="quiz">
+      <h2>9. Quiz finale</h2>
+      <p>Dieci domande su campione, media/mediana, deviazione standard, distribuzioni e correlazione. Difficoltà
+        crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <!-- Widget interattivi -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const P = window.Plt;
+      const C = P ? P.themeColors() : {};
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toString().replace('.', ','); }
+      function median(a) { const s = a.slice().sort((x, y) => x - y); const n = s.length, m = n >> 1; return n % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
+      function mean(a) { return a.reduce((s, x) => s + x, 0) / a.length; }
+      function mode(a) { const c = {}; let best = a[0], bc = 0; a.forEach(v => { c[v] = (c[v] || 0) + 1; if (c[v] > bc) { bc = c[v]; best = v; } }); return best; }
+      function binom(n, k) { let r = 1; for (let i = 0; i < k; i++) r = r * (n - i) / (i + 1); return Math.round(r); }
+
+      // ===== 2 — media/moda/mediana con outlier =====
+      (function () {
+        const svg = document.getElementById('ce-svg'); if (!svg) return;
+        const sx = document.getElementById('ce-x'), vx = document.getElementById('ce-x-val');
+        const eM = document.getElementById('ce-mean'), eMd = document.getElementById('ce-med'), eMo = document.getElementById('ce-mode'), out = document.getElementById('ce-out');
+        const base = [4, 6, 6, 7, 8, 9, 9, 9];
+        function go() {
+          const x = +sx.value; vx.textContent = x;
+          const data = base.concat([x]);
+          const mn = mean(data), md = median(data), mo = mode(data);
+          eM.textContent = nf(mn, 2); eMd.textContent = nf(md, 1); eMo.textContent = mo;
+          // number line 0..30
+          const W = 460, H = 90, PADX = 24, y = 55;
+          function X(v) { return PADX + v / 30 * (W - 2 * PADX); }
+          let s = `<line x1="${PADX}" y1="${y}" x2="${W - PADX}" y2="${y}" stroke="var(--text-soft)" stroke-width="2"/>`;
+          for (let t = 0; t <= 30; t += 5) s += `<line x1="${X(t)}" y1="${y}" x2="${X(t)}" y2="${y + 5}" stroke="var(--muted)"/><text x="${X(t)}" y="${y + 20}" text-anchor="middle" style="fill:var(--muted);font-size:10px;">${t}</text>`;
+          data.forEach(v => { s += `<circle cx="${X(v).toFixed(1)}" cy="${y}" r="6" fill="var(--accent)" opacity="0.55"/>`; });
+          s += `<line x1="${X(mn).toFixed(1)}" y1="${y - 34}" x2="${X(mn).toFixed(1)}" y2="${y + 6}" stroke="#dc2626" stroke-width="2.5"/><text x="${X(mn).toFixed(1)}" y="${y - 38}" text-anchor="middle" style="fill:#dc2626;font-size:11px;font-weight:700;">media</text>`;
+          s += `<line x1="${X(md).toFixed(1)}" y1="${y - 20}" x2="${X(md).toFixed(1)}" y2="${y + 6}" stroke="#16a34a" stroke-width="2.5"/><text x="${X(md).toFixed(1)}" y="${y - 24}" text-anchor="middle" style="fill:#16a34a;font-size:11px;font-weight:700;">mediana</text>`;
+          svg.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="retta dei dati con media e mediana">${s}</svg>`;
+          out.innerHTML = x > 12 ? 'Guarda: con un valore anomalo alto la <strong>media</strong> (rossa) scappa a destra, ma la <strong>mediana</strong> (verde) resta quasi ferma. La mediana è più robusta!' : 'Sposta il cursore verso valori molto alti per creare un «outlier».';
+        }
+        sx.addEventListener('input', go); go();
+      })();
+
+      // ===== 3 — spread / deviazione standard =====
+      (function () {
+        const svg = document.getElementById('sp-svg'); if (!svg) return;
+        const ss = document.getElementById('sp-s'), vs = document.getElementById('sp-s-val'), out = document.getElementById('sp-out');
+        const base = [-2, -1, -0.5, 0, 0.5, 1, 2], mu = 10;
+        function go() {
+          const k = +ss.value; vs.textContent = nf(k, 1);
+          const data = base.map(b => mu + b * k);
+          const m = mean(data);
+          let sum = 0; data.forEach(v => sum += (v - m) * (v - m));
+          const sigma = Math.sqrt(sum / (data.length - 1));
+          const W = 460, H = 80, PADX = 24, y = 45;
+          function X(v) { return PADX + (v) / 20 * (W - 2 * PADX); }
+          let s = `<line x1="${PADX}" y1="${y}" x2="${W - PADX}" y2="${y}" stroke="var(--text-soft)" stroke-width="2"/>`;
+          for (let t = 0; t <= 20; t += 5) s += `<line x1="${X(t)}" y1="${y}" x2="${X(t)}" y2="${y + 5}" stroke="var(--muted)"/><text x="${X(t)}" y="${y + 19}" text-anchor="middle" style="fill:var(--muted);font-size:10px;">${t}</text>`;
+          // banda ±sigma
+          s += `<rect x="${X(mu - sigma).toFixed(1)}" y="${y - 22}" width="${(X(mu + sigma) - X(mu - sigma)).toFixed(1)}" height="24" fill="var(--accent)" opacity="0.15"/>`;
+          data.forEach(v => { s += `<circle cx="${X(v).toFixed(1)}" cy="${y}" r="6" fill="var(--accent)"/>`; });
+          s += `<line x1="${X(mu).toFixed(1)}" y1="${y - 26}" x2="${X(mu).toFixed(1)}" y2="${y + 4}" stroke="#dc2626" stroke-width="2"/>`;
+          svg.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="dati sparpagliati attorno alla media">${s}</svg>`;
+          out.innerHTML = `Media $= 10$ (linea rossa); i dati si allargano nella banda $\\pm\\sigma$ (in azzurro). Deviazione standard $\\sigma \\approx$ <strong>${nf(sigma, 2)}</strong>.`;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        ss.addEventListener('input', go); go();
+      })();
+
+      // ===== 4 — grafici a torta e a dispersione (Plotly statici) =====
+      if (P) {
+        P.draw('pie-plot', [{
+          type: 'pie', labels: ['Calcio', 'Pallavolo', 'Basket', 'Nuoto', 'Altro'], values: [38, 22, 16, 14, 10],
+          textinfo: 'label+percent', marker: { colors: [C.accent, C.curve, C.primary, C.gold || '#f5b400', C.grid] }, hole: 0.35
+        }], { showlegend: false, margin: { t: 20, b: 20, l: 20, r: 20 } });
+
+        const sx = [1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8], sy = [4, 5, 6, 5, 7, 6, 8, 7, 9, 8, 9, 9, 10];
+        const a = (function () { const n = sx.length, mx = mean(sx), my = mean(sy); let num = 0, den = 0; for (let i = 0; i < n; i++) { num += (sx[i] - mx) * (sy[i] - my); den += (sx[i] - mx) ** 2; } const m = num / den; return { m, q: my - m * mx }; })();
+        P.draw('scatter-plot', [
+          { x: sx, y: sy, mode: 'markers', type: 'scatter', marker: { color: C.accent, size: 9 }, name: 'studenti' },
+          { x: [0, 9], y: [a.q, a.m * 9 + a.q], mode: 'lines', type: 'scatter', line: { color: C.curve, width: 2.5, dash: 'dash' }, name: 'tendenza' }
+        ], { xaxis: { title: 'ore di studio', range: [0, 9] }, yaxis: { title: 'voto', range: [3, 11] }, showlegend: false });
+      }
+
+      // ===== 5 — istogramma della moneta (binomiale) =====
+      (function () {
+        const svg = document.getElementById('bn-svg'); if (!svg) return;
+        const out = document.getElementById('bn-out');
+        let counts = new Array(11).fill(0);
+        function toss(groups) { for (let g = 0; g < groups; g++) { let h = 0; for (let c = 0; c < 10; c++) if (Math.random() < 0.5) h++; counts[h]++; } draw(); }
+        function draw() {
+          const W = 460, H = 250, PADX = 30, PADB = 40, top = 20;
+          const maxC = Math.max(1, ...counts), bw = (W - 2 * PADX) / 11;
+          let s = '';
+          const theo = []; for (let k = 0; k <= 10; k++) theo.push(binom(10, k));
+          const maxT = Math.max(...theo), tot = counts.reduce((a, b) => a + b, 0);
+          for (let k = 0; k <= 10; k++) {
+            const x = PADX + k * bw, h = counts[k] / maxC * (H - top - PADB);
+            s += `<rect x="${(x + 3).toFixed(1)}" y="${(H - PADB - h).toFixed(1)}" width="${(bw - 6).toFixed(1)}" height="${h.toFixed(1)}" fill="var(--accent)" opacity="0.8"/>`;
+            s += `<text x="${(x + bw / 2).toFixed(1)}" y="${H - PADB + 15}" text-anchor="middle" style="fill:var(--muted);font-size:10px;">${k}</text>`;
+            // curva teorica (coefficiente / max)
+            const ty = H - PADB - theo[k] / maxT * (H - top - PADB);
+            s += `<circle cx="${(x + bw / 2).toFixed(1)}" cy="${ty.toFixed(1)}" r="3" fill="var(--curve, #f06ab8)"/>`;
+          }
+          s += `<text x="${W / 2}" y="${H - 6}" text-anchor="middle" style="fill:var(--muted);font-size:11px;">numero di teste (su 10 monete)</text>`;
+          svg.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="istogramma del numero di teste">${s}</svg>`;
+          if (tot > 0) out.innerHTML = `Gruppi lanciati: <strong>${tot}</strong>. I pallini rosa sono le altezze <em>teoriche</em> (i coefficienti di Tartaglia): l'istogramma reale ci si adagia sopra.`;
+        }
+        document.getElementById('bn-100').addEventListener('click', () => toss(100));
+        document.getElementById('bn-2000').addEventListener('click', () => toss(2000));
+        document.getElementById('bn-reset').addEventListener('click', () => { counts = new Array(11).fill(0); draw(); });
+        draw();
+      })();
+
+      // ===== 5.1 — triangolo di Tartaglia interattivo =====
+      (function () {
+        const wrap = document.getElementById('tri-wrap'); if (!wrap) return;
+        const out = document.getElementById('tri-out');
+        const NMAX = 7;
+        function fact(n) { let r = 1; for (let i = 2; i <= n; i++) r *= i; return r; }
+        for (let n = 0; n <= NMAX; n++) {
+          const row = document.createElement('div');
+          row.className = 'tri-row';
+          const lab = document.createElement('span');
+          lab.className = 'tri-lab';
+          lab.textContent = 'n = ' + n;
+          row.appendChild(lab);
+          for (let k = 0; k <= n; k++) {
+            const c = document.createElement('button');
+            c.className = 'tri-cell';
+            c.type = 'button';
+            c.textContent = binom(n, k);
+            c.setAttribute('data-n', n);
+            c.setAttribute('data-k', k);
+            c.setAttribute('aria-label', n + ' su ' + k);
+            row.appendChild(c);
+          }
+          wrap.appendChild(row);
+        }
+        const cells = wrap.querySelectorAll('.tri-cell');
+        function show(n, k) {
+          cells.forEach(function (c) {
+            const cn = +c.getAttribute('data-n'), ck = +c.getAttribute('data-k');
+            c.className = 'tri-cell';
+            if (cn === n && ck === k) c.className = 'tri-cell sel';
+            else if (cn === n - 1 && (ck === k - 1 || ck === k)) c.className = 'tri-cell par';
+          });
+          const v = binom(n, k);
+          let s = `Hai scelto $\\binom{${n}}{${k}}$, che si legge <strong>«${n} su ${k}»</strong> e vale <strong>${v}</strong>.<br>`;
+          s += `Con la formula: $\\binom{${n}}{${k}} = \\dfrac{${n}!}{${k}!\\,(${n}-${k})!} = \\dfrac{${fact(n)}}{${fact(k)} \\cdot ${fact(n - k)}} = ${v}$.<br>`;
+          if (n === 0) {
+            s += 'È la punta del triangolo: con zero lanci c\'è un solo risultato possibile, «niente».';
+          } else {
+            s += `Significato: lanciando <strong>${n}</strong> monete, ci sono <strong>${v}</strong> ` +
+              (v === 1 ? 'modo' : 'modi') + ` diversi di ottenere esattamente <strong>${k}</strong> ` +
+              (k === 1 ? 'testa' : 'teste') + `, su $2^{${n}} = ${Math.pow(2, n)}$ risultati possibili in tutto.`;
+            if (k > 0 && k < n) {
+              s += ` I due numeri illuminati sopra sono i suoi «genitori»: $${binom(n - 1, k - 1)} + ${binom(n - 1, k)} = ${v}$.`;
+            }
+            if (k !== n - k) {
+              s += ` Per la simmetria, $\\binom{${n}}{${k}} = \\binom{${n}}{${n - k}}$: stesso valore dall'altra parte della riga.`;
+            }
+          }
+          out.innerHTML = s;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        cells.forEach(function (c) {
+          c.addEventListener('click', function () {
+            show(+c.getAttribute('data-n'), +c.getAttribute('data-k'));
+          });
+        });
+        show(5, 2);
+      })();
+
+      // ===== 5 — macchina di Galton =====
+      (function () {
+        const svg = document.getElementById('ga-svg'); if (!svg) return;
+        const out = document.getElementById('ga-out');
+        const ROWS = 10, BINS = ROWS + 1, W = 460, H = 300, top = 20, pegTop = 40, binTop = 190;
+        let bins = new Array(BINS).fill(0);
+        function pegXY(r, i) { const cx = W / 2 + (i - r / 2) * 30; return [cx, pegTop + r * 15]; }
+        function binX(b) { const bw = (W - 60) / BINS; return 30 + b * bw + bw / 2; }
+        function draw(ball) {
+          let s = '';
+          for (let r = 0; r < ROWS; r++) for (let i = 0; i <= r; i++) { const p = pegXY(r, i); s += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5" fill="var(--text-soft)"/>`; }
+          const maxB = Math.max(1, ...bins), bw = (W - 60) / BINS;
+          for (let b = 0; b < BINS; b++) {
+            const h = bins[b] / maxB * (H - binTop - 24);
+            s += `<rect x="${(30 + b * bw + 2).toFixed(1)}" y="${(H - 24 - h).toFixed(1)}" width="${(bw - 4).toFixed(1)}" height="${h.toFixed(1)}" fill="var(--accent)" opacity="0.8"/>`;
+          }
+          if (ball) s += `<circle cx="${ball[0].toFixed(1)}" cy="${ball[1].toFixed(1)}" r="5" fill="var(--curve, #f06ab8)"/>`;
+          svg.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="macchina di Galton">${s}</svg>`;
+        }
+        function dropMany(n) { for (let k = 0; k < n; k++) { let b = 0; for (let r = 0; r < ROWS; r++) if (Math.random() < 0.5) b++; bins[b]++; } draw(); info(); }
+        function info() { const tot = bins.reduce((a, b) => a + b, 0); if (tot) out.innerHTML = `Palline cadute: <strong>${tot}</strong>. Ogni chiodo è un «testa o croce»: la somma di tanti lanci disegna da sola la campana binomiale.`; }
+        function dropOne() {
+          let r = 0, i = 0, b = 0; const path = [[W / 2, top]];
+          for (r = 0; r < ROWS; r++) { const right = Math.random() < 0.5; if (right) { i++; b++; } const p = pegXY(r, i - (right ? 0 : 0)); path.push([W / 2 + (i - (r + 1) / 2) * 30, pegTop + r * 15]); }
+          path.push([binX(b), H - 30]);
+          let step = 0;
+          const timer = setInterval(function () { if (step >= path.length) { clearInterval(timer); bins[b]++; draw(); info(); return; } draw(path[step]); step++; }, 55);
+        }
+        document.getElementById('ga-1').addEventListener('click', dropOne);
+        document.getElementById('ga-500').addEventListener('click', () => dropMany(500));
+        document.getElementById('ga-reset').addEventListener('click', () => { bins = new Array(BINS).fill(0); draw(); out.textContent = ''; });
+        draw();
+      })();
+
+      // ===== 6 — curva asimmetrica (skew) =====
+      if (P) {
+        const xs = [], ys = []; for (let x = 0; x <= 10; x += 0.1) { xs.push(x); ys.push(Math.pow(x, 2) * Math.exp(-x * 0.9)); }
+        const peak = xs[ys.indexOf(Math.max(...ys))];
+        // media, mediana approssimate per l'annotazione
+        let area = 0, cum = 0; ys.forEach(v => area += v); let mediana = 0, m2 = 0; for (let i = 0; i < ys.length; i++) { cum += ys[i]; if (cum >= area / 2) { mediana = xs[i]; break; } }
+        let sm = 0, sw = 0; for (let i = 0; i < ys.length; i++) { sm += xs[i] * ys[i]; sw += ys[i]; } const media = sm / sw;
+        P.draw('skew-plot', [
+          { x: xs, y: ys, mode: 'lines', type: 'scatter', fill: 'tozeroy', line: { color: C.curve, width: 2.5 }, fillcolor: 'rgba(240,106,184,0.15)' }
+        ], {
+          xaxis: { title: 'gol in una partita', range: [0, 10] }, yaxis: { title: 'frequenza', showticklabels: false }, showlegend: false,
+          shapes: [
+            { type: 'line', x0: peak, x1: peak, y0: 0, y1: Math.max(...ys), line: { color: '#f5b400', width: 2, dash: 'dot' } },
+            { type: 'line', x0: mediana, x1: mediana, y0: 0, y1: Math.max(...ys) * 0.9, line: { color: '#16a34a', width: 2, dash: 'dot' } },
+            { type: 'line', x0: media, x1: media, y0: 0, y1: Math.max(...ys) * 0.8, line: { color: '#dc2626', width: 2, dash: 'dot' } }
+          ],
+          annotations: [
+            { x: peak, y: Math.max(...ys), text: 'moda', showarrow: false, yshift: 12, font: { color: '#f5b400' } },
+            { x: mediana, y: Math.max(...ys) * 0.9, text: 'mediana', showarrow: false, yshift: 12, font: { color: '#16a34a' } },
+            { x: media, y: Math.max(...ys) * 0.8, text: 'media', showarrow: false, yshift: 12, font: { color: '#dc2626' } }
+          ]
+        });
+      }
+
+      // ===== 7 — gaussiana con 68-95-99.7 =====
+      if (P) {
+        const mu = 0, sg = 1, xs = [], ys = []; for (let x = -4; x <= 4; x += 0.05) { xs.push(x); ys.push(Math.exp(-x * x / 2)); }
+        function band(a, b, col) { const bx = [], by = []; for (let x = a; x <= b; x += 0.05) { bx.push(x); by.push(Math.exp(-x * x / 2)); } return { x: bx, y: by, mode: 'lines', type: 'scatter', fill: 'tozeroy', line: { width: 0 }, fillcolor: col, hoverinfo: 'skip' }; }
+        P.draw('gauss-plot', [
+          band(-3, 3, 'rgba(124,160,255,0.10)'), band(-2, 2, 'rgba(124,160,255,0.16)'), band(-1, 1, 'rgba(124,160,255,0.28)'),
+          { x: xs, y: ys, mode: 'lines', type: 'scatter', line: { color: C.accent, width: 3 }, hoverinfo: 'skip' }
+        ], {
+          xaxis: { title: 'in deviazioni standard σ dalla media', range: [-4, 4], tickvals: [-3, -2, -1, 0, 1, 2, 3], ticktext: ['−3σ', '−2σ', '−σ', 'media', '+σ', '+2σ', '+3σ'] },
+          yaxis: { showticklabels: false, range: [0, 1.08] }, showlegend: false,
+          annotations: [{ x: 0, y: 0.5, text: '68%', showarrow: false, font: { size: 14, color: C.font } },
+            { x: 1.5, y: 0.16, text: '95%', showarrow: false, font: { size: 12, color: C.font } }]
+        });
+      }
+
+      // ===== 7 — teorema del limite centrale (somma di dadi) =====
+      (function () {
+        const svg = document.getElementById('clt-svg'); if (!svg) return;
+        const sn = document.getElementById('clt-n'), vn = document.getElementById('clt-n-val'), out = document.getElementById('clt-out');
+        function go() {
+          const N = +sn.value; vn.textContent = N;
+          const trials = 8000, minS = N, maxS = 6 * N, counts = {};
+          for (let t = 0; t < trials; t++) { let s = 0; for (let d = 0; d < N; d++) s += 1 + Math.floor(Math.random() * 6); counts[s] = (counts[s] || 0) + 1; }
+          const W = 460, H = 220, PADX = 24, PADB = 26, top = 14, K = maxS - minS + 1;
+          const bw = (W - 2 * PADX) / K, maxC = Math.max(...Object.values(counts));
+          let s = '';
+          for (let v = minS; v <= maxS; v++) { const c = counts[v] || 0, x = PADX + (v - minS) * bw, h = c / maxC * (H - top - PADB); s += `<rect x="${(x + 1).toFixed(1)}" y="${(H - PADB - h).toFixed(1)}" width="${Math.max(1, bw - 2).toFixed(1)}" height="${h.toFixed(1)}" fill="var(--accent)" opacity="0.8"/>`; }
+          s += `<text x="${W / 2}" y="${H - 6}" text-anchor="middle" style="fill:var(--muted);font-size:11px;">somma di ${N} dad${N === 1 ? 'o' : 'i'}</text>`;
+          svg.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="istogramma della somma di dadi">${s}</svg>`;
+          out.innerHTML = N === 1 ? 'Con <strong>un</strong> dado la distribuzione è <strong>piatta</strong> (uniforme): ogni faccia è ugualmente probabile.' : `Sommando <strong>${N}</strong> dadi la forma è già una <strong>campana</strong>: più dadi sommi, più diventa gaussiana. È il teorema del limite centrale in azione.`;
+        }
+        sn.addEventListener('input', go); go();
+      })();
+
+      // ===== 8 — galleria di correlazioni (dati reali dove indicato) =====
+      (function () {
+        if (!P) return;
+        const out = document.getElementById('corr-out'), src = document.getElementById('corr-src');
+        const btns = document.getElementById('corr-btns');
+        if (!btns) return;
+
+        // gelati: esempio classico, dati illustrativi (generati)
+        const gel = { x: [], y: [] };
+        for (let i = 0; i < 40; i++) {
+          const t = 10 + Math.random() * 25;
+          gel.x.push(+(t + (Math.random() - 0.5) * 4).toFixed(1));
+          gel.y.push(+(t * 0.9 + (Math.random() - 0.5) * 6).toFixed(1));
+        }
+        // cioccolato e premi Nobel — dati dell'articolo di Messerli (NEJM, 2012)
+        const CIOC = [['Cina', 0.7, 0.1], ['Brasile', 2.9, 0.1], ['Giappone', 1.8, 1.5], ['Portogallo', 2.0, 1.9],
+          ['Grecia', 2.5, 1.9], ['Spagna', 3.6, 1.7], ['Italia', 3.7, 3.3], ['Polonia', 3.6, 3.1],
+          ['Australia', 4.8, 5.4], ['Canada', 3.9, 6.1], ['Finlandia', 7.3, 7.6], ['Belgio', 4.4, 8.6],
+          ['Francia', 6.3, 9.2], ['Stati Uniti', 5.3, 10.8], ['Paesi Bassi', 4.5, 11.3], ['Irlanda', 8.8, 12.7],
+          ['Germania', 11.6, 12.7], ['Regno Unito', 9.7, 18.9], ['Norvegia', 9.4, 23.3], ['Austria', 8.7, 24.3],
+          ['Danimarca', 8.5, 25.3], ['Svezia', 6.4, 31.9], ['Svizzera', 11.9, 31.5]];
+        // cicogne e nascite — dati dell'articolo di Matthews (Teaching Statistics, 2000)
+        const CIC = [['Albania', 100, 83], ['Austria', 300, 87], ['Belgio', 1, 118], ['Bulgaria', 5000, 117],
+          ['Danimarca', 9, 59], ['Francia', 140, 774], ['Germania', 3300, 901], ['Grecia', 2500, 106],
+          ['Paesi Bassi', 4, 188], ['Italia', 5, 551], ['Polonia', 30000, 610], ['Portogallo', 1500, 120],
+          ['Romania', 5000, 367], ['Spagna', 8000, 439], ['Svizzera', 150, 82], ['Turchia', 25000, 1576],
+          ['Ungheria', 5000, 124]];
+        // margarina e divorzi nel Maine, 2000-2009 (Tyler Vigen)
+        const ANNI = [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009];
+        const MARG = [8.2, 7.0, 6.5, 5.3, 5.2, 4.0, 4.6, 4.5, 4.2, 3.7];
+        const DIVO = [5.0, 4.7, 4.6, 4.4, 4.3, 4.1, 4.2, 4.2, 4.2, 4.1];
+        // ore di studio e voto — la stessa indagine di classe della lezione 9
+        const STU = [['Anna', 1, 5], ['Bruno', 2, 5.5], ['Carla', 2, 6], ['Dario', 3, 6], ['Elena', 3, 6.5],
+          ['Fabio', 4, 6.5], ['Giulia', 4, 7.5], ['Luca', 5, 7], ['Marta', 5, 8], ['Nicola', 6, 8.5],
+          ['Sara', 7, 9], ['Paolo', 8, 9.5]];
+
+        function corr(xs, ys) {
+          const n = xs.length;
+          const mx = xs.reduce((a, b) => a + b, 0) / n, my = ys.reduce((a, b) => a + b, 0) / n;
+          let sxy = 0, sxx = 0, syy = 0;
+          for (let i = 0; i < n; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; syy += (ys[i] - my) ** 2; }
+          return sxy / Math.sqrt(sxx * syy);
+        }
+        const col = a => a.map(r => r[0]), cx = a => a.map(r => r[1]), cy = a => a.map(r => r[2]);
+
+        const DATI = [
+          {
+            id: 'gel', btn: '🍦 gelati & annegamenti', x: gel.x, y: gel.y,
+            ax: 'gelati venduti', ay: 'annegamenti',
+            msg: '<strong>Causa comune.</strong> I gelati non fanno annegare nessuno: la causa nascosta è l\'<strong>estate</strong>. Quando fa caldo si mangia più gelato <em>e</em> si fa più il bagno.',
+            fonte: 'Esempio classico dei manuali di statistica; qui i punti sono <em>illustrativi</em> (generati al computer), non dati reali — te lo diciamo, perché in una lezione come questa sarebbe grave non farlo.'
+          },
+          {
+            id: 'cioc', btn: '🍫 cioccolato & premi Nobel', x: cx(CIOC), y: cy(CIOC), lab: col(CIOC),
+            ax: 'cioccolato consumato (kg per abitante all\'anno)', ay: 'premi Nobel per 10 milioni di abitanti',
+            msg: '<strong>Causa comune.</strong> Mangiare cioccolato non fa vincere il Nobel. A muovere entrambe le cose è la <strong>ricchezza del Paese</strong>: dove il reddito è alto si consumano più beni voluttuari <em>e</em> si finanziano di più scuola, università e ricerca. L\'autore lo scrisse in tono ironico proprio per mostrare quanto sia facile cadere nella trappola.',
+            fonte: 'Dati reali: F. H. Messerli, <em>Chocolate Consumption, Cognitive Function, and Nobel Laureates</em>, <strong>The New England Journal of Medicine</strong>, 367, 2012.'
+          },
+          {
+            id: 'cic', btn: '🐦 cicogne & nascite', x: cx(CIC), y: cy(CIC), lab: col(CIC),
+            ax: 'coppie di cicogne nidificanti', ay: 'nascite all\'anno (migliaia)',
+            msg: '<strong>Causa comune.</strong> Le cicogne non portano i bambini. Il confondente è la <strong>dimensione del Paese</strong>: uno Stato grande ha più territorio per i nidi <em>e</em> più abitanti, quindi più nascite. Guarda infatti chi sta in alto a destra: Turchia, Polonia, Germania, Spagna.',
+            fonte: 'Dati reali su 17 Paesi europei: R. Matthews, <em>Storks Deliver Babies (p = 0.008)</em>, <strong>Teaching Statistics</strong>, 22(2), 2000 — uno studio scritto apposta per smontare il «correlazione uguale causa».'
+          },
+          {
+            id: 'mar', btn: '🧈 margarina & divorzi', x: MARG, y: DIVO, lab: ANNI.map(a => 'anno ' + a),
+            ax: 'margarina consumata negli USA (libbre per abitante)', ay: 'divorzi nel Maine (ogni 1000 abitanti)',
+            msg: '<strong>Pura coincidenza.</strong> Qui non c\'è proprio nessun legame, in nessun verso: due curve che scendono insieme per dieci anni, e basta. Eppure la correlazione è quasi perfetta! Se si confrontano <strong>migliaia</strong> di serie di dati a caso, qualche accoppiata combaciante salta fuori <em>per forza</em>. Morale: un $r$ altissimo, da solo, non dimostra proprio niente.',
+            fonte: 'Dati reali 2000-2009 raccolti da Tyler Vigen, <em>Spurious Correlations</em> (2015), da National Vital Statistics Reports e Dipartimento dell\'Agricoltura degli Stati Uniti.'
+          },
+          {
+            id: 'stu', btn: '📚 ore di studio & voto', x: cx(STU), y: cy(STU), lab: col(STU),
+            ax: 'ore di studio a settimana', ay: 'voto',
+            msg: '<strong>Legame plausibile, ma non dimostrato.</strong> Qui una causa probabilmente c\'è: studiare aiuta. Ma il grafico da solo non lo prova — potrebbe esserci una causa comune (chi è appassionato studia di più <em>e</em> capisce meglio) o il verso opposto (chi va bene si appassiona e studia di più). Anche quando l\'ipotesi è ragionevole, un grafico resta un indizio, non una prova.',
+            fonte: 'Indagine di classe, gli stessi dati del grafico a dispersione della <a href="9.Foglio_di_calcolo.html#sec8">lezione sul foglio di calcolo</a>.'
+          }
+        ];
+
+        function show(k) {
+          const d = DATI[k], C2 = P.themeColors();
+          const r = corr(d.x, d.y);
+          const tr = {
+            x: d.x, y: d.y, mode: 'markers', type: 'scatter',
+            marker: { color: C2.accent, size: 9 }
+          };
+          if (d.lab) {
+            tr.text = d.lab;
+            tr.hovertemplate = '%{text}<br>%{x} · %{y}<extra></extra>';
+          }
+          P.draw('corr-plot', [tr], {
+            xaxis: { title: d.ax, zeroline: false },
+            yaxis: { title: d.ay, zeroline: false },
+            margin: { t: 20, b: 60, l: 60, r: 20 }, showlegend: false
+          });
+          Array.prototype.forEach.call(btns.children, function (b, i) { b.classList.toggle('active', i === k); });
+          out.innerHTML = 'Coefficiente di correlazione: <strong>r = ' + nf(r, 2) + '</strong> (il massimo è 1). ' + d.msg;
+          src.innerHTML = '📎 ' + d.fonte;
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        DATI.forEach(function (d, k) {
+          const b = document.createElement('button');
+          b.className = 'btn';
+          b.innerHTML = d.btn;
+          b.addEventListener('click', function () { show(k); });
+          btns.appendChild(b);
+        });
+        show(0);
+      })();
+
+    });
+  </script>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Un <strong>campione significativo</strong> è un campione che:',
+        options: ['è il più piccolo possibile', 'rappresenta bene tutta la popolazione (grande e senza distorsioni)', 'contiene solo i valori più alti', 'è scelto tra gli amici', 'ha sempre 100 elementi'],
+        correct: 1, explain: 'Deve "assomigliare" alla popolazione: abbastanza grande e scelto senza pregiudizi.' },
+      { type: 'mc', diff: 'easy', text: 'La <strong>mediana</strong> di un insieme di dati è:',
+        options: ['la somma diviso il numero', 'il valore più frequente', 'il valore centrale, dopo aver ordinato i dati', 'il valore più grande', 'la metà del massimo'],
+        correct: 2, explain: 'La media è la somma/numero; la moda è il più frequente; la mediana è il valore centrale.' },
+      { type: 'mc', diff: 'medium', text: 'Perché la <strong>mediana</strong> è spesso più "onesta" della media (per esempio per gli stipendi)?',
+        options: ['perché è più facile da calcolare', 'perché non risente dei valori anomali (outlier), che invece spostano la media', 'perché è sempre più grande', 'perché usa il quadrato', 'perché è un percentile'],
+        correct: 1, explain: 'Pochi valori estremi gonfiano la media, ma quasi non toccano la mediana.' },
+      { type: 'mc', diff: 'medium', text: 'Nel calcolo dello scarto quadratico medio, perché si <strong>elevano al quadrato</strong> gli scarti?',
+        options: ['per fare prima', 'perché la loro somma senza quadrato farebbe sempre 0 (positivi e negativi si annullano)', 'per renderli più grandi', 'perché lo dice la moda', 'per dividerli per N'],
+        correct: 1, explain: 'La somma degli scarti è sempre zero: il quadrato elimina i segni e lascia solo grandezze positive.' },
+      { type: 'mc', diff: 'medium', text: 'Lanciando 4 monete, la probabilità di esattamente 2 teste (dai coefficienti $1,4,6,4,1$) è:',
+        options: ['$\\dfrac{4}{16}$', '$\\dfrac{6}{16}$', '$\\dfrac{1}{4}$', '$\\dfrac{6}{8}$', '$\\dfrac{2}{4}$'],
+        correct: 1, explain: '$\\binom{4}{2}=6$ casi favorevoli su $2^4=16$: $\\dfrac{6}{16}=\\dfrac{3}{8}$.' },
+      { type: 'mc', diff: 'medium', text: 'La distribuzione che si ottiene lanciando tante monete (o con la macchina di Galton) è la:',
+        options: ['gaussiana continua', 'binomiale', 'uniforme (piatta)', 'di Maxwell', 'esponenziale'],
+        correct: 1, explain: 'È la binomiale: le sue altezze sono i coefficienti del binomio di Newton (triangolo di Tartaglia).' },
+      { type: 'mc', diff: 'hard', text: 'Il <strong>teorema del limite centrale</strong> afferma che, sommando tante cause casuali indipendenti, la distribuzione tende alla:',
+        options: ['uniforme', 'binomiale', 'gaussiana (a campana)', 'asimmetrica', 'nessuna in particolare'],
+        correct: 2, explain: 'Per questo la campana è ovunque: quasi tutto in natura è la somma di tanti piccoli effetti.' },
+      { type: 'mc', diff: 'hard', text: 'In una distribuzione normale, l\'intervallo $\\bar{x}\\pm\\sigma$ (una deviazione standard) contiene circa:',
+        options: ['il 50% dei casi', 'il 68% dei casi', 'il 95% dei casi', 'il 99,7% dei casi', 'il 100% dei casi'],
+        correct: 1, explain: 'Regola 68-95-99,7: 1σ ≈ 68%, 2σ ≈ 95%, 3σ ≈ 99,7%.' },
+      { type: 'mc', diff: 'hard', text: 'In estate aumentano sia le vendite di gelati sia gli annegamenti: sono correlati. Che cosa possiamo concludere?',
+        options: ['i gelati causano gli annegamenti', 'gli annegamenti fanno vendere gelati', 'nulla di causale: c\'è una causa comune (il caldo). Correlazione non è causalità', 'il grafico è sbagliato', 'è una coincidenza impossibile'],
+        correct: 2, explain: 'Due variabili correlate possono avere una terza causa comune: la correlazione da sola non prova un legame di causa.' },
+      { type: 'open', diff: 'hard', text: 'Spiega con parole tue perché "lo dice la statistica" non basta a stabilire quali rischi o scenari siano accettabili in una scelta pubblica.',
+        keywords: ['descriv', 'ideologia', 'valori', 'scelta', 'scenari', 'rischi', 'decision', 'numeri', 'causa', 'non basta'], requiredMatches: 2,
+        explain: 'La statistica descrive ciò che accade e mostra gli scenari possibili in base alle scelte; ma decidere quali scenari e quali rischi siano accettabili è una scelta di valori (ideologia), non un risultato scientifico. I numeri informano la decisione, non la sostituiscono.' }
+    ];
+  </script>
+
+</body>
+
+</html>

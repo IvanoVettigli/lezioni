@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 7 — La probabilità</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.1/lib/browser/math.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+    .simbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1rem; margin: 1.1rem 0; }
+    .simbox svg { display: block; width: 100%; height: auto; max-width: 480px; margin: 0.3rem auto; }
+    /* i grafici Plotly disegnano SVG interni: niente cap di larghezza, altrimenti si vede solo un pezzo */
+    .simbox .plot svg { max-width: none; }
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; }
+    .sim-out { margin-top: 0.6rem; font-size: 1rem; min-height: 1.5em; }
+    .big { font-size: 1.9rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.7rem; text-align: center; }
+    .stat .n { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .stat .l { font-size: 0.8rem; color: var(--muted); }
+    /* Monty Hall */
+    .doors { display: flex; gap: 0.8rem; justify-content: center; margin: 0.8rem 0; flex-wrap: wrap; }
+    .door { width: 92px; height: 130px; border-radius: 8px; border: 3px solid var(--border); background: var(--surface);
+      display: flex; align-items: center; justify-content: center; font-size: 2.6rem; cursor: pointer; transition: transform .12s, border-color .12s; }
+    .door:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .door.sel { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
+    .door.open { cursor: default; background: var(--surface-2); }
+    .door.win { border-color: #16a34a; }
+    .door[aria-disabled="true"] { cursor: default; }
+    .bar-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; height: 26px; overflow: hidden; position: relative; margin: 0.3rem 0; }
+    .bar-fill { height: 100%; background: var(--accent); transition: width .2s; }
+    .prob-tab { border-collapse: collapse; width: 100%; margin: 0.7rem 0; font-size: 0.9rem; }
+    .prob-tab th, .prob-tab td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: center; }
+    .prob-tab th { background: var(--surface-2); }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Secondo anno · Lezione 7</div>
+    <h1>La probabilità</h1>
+    <p>Misurare il caso: dai dadi alle scommesse, dai compleanni al teorema di Bayes</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Secondo anno</a>
+    <span class="sep">/</span> La probabilità
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove siamo.</strong> Fino a qui la matematica ci ha dato <em>certezze</em>: un'equazione ha la sua
+      soluzione, un triangolo la sua area. Ma gran parte della vita è fatta di <strong>incertezza</strong>: uscirà
+      testa o croce? pioverà? vincerò? La <strong>probabilità</strong> è lo strumento con cui la matematica riesce a
+      <strong>misurare il caso</strong> — e a difenderci da chi il caso lo usa per fregarci.
+    </div>
+
+    <!-- 1 — DEFINIZIONE CLASSICA -->
+    <section id="sec1">
+      <h2>1. Che cos'è la probabilità</h2>
+
+      <p>Immagina un'azione dal risultato incerto — lanciare un dado, estrarre una carta — che chiamiamo
+        <strong>esperimento</strong>. Ogni risultato possibile è un <strong>evento elementare</strong>; l'insieme di
+        <em>tutti</em> i risultati possibili è l'<strong>universo</strong> $U$. Un <strong>evento</strong> è ciò che
+        ci interessa: «esce un numero pari», «esce cuori». La domanda è: quanto è <em>probabile</em>?</p>
+
+      <div class="definition">
+        <strong>Definizione classica.</strong> Se tutti gli esiti sono <strong>ugualmente possibili</strong>, la
+        probabilità di un evento $E$ è
+        $$P(E) = \frac{\text{numero di casi favorevoli}}{\text{numero di casi possibili}}.$$
+      </div>
+
+      <p>Esempi concreti: con un dado, $P(\text{esce } 6) = \dfrac{1}{6}$ (un caso favorevole su sei possibili);
+        $P(\text{esce pari}) = \dfrac{3}{6} = \dfrac{1}{2}$ (i favorevoli sono $\{2,4,6\}$). Con una moneta,
+        $P(\text{testa}) = \dfrac{1}{2}$. Con un mazzo di carte francesi (52 carte), $P(\text{un asso}) = \dfrac{4}{52} = \dfrac{1}{13}$.</p>
+
+      <h3>1.1 — Il legame con gli insiemi</h3>
+      <p>Ti ricorda qualcosa? È esattamente il linguaggio degli <strong>insiemi</strong> del primo anno! L'universo
+        $U$ è l'insieme di tutti gli esiti, e l'evento $E$ è un suo <strong>sottoinsieme</strong>. «Contare i casi»
+        significa calcolare la <strong>cardinalità</strong> (il numero di elementi). Perciò:</p>
+      <div class="formula-box">
+        $$P(E) = \frac{|E|}{|U|} \qquad (\text{cardinalità del sottoinsieme diviso cardinalità dell'universo})$$
+      </div>
+      <p>Da qui una conseguenza importante: poiché un sottoinsieme non può avere più elementi dell'insieme che lo
+        contiene, si ha $0 \le |E| \le |U|$, e dividendo per $|U|$:</p>
+      <div class="formula-box">
+        <div class="formula-title">La probabilità è sempre un numero tra 0 e 1</div>
+        $$0 \le P(E) \le 1$$
+        <p class="formula-note">$P = 0$ evento <strong>impossibile</strong> (insieme vuoto, es. «esce 7» con un
+          dado); $P = 1$ evento <strong>certo</strong> (tutto l'universo, es. «esce un numero da 1 a 6»). Spesso la si
+          scrive anche in percentuale: $\dfrac{1}{2} = 50\%$.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>💯 Ripasso lampo: cos'è una percentuale.</strong> «Per cento» significa letteralmente <em>su
+        cento</em>: una percentuale è semplicemente una frazione con denominatore $100$. Scrivere $50\%$ vuol dire
+        $\dfrac{50}{100}$, cioè «$50$ parti su $100$». Non è un numero nuovo, è solo un <strong>altro vestito</strong>
+        per lo stesso numero:
+        $$25\% = \frac{25}{100} = 0{,}25 \qquad 7\% = \frac{7}{100} = 0{,}07 \qquad 100\% = \frac{100}{100} = 1.$$
+        <ul>
+          <li><strong>Da numero a percentuale:</strong> moltiplica per $100$ e aggiungi il simbolo $\%$. Esempi:
+            $0{,}2 \to 0{,}2 \times 100 = 20\%$; &nbsp; $\dfrac{3}{4} = 0{,}75 \to 75\%$; &nbsp; $\dfrac{1}{6} \approx 0{,}167 \to 16{,}7\%$.</li>
+          <li><strong>Da percentuale a numero:</strong> togli il $\%$ e dividi per $100$ (cioè sposta la virgola di
+            due posti a sinistra). Esempi: $30\% \to 30 \div 100 = 0{,}3$; &nbsp; $4\% \to 0{,}04$; &nbsp; $150\% \to 1{,}5$.</li>
+        </ul>
+        Per la probabilità è comodissimo: «l'evento ha probabilità $0{,}25$» e «l'evento ha il $25\%$ di probabilità»
+        dicono <strong>esattamente la stessa cosa</strong>. Ricorda solo che la probabilità vive sempre tra $0$ e $1$,
+        cioè tra lo $\mathbf{0\%}$ (impossibile) e il $\mathbf{100\%}$ (certo): una probabilità del $120\%$ non esiste!
+      </div>
+
+      <p>Gioca con il sacchetto: scegli un colore e guarda quali palline sono «favorevoli» e quanto vale la
+        probabilità di pescarne una a caso.</p>
+      <div class="simbox">
+        <div id="bag-svg"></div>
+        <div class="sim-btns" id="bag-btns"></div>
+        <p class="sim-out" id="bag-out"></p>
+      </div>
+    </section>
+
+    <!-- 2 — FREQUENTISTA -->
+    <section id="sec2">
+      <h2>2. La definizione frequentista</h2>
+
+      <p>La definizione classica ha un limite: funziona solo se gli esiti sono <em>ugualmente</em> possibili (un dado
+        <strong>truccato</strong> la manda in crisi). C'è allora un secondo modo, più «sperimentale»: ripetere
+        l'esperimento tantissime volte e <strong>contare</strong>.</p>
+      <div class="definition">
+        <strong>Definizione frequentista.</strong> Ripeto l'esperimento $N$ volte (con $N$ il più grande possibile) e
+        registro quante volte ($f$) si verifica l'evento. La probabilità è la <strong>frequenza relativa</strong>
+        $$P(E) \approx \frac{f}{N}.$$
+      </div>
+      <p>La cosa meravigliosa è che, quando $N$ diventa grande, la frequenza relativa si <strong>avvicina sempre di
+        più</strong> al valore della definizione classica: le due definizioni <strong>coincidono</strong>. (È la
+        cosiddetta «legge dei grandi numeri».) Lancia la moneta e guarda: all'inizio la frequenza balla, ma più lanci
+        e più si incolla a $0{,}5$.</p>
+      <div class="simbox">
+        <div class="sim-btns">
+          <button class="btn" id="fq-1">🪙 lancia 1</button>
+          <button class="btn" id="fq-100">lancia 100</button>
+          <button class="btn" id="fq-1000">lancia 1000</button>
+          <button class="btn" id="fq-reset">↺ azzera</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="fq-n">0</div><div class="l">lanci totali</div></div>
+          <div class="stat"><div class="n" id="fq-t">0</div><div class="l">teste uscite</div></div>
+          <div class="stat"><div class="n" id="fq-f">—</div><div class="l">frequenza (teste/lanci)</div></div>
+        </div>
+        <div class="bar-wrap"><div class="bar-fill" id="fq-bar" style="width:0%;"></div></div>
+        <p class="sim-out" id="fq-out">La linea di riferimento è il 50% teorico.</p>
+      </div>
+    </section>
+
+    <!-- 3 — ALTRE DEFINIZIONI -->
+    <section id="sec3">
+      <h2>3. Ci sono altri modi di intendere la probabilità</h2>
+      <p>Classica e frequentista non sono le uniche «lenti» con cui guardare il caso. Due le incontrerai ancora:</p>
+      <div class="two-col">
+        <div class="formula-box">
+          <div class="formula-title">Probabilità soggettivista</div>
+          <p>È il <strong>grado di fiducia</strong> che una persona, in base a ciò che sa, assegna a un evento —
+            magari irripetibile. «Che probabilità do alla vittoria della mia squadra domenica?» Non posso «ripeterla»
+            $1000$ volte: è una <strong>scommessa ragionata</strong>, la quota che riterrei equa per puntarci.</p>
+        </div>
+        <div class="formula-box">
+          <div class="formula-title">Probabilità bayesiana (cenno)</div>
+          <p>È una probabilità che si <strong>aggiorna</strong> man mano che arrivano nuove informazioni: parto da
+            una stima iniziale e la correggo con le prove. È potentissima — la spam nella posta, le diagnosi
+            mediche, l'intelligenza artificiale la usano di continuo. La riprendiamo nell'ultima sezione.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — EVENTI INDIPENDENTI -->
+    <section id="sec4">
+      <h2>4. Eventi indipendenti e la regola del prodotto</h2>
+
+      <div class="definition">
+        Due eventi sono <strong>indipendenti</strong> quando il verificarsi dell'uno <strong>non cambia</strong> la
+        probabilità dell'altro. Il lancio di due monete, due dadi, l'estrazione di una pallina che poi
+        <strong>rimetto nel sacchetto</strong> (con reimbussolamento): il passato non «ricorda» nulla.
+      </div>
+      <p>Attenzione a un tranello: la moneta <strong>non ha memoria</strong>. Dopo cinque teste di fila, la sesta ha
+        ancora probabilità $\dfrac{1}{2}$ di essere testa — non «è più probabile croce perché deve pareggiare». Quella
+        convinzione, diffusissima, si chiama <em>errore del giocatore</em>, ed è la prima trappola dei casinò.</p>
+
+      <p>Perché, per eventi indipendenti, le probabilità si <strong>moltiplicano</strong>? Torniamo ai casi
+        favorevoli. Se il primo evento ha probabilità $\dfrac{a}{m}$ e il secondo $\dfrac{b}{n}$, allora le coppie
+        possibili sono $m \times n$ e quelle favorevoli $a \times b$: la probabilità che accadano
+        <strong>entrambi</strong> è $\dfrac{a \cdot b}{m \cdot n} = \dfrac{a}{m} \cdot \dfrac{b}{n}$.</p>
+      <div class="formula-box">
+        <div class="formula-title">Regola del prodotto (eventi indipendenti)</div>
+        $$P(A \text{ e } B) = P(A) \cdot P(B)$$
+      </div>
+
+      <p>Qualche esempio, tra carte e palline:</p>
+      <ul>
+        <li><strong>Due dadi, doppio 6:</strong> $P = \dfrac{1}{6} \cdot \dfrac{1}{6} = \dfrac{1}{36} \approx 2{,}8\%$.</li>
+        <li><strong>Carte francesi</strong> (52 carte, 4 semi da 13): due cuori di fila, <em>rimettendo</em> la prima
+          carta nel mazzo, $P = \dfrac{13}{52} \cdot \dfrac{13}{52} = \dfrac{1}{4} \cdot \dfrac{1}{4} = \dfrac{1}{16}$.</li>
+        <li><strong>Carte napoletane</strong> (40 carte, uguali alle spagnole, 4 semi da 10 — coppe, denari, spade,
+          bastoni): pescare un asso, rimetterlo, pescarne un altro, $P = \dfrac{4}{40} \cdot \dfrac{4}{40} = \dfrac{1}{10}\cdot\dfrac{1}{10} = \dfrac{1}{100}$.</li>
+      </ul>
+
+      <p>Verifichiamolo «sul campo»: lanciamo due dadi tante volte e contiamo i doppi 6. La frequenza dovrebbe
+        avvicinarsi a $\dfrac{1}{36}$.</p>
+      <div class="simbox">
+        <div class="sim-btns">
+          <button class="btn" id="dd-1">🎲🎲 lancia 1</button>
+          <button class="btn" id="dd-1000">lancia 1000</button>
+          <button class="btn" id="dd-reset">↺ azzera</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="dd-n">0</div><div class="l">lanci</div></div>
+          <div class="stat"><div class="n" id="dd-s">0</div><div class="l">doppi 6</div></div>
+          <div class="stat"><div class="n" id="dd-f">—</div><div class="l">frequenza</div></div>
+        </div>
+        <p class="sim-out" id="dd-out">Valore teorico: $1/36 \approx 2{,}78\%$.</p>
+      </div>
+
+      <h3>4.1 — Un dado è «piatto», due dadi no!</h3>
+      <p>Il singolo dado è <strong>equo</strong>: ognuna delle sei facce ha la stessa probabilità $\dfrac{1}{6}$, quindi
+        il suo istogramma è piatto. Ma quando sommiamo <em>due</em> dadi succede qualcosa di interessante: certe somme
+        si possono ottenere in <strong>più modi</strong> di altre. Il $2$ solo con $1+1$; il $7$ invece con $1+6$,
+        $2+5$, $3+4$, $4+3$, $5+2$, $6+1$ — ben sei coppie su $36$! Lancia tante volte e confronta i due istogrammi:
+        a sinistra le facce dei singoli dadi, a destra la somma. <strong>Quale numero esce più spesso?</strong></p>
+      <div class="simbox">
+        <div class="sim-btns">
+          <button class="btn" id="td-1">🎲🎲 lancia 1</button>
+          <button class="btn" id="td-100">lancia 100</button>
+          <button class="btn" id="td-10000">lancia 10 000</button>
+          <button class="btn" id="td-reset">↺ azzera</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="td-n">0</div><div class="l">lanci totali</div></div>
+          <div class="stat"><div class="n" id="td-mode">—</div><div class="l">somma più frequente</div></div>
+        </div>
+        <p style="margin:0.7rem 0 0.15rem; font-weight:600;">① Facce dei singoli dadi (quasi piatto)</p>
+        <div class="plot" id="td-single" style="min-height:270px;"></div>
+        <p style="margin:0.7rem 0 0.15rem; font-weight:600;">② Somma dei due dadi (a campana, con la punta sul 7)</p>
+        <div class="plot" id="td-sum" style="min-height:270px;"></div>
+        <p class="sim-out" id="td-out">Premi un pulsante per lanciare. In rosa il valore teorico.</p>
+      </div>
+    </section>
+
+    <!-- 5 — COMPLEANNI E CICLO -->
+    <section id="sec5">
+      <h2>5. Due sorprese: compleanni e cicli</h2>
+      <p>La regola del prodotto porta a risultati che sembrano impossibili. Il trucco, in entrambi i problemi, è lo
+        stesso: invece di calcolare direttamente «almeno due», calcoliamo la probabilità dell'<strong>evento
+        contrario</strong> (nessuna coincidenza) e la sottraiamo da $1$ — perché $P(\text{almeno due}) = 1 - P(\text{nessuna coppia})$.</p>
+
+      <h3>5.1 — Il paradosso dei compleanni</h3>
+      <p>In una classe di <strong>30 studenti</strong>, che probabilità c'è che <strong>almeno due</strong> compiano
+        gli anni lo stesso giorno? La maggior parte risponde «pochissima, ci sono 365 giorni!». Sbagliato. Contiamo il
+        contrario: che siano <em>tutti diversi</em>. Il primo può nascere in un giorno qualsiasi ($\frac{365}{365}$);
+        il secondo deve evitarlo ($\frac{364}{365}$); il terzo deve evitarne due ($\frac{363}{365}$); e così via:</p>
+      <div class="formula-box">
+        $$P(\text{tutti diversi}) = \frac{365}{365}\cdot\frac{364}{365}\cdot\frac{363}{365}\cdots\frac{336}{365}
+        \approx 0{,}294$$
+        $$P(\text{almeno due uguali}) = 1 - 0{,}294 \approx 0{,}706 = 70{,}6\%$$
+      </div>
+      <p>Oltre due terzi! E bastano <strong>23 persone</strong> per superare il $50\%$. Sposta il cursore per vedere
+        come cresce la probabilità con il numero di persone:</p>
+      <div class="simbox">
+        <div class="controls"><div class="control-group"><label>Numero di persone: <span class="val" id="bd-n-val">30</span></label>
+          <input type="range" id="bd-n" min="2" max="60" step="1" value="30"></div></div>
+        <div class="plot" id="bd-plot" style="min-height:300px;"></div>
+        <p class="sim-out" id="bd-out"></p>
+      </div>
+
+      <h3>5.2 — Lo stesso trucco: il ciclo in classe</h3>
+      <p>Immaginiamo una classe con <strong>25 studentesse</strong>. Supponiamo (per semplificare) che ognuna abbia
+        il ciclo per <strong>4 giorni</strong> al mese e che i mesi durino <strong>30 giorni</strong>: allora oggi,
+        per ciascuna, la probabilità di averlo è $\dfrac{4}{30} \approx 13{,}3\%$. Qual è la probabilità che
+        <strong>almeno due</strong> ce l'abbiano <em>oggi</em>? Stesso metodo — l'evento contrario è «nessuna, oppure
+        una sola» — e il risultato è di nuovo sorprendente:</p>
+      <div class="formula-box">
+        $$P(\text{nessuna oggi}) = \left(\tfrac{26}{30}\right)^{25} \approx 2{,}8\%, \qquad
+        P(\text{esattamente una}) \approx 10{,}8\%$$
+        $$P(\text{almeno due oggi}) = 1 - 2{,}8\% - 10{,}8\% \approx 86{,}5\%$$
+      </div>
+      <p>Quasi il $90\%$! Con soli $4$ giorni su $30$ sembrerebbe improbabile, eppure in $25$ persone la coincidenza
+        è quasi garantita. Ecco il grafico al variare del numero di ragazze:</p>
+      <div class="simbox">
+        <div class="controls"><div class="control-group"><label>Numero di studentesse: <span class="val" id="cy-n-val">25</span></label>
+          <input type="range" id="cy-n" min="2" max="40" step="1" value="25"></div></div>
+        <div class="plot" id="cy-plot" style="min-height:300px;"></div>
+        <p class="sim-out" id="cy-out"></p>
+      </div>
+
+      <div class="note">
+        <strong>E se gli eventi NON sono indipendenti?</strong> Nell'estrazione <em>senza</em> reimbussolamento, la
+        prima carta cambia le carte rimaste: allora si usa la <strong>probabilità condizionata</strong> $P(B \mid A)$
+        («$B$ sapendo che è accaduto $A$»), e la regola diventa $P(A \text{ e } B) = P(A)\cdot P(B \mid A)$. Esempio:
+        due assi di fila da un mazzo francese <em>senza</em> rimettere la carta: $\dfrac{4}{52}\cdot\dfrac{3}{51}$ (dopo
+        il primo asso ne restano $3$ su $51$ carte). È la porta che ci apre l'ultima grande idea della lezione, il
+        teorema di Bayes.
+      </div>
+    </section>
+
+    <!-- 6 — GIOCO D'AZZARDO -->
+    <section id="sec6">
+      <h2>6. ⚠️ Il gioco d'azzardo: il banco vince sempre</h2>
+      <p>Questa è la sezione più importante della lezione, e non è di matematica: è di <strong>vita</strong>. Perché la
+        probabilità è anche l'arma con cui il mondo delle scommesse ti alleggerisce il portafoglio — legalmente, e
+        senza barare.</p>
+
+      <div class="warnbox">
+        <strong>La regola d'oro: il banco vince sempre.</strong> Anche ammettendo che <em>nessuno</em> imbrogli, le
+        regole di ogni gioco d'azzardo sono costruite perché la probabilità penda <strong>sempre</strong> a favore del
+        banco. Può succedere che per un po' tu abbia l'illusione di vincere — anzi, il gioco è <em>progettato</em> per
+        darti quell'illusione — ma <strong>a lungo andare perderai sempre</strong>. Non è sfortuna: è matematica.</div>
+
+      <h3>6.1 — Il Blackjack</h3>
+      <p>Nel Blackjack ti sembra di giocare «alla pari» contro il banco. Non è così. Anche giocando con la strategia
+        perfetta, in una singola mano le probabilità sono all'incirca:</p>
+      <div class="stat-grid">
+        <div class="stat"><div class="n" style="color:#16a34a;">42%</div><div class="l">vinci</div></div>
+        <div class="stat"><div class="n" style="color:var(--muted);">9%</div><div class="l">pareggio</div></div>
+        <div class="stat"><div class="n" style="color:#dc2626;">49%</div><div class="l">perdi</div></div>
+      </div>
+      <p>Perdi <strong>più spesso</strong> di quanto vinci: la differenza (quel poco più del $49\%$ contro il $42\%$)
+        è il <strong>margine del banco</strong>. Piccolo? Sì. Ma applicato a migliaia di mani diventa una certezza
+        matematica: giochi tanto → perdi. Il segreto della casa non è vincere ogni mano, è avere la probabilità
+        <em>appena</em> dalla sua parte e lasciarti giocare a lungo.</p>
+
+      <h3>6.2 — Le loot box nei videogiochi</h3>
+      <p>Lo stesso meccanismo è entrato nei <strong>videogiochi</strong>, con le <strong>loot box</strong>: paghi per
+        aprire una «scatola a sorpresa» sperando nell'oggetto raro. Supponiamo che l'oggetto leggendario abbia una
+        probabilità di uscita dell'<strong>$1\%$</strong> a scatola. Sembra: «basta comprarne 100 e ce l'ho». Falso!
+        In media ne servono $100$, ma <em>in media</em>: per avere una probabilità del $50\%$ di ottenerlo servono già
+        <strong>69 scatole</strong>; per il $90\%$ ne servono <strong>229</strong>. E ogni scatola costa. Ecco perché
+        «continui a comprarne» e spendi molto più del previsto. Provalo:</p>
+      <div class="simbox">
+        <div class="sim-btns">
+          <button class="btn" id="lb-1">📦 apri 1 scatola (2 €)</button>
+          <button class="btn" id="lb-10">apri 10</button>
+          <button class="btn" id="lb-reset">↺ ricomincia</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="lb-n">0</div><div class="l">scatole aperte</div></div>
+          <div class="stat"><div class="n" id="lb-s">0 €</div><div class="l">soldi spesi</div></div>
+          <div class="stat"><div class="n" id="lb-w">no</div><div class="l">leggendario?</div></div>
+        </div>
+        <p class="sim-out" id="lb-out">Probabilità per scatola: 1%.</p>
+      </div>
+
+      <h3>6.3 — Un terno al SuperEnalotto</h3>
+      <p>Al SuperEnalotto si estraggono <strong>6 numeri su 90</strong>. Fare un <strong>«3»</strong> (indovinarne
+        esattamente tre) sembra facile... calcoliamolo. I modi di scegliere 6 numeri su 90 sono
+        $\binom{90}{6} = 622\,614\,630$ (oltre <strong>seicento milioni</strong>). I modi che ne azzeccano esattamente
+        3 sono $\binom{6}{3}\cdot\binom{84}{3} = 1\,905\,680$. Quindi:</p>
+      <div class="formula-box">
+        $$P(\text{fare 3}) = \frac{1\,905\,680}{622\,614\,630} \approx 0{,}0031 = \frac{1}{327}$$
+      </div>
+      <p>Circa <strong>1 su 327</strong>. Con giocate da $1$ € l'una, per avere una probabilità <strong>ragionevole
+        (50%)</strong> di fare <em>almeno un</em> terno dovresti giocare circa <strong>226 volte</strong> (226 €); per
+        una quasi-certezza ($99\%$) servono oltre <strong>1500 €</strong>. E il premio per un «3» è di appena qualche
+        decina di euro. Tradotto: spendi centinaia di euro per sperare di vincerne trenta. Il conto, come sempre, non
+        torna mai a tuo favore.</p>
+      <div class="warnbox"><strong>Morale.</strong> Il gioco d'azzardo non è un modo per fare soldi: è un modo per
+        <em>perderli</em>, con la matematica che lavora contro di te. L'unica mossa vincente è non giocare.</div>
+    </section>
+
+    <!-- 7 — MONTY HALL -->
+    <section id="sec7">
+      <h2>7. Il paradosso di Monty Hall</h2>
+      <p>Restiamo sul filo del ragionamento probabilistico, ma usciamo dall'azzardo con uno dei rompicapi più
+        celebri e controintuitivi di sempre, nato da un quiz televisivo americano (<em>Let's Make a Deal</em>, il cui
+        conduttore era Monty Hall).</p>
+      <div class="definition">
+        <strong>Le regole.</strong> Ci sono <strong>tre porte</strong>. Dietro una c'è un'automobile (il premio),
+        dietro le altre due una capra. Tu ne scegli una, ma non la apri. A quel punto il conduttore — che
+        <strong>sa dove sta l'auto</strong> — apre una delle <em>altre</em> due porte, mostrando <strong>sempre una
+        capra</strong>. Poi ti chiede: vuoi <strong>restare</strong> sulla tua porta, o <strong>cambiare</strong> con
+        l'altra rimasta chiusa?
+      </div>
+      <p>Sembra indifferente: due porte chiuse, l'auto è dietro una, quindi $50$ e $50$... vero? <strong>No.</strong>
+        Se <strong>cambi</strong>, vinci con probabilità $\dfrac{2}{3}$; se <strong>resti</strong>, solo $\dfrac{1}{3}$.
+        Il motivo: la tua prima scelta ha $\frac{1}{3}$ di essere giusta e $\frac{2}{3}$ di essere sbagliata. Nei
+        $\frac{2}{3}$ dei casi in cui hai sbagliato, il conduttore — costretto a mostrarti una capra — di fatto ti
+        <strong>indica</strong> dov'è l'auto con l'unica porta che lascia chiusa. Cambiare «raccoglie» quei
+        $\frac{2}{3}$. Non ci credi? È normale: non ci credeva neanche mezzo mondo di matematici. Ma puoi
+        <strong>verificarlo tu stesso</strong>.</p>
+
+      <div class="simbox">
+        <p style="font-weight:600; margin-top:0;">Gioca una partita: scegli una porta.</p>
+        <div class="doors" id="mh-doors"></div>
+        <div class="sim-btns" id="mh-choice" style="display:none;">
+          <button class="btn btn-primary" id="mh-switch">🔄 cambio porta</button>
+          <button class="btn" id="mh-stay">✋ resto</button>
+        </div>
+        <p class="sim-out" id="mh-out">Clicca una delle tre porte.</p>
+        <hr style="border:none; border-top:1px solid var(--border); margin:0.9rem 0;">
+        <p style="font-weight:600;">Oppure lascia decidere ai numeri: simula 1000 partite con le due strategie.</p>
+        <div class="sim-btns"><button class="btn" id="mh-sim">▶ simula 1000 partite</button>
+          <button class="btn" id="mh-reset">↺ azzera tutto</button></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="mh-stay-p">—</div><div class="l">vittorie se RESTI</div></div>
+          <div class="stat"><div class="n" id="mh-switch-p">—</div><div class="l">vittorie se CAMBI</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — BAYES -->
+    <section id="sec8">
+      <h2>8. Il teorema di Bayes</h2>
+      <p>Chiudiamo con l'idea che, di tutta questa lezione, è forse la più potente e la più usata oggi: la probabilità
+        che si <strong>aggiorna con le prove</strong>. Immagina di avere una convinzione iniziale su qualcosa; poi
+        arriva un'informazione nuova. Come devi <em>rivedere</em> la tua stima? La risposta è il <strong>teorema di
+        Bayes</strong> (dal reverendo Thomas Bayes, '700). Non lo dimostriamo, ma impariamo a usarlo:</p>
+      <div class="formula-box">
+        <div class="formula-title">Teorema di Bayes</div>
+        $$P(A \mid B) = \frac{P(B \mid A)\cdot P(A)}{P(B)}$$
+        <p class="formula-note">$P(A \mid B)$ = probabilità di $A$ <em>sapendo</em> che è accaduto $B$. In parole: la
+          convinzione iniziale $P(A)$ viene <strong>corretta</strong> dalla nuova prova $B$.</p>
+      </div>
+
+      <h3>8.1 — Un esempio che spiazza tutti: il test medico</h3>
+      <p>C'è una malattia rara: colpisce l'<strong>$1\%$</strong> della popolazione. Esiste un test molto buono:
+        se sei malato, risulta positivo nel <strong>$99\%$</strong> dei casi; se sei sano, sbaglia (falso positivo)
+        solo nel <strong>$5\%$</strong> dei casi. Fai il test e risulti <strong>positivo</strong>. Qual è la
+        probabilità di essere davvero malato? Quasi tutti rispondono «$99\%$!». La risposta vera è
+        <strong>$\approx 17\%$</strong>.</p>
+      <p>Perché? Ragioniamo su $10\,000$ persone. I malati sono $100$ ($1\%$): di questi, $99$ risultano positivi. I
+        sani sono $9\,900$: ma il $5\%$ di loro, cioè <strong>$495$</strong>, risulta positivo <em>per sbaglio</em>.
+        In tutto i positivi sono $99 + 495 = 594$, ma solo $99$ sono davvero malati:</p>
+      <div class="formula-box">
+        $$P(\text{malato} \mid \text{positivo}) = \frac{99}{594} \approx 0{,}167 = 16{,}7\%$$
+      </div>
+      <p>La ragione è che la malattia è <strong>rara</strong>: i falsi positivi tra i tantissimi sani superano di
+        gran lunga i veri positivi tra i pochi malati. È un errore di ragionamento così comune che ha un nome
+        («trascurare la frequenza di base») e conseguenze reali: per questo, dopo un primo test positivo per una
+        malattia rara, i medici ne fanno <em>un secondo</em>. Prova a cambiare i numeri:</p>
+      <div class="simbox">
+        <div class="controls">
+          <div class="control-group"><label>Diffusione della malattia: <span class="val" id="by-prev-val">1</span>%</label>
+            <input type="range" id="by-prev" min="0.1" max="30" step="0.1" value="1"></div>
+          <div class="control-group"><label>Affidabilità (positivo se malato): <span class="val" id="by-sens-val">99</span>%</label>
+            <input type="range" id="by-sens" min="50" max="100" step="1" value="99"></div>
+          <div class="control-group"><label>Falsi positivi (positivo se sano): <span class="val" id="by-fp-val">5</span>%</label>
+            <input type="range" id="by-fp" min="0" max="30" step="0.5" value="5"></div>
+        </div>
+        <p class="sim-out">Se risulti positivo, la probabilità di essere davvero malato è:
+          <span class="big" id="by-out">16,7%</span></p>
+      </div>
+
+      <h3>8.2 — Un secondo esempio: da quale sacchetto arriva?</h3>
+      <p>Torniamo alle palline. Ci sono <strong>due sacchetti</strong>, identici a vederli:</p>
+      <ul>
+        <li><strong>Sacchetto A:</strong> $8$ palline rosse e $2$ blu.</li>
+        <li><strong>Sacchetto B:</strong> $3$ palline rosse e $7$ blu.</li>
+      </ul>
+      <p>Un amico ne sceglie uno <strong>a caso</strong> (una probabilità su due) senza dirti quale, pesca una pallina e
+        ti mostra che è <strong>rossa</strong>. Domanda: da quale sacchetto l'ha più probabilmente presa? La convinzione
+        iniziale era $50\%$ e $50\%$; la pallina rossa è la <strong>prova</strong> che deve aggiornare la stima.</p>
+      <p>Le probabilità di pescare rosso nei due sacchetti sono $P(\text{rosso}\mid A)=\frac{8}{10}=0{,}8$ e
+        $P(\text{rosso}\mid B)=\frac{3}{10}=0{,}3$. Prima ci serve la probabilità di pescare rosso <em>in generale</em>,
+        mettendo insieme i due casi possibili:</p>
+      <div class="formula-box">
+        $$P(\text{rosso}) = \underbrace{\tfrac{1}{2}\cdot 0{,}8}_{\text{sceglie A}} + \underbrace{\tfrac{1}{2}\cdot 0{,}3}_{\text{sceglie B}} = 0{,}4 + 0{,}15 = 0{,}55$$
+      </div>
+      <p>Ora applichiamo Bayes per capovolgere la domanda e passare da «rosso dato il sacchetto» a «sacchetto dato il
+        rosso»:</p>
+      <div class="formula-box">
+        $$P(A \mid \text{rosso}) = \frac{P(\text{rosso}\mid A)\cdot P(A)}{P(\text{rosso})} = \frac{0{,}8 \cdot \tfrac{1}{2}}{0{,}55} = \frac{0{,}4}{0{,}55} = \frac{8}{11} \approx 72{,}7\%$$
+      </div>
+      <p>Di conseguenza $P(B \mid \text{rosso}) = \frac{3}{11} \approx 27{,}3\%$. La prova ha spostato la nostra
+        convinzione da $50$ e $50$ a circa <strong>73 contro 27</strong> a favore del sacchetto A: proprio ciò che il
+        buon senso suggerisce (A ha più rosse), ma ora con un <strong>numero preciso</strong>.</p>
+
+      <h3>8.3 — Il teorema «al contrario» (e un errore da evitare)</h3>
+      <p>Hai notato cosa fa davvero Bayes? Prende una probabilità condizionata e la <strong>gira</strong>: parte da
+        «rosso <em>dato</em> il sacchetto» e restituisce «sacchetto <em>dato</em> il rosso». Per questo si dice che
+        Bayes <strong>inverte</strong> le probabilità condizionate. Scambiando i ruoli di $A$ e $B$ si ottiene la forma
+        speculare, che è lo <strong>stesso</strong> teorema letto nell'altro verso:</p>
+      <div class="formula-box">
+        <div class="formula-title">Le due facce dello stesso teorema</div>
+        $$P(A \mid B) = \frac{P(B \mid A)\cdot P(A)}{P(B)} \qquad\Longleftrightarrow\qquad P(B \mid A) = \frac{P(A \mid B)\cdot P(B)}{P(A)}$$
+      </div>
+      <div class="warnbox">
+        <strong>⚠️ Attenzione: $P(A\mid B)$ e $P(B\mid A)$ NON sono la stessa cosa!</strong> È l'errore più diffuso di
+        tutti. Ricordi il test medico? La probabilità di essere positivi <em>se</em> malati era $P(\text{pos}\mid\text{malato})=99\%$,
+        ma la probabilità di essere malati <em>se</em> positivi era soltanto $P(\text{malato}\mid\text{pos})=17\%$:
+        stessi eventi, condizioni scambiate, risultati lontanissimi. Scambiarle — «è positivo, quindi è malato al
+        $99\%$» — si chiama <em>fallacia dell'inverso</em>. Applicata al DNA in tribunale («coincide con probabilità $1$
+        su un milione, quindi è colpevole al $99{,}9999\%$») ha portato a vere <strong>condanne ingiuste</strong>. Il
+        teorema di Bayes è proprio lo strumento che serve per non caderci: per invertire una probabilità condizionata
+        <em>bisogna</em> passare da lui.
+      </div>
+
+      <div class="curiosita">
+        <strong>🤖 Perché è così importante.</strong> Il ragionamento di Bayes è ovunque: il filtro
+        <strong>anti-spam</strong> aggiorna «quanto è probabile che sia spam» a ogni parola che legge; le
+        <strong>diagnosi mediche</strong> e i test combinano più esami; l'<strong>intelligenza artificiale</strong>,
+        i navigatori, il riconoscimento vocale... funzionano partendo da una stima e correggendola con i dati che
+        arrivano. Bayes è il modo matematico di dire una cosa molto saggia: <em>quando arrivano prove nuove, cambia
+        idea</em>.
+      </div>
+    </section>
+
+    <!-- 9 — QUIZ -->
+    <section id="quiz">
+      <h2>9. Quiz finale</h2>
+      <p>Dieci domande su probabilità classica e frequentista, eventi indipendenti, gioco d'azzardo, Monty Hall e
+        Bayes. Difficoltà crescente.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <!-- Widget interattivi -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const { draw, themeColors } = (window.Plt || {});
+
+      function pct(x) { return (x * 100).toFixed(1).replace('.', ',') + '%'; }
+
+      // ===== 1 — Sacchetto di palline =====
+      (function () {
+        const host = document.getElementById('bag-svg'); if (!host) return;
+        const btns = document.getElementById('bag-btns'), out = document.getElementById('bag-out');
+        const cols = { rossa: '#ef4444', blu: '#3b82f6', verde: '#22c55e', oro: '#f5b400' };
+        const balls = ['rossa', 'rossa', 'rossa', 'rossa', 'blu', 'blu', 'blu', 'verde', 'verde', 'oro'];
+        const events = {
+          'Rossa': b => b === 'rossa', 'Blu': b => b === 'blu', 'Verde': b => b === 'verde',
+          'Oro': b => b === 'oro', 'Non rossa': b => b !== 'rossa'
+        };
+        function render(sel) {
+          let s = '';
+          balls.forEach(function (b, i) {
+            const x = 44 + (i % 5) * 86, y = 45 + Math.floor(i / 5) * 86;
+            const on = sel ? events[sel](b) : true;
+            s += `<circle cx="${x}" cy="${y}" r="30" fill="${cols[b]}" opacity="${on ? 1 : 0.18}"/>`;
+            if (sel && on) s += `<circle cx="${x}" cy="${y}" r="34" fill="none" stroke="var(--text)" stroke-width="3"/>`;
+          });
+          host.innerHTML = `<svg viewBox="0 0 470 180" role="img" aria-label="sacchetto con 10 palline colorate">${s}</svg>`;
+          if (sel) {
+            const k = balls.filter(events[sel]).length;
+            out.innerHTML = `Evento «${sel}»: <strong>${k} casi favorevoli su 10</strong>. $P = \\dfrac{${k}}{10} = ${(k / 10).toString().replace('.', ',')} = ${pct(k / 10)}$.`;
+          } else { out.innerHTML = 'Scegli un evento qui sopra.'; }
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        Object.keys(events).forEach(function (name) {
+          const b = document.createElement('button'); b.className = 'btn'; b.textContent = name;
+          b.addEventListener('click', function () { render(name); });
+          btns.appendChild(b);
+        });
+        render(null);
+      })();
+
+      // ===== 2 — Frequentista: moneta =====
+      (function () {
+        const N = document.getElementById('fq-n'); if (!N) return;
+        const T = document.getElementById('fq-t'), F = document.getElementById('fq-f'), bar = document.getElementById('fq-bar');
+        let n = 0, t = 0;
+        function upd() {
+          N.textContent = n; T.textContent = t;
+          if (n === 0) { F.textContent = '—'; bar.style.width = '0%'; return; }
+          const f = t / n; F.textContent = pct(f); bar.style.width = (f * 100).toFixed(1) + '%';
+        }
+        function flip(k) { for (let i = 0; i < k; i++) { n++; if (Math.random() < 0.5) t++; } upd(); }
+        document.getElementById('fq-1').addEventListener('click', () => flip(1));
+        document.getElementById('fq-100').addEventListener('click', () => flip(100));
+        document.getElementById('fq-1000').addEventListener('click', () => flip(1000));
+        document.getElementById('fq-reset').addEventListener('click', () => { n = 0; t = 0; upd(); });
+      })();
+
+      // ===== 4 — Due dadi: doppio 6 =====
+      (function () {
+        const N = document.getElementById('dd-n'); if (!N) return;
+        const S = document.getElementById('dd-s'), F = document.getElementById('dd-f');
+        let n = 0, s = 0;
+        function upd() { N.textContent = n; S.textContent = s; F.textContent = n ? pct(s / n) : '—'; }
+        function roll(k) { for (let i = 0; i < k; i++) { n++; if ((1 + Math.floor(Math.random() * 6)) === 6 && (1 + Math.floor(Math.random() * 6)) === 6) s++; } upd(); }
+        document.getElementById('dd-1').addEventListener('click', () => roll(1));
+        document.getElementById('dd-1000').addEventListener('click', () => roll(1000));
+        document.getElementById('dd-reset').addEventListener('click', () => { n = 0; s = 0; upd(); });
+      })();
+
+      // ===== 4.1 — Due dadi: istogrammi facce e somma =====
+      (function () {
+        const btn1 = document.getElementById('td-1'); if (!btn1 || !window.Plt) return;
+        const C = themeColors();
+        const single = new Array(7).fill(0);  // facce 1..6
+        const sums = new Array(13).fill(0);   // somme 2..12
+        let n = 0, init = false;
+        const nEl = document.getElementById('td-n'), modeEl = document.getElementById('td-mode'), outEl = document.getElementById('td-out');
+        // n. di coppie (su 36) che danno ciascuna somma → probabilità teorica
+        const combos = {}; for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) combos[a + b] = (combos[a + b] || 0) + 1;
+        const facesX = [1, 2, 3, 4, 5, 6];
+        const sumX = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+        function drawCharts() {
+          const fY = facesX.map(f => n ? single[f] / (2 * n) : 0);   // ogni lancio produce 2 facce
+          const sY = sumX.map(s => n ? sums[s] / n : 0);
+          const drawFn = init ? Plt.update : Plt.draw;
+          drawFn('td-single', [
+            { x: facesX, y: fY, type: 'bar', marker: { color: C.accent }, name: 'osservata', hovertemplate: 'faccia %{x}: %{y:.1%}<extra></extra>' },
+            { x: facesX, y: facesX.map(() => 1 / 6), type: 'scatter', mode: 'lines', line: { color: C.curve, width: 2, dash: 'dot' }, name: 'teorica 1/6', hoverinfo: 'skip' }
+          ], {
+            xaxis: { title: 'faccia del singolo dado', dtick: 1, zeroline: false },
+            yaxis: { title: 'frequenza relativa', tickformat: '.0%', rangemode: 'tozero', zeroline: false },
+            showlegend: false
+          });
+          drawFn('td-sum', [
+            { x: sumX, y: sY, type: 'bar', marker: { color: C.accent }, name: 'osservata', hovertemplate: 'somma %{x}: %{y:.1%}<extra></extra>' },
+            { x: sumX, y: sumX.map(s => (combos[s] || 0) / 36), type: 'scatter', mode: 'lines+markers', line: { color: C.curve, width: 2 }, marker: { size: 6, color: C.curve }, name: 'teorica', hoverinfo: 'skip' }
+          ], {
+            xaxis: { title: 'somma dei due dadi', dtick: 1, zeroline: false },
+            yaxis: { title: 'frequenza relativa', tickformat: '.0%', rangemode: 'tozero', zeroline: false },
+            showlegend: true, legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: 1.12 }
+          });
+          init = true;
+        }
+        function roll(k) {
+          for (let i = 0; i < k; i++) {
+            const a = 1 + Math.floor(Math.random() * 6), b = 1 + Math.floor(Math.random() * 6);
+            single[a]++; single[b]++; sums[a + b]++; n++;
+          }
+          nEl.textContent = n.toLocaleString('it-IT');
+          let best = 7, bestC = -1;
+          for (let s = 2; s <= 12; s++) if (sums[s] > bestC) { bestC = sums[s]; best = s; }
+          modeEl.textContent = n ? best : '—';
+          drawCharts();
+          if (n) {
+            outEl.innerHTML = 'Le <strong>facce singole</strong> restano tutte quasi uguali (ognuna circa $\\frac{1}{6}\\approx 16{,}7\\%$): un dado da solo non ha «numeri fortunati». La <strong>somma</strong>, invece, forma una campana con la punta sul <strong>7</strong>, il valore più probabile ($\\frac{6}{36}\\approx 16{,}7\\%$), mentre il $2$ e il $12$ sono i più rari ($\\frac{1}{36}$). Con pochi lanci le barre ballano; con tanti si incollano al valore teorico (in rosa).';
+            if (typeof renderMathIn === 'function') renderMathIn(outEl);
+          }
+        }
+        document.getElementById('td-1').addEventListener('click', () => roll(1));
+        document.getElementById('td-100').addEventListener('click', () => roll(100));
+        document.getElementById('td-10000').addEventListener('click', () => roll(10000));
+        document.getElementById('td-reset').addEventListener('click', () => {
+          single.fill(0); sums.fill(0); n = 0; nEl.textContent = '0'; modeEl.textContent = '—';
+          outEl.innerHTML = 'Premi un pulsante per lanciare. In rosa il valore teorico.'; drawCharts();
+        });
+        drawCharts();  // render iniziale con assi e curve teoriche
+      })();
+
+      // ===== 5 — Grafici compleanni e ciclo =====
+      function bday(n) { let p = 1; for (let k = 0; k < n; k++) p *= (365 - k) / 365; return 1 - p; }
+      function ciclo(n) { const p = 4 / 30, q = 1 - p; return 1 - Math.pow(q, n) - n * p * Math.pow(q, n - 1); }
+      function probPlot(divId, sliderId, valId, outId, fn, maxN, label) {
+        const div = document.getElementById(divId); if (!div || !window.Plt) return;
+        const s = document.getElementById(sliderId), v = document.getElementById(valId), out = document.getElementById(outId);
+        const C = themeColors();
+        const xs = [], ys = []; for (let k = 2; k <= maxN; k++) { xs.push(k); ys.push(fn(k) * 100); }
+        let init = false;
+        function go() {
+          const n = +s.value; v.textContent = n; const P = fn(n) * 100;
+          const traces = [
+            { x: xs, y: ys, type: 'scatter', mode: 'lines', line: { color: C.accent, width: 3 }, hoverinfo: 'x+y' },
+            { x: [n], y: [P], type: 'scatter', mode: 'markers', marker: { color: C.curve, size: 11 }, hoverinfo: 'skip' }
+          ];
+          (init ? Plt.update : Plt.draw)(divId, traces, {
+            xaxis: { title: label, range: [2, maxN], zeroline: false },
+            yaxis: { title: 'probabilità (%)', range: [0, 100], zeroline: false },
+            shapes: [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: 50, y1: 50, line: { color: C.zero, width: 1, dash: 'dot' } }]
+          });
+          init = true;
+          out.innerHTML = `Con <strong>${n}</strong> persone la probabilità è <span class="big">${pct(fn(n))}</span>`;
+        }
+        s.addEventListener('input', go); go();
+      }
+      probPlot('bd-plot', 'bd-n', 'bd-n-val', 'bd-out', bday, 60, 'numero di persone');
+      probPlot('cy-plot', 'cy-n', 'cy-n-val', 'cy-out', ciclo, 40, 'numero di studentesse');
+
+      // ===== 6 — Loot box =====
+      (function () {
+        const N = document.getElementById('lb-n'); if (!N) return;
+        const Sp = document.getElementById('lb-s'), W = document.getElementById('lb-w'), out = document.getElementById('lb-out');
+        let n = 0, won = false;
+        function upd() {
+          N.textContent = n; Sp.textContent = (n * 2) + ' €';
+          W.textContent = won ? '🏆 sì!' : 'no'; W.style.color = won ? '#16a34a' : 'var(--muted)';
+          out.innerHTML = won
+            ? `Ottenuto dopo <strong>${n}</strong> scatole e <strong>${n * 2} €</strong>. (In media servono 100 scatole = 200 €... e potevi essere sfortunato.)`
+            : `Probabilità per scatola: 1%. Finora <strong>${n * 2} €</strong> spesi, ancora niente leggendario.`;
+        }
+        function open(k) { for (let i = 0; i < k; i++) { if (won) break; n++; if (Math.random() < 0.01) won = true; } upd(); }
+        document.getElementById('lb-1').addEventListener('click', () => open(1));
+        document.getElementById('lb-10').addEventListener('click', () => open(10));
+        document.getElementById('lb-reset').addEventListener('click', () => { n = 0; won = false; upd(); });
+        upd();
+      })();
+
+      // ===== 7 — Monty Hall =====
+      (function () {
+        const doorsEl = document.getElementById('mh-doors'); if (!doorsEl) return;
+        const choiceEl = document.getElementById('mh-choice'), out = document.getElementById('mh-out');
+        const bSwitch = document.getElementById('mh-switch'), bStay = document.getElementById('mh-stay');
+        let car, picked, opened, phase;
+        function newGame() {
+          car = Math.floor(Math.random() * 3); picked = -1; opened = -1; phase = 'pick';
+          choiceEl.style.display = 'none';
+          out.textContent = 'Clicca una delle tre porte.';
+          render();
+        }
+        function render() {
+          doorsEl.innerHTML = '';
+          for (let i = 0; i < 3; i++) {
+            const d = document.createElement('div'); d.className = 'door';
+            if (i === picked) d.classList.add('sel');
+            if (i === opened) { d.classList.add('open'); d.textContent = '🐐'; }
+            else if (phase === 'done') { d.textContent = (i === car ? '🚗' : '🐐'); d.classList.add('open'); if (i === car) d.classList.add('win'); }
+            else d.textContent = '🚪';
+            if (phase === 'pick') d.addEventListener('click', function () { pick(i); });
+            doorsEl.appendChild(d);
+          }
+        }
+        function pick(i) {
+          picked = i;
+          const opts = [0, 1, 2].filter(x => x !== picked && x !== car);
+          opened = opts[Math.floor(Math.random() * opts.length)];
+          phase = 'decide';
+          choiceEl.style.display = 'flex';
+          out.innerHTML = `Hai scelto la porta ${i + 1}. Il conduttore apre la porta ${opened + 1} (una capra 🐐). Resti o cambi?`;
+          render();
+        }
+        function finish(sw) {
+          const other = [0, 1, 2].find(x => x !== picked && x !== opened);
+          const final = sw ? other : picked;
+          picked = final; phase = 'done';
+          choiceEl.style.display = 'none';
+          const win = final === car;
+          out.innerHTML = (win ? '🎉 <strong>Hai vinto l\'auto!</strong> ' : '😿 <strong>Una capra...</strong> ')
+            + (sw ? 'Hai cambiato porta. ' : 'Sei rimasto. ') + '<button class="btn" id="mh-again">🔁 gioca ancora</button>';
+          render();
+          document.getElementById('mh-again').addEventListener('click', newGame);
+        }
+        bSwitch.addEventListener('click', () => finish(true));
+        bStay.addEventListener('click', () => finish(false));
+
+        // simulazione batch
+        const stayP = document.getElementById('mh-stay-p'), switchP = document.getElementById('mh-switch-p');
+        document.getElementById('mh-sim').addEventListener('click', function () {
+          let ws = 0, wsw = 0, R = 1000;
+          for (let i = 0; i < R; i++) {
+            const c = Math.floor(Math.random() * 3), p = Math.floor(Math.random() * 3);
+            if (p === c) ws++;            // se resti, vinci quando la prima scelta era giusta
+            else wsw++;                    // se cambi, vinci quando la prima scelta era sbagliata
+          }
+          stayP.textContent = pct(ws / R); switchP.textContent = pct(wsw / R);
+          stayP.style.color = '#dc2626'; switchP.style.color = '#16a34a';
+        });
+        document.getElementById('mh-reset').addEventListener('click', function () {
+          stayP.textContent = '—'; switchP.textContent = '—'; stayP.style.color = ''; switchP.style.color = ''; newGame();
+        });
+        newGame();
+      })();
+
+      // ===== 8 — Bayes (test medico) =====
+      (function () {
+        const p = document.getElementById('by-prev'); if (!p) return;
+        const se = document.getElementById('by-sens'), fp = document.getElementById('by-fp');
+        const pv = document.getElementById('by-prev-val'), sev = document.getElementById('by-sens-val'), fpv = document.getElementById('by-fp-val');
+        const out = document.getElementById('by-out');
+        function go() {
+          const prev = +p.value / 100, sens = +se.value / 100, fpr = +fp.value / 100;
+          pv.textContent = (+p.value).toString().replace('.', ','); sev.textContent = se.value; fpv.textContent = (+fp.value).toString().replace('.', ',');
+          const num = sens * prev, den = sens * prev + fpr * (1 - prev);
+          out.textContent = den > 0 ? pct(num / den) : '—';
+        }
+        [p, se, fp].forEach(el => el.addEventListener('input', go)); go();
+      })();
+
+    });
+  </script>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/plot-utils.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Con un dado a 6 facce, la probabilità che esca un numero <strong>maggiore di 4</strong> (cioè 5 o 6) è:',
+        options: ['$\\dfrac{1}{6}$', '$\\dfrac{1}{3}$', '$\\dfrac{1}{2}$', '$\\dfrac{2}{3}$', '$\\dfrac{4}{6}$'],
+        correct: 1, explain: 'Casi favorevoli $\\{5,6\\}$ = 2 su 6: $\\dfrac{2}{6} = \\dfrac{1}{3}$.' },
+      { type: 'mc', diff: 'easy', text: 'La probabilità di un evento è sempre un numero:',
+        options: ['maggiore di 1', 'tra 0 e 1 (estremi compresi)', 'negativo', 'intero', 'tra 1 e 6'],
+        correct: 1, explain: 'È il rapporto $|E|/|U|$: il favorevole non supera il possibile, quindi $0 \\le P \\le 1$.' },
+      { type: 'mc', diff: 'easy', text: 'Un evento con probabilità $P = 0$ è:',
+        options: ['certo', 'impossibile', 'molto probabile', 'raro ma possibile', 'indipendente'],
+        correct: 1, explain: '$P=0$ corrisponde all\'insieme vuoto: non può accadere. $P=1$ sarebbe l\'evento certo.' },
+      { type: 'mc', diff: 'medium', text: 'Ho lanciato una moneta e sono uscite 5 <strong>teste</strong> di fila. Al sesto lancio la probabilità di testa è:',
+        options: ['minore di $\\frac{1}{2}$, perché "deve" uscire croce', 'ancora $\\frac{1}{2}$: la moneta non ha memoria', 'maggiore di $\\frac{1}{2}$', '0', '1'],
+        correct: 1, explain: 'I lanci sono indipendenti: il passato non influenza il futuro. Crederlo è l\'"errore del giocatore".' },
+      { type: 'mc', diff: 'medium', text: 'Lanciando <strong>due dadi</strong>, la probabilità di ottenere un doppio 6 è:',
+        options: ['$\\dfrac{1}{6}$', '$\\dfrac{2}{6}$', '$\\dfrac{1}{12}$', '$\\dfrac{1}{36}$', '$\\dfrac{1}{18}$'],
+        correct: 3, explain: 'Eventi indipendenti: si moltiplica, $\\dfrac{1}{6}\\cdot\\dfrac{1}{6} = \\dfrac{1}{36}$.' },
+      { type: 'mc', diff: 'medium', text: 'In una classe di 30 persone, la probabilità che almeno due compiano gli anni lo stesso giorno è circa:',
+        options: ['meno dell\'1%', 'circa l\'8%', 'circa il 30%', 'circa il 70%', 'esattamente il 50%'],
+        correct: 3, explain: 'Il "paradosso dei compleanni": con 30 persone si arriva a circa il 70% (e bastano 23 per superare il 50%).' },
+      { type: 'mc', diff: 'medium', text: 'Nel gioco d\'azzardo, "il banco vince sempre" significa che:',
+        options: ['il banco bara', 'le regole tengono la probabilità sempre a favore del banco, quindi a lungo andare il giocatore perde', 'il giocatore non vince mai una singola giocata', 'il gioco è illegale', 'serve fortuna'],
+        correct: 1, explain: 'Anche senza barare, il margine del banco rende la perdita una certezza sul lungo periodo.' },
+      { type: 'mc', diff: 'hard', text: 'Nel problema di Monty Hall (3 porte), dopo che il conduttore ha aperto una capra conviene:',
+        options: ['restare: vinci con probabilità $\\frac{1}{2}$', 'cambiare: vinci con probabilità $\\frac{2}{3}$', 'restare: vinci con probabilità $\\frac{2}{3}$', 'è indifferente, $\\frac{1}{2}$ e $\\frac{1}{2}$', 'cambiare: vinci con probabilità $\\frac{1}{3}$'],
+        correct: 1, explain: 'Cambiando si "raccolgono" i $\\frac{2}{3}$ dei casi in cui la prima scelta era sbagliata.' },
+      { type: 'mc', diff: 'hard', text: 'Un test per una malattia <strong>rara</strong> risulta positivo. Perché la probabilità di essere davvero malati può essere molto più bassa del previsto?',
+        options: ['perché il test è rotto', 'perché, essendo la malattia rara, i falsi positivi tra i tanti sani superano i veri positivi tra i pochi malati', 'perché $P$ è sempre 50%', 'perché il test è indipendente', 'perché la malattia non esiste'],
+        correct: 1, explain: 'È l\'idea di Bayes: bisogna tener conto della frequenza di base. Per questo si ripete il test.' },
+      { type: 'open', diff: 'hard', text: 'Una loot box dà l\'oggetto raro con probabilità 1% a scatola. Spiega perché "ne compro 100 e ce l\'ho di sicuro" è sbagliato, e che cosa succede continuando a comprarne.',
+        keywords: ['media', '100', 'non', 'sicur', 'certezza', 'indipendent', '50', '69', 'sfortun', 'spend', 'più'], requiredMatches: 2,
+        explain: 'In media servono 100 scatole, ma "in media" non vuol dire "di sicuro": ogni apertura è indipendente e potresti non ottenerlo neppure in 100 (o 200) tentativi. Per una probabilità del 50% bastano già 69 scatole, ma non c\'è mai la certezza: così si finisce per comprarne sempre di più e spendere molto più del previsto.' }
+    ];
+  </script>
+
+</body>
+
+</html>
