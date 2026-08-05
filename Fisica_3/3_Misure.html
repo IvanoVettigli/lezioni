@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 3 — Misure in laboratorio e relazione scientifica</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+
+    /* riquadro con disegni/simulatori */
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 680px; margin: 0.3rem auto; }
+    .ckt .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 11px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .ckt .metal { fill: color-mix(in srgb, var(--text-soft) 22%, var(--surface)); stroke: var(--text-soft); stroke-width: 1.6; }
+    .ckt .metal2 { fill: color-mix(in srgb, var(--accent) 26%, var(--surface)); stroke: var(--accent); stroke-width: 1.6; }
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+
+    /* caselle di risposta guidata */
+    .inp { width: 7rem; font-size: 1rem; font-family: inherit; padding: 0.3rem 0.45rem; border-radius: 8px;
+           border: 2px solid var(--border); background: var(--surface); color: var(--text); text-align: right; }
+    .inp:focus { outline: none; border-color: var(--accent); }
+    .qbox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.8rem 0; }
+    .qbox .qt { font-weight: 600; margin-bottom: 0.45rem; }
+    .qrow { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .fb { min-height: 1.4em; margin-top: 0.45rem; font-weight: 600; font-size: 0.95rem; }
+    .fb.ok { color: var(--green); }
+    .fb.no { color: var(--red); }
+
+    /* riquadri con i valori calcolati */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.7rem; text-align: center; }
+    .stat .n { font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
+    .stat .l { font-size: 0.76rem; color: var(--muted); }
+
+    /* tabelle dati */
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf tr.tot td { font-weight: 700; background: color-mix(in srgb, var(--accent) 9%, transparent); }
+
+    /* gioco: ordina le sezioni */
+    .ord-pool { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.6rem 0; }
+    .ord-chip { background: var(--surface); border: 2px solid var(--border); border-radius: 999px;
+                padding: 0.3rem 0.75rem; cursor: pointer; font-size: 0.9rem; transition: transform 0.12s, border-color 0.12s; }
+    .ord-chip:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .ord-list { list-style: none; padding: 0; margin: 0.6rem 0; display: grid; gap: 0.3rem; counter-reset: ordc; }
+    .ord-list li { counter-increment: ordc; background: var(--surface); border: 1px solid var(--border);
+                   border-radius: 8px; padding: 0.32rem 0.7rem; font-size: 0.92rem; display: flex; gap: 0.6rem; }
+    .ord-list li::before { content: counter(ordc) '.'; font-weight: 800; color: var(--muted); min-width: 1.5rem; }
+    .ord-list li.ok { border-color: var(--green); background: color-mix(in srgb, var(--green) 10%, var(--surface)); }
+    .ord-list li.no { border-color: var(--red); background: color-mix(in srgb, #ef4444 10%, var(--surface)); }
+
+    /* relazione di prova */
+    .rep { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+           padding: 1.1rem 1.3rem; margin: 1.2rem 0; }
+    .rep .rep-head { text-align: center; border-bottom: 2px solid var(--border); padding-bottom: 0.7rem; margin-bottom: 0.9rem; }
+    .rep .rep-title { font-size: 1.2rem; font-weight: 800; color: var(--text); }
+    .rep .rep-auth { font-size: 0.88rem; color: var(--muted); margin-top: 0.3rem; }
+    .rep h4 { color: var(--accent); margin: 1rem 0 0.35rem; font-size: 1.02rem; }
+    .rep p, .rep li { font-size: 0.94rem; }
+    .rep .abst { font-size: 0.92rem; font-style: italic; background: var(--surface-2);
+                 border-radius: 8px; padding: 0.6rem 0.85rem; }
+
+    /* peer review: percorso */
+    .flow-steps { display: grid; gap: 0.55rem; margin: 1rem 0; }
+    .flow-step { display: flex; gap: 0.75rem; align-items: flex-start; background: var(--surface-2);
+                 border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem 0.85rem; }
+    .flow-step .fs-n { flex: 0 0 auto; width: 1.9rem; height: 1.9rem; border-radius: 50%; display: grid; place-items: center;
+                       background: var(--accent); color: #fff; font-weight: 800; font-size: 0.88rem; }
+    .flow-step .fs-b { font-size: 0.94rem; }
+    .flow-step .fs-b strong { color: var(--text); }
+
+    .prop { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .prop-card { background: var(--surface-2); border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px; padding: 0.8rem 0.95rem; }
+    .prop-card h4 { margin: 0 0 0.3rem; color: var(--accent); font-size: 1.03rem; }
+    .prop-card p { margin: 0.35rem 0; font-size: 0.93rem; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Terzo anno · Lezione 3</div>
+    <h1>Misure in laboratorio e relazione scientifica</h1>
+    <p>Dal calibro alla <em>peer review</em>: come si ottiene un numero, come lo si racconta e come la comunità
+      scientifica decide se crederci</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Terzo anno</a>
+    <span class="sep">/</span> Misure e relazione scientifica
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Che cosa faremo.</strong> Prima ci ricorderemo perché la fisica non è (solo) un gioco di formule, e
+      perché chi la fa non lavora mai da solo. Poi impareremo a scrivere una <strong>relazione scientifica</strong>.
+      Quindi entreremo in laboratorio — virtualmente — e rifaremo insieme, passo per passo, l'esperienza sulle
+      <strong>misure dirette e indirette</strong> e sulla <strong>propagazione delle incertezze</strong>: banco,
+      calibro, blocchetto misterioso, parete, istogramma della classe. Alla fine scriveremo davvero la relazione su
+      quelle misure. E infine scopriremo che cosa succede quando quella relazione, invece che al prof, viene mandata
+      a una rivista scientifica: <em>peer review</em>, bibliografia, e tutte le cose che in quel sistema non
+      funzionano.
+    </div>
+
+    <!-- 1 — LA FISICA SI FA CON LE MANI -->
+    <section id="sec1">
+      <h2>1. La fisica si fa con le mani (e quasi mai da soli)</h2>
+
+      <p>Nella <a href="1_Fisica.html">prima lezione</a> l'abbiamo detto subito: la fisica è una disciplina
+        <strong>sperimentale</strong>. Vale la pena ripeterlo adesso, perché è la prima cosa che si dimentica appena
+        si comincia a fare i conti. Una teoria può essere elegante, simmetrica, scritta in un'equazione che sta in
+        una riga e che vi sembra bellissima: se il suo risultato non coincide con quello che l'esperimento misura,
+        quella teoria è <strong>sbagliata</strong>. Non «da rivedere», non «valida in un altro senso»: sbagliata.</p>
+
+      <div class="curiosita">
+        <p style="margin:0"><em>«If it disagrees with experiment, it is wrong. In that simple statement is the key to
+          science.»</em></p>
+        <p style="margin:0.35rem 0 0"><strong>«Se è in disaccordo con l'esperimento, è sbagliata. In questa
+          semplice affermazione sta la chiave della scienza.»</strong> — Richard Feynman, <em>The Character of
+          Physical Law</em>, 1964. Poco prima nella stessa lezione aggiunge: non importa quanto sia bella la vostra
+          congettura, non importa quanto siate intelligenti voi che l'avete fatta, non importa come si chiami chi
+          l'ha proposta. Se non torna con l'esperimento, è sbagliata.</p>
+      </div>
+
+      <p class="joke">Piccola confessione del vostro prof: io, in realtà, ho un debole per la parte teorica. Il
+        momento in cui un conto lungo si semplifica da solo e resta lì, nudo, un risultato che nessuno si aspettava,
+        per me vale una giornata intera. Ma proprio per questo devo essere il primo a ripeterlo: quel risultato non
+        vale niente finché qualcuno non va a guardare se il mondo è d'accordo. La bellezza è un ottimo motore di
+        ricerca e un pessimo giudice.</p>
+
+      <h3>1.1 Lo scienziato solo nel seminterrato non esiste</h3>
+
+      <p>C'è un'immagine dello scienziato che ci portiamo dietro dai romanzi dell'Ottocento: un tizio geniale e un
+        po' storto, chiuso in un laboratorio segreto, che una notte grida «ce l'ho fatta!». È un'immagine
+        letteraria — il dottor Frankenstein, il dottor Jekyll — e ha con la realtà lo stesso rapporto che il
+        pirata con una gamba di legno ha con la navigazione.</p>
+
+      <p>La verità è quasi l'opposto: <strong>la scienza è una delle attività umane più sociali che esistano</strong>.
+        Si fa in gruppo, si discute in continuazione, e si passa una quantità sorprendente di tempo a spiegare agli
+        altri quello che si sta facendo. Un fisico sperimentale medio, in una settimana:</p>
+
+      <ul>
+        <li>lavora in un <strong>gruppo di ricerca</strong> di cinque, dieci, mille persone, ciascuna con un pezzo
+          del problema;</li>
+        <li>partecipa al <strong>seminario</strong> settimanale del dipartimento, dove qualcuno racconta il proprio
+          lavoro e gli altri, gentilmente ma senza sconti, provano a smontarlo;</li>
+        <li>legge gli articoli usciti quel giorno sui <strong>preprint</strong> e ne discute con i colleghi;</li>
+        <li>scrive email, litiga su un grafico, rifà una figura per la quinta volta;</li>
+        <li>e sì, passa parecchio tempo davanti alla lavagna del corridoio o alla macchina del caffè, che in molti
+          istituti è il vero centro nevralgico della ricerca.</li>
+      </ul>
+
+      <div class="curiosita">
+        <p style="margin:0"><strong>Due numeri per capire la scala.</strong> Alla celebre conferenza
+          <strong>Solvay del 1927</strong>, quella della fotografia con Einstein al centro, erano presenti 29
+          scienziati: di quei 29, diciassette hanno vinto (o vinceranno) il premio Nobel. Un'intera rivoluzione
+          scientifica stava, letteralmente, in una stanza.</p>
+        <p style="margin:0.4rem 0 0">Oggi la stanza è molto più grande. L'articolo che nel 2015 ha stabilito la massa
+          del bosone di Higgs combinando i dati dei due esperimenti ATLAS e CMS del CERN è firmato da <strong>più di
+          cinquemila autori</strong>: l'articolo è lungo 33 pagine, di cui 24 servono solo per elencare i nomi di chi
+          l'ha scritto. Nessuno di quei cinquemila avrebbe potuto fare da solo nemmeno un centesimo di quel
+          lavoro.</p>
+      </div>
+
+      <h3>1.2 Perché tutto questo riguarda anche voi</h3>
+
+      <p>Una comunità che lavora insieme ha bisogno di una cosa sola, ma indispensabile: un <strong>modo condiviso di
+        raccontarsi quello che si è fatto</strong>. Se ogni gruppo scrivesse i propri risultati come gli pare — senza
+        dire con quale strumento ha misurato, senza dichiarare l'incertezza, saltando i passaggi «tanto si capisce» —
+        nessuno potrebbe controllare niente, e la scienza smetterebbe di funzionare nel giro di una generazione.</p>
+
+      <p>Questo modo condiviso ha un nome e una forma precisa: si chiama <strong>relazione scientifica</strong> (in
+        versione professionale, <em>articolo</em>). Impararla adesso, su un banco e un blocchetto di metallo, serve
+        esattamente come imparare a usare il calibro. Anzi: serve di più, perché quella struttura la ritroverete
+        identica in una tesi di laurea, in una relazione tecnica di un'azienda, in una perizia, in un referto.</p>
+
+      <div class="rule">
+        Il criterio guida di tutto ciò che segue: <strong>una persona che non era in laboratorio con voi deve poter
+        leggere la vostra relazione e rifare l'esperimento da capo, ottenendo un risultato compatibile con il
+        vostro.</strong> Se non può, la relazione è incompleta — per quanto sia bella la calligrafia.
+      </div>
+    </section>
+
+    <!-- 2 — LA RELAZIONE SCIENTIFICA -->
+    <section id="sec2">
+      <h2>2. La relazione scientifica: obiettivi e struttura</h2>
+
+      <h3>2.1 A che cosa serve davvero</h3>
+
+      <p>Una relazione non serve a «far vedere al prof che avete lavorato». Serve a cinque cose molto concrete, e
+        ognuna di esse spiega una delle sezioni che vedremo fra poco.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>1. Comunicare un risultato</h4>
+          <p>Dire, in modo che non si possa fraintendere, <strong>che cosa avete trovato</strong>: un numero, la sua
+            unità di misura e la sua incertezza. Non «il blocchetto è di alluminio», ma
+            <span>$\rho = (2{,}70 \pm 0{,}03)$</span> g/cm³, compatibile con l'alluminio.</p>
+        </div>
+        <div class="prop-card">
+          <h4>2. Rendere l'esperimento riproducibile</h4>
+          <p>Descrivere strumenti e procedura con tanti dettagli quanti ne servono perché <strong>un altro possa
+            rifarlo</strong>. La riproducibilità è ciò che distingue un risultato scientifico da un aneddoto.</p>
+        </div>
+        <div class="prop-card">
+          <h4>3. Dichiarare quanto ci si può fidare</h4>
+          <p>Un risultato senza incertezza non è un risultato. La relazione deve dire <strong>da dove viene</strong>
+            l'incertezza dichiarata: sensibilità dello strumento, dispersione delle misure ripetute, propagazione.</p>
+        </div>
+        <div class="prop-card">
+          <h4>4. Permettere il controllo</h4>
+          <p>I dati grezzi vanno riportati <strong>tutti</strong>, anche quelli brutti. Chi legge deve poter rifare i
+            vostri conti e, se serve, scoprire che avete sbagliato. È una funzione, non un rischio.</p>
+        </div>
+        <div class="prop-card">
+          <h4>5. Lasciare una traccia datata</h4>
+          <p>Una relazione è un documento con una data: fissa <strong>chi ha trovato che cosa e quando</strong>. Su
+            questo, nella storia della scienza, si sono combattute battaglie feroci (Newton contro Leibniz, per
+            dirne una).</p>
+        </div>
+      </div>
+
+      <h3>2.2 La struttura, sezione per sezione</h3>
+
+      <p>Quella che segue è la <strong>struttura di base</strong>. Non è un modulo da riempire: è uno scheletro da
+        adattare caso per caso. Un esperimento senza grafici non avrà la sezione dei grafici; una misura ripetuta
+        mille volte avrà un'elaborazione dati lunghissima e un procedimento di tre righe. Quello che <em>non</em>
+        cambia mai è l'ordine logico: <strong>perché → come → che cosa ho ottenuto → che cosa significa</strong>.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead>
+            <tr><th style="width:22%">Sezione</th><th>A quale domanda risponde</th><th>Errore tipico</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="lab">Titolo</td><td>Di che cosa parla, in una riga? Deve contenere la grandezza misurata e il metodo.</td><td>«Relazione di laboratorio n. 3»: non dice nulla.</td></tr>
+            <tr><td class="lab">Autori, classe, data</td><td>Chi ha fatto le misure e quando? Anche i compagni di gruppo.</td><td>Dimenticare la data: rende la relazione inutilizzabile come documento.</td></tr>
+            <tr><td class="lab">Scopo</td><td>Che cosa volevamo misurare o verificare? Due o tre righe, in forma di obiettivo.</td><td>Confondere lo scopo con il procedimento.</td></tr>
+            <tr><td class="lab">Richiami teorici</td><td>Quali formule userò e da dove vengono? Solo quelle che servono davvero.</td><td>Ricopiare tre pagine di libro. Se una formula non viene usata, non ci va.</td></tr>
+            <tr><td class="lab">Materiali e strumenti</td><td>Che cosa ho usato? Per ogni strumento: <strong>sensibilità e portata</strong>.</td><td>Scrivere «un righello» senza dirne la sensibilità: rende impossibile controllare le incertezze.</td></tr>
+            <tr><td class="lab">Procedimento</td><td>Che cosa ho fatto, nell'ordine in cui l'ho fatto? Quante ripetizioni, quali accorgimenti.</td><td>Scrivere le istruzioni della scheda invece di ciò che è realmente successo.</td></tr>
+            <tr><td class="lab">Dati raccolti</td><td>Quali numeri ho letto? In tabella, con unità di misura nell'intestazione.</td><td>Riportare i dati già elaborati e buttare quelli grezzi.</td></tr>
+            <tr><td class="lab">Elaborazione dei dati</td><td>Come sono passato dai dati al risultato? Formule, un esempio numerico svolto per esteso, propagazione delle incertezze.</td><td>Scrivere solo il risultato finale: chi legge non può controllare nulla.</td></tr>
+            <tr><td class="lab">Risultati</td><td>Che cosa ho ottenuto? Ogni risultato nella forma <span>$x = x_{\text{mis}} \pm \Delta x$</span> con l'unità.</td><td>Trenta cifre decimali sul valore e una sull'incertezza.</td></tr>
+            <tr><td class="lab">Discussione</td><td>I risultati sono compatibili con l'atteso? Quali errori hanno pesato di più? Che cosa migliorerei?</td><td>«L'esperimento è riuscito.» Non significa niente.</td></tr>
+            <tr><td class="lab">Conclusioni</td><td>La risposta secca alla domanda dello scopo, in tre righe.</td><td>Introdurre in conclusione risultati mai mostrati prima.</td></tr>
+            <tr><td class="lab">Bibliografia</td><td>Da dove ho preso i dati non miei (densità tabulate, costanti, formule)?</td><td>Non metterla. Ci torneremo per esteso nel §11.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="curiosita">
+        <p style="margin:0"><strong>E l'abstract?</strong> Negli articoli scientifici veri, subito dopo il titolo,
+          c'è un <strong>sommario</strong> (<em>abstract</em>) di dieci-quindici righe che riassume scopo, metodo e
+          <em>risultato numerico</em>. Serve a chi deve decidere in trenta secondi se leggere il resto. Nelle
+          relazioni scolastiche di solito non si chiede, ma provare a scriverlo è un ottimo esercizio: se non
+          riuscite a riassumere il vostro lavoro in dieci righe, probabilmente non avete ancora capito che cosa avete
+          fatto.</p>
+      </div>
+
+      <h3>2.3 Come si scrive: sette regole di stile</h3>
+
+      <ol>
+        <li><strong>Impersonale e al passato.</strong> «Si è misurata la lunghezza del banco» oppure «abbiamo
+          misurato», ma poi si resta coerenti per tutta la relazione. Mai il presente («misuro il banco»): la
+          relazione racconta cose già accadute.</li>
+        <li><strong>Ogni numero ha un'unità.</strong> Sempre. Un numero senza unità è, in fisica, un errore — a meno
+          che non sia davvero adimensionale, e allora va detto.</li>
+        <li><strong>Cifre significative.</strong> L'incertezza si scrive con <strong>una sola cifra
+          significativa</strong> (al massimo due se la prima è un 1), e il valore si arrotonda alla stessa posizione
+          decimale: <span>$(2{,}70 \pm 0{,}03)$</span> g/cm³, non <span>$(2{,}7013 \pm 0{,}0314)$</span>.</li>
+        <li><strong>Tabelle e figure numerate, con didascalia.</strong> «Tabella 1 — Misure dei lati del banco
+          (cm).» E nel testo ci si riferisce a esse per numero, non con «la tabella qui sotto».</li>
+        <li><strong>Grafici con assi etichettati</strong>, unità di misura, barre d'errore quando ci sono, e nessuna
+          decorazione inutile. Il grafico è un argomento, non un abbellimento.</li>
+        <li><strong>Nessun dato nascosto.</strong> Se una misura vi sembra sbagliata, la riportate e spiegate perché
+          la escludete. Cancellarla in silenzio è la prima porta della disonestà scientifica.</li>
+        <li><strong>Niente «riuscito» o «fallito».</strong> Un esperimento non riesce né fallisce: dà un risultato,
+          compatibile o incompatibile con ciò che ci si aspettava. Se è incompatibile, il lavoro interessante
+          comincia lì.</li>
+      </ol>
+
+      <h3>2.4 Provate voi: rimettete in ordine la relazione</h3>
+
+      <p>Qui sotto trovate le dodici sezioni, mescolate. Cliccatele nell'ordine in cui devono comparire nella
+        relazione; poi controllate. (Se sbagliate, le sezioni giuste restano verdi e potete correggere solo le
+        altre.)</p>
+
+      <div class="ckt">
+        <div class="ord-pool" id="or-pool"></div>
+        <ol class="ord-list" id="or-list"></ol>
+        <div class="sim-btns">
+          <button class="btn btn-primary" id="or-check">✓ controlla</button>
+          <button class="btn" id="or-reset">↺ ricomincia</button>
+        </div>
+        <p class="eq-out" id="or-out"></p>
+      </div>
+    </section>
+
+    <!-- 3 — GLI STRUMENTI E IL NONIO -->
+    <section id="sec3">
+      <h2>3. In laboratorio: gli strumenti di oggi</h2>
+
+      <p>Da qui comincia l'esperienza vera e propria. È quella della scheda
+        <a href="../Laboratorio/PDF/Misure_dirette_indirette_propagazione.pdf"><em>Misure dirette e indirette e
+        propagazione delle incertezze</em></a> (la trovate anche fra i
+        <a href="../Laboratorio/index.html">laboratori</a>, da stampare e compilare a mano): qui la faremo insieme,
+        passo per passo, con i numeri di un gruppo che l'ha svolta davvero. Voi seguite i conti, provate a rispondere
+        prima di guardare la soluzione, e alla fine (§9) leggeremo la relazione scritta su queste stesse misure.</p>
+
+      <p>Gli strumenti sono quattro, e la prima cosa da fare — <em>sempre</em>, prima di toccare qualsiasi cosa — è
+        annotarne <strong>sensibilità</strong> e <strong>portata</strong>. Senza queste due informazioni non potrete
+        scrivere nessuna incertezza.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead>
+            <tr><th>Strumento</th><th>Sensibilità</th><th>Portata</th><th>Note</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="lab">Metro da sarta</td><td>1 mm = 0,1 cm</td><td>150 cm</td><td>Flessibile: si tende, si storce, con gli anni si allunga. Doppia scala: cm da un lato, pollici dall'altro.</td></tr>
+            <tr><td class="lab">Calibro a nonio ventesimale</td><td>0,05 mm = 0,005 cm</td><td>150 mm</td><td>Rigido e molto sensibile: è lo strumento di precisione dell'esperienza.</td></tr>
+            <tr><td class="lab">Bilancia elettronica</td><td>0,1 g</td><td>2 kg</td><td>Va azzerata (tara) prima di ogni pesata.</td></tr>
+            <tr><td class="lab">Cilindro graduato</td><td>1 mL = 1 cm³</td><td>100 mL</td><td>Si legge in corrispondenza del <em>menisco</em>, con l'occhio all'altezza del pelo dell'acqua.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>3.1 Il calibro a nonio: le parti</h3>
+
+      <p>Il calibro (o <em>nonio</em>, dal nome latinizzato del matematico portoghese Pedro Nunes, che nel Cinquecento
+        inventò il principio) permette di misurare lunghezze con una sensibilità venti volte più fine di quella di un
+        righello. Ecco com'è fatto.</p>
+
+      <div class="ckt">
+        <svg viewBox="0 0 680 250" role="img" aria-label="Schema del calibro a nonio">
+          <!-- asta graduata -->
+          <rect class="metal" x="55" y="105" width="500" height="30" rx="3"/>
+          <text class="lbl-s" x="180" y="124">asta graduata (scala principale, in mm)</text>
+          <!-- becco fisso -->
+          <rect class="metal" x="55" y="55" width="26" height="50" rx="2"/>
+          <rect class="metal" x="55" y="135" width="26" height="66" rx="2"/>
+          <!-- cursore -->
+          <rect class="metal2" x="290" y="96" width="78" height="48" rx="4"/>
+          <rect class="metal2" x="290" y="55" width="22" height="41" rx="2"/>
+          <rect class="metal2" x="290" y="144" width="22" height="57" rx="2"/>
+          <text class="lbl-s" x="316" y="126" style="font-size:11px">nonio</text>
+          <!-- vite di bloccaggio -->
+          <circle cx="352" cy="90" r="7" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold)"/>
+          <!-- asta di profondità -->
+          <rect class="metal2" x="555" y="114" width="90" height="9" rx="2"/>
+          <!-- etichette -->
+          <text class="lbl" x="46" y="30" text-anchor="start">becchi per misure interne</text>
+          <line x1="70" y1="38" x2="70" y2="53" stroke="currentColor" style="color:var(--muted)" stroke-width="1.5"/>
+          <line x1="230" y1="38" x2="300" y2="53" stroke="currentColor" style="color:var(--muted)" stroke-width="1.5"/>
+          <text class="lbl" x="392" y="86" text-anchor="start">vite di bloccaggio</text>
+          <line x1="388" y1="82" x2="360" y2="88" stroke="currentColor" style="color:var(--muted)" stroke-width="1.5"/>
+          <text class="lbl" x="46" y="228" text-anchor="start">becchi per misure esterne</text>
+          <line x1="70" y1="215" x2="70" y2="203" stroke="currentColor" style="color:var(--muted)" stroke-width="1.5"/>
+          <line x1="240" y1="215" x2="300" y2="203" stroke="currentColor" style="color:var(--muted)" stroke-width="1.5"/>
+          <text class="lbl" x="600" y="146" text-anchor="middle">asta di profondità</text>
+        </svg>
+      </div>
+
+      <ul>
+        <li><strong>Becchi per misure esterne</strong> (in basso): si stringono attorno all'oggetto — il lato del
+          blocchetto, il diametro di una sfera.</li>
+        <li><strong>Becchi per misure interne</strong> (in alto): si infilano dentro un foro e si allargano.</li>
+        <li><strong>Asta di profondità</strong> (in fondo a destra): esce dall'estremità e misura la profondità di un
+          foro.</li>
+        <li><strong>Vite di bloccaggio</strong>: fissa il cursore, così potete togliere il calibro dall'oggetto senza
+          perdere la lettura.</li>
+      </ul>
+
+      <h3>3.2 L'idea geniale del nonio</h3>
+
+      <p>Sul cursore sono incise <strong>20 divisioni</strong> che, tutte insieme, occupano <strong>19 mm</strong>
+        della scala principale. Ogni divisione del nonio è dunque lunga</p>
+
+      <div class="formula-box">
+        $$ \frac{19\ \text{mm}}{20} = 0{,}95\ \text{mm} $$
+      </div>
+
+      <p>cioè <strong>0,05 mm in meno</strong> di un millimetro intero. Questa differenza è tutto il segreto: quando
+        apriamo il calibro di 0,05 mm, la prima tacca del nonio si allinea con la scala principale; a 0,10 mm si
+        allinea la seconda; e così via. La <strong>tacca allineata dice quanti ventesimi di millimetro</strong> vanno
+        aggiunti ai millimetri interi.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Sensibilità del nonio ventesimale</div>
+        $$ \text{sensibilità} = \frac{1\ \text{mm}}{20} = 0{,}05\ \text{mm} $$
+        <div class="formula-note">In generale, un nonio con <span>$n$</span> divisioni che coprono
+          <span>$n-1$</span> millimetri ha sensibilità <span>$1/n$</span> mm: il <em>decimale</em> (10 divisioni)
+          legge il decimo di millimetro, il <em>cinquantesimale</em> (50 divisioni) i due centesimi.</div>
+      </div>
+
+      <p>La lettura si fa in <strong>tre passi</strong>:</p>
+
+      <div class="flow-steps">
+        <div class="flow-step"><div class="fs-n">1</div><div class="fs-b"><strong>I millimetri interi.</strong>
+          Si guarda dove cade lo <strong>zero del nonio</strong> e si legge sulla scala principale l'ultimo
+          millimetro <em>superato</em>.</div></div>
+        <div class="flow-step"><div class="fs-n">2</div><div class="fs-b"><strong>La tacca allineata.</strong> Si
+          cerca l'<em>unica</em> tacca del nonio perfettamente in linea con una tacca della scala principale, e se ne
+          legge il numero.</div></div>
+        <div class="flow-step"><div class="fs-n">3</div><div class="fs-b"><strong>Si somma.</strong> Lettura =
+          millimetri interi + (numero della tacca) × 0,05 mm.</div></div>
+      </div>
+
+      <h3>3.3 Allenamento: leggete il calibro</h3>
+
+      <p>Spostate il cursore del calibro con la barra scorrevole (oppure premete il dado per un'apertura a caso),
+        leggete la misura seguendo i tre passi e scrivetela in millimetri. Poi controllate. Solo dopo, se proprio
+        serve, chiedete l'aiuto: la tacca allineata si accenderà.</p>
+
+      <div class="ckt">
+        <div class="controls">
+          <div class="control-group">
+            <label for="cal-slider">apertura del calibro</label>
+            <input type="range" id="cal-slider" min="0" max="1000" step="1" value="246">
+          </div>
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="cal-rand">🎲 apertura a caso</button>
+          <button class="btn btn-primary" id="cal-help">💡 mostra la tacca allineata</button>
+        </div>
+        <div id="cal-svg"></div>
+        <div class="qbox">
+          <div class="qt">Quanto vale la lettura?</div>
+          <div class="qrow">
+            <input class="inp" id="cal-in" type="text" inputmode="decimal" placeholder="es. 12,30">
+            <span>mm</span>
+            <button class="btn btn-primary" id="cal-check">controlla</button>
+          </div>
+          <div class="fb" id="cal-fb"></div>
+        </div>
+      </div>
+
+      <div class="warnbox">
+        <strong>⚠ Un solo allineamento è quello vero.</strong> Guardando il nonio vi sembrerà che due o tre tacche
+        vicine siano «quasi» allineate: è normale, perché lo scarto fra una tacca e la successiva è di soli
+        0,05 mm. Scegliete quella che coincide <em>meglio</em>, e ricordate che l'incertezza dichiarata (0,05 mm)
+        copre proprio questa esitazione.
+      </div>
+    </section>
+
+    <!-- 4 — ESPERIMENTO A -->
+    <section id="sec4">
+      <h2>4. Esperimento A — Il banco: perimetro, superficie e un numero senza unità</h2>
+
+      <p>Prima attività. Prendiamo un banco e il metro da sarta, e misuriamo i suoi <strong>quattro lati</strong>.
+        Regola valida per tutta l'esperienza: <strong>ogni misura si ripete almeno tre volte</strong>, possibilmente
+        cambiando operatore. Ecco che cosa ha trovato il gruppo che ha svolto l'esperienza.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <caption class="lbl-s" style="caption-side:bottom; padding-top:0.4rem; color:var(--muted)">
+            Tabella 1 — Lati del piano del banco, misurati con il metro da sarta (sensibilità 0,1 cm).</caption>
+          <thead>
+            <tr><th>Lato</th><th>1ª misura (cm)</th><th>2ª misura (cm)</th><th>3ª misura (cm)</th><th>Valore ± errore (cm)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="lab">$l_1$ (lungo)</td><td>70,0</td><td>70,0</td><td>70,0</td><td>70,0 ± 0,1</td></tr>
+            <tr><td class="lab">$l_2$ (corto)</td><td>50,0</td><td>50,0</td><td>50,0</td><td>50,0 ± 0,1</td></tr>
+            <tr><td class="lab">$l_3$ (lungo)</td><td>70,0</td><td>70,0</td><td>70,0</td><td>70,0 ± 0,1</td></tr>
+            <tr><td class="lab">$l_4$ (corto)</td><td>50,0</td><td>50,0</td><td>50,0</td><td>50,0 ± 0,1</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="method">
+        Le tre misure di ciascun lato sono <strong>identiche</strong>. Non è un caso e non è fortuna: significa che le
+        differenze reali fra una misura e l'altra sono <em>più piccole di quanto lo strumento riesca a vedere</em>. In
+        questa situazione non ha senso fare medie o scarti: l'incertezza è tutta dello strumento, ed è il suo
+        <strong>errore massimo</strong>, cioè la sua sensibilità: <span>$\Delta l = 0{,}1$</span> cm.
+      </div>
+
+      <h3>4.1 Il perimetro: una misura indiretta per somma</h3>
+
+      <p>Il perimetro non lo abbiamo misurato: lo <strong>calcoliamo</strong>. È dunque una <strong>misura
+        indiretta</strong>, e la sua incertezza va ricavata da quelle dei quattro lati. La regola della somma dice che
+        si sommano gli <strong>errori assoluti</strong>:</p>
+
+      <div class="formula-box">
+        $$ P = l_1 + l_2 + l_3 + l_4 \qquad\qquad \Delta P = \Delta l_1 + \Delta l_2 + \Delta l_3 + \Delta l_4 $$
+      </div>
+
+      <p>Poiché tutti i lati sono stati misurati con lo <strong>stesso</strong> strumento, i quattro errori sono
+        uguali e la formula si semplifica in <span>$\Delta P = 4\,\Delta l$</span>.</p>
+
+      <div class="qbox">
+        <div class="qt">Prova tu: quanto valgono <span>$P$</span> e <span>$\Delta P$</span>?</div>
+        <div class="qrow">
+          <span>$P =$</span> <input class="inp" id="ba-p" type="text" inputmode="decimal" placeholder="cm">
+          <span>cm</span>
+          <span style="margin-left:0.6rem">$\Delta P =$</span> <input class="inp" id="ba-dp" type="text" inputmode="decimal" placeholder="cm">
+          <span>cm</span>
+          <button class="btn btn-primary" id="ba-check1">controlla</button>
+        </div>
+        <div class="fb" id="ba-fb1"></div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Svolgimento</span></div>
+        <div class="ex-actions"><button class="btn-toggle" data-target="#ba-sol1">mostra i conti</button></div>
+        <div class="solution" id="ba-sol1">
+          <div class="steps">
+            <p><span class="step-num">1</span> Il valore: <span>$P = 70{,}0 + 50{,}0 + 70{,}0 + 50{,}0 = 240{,}0$</span> cm.</p>
+            <p><span class="step-num">2</span> L'incertezza: <span>$\Delta P = 4 \times 0{,}1 = 0{,}4$</span> cm.</p>
+            <p><span class="step-num">3</span> Il risultato si scrive <span>$P = (240{,}0 \pm 0{,}4)$</span> cm, con errore percentuale <span>$\varepsilon_P\% = \dfrac{0{,}4}{240{,}0}\cdot 100 = 0{,}17\%$</span>.</p>
+          </div>
+          <p>Osservate una cosa importante: <strong>l'errore sul perimetro non dipende da quanto è grande il
+            banco</strong>. Dipende solo da quante grandezze abbiamo sommato e dall'errore di ciascuna. Se il banco
+            fosse lungo il doppio, <span>$\Delta P$</span> resterebbe 0,4 cm — ma l'errore <em>percentuale</em> si
+            dimezzerebbe. È il primo indizio di una regola generale: <strong>a parità di strumento, conviene
+            misurare cose grandi</strong>.</p>
+        </div>
+      </div>
+
+      <h3>4.2 La superficie: una misura indiretta per prodotto</h3>
+
+      <p>Per la superficie prendiamo due lati adiacenti, la base <span>$b = l_1$</span> e l'altezza
+        <span>$h = l_2$</span>. Qui la regola cambia: nei prodotti (e nei rapporti) si sommano gli <strong>errori
+        relativi</strong>.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Propagazione nel prodotto</div>
+        $$ S = b \cdot h \qquad\qquad \frac{\Delta S}{S} = \frac{\Delta b}{b} + \frac{\Delta h}{h}
+           \qquad\Longrightarrow\qquad \boxed{\;\Delta S = S\left(\frac{\Delta b}{b} + \frac{\Delta h}{h}\right)\;} $$
+        <div class="formula-note">La formula a sinistra dà l'errore <em>relativo</em>; quella nel riquadro, che è la
+          stessa moltiplicata per <span>$S$</span>, dà direttamente l'errore <em>assoluto</em>. In pratica si usa
+          sempre la seconda.</div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">Prova tu: <span>$S$</span> e <span>$\Delta S$</span> (arrotonda l'incertezza a due cifre).</div>
+        <div class="qrow">
+          <span>$S =$</span> <input class="inp" id="ba-s" type="text" inputmode="decimal" placeholder="cm²">
+          <span>cm²</span>
+          <span style="margin-left:0.6rem">$\Delta S =$</span> <input class="inp" id="ba-ds" type="text" inputmode="decimal" placeholder="cm²">
+          <span>cm²</span>
+          <button class="btn btn-primary" id="ba-check2">controlla</button>
+        </div>
+        <div class="fb" id="ba-fb2"></div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Svolgimento</span></div>
+        <div class="ex-actions"><button class="btn-toggle" data-target="#ba-sol2">mostra i conti</button></div>
+        <div class="solution" id="ba-sol2">
+          <div class="steps">
+            <p><span class="step-num">1</span> <span>$S = 70{,}0 \times 50{,}0 = 3500$</span> cm².</p>
+            <p><span class="step-num">2</span> Errori relativi dei due lati: <span>$\dfrac{0{,}1}{70{,}0} = 0{,}00143$</span> (cioè 0,14%) e <span>$\dfrac{0{,}1}{50{,}0} = 0{,}00200$</span> (cioè 0,20%).</p>
+            <p><span class="step-num">3</span> Si sommano: <span>$\dfrac{\Delta S}{S} = 0{,}00143 + 0{,}00200 = 0{,}00343$</span>, cioè <strong>0,34%</strong>.</p>
+            <p><span class="step-num">4</span> <span>$\Delta S = 3500 \times 0{,}00343 = 12$</span> cm².</p>
+            <p><span class="step-num">5</span> Risultato: <span>$S = (3500 \pm 12)$</span> cm².</p>
+          </div>
+          <p><strong>La risposta alla domanda della scheda.</strong> L'errore percentuale sulla superficie (0,34%) è
+            <em>maggiore</em> di quello di ciascun lato (0,14% e 0,20%): è esattamente la loro somma. È il fatto
+            centrale della propagazione: <strong>ogni volta che si moltiplica, le imprecisioni si accumulano</strong>.
+            Una misura indiretta non è mai più precisa, in percentuale, delle misure dirette da cui nasce.</p>
+        </div>
+      </div>
+
+      <div class="warnbox">
+        <strong>⚠ Il tranello del quadrato.</strong> Se calcolate l'area di un <em>quadrato</em> come
+        <span>$S = l^2$</span>, non state moltiplicando due misure indipendenti: state usando <em>due volte la
+        stessa</em>. La regola diventa <span>$\dfrac{\Delta S}{S} = 2\dfrac{\Delta l}{l}$</span> — l'errore relativo
+        si moltiplica per l'esponente. Per un volume <span>$V = l^3$</span> si moltiplica per 3. Un errore dell'1%
+        sul lato diventa un errore del <strong>3%</strong> sul volume.
+      </div>
+
+      <h3>4.3 Il propagatore: giocate con le formule</h3>
+
+      <p>Prima di andare avanti, ecco uno strumento che vi tornerà utile per tutto il resto della lezione (e per
+        tutto il triennio). Scegliete l'operazione, inserite le due misure con le loro incertezze e guardate che cosa
+        succede all'errore — in valore assoluto e in percentuale.</p>
+
+      <div class="ckt">
+        <div class="example-buttons">
+          <span class="lbl" style="font-size:0.85rem; color:var(--muted)">esempi:</span>
+          <span class="chip" data-pp="70,0|0,1|50,0|0,1|mul">lati del banco</span>
+          <span class="chip" data-pp="3,015|0,005|2,005|0,005|mul">due lati del blocchetto</span>
+          <span class="chip" data-pp="24,5|0,1|9,07|0,07|div">massa / volume</span>
+          <span class="chip" data-pp="59|1|50|1|sub">livelli del cilindro</span>
+        </div>
+        <div class="qrow" style="margin:0.6rem 0">
+          <span>$x =$</span> <input class="inp" id="pp-x" type="text" inputmode="decimal" value="70,0">
+          <span>$\pm$</span> <input class="inp" id="pp-dx" type="text" inputmode="decimal" value="0,1">
+          <span style="margin-left:0.8rem">$y =$</span> <input class="inp" id="pp-y" type="text" inputmode="decimal" value="50,0">
+          <span>$\pm$</span> <input class="inp" id="pp-dy" type="text" inputmode="decimal" value="0,1">
+        </div>
+        <div class="sim-btns" id="pp-ops"></div>
+        <div id="pp-out" class="eq-out"></div>
+        <div id="pp-bars"></div>
+      </div>
+
+      <h3>4.4 Il banco in pollici: un numero che non ha unità</h3>
+
+      <p>Il metro da sarta ha una <strong>doppia scala</strong>: da un lato i centimetri, dall'altro i
+        <strong>pollici</strong> (in inglese <em>inch</em>, simbolo <span>$\mathrm{in}$</span> oppure due apici),
+        l'unità di lunghezza dei paesi anglosassoni — quella con cui ancora oggi si misurano le diagonali degli
+        schermi e i diametri dei tubi. La conversione è <span>$1\ \mathrm{in} = 2{,}54$</span> cm, esatta per
+        definizione dal 1959.</p>
+
+      <p>Attenzione: la scala in pollici <strong>non è decimale</strong>. Le divisioni valgono di solito un ottavo di
+        pollice, cioè <span>$0{,}125$</span> in — ed è quello il nostro errore massimo su quella scala. Rimisurando i
+        due lati del banco dalla parte dei pollici il gruppo ha letto:</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <caption class="lbl-s" style="caption-side:bottom; padding-top:0.4rem; color:var(--muted)">
+            Tabella 2 — Gli stessi due lati letti sulle due scale dello stesso metro.</caption>
+          <thead><tr><th>Lato</th><th>in centimetri</th><th>in pollici</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">$l_1$ (lungo)</td><td>70,0 ± 0,1 cm</td><td>27,500 ± 0,125 in</td></tr>
+            <tr><td class="lab">$l_2$ (corto)</td><td>50,0 ± 0,1 cm</td><td>19,625 ± 0,125 in</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Adesso calcoliamo, <strong>in ciascuna unità</strong>, il rapporto fra il lato lungo e il lato corto.</p>
+
+      <div class="qbox">
+        <div class="qt">Quanto valgono i due rapporti? (tre cifre decimali)</div>
+        <div class="qrow">
+          <span>$r_{\text{cm}} =$</span> <input class="inp" id="ba-rcm" type="text" inputmode="decimal">
+          <span style="margin-left:0.8rem">$r_{\text{in}} =$</span> <input class="inp" id="ba-rin" type="text" inputmode="decimal">
+          <button class="btn btn-primary" id="ba-check3">controlla</button>
+        </div>
+        <div class="fb" id="ba-fb3"></div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Perché viene lo stesso numero?</span></div>
+        <div class="ex-actions"><button class="btn-toggle" data-target="#ba-sol3">mostra la spiegazione</button></div>
+        <div class="solution" id="ba-sol3">
+          <div class="steps">
+            <p><span class="step-num">1</span> In centimetri: <span>$r_{\text{cm}} = \dfrac{70{,}0}{50{,}0} = 1{,}400$</span>, con <span>$\Delta r = r\left(\dfrac{0{,}1}{70{,}0} + \dfrac{0{,}1}{50{,}0}\right) = 1{,}400 \times 0{,}00343 = 0{,}005$</span>: dunque <span>$r_{\text{cm}} = 1{,}400 \pm 0{,}005$</span>.</p>
+            <p><span class="step-num">2</span> In pollici: <span>$r_{\text{in}} = \dfrac{27{,}500}{19{,}625} = 1{,}401$</span>, con <span>$\Delta r = 1{,}401\left(\dfrac{0{,}125}{27{,}500} + \dfrac{0{,}125}{19{,}625}\right) = 1{,}401 \times 0{,}0109 = 0{,}015$</span>: dunque <span>$r_{\text{in}} = 1{,}401 \pm 0{,}015$</span>.</p>
+            <p><span class="step-num">3</span> I due intervalli, <span>$[1{,}395;\ 1{,}405]$</span> e <span>$[1{,}386;\ 1{,}416]$</span>, si sovrappongono abbondantemente: le due misure sono <strong>compatibili</strong>.</p>
+          </div>
+          <p>Il motivo è puramente algebrico. Dividendo una lunghezza per un'altra lunghezza, le unità
+            <strong>si semplificano come in una frazione</strong>:</p>
+          <div class="formula-box">
+            $$ r = \frac{l_1}{l_2} = \frac{70{,}0\ \cancel{\text{cm}}}{50{,}0\ \cancel{\text{cm}}} = 1{,}400 $$
+          </div>
+          <p>Il risultato è un <strong>numero puro</strong>: si dice <strong>adimensionale</strong>. E un numero
+            adimensionale <em>non dipende dall'unità scelta</em>: chi misura in centimetri e chi misura in pollici —
+            o in cubiti, o in piedi — trova lo stesso valore. È per questo che uno schermo può essere «16:9» senza
+            che nessuno debba specificare un'unità di misura, ed è per questo che i numeri adimensionali sono i più
+            preziosi della fisica: <span>$\pi$</span>, il numero di Mach, il numero di Reynolds, la costante di
+            struttura fine <span>$\alpha \approx 1/137$</span>. Quest'ultima, in particolare, ha lo stesso valore per
+            qualunque civiltà dell'universo, indipendentemente da quali unità abbia scelto: è uno dei pochi numeri
+            che potremmo scambiare con degli alieni senza doverci prima mettere d'accordo su niente.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — ESPERIMENTO B -->
+    <section id="sec5">
+      <h2>5. Esperimento B — Il blocchetto misterioso: volume, densità, che materiale è</h2>
+
+      <p>Secondo esperimento, e cambio di strumento: adesso serve il <strong>calibro</strong>. Sul tavolo c'è un
+        blocchetto parallelepipedo di materiale ignoto. L'obiettivo è capire di che cosa è fatto — senza graffiarlo,
+        senza scaldarlo, senza chiederlo al prof: solo misurando.</p>
+
+      <p>La strategia è quella classica delle misure indirette: la <strong>densità</strong>
+        <span>$\rho = m/V$</span> è una specie di «impronta digitale» di un materiale, e la si ottiene da due misure
+        che sappiamo fare — la massa con la bilancia e il volume con il calibro.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <caption class="lbl-s" style="caption-side:bottom; padding-top:0.4rem; color:var(--muted)">
+            Tabella 3 — Dimensioni del blocchetto, calibro ventesimale (sensibilità 0,05 mm).</caption>
+          <thead><tr><th>Dimensione</th><th>1ª (mm)</th><th>2ª (mm)</th><th>3ª (mm)</th><th>Valore ± errore (mm)</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">$a$</td><td>30,15</td><td>30,15</td><td>30,15</td><td>30,15 ± 0,05</td></tr>
+            <tr><td class="lab">$b$</td><td>20,05</td><td>20,05</td><td>20,05</td><td>20,05 ± 0,05</td></tr>
+            <tr><td class="lab">$c$</td><td>15,00</td><td>15,00</td><td>15,00</td><td>15,00 ± 0,05</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>5.1 Il volume con il calibro</h3>
+
+      <p>Tre fattori, tre errori relativi da sommare:</p>
+
+      <div class="formula-box">
+        $$ V = a\,b\,c \qquad\qquad \Delta V = V\left(\frac{\Delta a}{a} + \frac{\Delta b}{b} + \frac{\Delta c}{c}\right) $$
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">I conti, passo per passo</span></div>
+        <div class="ex-actions"><button class="btn-toggle" data-target="#bb-sol1">mostra</button></div>
+        <div class="solution" id="bb-sol1">
+          <div class="steps">
+            <p><span class="step-num">1</span> Conviene passare subito ai centimetri: <span>$a = 3{,}015$</span> cm, <span>$b = 2{,}005$</span> cm, <span>$c = 1{,}500$</span> cm, con <span>$\Delta = 0{,}005$</span> cm ciascuna.</p>
+            <p><span class="step-num">2</span> <span>$V = 3{,}015 \times 2{,}005 \times 1{,}500 = 9{,}0676$</span> cm³.</p>
+            <p><span class="step-num">3</span> Errori relativi: <span>$\dfrac{0{,}005}{3{,}015} = 0{,}00166$</span>, <span>$\dfrac{0{,}005}{2{,}005} = 0{,}00249$</span>, <span>$\dfrac{0{,}005}{1{,}500} = 0{,}00333$</span>. Somma: <span>$0{,}00749$</span>, cioè <strong>0,75%</strong>.</p>
+            <p><span class="step-num">4</span> <span>$\Delta V = 9{,}0676 \times 0{,}00749 = 0{,}068$</span> cm³.</p>
+            <p><span class="step-num">5</span> <span>$V_{\text{cal}} = (9{,}07 \pm 0{,}07)$</span> cm³.</p>
+          </div>
+          <p>Notate quale delle tre dimensioni pesa di più: la <strong>più piccola</strong>. Lo stesso errore assoluto
+            di 0,005 cm vale lo 0,17% su 3 cm e lo 0,33% su 1,5 cm. Quando in un prodotto una grandezza è molto più
+            piccola delle altre, è lei a comandare l'incertezza del risultato — e conviene misurarla con lo strumento
+            migliore che si ha.</p>
+        </div>
+      </div>
+
+      <h3>5.2 Lo stesso volume, con Archimede</h3>
+
+      <p>Esiste un secondo modo di misurare quel volume, che non richiede né spigoli né facce piane: immergere il
+        blocchetto in un cilindro graduato pieno d'acqua e guardare di quanto sale il livello. È il
+        <strong>principio di Archimede</strong> nella sua forma più pratica: un corpo immerso sposta un volume
+        d'acqua uguale al proprio.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <caption class="lbl-s" style="caption-side:bottom; padding-top:0.4rem; color:var(--muted)">
+            Tabella 4 — Metodo dell'immersione, cilindro graduato da 100 mL (sensibilità 1 cm³).</caption>
+          <thead><tr><th>Lettura</th><th>Valore (cm³)</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">Livello iniziale $V_0$</td><td>50 ± 1</td></tr>
+            <tr><td class="lab">Livello finale $V_1$</td><td>59 ± 1</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Il volume è la <strong>differenza</strong> di due letture, e nelle differenze gli errori assoluti — attenzione —
+        <strong>si sommano</strong> (non si sottraggono!):</p>
+
+      <div class="formula-box">
+        $$ V_{\text{cil}} = V_1 - V_0 = 59 - 50 = 9\ \text{cm}^3 \qquad
+           \Delta V_{\text{cil}} = \Delta V_1 + \Delta V_0 = 1 + 1 = 2\ \text{cm}^3 $$
+      </div>
+
+      <div class="warnbox">
+        <strong>⚠ La trappola della differenza.</strong> Qui si vede il caso più pericoloso di tutta la propagazione:
+        sottraendo due numeri <em>vicini</em> il risultato diventa piccolo, ma l'errore no. Il volume misurato è
+        9 cm³ con un'incertezza di 2 cm³: un errore relativo del <strong>22%</strong>, contro lo 0,75% del calibro.
+        Se il blocchetto fosse stato più piccolo — diciamo 3 cm³ — la misura sarebbe stata praticamente inutile. In
+        laboratorio, quando dovete misurare per differenza, la prima domanda da farsi è sempre: <em>quanto è piccola
+        la differenza rispetto agli errori?</em>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">Confronto: qual è l'errore relativo percentuale dei due metodi?</div>
+        <div class="qrow">
+          <span>calibro:</span> <input class="inp" id="bb-ec" type="text" inputmode="decimal" placeholder="%"> <span>%</span>
+          <span style="margin-left:0.8rem">cilindro:</span> <input class="inp" id="bb-ez" type="text" inputmode="decimal" placeholder="%"> <span>%</span>
+          <button class="btn btn-primary" id="bb-check1">controlla</button>
+        </div>
+        <div class="fb" id="bb-fb1"></div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">La domanda difficile della scheda</span><span class="difficulty hard">difficile</span></div>
+        <div class="ex-actions"><button class="btn-toggle" data-target="#bb-sol2">mostra la risposta</button></div>
+        <div class="solution" id="bb-sol2">
+          <p><em>Il cilindro graduato è uno strumento molto più grossolano del calibro: perché allora il suo errore
+            relativo potrebbe, in altre circostanze, risultare paragonabile?</em></p>
+          <p>Perché l'errore <strong>relativo</strong> è un rapporto, e dipende da quanto è grande l'oggetto.
+            L'incertezza del cilindro è <em>fissa</em> (2 cm³), quella del calibro <em>cresce</em> con l'oggetto
+            (è una percentuale). Facciamo i conti su un blocchetto molto più grande, diciamo di 8 cm di lato:</p>
+          <ul>
+            <li>volume vero <span>$V = 8^3 = 512$</span> cm³;</li>
+            <li>con il <strong>cilindro</strong> (se ne avessimo uno abbastanza capiente): <span>$\varepsilon = 2/512 = 0{,}4\%$</span>;</li>
+            <li>con il <strong>calibro</strong>: <span>$\varepsilon = 3 \times \dfrac{0{,}005}{8} = 0{,}19\%$</span>.</li>
+          </ul>
+          <p>Da 22% contro 0,75% siamo passati a 0,4% contro 0,19%: ancora a favore del calibro, ma ormai dello
+            stesso ordine di grandezza. <strong>La qualità di una misura non sta nello strumento, sta nel rapporto
+            fra la sensibilità dello strumento e la grandezza da misurare.</strong> Un metro da muratore è
+            ridicolo per misurare uno spillo ed è perfetto per misurare una stanza.</p>
+        </div>
+      </div>
+
+      <p>Per i conti che seguono useremo naturalmente il volume con l'errore relativo minore, quello del calibro:
+        <span>$V = (9{,}07 \pm 0{,}07)$</span> cm³.</p>
+
+      <h3>5.3 La massa e la densità</h3>
+
+      <p>Il blocchetto è stato pesato tre volte sulla bilancia elettronica (sensibilità 0,1 g), ottenendo sempre
+        <strong>24,5 g</strong>. Dunque <span>$m = (24{,}5 \pm 0{,}1)$</span> g. La densità è un rapporto, e nei
+        rapporti — come nei prodotti — si sommano gli errori relativi:</p>
+
+      <div class="formula-box">
+        $$ \rho = \frac{m}{V} \qquad\qquad \Delta \rho = \rho\left(\frac{\Delta m}{m} + \frac{\Delta V}{V}\right) $$
+      </div>
+
+      <div class="qbox">
+        <div class="qt">Prova tu: <span>$\rho$</span> e <span>$\Delta\rho$</span>, in g/cm³.</div>
+        <div class="qrow">
+          <span>$\rho =$</span> <input class="inp" id="bb-rho" type="text" inputmode="decimal">
+          <span style="margin-left:0.8rem">$\Delta\rho =$</span> <input class="inp" id="bb-drho" type="text" inputmode="decimal">
+          <button class="btn btn-primary" id="bb-check2">controlla</button>
+        </div>
+        <div class="fb" id="bb-fb2"></div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Svolgimento e verdetto</span></div>
+        <div class="ex-actions"><button class="btn-toggle" data-target="#bb-sol3">mostra</button></div>
+        <div class="solution" id="bb-sol3">
+          <div class="steps">
+            <p><span class="step-num">1</span> <span>$\rho = \dfrac{24{,}5}{9{,}0676} = 2{,}702$</span> g/cm³.</p>
+            <p><span class="step-num">2</span> Errori relativi: massa <span>$\dfrac{0{,}1}{24{,}5} = 0{,}0041$</span> (0,41%), volume <span>$0{,}0075$</span> (0,75%). Somma: <span>$0{,}0116$</span>, cioè <strong>1,2%</strong>.</p>
+            <p><span class="step-num">3</span> <span>$\Delta\rho = 2{,}702 \times 0{,}0116 = 0{,}031$</span> g/cm³.</p>
+            <p><span class="step-num">4</span> <span>$\rho = (2{,}70 \pm 0{,}03)$</span> g/cm³, cioè l'intervallo <span>$[2{,}67;\ 2{,}73]$</span> g/cm³.</p>
+          </div>
+          <p>Confrontiamo con la tabella delle densità: l'alluminio vale <strong>2,70 g/cm³</strong> e cade in pieno
+            dentro l'intervallo. Il verdetto è: <strong>il blocchetto è compatibile con l'alluminio</strong>.</p>
+          <p>Ma un fisico onesto aggiunge subito la riserva: anche un <em>vetro</em> pesante arriva a 2,8 g/cm³, e il
+            bordo superiore del nostro intervallo (2,73) sfiora quella zona. La densità da sola non chiude sempre la
+            questione. Qui il dubbio si scioglie con due osservazioni qualitative che vanno scritte in relazione: il
+            blocchetto ha aspetto e lucentezza metallici, e al tatto è <em>freddo</em> — cioè conduce calore molto
+            meglio di un vetro. Conclusione: alluminio.</p>
+          <p><strong>E se avessimo usato il volume del cilindro?</strong> Avremmo trovato
+            <span>$\rho = 24{,}5/9 = 2{,}7$</span> g/cm³ con <span>$\Delta\rho = 2{,}7 \times (0{,}0041 + 0{,}222) = 0{,}6$</span> g/cm³:
+            cioè <span>$(2{,}7 \pm 0{,}6)$</span> g/cm³, un intervallo da 2,1 a 3,3 dentro il quale ci stanno il
+            vetro, l'alluminio, il marmo, il quarzo e altri dieci materiali. Stesso blocchetto, stessa bilancia,
+            stessa formula: ma con quell'incertezza <strong>l'esperimento non risponde più alla domanda</strong>.
+            Ecco a che cosa serve, concretamente, saper propagare gli errori: a sapere <em>prima</em> se
+            l'esperimento che state progettando potrà dirvi qualcosa.</p>
+        </div>
+      </div>
+
+      <h3>5.4 Tocca a voi: un blocchetto nuovo ogni volta</h3>
+
+      <p>Premete il pulsante: il laboratorio vi consegna un blocchetto diverso, con le sue misure. Calcolate densità
+        e incertezza, poi scegliete il materiale. La tabella di riferimento è quella qui sotto.</p>
+
+      <div class="ckt">
+        <div class="sim-btns">
+          <button class="btn btn-primary" id="mb-new">🎲 nuovo blocchetto</button>
+          <button class="btn" id="mb-help">🔎 mostra i conti</button>
+        </div>
+        <div id="mb-dati"></div>
+        <div class="sim-btns" id="mb-scelte"></div>
+        <div class="fb" id="mb-fb"></div>
+        <div id="mb-conti" class="eq-out"></div>
+      </div>
+
+      <div class="table-container">
+        <table class="tabf">
+          <caption class="lbl-s" style="caption-side:bottom; padding-top:0.4rem; color:var(--muted)">
+            Tabella 5 — Densità di alcuni materiali a temperatura ambiente (fonte: §11, rif. [2]).</caption>
+          <thead><tr><th>Materiale</th><th>Densità (g/cm³)</th><th>Materiale</th><th>Densità (g/cm³)</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">Legno (pino)</td><td>0,65</td><td class="lab">Alluminio</td><td>2,70</td></tr>
+            <tr><td class="lab">Polietilene</td><td>0,95</td><td class="lab">Ferro / acciaio</td><td>7,87</td></tr>
+            <tr><td class="lab">PVC</td><td>1,38</td><td class="lab">Ottone</td><td>8,50</td></tr>
+            <tr><td class="lab">Vetro</td><td>2,50</td><td class="lab">Rame</td><td>8,96</td></tr>
+            <tr><td class="lab">Marmo</td><td>2,71</td><td class="lab">Piombo</td><td>11,34</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="curiosita">
+        <p style="margin:0"><strong>Alluminio e marmo hanno praticamente la stessa densità</strong> (2,70 e 2,71):
+          nessuna misura di densità li distinguerà mai. È un buon promemoria del fatto che una misura fisica, da
+          sola, quasi mai identifica <em>univocamente</em> qualcosa: restringe il campo. Sono le misure
+          <em>indipendenti</em> messe insieme — densità, durezza, conducibilità, colore della fiamma, spettro — a
+          chiudere il cerchio. La stessa logica per cui, in un processo, un solo indizio non basta mai.</p>
+      </div>
+    </section>
+
+    <!-- 6 — ESPERIMENTO C -->
+    <section id="sec6">
+      <h2>6. Esperimento C — La parete: quando le misure ripetute non coincidono</h2>
+
+      <p>Nei primi due esperimenti le misure ripetute davano sempre lo stesso numero, e l'incertezza era quella dello
+        strumento. Adesso misuriamo qualcosa di <strong>grande</strong>: una parete dell'aula, con il metro da sarta,
+        <strong>cinque volte</strong>, cambiando ogni volta operatore e ripartendo da capo.</p>
+
+      <p>Succederà una cosa diversa: i cinque valori saranno <em>leggermente diversi</em>. Non perché qualcuno abbia
+        sbagliato, ma perché il metro è flessibile, va teso, va appoggiato dritto, e su quattro metri bisogna
+        riposizionarlo tre volte. Sono i classici <strong>errori casuali</strong> di cui abbiamo parlato nella
+        <a href="2_Statistica_descrittiva.html">lezione precedente</a>: piccoli, indipendenti, ora in eccesso ora in
+        difetto. E questa volta sono <em>loro</em>, non lo strumento, a stabilire l'incertezza.</p>
+
+      <div class="rule">
+        Se le misure ripetute <strong>coincidono</strong>, l'incertezza è la sensibilità dello strumento (errore
+        massimo). Se le misure ripetute <strong>differiscono</strong>, l'incertezza si stima dalla loro dispersione:
+        semidispersione (metodo rapido) o scarto quadratico medio (metodo statistico).
+      </div>
+
+      <h3>6.1 I dati e i tre conti</h3>
+
+      <p>Il laboratorio qui sotto contiene le cinque misure del gruppo, in centimetri. Potete modificarle, oppure
+        premere il dado per simulare una nuova serie di cinque misure (con la stessa parete e gli stessi errori
+        casuali): tutti i conti si rifanno da soli.</p>
+
+      <div class="ckt">
+        <div class="qrow" id="pa-inputs" style="margin-bottom:0.5rem"></div>
+        <div class="sim-btns">
+          <button class="btn" id="pa-rand">🎲 nuova serie di 5 misure</button>
+          <button class="btn" id="pa-reset">↺ dati del gruppo</button>
+        </div>
+        <div id="pa-tab"></div>
+        <div class="stat-grid" id="pa-stats" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:0.6rem; margin:0.6rem 0"></div>
+        <div id="pa-svg"></div>
+        <p class="eq-out" id="pa-out"></p>
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">Le tre formule</div>
+        $$ \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i \qquad
+           \Delta x_{\text{semi}} = \frac{x_{\max} - x_{\min}}{2} \qquad
+           \sigma = \sqrt{\frac{\sum_{i=1}^{n}\left(x_i - \bar{x}\right)^2}{n}} $$
+        <div class="formula-note">Ricordate il controllo che vale sempre: la somma degli scarti
+          <span>$\sum (x_i - \bar{x})$</span> deve venire <strong>esattamente zero</strong>. Se non viene, avete
+          sbagliato la media. È il modo più veloce per accorgersene.</div>
+      </div>
+
+      <h3>6.2 Semidispersione o scarto quadratico medio?</h3>
+
+      <p>Con i dati del gruppo i due metodi danno <span>$\Delta x_{\text{semi}} = 0{,}4$</span> cm e
+        <span>$\sigma = 0{,}3$</span> cm: numeri simili, e questa è già una buona notizia — quando due stime
+        indipendenti dell'incertezza concordano, di solito vuol dire che non abbiamo preso lucciole per lanterne. Ma
+        non sono equivalenti.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Semidispersione</h4>
+          <p><strong>Pro:</strong> si calcola in tre secondi, anche a mente. Utile per una stima al volo mentre si è
+            ancora in laboratorio.</p>
+          <p><strong>Contro:</strong> usa solo <strong>due</strong> delle cinque misure — la più grande e la più
+            piccola, cioè proprio le due più a rischio di essere sfortunate. E ha un difetto sistematico: più misure
+            fate, più è probabile che vi capiti un valore estremo, quindi la semidispersione <em>cresce</em> col
+            numero di misure. Un'incertezza che peggiora perché lavorate di più non può essere la stima giusta.</p>
+        </div>
+        <div class="prop-card" style="border-top-color: var(--gold)">
+          <h4 style="color: var(--gold)">Scarto quadratico medio</h4>
+          <p><strong>Pro:</strong> usa <strong>tutte</strong> le misure; un singolo valore un po' anomalo lo sposta
+            poco; e non cresce sistematicamente con <span>$n$</span> — anzi, con tante misure si stabilizza sul
+            valore «vero» della dispersione.</p>
+          <p><strong>Contro:</strong> richiede una tabella di scarti e qualche minuto di conti (o una riga di foglio
+            di calcolo).</p>
+        </div>
+      </div>
+
+      <p>Per questo, dalla terza in avanti, <strong>lo scarto quadratico medio è lo standard</strong>. La
+        semidispersione resta un'ottima stima di riserva quando le misure sono poche (tre, quattro) e serve un numero
+        subito.</p>
+
+      <div class="curiosita">
+        <p style="margin:0"><strong>E l'errore sulla media?</strong> C'è un'ultima sottigliezza, che vedrete meglio
+          più avanti. <span>$\sigma$</span> dice quanto è dispersa una <em>singola</em> misura. Ma noi non dichiariamo
+          una singola misura: dichiariamo la <strong>media</strong> di cinque, che è un numero più stabile. La sua
+          incertezza è più piccola, e vale</p>
+        <div class="formula-box" style="margin:0.5rem 0">
+          $$ \sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}} = \frac{0{,}28}{\sqrt{5}} \approx 0{,}12\ \text{cm} $$
+        </div>
+        <p style="margin:0">Attenzione però: questa formula tratta <em>solo</em> gli errori casuali. Se il metro da
+          sarta si è allungato di mezzo centimetro con l'uso, potete fare mille misure e mediare quanto volete: quel
+          mezzo centimetro resterà lì, imperturbabile. <strong>Nessuna quantità di statistica cura un errore
+          sistematico.</strong> Nella nostra relazione useremo prudentemente <span>$\sigma$</span>, non
+          <span>$\sigma/\sqrt{n}$</span>: in laboratorio didattico è la scelta onesta, perché i sistematici li
+          conosciamo male.</p>
+      </div>
+
+      <div class="curiosita">
+        <p style="margin:0"><strong>Perché a volte si vede <span>$n-1$</span> al denominatore?</strong> Perché quando
+          si usa la <em>stessa</em> serie di dati sia per stimare la media sia per stimare la dispersione attorno a
+          essa, si tende a sottostimare la seconda: dividere per <span>$n-1$</span> invece che per <span>$n$</span>
+          corregge questo effetto. Con <span>$n=5$</span> la differenza è piccola (0,28 contro 0,31 cm) e non cambia
+          nulla di sostanziale: noi useremo <span>$n$</span>.</p>
+      </div>
+    </section>
+
+    <!-- 7 — ESPERIMENTO D -->
+    <section id="sec7">
+      <h2>7. Esperimento D — L'istogramma delle altezze della classe</h2>
+
+      <p>Ultimo esperimento, ed è diverso dagli altri: finora ogni gruppo ha lavorato per conto suo, adesso i dati di
+        <strong>tutti</strong> vanno messi in comune. È il primo assaggio, in piccolo, di quello che nella ricerca
+        vera è la norma: un risultato che nessun gruppo può ottenere da solo.</p>
+
+      <p><strong>Il protocollo.</strong> Ogni gruppo misura l'altezza dei propri componenti. Lo studente, senza
+        scarpe, sta in piedi con schiena e talloni contro la parete; un compagno gli appoggia sulla testa un libro
+        rigido tenendolo bene <em>orizzontale</em> e segna a matita il punto in cui il libro tocca il muro; si misura
+        poi la distanza dal pavimento al segno. Poi un rappresentante per gruppo scrive le altezze alla lavagna, e
+        tutti copiano i dati di tutti.</p>
+
+      <div class="warnbox">
+        <strong>⚠ L'incertezza qui non è quella del metro.</strong> Il metro da sarta legge il millimetro, ma
+        provate a farvi misurare due volte di seguito: troverete differenze di mezzo centimetro, perché dipendono
+        dalla postura, da quanto tenete su la testa, da quanto è storto il libro. Quando la <strong>procedura</strong>
+        è meno riproducibile dello strumento, è la procedura a dettare l'incertezza. Assumiamo dunque
+        <span>$\Delta h = 0{,}5$</span> cm per tutte le altezze — cinque volte la sensibilità del metro. Dichiararlo
+        in relazione, spiegando perché, vale molto più che scrivere un ottimistico «± 0,1 cm».
+      </div>
+
+      <p>Ecco le altezze raccolte in una classe di 26 studenti (in cm), già ordinate per comodità:</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <caption class="lbl-s" style="caption-side:bottom; padding-top:0.4rem; color:var(--muted)">
+            Tabella 6 — Altezze degli studenti della classe (cm), tutte con incertezza ± 0,5 cm.</caption>
+          <tbody>
+            <tr><td>156</td><td>159</td><td>161</td><td>162</td><td>163</td><td>164</td><td>165</td><td>166</td><td>167</td></tr>
+            <tr><td>168</td><td>168</td><td>169</td><td>170</td><td>170</td><td>171</td><td>172</td><td>172</td><td>173</td></tr>
+            <tr><td>174</td><td>175</td><td>176</td><td>177</td><td>179</td><td>181</td><td>183</td><td>187</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>7.1 Costruire l'istogramma (e scegliere bene le classi)</h3>
+
+      <p>Un elenco di ventisei numeri non dice quasi niente. Un <strong>istogramma</strong> — rettangoli
+        <em>adiacenti</em>, base uguale a una classe di valori, altezza uguale a quanti dati cadono in quella classe —
+        lo dice tutto in un colpo d'occhio: dove si addensano i dati, quanto sono dispersi, che forma ha la
+        distribuzione.</p>
+
+      <p>L'unica vera decisione è: <strong>quanto larghe devono essere le classi?</strong> Provate a cambiarla e
+        guardate che cosa succede alla forma.</p>
+
+      <div class="ckt">
+        <div class="sim-btns" id="is-btns"></div>
+        <div id="is-svg"></div>
+        <p class="eq-out" id="is-out"></p>
+      </div>
+
+      <div class="method">
+        <strong>Due regole pratiche per scegliere il numero di classi.</strong> Con <span>$N$</span> dati si prendono
+        all'incirca <span>$\sqrt{N}$</span> classi, oppure si usa la <em>regola di Sturges</em>
+        <span>$k = 1 + 3{,}3\,\log_{10} N$</span>. Qui <span>$N = 26$</span>, e le due regole danno rispettivamente
+        <span>$\sqrt{26} \approx 5{,}1$</span> e <span>$1 + 3{,}3 \cdot 1{,}41 \approx 5{,}7$</span>: <strong>cinque
+        o sei classi</strong>. Con altezze fra 156 e 187 cm, una larghezza di 5 cm (che dà 7 classi, con gli estremi
+        quasi vuoti) è il compromesso giusto — ed è anche comoda, perché i confini cadono su multipli di 5.
+      </div>
+
+      <div class="warnbox">
+        <strong>⚠ La convenzione sui bordi.</strong> Un dato che cade esattamente sul confine fra due classi
+        rischia di essere contato due volte, o zero. Si usa perciò la regola: <strong>ogni classe include il proprio
+        estremo sinistro e non quello destro</strong>. La classe «da 160 a 165» contiene i valori
+        <span>$160 \le h \lt 165$</span>, e il 165 va nella classe successiva. E al termine del conteggio si
+        controlla sempre che la somma delle frequenze sia uguale a <span>$N$</span>: se non torna, un dato è stato
+        perso o contato due volte.
+      </div>
+
+      <h3>7.2 Che cosa ci dice questo istogramma</h3>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Le quattro domande della scheda</span></div>
+        <div class="ex-actions"><button class="btn-toggle" data-target="#is-sol">mostra le risposte</button></div>
+        <div class="solution" id="is-sol">
+          <p><strong>1. Qual è la classe più frequente?</strong> Con classi di 5 cm è la classe
+            <span>$170 \le h \lt 175$</span>, con 7 studenti. È la <strong>moda</strong> della distribuzione — o
+            meglio, la <em>classe modale</em>, perché con dati raggruppati non si parla di un singolo valore.</p>
+          <p><strong>2. L'istogramma ha la forma a campana?</strong> Vagamente sì: c'è un massimo al centro e le code
+            si abbassano ai lati, ma è tutt'altro che liscio, e a destra c'è una coda più lunga (qualche studente
+            molto alto). Il motivo è semplice e va detto in relazione: <strong>26 dati sono pochi</strong>. La
+            campana è ciò che si ottiene <em>al limite</em> di tanti dati; con poche decine di misure le
+            fluttuazioni casuali sono ancora più grandi della forma che cercate. Con 2600 altezze la campana
+            comparirebbe nitida.</p>
+          <p><strong>3. Dove cade la media?</strong> La media delle 26 altezze vale
+            <span>$\bar{h} = 170{,}3$</span> cm, che cade proprio nella classe modale. Quando media e moda
+            coincidono la distribuzione è ragionevolmente simmetrica; quando si separano, come qui succede appena
+            (la coda a destra tira la media in su), c'è un'<strong>asimmetria</strong>.</p>
+          <p><strong>4. E se avessimo scelto classi di 1 cm o di 20 cm?</strong> Provatelo con il simulatore. Con
+            <strong>1 cm</strong> l'istogramma diventa un pettine: quasi ogni barra vale 0 o 1, si vede il rumore e
+            non la forma. Con <strong>20 cm</strong> restano tre barre: la forma è così liscia che non c'è più
+            informazione. In mezzo c'è il compromesso, e non è una questione estetica ma di
+            <strong>onestà</strong>: cambiando la larghezza delle classi si può far sembrare la stessa
+            distribuzione bimodale, piatta o appuntita. Per questo la larghezza scelta va <em>sempre</em>
+            dichiarata.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — OPZIONALE: PROPAGAZIONE IN QUADRATURA -->
+    <section id="sec8" class="optional">
+      <h2>8. E i professionisti? La propagazione in quadratura</h2>
+
+      <p>C'è una cosa che va detta, perché se aprite un articolo scientifico o un libro universitario le formule che
+        troverete non saranno quelle che abbiamo usato. Le nostre regole — <em>sommare</em> gli errori assoluti nelle
+        somme, <em>sommare</em> gli errori relativi nei prodotti — descrivono il <strong>caso peggiore</strong>:
+        assumono che tutti gli errori congiurino, sbagliando tutti nella stessa direzione nello stesso momento.</p>
+
+      <p>Ma se gli errori sono <strong>casuali e indipendenti</strong>, questo è improbabilissimo. È molto più
+        probabile che si compensino almeno in parte: uno in eccesso, l'altro in difetto. La teoria della probabilità
+        dice esattamente di quanto, e il risultato è che gli errori vanno sommati <strong>in quadratura</strong>,
+        cioè come i cateti di un triangolo rettangolo:</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Le formule «vere»</div>
+        $$ z = x \pm y \;\Longrightarrow\; \Delta z = \sqrt{(\Delta x)^2 + (\Delta y)^2} $$
+        $$ z = x\,y \ \text{ oppure } \ z = \frac{x}{y} \;\Longrightarrow\;
+           \frac{\Delta z}{z} = \sqrt{\left(\frac{\Delta x}{x}\right)^2 + \left(\frac{\Delta y}{y}\right)^2} $$
+        <div class="formula-note">È lo stesso teorema di Pitagora, e non è un caso: gli errori indipendenti si
+          comportano come vettori perpendicolari.</div>
+      </div>
+
+      <p>Rifacciamo con queste formule i tre risultati dell'esperienza:</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>Grandezza</th><th>Somma lineare (la nostra)</th><th>In quadratura</th><th>Rapporto</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">Perimetro del banco</td><td>± 0,4 cm</td><td>± 0,2 cm</td><td>2,0</td></tr>
+            <tr><td class="lab">Superficie del banco</td><td>± 12 cm²</td><td>± 8,6 cm²</td><td>1,4</td></tr>
+            <tr><td class="lab">Densità del blocchetto</td><td>± 0,031 g/cm³</td><td>± 0,023 g/cm³</td><td>1,3</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>La somma in quadratura dà sempre un'incertezza <strong>più piccola</strong> — mai maggiore, per il semplice
+        fatto che l'ipotenusa è minore della somma dei cateti. E il guadagno è tanto più grande quanto più numerosi
+        sono i contributi: sommando quattro errori uguali, la regola lineare dà <span>$4\Delta$</span>, quella in
+        quadratura <span>$2\Delta$</span>; con cento errori uguali si passa da <span>$100\Delta$</span> a
+        <span>$10\Delta$</span>. In un esperimento moderno, con decine di sorgenti di incertezza, la differenza fra
+        le due regole è la differenza fra un risultato utile e uno inutile.</p>
+
+      <div class="rule">
+        <strong>Quale usare, allora?</strong> In questo triennio useremo la regola <em>lineare</em>: è più semplice,
+        e sbaglia sempre dalla parte della prudenza (dichiara un'incertezza maggiore del vero, mai minore).
+        Sbagliare per prudenza, in fisica, è una colpa lieve; sbagliare per ottimismo, dichiarando un'incertezza più
+        piccola di quella reale, è la colpa più grave che ci sia — perché fa apparire incompatibili risultati che
+        vanno d'accordo, e fa annunciare scoperte che non esistono.
+      </div>
+
+      <div class="curiosita">
+        <p style="margin:0"><strong>Un dettaglio che si dimentica sempre.</strong> La regola in quadratura vale solo
+          se gli errori sono <strong>indipendenti</strong>. Se avete misurato tutti e quattro i lati del banco con lo
+          <em>stesso</em> metro allungato, quell'errore è sistematico e identico per tutti: non si compensa affatto,
+          e va sommato linearmente. Nella pratica professionale si separano allora due incertezze — quella
+          <em>statistica</em> (sommata in quadratura) e quella <em>sistematica</em> (trattata a parte). È il motivo
+          per cui, negli articoli di fisica delle particelle, i risultati si scrivono con <em>due</em> barre
+          d'errore: per esempio <span>$m = (125{,}09 \pm 0{,}21\ \text{stat} \pm 0{,}11\ \text{sist})$</span> GeV,
+          che è proprio la massa del bosone di Higgs dell'articolo dai cinquemila autori.</p>
+      </div>
+    </section>
+
+    <!-- 9 — LA RELAZIONE DI PROVA -->
+    <section id="sec9">
+      <h2>9. La relazione di prova</h2>
+
+      <p>Adesso il pezzo forte: mettiamo insieme tutto quello che abbiamo fatto e scriviamo davvero la relazione.
+        Quella che segue è una relazione <em>completa</em> sull'esperienza di oggi. Leggetela con la struttura del §2
+        sotto gli occhi e verificate che ogni sezione risponda alla sua domanda.</p>
+
+      <div class="rep">
+        <div class="rep-head">
+          <div class="rep-title">Misure dirette e indirette di lunghezza, volume e massa:<br>propagazione delle
+            incertezze e identificazione di un materiale incognito</div>
+          <div class="rep-auth">A. Bianchi, M. Conti, S. Ferrari, L. Rossi — classe 3ª B — Laboratorio di fisica<br>
+            Esperienza svolta il 14 ottobre 2025 · relazione consegnata il 21 ottobre 2025</div>
+        </div>
+
+        <p class="abst"><strong>Sommario.</strong> Sono state eseguite misure dirette di lunghezza (metro da sarta,
+          calibro ventesimale), di massa (bilancia elettronica) e di volume (cilindro graduato) e se ne sono ricavate
+          per via indiretta il perimetro e la superficie di un banco, il volume e la densità di un blocchetto di
+          materiale incognito, e il rapporto adimensionale fra due lunghezze. Le incertezze sono state propagate con
+          le regole della somma e del prodotto. Il risultato principale è la densità del blocchetto,
+          <span>$\rho = (2{,}70 \pm 0{,}03)$</span> g/cm³, compatibile con l'alluminio. Una misura ripetuta cinque
+          volte su una parete ha permesso di confrontare semidispersione e scarto quadratico medio come stimatori
+          dell'incertezza; le altezze dei 26 studenti della classe sono state rappresentate in un istogramma.</p>
+
+        <h4>1. Scopo</h4>
+        <p>L'esperienza si propone di: (a) distinguere operativamente misure dirette e indirette; (b) verificare
+          sperimentalmente le regole di propagazione delle incertezze per somma, differenza, prodotto e rapporto;
+          (c) identificare il materiale di un blocchetto incognito attraverso la misura della sua densità;
+          (d) confrontare due stimatori dell'incertezza (semidispersione e scarto quadratico medio) su una serie di
+          misure ripetute.</p>
+
+        <h4>2. Richiami teorici</h4>
+        <p>Ogni misura si esprime nella forma <span>$x = x_{\text{mis}} \pm \Delta x$</span>. Quando le misure
+          ripetute coincidono si assume come incertezza l'errore massimo dello strumento, pari alla sua sensibilità;
+          quando differiscono si assume la semidispersione <span>$(x_{\max}-x_{\min})/2$</span> oppure lo scarto
+          quadratico medio <span>$\sigma = \sqrt{\sum (x_i-\bar x)^2/n}$</span>. Per le misure indirette valgono le
+          regole di propagazione:</p>
+        <div class="formula-box" style="margin:0.5rem 0">
+          $$ z = x \pm y \;\Rightarrow\; \Delta z = \Delta x + \Delta y \qquad\qquad
+             z = x\,y \ \text{o}\ \frac{x}{y} \;\Rightarrow\; \Delta z = z\left(\frac{\Delta x}{x} + \frac{\Delta y}{y}\right) $$
+        </div>
+        <p>La densità di un corpo omogeneo è <span>$\rho = m/V$</span> ed è una proprietà caratteristica del
+          materiale, tabulata per i materiali comuni [2].</p>
+
+        <h4>3. Materiali e strumenti</h4>
+        <ul>
+          <li>metro da sarta a doppia scala (cm / pollici) — sensibilità 1 mm sulla scala metrica e 1/8 in su quella
+            in pollici; portata 150 cm;</li>
+          <li>calibro a nonio ventesimale — sensibilità 0,05 mm; portata 150 mm;</li>
+          <li>bilancia elettronica — sensibilità 0,1 g; portata 2 kg;</li>
+          <li>cilindro graduato da 100 mL — sensibilità 1 mL;</li>
+          <li>blocchetto parallelepipedo di materiale incognito, superficie metallica non ossidata;</li>
+          <li>banco dell'aula, parete dell'aula, libro rigido per la misura delle altezze.</li>
+        </ul>
+
+        <h4>4. Procedimento</h4>
+        <p><strong>A.</strong> Si sono misurati i quattro lati del piano del banco con il metro da sarta, ripetendo
+          ogni misura tre volte con operatori diversi; si sono poi rimisurati i due lati distinti sulla scala in
+          pollici. <strong>B.</strong> Si sono misurate con il calibro le tre dimensioni del blocchetto (tre
+          ripetizioni ciascuna) e se ne è pesata la massa tre volte; il volume è stato misurato anche per immersione
+          in cilindro graduato, leggendo il livello prima e dopo. <strong>C.</strong> La lunghezza di una parete
+          dell'aula è stata misurata cinque volte, cambiando ogni volta operatore e ripartendo dallo spigolo.
+          <strong>D.</strong> Ogni gruppo ha misurato l'altezza dei propri componenti (schiena e talloni al muro,
+          libro rigido orizzontale sulla testa, segno a matita) e i 26 valori della classe sono stati messi in
+          comune.</p>
+
+        <h4>5. Dati raccolti</h4>
+        <p><em>Banco</em> — quattro lati, tre ripetizioni ciascuno, tutte coincidenti:
+          <span>$l_1 = l_3 = (70{,}0 \pm 0{,}1)$</span> cm, <span>$l_2 = l_4 = (50{,}0 \pm 0{,}1)$</span> cm. Sulla
+          scala in pollici: <span>$l_1 = (27{,}500 \pm 0{,}125)$</span> in, <span>$l_2 = (19{,}625 \pm 0{,}125)$</span> in.</p>
+        <p><em>Blocchetto</em> — <span>$a = (30{,}15 \pm 0{,}05)$</span> mm, <span>$b = (20{,}05 \pm 0{,}05)$</span> mm,
+          <span>$c = (15{,}00 \pm 0{,}05)$</span> mm (tre ripetizioni coincidenti ciascuna);
+          <span>$m = (24{,}5 \pm 0{,}1)$</span> g; livelli del cilindro <span>$V_0 = (50 \pm 1)$</span> cm³ e
+          <span>$V_1 = (59 \pm 1)$</span> cm³.</p>
+        <p><em>Parete</em> — cinque misure, in cm: 412,3 · 411,8 · 412,6 · 412,0 · 412,3.</p>
+        <p><em>Altezze della classe</em> — 26 valori fra 156 e 187 cm, tutti con incertezza ± 0,5 cm (Tabella 6 della
+          scheda dati allegata).</p>
+
+        <h4>6. Elaborazione dei dati</h4>
+        <p><strong>Perimetro e superficie del banco.</strong> Trattandosi di una somma,
+          <span>$\Delta P = 4\,\Delta l = 0{,}4$</span> cm, da cui <span>$P = (240{,}0 \pm 0{,}4)$</span> cm. Per la
+          superficie, prodotto di due lati, si sono sommati gli errori relativi:
+          <span>$0{,}1/70{,}0 + 0{,}1/50{,}0 = 0{,}00343$</span>, da cui
+          <span>$\Delta S = 3500 \times 0{,}00343 = 12$</span> cm² e <span>$S = (3500 \pm 12)$</span> cm².</p>
+        <p><strong>Rapporto adimensionale.</strong> Il rapporto fra lato lungo e lato corto vale
+          <span>$1{,}400 \pm 0{,}005$</span> se calcolato in centimetri e <span>$1{,}401 \pm 0{,}015$</span> se
+          calcolato in pollici: i due intervalli si sovrappongono, come atteso per una grandezza priva di
+          dimensioni.</p>
+        <p><strong>Volume e densità del blocchetto.</strong> Con il calibro
+          <span>$V = 3{,}015 \times 2{,}005 \times 1{,}500 = 9{,}0676$</span> cm³ e, sommando i tre errori relativi
+          (0,17% + 0,25% + 0,33% = 0,75%), <span>$\Delta V = 0{,}068$</span> cm³, cioè
+          <span>$V_{\text{cal}} = (9{,}07 \pm 0{,}07)$</span> cm³. Con il cilindro graduato
+          <span>$V_{\text{cil}} = V_1 - V_0 = (9 \pm 2)$</span> cm³, con errore relativo del 22% contro lo 0,75% del
+          calibro: per il seguito si è usato il valore ottenuto con il calibro. La densità risulta
+          <span>$\rho = 24{,}5/9{,}0676 = 2{,}702$</span> g/cm³ con errore relativo
+          <span>$0{,}41\% + 0{,}75\% = 1{,}16\%$</span>, quindi
+          <span>$\rho = (2{,}70 \pm 0{,}03)$</span> g/cm³.</p>
+        <p><strong>Parete.</strong> Le cinque misure non coincidono. Media
+          <span>$\bar{x} = 412{,}20$</span> cm; semidispersione <span>$(412{,}6-411{,}8)/2 = 0{,}40$</span> cm;
+          somma dei quadrati degli scarti <span>$0{,}38$</span> cm², da cui
+          <span>$\sigma = \sqrt{0{,}38/5} = 0{,}28$</span> cm. La somma degli scarti è risultata esattamente nulla,
+          a conferma del calcolo della media.</p>
+        <p><strong>Altezze.</strong> I 26 valori sono stati raggruppati in classi di ampiezza 5 cm a partire da
+          155 cm (7 classi; frequenze 2, 4, 6, 7, 4, 2, 1, somma 26 come richiesto). L'altezza media della classe
+          vale <span>$\bar{h} = 170{,}3$</span> cm.</p>
+
+        <h4>7. Risultati</h4>
+        <div class="table-container">
+          <table class="tabf">
+            <thead><tr><th>Grandezza</th><th>Risultato</th><th>Errore relativo</th></tr></thead>
+            <tbody>
+              <tr><td class="lab">Perimetro del banco</td><td>(240,0 ± 0,4) cm</td><td>0,17%</td></tr>
+              <tr><td class="lab">Superficie del banco</td><td>(3500 ± 12) cm²</td><td>0,34%</td></tr>
+              <tr><td class="lab">Rapporto fra i lati (cm)</td><td>1,400 ± 0,005</td><td>0,34%</td></tr>
+              <tr><td class="lab">Rapporto fra i lati (pollici)</td><td>1,401 ± 0,015</td><td>1,1%</td></tr>
+              <tr><td class="lab">Volume del blocchetto (calibro)</td><td>(9,07 ± 0,07) cm³</td><td>0,75%</td></tr>
+              <tr><td class="lab">Volume del blocchetto (cilindro)</td><td>(9 ± 2) cm³</td><td>22%</td></tr>
+              <tr><td class="lab">Massa del blocchetto</td><td>(24,5 ± 0,1) g</td><td>0,41%</td></tr>
+              <tr class="tot"><td class="lab">Densità del blocchetto</td><td>(2,70 ± 0,03) g/cm³</td><td>1,2%</td></tr>
+              <tr><td class="lab">Lunghezza della parete</td><td>(412,2 ± 0,3) cm</td><td>0,07%</td></tr>
+              <tr><td class="lab">Altezza media della classe</td><td>(170,3 ± 0,5) cm</td><td>0,3%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4>8. Discussione</h4>
+        <p>Il valore di densità ottenuto è compatibile con quello tabulato dell'alluminio (2,70 g/cm³), che cade
+          esattamente al centro dell'intervallo. L'intervallo è però compatibile anche con il limite superiore dei
+          vetri (2,8 g/cm³) e con il marmo (2,71 g/cm³): la sola misura di densità non è dunque risolutiva. Il dubbio
+          è stato sciolto su base qualitativa — il blocchetto ha lucentezza metallica, risulta freddo al tatto (buona
+          conducibilità termica) ed è privo di venature — portando a concludere per l'alluminio. Si segnala che una
+          misura indipendente, per esempio della conducibilità elettrica, renderebbe la conclusione più solida.</p>
+        <p>Il confronto fra i due metodi di misura del volume mostra in modo netto l'importanza dell'errore relativo:
+          la misura per immersione, pur essendo concettualmente ineccepibile, ha un'incertezza trenta volte maggiore
+          perché nasce da una <em>differenza</em> di due letture vicine fra loro. Utilizzando quel valore la densità
+          sarebbe risultata <span>$(2{,}7 \pm 0{,}6)$</span> g/cm³, intervallo compatibile con almeno cinque
+          materiali diversi: l'esperimento non avrebbe risposto alla domanda posta nello scopo.</p>
+        <p>Come atteso, l'errore relativo delle grandezze ottenute per prodotto (superficie, volume, densità) è
+          risultato sempre maggiore di quello delle singole misure dirette da cui provengono, ed esattamente pari
+          alla loro somma. L'errore assoluto sul perimetro, invece, non dipende dalla dimensione del banco ma solo
+          dal numero di addendi.</p>
+        <p>Sulla misura della parete, semidispersione (0,40 cm) e scarto quadratico medio (0,28 cm) danno stime dello
+          stesso ordine, il che è indice di una serie senza valori anomali; si è preferito riportare
+          <span>$\sigma$</span> perché tiene conto di tutte le misure. La dispersione osservata, molto maggiore della
+          sensibilità del metro, è attribuibile al fatto che su una distanza di oltre quattro metri lo strumento (di
+          portata 150 cm) va riposizionato tre volte, e ogni riposizionamento introduce un errore casuale.</p>
+        <p><strong>Limiti e possibili miglioramenti.</strong> (i) Il metro da sarta, essendo flessibile, potrebbe
+          essersi allungato con l'uso: sarebbe un errore <em>sistematico</em>, che le nostre ripetizioni non
+          possono rivelare; converrebbe confrontarlo con un metro rigido di riferimento. (ii) Il blocchetto è stato
+          assunto perfettamente parallelepipedo, ma gli spigoli sono leggermente smussati: il volume vero è
+          quindi un po' minore di quello calcolato, e la densità vera un po' maggiore — un secondo errore
+          sistematico, che spinge tutto nella stessa direzione. (iii) Per la parete converrebbe usare un metro a
+          nastro da 5 m, eliminando i riposizionamenti. (iv) I 26 dati delle altezze sono troppo pochi perché la
+          forma a campana emerga con chiarezza: raccogliendo i dati di tutto l'istituto la distribuzione sarebbe
+          molto più leggibile.</p>
+
+        <h4>9. Conclusioni</h4>
+        <p>Le regole di propagazione delle incertezze sono state applicate con successo a somme, differenze,
+          prodotti e rapporti, verificando che l'errore relativo di una misura indiretta ottenuta per prodotto è la
+          somma degli errori relativi delle misure dirette. Il blocchetto incognito ha densità
+          <span>$(2{,}70 \pm 0{,}03)$</span> g/cm³ ed è identificato come <strong>alluminio</strong>. Il rapporto
+          fra due lunghezze è risultato indipendente dall'unità di misura impiegata, come previsto per una grandezza
+          adimensionale. Infine, la scelta dello strumento va fatta confrontando la sua sensibilità con la grandezza
+          da misurare, e non in assoluto.</p>
+
+        <h4>10. Bibliografia</h4>
+        <ol style="font-size:0.9rem">
+          <li>J. R. Taylor, <em>Introduzione all'analisi degli errori</em>, 2ª ed., Zanichelli, Bologna 2000,
+            capitoli 2–4.</li>
+          <li><em>CRC Handbook of Chemistry and Physics</em>, 104ª ed., CRC Press, 2023, sezione «Density of
+            solids».</li>
+          <li>Bureau International des Poids et Mesures, <em>Le Système international d'unités</em>, 9ª ed., 2019
+            (per le definizioni delle unità e la conversione esatta pollice-centimetro).</li>
+          <li>Scheda di laboratorio <em>Misure dirette e indirette e propagazione delle incertezze</em>, distribuita
+            in classe, a.s. 2025/26.</li>
+        </ol>
+      </div>
+
+      <div class="method">
+        <strong>Che cosa rende buona questa relazione.</strong> Provate a rileggerla cercando queste sei cose: (1)
+        ogni numero ha un'unità e un'incertezza; (2) le incertezze hanno una o due cifre significative, e i valori
+        sono arrotondati di conseguenza; (3) c'è <em>un</em> esempio numerico svolto per esteso di ciascun tipo di
+        propagazione, così chi legge può rifare tutto il resto; (4) i dati grezzi ci sono tutti, compresi quelli
+        della misura peggiore (il cilindro graduato), che non sono stati nascosti ma usati per dire qualcosa;
+        (5) la discussione ammette due errori sistematici possibili e ne indica il <em>verso</em>; (6) le
+        conclusioni rispondono, una per una, alle domande dello scopo — e non aggiungono niente di nuovo.
+      </div>
+
+      <div class="joke">Notate anche una cosa che <em>non</em> c'è: da nessuna parte è scritto «l'esperimento è
+        riuscito». C'è scritto che cosa si è trovato e quanto ci si può fidare. La differenza fra le due cose è
+        tutta la fisica sperimentale.</div>
+    </section>
+
+    <!-- 10 — COME SI PUBBLICA LA SCIENZA -->
+    <section id="sec10">
+      <h2>10. Fuori dall'aula: come si pubblica la scienza</h2>
+
+      <p>La relazione che avete appena letto finisce sulla cattedra del prof. La stessa relazione, scritta da un
+        gruppo di ricerca, finisce in un posto molto diverso: su una <strong>rivista scientifica</strong>. E il
+        percorso che deve fare per arrivarci è, dopo il metodo sperimentale, la seconda grande invenzione
+        organizzativa della scienza moderna.</p>
+
+      <p>Una cosa merita di essere detta subito: questo modo di lavorare è nato nelle scienze naturali, ma
+        <strong>si è propagato a tutta l'accademia</strong>. Oggi pubblicano su riviste con revisione — con la stessa
+        struttura, gli stessi referee anonimi, la stessa bibliografia — non solo fisici, chimici e biologi, ma anche
+        medici, psicologi, economisti, sociologi, linguisti, storici, archeologi, filologi, giuristi. Un articolo di
+        storia medievale e uno di fisica delle particelle si somigliano molto più di quanto immaginereste: cambiano
+        i dati, non l'architettura dell'argomentazione.</p>
+
+      <h3>10.1 Il percorso di un articolo</h3>
+
+      <div class="flow-steps">
+        <div class="flow-step"><div class="fs-n">1</div><div class="fs-b"><strong>La ricerca.</strong> Mesi o anni di
+          lavoro, con il <em>quaderno di laboratorio</em> aggiornato ogni giorno: date, condizioni, guasti, dati
+          grezzi. È il documento che, se un giorno qualcuno contesterà il risultato, dimostrerà che cosa è stato
+          fatto davvero.</div></div>
+        <div class="flow-step"><div class="fs-n">2</div><div class="fs-b"><strong>La scrittura.</strong> L'articolo
+          segue lo schema <strong>IMRaD</strong>: <em>Introduction, Methods, Results and Discussion</em> — cioè
+          esattamente le sezioni della vostra relazione, con l'aggiunta dell'abstract e della bibliografia. Non è una
+          coincidenza: la relazione scolastica è la versione ridotta dell'articolo scientifico.</div></div>
+        <div class="flow-step"><div class="fs-n">3</div><div class="fs-b"><strong>Il preprint.</strong> Molti gruppi
+          mettono il lavoro su un archivio pubblico gratuito — in fisica <span class="inline-code">arXiv</span>,
+          fondato nel 1991 — <em>prima</em> di mandarlo a una rivista. Serve a due cose: far circolare subito il
+          risultato e mettere una data pubblica sulla priorità della scoperta.</div></div>
+        <div class="flow-step"><div class="fs-n">4</div><div class="fs-b"><strong>La sottomissione.</strong> Si sceglie
+          la rivista (più è prestigiosa, più è probabile il rifiuto) e si invia l'articolo con una lettera che spiega
+          all'editor perché quel lavoro è importante e nuovo.</div></div>
+        <div class="flow-step"><div class="fs-n">5</div><div class="fs-b"><strong>Il filtro dell'editor.</strong>
+          Un redattore scientifico legge e decide se l'articolo merita la revisione. Nelle riviste più selettive la
+          maggioranza dei lavori viene respinta qui, senza nemmeno arrivare ai referee
+          (<em>desk rejection</em>).</div></div>
+        <div class="flow-step"><div class="fs-n">6</div><div class="fs-b"><strong>La revisione paritaria
+          (<em>peer review</em>).</strong> L'editor manda l'articolo a due o tre <strong>referee</strong>: scienziati
+          che lavorano sullo stesso argomento, scelti dall'editor, che leggono il lavoro e scrivono un rapporto.
+          Normalmente sono <em>anonimi</em> per gli autori, e lavorano <strong>gratis</strong>.</div></div>
+        <div class="flow-step"><div class="fs-n">7</div><div class="fs-b"><strong>Il verdetto.</strong> Quattro esiti
+          possibili: <em>accettato</em> (raro al primo giro), <em>revisione minore</em>, <em>revisione
+          maggiore</em>, <em>respinto</em>. Nelle riviste serie il secondo e il terzo sono la norma.</div></div>
+        <div class="flow-step"><div class="fs-n">8</div><div class="fs-b"><strong>Le repliche.</strong> Gli autori
+          rispondono <em>punto per punto</em> a ogni obiezione: che cosa hanno cambiato, oppure perché non sono
+          d'accordo. Rifanno analisi, aggiungono controlli, a volte rifanno l'esperimento. Poi il testo torna ai
+          referee. Due o tre giri sono normali; il tutto dura da qualche mese a un paio d'anni.</div></div>
+        <div class="flow-step"><div class="fs-n">9</div><div class="fs-b"><strong>La pubblicazione.</strong>
+          Accettazione, bozze da correggere, uscita. L'articolo riceve un <strong>DOI</strong>, un codice
+          permanente che lo identificherà per sempre.</div></div>
+        <div class="flow-step"><div class="fs-n">10</div><div class="fs-b"><strong>La vera revisione comincia
+          adesso.</strong> La comunità legge, cita, discute, prova a rifare l'esperimento. Se il risultato non regge,
+          arrivano articoli che lo contestano e, nei casi gravi, la <strong>ritrattazione</strong>: l'articolo resta
+          consultabile ma marchiato come ritirato.</div></div>
+      </div>
+
+      <h3>10.2 Che cosa fa (e che cosa non fa) un referee</h3>
+
+      <p>Il referee <strong>non rifà l'esperimento</strong>: non ne ha il tempo, i soldi né gli strumenti. Legge, e
+        si fa più o meno le stesse domande che vi ho suggerito per la relazione: il metodo è descritto in modo che
+        io possa rifarlo? Le incertezze sono trattate correttamente? L'analisi statistica regge? Le conclusioni
+        seguono <em>davvero</em> dai dati mostrati, o gli autori si stanno allargando? C'è qualcosa di nuovo rispetto
+        a quanto già pubblicato? La bibliografia riconosce chi ha fatto il lavoro precedente?</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Revisione a singolo cieco</h4>
+          <p>Il referee sa chi sono gli autori, gli autori non sanno chi è il referee. È la più diffusa. Protegge il
+            referee dalle ritorsioni, ma lo espone al pregiudizio: lo stesso articolo firmato da un premio Nobel o da
+            uno sconosciuto non viene letto allo stesso modo.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Revisione a doppio cieco</h4>
+          <p>Nessuno dei due sa chi è l'altro. Riduce i pregiudizi su nome, istituzione, nazionalità e genere degli
+            autori. Ha un limite pratico: in un campo ristretto si capisce facilmente chi ha scritto un
+            articolo.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Revisione aperta</h4>
+          <p>Nomi dei referee e rapporti pubblicati insieme all'articolo. È la proposta più recente: massima
+            trasparenza, ma serve un certo coraggio a stroncare pubblicamente il lavoro di un collega da cui domani
+            dipenderà un vostro finanziamento.</p>
+        </div>
+      </div>
+
+      <div class="warnbox">
+        <strong>⚠ La peer review non certifica la verità.</strong> È il fraintendimento più diffuso, e alimenta
+        entrambi gli estremi: «è stato pubblicato su una rivista, quindi è vero» e «è stato pubblicato su una
+        rivista, quindi fa parte del sistema». Nessuna delle due. La revisione paritaria è un <strong>filtro contro
+        gli errori grossolani</strong>, fatto da due o tre persone che leggono per qualche ora un lavoro durato anni.
+        Un articolo pubblicato può essere — e spesso è — sbagliato. La <em>vera</em> verifica arriva dopo, quando
+        altri gruppi provano a ottenere lo stesso risultato. In scienza il timbro non lo dà nessuno: lo dà il tempo.
+      </div>
+
+      <div class="curiosita">
+        <p style="margin:0"><strong>Non è antica come sembra.</strong> La prima rivista scientifica sono le
+          <em>Philosophical Transactions</em> della Royal Society, 1665, e già il loro segretario Henry Oldenburg
+          faceva leggere i lavori ad alcuni soci esperti: è il germe dell'idea. Ma la revisione paritaria come
+          procedura obbligatoria e sistematica è <strong>recentissima</strong>: <em>Nature</em> l'ha resa formale
+          solo nel <strong>1973</strong>. I celebri articoli di Einstein del 1905 non furono mai mandati ad alcun
+          referee: li lesse l'editor e li pubblicò.</p>
+        <p style="margin:0.45rem 0 0">C'è di più, ed è una storia deliziosa. Einstein incontrò un referee una volta
+          sola, nel 1936, quando mandò alla <em>Physical Review</em> un articolo scritto con Nathan Rosen intitolato
+          <em>Do gravitational waves exist?</em>, che concludeva di no. L'editor lo mandò a un revisore, che
+          rispose con dieci pagine di obiezioni. Einstein si infuriò, scrisse che non aveva autorizzato nessuno a
+          mostrare il suo lavoro a estranei, ritirò l'articolo e non pubblicò mai più su quella rivista. Il punto
+          divertente è che <strong>il referee aveva ragione</strong>: il calcolo conteneva un errore, Einstein se ne
+          accorse poco dopo, corresse il lavoro e lo pubblicò altrove con la conclusione <em>opposta</em>. Le onde
+          gravitazionali esistono, e sono state misurate nel 2015.</p>
+      </div>
+    </section>
+
+    <!-- 11 — LA BIBLIOGRAFIA -->
+    <section id="sec11">
+      <h2>11. La bibliografia: perché si cita, sempre</h2>
+
+      <p>In fondo alla relazione del §9 c'è una lista di quattro riferimenti. Sembra la parte più noiosa e inutile
+        del lavoro; è invece una delle poche parti che <strong>non si possono saltare</strong>. Ecco perché.</p>
+
+      <ol>
+        <li><strong>Per dire che cosa non è vostro.</strong> È la ragione principale. Una relazione mescola
+          inevitabilmente ciò che avete fatto voi e ciò che avete preso da altri: la densità dell'alluminio non
+          l'avete determinata voi, la formula di propagazione nemmeno. Citare serve a tracciare il confine, e a far
+          risaltare — per contrasto — il vostro contributo originale.</li>
+        <li><strong>Per permettere la verifica.</strong> Se scrivo che l'alluminio ha densità 2,70 g/cm³, chi legge
+          deve poter controllare dove l'ho preso, con quale precisione e a quale temperatura. Un dato senza fonte
+          è, tecnicamente, un'affermazione senza prove.</li>
+        <li><strong>Per riconoscere il lavoro altrui.</strong> Le citazioni sono la moneta con cui la comunità
+          scientifica paga chi ha lavorato prima. Non citare qualcuno che avete usato non è una svista: è, di
+          fatto, un furto di credito.</li>
+        <li><strong>Per mostrare su che cosa poggia il lavoro.</strong> Un articolo senza bibliografia sembra
+          nato dal nulla — e nella scienza nulla nasce dal nulla.</li>
+        <li><strong>Per non commettere plagio.</strong> Presentare come proprie parole o idee altrui è, a scuola, un
+          grave errore; all'università e nella ricerca è un illecito che costa la carriera. E oggi si scopre in
+          pochi secondi con un software.</li>
+      </ol>
+
+      <div class="curiosita">
+        <p style="margin:0"><em>«Se ho visto più lontano, è perché stavo sulle spalle di giganti.»</em> La frase è di
+          Isaac Newton, in una lettera a Robert Hooke del 1676, ma non l'aveva inventata lui: circolava già nel XII
+          secolo, attribuita a Bernardo di Chartres, che paragonava i moderni a nani seduti sulle spalle di giganti —
+          vedono più lontano non perché siano più alti, ma per la statura di chi li sostiene. Che Newton l'abbia
+          scritta proprio a Hooke, con cui era in guerra aperta per la priorità di alcune scoperte, ha fatto
+          sospettare a molti che fosse una frecciata più che un complimento. In ogni caso, quella frase è la
+          bibliografia in una riga: <strong>si vede più lontano solo se si sa su quali spalle si è saliti — e lo si
+          dice</strong>.</p>
+      </div>
+
+      <h3>11.1 Come si cita in pratica</h3>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th style="width:20%">Tipo di fonte</th><th>Che cosa serve</th><th>Esempio</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">Libro</td><td>autore, titolo, edizione, editore, città, anno, pagine o capitolo</td><td style="text-align:left">J. R. Taylor, <em>Introduzione all'analisi degli errori</em>, 2ª ed., Zanichelli, Bologna 2000, cap. 3.</td></tr>
+            <tr><td class="lab">Articolo</td><td>autori, titolo, rivista, volume, pagine, anno, DOI</td><td style="text-align:left">B. P. Abbott et al., «Observation of Gravitational Waves from a Binary Black Hole Merger», <em>Phys. Rev. Lett.</em> <strong>116</strong>, 061102 (2016).</td></tr>
+            <tr><td class="lab">Sito web</td><td>autore o ente, titolo della pagina, URL e <strong>data di consultazione</strong></td><td style="text-align:left">NIST, <em>Fundamental Physical Constants</em>, physics.nist.gov/constants (consultato il 12 ottobre 2025).</td></tr>
+            <tr><td class="lab">Materiale del corso</td><td>titolo, natura del documento, anno scolastico</td><td style="text-align:left">Scheda di laboratorio <em>Misure dirette e indirette</em>, a.s. 2025/26.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>La <strong>data di consultazione</strong> per i siti non è un capriccio: le pagine web cambiano e
+        spariscono. Senza quella data, fra tre anni, il vostro riferimento non sarà verificabile da nessuno.</p>
+
+      <div class="warnbox">
+        <strong>⚠ Due fonti da maneggiare con cura.</strong><br>
+        <strong>Wikipedia</strong> è un ottimo punto di partenza e una pessima citazione: usatela per orientarvi,
+        poi scendete in fondo alla voce, guardate le fonti che <em>lei</em> cita e citate quelle — che sono libri e
+        articoli veri.<br>
+        <strong>Le intelligenze artificiali generative</strong> non sono una fonte, per un motivo tecnico preciso:
+        non sanno da dove viene ciò che dicono, e quando manca loro un riferimento sono perfettamente capaci di
+        inventarne uno plausibile, con autori, rivista, volume e anno tutti falsi. Se le usate per farvi spiegare
+        qualcosa va benissimo, ma dichiaratelo e poi <strong>verificate ogni singolo riferimento</strong> andando a
+        vedere se esiste. Ci sono avvocati che hanno presentato in tribunale sentenze inesistenti perché non lo
+        hanno fatto.
+      </div>
+    </section>
+
+    <!-- 12 — LE CRITICHE AL SISTEMA -->
+    <section id="sec12">
+      <h2>12. Che cosa non funziona in questo sistema</h2>
+
+      <p>Fin qui il quadro è nobile: una comunità che si controlla da sola, gratuitamente, per il bene della
+        conoscenza. Adesso guardiamo il rovescio, perché è importante che lo sappiate — e perché una delle critiche
+        più efficaci al sistema arriva da dentro, dagli scienziati stessi.</p>
+
+      <h3>12.1 Il muro a pagamento</h3>
+
+      <p>Seguiamo i soldi. Una ricerca universitaria è pagata, quasi sempre, con <strong>denaro pubblico</strong>:
+        stipendi, laboratori, strumenti, borse di dottorato. Il ricercatore scrive l'articolo e lo
+        <strong>cede gratuitamente</strong> alla rivista. I referee lo valutano <strong>gratis</strong>. L'editor
+        scientifico, spesso, è a sua volta un accademico che lo fa per prestigio. A questo punto la rivista
+        impagina, mette il proprio marchio e… <strong>vende</strong> l'articolo: 30-40 euro per leggere un singolo
+        lavoro, decine o centinaia di migliaia di euro l'anno per l'abbonamento di un ateneo. I margini operativi dei
+        grandi editori scientifici stanno stabilmente fra il 30% e il 40%: percentuali che nessuna industria
+        manifatturiera si sogna.</p>
+
+      <p>Il risultato è che una ricerca pagata dai cittadini <strong>non è leggibile dai cittadini</strong>. Un
+        medico di famiglia, un insegnante, un'associazione di malati, un giornalista, un ricercatore di un paese
+        povero: tutti fuori dal muro. Ed è esattamente il contrario del principio da cui siamo partiti — la scienza
+        è un'impresa collettiva e il sapere deve circolare.</p>
+
+      <div class="curiosita">
+        <p style="margin:0"><strong>Le reazioni.</strong> Sono nati gli archivi liberi (<span class="inline-code">arXiv</span>
+          dal 1991, poi biorXiv, medRxiv), il movimento <em>open access</em>, e obblighi di apertura imposti dagli
+          enti finanziatori. Ma ci sono stati anche episodi più duri: nel 2011 <strong>Aaron Swartz</strong>,
+          programmatore e attivista ventiquattrenne, scaricò circa cinque milioni di articoli dall'archivio JSTOR
+          usando la rete del MIT, con l'intenzione dichiarata di renderli pubblici. Fu incriminato con capi d'accusa
+          che, sommati, prevedevano decenni di carcere; si tolse la vita nel gennaio 2013, a 26 anni. La sua vicenda
+          è diventata il simbolo di quanto sia diventato aspro lo scontro fra il diritto d'autore degli editori e
+          l'idea che la conoscenza scientifica debba essere di tutti.</p>
+      </div>
+
+      <h3>12.2 Il rovesciamento dell'incentivo: chi paga chi</h3>
+
+      <p>Qui c'è la differenza più interessante, e vale la pena metterla a confronto con un mestiere che conoscete.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th></th><th>Giornalismo tradizionale</th><th>Editoria scientifica</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">Chi scrive</td><td>viene <strong>pagato</strong> dal giornale</td><td><strong>paga</strong> la rivista (o le cede il lavoro gratis)</td></tr>
+            <tr><td class="lab">Chi controlla</td><td>redazione stipendiata</td><td>referee volontari, non retribuiti</td></tr>
+            <tr><td class="lab">Chi legge</td><td>paga il giornale</td><td>paga l'abbonamento (o l'ha già pagato l'autore)</td></tr>
+            <tr><td class="lab">La rivista guadagna se…</td><td>vende molte copie: le conviene la <strong>qualità</strong></td><td>pubblica molti articoli: le conviene la <strong>quantità</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Il modello <em>open access</em>, nato per abbattere il muro a pagamento, ha spostato il costo dal lettore
+        all'autore: si chiamano <strong>APC</strong> (<em>Article Processing Charges</em>) e vanno da qualche
+        centinaio a quasi diecimila euro per articolo — su <em>Nature</em> circa 9500 euro. È una soluzione al
+        problema dell'accesso, ma crea un conflitto d'interesse strutturale: <strong>ogni rifiuto è un mancato
+        incasso</strong>. E chi non ha un finanziamento non pubblica.</p>
+
+      <p>Il caso estremo sono le <strong>riviste predatorie</strong>: migliaia di pubblicazioni che simulano una
+        peer review e in realtà accettano qualunque cosa, purché si paghi. Nel 2013 il giornalista scientifico John
+        Bohannon fece un esperimento e lo raccontò su <em>Science</em>: inviò a 304 riviste <em>open access</em> un
+        articolo di sua invenzione, con errori metodologici così grossolani che «qualunque revisore con una
+        formazione chimica di base e capace di capire un grafico» li avrebbe visti. Fu <strong>accettato da
+        157</strong> riviste su 255 che risposero.</p>
+
+      <h3>12.3 La malattia delle metriche</h3>
+
+      <p>La terza critica è la più profonda, perché non riguarda i soldi ma il modo in cui si valuta il lavoro
+        scientifico. La domanda «questo ricercatore è bravo?» è difficilissima: richiederebbe di leggere i suoi
+        lavori e capirli. Così si è cercata una scorciatoia numerica: <strong>contare le citazioni</strong>. Da lì
+        l'<em>impact factor</em> di una rivista (quante volte in media viene citato un suo articolo) e
+        l'<em>h-index</em> di uno scienziato. Da quei numeri dipendono assunzioni, promozioni, finanziamenti. Il
+        motto del mestiere, non a caso, è <span class="inline-code">publish or perish</span>: pubblica o
+        sparisci.</p>
+
+      <div class="rule">
+        <strong>Legge di Goodhart:</strong> «quando una misura diventa un obiettivo, cessa di essere una buona
+        misura». Le citazioni erano un indicatore ragionevole finché nessuno ci puntava la carriera. Da quando ci si
+        punta la carriera, sono diventate un bersaglio da colpire — e sono nate tutte le tecniche per colpirlo.
+      </div>
+
+      <ul>
+        <li><strong>Citazioni reciproche.</strong> «Tu citi me, io cito te»: gruppi di ricercatori — a volte vere e
+          proprie <em>cartelli di citazione</em> con decine di partecipanti — che si citano a vicenda senza alcuna
+          necessità scientifica, gonfiando i numeri di tutti.</li>
+        <li><strong>Autocitazioni di massa.</strong> Esistono autori il cui indice è sostenuto per metà dalle
+          citazioni ai propri lavori precedenti.</li>
+        <li><strong>Citazioni estorte.</strong> L'editor che, in fase di revisione, «suggerisce» di aggiungere
+          qualche riferimento ad articoli usciti sulla <em>propria</em> rivista, per alzarne l'impact factor.</li>
+        <li><strong>Affettare il salame.</strong> Spezzare un unico lavoro in cinque articoletti pubblicabili
+          separatamente: cinque titoli nel curriculum invece di uno.</li>
+        <li><strong>Le fabbriche di articoli</strong> (<em>paper mills</em>): aziende che producono articoli finti o
+          riciclati e <strong>vendono le firme</strong>. Si compra la posizione da coautore su un lavoro che non si è
+          mai visto, con listino prezzi.</li>
+      </ul>
+
+      <p>Non è un fenomeno marginale. Nel <strong>2023</strong> sono stati ritirati più di <strong>diecimila</strong>
+        articoli scientifici, record storico assoluto, in buona parte riconducibili proprio alle fabbriche di
+        articoli: un solo editore ha dovuto ritirarne migliaia e chiudere diciannove riviste. E accanto alla frode
+        c'è un problema più silenzioso e più vasto, la <strong>crisi della replicabilità</strong>: quando nel 2015 un
+        grande progetto collettivo provò a rifare cento studi di psicologia già pubblicati, solo il
+        <strong>36%</strong> diede di nuovo un risultato significativo. Un sondaggio di <em>Nature</em> del 2016 su
+        millecinquecento ricercatori trovò che oltre il <strong>70%</strong> aveva provato — senza riuscirci — a
+        riprodurre l'esperimento di un collega; e più della metà non era riuscita a riprodurre nemmeno il
+        proprio.</p>
+
+      <h3>12.4 E allora? La frase di Churchill</h3>
+
+      <p>A questo punto la tentazione è di concludere che il sistema sia marcio e vada buttato. Sarebbe una
+        conclusione affrettata, e per spiegare perché conviene rubare le parole a un politico che di sistemi
+        imperfetti se ne intendeva. L'11 novembre 1947, alla Camera dei Comuni, Winston Churchill disse:</p>
+
+      <div class="curiosita">
+        <p style="margin:0"><em>«Many forms of Government have been tried, and will be tried in this world of sin and
+          woe. No one pretends that democracy is perfect or all-wise. Indeed it has been said that democracy is the
+          worst form of Government except for all those other forms that have been tried from time to
+          time.»</em></p>
+        <p style="margin:0.4rem 0 0"><strong>«Molte forme di governo sono state provate, e saranno provate, in
+          questo mondo di peccato e di dolore. Nessuno pretende che la democrazia sia perfetta o onnisciente. Anzi,
+          si è detto che la democrazia è la peggiore forma di governo, eccezion fatta per tutte le altre forme che
+          sono state sperimentate di volta in volta.»</strong> — Winston Churchill, House of Commons, 11 novembre
+          1947. Notate l'onestà del «si è detto»: nemmeno la battuta era sua, e lui lo dichiarava.</p>
+      </div>
+
+      <p>Ecco: cambiate una parola, e avete la conclusione di questa lezione. <strong>La revisione paritaria è il
+        peggiore sistema di controllo della qualità scientifica — eccezion fatta per tutti gli altri che sono stati
+        provati di volta in volta.</strong> Gli altri li conosciamo, e sono stati provati sul serio: l'autorità di un
+        maestro, la fedeltà a un testo sacro, la decisione di un comitato politico, il consenso di una folla, il
+        prestigio di chi parla più forte. Ogni volta che uno di questi ha sostituito il controllo fra pari, il
+        risultato è stato peggiore — e in qualche caso disastroso.</p>
+
+      <p>E soprattutto: quel sistema, con tutti i suoi difetti, <strong>funziona</strong>. La società in cui vivete,
+        la più intensamente scientifica e tecnologica che sia mai esistita, è anche figlia di questo meccanismo
+        imperfetto. I vaccini, i semiconduttori del telefono che avete in tasca, il GPS che vi dice dove siete
+        (correggendo, per inciso, gli effetti della relatività), la risonanza magnetica, le previsioni del tempo a
+        cinque giorni, la fibra ottica: tutte cose passate, prima o poi, attraverso quel filtro fatto di due o tre
+        colleghi scontenti che leggono un manoscritto di sera, gratis, e scrivono che il paragrafo 3 non li
+        convince.</p>
+
+      <p>E c'è un'ultima cosa che rende questo sistema diverso da tutti gli altri: <strong>è capace di
+        correggersi</strong>. La crisi della replicabilità l'hanno scoperta gli scienziati; le riviste predatorie le
+        hanno smascherate i giornalisti scientifici; le ritrattazioni record del 2023 sono il segno che qualcuno sta
+        finalmente ripulendo. E le riforme ci sono: gli archivi aperti, la revisione pubblica e firmata, i
+        <em>registered reports</em> (in cui la rivista accetta il progetto <em>prima</em> di conoscerne i risultati,
+        così pubblicare un esito negativo non è più un fallimento), l'obbligo di depositare i dati grezzi, e la
+        dichiarazione DORA del 2012 con cui migliaia di enti si sono impegnati a non valutare più le persone con
+        l'impact factor.</p>
+
+      <div class="rule">
+        Nessuna di queste riforme, però, sostituisce lo strumento più potente che la scienza abbia — lo stesso che
+        avete usato oggi in laboratorio con un calibro e un blocchetto di alluminio: <strong>rifare la
+        misura</strong>. È lento, è noioso, non fa carriera. Ed è l'unica cosa che, alla fine, decide.
+      </div>
+    </section>
+
+<!--SENTINEL-->
+
+    <section id="quiz">
+      <h2>13. Quiz finale</h2>
+      <p>Dodici domande su relazione scientifica, calibro, propagazione delle incertezze, misure ripetute e
+        pubblicazione scientifica.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 3 — Misure in laboratorio e relazione scientifica · Fisica · Terzo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+      function num(s) { return parseFloat(String(s).replace(',', '.').trim()); }
+      function near(a, b, tol) { return isFinite(a) && Math.abs(a - b) <= tol; }
+      function fb(el, ok, msg) { el.className = 'fb ' + (ok ? 'ok' : 'no'); el.innerHTML = (ok ? '✔ ' : '✘ ') + msg; }
+
+      /* ===== 2.4 — ordina le sezioni della relazione ===== */
+      (function () {
+        const pool = document.getElementById('or-pool'); if (!pool) return;
+        const list = document.getElementById('or-list'), out = document.getElementById('or-out');
+        const GIUSTO = ['Titolo', 'Autori, classe e data', 'Scopo dell\'esperienza', 'Richiami teorici',
+          'Materiali e strumenti', 'Procedimento', 'Dati raccolti', 'Elaborazione dei dati',
+          'Risultati', 'Discussione', 'Conclusioni', 'Bibliografia'];
+        let scelte = [];
+        function render() {
+          pool.innerHTML = '';
+          GIUSTO.forEach(function (s) {
+            if (scelte.indexOf(s) >= 0) { return; }
+            const b = document.createElement('button');
+            b.className = 'ord-chip'; b.textContent = s;
+            b.onclick = function () { scelte.push(s); out.innerHTML = ''; render(); };
+            pool.appendChild(b);
+          });
+          if (pool.children.length === 0) { pool.innerHTML = '<span class="lbl-s" style="color:var(--muted)">— tutte collocate —</span>'; }
+          list.innerHTML = '';
+          scelte.forEach(function (s, i) {
+            const li = document.createElement('li');
+            li.innerHTML = '<span>' + s + '</span>';
+            li.onclick = function () { scelte.splice(i, 1); out.innerHTML = ''; render(); };
+            li.style.cursor = 'pointer';
+            list.appendChild(li);
+          });
+        }
+        document.getElementById('or-check').onclick = function () {
+          let ok = 0;
+          Array.prototype.forEach.call(list.children, function (li, i) {
+            const giusto = scelte[i] === GIUSTO[i];
+            li.className = giusto ? 'ok' : 'no';
+            if (giusto) { ok++; }
+          });
+          if (scelte.length < 12) {
+            out.innerHTML = 'Mancano ancora ' + (12 - scelte.length) + ' sezioni. <strong>' + ok + '</strong> di quelle collocate sono al posto giusto.';
+          } else if (ok === 12) {
+            out.innerHTML = '<strong style="color:var(--green)">Perfetto: 12 su 12.</strong> Questo è l\'ordine logico di ogni relazione scientifica del mondo: perché → come → che cosa ho ottenuto → che cosa significa.';
+          } else {
+            out.innerHTML = '<strong>' + ok + ' su 12</strong> al posto giusto (in verde). Clicca una voce sbagliata per rimetterla nel mazzo.';
+          }
+        };
+        document.getElementById('or-reset').onclick = function () { scelte = []; out.innerHTML = ''; render(); };
+        render();
+      })();
+
+      /* ===== 3.3 — lettura del calibro a nonio ===== */
+      (function () {
+        const host = document.getElementById('cal-svg'); if (!host) return;
+        const sl = document.getElementById('cal-slider'), inp = document.getElementById('cal-in'),
+              fbEl = document.getElementById('cal-fb');
+        let aiuto = false;
+        function valore() { return parseInt(sl.value, 10) * 0.05; }   // 0 … 50,00 mm a passi di 0,05
+        function draw() {
+          const v = valore();
+          const mmInt = Math.floor(v + 1e-9);
+          const tacca = Math.round((v - mmInt) / 0.05);
+          const start = Math.max(0, Math.round(v) - 3);
+          const W = 900, H = 210, px = 32;              // 32 px per millimetro
+          const nmm = Math.floor((W - 60) / px);        // millimetri visibili
+          const X = function (mm) { return 30 + (mm - start) * px; };
+          let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="lettura del nonio">';
+          // scala principale
+          s += '<line x1="20" y1="70" x2="' + (W - 20) + '" y2="70" stroke="currentColor" style="color:var(--text-soft)" stroke-width="2.5"/>';
+          for (let m = start; m <= start + nmm; m++) {
+            const x = X(m);
+            const lungo = (m % 5 === 0);
+            s += '<line x1="' + x + '" y1="70" x2="' + x + '" y2="' + (lungo ? 40 : 52) + '" stroke="currentColor" style="color:var(--text-soft)" stroke-width="' + (lungo ? 2 : 1.2) + '"/>';
+            if (m % 5 === 0) { s += '<text class="lbl-s" x="' + x + '" y="32" text-anchor="middle">' + m + '</text>'; }
+          }
+          s += '<text class="lbl-s" x="20" y="88" text-anchor="start">scala principale (mm)</text>';
+          // nonio
+          const x0 = X(v);
+          s += '<rect x="' + (x0 - 12) + '" y="74" width="' + (19 * px + 24) + '" height="62" rx="6" fill="color-mix(in srgb, var(--accent) 14%, transparent)" stroke="var(--accent)" stroke-width="1.4"/>';
+          s += '<line x1="' + x0 + '" y1="78" x2="' + (x0 + 19 * px) + '" y2="78" stroke="currentColor" style="color:var(--accent)" stroke-width="2.5"/>';
+          for (let i = 0; i <= 20; i++) {
+            const x = x0 + i * 0.95 * px;
+            const lungo = (i % 5 === 0);
+            const on = aiuto && (i === tacca);
+            s += '<line x1="' + x + '" y1="78" x2="' + x + '" y2="' + (lungo ? 110 : 100) + '" stroke="' + (on ? 'var(--magenta)' : 'currentColor') + '" style="color:var(--accent)" stroke-width="' + (on ? 3.2 : (lungo ? 2 : 1.2)) + '"/>';
+            if (lungo) { s += '<text class="lbl-s" x="' + x + '" y="126" text-anchor="middle" ' + (on ? 'fill="var(--magenta)" font-weight="800"' : '') + '>' + i + '</text>'; }
+          }
+          // zero del nonio
+          s += '<line x1="' + x0 + '" y1="20" x2="' + x0 + '" y2="140" stroke="var(--green)" stroke-width="1.4" stroke-dasharray="5 4"/>';
+          s += '<text class="lbl-s" x="' + x0 + '" y="158" text-anchor="middle" fill="var(--green)">zero del nonio</text>';
+          if (aiuto) {
+            const xt = x0 + tacca * 0.95 * px;
+            s += '<line x1="' + xt + '" y1="20" x2="' + xt + '" y2="120" stroke="var(--magenta)" stroke-width="1.6" stroke-dasharray="4 4"/>';
+            s += '<text class="em" x="' + xt + '" y="180" text-anchor="middle">tacca n. ' + tacca + ' → ' + nf(tacca * 0.05, 2) + ' mm</text>';
+            s += '<text class="em" x="' + (W / 2) + '" y="202" text-anchor="middle">' + mmInt + ' mm + ' + tacca + ' × 0,05 mm = ' + nf(v, 2) + ' mm</text>';
+          }
+          s += '</svg>';
+          host.innerHTML = s;
+        }
+        sl.oninput = function () { aiuto = false; fbEl.className = 'fb'; fbEl.innerHTML = ''; draw(); };
+        document.getElementById('cal-rand').onclick = function () {
+          sl.value = 60 + Math.floor(Math.random() * 880);
+          aiuto = false; fbEl.className = 'fb'; fbEl.innerHTML = ''; inp.value = ''; draw();
+        };
+        document.getElementById('cal-help').onclick = function () { aiuto = true; draw(); };
+        document.getElementById('cal-check').onclick = function () {
+          const v = valore(), r = num(inp.value);
+          if (!isFinite(r)) { fb(fbEl, false, 'Scrivi un numero, per esempio <span class="inline-code">12,30</span>.'); return; }
+          if (near(r, v, 0.001)) {
+            fb(fbEl, true, 'Esatto: <strong>' + nf(v, 2) + ' mm</strong>. Scritta come si deve: (' + nf(v, 2) + ' ± 0,05) mm.');
+          } else if (near(r, v, 0.051)) {
+            fb(fbEl, false, 'Ci sei quasi: hai sbagliato di una tacca. Il valore è <strong>' + nf(v, 2) + ' mm</strong> — guarda meglio quale tacca è davvero allineata.');
+          } else if (near(r * 10, v, 0.001) || near(r / 10, v, 0.001)) {
+            fb(fbEl, false, 'Attenzione alle unità: la lettura va data in millimetri. È <strong>' + nf(v, 2) + ' mm</strong>.');
+          } else if (Math.abs(Math.floor(r) - Math.floor(v)) >= 1) {
+            fb(fbEl, false, 'Hai sbagliato i <strong>millimetri interi</strong>: conta dove cade lo zero del nonio. Il valore è ' + nf(v, 2) + ' mm.');
+          } else {
+            fb(fbEl, false, 'No: il valore è <strong>' + nf(v, 2) + ' mm</strong>. Rifai i tre passi con calma.');
+          }
+        };
+        draw();
+      })();
+
+      /* ===== 4 — banco: risposte guidate ===== */
+      (function () {
+        const c1 = document.getElementById('ba-check1'); if (!c1) return;
+        c1.onclick = function () {
+          const p = num(document.getElementById('ba-p').value), dp = num(document.getElementById('ba-dp').value);
+          const el = document.getElementById('ba-fb1');
+          if (!isFinite(p) || !isFinite(dp)) { fb(el, false, 'Compila tutte e due le caselle.'); return; }
+          const okP = near(p, 240, 0.05), okD = near(dp, 0.4, 0.005);
+          if (okP && okD) { fb(el, true, 'Giusto: <strong>P = (240,0 ± 0,4) cm</strong>, cioè lo 0,17% di errore percentuale.'); }
+          else if (okP && near(dp, 0.1, 0.005)) { fb(el, false, 'Il valore di P è giusto, ma l\'incertezza no: gli errori dei <em>quattro</em> lati si sommano, quindi 4 × 0,1 = 0,4 cm.'); }
+          else if (okP) { fb(el, false, 'Il valore di P è giusto; ricontrolla ΔP = Δl₁ + Δl₂ + Δl₃ + Δl₄.'); }
+          else { fb(el, false, 'Non ancora. P è la somma dei quattro lati (70,0 + 50,0 + 70,0 + 50,0) e ΔP è la somma dei quattro errori.'); }
+        };
+        document.getElementById('ba-check2').onclick = function () {
+          const s = num(document.getElementById('ba-s').value), ds = num(document.getElementById('ba-ds').value);
+          const el = document.getElementById('ba-fb2');
+          if (!isFinite(s) || !isFinite(ds)) { fb(el, false, 'Compila tutte e due le caselle.'); return; }
+          const okS = near(s, 3500, 1), okD = near(ds, 12, 0.6);
+          if (okS && okD) { fb(el, true, 'Giusto: <strong>S = (3500 ± 12) cm²</strong>, errore percentuale 0,34%.'); }
+          else if (okS && near(ds, 0.2, 0.02)) { fb(el, false, 'Attenzione: 0,2 cm² sarebbe la somma degli errori <em>assoluti</em>, ma nei prodotti si sommano quelli <strong>relativi</strong>. Il risultato corretto è 12 cm².'); }
+          else if (okS) { fb(el, false, 'S è giusto. Per ΔS usa ΔS = S(Δb/b + Δh/h) = 3500 × (0,00143 + 0,00200).'); }
+          else { fb(el, false, 'Non ancora: S = 70,0 × 50,0 e ΔS = S(Δb/b + Δh/h).'); }
+        };
+        document.getElementById('ba-check3').onclick = function () {
+          const a = num(document.getElementById('ba-rcm').value), b = num(document.getElementById('ba-rin').value);
+          const el = document.getElementById('ba-fb3');
+          if (!isFinite(a) || !isFinite(b)) { fb(el, false, 'Compila tutte e due le caselle.'); return; }
+          const okA = near(a, 1.400, 0.004), okB = near(b, 1.4013, 0.005);
+          if (okA && okB) { fb(el, true, 'Esatto: 1,400 e 1,401 — praticamente lo stesso numero, ed entro le incertezze sono compatibili. Il rapporto fra due lunghezze non dipende dall\'unità di misura: è <strong>adimensionale</strong>.'); }
+          else { fb(el, false, 'Ricontrolla: r = lato lungo / lato corto, cioè 70,0/50,0 in centimetri e 27,500/19,625 in pollici.'); }
+        };
+      })();
+
+      /* ===== 4.3 — il propagatore ===== */
+      (function () {
+        const host = document.getElementById('pp-out'); if (!host) return;
+        const bars = document.getElementById('pp-bars'), opsBox = document.getElementById('pp-ops');
+        const gx = document.getElementById('pp-x'), gdx = document.getElementById('pp-dx'),
+              gy = document.getElementById('pp-y'), gdy = document.getElementById('pp-dy');
+        const OPS = [
+          ['add', 'x + y', 2], ['sub', 'x − y', 2], ['mul', 'x · y', 2],
+          ['div', 'x / y', 2], ['p2', 'x²', 1], ['p3', 'x³', 1]
+        ];
+        let op = 'mul';
+        OPS.forEach(function (o) {
+          const b = document.createElement('button');
+          b.className = 'btn' + (o[0] === op ? ' active' : ''); b.textContent = o[1]; b.dataset.op = o[0];
+          b.onclick = function () {
+            op = o[0];
+            Array.prototype.forEach.call(opsBox.children, function (k) { k.className = 'btn' + (k.dataset.op === op ? ' active' : ''); });
+            calc();
+          };
+          opsBox.appendChild(b);
+        });
+        function calc() {
+          const x = num(gx.value), dx = Math.abs(num(gdx.value)), y = num(gy.value), dy = Math.abs(num(gdy.value));
+          if (!isFinite(x) || !isFinite(dx)) { host.innerHTML = '<span style="color:var(--red)">Inserisci x e Δx.</span>'; bars.innerHTML = ''; return; }
+          const duale = (op === 'add' || op === 'sub' || op === 'mul' || op === 'div');
+          if (duale && (!isFinite(y) || !isFinite(dy))) { host.innerHTML = '<span style="color:var(--red)">Inserisci anche y e Δy.</span>'; bars.innerHTML = ''; return; }
+          let z, dz, formula;
+          if (op === 'add') { z = x + y; dz = dx + dy; formula = 'Δz = Δx + Δy'; }
+          else if (op === 'sub') { z = x - y; dz = dx + dy; formula = 'Δz = Δx + Δy  (anche nella differenza si <em>sommano</em>)'; }
+          else if (op === 'mul') { z = x * y; dz = Math.abs(z) * (dx / Math.abs(x) + dy / Math.abs(y)); formula = 'Δz = z (Δx/x + Δy/y)'; }
+          else if (op === 'div') { z = x / y; dz = Math.abs(z) * (dx / Math.abs(x) + dy / Math.abs(y)); formula = 'Δz = z (Δx/x + Δy/y)'; }
+          else if (op === 'p2') { z = x * x; dz = 2 * Math.abs(z) * dx / Math.abs(x); formula = 'Δz = 2 z (Δx/x)'; }
+          else { z = x * x * x; dz = 3 * Math.abs(z) * dx / Math.abs(x); formula = 'Δz = 3 z (Δx/x)'; }
+          const ex = 100 * dx / Math.abs(x), ey = duale ? 100 * dy / Math.abs(y) : 0, ez = 100 * dz / Math.abs(z);
+          const cif = Math.abs(z) >= 100 ? 1 : (Math.abs(z) >= 1 ? 3 : 5);
+          host.innerHTML = '<strong>' + formula + '</strong><br>z = <strong>' + nf(z, cif) + ' ± ' + nf(dz, cif) +
+            '</strong> &nbsp;(errore percentuale <strong>' + nf(ez, 2) + '%</strong>)';
+          const mx = Math.max(ex, ey, ez, 0.0001);
+          function riga(lab, v, col) {
+            return '<div style="display:flex;align-items:center;gap:0.5rem;margin:0.22rem 0;font-size:0.88rem">' +
+              '<span style="min-width:3.6rem;color:var(--muted)">' + lab + '</span>' +
+              '<span style="height:12px;border-radius:6px;background:' + col + ';width:' + (100 * v / mx) + '%;min-width:2px"></span>' +
+              '<span style="font-variant-numeric:tabular-nums">' + nf(v, 2) + '%</span></div>';
+          }
+          bars.innerHTML = riga('su x', ex, 'var(--accent)') + (duale ? riga('su y', ey, 'var(--primary)') : '') +
+            riga('su z', ez, 'var(--gold)');
+        }
+        [gx, gdx, gy, gdy].forEach(function (i) { i.oninput = calc; });
+        document.querySelectorAll('[data-pp]').forEach(function (ch) {
+          ch.onclick = function () {
+            const p = ch.dataset.pp.split('|');
+            gx.value = p[0]; gdx.value = p[1]; gy.value = p[2]; gdy.value = p[3]; op = p[4];
+            Array.prototype.forEach.call(opsBox.children, function (k) { k.className = 'btn' + (k.dataset.op === op ? ' active' : ''); });
+            calc();
+          };
+        });
+        calc();
+      })();
+
+      /* ===== 5 — blocchetto: risposte guidate ===== */
+      (function () {
+        const c1 = document.getElementById('bb-check1'); if (!c1) return;
+        c1.onclick = function () {
+          const a = num(document.getElementById('bb-ec').value), b = num(document.getElementById('bb-ez').value);
+          const el = document.getElementById('bb-fb1');
+          if (!isFinite(a) || !isFinite(b)) { fb(el, false, 'Compila tutte e due le caselle.'); return; }
+          const okA = near(a, 0.75, 0.06), okB = near(b, 22.2, 1.2);
+          if (okA && okB) { fb(el, true, 'Esatto: <strong>0,75% col calibro</strong> e <strong>22% col cilindro</strong>. Un fattore trenta di differenza: il calibro vince senza discussione.'); }
+          else { fb(el, false, 'Ricontrolla: ε = Δ/valore × 100, cioè 0,068/9,07 per il calibro e 2/9 per il cilindro.'); }
+        };
+        document.getElementById('bb-check2').onclick = function () {
+          const r = num(document.getElementById('bb-rho').value), d = num(document.getElementById('bb-drho').value);
+          const el = document.getElementById('bb-fb2');
+          if (!isFinite(r) || !isFinite(d)) { fb(el, false, 'Compila tutte e due le caselle.'); return; }
+          const okR = near(r, 2.702, 0.02), okD = near(d, 0.031, 0.006);
+          if (okR && okD) { fb(el, true, 'Giusto: <strong>ρ = (2,70 ± 0,03) g/cm³</strong>. Guarda la tabella delle densità: che materiale sarà?'); }
+          else if (okR) { fb(el, false, 'ρ è giusto. Per Δρ somma gli errori <em>relativi</em> di massa e volume (0,41% + 0,75% = 1,16%) e moltiplica per ρ.'); }
+          else { fb(el, false, 'Non ancora: ρ = m/V = 24,5/9,0676 e Δρ = ρ(Δm/m + ΔV/V).'); }
+        };
+      })();
+
+      /* ===== 5.4 — il blocchetto misterioso ===== */
+      (function () {
+        const box = document.getElementById('mb-dati'); if (!box) return;
+        const scelte = document.getElementById('mb-scelte'), fbEl = document.getElementById('mb-fb'),
+              conti = document.getElementById('mb-conti');
+        const POOL = [['legno di pino', 0.65], ['polietilene', 0.95], ['PVC', 1.38], ['alluminio', 2.70],
+                      ['ferro', 7.87], ['rame', 8.96], ['piombo', 11.34]];
+        const TAB = POOL.concat([['vetro', 2.50], ['marmo', 2.71], ['ottone', 8.50]]);
+        let S = null;
+        function tondo(v, p) { return Math.round(v / p) * p; }
+        function genera() {
+          const mat = POOL[Math.floor(Math.random() * POOL.length)];
+          const a = tondo(20 + Math.random() * 20, 0.05), b = tondo(15 + Math.random() * 15, 0.05),
+                c = tondo(10 + Math.random() * 10, 0.05);
+          const V = a * b * c / 1000;                        // cm³
+          const m = Math.round(mat[1] * V * 10) / 10;        // g, bilancia 0,1 g
+          const ac = a / 10, bc = b / 10, cc = c / 10, s = 0.005;
+          const dV = V * (s / ac + s / bc + s / cc);
+          const rho = m / V, drho = rho * (0.1 / m + dV / V);
+          S = { mat: mat, a: a, b: b, c: c, V: V, dV: dV, m: m, rho: rho, drho: drho };
+          box.innerHTML = '<table class="tabf"><thead><tr><th colspan="2">Dati del blocchetto</th></tr></thead><tbody>' +
+            '<tr><td class="lab">lato a (calibro)</td><td>' + nf(a, 2) + ' ± 0,05 mm</td></tr>' +
+            '<tr><td class="lab">lato b (calibro)</td><td>' + nf(b, 2) + ' ± 0,05 mm</td></tr>' +
+            '<tr><td class="lab">lato c (calibro)</td><td>' + nf(c, 2) + ' ± 0,05 mm</td></tr>' +
+            '<tr><td class="lab">massa (bilancia)</td><td>' + nf(m, 1) + ' ± 0,1 g</td></tr>' +
+            '</tbody></table>';
+          fbEl.className = 'fb'; fbEl.innerHTML = ''; conti.innerHTML = '';
+          disegnaScelte();
+        }
+        function disegnaScelte() {
+          scelte.innerHTML = '<span style="font-size:0.85rem;color:var(--muted);margin-right:0.3rem">di che materiale è?</span>';
+          POOL.forEach(function (mm) {
+            const b = document.createElement('button');
+            b.className = 'btn'; b.textContent = mm[0];
+            b.onclick = function () { verifica(mm); };
+            scelte.appendChild(b);
+          });
+        }
+        function compatibili() {
+          return TAB.filter(function (t) { return Math.abs(t[1] - S.rho) <= S.drho; })
+                    .map(function (t) { return t[0]; });
+        }
+        function verifica(scelto) {
+          if (!S) { return; }
+          const comp = compatibili();
+          const dentro = Math.abs(scelto[1] - S.rho) <= S.drho;
+          const giusto = scelto[0] === S.mat[0];
+          let msg;
+          if (giusto) {
+            msg = 'Sì: <strong>' + S.mat[0] + '</strong>. La densità misurata è (' + nf(S.rho, 2) + ' ± ' + nf(S.drho, 2) +
+              ') g/cm³, e il valore tabulato ' + nf(S.mat[1], 2) + ' cade dentro l\'intervallo.';
+            if (comp.length > 1) {
+              msg += ' <em>Però attenzione</em>: con questa incertezza sono compatibili anche ' +
+                comp.filter(function (n) { return n !== S.mat[0]; }).join(', ') +
+                '. La densità restringe il campo, non sempre lo chiude.';
+            }
+            fb(fbEl, true, msg);
+          } else if (dentro) {
+            fb(fbEl, false, 'Non è quello giusto, ma la tua scelta è <em>compatibile</em> con la misura: (' +
+              nf(S.rho, 2) + ' ± ' + nf(S.drho, 2) + ') g/cm³ non riesce a distinguerli. Il blocchetto era di <strong>' +
+              S.mat[0] + '</strong>: per separarli servirebbe una misura più precisa, o una grandezza diversa.');
+          } else {
+            fb(fbEl, false, 'No: la densità misurata è (' + nf(S.rho, 2) + ' ± ' + nf(S.drho, 2) +
+              ') g/cm³, mentre ' + scelto[0] + ' vale ' + nf(scelto[1], 2) +
+              ' g/cm³ — fuori dall\'intervallo. Era <strong>' + S.mat[0] + '</strong>.');
+          }
+          mostraConti();
+        }
+        function mostraConti() {
+          if (!S) { return; }
+          const ac = S.a / 10, bc = S.b / 10, cc = S.c / 10;
+          conti.innerHTML = '<div class="steps" style="margin-top:0.7rem">' +
+            '<p><span class="step-num">1</span> In centimetri: ' + nf(ac, 3) + ' × ' + nf(bc, 3) + ' × ' + nf(cc, 3) +
+            ' → V = <strong>' + nf(S.V, 3) + ' cm³</strong></p>' +
+            '<p><span class="step-num">2</span> Errore relativo sul volume: 0,005/' + nf(ac, 3) + ' + 0,005/' + nf(bc, 3) +
+            ' + 0,005/' + nf(cc, 3) + ' = ' + nf(100 * S.dV / S.V, 2) + '% → ΔV = ' + nf(S.dV, 3) + ' cm³</p>' +
+            '<p><span class="step-num">3</span> ρ = ' + nf(S.m, 1) + '/' + nf(S.V, 3) + ' = <strong>' + nf(S.rho, 3) + ' g/cm³</strong></p>' +
+            '<p><span class="step-num">4</span> Errore relativo su ρ: ' + nf(100 * 0.1 / S.m, 2) + '% (massa) + ' +
+            nf(100 * S.dV / S.V, 2) + '% (volume) = ' + nf(100 * S.drho / S.rho, 2) + '% → Δρ = ' + nf(S.drho, 3) + ' g/cm³</p>' +
+            '<p><span class="step-num">5</span> Risultato: <strong>ρ = (' + nf(S.rho, 2) + ' ± ' + nf(S.drho, 2) +
+            ') g/cm³</strong> — compatibile con: ' + compatibili().join(', ') + '</p></div>';
+        }
+        document.getElementById('mb-new').onclick = genera;
+        document.getElementById('mb-help').onclick = mostraConti;
+        genera();
+      })();
+
+      /* ===== 6 — la parete: media, semidispersione, sqm ===== */
+      (function () {
+        const wrap = document.getElementById('pa-inputs'); if (!wrap) return;
+        const tab = document.getElementById('pa-tab'), st = document.getElementById('pa-stats'),
+              svg = document.getElementById('pa-svg'), out = document.getElementById('pa-out');
+        const BASE = [412.3, 411.8, 412.6, 412.0, 412.3];
+        function gauss() {
+          let u = 0, v = 0;
+          while (u === 0) { u = Math.random(); }
+          while (v === 0) { v = Math.random(); }
+          return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+        }
+        wrap.innerHTML = '<span style="font-size:0.9rem;color:var(--muted);margin-right:0.3rem">misure (cm):</span>';
+        for (let i = 0; i < 5; i++) {
+          const inp = document.createElement('input');
+          inp.className = 'inp'; inp.style.width = '5.6rem'; inp.id = 'pa-' + i; inp.type = 'text';
+          inp.inputMode = 'decimal'; inp.value = nf(BASE[i], 1);
+          inp.oninput = calc;
+          wrap.appendChild(inp);
+        }
+        function leggi() {
+          const v = [];
+          for (let i = 0; i < 5; i++) {
+            const x = num(document.getElementById('pa-' + i).value);
+            if (!isFinite(x)) { return null; }
+            v.push(x);
+          }
+          return v;
+        }
+        function calc() {
+          const x = leggi();
+          if (!x) { out.innerHTML = '<span style="color:var(--red)">Tutte e cinque le caselle devono contenere un numero.</span>'; return; }
+          const n = 5;
+          const media = x.reduce(function (a, b) { return a + b; }, 0) / n;
+          const mx = Math.max.apply(null, x), mn = Math.min.apply(null, x);
+          const semi = (mx - mn) / 2;
+          let sq = 0;
+          x.forEach(function (v) { sq += (v - media) * (v - media); });
+          const sigma = Math.sqrt(sq / n);
+          const sigmaC = Math.sqrt(sq / (n - 1));
+          const somScarti = x.reduce(function (a, v) { return a + (v - media); }, 0);
+          // tabella degli scarti
+          let t = '<div class="table-container"><table class="tabf"><thead><tr><th>i</th><th>x<sub>i</sub> (cm)</th>' +
+                  '<th>d<sub>i</sub> = x<sub>i</sub> − x̄ (cm)</th><th>d<sub>i</sub>² (cm²)</th></tr></thead><tbody>';
+          x.forEach(function (v, i) {
+            t += '<tr><td>' + (i + 1) + '</td><td>' + nf(v, 1) + '</td><td>' + nf(v - media, 2) + '</td><td>' + nf((v - media) * (v - media), 3) + '</td></tr>';
+          });
+          t += '<tr class="tot"><td>somma</td><td>' + nf(media * n, 1) + '</td><td>' + nf(Math.abs(somScarti) < 1e-9 ? 0 : somScarti, 2) +
+               '</td><td>' + nf(sq, 3) + '</td></tr></tbody></table></div>';
+          tab.innerHTML = t;
+          st.innerHTML =
+            '<div class="stat"><div class="n">' + nf(media, 2) + '</div><div class="l">media x̄ (cm)</div></div>' +
+            '<div class="stat"><div class="n">' + nf(semi, 2) + '</div><div class="l">semidispersione (cm)</div></div>' +
+            '<div class="stat"><div class="n">' + nf(sigma, 2) + '</div><div class="l">scarto quadr. medio σ (cm)</div></div>' +
+            '<div class="stat"><div class="n">' + nf(sigma / Math.sqrt(n), 2) + '</div><div class="l">σ/√n — errore sulla media</div></div>';
+          // grafico: le misure e i due intervalli
+          const lo = Math.min(mn, media - Math.max(semi, sigma)) - 0.35,
+                hi = Math.max(mx, media + Math.max(semi, sigma)) + 0.35;
+          const W = 760, H = 190, L = 30, R = W - 30;
+          const X = function (v) { return L + (v - lo) / (hi - lo) * (R - L); };
+          let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="le cinque misure e i due intervalli">';
+          s += '<rect x="' + X(media - semi) + '" y="42" width="' + (X(media + semi) - X(media - semi)) + '" height="26" rx="5" fill="color-mix(in srgb, var(--primary) 26%, transparent)" stroke="var(--primary)"/>';
+          s += '<text class="lbl-s" x="' + (X(media) ) + '" y="34" text-anchor="middle" fill="var(--primary)">x̄ ± semidispersione</text>';
+          s += '<rect x="' + X(media - sigma) + '" y="80" width="' + (X(media + sigma) - X(media - sigma)) + '" height="26" rx="5" fill="color-mix(in srgb, var(--gold) 26%, transparent)" stroke="var(--gold)"/>';
+          s += '<text class="lbl-s" x="' + (X(media)) + '" y="122" text-anchor="middle" fill="var(--gold)">x̄ ± σ</text>';
+          s += '<line x1="' + X(media) + '" y1="28" x2="' + X(media) + '" y2="150" stroke="var(--magenta)" stroke-width="1.6" stroke-dasharray="5 4"/>';
+          s += '<line x1="' + L + '" y1="150" x2="' + R + '" y2="150" stroke="currentColor" style="color:var(--text-soft)" stroke-width="2"/>';
+          x.forEach(function (v) {
+            s += '<circle cx="' + X(v) + '" cy="150" r="6" fill="var(--accent)" stroke="var(--surface)" stroke-width="1.5"/>';
+            s += '<text class="lbl-s" x="' + X(v) + '" y="176" text-anchor="middle">' + nf(v, 1) + '</text>';
+          });
+          s += '</svg>';
+          svg.innerHTML = s;
+          let commento;
+          if (sigma === 0) {
+            commento = 'Le cinque misure coincidono: qui la dispersione non dice nulla e l\'incertezza torna a essere quella dello strumento, cioè 0,1 cm.';
+          } else if (semi / sigma > 1.6) {
+            commento = 'Qui la semidispersione è molto più grande di σ: segno che c\'è un valore un po\' anomalo che tira gli estremi.';
+          } else {
+            commento = 'Le due stime sono dello stesso ordine: la serie non ha valori anomali.';
+          }
+          out.innerHTML = 'Risultato nelle due forme: <strong>x = (' + nf(media, 1) + ' ± ' + nf(semi, 1) + ') cm</strong> con la semidispersione, ' +
+            '<strong>x = (' + nf(media, 1) + ' ± ' + nf(sigma, 1) + ') cm</strong> con lo scarto quadratico medio. ' +
+            commento + ' (Con il denominatore n−1 si otterrebbe σ = ' + nf(sigmaC, 2) + ' cm.)';
+        }
+        document.getElementById('pa-rand').onclick = function () {
+          for (let i = 0; i < 5; i++) {
+            document.getElementById('pa-' + i).value = nf(412.2 + 0.3 * gauss(), 1);
+          }
+          calc();
+        };
+        document.getElementById('pa-reset').onclick = function () {
+          for (let i = 0; i < 5; i++) { document.getElementById('pa-' + i).value = nf(BASE[i], 1); }
+          calc();
+        };
+        calc();
+      })();
+
+      /* ===== 7 — istogramma delle altezze ===== */
+      (function () {
+        const host = document.getElementById('is-svg'); if (!host) return;
+        const btns = document.getElementById('is-btns'), out = document.getElementById('is-out');
+        const H = [156, 159, 161, 162, 163, 164, 165, 166, 167, 168, 168, 169, 170, 170, 171, 172, 172, 173,
+                   174, 175, 176, 177, 179, 181, 183, 187];
+        const N = H.length;
+        const media = H.reduce(function (a, b) { return a + b; }, 0) / N;
+        const hmin = Math.min.apply(null, H), hmax = Math.max.apply(null, H);
+        const LARG = [1, 2, 5, 10, 20];
+        const COMM = {
+          1: 'Trentadue classi per ventisei dati: quasi ogni barra vale 0 o 1. Questo non è più un istogramma, è l\'elenco dei dati messo in piedi. Si vede il <strong>rumore</strong>, non la forma.',
+          2: 'Sedici classi: meglio, ma ancora troppe. L\'istogramma è frastagliato e i buchi fra una barra e l\'altra sono casuali, non significativi.',
+          5: '<strong>Sette classi: è la scelta giusta.</strong> Le regole pratiche ne suggerivano 5–6, i confini cadono su multipli di 5 e la forma si legge: un massimo attorno a 170–175 cm e una coda più lunga verso destra.',
+          10: 'Quattro classi: la forma c\'è ancora ma è ormai grossolana, e la classe modale è larga 10 cm — dire «la moda è fra 170 e 180» è un\'informazione molto più povera.',
+          20: 'Tre barre soltanto. Si vede che c\'è un massimo centrale e basta: tutto il resto dell\'informazione è stato buttato via nel raggruppamento.'
+        };
+        let w = 5;
+        LARG.forEach(function (v) {
+          const b = document.createElement('button');
+          b.className = 'btn' + (v === w ? ' active' : ''); b.textContent = 'classi da ' + v + ' cm'; b.dataset.w = v;
+          b.onclick = function () {
+            w = v;
+            Array.prototype.forEach.call(btns.children, function (k) { k.className = 'btn' + (parseInt(k.dataset.w, 10) === w ? ' active' : ''); });
+            draw();
+          };
+          btns.appendChild(b);
+        });
+        function draw() {
+          const start = Math.floor(hmin / w) * w;
+          const k = Math.floor((hmax - start) / w) + 1;
+          const f = new Array(k).fill(0);
+          H.forEach(function (h) { f[Math.floor((h - start) / w)]++; });
+          const fmax = Math.max.apply(null, f);
+          const imod = f.indexOf(fmax);
+          const W = 760, HH = 330, L = 46, R = W - 16, T = 18, B = HH - 62;
+          const bw = (R - L) / k;
+          const Y = function (v) { return B - v / fmax * (B - T); };
+          let s = '<svg viewBox="0 0 ' + W + ' ' + HH + '" role="img" aria-label="istogramma delle altezze">';
+          // griglia orizzontale
+          const passo = fmax <= 8 ? 1 : (fmax <= 16 ? 2 : 5);
+          for (let v = 0; v <= fmax; v += passo) {
+            s += '<line x1="' + L + '" y1="' + Y(v) + '" x2="' + R + '" y2="' + Y(v) + '" stroke="currentColor" style="color:var(--border)" stroke-width="1"/>';
+            s += '<text class="lbl-s" x="' + (L - 8) + '" y="' + (Y(v) + 4) + '" text-anchor="end">' + v + '</text>';
+          }
+          // barre
+          for (let i = 0; i < k; i++) {
+            if (f[i] === 0) { continue; }
+            s += '<rect x="' + (L + i * bw) + '" y="' + Y(f[i]) + '" width="' + bw + '" height="' + (B - Y(f[i])) +
+                 '" fill="' + (i === imod ? 'color-mix(in srgb, var(--gold) 55%, var(--surface))' : 'color-mix(in srgb, var(--accent) 45%, var(--surface))') +
+                 '" stroke="' + (i === imod ? 'var(--gold)' : 'var(--accent)') + '" stroke-width="1.4"/>';
+            if (bw > 20) { s += '<text class="lbl-s" x="' + (L + i * bw + bw / 2) + '" y="' + (Y(f[i]) - 5) + '" text-anchor="middle">' + f[i] + '</text>'; }
+          }
+          // asse x e confini
+          s += '<line x1="' + L + '" y1="' + B + '" x2="' + R + '" y2="' + B + '" stroke="currentColor" style="color:var(--text-soft)" stroke-width="2"/>';
+          const ogni = Math.ceil((k + 1) / 12);
+          for (let i = 0; i <= k; i++) {
+            const x = L + i * bw;
+            s += '<line x1="' + x + '" y1="' + B + '" x2="' + x + '" y2="' + (B + 6) + '" stroke="currentColor" style="color:var(--text-soft)" stroke-width="1.2"/>';
+            if (i % ogni === 0) { s += '<text class="lbl-s" x="' + x + '" y="' + (B + 20) + '" text-anchor="middle">' + (start + i * w) + '</text>'; }
+          }
+          s += '<text class="lbl-s" x="' + R + '" y="' + (B + 38) + '" text-anchor="end">altezza h (cm)</text>';
+          s += '<text class="lbl-s" x="' + (L - 8) + '" y="' + (T - 4) + '" text-anchor="end">frequenza</text>';
+          // media
+          const xm = L + (media - start) / w * bw;
+          s += '<line x1="' + xm + '" y1="' + (T - 8) + '" x2="' + xm + '" y2="' + B + '" stroke="var(--magenta)" stroke-width="1.8" stroke-dasharray="6 4"/>';
+          s += '<text class="em" x="' + xm + '" y="' + (HH - 10) + '" text-anchor="middle">media ' + nf(media, 1) + ' cm</text>';
+          s += '</svg>';
+          host.innerHTML = s;
+          const somma = f.reduce(function (a, b) { return a + b; }, 0);
+          out.innerHTML = '<strong>' + k + ' classi</strong> di ampiezza ' + w + ' cm, dalla prima che parte da ' + start +
+            ' cm. Somma delle frequenze: <strong>' + somma + '</strong> — e deve fare ' + N + ', altrimenti abbiamo perso un dato. ' +
+            'Classe modale: <strong>' + (start + imod * w) + ' ≤ h &lt; ' + (start + (imod + 1) * w) + '</strong> cm, con ' + fmax + ' studenti. ' +
+            (COMM[w] || '');
+        }
+        draw();
+      })();
+
+      //JSSENTINEL
+
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'In quale sezione della relazione vanno dichiarate <strong>sensibilità e portata</strong> degli strumenti?',
+        options: ['Scopo', 'Procedimento', 'Materiali e strumenti', 'Elaborazione dei dati', 'Discussione'],
+        correct: 2, explain: 'Vanno nella sezione <strong>Materiali e strumenti</strong>, insieme all\'elenco di ciò che si è usato. Senza quei due numeri chi legge non può controllare nessuna delle incertezze dichiarate più avanti.' },
+
+      { type: 'mc', diff: 'easy', text: 'Lo zero del nonio di un calibro <strong>ventesimale</strong> cade fra 24 e 25 mm, e risulta allineata la tacca n. 13. Quanto vale la lettura?',
+        options: ['24,13 mm', '24,26 mm', '24,50 mm', '24,65 mm', '25,13 mm'],
+        correct: 3, explain: 'Millimetri interi (24, cioè l\'ultimo superato dallo zero del nonio) più il numero della tacca allineata moltiplicato per la sensibilità: $24 + 13 \\times 0{,}05 = 24{,}65$ mm.' },
+
+      { type: 'mc', diff: 'medium', text: 'Due lunghezze valgono $(12{,}0 \\pm 0{,}2)$ cm e $(5{,}0 \\pm 0{,}1)$ cm. La loro <strong>differenza</strong> è:',
+        options: ['$(7{,}0 \\pm 0{,}1)$ cm', '$(7{,}0 \\pm 0{,}3)$ cm', '$(7{,}0 \\pm 0{,}2)$ cm', '$(17{,}0 \\pm 0{,}3)$ cm', '$(7{,}0 \\pm 0{,}02)$ cm'],
+        correct: 1, explain: 'Nelle differenze — come nelle somme — gli errori assoluti <strong>si sommano</strong>: $0{,}2 + 0{,}1 = 0{,}3$ cm. Sottrarre i valori non significa sottrarre le incertezze: l\'incertezza non può che crescere.' },
+
+      { type: 'mc', diff: 'medium', text: 'Nel <strong>prodotto</strong> di due misure si sommano:',
+        options: ['gli errori assoluti', 'le sensibilità dei due strumenti', 'gli errori relativi', 'i quadrati degli errori assoluti', 'niente: l\'errore resta quello maggiore dei due'],
+        correct: 2, explain: '$\\dfrac{\\Delta z}{z} = \\dfrac{\\Delta x}{x} + \\dfrac{\\Delta y}{y}$, e moltiplicando per $z$ si ottiene l\'errore assoluto. È il motivo per cui una misura indiretta ottenuta per prodotto non è mai, in percentuale, più precisa delle misure dirette da cui nasce.' },
+
+      { type: 'mc', diff: 'hard', text: 'Il volume di un blocchetto misurato per immersione risulta $(9 \\pm 2)$ cm³, mentre col calibro dà $(9{,}07 \\pm 0{,}07)$ cm³. Perché il primo metodo è tanto peggiore?',
+        options: ['perché l\'acqua bagna il blocchetto e ne altera il volume', 'perché il principio di Archimede vale solo per i liquidi puri', 'perché il cilindro graduato non è mai tarato correttamente', 'perché la lettura del menisco è soggettiva', 'perché il volume nasce dalla differenza di due letture vicine: gli errori si sommano mentre il risultato resta piccolo'],
+        correct: 4, explain: 'È la trappola della differenza: $\\Delta V = 1 + 1 = 2$ cm³ su un risultato di soli 9 cm³, cioè il 22%. Ogni volta che misurate qualcosa per differenza, chiedetevi subito quanto è piccola la differenza rispetto agli errori.' },
+
+      { type: 'mc', diff: 'medium', text: 'Tre misure ripetute della stessa grandezza danno esattamente lo stesso valore. Che cosa si assume come incertezza?',
+        options: ['zero, perché non c\'è dispersione', 'la sensibilità dello strumento (errore massimo)', 'la media dei tre valori', 'lo scarto quadratico medio, che qui vale zero', 'la metà del valore misurato'],
+        correct: 1, explain: 'Le misure coincidono perché lo strumento non è abbastanza sensibile per vedere le differenze reali: l\'incertezza è tutta sua, ed è pari alla sua sensibilità. Dichiarare zero significherebbe sostenere di conoscere il valore esatto — cosa che in fisica non succede mai.' },
+
+      { type: 'mc', diff: 'medium', text: 'Rispetto alla semidispersione, lo <strong>scarto quadratico medio</strong> è preferibile perché:',
+        options: ['è sempre più piccolo', 'si calcola più in fretta', 'usa tutte le misure e non solo le due estreme', 'non richiede di calcolare la media', 'si può usare anche con una sola misura'],
+        correct: 2, explain: 'La semidispersione guarda solo il massimo e il minimo, cioè le due misure più a rischio di essere sfortunate, e per di più cresce sistematicamente all\'aumentare del numero di misure. Il σ tiene conto di tutti i dati e si stabilizza.' },
+
+      { type: 'mc', diff: 'medium', text: 'Il rapporto fra lato lungo e lato corto di un banco vale 1,400 se i lati sono misurati in centimetri. Misurandoli in pollici, il rapporto:',
+        options: ['diventa 2,54 volte più grande', 'diventa 2,54 volte più piccolo', 'non si può calcolare', 'resta lo stesso, perché è un numero adimensionale', 'dipende dalla sensibilità della scala usata'],
+        correct: 3, explain: 'Dividendo una lunghezza per un\'altra lunghezza le unità si semplificano e resta un numero puro, che non dipende dall\'unità scelta. È la ragione per cui un formato «16:9» si capisce ovunque nell\'universo senza doversi mettere d\'accordo su niente.' },
+
+      { type: 'mc', diff: 'hard', text: 'Perché la <strong>larghezza delle classi</strong> di un istogramma va sempre dichiarata?',
+        options: ['perché lo impone il Sistema Internazionale', 'perché cambiandola la stessa distribuzione può apparire appuntita, piatta o addirittura con più massimi', 'perché senza di essa non si può calcolare la media', 'perché serve a individuare la mediana', 'perché le classi devono comunque essere larghe 5 unità'],
+        correct: 1, explain: 'Il raggruppamento è una scelta di chi disegna il grafico, e influenza pesantemente la forma che si vede: troppe classi mostrano il rumore, troppo poche cancellano l\'informazione. Dichiararla è una questione di onestà, non di formalismo.' },
+
+      { type: 'mc', diff: 'medium', text: 'Che cosa garantisce la <em>peer review</em> su un articolo pubblicato?',
+        options: ['che il risultato è vero', 'che l\'esperimento è stato rifatto dai revisori', 'che tutti i dati grezzi sono stati ricontrollati uno per uno', 'che due o tre esperti del settore non vi hanno trovato errori evidenti', 'che nessuno potrà più contestarlo'],
+        correct: 3, explain: 'È un filtro contro gli errori grossolani, non un certificato di verità: i referee leggono per qualche ora un lavoro durato anni e non rifanno nulla. La verifica vera arriva dopo, quando altri gruppi provano a riprodurre il risultato.' },
+
+      { type: 'mc', diff: 'hard', text: 'Perché il modello <em>open access</em> finanziato dalle APC (l\'autore paga per pubblicare) crea un conflitto d\'interesse?',
+        options: ['perché gli autori guadagnano dalle citazioni ricevute', 'perché i referee vengono pagati direttamente dagli autori', 'perché per la rivista ogni articolo respinto è un mancato incasso', 'perché i lettori non pagano più nulla', 'perché le riviste diventano di proprietà pubblica'],
+        correct: 2, explain: 'Se l\'incasso dipende dal numero di articoli pubblicati, alla rivista conviene la quantità e non la qualità — l\'esatto contrario dell\'editoria tradizionale, dove chi scrive viene pagato e il giornale guadagna se i lettori si fidano. All\'estremo di questa china ci sono le riviste predatorie, che accettano quasi tutto purché si paghi.' },
+
+      { type: 'open', diff: 'hard', text: 'Il sistema della pubblicazione scientifica ha difetti seri: muro a pagamento, conflitti d\'interesse, metriche manipolabili, articoli irriproducibili. Spiega perché, nonostante tutto questo, non conviene buttarlo via — e che cosa è stato provato al suo posto, nella storia.',
+        keywords: ['peggior', 'churchill', 'democraz', 'eccezion', 'autorit', 'maestro', 'sacr', 'politic', 'consens', 'prestig', 'corregg', 'rifare', 'replic', 'alternativ', 'riform', 'trasparen'],
+        requiredMatches: 3,
+        explain: 'Il paragone è quello di Churchill sulla democrazia: la revisione paritaria è il peggiore sistema di controllo della qualità scientifica, <em>eccezion fatta per tutti gli altri che sono stati provati di volta in volta</em>. E gli altri li conosciamo bene, perché sono stati sperimentati sul serio per secoli: l\'<strong>autorità di un maestro</strong> (Aristotele aveva ragione perché era Aristotele), la <strong>fedeltà a un testo sacro</strong>, la <strong>decisione di un comitato politico</strong> (il caso più tragico è la genetica sovietica di Lysenko), il <strong>consenso della folla</strong> e il <strong>prestigio di chi parla più forte</strong>. Ogni volta che uno di questi ha sostituito il controllo fra pari, il risultato è stato peggiore. In più, questo sistema ha una proprietà che gli altri non hanno: <strong>si corregge da solo</strong>. La crisi della replicabilità l\'hanno scoperta gli scienziati stessi, le riviste predatorie sono state smascherate da esperimenti pubblicati, e le riforme sono in corso — archivi aperti, revisione firmata, <em>registered reports</em>, obbligo di depositare i dati grezzi, dichiarazione DORA contro l\'uso dell\'impact factor per valutare le persone. Resta comunque che lo strumento decisivo non è nessuno di questi: è <strong>rifare la misura</strong>.' }
+    ];
+  </script>
+
+</body>
+
+</html>

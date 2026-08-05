@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 2 — Misure, incertezze e statistica descrittiva</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+    .ckt { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .ckt svg { display: block; width: 100%; height: auto; max-width: 620px; margin: 0.3rem auto; }
+    .ckt .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .ckt .lbl-s { fill: var(--muted); font-size: 11px; }
+    .ckt .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.7rem; text-align: center; }
+    .stat .n { font-size: 1.2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
+    .stat .l { font-size: 0.76rem; color: var(--muted); }
+    .prop { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .prop-card { background: var(--surface-2); border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px; padding: 0.8rem 0.95rem; }
+    .prop-card h4 { margin: 0 0 0.3rem; color: var(--accent); font-size: 1.05rem; }
+    .prop-card p { margin: 0.35rem 0; font-size: 0.94rem; }
+    .prop-card .es { font-size: 0.9rem; border-top: 1px dashed var(--border); padding-top: 0.4rem; margin-top: 0.5rem; color: var(--muted); }
+    .prop-card .es strong { color: var(--gold); }
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Terzo anno · Lezione 2</div>
+    <h1>Misure, incertezze e statistica descrittiva</h1>
+    <p>Come si dichiara ciò che si è misurato — e come si scopre una legge fisica dentro una nuvola di punti</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Terzo anno</a>
+    <span class="sep">/</span> Misure e statistica descrittiva
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Una lezione di matematica travestita da fisica.</strong> Gran parte di ciò che segue lo avete già
+      incontrato nella <a href="../Matematica_2/8.Statistica.html">lezione di statistica</a>: media, mediana, scarto
+      quadratico medio, gaussiana. Perché rifarlo? Perché in laboratorio lo userete <em>ogni volta</em>, e perché qui
+      quei numeri smettono di essere un esercizio e diventano il modo in cui si dichiara onestamente che cosa si è
+      trovato. Ripartiamo da dove ci eravamo lasciati: <strong>una misura non è un numero, è un intervallo</strong>.
+    </div>
+
+    <!-- 1 — GLI STRUMENTI -->
+    <section id="sec1">
+      <h2>1. Le quattro proprietà di uno strumento</h2>
+
+      <p>Nella <a href="1_Fisica.html">lezione precedente</a> abbiamo detto che per misurare servono uno strumento e
+        un protocollo. Adesso guardiamo lo strumento più da vicino: ogni strumento di misura si descrive con
+        <strong>quattro proprietà</strong>, e confonderle è l'errore più comune di tutto il triennio.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Sensibilità</h4>
+          <p>La <strong>più piccola variazione</strong> della grandezza che lo strumento riesce ad apprezzare: in
+            pratica, il valore della sua <strong>divisione più piccola</strong> (o dell'ultima cifra del display).</p>
+          <p class="es"><strong>Metro da sarto:</strong> 1 mm. <strong>Riga da disegno:</strong> 0,5 mm.
+            <strong>Bilancia da cucina:</strong> 1 g. <strong>Termometro clinico:</strong> 0,1 °C.
+            <strong>Tachimetro dell'auto:</strong> 5 km/h (le tacche fra i numeri).</p>
+        </div>
+        <div class="prop-card">
+          <h4>Portata</h4>
+          <p>Il <strong>valore massimo</strong> misurabile (e talvolta anche il minimo): oltre quello, lo strumento
+            va fuori scala o si rompe.</p>
+          <p class="es"><strong>Metro da sarto:</strong> 150 cm. <strong>Bilancia da cucina:</strong> 5 kg.
+            <strong>Termometro clinico:</strong> 42 °C — ed è il motivo per cui non lo si usa per misurare l'acqua
+            che bolle. <strong>Tachimetro:</strong> 220 km/h.</p>
+        </div>
+        <div class="prop-card" style="border-top-color: var(--magenta);">
+          <h4 style="color: var(--magenta);">Precisione</h4>
+          <p>Quanto le misure <strong>ripetute</strong> della stessa grandezza sono <strong>vicine fra loro</strong>.
+            È una proprietà della <em>ripetibilità</em>: uno strumento preciso dà sempre più o meno lo stesso numero.
+            Nulla dice, però, se quel numero sia quello giusto.</p>
+          <p class="es"><strong>Esempio:</strong> una bilancia che pesa lo stesso oggetto 10 volte e restituisce
+            sempre 72,3 kg è <em>precisissima</em>… anche se l'oggetto pesa 70 kg.</p>
+        </div>
+        <div class="prop-card" style="border-top-color: var(--gold);">
+          <h4 style="color: var(--gold);">Accuratezza</h4>
+          <p>Quanto la misura è <strong>vicina al valore vero</strong>. È la proprietà che riguarda la
+            <em>correttezza</em>, e si verifica solo <strong>tarando</strong> lo strumento su un campione noto.</p>
+          <p class="es"><strong>Esempio:</strong> quella stessa bilancia, se azzerata bene, diventa accurata. Se
+            qualcuno ci ha appoggiato sopra un peso e poi l'ha azzerata, resta precisa ma è diventata inaccurata.</p>
+        </div>
+      </div>
+
+      <p>Precisione e accuratezza sono <strong>indipendenti</strong>: si possono avere tutte e quattro le
+        combinazioni. Il modo più efficace per capirlo è pensare a un bersaglio, dove ogni freccia è una misura e il
+        centro è il valore vero. Prova a tirare:</p>
+
+      <div class="ckt">
+        <div class="sim-btns" id="be-btns"></div>
+        <div class="sim-btns">
+          <button class="btn btn-primary" id="be-tira">🎯 tira 8 frecce</button>
+          <button class="btn" id="be-clear">↺ pulisci</button>
+        </div>
+        <div id="be-svg"></div>
+        <p class="eq-out" id="be-out"></p>
+      </div>
+
+      <div class="warnbox">
+        <strong>⚠ Sensibilità non è accuratezza.</strong> È l'equivoco che vi farà sbagliare più esercizi. Uno
+        strumento <em>sensibilissimo</em> mostra tante cifre; uno strumento <em>accurato</em> mostra le cifre
+        <strong>giuste</strong>. Una bilancia da laboratorio che legge il milligrammo ma è scentrata di 3 grammi è
+        sensibile e inaccurata insieme: vi darà numeri con cinque cifre, tutte sbagliate dalla terza in poi. E
+        nessuna quantità di cifre decimali potrà mai correggere quell'errore.
+      </div>
+    </section>
+
+    <!-- 2 — I TIPI DI ERRORE -->
+    <section id="sec2">
+      <h2>2. Tre famiglie di errori</h2>
+
+      <p>Quando una misura non coincide con il valore vero, le cause si dividono in tre famiglie ben distinte — e la
+        distinzione non è accademica, perché <strong>si trattano in modo completamente diverso</strong>.</p>
+
+      <h3>2.1 — L'errore massimo dello strumento</h3>
+
+      <p>È l'incertezza che deriva dalla <strong>sensibilità finita</strong> dello strumento, di cui abbiamo già
+        parlato. Non dipende da chi misura né da quante volte si misura: c'è, e basta.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Come si stima</div>
+        <p style="margin:0;">Per uno strumento <strong>analogico</strong> si assume in genere
+          <strong>mezza divisione</strong>; per uno <strong>digitale</strong>, <strong>una unità dell'ultima
+          cifra</strong> (a meno che il costruttore non dichiari di meglio nel manuale).</p>
+        <p class="formula-note">Se misuro con una riga da 1 mm e leggo $12{,}4$ cm, scriverò
+          $L = (12{,}40 \pm 0{,}05)$ cm.</p>
+      </div>
+
+      <p>Attenzione a un caso in cui questo errore <strong>si somma</strong>: se per misurare una lunghezza devo
+        leggere <em>due</em> tacche (l'inizio e la fine), l'incertezza raddoppia, perché ogni lettura porta la sua.
+        È il motivo per cui, potendo, si fa coincidere lo zero del righello con un estremo dell'oggetto.</p>
+
+      <h3>2.2 — Gli errori sistematici: i più infidi di tutti</h3>
+
+      <div class="definition">
+        Un <strong>errore sistematico</strong> è un errore che si ripete <strong>sempre nello stesso verso</strong> e
+        con entità simile: sposta <em>tutte</em> le misure dalla stessa parte, o sempre in eccesso o sempre in
+        difetto.
+      </div>
+
+      <p>Ecco perché sono i più pericolosi: <strong>ripetere la misura non li rivela</strong>. Anzi, li nasconde
+        meglio. Se misuro mille volte con un righello che ha il primo centimetro consumato, ottengo mille valori
+        splendidamente concordi fra loro — e tutti sbagliati di un centimetro. La statistica mi dirà che la misura è
+        precisissima, e sarà vero: la precisione non ha nulla da dire sull'accuratezza.</p>
+
+      <p>Qualche esempio concreto, per riconoscerli:</p>
+      <ul>
+        <li><strong>Strumento non azzerato.</strong> La bilancia che segna 0,3 kg a vuoto aggiungerà 0,3 kg a
+          qualunque pesata. Il dinamometro che parte già teso. È il caso più banale e il più frequente.</li>
+        <li><strong>Strumento mal tarato.</strong> Un metro di legno che con l'umidità si è allungato dell'1%
+          restituirà lunghezze sempre più piccole del vero, dell'1%.</li>
+        <li><strong>Errore di parallasse sistematico.</strong> Se leggo sempre la scala con l'occhio nella stessa
+          posizione sbagliata, sbaglio sempre nello stesso verso.</li>
+        <li><strong>Effetto dello strumento sul sistema.</strong> Il termometro freddo immerso in poca acqua
+          <em>raffredda</em> l'acqua: misurerò sempre una temperatura più bassa di quella che c'era prima.</li>
+        <li><strong>Un effetto fisico trascurato.</strong> Cronometrare a mano la caduta di un grave: il tempo di
+          reazione umano (circa 0,2 s) fa partire il cronometro tardi e lo ferma tardi — e non si compensa, perché il
+          ritardo alla partenza e all'arrivo non sono uguali.</li>
+      </ul>
+
+      <div class="warnbox">
+        <strong>Come si combattono?</strong> Non con la statistica: <strong>con la testa</strong>. Bisogna
+        <em>sospettarli</em>, cercarli e stanarli uno per uno. Le armi sono: <strong>tarare</strong> lo strumento su
+        un campione noto; <strong>cambiare strumento</strong> e vedere se il risultato cambia;
+        <strong>cambiare metodo</strong> di misura (se due metodi diversi danno lo stesso numero, è un buon segno);
+        <strong>far ripetere l'esperimento a qualcun altro</strong>, magari in un altro laboratorio.
+        <p style="margin:0.55rem 0 0;">È esattamente il motivo per cui la scienza pretende la
+          <strong>riproducibilità</strong>: un errore sistematico è invisibile dall'interno di un esperimento, e
+          spesso solo un gruppo indipendente riesce a scovarlo. Nel 2011 un famoso esperimento sembrò misurare
+          neutrini più veloci della luce: mesi dopo si scoprì che un cavo in fibra ottica non era avvitato bene.
+          Un errore sistematico, appunto.</p>
+      </div>
+
+      <h3>2.3 — Gli errori casuali (o statistici)</h3>
+
+      <div class="definition">
+        Un <strong>errore casuale</strong> è dovuto a tante piccole cause imprevedibili e indipendenti, che a ogni
+        ripetizione agiscono <strong>in verso diverso</strong>: a volte in eccesso, a volte in difetto. Ripetendo la
+        misura, i valori si <strong>sparpagliano</strong> attorno a un valore centrale.
+      </div>
+
+      <p>Vibrazioni del banco, correnti d'aria, minime variazioni di temperatura, la mano che trema, il tempo di
+        reazione che ogni volta è un po' diverso: nessuna di queste cause, da sola, conta qualcosa; tutte insieme
+        fanno ballare l'ultima cifra.</p>
+
+      <p>E qui arriva il regalo. Ricordate il <strong>teorema del limite centrale</strong>, dalla lezione di
+        statistica? Diceva che sommando tante cause casuali indipendenti si ottiene sempre la stessa forma: la
+        <strong>gaussiana</strong>. Ed è esattamente ciò che succede alle misure ripetute.</p>
+
+      <div class="theorem">
+        Se gli errori casuali sono tanti, piccoli e indipendenti, le misure ripetute si distribuiscono secondo una
+        <strong>curva gaussiana</strong> centrata sul valore vero. Questo ha una conseguenza pratica enorme: gli
+        errori casuali, a differenza di quelli sistematici, <strong>si possono ridurre ripetendo le misure</strong> —
+        perché in media si compensano.
+      </div>
+
+      <table class="tabf">
+        <tr><th>&nbsp;</th><th>Errori sistematici</th><th>Errori casuali</th></tr>
+        <tr><td class="lab">Verso</td><td>sempre lo stesso</td><td>ogni volta diverso</td></tr>
+        <tr><td class="lab">Ripetendo le misure</td><td><strong>non si vedono</strong> e non si riducono</td><td>si sparpagliano e <strong>si compensano</strong></td></tr>
+        <tr><td class="lab">Effetto</td><td>rovinano l'<strong>accuratezza</strong></td><td>rovinano la <strong>precisione</strong></td></tr>
+        <tr><td class="lab">Come si affrontano</td><td>tarando, cambiando metodo, facendo ripetere ad altri</td><td>con la <strong>statistica</strong></td></tr>
+      </table>
+
+      <p>E siccome i secondi si trattano con la statistica, è ora di andarsela a riprendere.</p>
+    </section>
+
+    <!-- 3 — GLI INDICI -->
+    <section id="sec3">
+      <h2>3. Il valore da dichiarare: media, mediana, moda</h2>
+
+      <p>Ho ripetuto la misura dieci volte e ho dieci numeri diversi. Quale scrivo sul quaderno? Riprendiamo i tre
+        indici della lezione di statistica, con gli occhi del laboratorio.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Media aritmetica</h4>
+          $$\bar{x} = \frac{x_1 + x_2 + \dots + x_N}{N}$$
+          <p class="es">È <strong>il valore che si dichiara</strong> quando gli errori sono casuali: essendo
+            distribuiti a caso attorno al valore vero, mediando si compensano. È la scelta standard in laboratorio.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Media ponderata</h4>
+          $$\bar{x}_p = \frac{\sum_i p_i x_i}{\sum_i p_i}$$
+          <p class="es">Si usa quando le misure <strong>non hanno tutte lo stesso valore</strong>: per esempio,
+            combinando risultati di laboratori diversi, si dà più peso a quelli con incertezza minore (di solito
+            $p_i = 1/\sigma_i^2$).</p>
+        </div>
+        <div class="prop-card">
+          <h4>Mediana</h4>
+          <p>Il valore centrale dei dati <strong>ordinati</strong>.</p>
+          <p class="es">In laboratorio è preziosa come <strong>controllo</strong>: essendo robusta, non risente di un
+            valore anomalo. Se media e mediana sono molto diverse, c'è quasi certamente un dato sbagliato — un
+            campanello d'allarme gratuito.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Moda</h4>
+          <p>Il valore più frequente.</p>
+          <p class="es">Poco usata per una singola grandezza (con misure continue spesso ogni valore compare una
+            volta sola), ma utile per capire la <strong>forma</strong> della distribuzione: se compaiono
+            <em>due</em> mode, quasi sempre state misurando due cose diverse senza accorgervene.</p>
+        </div>
+      </div>
+
+      <h3>3.1 — Un modo rapido: la semidispersione</h3>
+
+      <p>Con <strong>poche</strong> misure (tre, quattro, cinque) si può stimare l'incertezza nel modo più semplice
+        possibile: si prende metà dell'intervallo coperto dai dati.</p>
+
+      <div class="formula-box">
+        $$\bar{x} = \frac{x_{\max} + x_{\min}}{2} \qquad\qquad \Delta x = \frac{x_{\max} - x_{\min}}{2}$$
+        <p class="formula-note">La <strong>semidispersione</strong> è veloce e onesta quando i dati sono pochi. Ha
+          però un difetto evidente: usa <em>solo</em> il valore più grande e il più piccolo, cioè proprio i due più
+          esposti al caso, e butta via tutti gli altri. Con molte misure si può fare molto meglio.</p>
+      </div>
+
+      <h3>3.2 — Che forma hanno davvero le misure? Facciamole</h3>
+
+      <p>Smettiamo di parlarne e misuriamo. Nel simulatore qui sotto si misura con un cronometro il periodo di un
+        pendolo: il valore vero è nascosto, e ogni misura porta con sé i suoi errori casuali (tempo di reazione,
+        lettura, piccole vibrazioni). Premi il pulsante e accumula misure — poi guarda l'istogramma prendere forma.</p>
+
+      <div class="ckt">
+        <div class="sim-btns">
+          <button class="btn btn-primary" id="mr-1">⏱ misura una volta</button>
+          <button class="btn" id="mr-10">misura 10 volte</button>
+          <button class="btn" id="mr-200">misura 200 volte</button>
+          <button class="btn" id="mr-reset">↺ ricomincia</button>
+        </div>
+        <div id="mr-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="mr-n">0</div><div class="l">misure fatte</div></div>
+          <div class="stat"><div class="n" id="mr-media">—</div><div class="l">media</div></div>
+          <div class="stat"><div class="n" id="mr-sd">—</div><div class="l">scarto quad. medio σ</div></div>
+          <div class="stat"><div class="n" id="mr-68">—</div><div class="l">dentro ±σ</div></div>
+        </div>
+        <p class="eq-out" id="mr-out"></p>
+      </div>
+
+      <h3>3.3 — L'incertezza è lo scarto quadratico medio</h3>
+
+      <p>Le misure si dispongono su una <strong>gaussiana</strong>, esattamente come previsto dal teorema del limite
+        centrale. E allora la domanda diventa: quale numero descrive la <strong>larghezza</strong> di quella campana?
+        La risposta la conoscete già dalla lezione di statistica — è lo <strong>scarto quadratico medio</strong>.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Come si dichiara una misura ripetuta</div>
+        $$x = \bar{x} \pm \sigma \qquad\text{con}\qquad
+          \sigma = \sqrt{\frac{\sum_i \left(x_i - \bar{x}\right)^2}{N-1}}$$
+        <p class="formula-note">Si divide per $N-1$ e non per $N$ perché la media $\bar{x}$ è stata ricavata
+          <em>dagli stessi dati</em>: uno dei valori non è più libero. È la stessa correzione vista in statistica.</p>
+      </div>
+
+      <p>E adesso il punto che dà senso a tutto. Scrivere $x = \bar{x} \pm \sigma$ non è un modo elegante di dire
+        «più o meno»: è un'<strong>affermazione probabilistica precisa</strong>.</p>
+
+      <div class="theorem">
+        Se ripeto la misura <strong>un'altra volta</strong>, ho circa il <strong>68%</strong> di probabilità che il
+        nuovo valore cada dentro l'intervallo $[\bar{x} - \sigma,\ \bar{x} + \sigma]$. Con $2\sigma$ la probabilità
+        sale al <strong>95%</strong>, con $3\sigma$ al <strong>99,7%</strong>.
+      </div>
+
+      <p>È la regola <strong>68-95-99,7</strong> della gaussiana, applicata al laboratorio. Ecco perché dichiarare
+        l'incertezza è un atto di onestà quantificabile: state dicendo agli altri <em>quanto</em> possono fidarsi, e
+        con che probabilità.</p>
+
+      <div class="curiosita">
+        <strong>📉 Misurare di più conviene (ma sempre meno).</strong> Lo scarto quadratico medio $\sigma$ descrive
+        quanto sono sparpagliate <em>le singole misure</em>, e non cala ripetendo l'esperimento: è una proprietà
+        dell'apparato. Ma l'incertezza sulla <strong>media</strong> — cioè sul valore che dichiariamo — è più
+        piccola, e vale $\sigma_{\bar{x}} = \sigma/\sqrt{N}$.
+        <p style="margin:0.55rem 0 0;">Attenzione a quella radice: per dimezzare l'incertezza servono
+          <strong>quattro volte</strong> più misure, per ridurla a un decimo ne servono <strong>cento volte</strong>.
+          È il motivo per cui, oltre un certo punto, conviene smettere di ripetere e cominciare a costruire uno
+          strumento migliore — o andare a caccia degli errori sistematici, che tanto non calano comunque.</p>
+      </div>
+    </section>
+
+    <!-- 4 — COMPATIBILITÀ -->
+    <section id="sec4">
+      <h2>4. Due misure sono d'accordo? Il confronto</h2>
+
+      <p>Torniamo al metodo sperimentale. Ho misurato l'accelerazione di gravità e ho ottenuto
+        $g = (9{,}78 \pm 0{,}05)$ m/s². Perché il risultato valga qualcosa, altri devono poter rifare l'esperimento e
+        trovare <em>lo stesso</em> risultato. Ma «lo stesso» che cosa significa, se una misura è un intervallo e non
+        un numero? È chiarissimo che nessuno otterrà mai $9{,}78$ esatto.</p>
+
+      <div class="definition">
+        Due misure della stessa grandezza si dicono <strong>compatibili</strong> (o <em>consistenti</em>) se i loro
+        <strong>intervalli di incertezza si sovrappongono</strong>, cioè se hanno almeno un valore in comune. Se non
+        si sovrappongono, le due misure sono <strong>incompatibili</strong>: da qualche parte c'è un errore — quasi
+        sempre <strong>sistematico</strong> — oppure un'incertezza è stata sottostimata.
+      </div>
+
+      <p>Muovi i due risultati e le loro incertezze, e guarda quando gli intervalli si toccano:</p>
+
+      <div class="ckt">
+        <div class="controls">
+          <div class="control-group"><label>misura A: <span class="val" id="cp-a-val">9,78</span> m/s²</label>
+            <input type="range" id="cp-a" min="9.5" max="10.1" step="0.01" value="9.78"></div>
+          <div class="control-group"><label>incertezza di A: ± <span class="val" id="cp-da-val">0,05</span></label>
+            <input type="range" id="cp-da" min="0.01" max="0.2" step="0.01" value="0.05"></div>
+        </div>
+        <div class="controls">
+          <div class="control-group"><label>misura B: <span class="val" id="cp-b-val">9,90</span> m/s²</label>
+            <input type="range" id="cp-b" min="9.5" max="10.1" step="0.01" value="9.9"></div>
+          <div class="control-group"><label>incertezza di B: ± <span class="val" id="cp-db-val">0,04</span></label>
+            <input type="range" id="cp-db" min="0.01" max="0.2" step="0.01" value="0.04"></div>
+        </div>
+        <div class="sim-btns" id="cp-k"></div>
+        <div id="cp-svg"></div>
+        <p class="eq-out" id="cp-out"></p>
+      </div>
+
+      <h3>4.1 — Ma quanto larghi, gli intervalli? Il compromesso</h3>
+
+      <p>Ed ecco il punto sottile, quello che nel widget avete appena toccato con mano. Abbiamo detto che dentro
+        $\pm\sigma$ cade solo il <strong>68%</strong> delle misure: significa che, anche facendo tutto
+        perfettamente, <strong>una misura su tre finisce fuori</strong>. Se usassimo $1\sigma$ come criterio
+        assoluto, dichiareremmo incompatibili un mucchio di misure che vanno benissimo.</p>
+
+      <p>Allarghiamo, allora, a $2\sigma$ o a $3\sigma$? Attenzione, perché il rimedio ha il suo prezzo:</p>
+
+      <div class="prop">
+        <div class="prop-card" style="border-top-color:#ef4444;">
+          <h4 style="color:#ef4444;">Intervallo troppo stretto</h4>
+          <p>Si dichiarano <strong>incompatibili misure che in realtà vanno d'accordo</strong>. Si va a caccia di
+            errori che non esistono, si rifà l'esperimento per niente, e nei casi peggiori si «aggiustano» i dati
+            fino a farli tornare.</p>
+        </div>
+        <div class="prop-card" style="border-top-color: var(--gold);">
+          <h4 style="color: var(--gold);">Intervallo troppo largo</h4>
+          <p>Si dichiarano <strong>compatibili misure che non lo sono</strong>. Con $\pm 3\sigma$ va d'accordo quasi
+            tutto: il criterio diventa così permissivo da non scartare più niente — e un criterio che non scarta mai
+            nulla non serve a nulla.</p>
+        </div>
+      </div>
+
+      <div class="curiosita">
+        <strong>🎚 Che cosa si fa in pratica?</strong> Dipende dalla posta in gioco, ed è una decisione
+        <em>esplicita</em>, da dichiarare insieme al risultato. In laboratorio didattico lo standard è
+        <strong>$1\sigma$</strong>: se gli intervalli a $\pm\sigma$ si sovrappongono, le misure si considerano
+        compatibili. Nella ricerca si è più severi via via che la scoperta è più straordinaria: in fisica delle
+        particelle, per annunciare una <strong>nuova particella</strong>, si pretendono <strong>$5\sigma$</strong> —
+        una probabilità di sbagliarsi inferiore a una su tre milioni. Fu esattamente la soglia che il bosone di Higgs
+        dovette superare nel 2012.
+        <p style="margin:0.55rem 0 0;">La regola che sta sotto è di buon senso: <em>affermazioni straordinarie
+          richiedono prove straordinarie</em>.</p>
+      </div>
+
+      <p class="formula-note">Una precisazione per il futuro: il criterio della sovrapposizione degli intervalli è
+        semplice e va benissimo per noi, ma è un po' rozzo. Il modo rigoroso confronta la <em>differenza</em> con
+        l'incertezza <em>combinata</em>: si considerano compatibili due misure se
+        $|x_A - x_B| \le k\sqrt{\sigma_A^2 + \sigma_B^2}$. Lo incontrerete se proseguirete negli studi.</p>
+    </section>
+
+    <!-- 5 — FACOLTATIVA: NON GAUSSIANA -->
+    <section id="sec5" class="optional">
+      <h2>5. E se la distribuzione non fosse una gaussiana?</h2>
+
+      <p>Tutto l'edificio che abbiamo costruito poggia su un'assunzione: che le misure si distribuiscano secondo una
+        <strong>gaussiana</strong>. Ma chi ce lo assicura? La domanda è legittima, e la risposta onesta è:
+        <strong>non sempre è vero</strong>.</p>
+
+      <ul>
+        <li>Se <strong>contiamo eventi rari</strong> — quante particelle attraversano un rivelatore in un minuto,
+          quanti decadimenti radioattivi in un secondo — la distribuzione non è gaussiana ma di
+          <strong>Poisson</strong>, asimmetrica e con una coda a destra.</li>
+        <li>Se misuriamo le <strong>velocità delle molecole</strong> di un gas, otteniamo la distribuzione di
+          <strong>Maxwell-Boltzmann</strong>: parte da zero, sale, e scende con una lunga coda verso le alte
+          velocità. Nettamente asimmetrica.</li>
+        <li>Se contiamo <strong>quanti successi</strong> su un numero fissato di prove, la distribuzione è
+          <strong>binomiale</strong> — quella delle monete della lezione di statistica.</li>
+      </ul>
+
+      <div class="warnbox">
+        <strong>Perché è un problema serio.</strong> Se la distribuzione non è simmetrica, come ricorderete dalla
+        <a href="../Matematica_2/8.Statistica.html#sec6">lezione di statistica</a>, <strong>media, moda e mediana non
+        coincidono più</strong>: e allora quale dei tre dichiaro come «il valore»? Non solo: lo scarto quadratico
+        medio si può sempre calcolare, ma <strong>perde il suo significato</strong> — non è più vero che dentro
+        $\pm\sigma$ cade il 68% dei casi. Quel numero, che era il cuore di tutto il nostro modo di dichiarare le
+        misure, smette di dire ciò che credevamo.
+      </div>
+
+      <h3>5.1 — Il test t di Student</h3>
+
+      <p>C'è poi un secondo problema, più insidioso, che riguarda anche i casi in cui la gaussiana <em>c'è</em>: le
+        misure sono <strong>poche</strong>. Con sei misure, il $\sigma$ che calcoliamo è a sua volta una stima
+        incerta — potremmo aver sottostimato la dispersione per puro caso. Usare la regola del 68% come se
+        conoscessimo il $\sigma$ vero significa illudersi di essere più precisi di quanto siamo.</p>
+
+      <div class="curiosita">
+        <strong>🍺 «Student» lavorava alla Guinness.</strong> Il problema fu risolto nel 1908 da
+        <strong>William Sealy Gosset</strong>, un chimico impiegato alla birreria <strong>Guinness</strong> di
+        Dublino, che doveva controllare la qualità dell'orzo su campioni piccolissimi. La Guinness vietava ai
+        dipendenti di pubblicare (temeva che rivelassero segreti industriali), così Gosset firmò l'articolo con lo
+        pseudonimo «<strong>Student</strong>». Da allora quella distribuzione si chiama <em>t di Student</em>, e in
+        pochi sanno che dietro c'è un tecnico della birra.
+      </div>
+
+      <div class="definition">
+        La distribuzione <strong>t di Student</strong> è una «gaussiana con le code più grasse»: tiene conto del
+        fatto che con pochi dati anche $\sigma$ è incerto, e quindi allarga prudentemente gli intervalli. Dipende dai
+        <strong>gradi di libertà</strong> $\nu = N - 1$; al crescere di $N$ diventa sempre più simile alla gaussiana,
+        con cui coincide praticamente per $N \gtrsim 30$.
+      </div>
+
+      <p><strong>Un esempio concreto, passo per passo.</strong> Ho misurato $6$ volte l'accelerazione di gravità e ho
+        ottenuto, in m/s²:</p>
+      <div class="formula-box">
+        $$9{,}72 \quad 9{,}85 \quad 9{,}78 \quad 9{,}69 \quad 9{,}91 \quad 9{,}75$$
+      </div>
+      <p>Il valore di riferimento in Italia è $g = 9{,}81$ m/s². <strong>La mia misura è compatibile con esso?</strong></p>
+
+      <ol class="fasi" style="list-style:none; padding:0; counter-reset:fase;">
+        <li><h4>Media e scarto</h4>
+          <p>$\bar{x} = \dfrac{58{,}70}{6} = 9{,}783$ m/s²; &nbsp; $\sigma = 0{,}083$ m/s².</p></li>
+        <li><h4>Incertezza sulla media</h4>
+          <p>$\sigma_{\bar{x}} = \dfrac{\sigma}{\sqrt{N}} = \dfrac{0{,}083}{\sqrt{6}} = 0{,}034$ m/s².</p></li>
+        <li><h4>Si calcola $t$</h4>
+          <p>Quante «incertezze della media» separano il mio risultato dal valore atteso?
+            $$t = \frac{\bar{x} - \mu}{\sigma/\sqrt{N}} = \frac{9{,}783 - 9{,}81}{0{,}034} = -0{,}79$$</p></li>
+        <li><h4>Si confronta con il valore critico</h4>
+          <p>Con $\nu = N - 1 = 5$ gradi di libertà e un livello di confidenza del $95\%$, la tavola della $t$ dà un
+            valore critico di <strong>$2{,}571$</strong>. (Se avessi usato la gaussiana avrei preteso solo $1{,}96$:
+            ecco la prudenza in più che la $t$ impone quando i dati sono pochi.)</p></li>
+        <li><h4>Si conclude</h4>
+          <p>$|t| = 0{,}79 \lt 2{,}571$: la differenza osservata è <strong>del tutto compatibile con il caso</strong>.
+            La mia misura <strong>non è in disaccordo</strong> con il valore di riferimento.</p></li>
+      </ol>
+
+      <p class="formula-note">Nota bene che cosa <em>non</em> abbiamo dimostrato: non abbiamo dimostrato che la mia
+        misura sia giusta, né che $g$ valga davvero $9{,}81$. Abbiamo solo constatato che i miei dati
+        <strong>non forniscono alcuna prova contraria</strong>. È di nuovo Popper: si corrobora, non si dimostra.</p>
+    </section>
+
+    <!-- 6 — LE LEGGI LINEARI -->
+    <section id="sec6">
+      <h2>6. Trovare la legge: le relazioni lineari</h2>
+
+      <p>Abbiamo detto nella prima lezione che il mestiere della fisica non è misurare, ma <strong>mettere in
+        relazione</strong> le grandezze: trovare le leggi. Adesso abbiamo tutti gli strumenti per farlo davvero.</p>
+
+      <p>Associare a ogni valore di una grandezza il corrispondente valore di un'altra: dove l'abbiamo già visto?
+        Nel <a href="../Matematica_2/4.Piano_cartesiano.html">piano cartesiano</a>. Ogni coppia di misure è un
+        <strong>punto</strong> $(x; y)$, e una legge fisica diventa una <strong>curva</strong>. Cominciamo dal caso
+        più semplice e più frequente: le leggi che danno una <strong>retta</strong>.</p>
+
+      <div class="definition">
+        Una <strong>legge lineare</strong> lega due grandezze nella forma
+        $$y = m\,x + q$$
+        Se $q = 0$ le due grandezze sono <strong>direttamente proporzionali</strong>: raddoppiando l'una raddoppia
+        l'altra, e il rapporto $y/x = m$ resta costante.
+      </div>
+
+      <table class="tabf">
+        <tr><th>Legge</th><th>Relazione</th><th>Sul grafico</th></tr>
+        <tr><td class="lab">Moto rettilineo uniforme</td><td>$s = s_0 + v\,t$</td><td>retta: pendenza $=$ velocità, intercetta $=$ posizione iniziale</td></tr>
+        <tr><td class="lab">Legge di Hooke</td><td>$F = k\,\Delta x$</td><td>retta per l'origine: pendenza $=$ costante elastica</td></tr>
+        <tr><td class="lab">Legge di Ohm</td><td>$V = R\,i$</td><td>retta per l'origine: pendenza $=$ resistenza</td></tr>
+        <tr><td class="lab">Dilatazione termica</td><td>$L = L_0(1 + \lambda\,\Delta T)$</td><td>retta: intercetta $=$ lunghezza iniziale</td></tr>
+      </table>
+
+      <div class="curiosita">
+        <strong>🔄 E la proporzionalità inversa?</strong> Due grandezze sono inversamente proporzionali quando il
+        loro <strong>prodotto</strong> è costante: $x\,y = k$, cioè $y = k/x$. È il caso della legge di Boyle per i
+        gas ($p\,V = $ costante). Sul grafico $y$ contro $x$ non si ottiene affatto una retta, ma un
+        <strong>ramo di iperbole</strong> — ed è un guaio, perché a occhio è difficilissimo distinguere un'iperbole
+        da qualunque altra curva discendente.
+        <p style="margin:0.55rem 0 0;">Il trucco del mestiere è questo: si <strong>cambia variabile</strong>. Si
+          mette in ascissa non $x$ ma $1/x$: se la legge è davvero $y = k/x$, i punti si dispongono su una
+          <strong>retta per l'origine</strong> di pendenza $k$. È una tecnica che userete continuamente:
+          <em>linearizzare</em> una legge per poterla verificare con gli strumenti che stiamo per imparare.</p>
+      </div>
+
+      <h3>6.1 — Il problema: i punti non stanno sulla retta</h3>
+
+      <p>Facciamo un esperimento vero. Appendiamo masse crescenti a una molla e misuriamo la lunghezza:
+        l'allungamento dovrebbe essere proporzionale alla massa, quindi $L = L_0 + \dfrac{g}{k}\,m$ — una legge
+        lineare, con intercetta la lunghezza a riposo.</p>
+
+      <table class="tabf">
+        <tr><th>massa (g)</th><td>0</td><td>50</td><td>100</td><td>150</td><td>200</td><td>250</td></tr>
+        <tr><th>lunghezza (mm)</th><td>102</td><td>118</td><td>131</td><td>149</td><td>160</td><td>177</td></tr>
+      </table>
+      <p class="formula-note">Ogni lunghezza è misurata con un righello: incertezza $\pm 2$ mm.</p>
+
+      <p>Se disegnate quei sei punti, scoprirete che <strong>non stanno su una retta</strong>. Nessuna retta ci
+        passa attraverso tutti. Ed è normalissimo: le misure hanno incertezze, e quindi ogni punto non è un punto —
+        è un piccolo <strong>segmento verticale</strong>, la sua <em>barra d'errore</em>. La domanda giusta non è
+        «quale retta passa per i punti» ma:</p>
+
+      <div class="warnbox" style="border-left-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface));">
+        <strong>Fra tutte le rette che attraversano tutte le barre d'errore, quali sono le più inclinate e le meno
+        inclinate?</strong> Perché da quelle due si ricava sia il valore della pendenza, sia la sua incertezza.
+      </div>
+
+      <h3>6.2 — Il metodo grafico: retta di massima e di minima pendenza</h3>
+
+      <p>È il metodo che userete in laboratorio, e ha il pregio di essere trasparente: si fa con la matita.</p>
+
+      <ol class="fasi" style="list-style:none; padding:0;">
+        <li><h4>Si disegnano i punti con le barre d'errore</h4>
+          <p>Ogni misura diventa un segmento verticale lungo $2\Delta y$, centrato sul valore misurato.</p></li>
+        <li><h4>Retta di massima pendenza</h4>
+          <p>Si traccia la retta <strong>più inclinata</strong> che riesce ancora ad attraversare tutte le barre:
+            in pratica passa <em>in basso</em> nella barra di sinistra e <em>in alto</em> in quella di destra.</p></li>
+        <li><h4>Retta di minima pendenza</h4>
+          <p>Specularmente, la <strong>meno inclinata</strong> che le attraversa tutte: in alto a sinistra, in basso
+            a destra.</p></li>
+        <li><h4>Si ricavano valore e incertezza</h4>
+          <p>Il valore è la <strong>media</strong> dei due, l'incertezza la <strong>semidispersione</strong>:
+            $$m = \frac{m_{\max} + m_{\min}}{2}, \qquad \Delta m = \frac{m_{\max} - m_{\min}}{2}$$
+            e lo stesso per l'intercetta $q$.</p></li>
+      </ol>
+
+      <div class="ckt">
+        <div class="sim-btns" id="re1-modo"></div>
+        <div class="sim-btns">
+          <button class="btn" id="re1-out">⚠️ aggiungi un dato anomalo</button>
+        </div>
+        <div id="re1-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="re1-m">—</div><div class="l">pendenza m (mm/g)</div></div>
+          <div class="stat"><div class="n" id="re1-q">—</div><div class="l">intercetta q (mm)</div></div>
+          <div class="stat"><div class="n" id="re1-r">—</div><div class="l">coefficiente r</div></div>
+        </div>
+        <p class="eq-out" id="re1-txt"></p>
+      </div>
+
+      <p>Dal risultato si ricava la fisica. La pendenza vale $m = g/k$, quindi la costante elastica della molla è
+        $k = g/m \approx 9{,}81 / 0{,}30 \approx 33$ N/m. E l'intercetta, circa $102$ mm, è la lunghezza della molla
+        a riposo — un valore che possiamo <strong>controllare</strong> misurandolo direttamente: se torna, è una
+        conferma indipendente che la legge è quella giusta.</p>
+    </section>
+
+    <!-- 7 — FACOLTATIVA: MINIMI QUADRATI -->
+    <section id="sec7" class="optional">
+      <h2>7. Il metodo dei minimi quadrati</h2>
+
+      <p>Il metodo grafico ha un difetto: dipende da come tracciate le rette a mano, e usa in pratica soltanto i
+        punti estremi. Esiste un metodo che usa <strong>tutti</strong> i dati e non lascia spazio a interpretazioni:
+        il <strong>metodo dei minimi quadrati</strong>, dovuto a Gauss e Legendre.</p>
+
+      <div class="definition">
+        Fra tutte le rette possibili, si sceglie quella che rende <strong>minima la somma dei quadrati degli scarti
+        verticali</strong> fra i punti misurati e la retta:
+        $$S = \sum_{i} \left(y_i - (m\,x_i + q)\right)^2 \;\longrightarrow\; \text{minimo}$$
+      </div>
+
+      <p>Perché i <strong>quadrati</strong> e non gli scarti semplici? Per lo stesso motivo visto in statistica: gli
+        scarti hanno segni opposti e si cancellerebbero. E perché il quadrato e non il valore assoluto? Perché con i
+        quadrati il minimo si trova <em>esattamente</em>, con formule chiuse — e perché così i punti molto lontani
+        pesano di più, il che è ragionevole… fino a un certo punto (ci torniamo con gli outlier).</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Le formule (non serve impararle a memoria: le usa il foglio di calcolo)</div>
+        $$m = \frac{N\sum x_i y_i - \sum x_i \sum y_i}{N\sum x_i^2 - \left(\sum x_i\right)^2}
+          \qquad
+          q = \frac{\sum x_i^2 \sum y_i - \sum x_i \sum x_i y_i}{N\sum x_i^2 - \left(\sum x_i\right)^2}$$
+        <p class="formula-note">Anche le incertezze $\Delta m$ e $\Delta q$ hanno le loro formule, e si ricavano
+          dalla dispersione dei punti attorno alla retta trovata. Ogni foglio di calcolo le calcola: in
+          <a href="../Matematica_2/9.Foglio_di_calcolo.html">Google Fogli</a> la retta di tendenza con l'equazione
+          visualizzata <em>è</em> la retta dei minimi quadrati.</p>
+      </div>
+
+      <p>Torna al widget della sezione precedente e passa alla modalità <strong>minimi quadrati</strong>: vedrai la
+        retta cambiare leggermente e comparire i residui, cioè gli scarti che il metodo sta minimizzando.</p>
+
+      <div class="ckt">
+        <div class="sim-btns" id="re2-modo"></div>
+        <div class="sim-btns">
+          <button class="btn" id="re2-out">⚠️ aggiungi un dato anomalo</button>
+        </div>
+        <div id="re2-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="re2-m">—</div><div class="l">pendenza m (mm/g)</div></div>
+          <div class="stat"><div class="n" id="re2-q">—</div><div class="l">intercetta q (mm)</div></div>
+          <div class="stat"><div class="n" id="re2-r">—</div><div class="l">coefficiente r</div></div>
+        </div>
+        <p class="eq-out" id="re2-txt"></p>
+      </div>
+
+      <div class="curiosita">
+        <strong>🤝 I due metodi devono essere d'accordo.</strong> Sui nostri dati il metodo grafico dà
+        $m = (0{,}300 \pm 0{,}016)$ mm/g e i minimi quadrati danno $m = (0{,}2966 \pm 0{,}0074)$ mm/g: gli intervalli
+        <strong>si sovrappongono ampiamente</strong>, quindi i due risultati sono compatibili — proprio come devono
+        essere, visto che descrivono gli stessi dati. Nota però che i minimi quadrati danno un'incertezza
+        <strong>più piccola</strong>: è il vantaggio di usare tutti i punti invece dei soli estremi.
+      </div>
+    </section>
+
+    <!-- 8 — r E OUTLIER -->
+    <section id="sec8">
+      <h2>8. Ma la legge è davvero una retta? Il coefficiente r</h2>
+
+      <p>C'è un problema che finora abbiamo aggirato: il metodo dei minimi quadrati <strong>traccia sempre una
+        retta</strong>. Anche su punti disposti a caso, anche su una parabola. Vi restituirà diligentemente una
+        pendenza e un'intercetta senza dirvi che la retta non c'entra nulla. Serve un numero che ci dica
+        <strong>quanto i punti siano davvero allineati</strong>.</p>
+
+      <div class="definition">
+        Il <strong>coefficiente di correlazione lineare</strong> $r$ misura quanto i punti si dispongono lungo una
+        retta. Vale sempre fra $-1$ e $+1$:
+        <ul style="margin:0.45rem 0 0;">
+          <li>$r = +1$: allineamento perfetto, retta crescente;</li>
+          <li>$r = -1$: allineamento perfetto, retta decrescente;</li>
+          <li>$r \approx 0$: nessuna relazione lineare fra le due grandezze.</li>
+        </ul>
+        In laboratorio, per una legge lineare ben verificata, ci si aspetta $|r| \gt 0{,}99$.
+      </div>
+
+      <p>Sui dati della molla $r = 0{,}9988$: i punti sono allineatissimi, e la legge lineare è ben corroborata.</p>
+
+      <div class="warnbox">
+        <strong>⚠ Tre trappole di $r$, tutte classiche.</strong>
+        <ol style="margin:0.45rem 0 0;">
+          <li><strong>$r$ alto non dimostra che la legge sia una retta.</strong> Un pezzetto di parabola, se guardato
+            in un intervallo stretto, ha $r$ altissimo. Guardate <em>sempre</em> anche il grafico: se i residui
+            mostrano un andamento sistematico (tutti sopra al centro e sotto ai bordi, per esempio), la legge non è
+            lineare per quanto $r$ sia bello.</li>
+          <li><strong>Con pochi punti $r$ non significa nulla.</strong> Con due soli punti $r = \pm 1$ sempre, per
+            forza: due punti stanno su una retta comunque. Il valore di $r$ va giudicato insieme al numero di
+            misure.</li>
+          <li><strong>$r$ non dice nulla sulla causa.</strong> È lo stesso avvertimento della lezione di statistica:
+            <a href="../Matematica_2/8.Statistica.html#sec8">correlazione non è causalità</a>. Qui in laboratorio il
+            legame causale di solito lo conosciamo già, perché siamo noi a decidere quale grandezza variare — ma
+            l'avvertimento resta valido appena si esce dal laboratorio.</li>
+        </ol>
+      </div>
+
+      <h3>8.1 — Gli outlier: quel punto che sta troppo lontano</h3>
+
+      <div class="definition">
+        Un <strong>outlier</strong> (o <em>valore anomalo</em>) è un dato che si discosta nettamente dagli altri o
+        dall'andamento generale — molto più di quanto la sua barra d'errore possa giustificare.
+      </div>
+
+      <p>Nel widget avete il pulsante «aggiungi un dato anomalo»: provate a premerlo e guardate il disastro. La
+        pendenza cambia, l'intercetta pure, $r$ crolla, e le rette di massima e minima pendenza si allargano
+        enormemente — perché per attraversare <em>tutte</em> le barre devono raggiungere anche quella sbagliata.
+        Un solo punto su sette rovina l'intera analisi. Con i minimi quadrati va anche peggio, perché gli scarti
+        entrano <strong>al quadrato</strong>: un punto lontano il doppio pesa quattro volte tanto.</p>
+
+      <p>Che cosa si fa allora? Ecco il procedimento corretto, in ordine.</p>
+
+      <ol class="fasi" style="list-style:none; padding:0;">
+        <li><h4>Non si cancella</h4>
+          <p>Mai eliminare un dato solo perché è scomodo. È la porta d'ingresso della disonestà scientifica, e spesso
+            di quella involontaria: si finisce per tenere solo i dati che confermano ciò che ci si aspettava.</p></li>
+        <li><h4>Si cerca una causa documentata</h4>
+          <p>Si torna al <strong>quaderno di laboratorio</strong>: c'è annotato qualcosa su quella misura? Il peso è
+            caduto, qualcuno ha urtato il banco, il valore è stato trascritto male (un 158 al posto di 185)? Se la
+            causa c'è ed è documentata, il dato si <strong>scarta dichiarandolo</strong>, insieme al motivo.</p></li>
+        <li><h4>Si ripete la misura</h4>
+          <p>È la strada migliore in assoluto, e spesso la più rapida: si rifà quel punto. Se la nuova misura cade in
+            linea con le altre, il caso è chiuso; se cade di nuovo lontano, allora l'anomalia è <strong>reale</strong>
+            e va capita.</p></li>
+        <li><h4>Se non si trova nulla, si dichiara tutto</h4>
+          <p>Si può presentare l'analisi <strong>con e senza</strong> il punto sospetto, mostrando quanto cambia il
+            risultato. Esistono anche criteri statistici (il più noto è quello di <em>Chauvenet</em>) che indicano
+            quando un dato è così improbabile da poter essere scartato — ma nessun criterio sostituisce la
+            trasparenza: <strong>si dichiara sempre che cosa si è escluso e perché</strong>.</p></li>
+      </ol>
+
+      <div class="curiosita">
+        <strong>💎 A volte l'outlier è la scoperta.</strong> La storia della fisica è piena di anomalie che sembravano
+        errori e non lo erano. L'orbita di Mercurio non tornava con Newton: sembrava un dato da sistemare, era la
+        relatività generale. Penzias e Wilson nel 1964 avevano un fastidioso rumore di fondo nell'antenna: pulirono
+        perfino gli escrementi dei piccioni prima di capire che stavano ascoltando l'eco del <strong>Big Bang</strong>
+        — e vinsero il Nobel. Il neutrino fu ipotizzato da Pauli proprio perché in certi decadimenti l'energia non
+        tornava.
+        <p style="margin:0.55rem 0 0;">Morale: un dato che non torna è un <em>problema</em> solo se lo si nasconde.
+          Se lo si indaga, a volte è un regalo.</p>
+      </div>
+
+    </section>
+
+    <!-- 9 — FACOLTATIVA: RELAZIONI NON LINEARI -->
+    <section id="sec9" class="optional">
+      <h2>9. E se la relazione non è una retta?</h2>
+
+      <p>Finora abbiamo dato per scontato che la legge da cercare fosse lineare. Ma la maggior parte delle leggi
+        fisiche <strong>non lo è</strong>: la caduta di un grave va con il quadrato del tempo, il decadimento
+        radioattivo è esponenziale, la terza legge di Keplero lega il periodo alla potenza $3/2$ del raggio. Che
+        cosa si fa in questi casi?</p>
+
+      <h3>9.1 — La strada maestra: linearizzare</h3>
+
+      <p>Il trucco più elegante e più usato in laboratorio è <strong>non cambiare metodo, ma cambiare
+        variabili</strong>: si sceglie che cosa mettere sugli assi in modo che la legge, riscritta, diventi una
+        retta. A quel punto tutto l'armamentario che avete appena imparato — rette di massima e minima pendenza,
+        minimi quadrati, coefficiente $r$ — torna utilizzabile senza modifiche.</p>
+
+      <table class="tabf">
+        <tr><th>Se la legge è…</th><th>metti in ascissa</th><th>ottieni</th><th>esempio fisico</th></tr>
+        <tr><td class="lab">$y = k\,x^2$</td><td>$x^2$</td><td>retta per l'origine, pendenza $k$</td><td>caduta libera: $s = \frac{1}{2}g\,t^2$</td></tr>
+        <tr><td class="lab">$y = k/x$</td><td>$1/x$</td><td>retta per l'origine, pendenza $k$</td><td>legge di Boyle: $p = k/V$</td></tr>
+        <tr><td class="lab">$y = k\sqrt{x}$</td><td>$\sqrt{x}$</td><td>retta per l'origine</td><td>periodo del pendolo: $T = 2\pi\sqrt{L/g}$</td></tr>
+        <tr><td class="lab">$y = A\,e^{kx}$</td><td>$x$, con $\ln y$ in ordinata</td><td>retta di pendenza $k$</td><td>decadimento radioattivo, scarica di un condensatore</td></tr>
+        <tr><td class="lab">$y = A\,x^{n}$</td><td>$\log x$, con $\log y$ in ordinata</td><td>retta di pendenza $n$</td><td>terza legge di Keplero: $T^2 = k\,a^3$</td></tr>
+      </table>
+
+      <p>Vediamolo su un caso vero. Lasciamo cadere un grave e misuriamo lo spazio percorso a istanti successivi:</p>
+
+      <div class="ckt">
+        <div class="sim-btns" id="li-modo"></div>
+        <div id="li-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="li-r">—</div><div class="l">coefficiente r</div></div>
+          <div class="stat"><div class="n" id="li-m">—</div><div class="l">pendenza</div></div>
+          <div class="stat"><div class="n" id="li-g">—</div><div class="l">g che se ne ricava</div></div>
+        </div>
+        <p class="eq-out" id="li-txt"></p>
+      </div>
+
+      <div class="warnbox">
+        <strong>⚠ Due avvertenze che quasi tutti dimenticano.</strong>
+        <ol style="margin:0.45rem 0 0;">
+          <li><strong>Linearizzando cambiano anche le incertezze.</strong> Se $y$ ha incertezza $\Delta y$ e in
+            ordinata mettete $\ln y$, l'incertezza da riportare <em>non</em> è più $\Delta y$: diventa
+            $\Delta y / y$. Le barre d'errore vanno <strong>trasformate</strong> insieme ai dati — altrimenti
+            l'incertezza finale sarà sbagliata (di solito sottostimata).</li>
+          <li><strong>Un $r$ alto sui dati non linearizzati non vi salva.</strong> Guardate il widget qui sopra: con
+            i dati grezzi $r = 0{,}979$, un valore che in un compito qualunque sembrerebbe ottimo — eppure la legge
+            <em>non è</em> una retta. A tradirla sono i <strong>residui</strong>, che hanno segni
+            $+\,-\,-\,-\,-\,+$: una <strong>U</strong>, cioè un andamento sistematico. Ecco perché, come dicevamo
+            nella sezione 8, il grafico dei residui va guardato <em>sempre</em>.</li>
+        </ol>
+      </div>
+
+      <h3>9.2 — Quando linearizzare non si può: il fit non lineare</h3>
+
+      <p>Non tutte le leggi si lasciano raddrizzare. Se la relazione è, per esempio,
+        $y = A\,e^{-kx} + C$ (una scarica che tende a un valore diverso da zero), nessun cambio di variabile la
+        trasforma in una retta. In questi casi si generalizza l'idea dei minimi quadrati.</p>
+
+      <div class="definition">
+        Nel <strong>fit non lineare</strong> si sceglie una funzione modello $f(x;\, p_1, p_2, \dots)$ che dipende da
+        alcuni <strong>parametri</strong>, e si cercano i valori dei parametri che rendono minima la stessa quantità
+        di prima:
+        $$S = \sum_i \big(y_i - f(x_i;\, p_1, p_2, \dots)\big)^2$$
+        La differenza è che ora il minimo <strong>non si trova con una formula</strong>: si cerca
+        <strong>numericamente</strong>, per tentativi successivi, partendo da una stima iniziale e migliorandola a
+        ogni passo. Lo fanno gli algoritmi di ogni software scientifico.
+      </div>
+
+      <p>E come si giudica se il modello scelto va bene? Con un indicatore che generalizza il nostro $r$: il
+        <strong>chi quadro</strong>, che confronta gli scarti dei punti dalla curva con le loro
+        <em>incertezze</em>. Se in media ogni punto dista dalla curva circa quanto la sua barra d'errore, il modello
+        è buono; se sta molto più lontano, il modello è sbagliato (o le incertezze sono sottostimate); se sta molto
+        più vicino… c'è qualcosa che non va lo stesso — di solito significa che le incertezze sono state
+        sovrastimate, oppure che si stanno usando troppi parametri.</p>
+
+      <h3>9.3 — La trappola: con abbastanza parametri si adatta qualunque cosa</h3>
+
+      <div class="curiosita">
+        <strong>🐘 «Con quattro parametri disegno un elefante».</strong> La frase è di <strong>John von
+        Neumann</strong>, riportata da Enrico Fermi: «<em>Con quattro parametri posso adattare un elefante, e con
+        cinque posso fargli muovere la proboscide</em>». Non era una battuta: nel 2010 quattro fisici l'hanno presa
+        alla lettera e hanno pubblicato su <em>American Journal of Physics</em> le quattro costanti (complesse) che
+        disegnano davvero un elefante.
+      </div>
+
+      <p>Il punto è serio. Dati $N$ punti, esiste <strong>sempre</strong> un polinomio di grado $N-1$ che ci passa
+        <strong>esattamente attraverso tutti</strong>, con scarto zero. Sembrerebbe il modello perfetto: in realtà
+        non ha alcun valore predittivo — fra un punto e l'altro fa oscillazioni assurde, e con un nuovo dato
+        sbaglia clamorosamente. È l'<strong>overfitting</strong> che avete già incontrato in
+        <a href="../Matematica_2/12.Intelligenza_artificiale.html#sec4">matematica</a>: il modello ha imparato i
+        dati a memoria invece della legge.</p>
+
+      <div class="warnbox">
+        <strong>La regola d'oro, ed è una regola di fisica, non di statistica.</strong> Il modello da usare
+        <strong>non lo scelgono i dati: lo sceglie la fisica</strong>. Si parte da una legge che si ha ragione di
+        aspettarsi — perché discende da una teoria, o da un ragionamento sulle grandezze in gioco — e poi la si
+        <em>mette alla prova</em> sui dati. Il contrario (provare curve a caso finché una passa vicino ai punti) non
+        è verificare una legge: è <strong>disegnare un elefante</strong>.
+        <p style="margin:0.55rem 0 0;">Ed è di nuovo Popper: un modello con tanti parametri liberi si adatta a
+          qualunque risultato, e quindi <strong>non è falsificabile</strong>. Fra due modelli che descrivono i dati
+          altrettanto bene, si sceglie sempre quello con <strong>meno parametri</strong> — più è rigido, più rischia
+          di essere smentito, e più vale se sopravvive.</p>
+      </div>
+
+      <p>Con questo avete in mano l'intero mestiere: sapete misurare, dichiarare l'incertezza, confrontare risultati,
+        cercare una legge in una nuvola di punti — lineare o no — e stimare quanto fidarvene. Da qui in avanti, in
+        ogni relazione di laboratorio, non vi sarà mai chiesto solo un numero: vi sarà chiesto <strong>un numero, la
+        sua incertezza e il ragionamento che c'è dietro</strong>.</p>
+    </section>
+
+    <!-- 10 — QUIZ -->
+    <section id="quiz">
+      <h2>10. Quiz finale</h2>
+      <p>Dieci domande su strumenti, tipi di errore, scarto quadratico medio, compatibilità, leggi lineari e
+        coefficiente di correlazione.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 2 — Misure, incertezze e statistica descrittiva · Fisica · Terzo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+      function gauss() {   // Box-Muller
+        let u = 0, v = 0;
+        while (u === 0) { u = Math.random(); }
+        while (v === 0) { v = Math.random(); }
+        return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+      }
+
+      /* ===== 1 — bersaglio: precisione e accuratezza ===== */
+      (function () {
+        const host = document.getElementById('be-svg'); if (!host) return;
+        const btns = document.getElementById('be-btns'), out = document.getElementById('be-out');
+        const CASI = [
+          ['preciso e accurato', 0.10, 0.00, 'È l\'obiettivo: le frecce sono <strong>vicine fra loro</strong> (precisione) e <strong>attorno al centro</strong> (accuratezza). Lo strumento è sensibile e ben tarato.'],
+          ['preciso ma non accurato', 0.10, 0.55, 'Il caso <strong>più insidioso di tutti</strong>: le frecce sono tutte vicine fra loro, quindi ripetendo le misure sembra andare tutto benissimo — ma sono tutte spostate dalla stessa parte. È l\'impronta di un <strong>errore sistematico</strong>, e nessuna ripetizione lo rivelerà.'],
+          ['accurato ma non preciso', 0.42, 0.00, 'Le frecce sono sparpagliate, ma <strong>centrate</strong>: gli errori sono <strong>casuali</strong>. Buona notizia: mediando molte misure ci si avvicina al valore vero, perché gli scarti si compensano.'],
+          ['né preciso né accurato', 0.42, 0.55, 'Errori casuali <strong>e</strong> sistematici insieme: la misura è sparpagliata e pure spostata. Qui non basta ripetere — bisogna prima trovare e togliere il sistematico.']
+        ];
+        let cur = 0, frecce = [];
+        function tira() {
+          const c = CASI[cur];
+          for (let i = 0; i < 8; i++) {
+            const a = Math.random() * 2 * Math.PI, r = Math.abs(gauss()) * c[1];
+            frecce.push([c[2] + r * Math.cos(a), r * Math.sin(a)]);
+          }
+          draw();
+        }
+        function draw() {
+          const W = 420, H = 300, CX = 210, CY = 150, R = 118;
+          let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="bersaglio: precisione e accuratezza">';
+          [1, 0.75, 0.5, 0.25].forEach(function (f, i) {
+            s += '<circle cx="' + CX + '" cy="' + CY + '" r="' + (R * f).toFixed(1) + '" fill="' +
+              (i % 2 ? 'var(--surface-2)' : 'var(--surface)') + '" stroke="var(--border)" stroke-width="1.4"/>';
+          });
+          s += '<circle cx="' + CX + '" cy="' + CY + '" r="5" fill="var(--gold)"/>';
+          s += '<text x="' + CX + '" y="' + (CY + R + 26) + '" text-anchor="middle" class="lbl-s">il centro è il valore vero</text>';
+          frecce.forEach(function (p) {
+            s += '<circle cx="' + (CX + p[0] * R).toFixed(1) + '" cy="' + (CY + p[1] * R).toFixed(1) +
+              '" r="5" fill="var(--magenta)" opacity="0.85" stroke="var(--surface)" stroke-width="1.2"/>';
+          });
+          s += '</svg>';
+          host.innerHTML = s;
+          Array.prototype.forEach.call(btns.children, (b, i) => b.classList.toggle('active', i === cur));
+          out.innerHTML = '<strong>' + CASI[cur][0].charAt(0).toUpperCase() + CASI[cur][0].slice(1) + '.</strong> ' + CASI[cur][3] +
+            (frecce.length ? '' : ' <em>Premi «tira 8 frecce».</em>');
+        }
+        CASI.forEach(function (c, i) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = c[0];
+          b.addEventListener('click', function () { cur = i; frecce = []; tira(); });
+          btns.appendChild(b);
+        });
+        document.getElementById('be-tira').addEventListener('click', tira);
+        document.getElementById('be-clear').addEventListener('click', function () { frecce = []; draw(); });
+        draw();
+      })();
+
+      /* ===== 3.2 — misure ripetute ===== */
+      (function () {
+        const host = document.getElementById('mr-svg'); if (!host) return;
+        const out = document.getElementById('mr-out');
+        const eN = document.getElementById('mr-n'), eM = document.getElementById('mr-media');
+        const eS = document.getElementById('mr-sd'), e68 = document.getElementById('mr-68');
+        const VERO = 1.847, SIGMA = 0.062;   // periodo del pendolo, in secondi
+        let dati = [];
+        function misura(k) {
+          for (let i = 0; i < k; i++) { dati.push(VERO + SIGMA * gauss()); }
+          draw();
+        }
+        function draw() {
+          const N = dati.length;
+          const W = 620, H = 280, X0 = 50, X1 = 596, Y0 = 214;
+          const LO = VERO - 4 * SIGMA, HI = VERO + 4 * SIGMA, K = 26;
+          const w = (HI - LO) / K;
+          const cnt = new Array(K).fill(0);
+          dati.forEach(function (x) {
+            const i = Math.floor((x - LO) / w);
+            if (i >= 0 && i < K) { cnt[i]++; }
+          });
+          const maxC = Math.max(1, Math.max.apply(null, cnt));
+          const bw = (X1 - X0) / K;
+          let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="istogramma delle misure ripetute">';
+          const media = N ? dati.reduce((a, b) => a + b, 0) / N : 0;
+          const sd = N > 1 ? Math.sqrt(dati.reduce((a, b) => a + (b - media) * (b - media), 0) / (N - 1)) : 0;
+          const px = v => X0 + (v - LO) / (HI - LO) * (X1 - X0);
+          if (N > 1) {
+            s += '<rect x="' + px(media - sd).toFixed(1) + '" y="24" width="' + ((px(media + sd) - px(media - sd))).toFixed(1) +
+              '" height="' + (Y0 - 24) + '" fill="var(--gold)" opacity="0.14"/>';
+          }
+          for (let i = 0; i < K; i++) {
+            if (!cnt[i]) { continue; }
+            const h = cnt[i] / maxC * 168;
+            s += '<rect x="' + (X0 + i * bw + 1).toFixed(1) + '" y="' + (Y0 - h).toFixed(1) + '" width="' + (bw - 2).toFixed(1) +
+              '" height="' + h.toFixed(1) + '" fill="var(--accent)" fill-opacity="0.72" stroke="var(--accent)" stroke-width="1"/>';
+          }
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text)" stroke-width="1.5"/>';
+          for (let j = -3; j <= 3; j++) {
+            const v = VERO + j * SIGMA;
+            s += '<line x1="' + px(v).toFixed(1) + '" y1="' + Y0 + '" x2="' + px(v).toFixed(1) + '" y2="' + (Y0 + 5) + '" stroke="var(--muted)" stroke-width="1"/>';
+            s += '<text x="' + px(v).toFixed(1) + '" y="' + (Y0 + 19) + '" text-anchor="middle" class="lbl-s">' + nf(v, 2) + '</text>';
+          }
+          s += '<text x="' + ((X0 + X1) / 2) + '" y="' + (Y0 + 38) + '" text-anchor="middle" class="lbl-s">periodo misurato (s)</text>';
+          if (N > 1) {
+            s += '<line x1="' + px(media).toFixed(1) + '" y1="18" x2="' + px(media).toFixed(1) + '" y2="' + Y0 + '" stroke="var(--magenta)" stroke-width="2.2"/>';
+            s += '<text x="' + px(media).toFixed(1) + '" y="14" text-anchor="middle" class="em">media</text>';
+            s += '<text x="' + px(media + sd).toFixed(1) + '" y="' + (Y0 - 4) + '" class="lbl-s" style="fill:var(--gold);">+σ</text>';
+            s += '<text x="' + px(media - sd).toFixed(1) + '" y="' + (Y0 - 4) + '" text-anchor="end" class="lbl-s" style="fill:var(--gold);">−σ</text>';
+          }
+          s += '</svg>';
+          host.innerHTML = s;
+          const dentro = N > 1 ? dati.filter(x => Math.abs(x - media) <= sd).length : 0;
+          eN.textContent = N;
+          eM.textContent = N ? nf(media, 3) + ' s' : '—';
+          eS.textContent = N > 1 ? nf(sd, 3) + ' s' : '—';
+          e68.textContent = N > 1 ? Math.round(100 * dentro / N) + '%' : '—';
+          out.innerHTML = N === 0
+            ? 'Premi «misura una volta» e osserva: ogni misura è diversa dalla precedente, anche se l\'oggetto misurato è sempre lo stesso.'
+            : (N < 12
+              ? 'Con <strong>' + N + '</strong> misure si vede solo che i valori ballano. Continua: la forma emerge quando i dati diventano tanti.'
+              : 'Ecco la <strong>campana</strong>. La <strong>media</strong> (linea rosa) stima il valore vero; lo <strong>scarto quadratico medio</strong> σ = ' +
+                nf(sd, 3) + ' s misura quanto sono sparpagliate le misure — è la fascia dorata. Dentro quella fascia cade il <strong>' +
+                Math.round(100 * dentro / N) + '%</strong> dei dati: la teoria dice <strong>68%</strong>, e più misure fai più il conto ci si avvicina. ' +
+                'Quindi il risultato si scrive $T = (' + nf(media, 2) + ' \\pm ' + nf(sd, 2) + ')$ s.');
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        document.getElementById('mr-1').addEventListener('click', () => misura(1));
+        document.getElementById('mr-10').addEventListener('click', () => misura(10));
+        document.getElementById('mr-200').addEventListener('click', () => misura(200));
+        document.getElementById('mr-reset').addEventListener('click', function () { dati = []; draw(); });
+        draw();
+      })();
+
+      /* ===== 4 — compatibilità di due misure ===== */
+      (function () {
+        const host = document.getElementById('cp-svg'); if (!host) return;
+        const sa = document.getElementById('cp-a'), sda = document.getElementById('cp-da');
+        const sb = document.getElementById('cp-b'), sdb = document.getElementById('cp-db');
+        const va = document.getElementById('cp-a-val'), vda = document.getElementById('cp-da-val');
+        const vb = document.getElementById('cp-b-val'), vdb = document.getElementById('cp-db-val');
+        const kEl = document.getElementById('cp-k'), out = document.getElementById('cp-out');
+        let k = 1;
+        function draw() {
+          const A = +sa.value, dA = +sda.value * k, B = +sb.value, dB = +sdb.value * k;
+          va.textContent = nf(+sa.value, 2); vda.textContent = nf(+sda.value, 2);
+          vb.textContent = nf(+sb.value, 2); vdb.textContent = nf(+sdb.value, 2);
+          const LO = 9.4, HI = 10.2, W = 620, H = 190, X0 = 44, X1 = 596;
+          const px = v => X0 + (v - LO) / (HI - LO) * (X1 - X0);
+          const ok = (A + dA >= B - dB) && (B + dB >= A - dA);
+          let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="confronto fra due misure">';
+          s += '<line x1="' + X0 + '" y1="150" x2="' + X1 + '" y2="150" stroke="var(--text)" stroke-width="1.5"/>';
+          for (let v = 9.4; v <= 10.21; v += 0.1) {
+            s += '<line x1="' + px(v).toFixed(1) + '" y1="150" x2="' + px(v).toFixed(1) + '" y2="156" stroke="var(--muted)" stroke-width="1"/>';
+            s += '<text x="' + px(v).toFixed(1) + '" y="170" text-anchor="middle" class="lbl-s">' + nf(v, 1) + '</text>';
+          }
+          s += '<text x="' + ((X0 + X1) / 2) + '" y="186" text-anchor="middle" class="lbl-s">accelerazione di gravità (m/s²)</text>';
+          [[A, dA, 52, 'var(--accent)', 'misura A'], [B, dB, 104, 'var(--magenta)', 'misura B']].forEach(function (m) {
+            const y = m[2];
+            s += '<line x1="' + px(m[0] - m[1]).toFixed(1) + '" y1="' + y + '" x2="' + px(m[0] + m[1]).toFixed(1) + '" y2="' + y +
+              '" stroke="' + m[3] + '" stroke-width="8" stroke-linecap="round" opacity="0.45"/>';
+            [m[0] - m[1], m[0] + m[1]].forEach(function (v) {
+              s += '<line x1="' + px(v).toFixed(1) + '" y1="' + (y - 12) + '" x2="' + px(v).toFixed(1) + '" y2="' + (y + 12) +
+                '" stroke="' + m[3] + '" stroke-width="2.4"/>';
+            });
+            s += '<circle cx="' + px(m[0]).toFixed(1) + '" cy="' + y + '" r="5.5" fill="' + m[3] + '"/>';
+            s += '<text x="' + (X0 - 6) + '" y="' + (y + 5) + '" text-anchor="end" class="lbl" style="fill:' + m[3] + ';">' + m[4] + '</text>';
+          });
+          if (ok) {
+            const lo = Math.max(A - dA, B - dB), hi = Math.min(A + dA, B + dB);
+            s += '<rect x="' + px(lo).toFixed(1) + '" y="40" width="' + Math.max(2, px(hi) - px(lo)).toFixed(1) +
+              '" height="76" fill="var(--green,#22c55e)" opacity="0.22"/>';
+            s += '<text x="' + px((lo + hi) / 2).toFixed(1) + '" y="32" text-anchor="middle" class="lbl-s" style="fill:var(--green,#22c55e);">valori comuni</text>';
+          }
+          s += '</svg>';
+          host.innerHTML = s;
+          Array.prototype.forEach.call(kEl.children, (b, i) => b.classList.toggle('active', i === k - 1));
+          const diff = Math.abs(A - B), comb = Math.sqrt(Math.pow(+sda.value, 2) + Math.pow(+sdb.value, 2));
+          out.innerHTML = (ok
+            ? '✅ <strong>Misure compatibili</strong> a ' + k + 'σ: gli intervalli si sovrappongono, esiste una fascia di valori accettata da entrambe. Le due misure <strong>non sono in disaccordo</strong>.'
+            : '❌ <strong>Misure incompatibili</strong> a ' + k + 'σ: gli intervalli non hanno alcun valore in comune. Non possono avere ragione entrambe: da qualche parte c\'è un <strong>errore sistematico</strong>, oppure qualcuno ha sottostimato la propria incertezza.') +
+            ' <br><span style="color:var(--muted); font-size:0.93rem;">Differenza fra i valori: ' + nf(diff, 2) +
+            ' m/s²; incertezza combinata $\\sqrt{\\sigma_A^2+\\sigma_B^2}$ = ' + nf(comb, 3) +
+            ', cioè la differenza vale <strong>' + nf(diff / comb, 1) + 'σ</strong>.</span>';
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        [1, 2, 3].forEach(function (kk) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = 'intervalli a ' + kk + 'σ';
+          b.addEventListener('click', function () { k = kk; draw(); });
+          kEl.appendChild(b);
+        });
+        [sa, sda, sb, sdb].forEach(e => e.addEventListener('input', draw));
+        draw();
+      })();
+
+      /* ===== 6 e 7 — rette: metodo grafico e minimi quadrati ===== */
+      function makeRette(pref, modoIni) {
+        const host = document.getElementById(pref + '-svg'); if (!host) return;
+        const modoEl = document.getElementById(pref + '-modo'), txt = document.getElementById(pref + '-txt');
+        const eM = document.getElementById(pref + '-m'), eQ = document.getElementById(pref + '-q'), eR = document.getElementById(pref + '-r');
+        const BASE = [[0, 102], [50, 118], [100, 131], [150, 149], [200, 160], [250, 177]];
+        const DY = 2;
+        const MODI = ['📐 rette di max e min pendenza', '📉 retta dei minimi quadrati'];
+        let modo = modoIni, anomalo = false;
+        function dati() { return anomalo ? BASE.concat([[300, 155]]) : BASE.slice(); }
+        function minq(P) {
+          const n = P.length;
+          const Sx = P.reduce((a, p) => a + p[0], 0), Sy = P.reduce((a, p) => a + p[1], 0);
+          const Sxx = P.reduce((a, p) => a + p[0] * p[0], 0), Sxy = P.reduce((a, p) => a + p[0] * p[1], 0);
+          const D = n * Sxx - Sx * Sx;
+          const m = (n * Sxy - Sx * Sy) / D, q = (Sxx * Sy - Sx * Sxy) / D;
+          const res = P.map(p => p[1] - (m * p[0] + q));
+          const s2 = res.reduce((a, r) => a + r * r, 0) / (n - 2);
+          return { m: m, q: q, dm: Math.sqrt(n * s2 / D), dq: Math.sqrt(s2 * Sxx / D), res: res };
+        }
+        function corr(P) {
+          const n = P.length, mx = P.reduce((a, p) => a + p[0], 0) / n, my = P.reduce((a, p) => a + p[1], 0) / n;
+          let sxy = 0, sxx = 0, syy = 0;
+          P.forEach(function (p) { sxy += (p[0] - mx) * (p[1] - my); sxx += (p[0] - mx) * (p[0] - mx); syy += (p[1] - my) * (p[1] - my); });
+          return sxy / Math.sqrt(sxx * syy);
+        }
+        function estremi(P) {   // rette di max e min pendenza fra il primo e l'ultimo punto
+          const A = P[0], B = P[P.length - 1];
+          const mMax = ((B[1] + DY) - (A[1] - DY)) / (B[0] - A[0]), qMax = (A[1] - DY) - mMax * A[0];
+          const mMin = ((B[1] - DY) - (A[1] + DY)) / (B[0] - A[0]), qMin = (A[1] + DY) - mMin * A[0];
+          return { mMax: mMax, qMax: qMax, mMin: mMin, qMin: qMin };
+        }
+        function draw() {
+          const P = dati(), W = 620, H = 330, X0 = 62, X1 = 596, Y0 = 274, Y1 = 24;
+          const xmax = 320, ymin = 90, ymax = 195;
+          const px = x => X0 + x / xmax * (X1 - X0);
+          const py = y => Y0 - (y - ymin) / (ymax - ymin) * (Y0 - Y1);
+          let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="misure con barre di errore e rette interpolanti">';
+          for (let x = 0; x <= xmax; x += 50) {
+            s += '<line x1="' + px(x).toFixed(1) + '" y1="' + Y1 + '" x2="' + px(x).toFixed(1) + '" y2="' + Y0 + '" stroke="var(--border)" stroke-width="0.8"/>';
+            s += '<text x="' + px(x).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' + x + '</text>';
+          }
+          for (let y = 100; y <= ymax; y += 20) {
+            s += '<line x1="' + X0 + '" y1="' + py(y).toFixed(1) + '" x2="' + X1 + '" y2="' + py(y).toFixed(1) + '" stroke="var(--border)" stroke-width="0.8"/>';
+            s += '<text x="' + (X0 - 8) + '" y="' + (py(y) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + y + '</text>';
+          }
+          s += '<text x="' + ((X0 + X1) / 2) + '" y="' + (Y0 + 36) + '" text-anchor="middle" class="lbl-s">massa appesa (g)</text>';
+          s += '<text x="16" y="' + ((Y0 + Y1) / 2) + '" transform="rotate(-90 16 ' + ((Y0 + Y1) / 2) + ')" text-anchor="middle" class="lbl-s">lunghezza della molla (mm)</text>';
+          const R = modo === 1 ? minq(P) : null, E = modo === 0 ? estremi(P) : null;
+          if (modo === 0) {
+            [[E.mMax, E.qMax, 'massima pendenza'], [E.mMin, E.qMin, 'minima pendenza']].forEach(function (r, i) {
+              s += '<line x1="' + px(0) + '" y1="' + py(r[1]).toFixed(1) + '" x2="' + px(xmax) + '" y2="' + py(r[0] * xmax + r[1]).toFixed(1) +
+                '" stroke="var(--gold)" stroke-width="2" stroke-dasharray="' + (i ? '6 4' : '') + '"/>';
+            });
+            const mm = (E.mMax + E.mMin) / 2, qm = (E.qMax + E.qMin) / 2;
+            s += '<line x1="' + px(0) + '" y1="' + py(qm).toFixed(1) + '" x2="' + px(xmax) + '" y2="' + py(mm * xmax + qm).toFixed(1) +
+              '" stroke="var(--accent)" stroke-width="3"/>';
+          } else {
+            s += '<line x1="' + px(0) + '" y1="' + py(R.q).toFixed(1) + '" x2="' + px(xmax) + '" y2="' + py(R.m * xmax + R.q).toFixed(1) +
+              '" stroke="var(--accent)" stroke-width="3"/>';
+            P.forEach(function (p, i) {
+              s += '<line x1="' + px(p[0]).toFixed(1) + '" y1="' + py(p[1]).toFixed(1) + '" x2="' + px(p[0]).toFixed(1) +
+                '" y2="' + py(R.m * p[0] + R.q).toFixed(1) + '" stroke="#ef4444" stroke-width="2.4" opacity="0.75"/>';
+            });
+          }
+          P.forEach(function (p, i) {
+            const anom = anomalo && i === P.length - 1;
+            s += '<line x1="' + px(p[0]).toFixed(1) + '" y1="' + py(p[1] - DY).toFixed(1) + '" x2="' + px(p[0]).toFixed(1) +
+              '" y2="' + py(p[1] + DY).toFixed(1) + '" stroke="' + (anom ? '#ef4444' : 'var(--magenta)') + '" stroke-width="2.4"/>';
+            [p[1] - DY, p[1] + DY].forEach(function (v) {
+              s += '<line x1="' + (px(p[0]) - 5).toFixed(1) + '" y1="' + py(v).toFixed(1) + '" x2="' + (px(p[0]) + 5).toFixed(1) +
+                '" y2="' + py(v).toFixed(1) + '" stroke="' + (anom ? '#ef4444' : 'var(--magenta)') + '" stroke-width="2"/>';
+            });
+            s += '<circle cx="' + px(p[0]).toFixed(1) + '" cy="' + py(p[1]).toFixed(1) + '" r="4.5" fill="' + (anom ? '#ef4444' : 'var(--magenta)') + '"/>';
+          });
+          s += '</svg>';
+          host.innerHTML = s;
+          const r = corr(P);
+          Array.prototype.forEach.call(modoEl.children, (b, i) => b.classList.toggle('active', i === modo));
+          if (modo === 0) {
+            const mm = (E.mMax + E.mMin) / 2, dm = (E.mMax - E.mMin) / 2;
+            const qm = (E.qMax + E.qMin) / 2, dq = Math.abs(E.qMax - E.qMin) / 2;
+            eM.textContent = nf(mm, 3) + ' ± ' + nf(dm, 3);
+            eQ.textContent = nf(qm, 1) + ' ± ' + nf(dq, 1);
+            eR.textContent = nf(r, 4);
+            txt.innerHTML = 'Le due rette <strong>dorate</strong> sono la più inclinata e la meno inclinata che attraversano ancora tutte le barre d\'errore; quella <strong>piena</strong> è la loro media, cioè il risultato. ' +
+              'Si ottiene $m = (' + nf(mm, 3) + ' \\pm ' + nf(dm, 3) + ')$ mm/g e $q = (' + nf(qm, 0) + ' \\pm ' + nf(dq, 0) + ')$ mm. ' +
+              (anomalo ? '⚠️ Con il <strong>dato anomalo</strong> le due rette si divaricano moltissimo: l\'incertezza esplode e il risultato diventa inutilizzabile.'
+                : 'La semidistanza fra le due rette <em>è</em> l\'incertezza: più i dati sono buoni, più le rette sono vicine.');
+          } else {
+            const mm = R.m, dm = R.dm, qm = R.q, dq = R.dq;
+            eM.textContent = nf(mm, 4) + ' ± ' + nf(dm, 4);
+            eQ.textContent = nf(qm, 1) + ' ± ' + nf(dq, 1);
+            eR.textContent = nf(r, 4);
+            txt.innerHTML = 'I segmenti <strong>rossi</strong> sono i <strong>residui</strong>: la distanza verticale fra ogni punto e la retta. Il metodo sceglie proprio la retta che rende minima la <strong>somma dei loro quadrati</strong>. ' +
+              'Risultato: $m = (' + nf(mm, 4) + ' \\pm ' + nf(dm, 4) + ')$ mm/g, $q = (' + nf(qm, 1) + ' \\pm ' + nf(dq, 1) + ')$ mm, con $r = ' + nf(r, 4) + '$. ' +
+              (anomalo ? '⚠️ Il <strong>dato anomalo</strong> tira la retta verso di sé — e lo fa con forza, perché gli scarti entrano <strong>al quadrato</strong>. Guarda come è crollato $r$.'
+                : 'Nota che l\'incertezza è <strong>più piccola</strong> di quella del metodo grafico: qui si usano tutti i punti, non solo i due estremi.');
+          }
+          if (typeof renderMathIn === 'function') renderMathIn(txt);
+        }
+        MODI.forEach(function (t, i) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = t;
+          b.addEventListener('click', function () { modo = i; draw(); });
+          modoEl.appendChild(b);
+        });
+        document.getElementById(pref + '-out').addEventListener('click', function () { anomalo = !anomalo; draw(); });
+        draw();
+      }
+      makeRette('re1', 0);
+      makeRette('re2', 1);
+
+      /* ===== 9.1 — linearizzare una legge quadratica ===== */
+      (function () {
+        const host = document.getElementById('li-svg'); if (!host) return;
+        const modoEl = document.getElementById('li-modo'), txt = document.getElementById('li-txt');
+        const eR = document.getElementById('li-r'), eM = document.getElementById('li-m'), eG = document.getElementById('li-g');
+        const T = [0.2, 0.4, 0.6, 0.8, 1.0, 1.2];
+        const S = [0.21, 0.77, 1.79, 3.10, 4.95, 7.02];
+        let modo = 0;   // 0 = s contro t   |   1 = s contro t^2
+        function fit(X, Y) {
+          const n = X.length;
+          const Sx = X.reduce((a, b) => a + b, 0), Sy = Y.reduce((a, b) => a + b, 0);
+          const Sxx = X.reduce((a, b) => a + b * b, 0), Sxy = X.reduce((a, b, i) => a + b * Y[i], 0);
+          const D = n * Sxx - Sx * Sx;
+          const m = (n * Sxy - Sx * Sy) / D, q = (Sxx * Sy - Sx * Sxy) / D;
+          const res = X.map((x, i) => Y[i] - (m * x + q));
+          const s2 = res.reduce((a, r) => a + r * r, 0) / (n - 2);
+          const mx = Sx / n, my = Sy / n;
+          let sxy = 0, sxx = 0, syy = 0;
+          X.forEach(function (x, i) { sxy += (x - mx) * (Y[i] - my); sxx += (x - mx) * (x - mx); syy += (Y[i] - my) * (Y[i] - my); });
+          return { m: m, q: q, dm: Math.sqrt(n * s2 / D), res: res, r: sxy / Math.sqrt(sxx * syy) };
+        }
+        function draw() {
+          const X = modo ? T.map(t => t * t) : T.slice();
+          const F = fit(X, S);
+          const W = 620, H = 330, X0 = 62, X1 = 596, Y0 = 250, Y1 = 24;
+          const xmax = modo ? 1.5 : 1.3, ymax = 7.6;
+          const px = x => X0 + x / xmax * (X1 - X0);
+          const py = y => Y0 - y / ymax * (Y0 - Y1);
+          let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="caduta libera: dati grezzi e linearizzati">';
+          for (let i = 0; i <= 5; i++) {
+            const x = xmax * i / 5;
+            s += '<line x1="' + px(x).toFixed(1) + '" y1="' + Y1 + '" x2="' + px(x).toFixed(1) + '" y2="' + Y0 + '" stroke="var(--border)" stroke-width="0.8"/>';
+            s += '<text x="' + px(x).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' + nf(x, 1) + '</text>';
+          }
+          for (let y = 0; y <= 7; y += 1) {
+            s += '<line x1="' + X0 + '" y1="' + py(y).toFixed(1) + '" x2="' + X1 + '" y2="' + py(y).toFixed(1) + '" stroke="var(--border)" stroke-width="0.8"/>';
+            s += '<text x="' + (X0 - 8) + '" y="' + (py(y) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + y + '</text>';
+          }
+          s += '<text x="' + ((X0 + X1) / 2) + '" y="' + (Y0 + 36) + '" text-anchor="middle" class="lbl-s">' +
+            (modo ? 'tempo al quadrato t² (s²)' : 'tempo t (s)') + '</text>';
+          s += '<text x="16" y="' + ((Y0 + Y1) / 2) + '" transform="rotate(-90 16 ' + ((Y0 + Y1) / 2) + ')" text-anchor="middle" class="lbl-s">spazio percorso s (m)</text>';
+          // la retta di best fit
+          s += '<line x1="' + px(0) + '" y1="' + py(F.q).toFixed(1) + '" x2="' + px(xmax) + '" y2="' + py(F.m * xmax + F.q).toFixed(1) +
+            '" stroke="var(--accent)" stroke-width="3"/>';
+          // residui
+          X.forEach(function (x, i) {
+            s += '<line x1="' + px(x).toFixed(1) + '" y1="' + py(S[i]).toFixed(1) + '" x2="' + px(x).toFixed(1) +
+              '" y2="' + py(F.m * x + F.q).toFixed(1) + '" stroke="#ef4444" stroke-width="2.4" opacity="0.8"/>';
+            s += '<circle cx="' + px(x).toFixed(1) + '" cy="' + py(S[i]).toFixed(1) + '" r="5" fill="var(--magenta)"/>';
+          });
+          // segni dei residui
+          s += '<text x="' + X0 + '" y="' + (H - 8) + '" class="lbl-s">segni dei residui: ' +
+            F.res.map(r => r > 0 ? '+' : '−').join(' ') + (modo ? '  → sparsi a caso ✔' : '  → una U: la legge non è una retta ✘') + '</text>';
+          s += '</svg>';
+          host.innerHTML = s;
+          Array.prototype.forEach.call(modoEl.children, (b, i) => b.classList.toggle('active', i === modo));
+          eR.textContent = nf(F.r, 4);
+          eM.textContent = nf(F.m, 3) + (modo ? ' m/s²' : ' m/s');
+          eG.textContent = modo ? nf(2 * F.m, 2) + ' ± ' + nf(2 * F.dm, 2) : '—';
+          txt.innerHTML = modo
+            ? '🎯 Mettendo in ascissa <strong>t²</strong> invece di t, i punti si allineano perfettamente: $r = ' + nf(F.r, 5) +
+              '$ e i residui sono <strong>sparsi a caso</strong>, senza andamento. La pendenza vale $\\frac{1}{2}g$, quindi $g = 2 \\times ' +
+              nf(F.m, 3) + ' = (' + nf(2 * F.m, 2) + ' \\pm ' + nf(2 * F.dm, 2) + ')$ m/s² — <strong>compatibile con il valore vero 9,81</strong>. ' +
+              'E l\'intercetta viene praticamente zero, come deve essere: a $t=0$ il grave non si è ancora mosso.'
+            : '⚠️ Provando a forzare una <strong>retta</strong> sui dati grezzi si ottiene $r = ' + nf(F.r, 4) +
+              '$: un valore che in un compito sembrerebbe ottimo! Ma guarda i <strong>residui</strong> (segmenti rossi): i punti stanno <em>sopra</em> la retta agli estremi e <em>sotto</em> in mezzo — i segni disegnano una <strong>U</strong>. ' +
+              'È la firma inconfondibile di una legge <strong>curva</strong> forzata dentro una retta. Passa all\'altra modalità.';
+          if (typeof renderMathIn === 'function') renderMathIn(txt);
+        }
+        ['📉 s in funzione di t', '📐 s in funzione di t² (linearizzato)'].forEach(function (t, i) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = t;
+          b.addEventListener('click', function () { modo = i; draw(); });
+          modoEl.appendChild(b);
+        });
+        draw();
+      })();
+
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'La <strong>sensibilità</strong> di uno strumento è:',
+        options: ['il valore massimo che può misurare', 'la più piccola variazione che riesce ad apprezzare', 'quanto è vicino al valore vero', 'quanto sono vicine fra loro le misure ripetute', 'il numero di cifre del display'],
+        correct: 1, explain: 'È il valore della divisione più piccola (o dell\'ultima cifra del display). Il valore massimo misurabile è invece la <strong>portata</strong>.' },
+      { type: 'mc', diff: 'medium', text: 'Una bilancia, pesando dieci volte lo stesso oggetto, dà sempre $72{,}3$ kg. L\'oggetto pesa in realtà $70{,}0$ kg. Quella bilancia è:',
+        options: ['precisa e accurata', 'precisa ma non accurata', 'accurata ma non precisa', 'né precisa né accurata', 'non si può dire'],
+        correct: 1, explain: 'Le misure sono tutte vicine fra loro (precisione) ma lontane dal valore vero (nessuna accuratezza): è l\'impronta tipica di un <strong>errore sistematico</strong>.' },
+      { type: 'mc', diff: 'hard', text: 'Perché gli errori <strong>sistematici</strong> sono i più insidiosi?',
+        options: ['perché sono più grandi degli altri', 'perché ripetendo le misure non si rivelano, anzi restano nascosti dietro un\'ottima precisione', 'perché dipendono da chi misura', 'perché cambiano verso ogni volta', 'perché riguardano solo gli strumenti digitali'],
+        correct: 1, explain: 'Spostano tutte le misure dalla stessa parte: la statistica non li vede. Si combattono tarando lo strumento, cambiando metodo e facendo ripetere l\'esperimento ad altri.' },
+      { type: 'mc', diff: 'medium', text: 'Gli errori <strong>casuali</strong> fanno sì che le misure ripetute si distribuiscano secondo:',
+        options: ['una retta', 'una curva gaussiana', 'una distribuzione uniforme', 'un\'iperbole', 'nessuna forma regolare'],
+        correct: 1, explain: 'È il teorema del limite centrale: tante cause casuali piccole e indipendenti producono una campana. Per questo gli errori casuali, a differenza dei sistematici, si riducono ripetendo le misure.' },
+      { type: 'mc', diff: 'medium', text: 'Scrivo il risultato $T = (1{,}85 \\pm 0{,}06)$ s. Che cosa significa esattamente?',
+        options: ['che il valore vero è certamente 1,85 s', 'che l\'errore commesso è di 0,06 s', 'che una nuova misura ha circa il 68% di probabilità di cadere fra 1,79 e 1,91 s', 'che lo strumento ha sensibilità 0,06 s', 'che ho fatto 6 misure'],
+        correct: 2, explain: 'L\'incertezza dichiarata è lo scarto quadratico medio: entro $\\pm\\sigma$ cade circa il 68% dei casi (95% entro $2\\sigma$, 99,7% entro $3\\sigma$).' },
+      { type: 'mc', diff: 'hard', text: 'Due gruppi misurano $g$: A trova $(9{,}78 \\pm 0{,}05)$ m/s², B trova $(9{,}90 \\pm 0{,}04)$ m/s². A $1\\sigma$ le due misure sono:',
+        options: ['compatibili', 'incompatibili', 'identiche', 'non confrontabili', 'entrambe sbagliate'],
+        correct: 1, explain: 'A copre $[9{,}73;\\ 9{,}83]$, B copre $[9{,}86;\\ 9{,}94]$: nessun valore in comune, quindi <strong>incompatibili</strong> a $1\\sigma$. Da qualche parte c\'è un errore sistematico o un\'incertezza sottostimata.' },
+      { type: 'mc', diff: 'hard', text: 'Perché non conviene usare sempre intervalli larghissimi (per esempio $3\\sigma$) nel confronto fra misure?',
+        options: ['perché i calcoli diventano difficili', 'perché il criterio diventa così permissivo da accettare come compatibili anche misure che non lo sono', 'perché la gaussiana non arriva a $3\\sigma$', 'perché lo vieta il sistema internazionale', 'perché aumenta l\'incertezza dello strumento'],
+        correct: 1, explain: 'È un compromesso: intervalli troppo stretti bocciano misure buone, intervalli troppo larghi promuovono misure cattive. In laboratorio didattico lo standard è $1\\sigma$; per annunciare una nuova particella si pretendono $5\\sigma$.' },
+      { type: 'mc', diff: 'medium', text: 'Due grandezze sono legate da $y = k/x$. Per verificarlo con una retta conviene mettere in ascissa:',
+        options: ['$x$', '$x^2$', '$1/x$', '$\\sqrt{x}$', '$\\log x$'],
+        correct: 2, explain: 'Ponendo $X = 1/x$ la legge diventa $y = kX$, cioè una retta per l\'origine di pendenza $k$. È la tecnica della <strong>linearizzazione</strong>.' },
+      { type: 'mc', diff: 'hard', text: 'Il coefficiente di correlazione vale $r = 0{,}998$. Che cosa possiamo concludere?',
+        options: ['che la legge è certamente lineare', 'che i punti sono ben allineati, ma va comunque guardato il grafico: anche un tratto di curva può dare r alto', 'che non ci sono incertezze', 'che la pendenza vale 0,998', 'che una grandezza causa l\'altra'],
+        correct: 1, explain: 'Un $r$ alto dice che l\'allineamento è buono, non che la legge <em>sia</em> una retta: un pezzo di parabola su un intervallo stretto dà $r$ altissimo. E con pochissimi punti $r$ non significa quasi nulla.' },
+      { type: 'open', diff: 'hard', text: 'Durante un esperimento uno dei punti sperimentali risulta molto lontano dagli altri. Descrivi che cosa fai, e spiega perché <strong>non</strong> devi limitarti a cancellarlo.',
+        keywords: ['non cancell', 'quaderno', 'annot', 'caus', 'ripet', 'rifar', 'dichiar', 'trasparen', 'con e senza', 'scopert', 'sistematico'], requiredMatches: 3,
+        explain: 'Non si cancella un dato solo perché è scomodo: sarebbe la porta d\'ingresso della disonestà scientifica, e porta a tenere solo i dati che confermano ciò che ci si aspettava. Il procedimento corretto è: (1) cercare una <strong>causa documentata</strong> sul quaderno di laboratorio — un urto, un peso caduto, una trascrizione sbagliata; se c\'è, si scarta il dato <em>dichiarando il motivo</em>; (2) <strong>ripetere la misura</strong> in quel punto, che è la strada migliore: se la nuova misura si allinea, il caso è chiuso, se cade di nuovo lontano l\'anomalia è reale; (3) se non si trova nulla, si presenta l\'analisi <strong>con e senza</strong> quel punto, mostrando quanto cambia il risultato. La regola d\'oro è la <strong>trasparenza</strong>: si dichiara sempre che cosa si è escluso e perché. E vale la pena ricordare che a volte l\'anomalia non è un errore ma una scoperta: l\'orbita di Mercurio, il rumore di fondo di Penzias e Wilson, il neutrino di Pauli.' }
+    ];
+  </script>
+
+</body>
+
+</html>

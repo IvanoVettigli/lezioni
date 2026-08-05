@@ -346,6 +346,76 @@
         sotto conta il <em>numero di uscite</em>, mentre il simulatore dei due dadi (lezione sulla probabilità) usava la
         <em>frequenza relativa</em>, confrontandola col valore teorico. Stesso grafico, asse verticale «tarato» in due
         modi diversi.</p>
+
+      <h3>4.4 — Come si scelgono gli intervalli (e perché conta moltissimo)</h3>
+
+      <p>C'è una decisione, nel costruire un istogramma, che nessuno prende sul serio abbastanza: <strong>in quanti
+        intervalli suddividere i dati</strong>. Quegli intervalli si chiamano <strong>classi</strong>, e la scelta
+        non è un dettaglio grafico — <strong>cambia la forma della distribuzione</strong>, cioè proprio la cosa che
+        l'istogramma dovrebbe mostrarci.</p>
+
+      <div class="definition">
+        Per costruire un istogramma si divide l'intervallo dei dati (da valore minimo a valore massimo) in
+        <strong>classi</strong>. Le classi devono essere <strong>consecutive</strong> (senza buchi), non si devono
+        <strong>sovrapporre</strong>, devono <strong>coprire tutti i dati</strong> e — salvo casi particolari — avere
+        tutte la <strong>stessa ampiezza</strong>. L'altezza di ogni barra è il numero di dati che cadono in quella
+        classe.
+      </div>
+
+      <p>Prendiamo un caso concreto: le <strong>altezze di una classe di 28 studenti</strong>, misurate in
+        centimetri. Sono sempre gli stessi 28 numeri — muovi il cursore e guarda cosa succede all'istogramma.</p>
+
+      <div class="simbox">
+        <div class="controls">
+          <div class="control-group"><label>numero di classi: <span class="val" id="bin-k-val">6</span></label>
+            <input type="range" id="bin-k" min="2" max="20" step="1" value="6"></div>
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="bin-radice">📐 usa la regola della radice</button>
+          <button class="btn" id="bin-dati">👁 mostra i dati grezzi</button>
+        </div>
+        <div id="bin-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="bin-amp">—</div><div class="l">ampiezza di ogni classe</div></div>
+          <div class="stat"><div class="n" id="bin-vuote">—</div><div class="l">classi vuote</div></div>
+          <div class="stat"><div class="n" id="bin-max">—</div><div class="l">barra più alta</div></div>
+        </div>
+        <p class="sim-out" id="bin-out"></p>
+      </div>
+
+      <p>Hai visto il problema? Con <strong>poche classi</strong> il grafico è stabile ma <em>grossolano</em>:
+        schiaccia tutto in due o tre blocchi e la forma sparisce. Con <strong>troppe classi</strong> succede il
+        contrario: le barre diventano alte una o due unità, compaiono buchi, e quello che vedi non è più la
+        distribuzione delle altezze — è il <strong>rumore</strong> del fatto che gli studenti sono soltanto 28.</p>
+
+      <div class="warnbox">
+        <strong>⚠ Il punto delicato.</strong> Cambiando il numero di classi si può far sembrare la stessa
+        distribuzione <em>simmetrica</em> oppure <em>storta</em>, con <em>un</em> picco oppure con <em>due</em>. È
+        una delle maniere più eleganti (e meno oneste) di far dire ai dati quello che si vuole: si provano varie
+        suddivisioni e si pubblica quella che «racconta meglio». Per questo, quando leggi un istogramma, la prima
+        domanda da farsi è: <strong>chi ha scelto le classi, e perché proprio così?</strong>
+      </div>
+
+      <p>Non esiste una risposta perfetta, ma esistono due <strong>regole pratiche</strong> che danno un buon punto
+        di partenza — da usare come suggerimento, non come dogma:</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Quante classi?</div>
+        $$k \approx \sqrt{N} \qquad\text{oppure}\qquad k \approx 1 + \log_2 N \;\;\text{(regola di Sturges)}$$
+        <p class="formula-note">Con i nostri $N = 28$ studenti: $\sqrt{28} \approx 5{,}3$ e
+          $1 + \log_2 28 \approx 5{,}8$. Entrambe suggeriscono <strong>5 o 6 classi</strong> — ed è esattamente
+          l'intervallo in cui, nel widget, la campana si vede meglio. Poi si sceglie un'ampiezza «comoda» (qui
+          $5$ cm) invece del numero esatto che esce dal conto: un istogramma con classi da $5{,}5$ cm è corretto ma
+          illeggibile.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>📊 Una regola che vale sempre.</strong> Se una conclusione <strong>cambia</strong> a seconda di come
+        hai suddiviso i dati, allora quella conclusione <strong>non è nei dati</strong>: è nella tua scelta. Prova
+        due o tre suddivisioni diverse: le caratteristiche vere (dove sta il centro, quanto è larga la
+        distribuzione, se c'è una coda da un lato) <strong>restano</strong>. Quelle che compaiono e scompaiono
+        muovendo il cursore, invece, erano rumore.
+      </div>
     </section>
 
     <!-- 5 — BINOMIALE -->
@@ -745,6 +815,74 @@
         document.getElementById('bn-100').addEventListener('click', () => toss(100));
         document.getElementById('bn-2000').addEventListener('click', () => toss(2000));
         document.getElementById('bn-reset').addEventListener('click', () => { counts = new Array(11).fill(0); draw(); });
+        draw();
+      })();
+
+      // ===== 4.4 — scelta delle classi di un istogramma =====
+      (function () {
+        const host = document.getElementById('bin-svg'); if (!host) return;
+        const sk = document.getElementById('bin-k'), vk = document.getElementById('bin-k-val');
+        const eA = document.getElementById('bin-amp'), eV = document.getElementById('bin-vuote'), eM = document.getElementById('bin-max');
+        const out = document.getElementById('bin-out');
+        const H = [155, 158, 160, 161, 162, 163, 164, 165, 165, 166, 167, 168, 168, 169, 170, 170,
+          171, 172, 172, 173, 174, 175, 176, 178, 179, 181, 184, 188];
+        const N = H.length, MIN = Math.min.apply(null, H), MAX = Math.max.apply(null, H);
+        const KRAD = Math.round(Math.sqrt(N));
+        let grezzi = false;
+        function draw() {
+          const k = +sk.value, w = (MAX - MIN) / k;
+          vk.textContent = k;
+          const cnt = new Array(k).fill(0);
+          H.forEach(function (x) { cnt[Math.min(Math.floor((x - MIN) / w), k - 1)]++; });
+          const maxC = Math.max.apply(null, cnt), vuote = cnt.filter(c => c === 0).length;
+          const W = 620, Hh = 300, X0 = 46, X1 = 600, Y0 = 240;
+          const bw = (X1 - X0) / k;
+          let s = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" role="img" aria-label="istogramma delle altezze con classi variabili">';
+          for (let i = 0; i < k; i++) {
+            const h = cnt[i] / maxC * 178;
+            s += '<rect x="' + (X0 + i * bw + 1.5).toFixed(1) + '" y="' + (Y0 - h).toFixed(1) + '" width="' + (bw - 3).toFixed(1) +
+              '" height="' + h.toFixed(1) + '" fill="var(--accent)" fill-opacity="' + (cnt[i] ? 0.75 : 0.12) + '" stroke="var(--accent)" stroke-width="1.5"/>';
+            if (cnt[i] && bw > 22) {
+              s += '<text x="' + (X0 + i * bw + bw / 2).toFixed(1) + '" y="' + (Y0 - h - 6).toFixed(1) +
+                '" text-anchor="middle" style="fill:var(--text); font-size:11px; font-weight:700;">' + cnt[i] + '</text>';
+            }
+          }
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text)" stroke-width="1.6"/>';
+          const passo = Math.max(1, Math.ceil(k / 8));
+          for (let i = 0; i <= k; i += passo) {
+            const x = X0 + i * bw;
+            s += '<line x1="' + x.toFixed(1) + '" y1="' + Y0 + '" x2="' + x.toFixed(1) + '" y2="' + (Y0 + 5) + '" stroke="var(--muted)" stroke-width="1"/>';
+            s += '<text x="' + x.toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" style="fill:var(--muted); font-size:10px;">' +
+              (MIN + i * w).toFixed(0) + '</text>';
+          }
+          s += '<text x="' + ((X0 + X1) / 2) + '" y="' + (Y0 + 36) + '" text-anchor="middle" style="fill:var(--muted); font-size:11px;">altezza (cm)</text>';
+          s += '<text x="14" y="' + (Y0 - 90) + '" transform="rotate(-90 14 ' + (Y0 - 90) + ')" text-anchor="middle" style="fill:var(--muted); font-size:11px;">quanti studenti</text>';
+          if (grezzi) {
+            H.forEach(function (x) {
+              const px = X0 + (x - MIN) / (MAX - MIN) * (X1 - X0);
+              s += '<circle cx="' + px.toFixed(1) + '" cy="' + (Y0 + 46) + '" r="3.4" fill="var(--magenta)" opacity="0.8"/>';
+            });
+            s += '<text x="' + X0 + '" y="' + (Y0 + 66) + '" style="fill:var(--magenta); font-size:11px;">i 28 dati veri, uno per pallino</text>';
+          }
+          s += '</svg>';
+          host.innerHTML = s;
+          eA.textContent = w.toFixed(1).replace('.', ',') + ' cm';
+          eV.textContent = vuote;
+          eM.textContent = maxC + ' studenti';
+          out.innerHTML = k <= 3
+            ? '📦 <strong>Troppo poche.</strong> Con ' + k + ' classi larghe ' + w.toFixed(1).replace('.', ',') +
+              ' cm ogni barra mette insieme persone alte e basse: la forma della distribuzione è <strong>sparita</strong>, resta solo un blocco.'
+            : (k >= 12
+              ? '🪒 <strong>Troppe.</strong> Con ' + k + ' classi le barre valgono una o due unità' +
+                (vuote ? ' e ci sono <strong>' + vuote + ' classi vuote</strong>' : '') +
+                ': quello che vedi non è più la distribuzione delle altezze, è il <strong>rumore</strong> dovuto al fatto che gli studenti sono solo 28. Con altri 28 studenti questi picchi cambierebbero tutti.'
+              : (Math.abs(k - KRAD) <= 1
+                ? '🎯 <strong>Siamo nella zona giusta</strong> (la regola della radice suggerisce ' + KRAD + ' classi): si vede una <strong>campana</strong> con il centro attorno ai 170 cm e le code ai lati. Questa forma è <em>vera</em>, non un artefatto: resta anche cambiando un po\' il numero di classi.'
+                : 'Con ' + k + ' classi larghe ' + w.toFixed(1).replace('.', ',') + ' cm la forma si legge ancora bene. Prova a scendere sotto 4 o a salire sopra 12 e guarda che disastro.'));
+        }
+        sk.addEventListener('input', draw);
+        document.getElementById('bin-radice').addEventListener('click', function () { sk.value = KRAD; draw(); });
+        document.getElementById('bin-dati').addEventListener('click', function () { grezzi = !grezzi; draw(); });
         draw();
       })();
 

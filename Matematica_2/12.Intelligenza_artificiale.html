@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 12 — L'intelligenza artificiale</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+    .simbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1rem; margin: 1.1rem 0; }
+    .simbox svg { display: block; width: 100%; height: auto; max-width: 560px; margin: 0.3rem auto; }
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .sim-out { margin-top: 0.6rem; font-size: 1rem; min-height: 1.5em; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.7rem; text-align: center; }
+    .stat .n { font-size: 1.25rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
+    .stat .l { font-size: 0.78rem; color: var(--muted); }
+    .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .lbl-s { fill: var(--muted); font-size: 11px; }
+
+    /* macchina di Turing */
+    .tm-tape { display: flex; justify-content: center; gap: 3px; margin: 0.8rem 0 0.2rem; overflow-x: auto; padding: 0.2rem; }
+    .tm-cell { min-width: 2.3rem; height: 2.6rem; display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--border); border-radius: 6px; background: var(--surface); font-family: Consolas, monospace;
+      font-size: 1.15rem; font-weight: 700; flex-shrink: 0; transition: background .15s; }
+    .tm-cell.head { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 22%, var(--surface)); }
+    .tm-head { text-align: center; font-size: 1.3rem; color: var(--accent); height: 1.4rem; }
+    .tm-state { text-align: center; font-family: Consolas, monospace; font-weight: 700; margin: 0.3rem 0; }
+    .tm-rules { border-collapse: collapse; margin: 0.6rem auto; font-family: Consolas, monospace; font-size: 0.86rem; }
+    .tm-rules th, .tm-rules td { border: 1px solid var(--border); padding: 0.22rem 0.55rem; text-align: center; }
+    .tm-rules th { background: var(--surface-2); }
+    .tm-rules tr.on td { background: color-mix(in srgb, var(--accent) 24%, transparent); font-weight: 700; }
+
+    /* chat ELIZA */
+    .chat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem; height: 230px; overflow-y: auto; margin: 0.5rem 0; }
+    .msg { margin: 0.35rem 0; padding: 0.4rem 0.7rem; border-radius: 12px; max-width: 82%; font-size: 0.95rem; line-height: 1.45; }
+    .msg.io { background: color-mix(in srgb, var(--accent) 20%, transparent); margin-left: auto; }
+    .msg.bot { background: var(--surface-2); border: 1px solid var(--border); }
+    .chat-row { display: flex; gap: 0.5rem; }
+    .chat-row input { flex: 1; padding: 0.45rem 0.7rem; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; }
+
+    /* testo generato */
+    .gen-out { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+      border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.6rem 0; font-size: 1rem; line-height: 1.6; min-height: 4.5rem; font-style: italic; }
+    .timeline { list-style: none; padding: 0; margin: 1rem 0; }
+    .timeline li { position: relative; padding: 0.45rem 0 0.45rem 5.4rem; border-top: 1px dashed var(--border); }
+    .timeline li:first-child { border-top: none; }
+    .timeline .anno { position: absolute; left: 0; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Secondo anno · Lezione 12 · Informatica</div>
+    <h1>L'intelligenza artificiale</h1>
+    <p>Da una domanda di logica del 1936 agli assistenti che ci rispondono oggi — come funzionano davvero</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Secondo anno</a>
+    <span class="sep">/</span> L'intelligenza artificiale
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Una lezione onesta.</strong> Di intelligenza artificiale si parla dappertutto, spesso a sproposito: c'è
+      chi la descrive come una magia e chi come una minaccia. Qui faremo una cosa diversa: guarderemo
+      <strong>come funziona</strong>. Scopriremo che dietro non c'è nessuna magia, ma matematica che conosci già —
+      statistica, funzioni, approssimazioni — e che la storia comincia molto prima dei computer, con un ragazzo
+      inglese che voleva rispondere a una domanda di logica.
+    </div>
+
+    <!-- 1 — TURING -->
+    <section id="sec1">
+      <h2>1. Alan Turing</h2>
+
+      <p>Nasce a Londra nel <strong>1912</strong>. È un ragazzo strano e solitario, bravissimo in matematica e
+        pessimo in quasi tutto il resto: a scuola i professori si lamentano perché scrive male e non segue il
+        programma. A Cambridge, a soli <strong>24 anni</strong>, scrive un articolo che cambierà il mondo — anche se
+        allora nessuno se ne accorge, perché parla di un problema apparentemente astrattissimo di logica.</p>
+
+      <p>Poi arriva la guerra. Turing viene reclutato a <strong>Bletchley Park</strong>, il centro segreto britannico
+        che tenta di decifrare le comunicazioni tedesche protette dalla macchina <strong>Enigma</strong>. Le
+        combinazioni possibili sono più di centocinquanta milioni di milioni di milioni: provarle a mano è
+        impensabile. Turing progetta allora una macchina, la <strong>Bomba</strong>, che le scarta a grande velocità
+        sfruttando le debolezze logiche del sistema. Il lavoro suo e dei suoi colleghi permette agli Alleati di
+        leggere i messaggi nemici, e secondo molti storici <strong>accorcia la guerra di circa due anni</strong>,
+        salvando milioni di vite. Resterà segreto per decenni.</p>
+
+      <p>Nel <strong>1950</strong> pubblica l'articolo in cui si domanda se una macchina possa pensare, e inventa il
+        test di cui parleremo fra poco. Ma la sua storia finisce male, e vale la pena raccontarla.</p>
+
+      <div class="warnbox">
+        <strong>La fine di Turing.</strong> Nel <strong>1952</strong> Alan Turing viene processato e condannato
+        perché <strong>omosessuale</strong>: nel Regno Unito di allora era un reato. Per evitare il carcere è
+        costretto ad accettare una cura ormonale che gli devasta il corpo e la mente; gli viene tolto il permesso di
+        lavorare per i servizi segreti. Muore nel <strong>1954</strong>, a 41 anni, avvelenato dal cianuro: l'inchiesta
+        parlò di suicidio.
+        <p style="margin:0.55rem 0 0;">Il governo britannico si è scusato ufficialmente solo nel <strong>2009</strong>;
+          la grazia reale è arrivata nel <strong>2013</strong>, e nel 2017 una legge che porta il suo nome ha
+          riabilitato decine di migliaia di uomini condannati per lo stesso «reato». Dal 2021 il volto di Turing è
+          sulla banconota britannica da 50 sterline. È giusto ricordarlo: l'uomo che aiutò a salvare l'Europa fu
+          distrutto dal Paese che aveva servito, per una ragione che oggi ci appare mostruosa. Le società, come le
+          teorie scientifiche, possono sbagliarsi — e vanno corrette.</p>
+      </div>
+    </section>
+
+    <!-- 2 — MACCHINA DI TURING -->
+    <section id="sec2">
+      <h2>2. La macchina di Turing</h2>
+
+      <p>Torniamo a quell'articolo del 1936. Turing si stava chiedendo: <em>che cosa significa, esattamente,
+        «calcolare»?</em> Noi diciamo che un problema si risolve «seguendo un procedimento», ma che cos'è un
+        procedimento? Per rispondere, Turing immaginò la macchina più stupida possibile — e dimostrò che tanto
+        bastava.</p>
+
+      <div class="definition">
+        Una <strong>macchina di Turing</strong> è fatta di tre cose soltanto:
+        <ul style="margin:0.45rem 0 0;">
+          <li>un <strong>nastro</strong> infinito diviso in caselle, su ognuna delle quali c'è un simbolo;</li>
+          <li>una <strong>testina</strong> che sta su una casella e sa fare tre cose: <em>leggere</em> il simbolo,
+            <em>scriverne</em> un altro al suo posto, e <em>spostarsi</em> di una casella a destra o a sinistra;</li>
+          <li>uno <strong>stato interno</strong> (un numero, o un nome: la sua «situazione mentale») e una
+            <strong>tabella di regole</strong> del tipo: <em>«se sei nello stato $q_0$ e leggi 1, allora scrivi 0,
+            spostati a sinistra e passa allo stato $q_1$»</em>.</li>
+        </ul>
+      </div>
+
+      <p>Tutto qui. Nessuna memoria sofisticata, nessuna aritmetica incorporata: sa solo leggere un simbolo, scriverne
+        uno e muoversi di un passo. Eppure <strong>qualunque calcolo eseguibile con un procedimento meccanico</strong>
+        — dalle addizioni al motore di ricerca, dai videogiochi all'intelligenza artificiale — può essere fatto da
+        una macchina come questa. Provala: scegli un programma e premi «passo» per eseguirlo una regola alla volta.</p>
+
+      <div class="simbox">
+        <div class="sim-btns" id="tm-progs"></div>
+        <div class="tm-state" id="tm-state">stato: q0</div>
+        <div class="tm-head" id="tm-head"></div>
+        <div class="tm-tape" id="tm-tape"></div>
+        <div class="sim-btns">
+          <button class="btn btn-primary" id="tm-step">▶ passo</button>
+          <button class="btn" id="tm-run">⏩ esegui tutto</button>
+          <button class="btn" id="tm-stop">⏸ ferma</button>
+          <button class="btn" id="tm-reset">↺ ricomincia</button>
+        </div>
+        <div id="tm-rules"></div>
+        <p class="sim-out" id="tm-out"></p>
+      </div>
+
+      <h3>2.1 — La macchina universale (e ciò che nessuna macchina può fare)</h3>
+
+      <p>E adesso l'idea che ha creato il mondo in cui vivi. Ogni macchina di Turing ha la sua tabella di regole:
+        una per sommare, una per confrontare, una per ordinare. Turing si accorse che la tabella di regole è
+        <strong>essa stessa</strong> una sequenza di simboli — e quindi <strong>può essere scritta sul nastro</strong>.</p>
+
+      <div class="theorem">
+        <strong>La macchina universale.</strong> Esiste una macchina di Turing capace di <strong>leggere sul nastro
+        la descrizione di qualunque altra macchina</strong> e di comportarsi esattamente come quella. Una macchina
+        sola, per tutti i problemi.
+      </div>
+
+      <p>Ti sembra familiare? Dovrebbe: è il <strong>computer</strong>. Non una macchina per ogni compito, ma
+        <strong>una macchina che legge il compito</strong> — cioè il programma — e lo esegue. Il telefono che hai in
+        tasca è una macchina universale di Turing: la stessa identica scatola diventa una calcolatrice, un lettore
+        musicale o un navigatore, a seconda di quali simboli le metti sul nastro. Turing ha inventato l'idea del
+        computer <strong>dieci anni prima</strong> che esistesse un computer.</p>
+
+      <div class="curiosita">
+        <strong>🛑 Però c'è un limite, e lo dimostrò lui stesso.</strong> Nello stesso articolo Turing dimostrò che
+        esistono problemi che <strong>nessuna</strong> macchina potrà mai risolvere. Il più famoso è il
+        <strong>problema della fermata</strong>: non esiste, e non esisterà mai, un programma capace di dire, per
+        ogni altro programma, se quello prima o poi si fermerà oppure andrà avanti all'infinito.
+        <p style="margin:0.5rem 0 0;">La dimostrazione è un ragionamento «alla Gödel» che hai già incontrato nella
+          <a href="../Matematica_1/2_Logica.html">lezione di logica</a>: si suppone che un tale programma esista e
+          gli si dà in pasto <em>sé stesso</em>, ottenendo una contraddizione. Tienilo a mente quando qualcuno ti
+          dirà che «con abbastanza potenza di calcolo si può fare tutto»: non è vero, e lo sappiamo con certezza
+          matematica dal 1936.</p>
+      </div>
+    </section>
+
+    <!-- 3 — TEST DI TURING -->
+    <section id="sec3">
+      <h2>3. Il test di Turing</h2>
+
+      <p>Nel 1950, sulla rivista <em>Mind</em>, Turing apre il suo articolo con la domanda: «<em>Le macchine possono
+        pensare?</em>». E subito dopo la butta via. Perché? Perché è una domanda mal posta: per rispondere bisognerebbe
+        prima mettersi d'accordo su che cosa significhino «macchina» e soprattutto «pensare», e su quello non si
+        accordano nemmeno i filosofi. Turing fa allora una mossa da scienziato: <strong>sostituisce la domanda con
+        un'altra, a cui si può rispondere con un esperimento</strong>.</p>
+
+      <div class="definition">
+        <strong>Il gioco dell'imitazione (test di Turing).</strong> Un <strong>giudice</strong> umano conversa per
+        iscritto, senza vederli, con due interlocutori: uno è una <strong>persona</strong>, l'altro una
+        <strong>macchina</strong>. Può chiedere qualunque cosa. Se al termine il giudice <strong>non riesce a
+        distinguere</strong> chi sia chi, meglio di quanto farebbe tirando a indovinare, allora — dice Turing —
+        dobbiamo ammettere che la macchina è intelligente <em>quanto basta</em>.
+      </div>
+
+      <p>Il punto sottile, quello che quasi tutti si perdono: il test <strong>non</strong> chiede se la macchina pensi
+        davvero, se sia cosciente o se «provi» qualcosa. Chiede solo se il suo <strong>comportamento</strong> sia
+        indistinguibile da quello umano. È una scelta filosofica precisa: giudichiamo dai fatti osservabili, non da
+        ciò che accade dentro — come del resto facciamo con gli altri esseri umani, di cui non possiamo verificare i
+        pensieri.</p>
+
+      <h3>3.1 — ELIZA, la psicoterapeuta di carta</h3>
+
+      <p>Nel <strong>1966</strong> Joseph Weizenbaum, al MIT, scrisse un programmino di poche righe chiamato
+        <strong>ELIZA</strong>, che imitava uno psicoterapeuta. Non capiva nulla: cercava parole chiave e rigirava le
+        frasi dell'utente sotto forma di domande. Eppure molte persone ci si affezionarono, alcune chiesero di
+        restare sole con «lei», e la segretaria di Weizenbaum gli domandò di uscire dalla stanza per poter parlare in
+        privato con il programma. Lo stesso Weizenbaum ne rimase turbato e passò il resto della vita a mettere in
+        guardia dall'attribuire comprensione alle macchine.</p>
+
+      <p>Eccotene una versione italiana. Scrivile qualcosa e poi <strong>prova a smascherarla</strong>: quanto ci
+        metti a capire il trucco?</p>
+
+      <div class="simbox">
+        <div class="chat" id="el-chat"></div>
+        <div class="chat-row">
+          <input id="el-in" type="text" placeholder="Scrivi qualcosa e premi Invio…" autocomplete="off">
+          <button class="btn btn-primary" id="el-send">invia</button>
+        </div>
+        <p class="sim-out" id="el-out">Suggerimento: prova a scrivere «sono stanco», «penso che la matematica sia difficile», «mia madre dice che studio poco».</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>🪞 L'effetto ELIZA.</strong> Il fenomeno per cui attribuiamo comprensione e intenzioni a un
+        programma che si limita a manipolare simboli si chiama, dal nome di quel software, <strong>effetto
+        ELIZA</strong>. È un cortocircuito del nostro cervello, che è fatto per riconoscere menti dappertutto (vediamo
+        facce nelle nuvole e nelle prese di corrente). Ricordatelo: la sensazione che «lui mi capisce» è
+        un'informazione su <em>te</em>, non sulla macchina.
+      </div>
+
+      <h3>3.2 — E oggi? Il test è superato… ma che cosa significa?</h3>
+
+      <p>Gli assistenti di oggi, in una conversazione breve, <strong>superano abbastanza facilmente</strong> il test
+        di Turing: quasi nessuno, leggendo qualche riga, saprebbe dire con sicurezza se le ha scritte una persona.
+        Sarebbe la notizia del secolo… e invece la reazione della comunità scientifica è stata soprattutto un'altra:
+        <strong>forse il test non misurava quello che credevamo</strong>.</p>
+
+      <p>Il filosofo John Searle lo aveva argomentato già nel 1980 con l'esperimento mentale della <strong>stanza
+        cinese</strong>: immagina una persona chiusa in una stanza che non sa una parola di cinese, ma possiede un
+        enorme manuale che dice «se ricevi <em>questi</em> segni, rispondi con <em>quelli</em>». Dall'esterno le
+        risposte sembrano di un madrelingua. Quella persona <em>capisce</em> il cinese? Searle dice di no: manipola
+        simboli senza significato. E allora — è la sua domanda — perché dovremmo dire il contrario di un computer che
+        fa esattamente la stessa cosa?</p>
+
+      <p>Non c'è una risposta condivisa, ed è giusto che tu sappia che il dibattito è aperto. Quello che possiamo
+        fare, adesso, è guardare <strong>come funzionano davvero</strong> queste macchine — e per farlo torniamo a un
+        argomento che conosci: la statistica.</p>
+    </section>
+
+    <!-- 4 — STATISTICA DELLE PAROLE -->
+    <section id="sec4">
+      <h2>4. Un primo passo: far scrivere la statistica</h2>
+
+      <p>Prima di arrivare alle reti neurali, facciamo un esperimento che puoi capire fino in fondo con quello che
+        hai imparato nella <a href="8.Statistica.html">lezione di statistica</a>. L'idea è semplice fino a sembrare
+        stupida:</p>
+
+      <div class="definition">
+        Prendi tutte le opere di un autore. <strong>Conta</strong> quali parole usa e, soprattutto, <strong>quali
+        parole vengono dopo quali</strong>. Poi fai scrivere alla macchina un testo nuovo, scegliendo ogni volta la
+        parola successiva <strong>a sorte, ma seguendo quelle statistiche</strong>. Questo meccanismo si chiama
+        <strong>catena di Markov</strong>.
+      </div>
+
+      <p>Esempio concreto. Se nel testo di partenza dopo la parola «una» compaiono 4 volte «volta», 2 volte «selva» e
+        1 volta «ciliegia», allora quando la macchina scrive «una» tirerà a sorte la parola successiva con
+        probabilità $\frac{4}{7}$, $\frac{2}{7}$ e $\frac{1}{7}$. Esattamente come estrarre da un sacchetto di
+        palline — solo che il sacchetto cambia a seconda dell'ultima parola scritta.</p>
+
+      <p>Provaci. Scegli un autore, scegli <strong>quante parole di contesto</strong> la macchina può guardare
+        all'indietro, e premi «scrivi».</p>
+
+      <div class="simbox">
+        <p style="margin:0 0 0.2rem; font-weight:600;">1. Su quale autore la alleniamo?</p>
+        <div class="sim-btns" id="mk-corpus"></div>
+        <p style="margin:0.4rem 0 0.2rem; font-weight:600;">2. Quante parole precedenti può guardare?</p>
+        <div class="sim-btns" id="mk-ord"></div>
+        <div class="sim-btns">
+          <button class="btn btn-primary" id="mk-gen">✍️ scrivi un testo nuovo</button>
+        </div>
+        <div class="gen-out" id="mk-text">Premi il pulsante…</div>
+        <p class="sim-out" id="mk-out"></p>
+      </div>
+
+      <div class="curiosita">
+        <strong>🔎 Che cosa hai appena visto.</strong> Con <strong>una</strong> parola di contesto esce quasi sempre
+        un'accozzaglia: le parole sono «del genere giusto», ma le frasi non stanno in piedi. Aumentando il contesto,
+        però, su un testo così corto succede una cosa istruttiva e per niente scontata: la macchina smette di
+        inventare e comincia a <strong>ricopiare l'originale</strong>, spesso parola per parola. Non ha imparato a
+        scrivere <em>come</em> Dante: ha imparato Dante <strong>a memoria</strong>.
+        <p style="margin:0.55rem 0 0;">In gergo si dice che ha fatto <strong>overfitting</strong>, e il motivo è
+          semplice: con poche decine di parole, quasi ogni contesto compare <em>una volta sola</em> nel testo, quindi
+          la parola successiva è obbligata — non c'è niente da estrarre a sorte. Per imparare uno <em>stile</em>
+          invece che un <em>testo</em> servono due cose: una quantità enorme di dati, in cui ogni contesto ricorra
+          molte volte in modi diversi, e un modello che non possa limitarsi a fare da archivio. È esattamente il
+          problema che gli LLM hanno dovuto risolvere.</p>
+      </div>
+
+      <h3>4.1 — Da qui agli LLM: che cosa manca</h3>
+
+      <p>Gli <strong>LLM</strong> (<em>Large Language Model</em>, «grande modello di linguaggio»), cioè gli assistenti
+        che usi oggi, fanno — a un livello profondissimo — <strong>la stessa identica cosa</strong>: guardano il testo
+        scritto finora e scelgono la parola successiva, tirandola a sorte da una distribuzione di probabilità.
+        Davvero: tutto quello che leggi in una risposta è nato una parolina per volta, così.</p>
+
+      <p>Le differenze sono tre, e sono enormi:</p>
+      <ol>
+        <li><strong>Il contesto.</strong> Non due o tre parole, ma <strong>migliaia</strong> di parole all'indietro
+          — l'intera conversazione.</li>
+        <li><strong>La quantità di testo.</strong> Non una pagina, ma una fetta enorme di tutto ciò che l'umanità ha
+          scritto e messo in rete.</li>
+        <li><strong>La tabella non esiste più.</strong> Ed è il punto cruciale.</li>
+      </ol>
+
+      <p>Fermiamoci sul terzo, perché è qui che nascono le reti neurali. Il nostro programmino tiene in memoria una
+        <strong>tabella</strong>: per ogni contesto, l'elenco delle parole che possono seguire. Proviamo a fare i
+        conti per una tabella «seria». Supponiamo un vocabolario di $50\,000$ parole e un contesto di sole
+        <strong>tre</strong> parole: le righe della tabella sarebbero</p>
+      <div class="formula-box">
+        $$50\,000 \times 50\,000 \times 50\,000 = 1{,}25 \times 10^{14}$$
+        <p class="formula-note">Centoventicinquemila miliardi di righe — e siamo fermi a tre parole di contesto. Con
+          mille parole il numero non ha nemmeno un nome: supera di gran lunga il numero di atomi dell'universo
+          osservabile.</p>
+      </div>
+
+      <p>Conclusione inevitabile: <strong>la tabella non si può costruire</strong>. Non è un problema di soldi o di
+        pazienza, è impossibile in linea di principio. Serve qualcos'altro: non un elenco da consultare, ma una
+        <strong>funzione da calcolare</strong> — una macchina che, dato un contesto qualsiasi (anche mai visto
+        prima!), <em>calcoli</em> le probabilità invece di andarle a leggere. E questa macchina è la
+        <strong>rete neurale</strong>.</p>
+    </section>
+
+    <!-- 5 — RETI NEURALI -->
+    <section id="sec5">
+      <h2>5. Che cos'è una rete neurale</h2>
+
+      <p>Il mattone di base si chiama <strong>neurone artificiale</strong>, ed è molto meno misterioso di quanto il
+        nome faccia pensare: è una formula con dei numeri regolabili.</p>
+
+      <div class="definition">
+        Un <strong>neurone artificiale</strong> riceve dei numeri in ingresso $x_1, x_2, \dots, x_n$, li moltiplica
+        ciascuno per un proprio <strong>peso</strong> $w_1, w_2, \dots, w_n$, somma tutto insieme a un numero fisso
+        $b$ (detto <em>bias</em>) e infine passa il risultato attraverso una <strong>funzione di attivazione</strong>
+        $f$ che decide «quanto accendersi»:
+        $$y = f\left(w_1 x_1 + w_2 x_2 + \dots + w_n x_n + b\right)$$
+      </div>
+
+      <div class="simbox" style="max-width:520px; margin-left:auto; margin-right:auto;">
+        <svg viewBox="0 0 460 220" role="img" aria-label="schema di un neurone artificiale: ingressi, pesi, somma, attivazione, uscita">
+          <circle cx="60" cy="50" r="16" fill="color-mix(in srgb, var(--primary) 26%, transparent)" stroke="var(--primary)" stroke-width="2"/>
+          <circle cx="60" cy="110" r="16" fill="color-mix(in srgb, var(--primary) 26%, transparent)" stroke="var(--primary)" stroke-width="2"/>
+          <circle cx="60" cy="170" r="16" fill="color-mix(in srgb, var(--primary) 26%, transparent)" stroke="var(--primary)" stroke-width="2"/>
+          <text x="60" y="55" text-anchor="middle" class="lbl">x₁</text>
+          <text x="60" y="115" text-anchor="middle" class="lbl">x₂</text>
+          <text x="60" y="175" text-anchor="middle" class="lbl">x₃</text>
+          <line x1="76" y1="50" x2="204" y2="100" stroke="var(--accent)" stroke-width="2"/>
+          <line x1="76" y1="110" x2="204" y2="110" stroke="var(--accent)" stroke-width="2"/>
+          <line x1="76" y1="170" x2="204" y2="120" stroke="var(--accent)" stroke-width="2"/>
+          <text x="132" y="66" class="lbl-s" style="fill:var(--accent);">w₁</text>
+          <text x="132" y="103" class="lbl-s" style="fill:var(--accent);">w₂</text>
+          <text x="132" y="156" class="lbl-s" style="fill:var(--accent);">w₃</text>
+          <circle cx="232" cy="110" r="30" fill="color-mix(in srgb, var(--accent) 18%, transparent)" stroke="var(--accent)" stroke-width="2.5"/>
+          <text x="232" y="117" text-anchor="middle" class="lbl" style="font-size:19px;">Σ</text>
+          <text x="232" y="62" text-anchor="middle" class="lbl-s">+ b</text>
+          <line x1="262" y1="110" x2="308" y2="110" stroke="var(--accent)" stroke-width="2"/>
+          <rect x="308" y="82" width="58" height="56" rx="8" fill="var(--surface)" stroke="var(--magenta)" stroke-width="2.5"/>
+          <path d="M 316 128 C 330 128, 334 92, 358 92" fill="none" stroke="var(--magenta)" stroke-width="2.5"/>
+          <text x="337" y="152" text-anchor="middle" class="lbl-s" style="fill:var(--magenta);">f</text>
+          <line x1="366" y1="110" x2="410" y2="110" stroke="var(--accent)" stroke-width="2"/>
+          <circle cx="426" cy="110" r="16" fill="color-mix(in srgb, var(--green) 26%, transparent)" stroke="var(--green)" stroke-width="2"/>
+          <text x="426" y="115" text-anchor="middle" class="lbl">y</text>
+          <text x="232" y="196" text-anchor="middle" class="lbl-s">somma pesata → attivazione → uscita</text>
+        </svg>
+      </div>
+
+      <p>Un neurone da solo non fa granché. Ma se ne mettiamo <strong>migliaia</strong>, organizzati in
+        <strong>strati</strong> — l'uscita di ogni strato diventa l'ingresso del successivo — otteniamo una
+        <strong>rete neurale</strong>: lo <em>strato d'ingresso</em> riceve i dati (i pixel di un'immagine, le parole
+        di una frase), gli <em>strati nascosti</em> li rielaborano, lo <em>strato d'uscita</em> produce la risposta.
+        I modelli di oggi hanno centinaia di miliardi di pesi.</p>
+
+      <h3>5.1 — Ispirate al cervello, non copie del cervello</h3>
+
+      <div class="warnbox">
+        <strong>⚠ Attenzione a una confusione molto diffusa.</strong> Le reti neurali <strong>non</strong> sono
+        simulazioni del cervello, e i loro creatori non hanno mai preteso che lo fossero. Un neurone vero è una
+        cellula di complessità spaventosa: comunica con impulsi elettrici e sostanze chimiche, il momento in cui
+        «spara» conta quanto il fatto che spari, cambia forma nel tempo, e ne abbiamo circa
+        <strong>86 miliardi</strong> collegati in modi che ancora non capiamo. Il neurone artificiale, al confronto,
+        è una moltiplicazione e una somma.
+        <p style="margin:0.55rem 0 0;">L'obiettivo non era <strong>copiare la fisiologia</strong>, ma
+          <strong>prendere ispirazione</strong> da un'idea: che tanti elementi semplicissimi, collegati fra loro e
+          capaci di regolare la forza dei collegamenti, possano imparare a fare cose complicate. È lo stesso
+          rapporto che c'è fra un uccello e un aereo: gli aerei volano, ma non sbattono le ali. Nessuno direbbe che
+          un Boeing è la simulazione di un gabbiano — eppure l'ispirazione è venuta di lì.</p>
+      </div>
+
+      <h3>5.2 — L'addestramento: non si programma, si allena</h3>
+
+      <p>Ed eccoci al punto che cambia tutto rispetto a un programma normale. In un algoritmo classico
+        <em>tu</em> scrivi le regole. In una rete neurale le regole sono i pesi — e all'inizio sono
+        <strong>numeri a caso</strong>. Nessuno li scrive: la rete li trova da sola, attraverso l'
+        <strong>addestramento</strong>.</p>
+
+      <div class="definition">
+        <strong>Addestrare</strong> una rete significa ripetere milioni di volte questo ciclo:
+        <ol style="margin:0.45rem 0 0;">
+          <li>le si mostra un <strong>esempio</strong> di cui si conosce la risposta giusta (una foto e l'etichetta
+            «gatto»);</li>
+          <li>la rete produce la sua risposta, all'inizio quasi sempre <strong>sbagliata</strong>;</li>
+          <li>si misura <strong>quanto</strong> ha sbagliato (l'<em>errore</em>);</li>
+          <li>si <strong>correggono un pochino tutti i pesi</strong>, nella direzione che avrebbe reso l'errore più
+            piccolo.</li>
+        </ol>
+        Un passo alla volta, l'errore complessivo cala e la rete «impara».
+      </div>
+
+      <p>Guardalo succedere. Qui sotto c'è la rete neurale più piccola possibile — <strong>un solo neurone</strong>,
+        storicamente chiamato <em>percettrone</em> — che deve imparare a separare i pallini rossi dai pallini blu.
+        La retta è la sua «idea» del confine, e all'inizio è a caso. Premi «un passo» e guardala correggersi.</p>
+
+      <div class="simbox">
+        <div class="sim-btns">
+          <button class="btn btn-primary" id="pc-step">▶ un passo di addestramento</button>
+          <button class="btn" id="pc-many">⏩ 50 passi</button>
+          <button class="btn" id="pc-new">🎲 nuovi dati</button>
+        </div>
+        <div id="pc-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="pc-ep">0</div><div class="l">passi di addestramento</div></div>
+          <div class="stat"><div class="n" id="pc-err">—</div><div class="l">errori rimasti</div></div>
+        </div>
+        <p class="sim-out" id="pc-out"></p>
+      </div>
+
+      <p class="formula-note">Nota: non tutte le reti neurali vanno addestrate con degli esempi — esistono reti
+        costruite a mano per compiti specifici e reti che imparano senza etichette — ma quasi tutte quelle che usi
+        ogni giorno hanno alle spalle un addestramento di questo tipo, ripetuto su quantità di dati e per tempi di
+        calcolo che è difficile immaginare.</p>
+    </section>
+
+    <!-- 6 — DA SPECIALISTI A GENERALISTI -->
+    <section id="sec6">
+      <h2>6. Da specialisti a generalisti (ma restano programmi)</h2>
+
+      <p>Per decenni le intelligenze artificiali sono state <strong>fenomenali in un compito solo</strong> e
+        completamente inutili in tutti gli altri.</p>
+
+      <ul class="timeline">
+        <li><span class="anno">1958</span>Frank Rosenblatt costruisce il <strong>percettrone</strong>: impara a
+          riconoscere semplici figure. I giornali parlano già di macchine che cammineranno e parleranno. Seguiranno
+          due lunghi «<strong>inverni dell'IA</strong>», in cui i finanziamenti spariscono per delusione.</li>
+        <li><span class="anno">1997</span><strong>Deep Blue</strong> batte a scacchi il campione del mondo Garri
+          Kasparov. Un'impresa storica — ma quella macchina sapeva fare <em>solo</em> quello: non sarebbe stata
+          capace di giocare a dama, né di dirti che tempo fa.</li>
+        <li><span class="anno">2012</span>Una rete neurale profonda vince a sorpresa la gara di
+          <strong>riconoscimento di immagini</strong> ImageNet, stracciando tutti i metodi precedenti. È l'inizio
+          del <em>deep learning</em> moderno: le reti diventano bravissime a vedere.</li>
+        <li><span class="anno">2016</span><strong>AlphaGo</strong> batte il campione di Go, un gioco che si riteneva
+          fuori portata per le macchine ancora per decenni.</li>
+        <li><span class="anno">2017</span>Un articolo dal titolo spavaldo, <em>Attention Is All You Need</em>,
+          introduce l'architettura <strong>transformer</strong>: è la base tecnica di tutti gli LLM di oggi.</li>
+        <li><span class="anno">oggi</span>Gli assistenti sanno scrivere, tradurre, riassumere, programmare,
+          spiegare, correggere. Non più specialisti: <strong>generalisti</strong>.</li>
+      </ul>
+
+      <h3>6.1 — Sono ancora «algoritmi»?</h3>
+
+      <p>Domanda legittima, e la risposta è interessante: <strong>sì e no</strong>. Sì, perché in fondo restano
+        programmi che girano su un hardware: circuiti, transistor, moltiplicazioni fra numeri. Non c'è niente di
+        magico né di vivo là dentro. Ma no, perché viene a mancare una delle proprietà che nella
+        <a href="../Matematica_1/9.Algoritmi_top_down.html">lezione sugli algoritmi</a> avevamo messo tra i requisiti
+        fondamentali: il <strong>determinismo</strong>.</p>
+
+      <div class="definition">
+        Un algoritmo si dice <strong>deterministico</strong> quando a uno stesso ingresso corrisponde
+        <strong>sempre</strong> la stessa identica uscita. Se fai due volte la stessa divisione, il risultato è
+        quello. Se fai due volte la stessa domanda a un assistente, ottieni <strong>due risposte diverse</strong>.
+      </div>
+
+      <p>Perché? Per il motivo che hai già visto nel widget della sezione 4: l'ultimo passo non è una scelta, è
+        un'<strong>estrazione a sorte</strong>. Il modello non decide qual è la parola successiva — calcola le
+        <em>probabilità</em> di tutte le parole possibili e poi ne <strong>pesca una</strong>. Cambia il sorteggio,
+        cambia la risposta.</p>
+      <p class="formula-note">Per precisione: si può obbligare il modello a scegliere sempre la parola più probabile
+        e fissare il generatore casuale, e allora torna deterministico. Ma di norma non si fa, perché un pizzico di
+        casualità rende le risposte più varie e meno ripetitive.</p>
+    </section>
+
+    <!-- 7 — APPROSSIMATORE UNIVERSALE -->
+    <section id="sec7">
+      <h2>7. Che cos'è davvero: un approssimatore universale</h2>
+
+      <p>Se dovessimo dire in una riga che cos'è una rete neurale, la risposta più onesta è questa: è una
+        <strong>funzione con moltissime manopole regolabili</strong>, capace di imitare qualunque altra funzione.
+        In matematica si dice <strong>approssimatore universale</strong>.</p>
+
+      <div class="theorem">
+        <strong>Teorema di approssimazione universale</strong> (Cybenko 1989, Hornik 1991). Una rete neurale con
+        <strong>un solo strato nascosto</strong>, purché abbia <strong>abbastanza neuroni</strong>, può approssimare
+        <strong>qualunque</strong> funzione continua con la precisione che si desidera.
+      </div>
+
+      <p>Detto in modo meno tecnico: dammi una relazione qualsiasi fra un ingresso e un'uscita — la temperatura di
+        domani a partire da quella di oggi, il prezzo di una casa a partire dai suoi metri quadri, la parola
+        successiva a partire dalle precedenti — ed esiste una rete neurale che la riproduce quanto vuoi bene. Non
+        importa quanto sia complicata quella relazione, né che nessuno sappia scriverne la formula.</p>
+
+      <p>Come è possibile? L'idea è la stessa dei mattoncini: ogni neurone contribuisce con un «gradino» morbido, e
+        sommando abbastanza gradini si può costruire qualunque profilo. Muovi il cursore e guarda la curva rossa
+        (la funzione da imitare) venire ricoperta sempre meglio:</p>
+
+      <div class="simbox">
+        <div class="sim-btns" id="ua-fn"></div>
+        <div class="controls">
+          <div class="control-group"><label>numero di neuroni: <span class="val" id="ua-n-val">3</span></label>
+            <input type="range" id="ua-n" min="1" max="40" step="1" value="3"></div>
+        </div>
+        <div id="ua-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="ua-err">—</div><div class="l">errore medio</div></div>
+          <div class="stat"><div class="n" id="ua-par">—</div><div class="l">manopole (pesi) usate</div></div>
+        </div>
+        <p class="sim-out" id="ua-out"></p>
+      </div>
+
+      <div class="warnbox">
+        <strong>⚠ Due avvertenze che il teorema non dice.</strong>
+        <ol style="margin:0.45rem 0 0;">
+          <li><strong>Che la rete <em>esista</em> non significa che si riesca a <em>trovarla</em>.</strong> Il
+            teorema garantisce che da qualche parte, nello spazio di tutti i possibili pesi, c'è la combinazione
+            giusta. Trovarla è l'addestramento — ed è la parte difficile, costosa e per niente garantita.</li>
+          <li><strong>Approssimare bene gli esempi visti non significa funzionare sugli altri.</strong> È
+            l'overfitting che hai già incontrato con Dante: una macchina può ricopiare alla perfezione tutto ciò che
+            ha visto e fallire clamorosamente sul caso nuovo.</li>
+        </ol>
+      </div>
+
+      <div class="curiosita">
+        <strong>💡 Perché le IA «inventano» le risposte.</strong> Adesso hai gli strumenti per capire uno dei
+        comportamenti più discussi: le cosiddette <strong>allucinazioni</strong>, cioè le risposte sbagliate dette
+        con assoluta sicurezza. Un approssimatore, per costruzione, <strong>restituisce sempre un valore</strong>:
+        se gli chiedi qualcosa che sta fuori da ciò che ha imparato, non si blocca — <em>interpola</em>, cioè
+        inventa la continuazione più plausibile. E siccome il suo mestiere è produrre testo <em>verosimile</em>,
+        non testo <em>vero</em>, il risultato suona benissimo anche quando è completamente sbagliato. Non ti sta
+        mentendo: sta facendo esattamente il suo lavoro. Sei tu che devi verificare.
+      </div>
+    </section>
+
+    <!-- 8 — USARLE BENE -->
+    <section id="sec8">
+      <h2>8. Bevi il sakè, ma non lasciarti bere</h2>
+
+      <p>Adesso la parte che conta di più, e sulla quale voglio essere molto chiaro con voi.</p>
+
+      <p>Queste macchine sono <strong>utilissime</strong>. Chi imparerà a usarle bene avrà un vantaggio enorme su
+        chi non lo farà — non diverso dal vantaggio che, vent'anni fa, aveva chi sapeva usare un computer su chi non
+        lo sapeva usare; o, andando molto più indietro, chi sapeva leggere e scrivere su chi non ne era capace.
+        Rifiutarle per principio non è prudenza: è mettersi da soli in svantaggio.</p>
+
+      <div class="curiosita">
+        <strong>🍶 Il proverbio.</strong> Dice un famoso proverbio giapponese:
+        <p style="margin:0.5rem 0; font-size:1.1rem; font-style:italic; border-left:3px solid var(--gold); padding-left:1rem;">
+          Bevi pure tutto il sakè del mondo, ma non lasciarti bere dal sakè.</p>
+        Ecco: è esattamente questo. Lo strumento è tuo, e finché lo usi tu va benissimo. Il problema comincia quando
+        è lui a usare te.
+      </div>
+
+      <p>Che cosa significa, concretamente, per uno studente? Significa fermarsi un attimo e farsi
+        <strong>due domande</strong>, ogni volta.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Le due domande da farsi</div>
+        <p style="margin:0;"><strong>1. Che cosa sto delegando?</strong> &nbsp;Se delego un lavoro noioso che so già
+          fare, ottimo. Se delego <strong>il pensiero</strong> — cioè proprio la cosa che ero lì per imparare —
+          allora sto pagando qualcuno per andare in palestra al posto mio: i pesi li ha sollevati lui, i muscoli sono
+          i suoi.</p>
+        <p style="margin:0.5rem 0 0;"><strong>2. Ne vale davvero la pena?</strong> &nbsp;Verificare una risposta
+          costa tempo. Se il compito è breve e lo sai fare, spesso farlo è più rapido che chiederlo, leggerlo e
+          controllarlo.</p>
+      </div>
+
+      <p>E poi quattro regole pratiche, che valgono per tutti:</p>
+      <ul>
+        <li><strong>Verifica sempre.</strong> Hai visto perché nella sezione 7: la macchina produce testo
+          <em>verosimile</em>, non testo <em>vero</em>. Su nomi, date, numeri e citazioni sbaglia con la stessa
+          identica sicurezza con cui dice le cose giuste.</li>
+        <li><strong>Non darle dati personali</strong> — tuoi o di altri. Quello che scrivi esce dal tuo computer e
+          finisce sui server di qualcun altro.</li>
+        <li><strong>Dichiara quando la usi.</strong> Non è una vergogna: è onestà intellettuale, come citare un
+          libro. (Questo sito, per esempio, l'ho scritto con l'aiuto di un'intelligenza artificiale. Non me ne
+          nascondo: le idee, la scaletta e il controllo di ogni riga sono miei, il lavoro di scrittura è stato fatto
+          in due.)</li>
+        <li><strong>Ricorda che costa.</strong> Ogni risposta consuma energia elettrica e acqua per raffreddare i
+          centri di calcolo. Non è gratis per il pianeta, anche se è gratis per te.</li>
+      </ul>
+
+      <div class="warnbox">
+        <strong>La cosa che vi chiedo davvero.</strong> Non vi sto dicendo di non usarla. Vi sto dicendo di
+        <strong>sapere sempre che cosa le state permettendo di fare</strong>. Un conto è chiederle di
+        riformulare un paragrafo che avete scritto voi, un altro è consegnare un tema che non avete mai pensato. Nel
+        primo caso siete più bravi di prima. Nel secondo avete solo una bella pagella e la testa vuota — e alla
+        prima verifica in classe, senza rete, si vede subito.
+      </div>
+    </section>
+
+    <!-- 9 — LA PAURA -->
+    <section id="sec9">
+      <h2>9. E se un domani…?</h2>
+
+      <p>C'è poi un'altra paura, di tutt'altro genere, e merita una risposta seria invece di una battuta.</p>
+
+      <p>Lo so che siete piccoli e forse non ve lo ricordate, ma fino a <strong>pochissimi anni fa</strong> un
+        programma non era in grado di scrivere nemmeno una frase di senso compiuto: usciva roba come quella del
+        widget della sezione 4, buffa e sconclusionata. Oggi un'intelligenza artificiale mi sta aiutando a scrivere
+        questo sito. In pochi anni. E allora la domanda viene da sé: <strong>e domani?</strong></p>
+
+      <p>E se un giorno una di queste macchine sviluppasse un proprio <strong>obiettivo</strong>, e cominciasse a
+        perseguirlo per conto suo, indipendentemente da ciò che le chiediamo? E se quell'obiettivo fosse in
+        contrasto con i nostri interessi di esseri umani? Sono le guerre uomo-macchina che avete visto mille volte
+        nei film e nei videogiochi.</p>
+
+      <div class="curiosita">
+        <strong>😌 State tranquilli: oggi siamo lontanissimi.</strong> E il motivo non è ottimismo, è come sono fatte
+        queste macchine — ormai lo sapete:
+        <ul style="margin:0.5rem 0 0;">
+          <li><strong>Non hanno obiettivi.</strong> Un modello calcola una distribuzione di probabilità sulla parola
+            successiva. Non desidera niente, non teme niente, non «vuole» continuare a esistere. Non ha nemmeno il
+            concetto di sé stesso come qualcosa che esiste nel tempo.</li>
+          <li><strong>Non pensano quando non le interroghi.</strong> Fra una tua domanda e l'altra non succede
+            assolutamente nulla: nessun piano che matura, nessuna riflessione. Il calcolo parte quando premi invio e
+            finisce quando la risposta è finita.</li>
+          <li><strong>Non ricordano</strong>, se non ciò che sta scritto nella conversazione in corso o che qualcuno
+            ha deciso di conservare per loro.</li>
+        </ul>
+        Uno scenario «alla Terminator» richiederebbe obiettivi propri, memoria persistente, capacità di agire nel
+        mondo e di pianificare a lungo termine. Oggi è <strong>ampiamente fuori dalla portata</strong> di
+        un'intelligenza artificiale.
+      </div>
+
+      <p>Detto questo, due precisazioni da persona onesta. La prima: la domanda non è stupida, ed è studiata sul
+        serio — esiste un intero campo di ricerca, chiamato <strong>allineamento</strong>, che si occupa di come fare
+        in modo che sistemi sempre più capaci continuino a fare ciò che vogliamo davvero. Non è fantascienza
+        occuparsene <em>prima</em>: è la stessa ragione per cui si progettano i freni quando si progetta l'auto, non
+        dopo il primo incidente.</p>
+
+      <p>La seconda, più importante per voi: mentre guardiamo il robot che potrebbe arrivare fra vent'anni, rischiamo
+        di non vedere i problemi che ci sono <strong>già oggi</strong>, e che non hanno niente di fantascientifico —
+        risposte sbagliate dette con sicurezza, pregiudizi ereditati dai testi su cui il modello è stato addestrato,
+        immagini e voci false indistinguibili dalle vere, lavori che cambiano o spariscono, e un potere enorme
+        concentrato in pochissime aziende. Sono cose concrete, che riguardano la vostra vita adesso — e su cui, da
+        cittadini, avrete voce in capitolo.</p>
+
+      <p>Il che ci riporta al punto di partenza. Questa non è una lezione su come diventare bravi a usare un
+        programma: è una lezione su come <strong>continuare a essere quelli che decidono</strong>. Il sakè è ottimo.
+        Bevetelo voi.</p>
+    </section>
+
+    <!-- 10 — QUIZ -->
+    <section id="quiz">
+      <h2>10. Quiz finale</h2>
+      <p>Dieci domande su Turing, macchine e test, catene di Markov, reti neurali, addestramento e uso consapevole.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 12 — L'intelligenza artificiale · Matematica (Informatica) · Secondo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toString().replace('.', ','); }
+      const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      /* ===== 2 — macchina di Turing ===== */
+      (function () {
+        const tapeEl = document.getElementById('tm-tape'); if (!tapeEl) return;
+        const headEl = document.getElementById('tm-head'), stEl = document.getElementById('tm-state');
+        const rulesEl = document.getElementById('tm-rules'), out = document.getElementById('tm-out');
+        const progsEl = document.getElementById('tm-progs');
+        const PROG = [
+          {
+            k: 'inc', nome: '➕ Aggiungi 1 (in binario)', input: '1011', start: 0,
+            R: { 'q0|0': ['0', 'R', 'q0'], 'q0|1': ['1', 'R', 'q0'], 'q0|_': ['_', 'L', 'q1'], 'q1|1': ['0', 'L', 'q1'], 'q1|0': ['1', '-', 'STOP'], 'q1|_': ['1', '-', 'STOP'] },
+            desc: 'Somma 1 al numero binario 1011 (cioè 11 in decimale). Prima corre fino in fondo, poi torna indietro gestendo i riporti. Risultato atteso: <strong>1100</strong> (cioè 12).'
+          },
+          {
+            k: 'inv', nome: '🔁 Inverti gli 0 e gli 1', input: '10110', start: 0,
+            R: { 'q0|0': ['1', 'R', 'q0'], 'q0|1': ['0', 'R', 'q0'], 'q0|_': ['_', '-', 'STOP'] },
+            desc: 'Scorre il nastro scambiando ogni 0 con un 1 e viceversa. Bastano tre regole e un solo stato.'
+          },
+          {
+            k: 'par', nome: '⚖️ Pari o dispari?', input: '1011', start: 0,
+            R: { 'q0|0': ['0', 'R', 'q0'], 'q0|1': ['1', 'R', 'q1'], 'q0|_': ['P', '-', 'STOP'], 'q1|0': ['0', 'R', 'q1'], 'q1|1': ['1', 'R', 'q0'], 'q1|_': ['D', '-', 'STOP'] },
+            desc: 'Conta se gli 1 sono in numero pari (scrive P) o dispari (scrive D). Il segreto è nei due stati: <strong>q0</strong> significa «finora ne ho visti un numero pari», <strong>q1</strong> «dispari». La macchina non ha memoria… se non lo stato in cui si trova!'
+          }
+        ];
+        let cur = 0, tape = [], head = 0, stato = 'q0', timer = null, passi = 0, ultima = null;
+        function reset() {
+          const p = PROG[cur];
+          tape = ('___' + p.input + '____').split('');
+          head = 3 + p.start; stato = 'q0'; passi = 0; ultima = null;
+          if (timer) { clearInterval(timer); timer = null; }
+          draw();
+        }
+        function step() {
+          if (stato === 'STOP') { return false; }
+          const p = PROG[cur], sym = tape[head] || '_';
+          const r = p.R[stato + '|' + sym];
+          ultima = stato + '|' + sym;
+          if (!r) { stato = 'STOP'; draw(); return false; }
+          tape[head] = r[0];
+          if (r[1] === 'R') { head++; } else if (r[1] === 'L') { head--; }
+          if (head < 0) { tape.unshift('_'); head = 0; }
+          if (head >= tape.length) { tape.push('_'); }
+          stato = r[2]; passi++;
+          draw();
+          return stato !== 'STOP';
+        }
+        function draw() {
+          const p = PROG[cur];
+          tapeEl.innerHTML = tape.map((c, i) =>
+            '<div class="tm-cell' + (i === head ? ' head' : '') + '">' + (c === '_' ? '&nbsp;' : esc(c)) + '</div>').join('');
+          headEl.innerHTML = '<span style="display:inline-block; width:100%; text-align:left; padding-left:' +
+            (head * 2.45 + 0.7) + 'rem;">▼</span>';
+          stEl.innerHTML = 'stato: <strong style="color:var(--accent);">' + stato + '</strong>' +
+            (stato === 'STOP' ? ' — macchina ferma' : '') + ' · passi: ' + passi;
+          let t = '<table class="tm-rules"><tr><th>se sono nello stato</th><th>e leggo</th><th>scrivo</th><th>mi sposto</th><th>e passo a</th></tr>';
+          Object.keys(p.R).forEach(function (k) {
+            const r = p.R[k], parts = k.split('|');
+            t += '<tr class="' + (k === ultima ? 'on' : '') + '"><td>' + parts[0] + '</td><td>' + (parts[1] === '_' ? '␣' : parts[1]) +
+              '</td><td>' + (r[0] === '_' ? '␣' : r[0]) + '</td><td>' + (r[1] === 'R' ? '→' : (r[1] === 'L' ? '←' : 'fermo')) + '</td><td>' + r[2] + '</td></tr>';
+          });
+          rulesEl.innerHTML = t + '</table>';
+          Array.prototype.forEach.call(progsEl.children, (b, i) => b.classList.toggle('active', i === cur));
+          out.innerHTML = p.desc + (stato === 'STOP'
+            ? ' <br>✅ <strong>Finito in ' + passi + ' passi.</strong> Sul nastro c\'è il risultato: <strong>' +
+              tape.join('').replace(/_/g, '') + '</strong>'
+            : '');
+        }
+        PROG.forEach(function (p, i) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = p.nome;
+          b.addEventListener('click', function () { cur = i; reset(); });
+          progsEl.appendChild(b);
+        });
+        document.getElementById('tm-step').addEventListener('click', step);
+        document.getElementById('tm-run').addEventListener('click', function () {
+          if (timer) { return; }
+          timer = setInterval(function () { if (!step()) { clearInterval(timer); timer = null; } }, 420);
+        });
+        document.getElementById('tm-stop').addEventListener('click', function () { clearInterval(timer); timer = null; });
+        document.getElementById('tm-reset').addEventListener('click', reset);
+        reset();
+      })();
+
+      /* ===== 3 — ELIZA ===== */
+      (function () {
+        const chat = document.getElementById('el-chat'); if (!chat) return;
+        const inp = document.getElementById('el-in'), btn = document.getElementById('el-send');
+        const out = document.getElementById('el-out');
+        const SPEC = { 'sono': 'sei', 'mio': 'tuo', 'mia': 'tua', 'miei': 'tuoi', 'mie': 'tue', 'io': 'tu', 'mi': 'ti', 'me': 'te', 'ho': 'hai' };
+        function rifletti(s) {
+          return s.split(/\b/).map(w => SPEC[w.toLowerCase()] || w).join('');
+        }
+        const REG = [
+          [/\b(?:sono|mi sento)\s+(.{2,60})/i, ['Da quanto tempo ti senti $1?', 'E perché pensi di essere $1?', 'Che effetto ti fa essere $1?']],
+          [/\b(?:penso|credo)\s+che\s+(.{2,60})/i, ['Pensi davvero che $1?', 'E se invece non fosse così?', 'Che cosa te lo fa credere?']],
+          [/\b(?:voglio|vorrei)\s+(.{2,60})/i, ['Perché vorresti $1?', 'E che cosa succederebbe se ottenessi $1?']],
+          [/\b(madre|padre|mamma|pap|famiglia|sorella|fratello)/i, ['Parlami di più della tua famiglia.', 'Che rapporto hai con la tua famiglia?']],
+          [/\b(scuola|professor|compiti|verifica|voto|matematica)/i, ['La scuola sembra contare parecchio per te. Perché?', 'Raccontami di più di questa cosa.']],
+          [/\b(amico|amica|amici)/i, ['I tuoi amici sono importanti per te?', 'Parlami dei tuoi amici.']],
+          [/perch[ée]/i, ['Perché lo chiedi?', 'E tu che cosa ne pensi?']],
+          [/\bnon\s+lo\s+so\b|\bboh\b/i, ['Prova a immaginare.', 'Nessuna fretta: pensaci.']],
+          [/\?/, ['Perché me lo chiedi?', 'Che risposta ti aspetteresti?']],
+          [/\bno\b/i, ['Perché no?', 'Sei un po\' negativo, non trovi?']],
+          [/\bs[iì]\b/i, ['Ne sei sicuro?', 'Capisco. Vai avanti.']]
+        ];
+        const DEF = ['Interessante. Vai avanti.', 'Puoi dirmi di più?', 'E questo come ti fa sentire?', 'Capisco. E poi?', 'Perché dici questo?', 'Continua pure, ti ascolto.'];
+        let n = 0;
+        function dì(testo, chi) {
+          const d = document.createElement('div');
+          d.className = 'msg ' + chi; d.textContent = testo;
+          chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
+        }
+        function rispondi(t) {
+          for (let i = 0; i < REG.length; i++) {
+            const m = t.match(REG[i][0]);
+            if (m) {
+              const scelte = REG[i][1];
+              let r = scelte[Math.floor(Math.random() * scelte.length)];
+              if (m[1]) { r = r.replace('$1', rifletti(m[1].replace(/[.!?]+$/, ''))); }
+              return r;
+            }
+          }
+          return DEF[Math.floor(Math.random() * DEF.length)];
+        }
+        function invia() {
+          const t = inp.value.trim();
+          if (!t) { return; }
+          dì(t, 'io'); inp.value = '';
+          setTimeout(function () {
+            dì(rispondi(t), 'bot');
+            n++;
+            if (n === 4) {
+              out.innerHTML = '🔎 Hai notato il trucco? ELIZA <strong>non capisce niente</strong>: cerca parole chiave («sono», «penso», «madre»), rigira la tua frase scambiando i pronomi e la restituisce come domanda. Se non trova niente, tira fuori una frase generica. Sono poche decine di regole — eppure nel 1966 qualcuno si commosse.';
+            }
+          }, 380);
+        }
+        btn.addEventListener('click', invia);
+        inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { invia(); } });
+        dì('Buongiorno. Come ti senti oggi?', 'bot');
+      })();
+
+      /* ===== 4 — catena di Markov ===== */
+      (function () {
+        const host = document.getElementById('mk-text'); if (!host) return;
+        const cEl = document.getElementById('mk-corpus'), oEl = document.getElementById('mk-ord'), out = document.getElementById('mk-out');
+        const CORPUS = [
+          { nome: '📜 Dante', testo: "Nel mezzo del cammin di nostra vita mi ritrovai per una selva oscura ché la diritta via era smarrita. Ahi quanto a dir qual era è cosa dura esta selva selvaggia e aspra e forte che nel pensier rinova la paura! Tant'è amara che poco è più morte; ma per trattar del ben ch'i' vi trovai, dirò de l'altre cose ch'i' v'ho scorte. Io non so ben ridir com'i' v'intrai, tant'era pien di sonno a quel punto che la verace via abbandonai." },
+          { nome: '🪵 Collodi', testo: "C'era una volta un pezzo di legno. Non era un legno di lusso, ma un semplice pezzo da catasta, di quelli che d'inverno si mettono nelle stufe e nei caminetti per accendere il fuoco e per riscaldare le stanze. Non so come andasse, ma il fatto gli è che un bel giorno questo pezzo di legno capitò nella bottega di un vecchio falegname, il quale aveva nome mastr'Antonio, se non che tutti lo chiamavano maestro Ciliegia, per via della punta del suo naso, che era sempre lustra e paonazza, come una ciliegia matura." },
+          { nome: '🏞️ Manzoni', testo: "Quel ramo del lago di Como, che volge a mezzogiorno, tra due catene non interrotte di monti, tutto a seni e a golfi, a seconda dello sporgere e del rientrare di quelli, vien, quasi a un tratto, a ristringersi, e a prender corso e figura di fiume, tra un promontorio a destra, e un'ampia costiera dall'altra parte; e il ponte, che ivi congiunge le due rive, par che renda ancor più sensibile all'occhio questa trasformazione, e segni il punto in cui il lago cessa, e l'Adda rincomincia, per ripigliar poi nome di lago dove le rive, allontanandosi di nuovo, lascian l'acqua distendersi e rallentarsi in nuovi golfi e in nuovi seni." }
+        ];
+        const ORD = [{ n: 1, t: '1 parola' }, { n: 2, t: '2 parole' }, { n: 3, t: '3 parole' }];
+        let ci = 0, oi = 0;
+        function parole(t) { return t.split(/\s+/).filter(Boolean); }
+        function genera() {
+          const W = parole(CORPUS[ci].testo), k = ORD[oi].n;
+          const M = {};
+          for (let i = 0; i + k < W.length; i++) {
+            const key = W.slice(i, i + k).join(' ').toLowerCase();
+            (M[key] = M[key] || []).push(W[i + k]);
+          }
+          let cur = W.slice(0, k), res = cur.slice();
+          for (let i = 0; i < 55; i++) {
+            const opz = M[cur.join(' ').toLowerCase()];
+            if (!opz || !opz.length) { break; }
+            const w = opz[Math.floor(Math.random() * opz.length)];
+            res.push(w);
+            cur = res.slice(-k);
+          }
+          const testo = res.join(' ');
+          host.textContent = '« ' + testo + ' »';
+          // quanto ha copiato di fila dall'originale?
+          const orig = W.join(' ').toLowerCase();
+          let best = 0;
+          for (let i = 0; i < res.length; i++) {
+            for (let j = i + 1; j <= res.length; j++) {
+              const s = res.slice(i, j).join(' ').toLowerCase();
+              if (orig.indexOf(s) >= 0) { best = Math.max(best, j - i); } else { break; }
+            }
+          }
+          Array.prototype.forEach.call(cEl.children, (b, i) => b.classList.toggle('active', i === ci));
+          Array.prototype.forEach.call(oEl.children, (b, i) => b.classList.toggle('active', i === oi));
+          const perc = Math.round(100 * best / res.length);
+          out.innerHTML = 'Contesto: <strong>' + ORD[oi].t + '</strong>. Il pezzo più lungo copiato <em>letteralmente</em> dall\'originale è di <strong>' +
+            best + ' parole</strong> su ' + res.length + ' (' + perc + '%). ' +
+            (perc >= 90
+              ? '⚠️ Praticamente <strong>tutto ricopiato</strong>: con un contesto così ampio e un testo così corto, ogni sequenza compare una volta sola e la parola successiva è obbligata. La macchina non ha imparato lo stile, ha imparato il testo <strong>a memoria</strong>: è l\'<strong>overfitting</strong>.'
+              : (perc >= 40
+                ? 'Cominciano a comparire interi pezzi presi di peso dall\'originale, alternati a raccordi inventati: siamo a metà strada fra l\'invenzione e la copia.'
+                : 'Le parole sono quelle dell\'autore, ma rimescolate: la macchina «sa» quale vocabolario usa, non come costruire un senso. Con un contesto così corto non può fare di meglio.'));
+        }
+        CORPUS.forEach(function (c, i) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = c.nome;
+          b.addEventListener('click', function () { ci = i; genera(); });
+          cEl.appendChild(b);
+        });
+        ORD.forEach(function (o, i) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = o.t;
+          b.addEventListener('click', function () { oi = i; genera(); });
+          oEl.appendChild(b);
+        });
+        document.getElementById('mk-gen').addEventListener('click', genera);
+        genera();
+      })();
+
+      /* ===== 5 — percettrone ===== */
+      (function () {
+        const host = document.getElementById('pc-svg'); if (!host) return;
+        const eEp = document.getElementById('pc-ep'), eEr = document.getElementById('pc-err'), out = document.getElementById('pc-out');
+        const W = 420, H = 300, M = 30;
+        let P = [], w = [0, 0], b = 0, ep = 0;
+        function X(u) { return M + (u + 1) / 2 * (W - 2 * M); }
+        function Y(v) { return H - M - (v + 1) / 2 * (H - 2 * M); }
+        function nuovi() {
+          P = [];
+          const m = 0.6 + Math.random() * 1.4, q = (Math.random() - 0.5) * 0.6;
+          for (let i = 0; i < 26; i++) {
+            let x, y, d;
+            do {
+              x = Math.random() * 1.8 - 0.9; y = Math.random() * 1.8 - 0.9;
+              d = y - (m * x + q);
+            } while (Math.abs(d) < 0.22);
+            P.push({ x: x, y: y, c: d > 0 ? 1 : -1 });
+          }
+          w = [Math.random() - 0.5, Math.random() - 0.5]; b = Math.random() - 0.5; ep = 0;
+          draw();
+        }
+        function pred(p) { return (w[0] * p.x + w[1] * p.y + b) >= 0 ? 1 : -1; }
+        function passo() {
+          const bad = P.filter(p => pred(p) !== p.c);
+          if (!bad.length) { draw(); return false; }
+          const p = bad[Math.floor(Math.random() * bad.length)], lr = 0.12;
+          w[0] += lr * p.c * p.x; w[1] += lr * p.c * p.y; b += lr * p.c;
+          ep++; draw(); return true;
+        }
+        function draw() {
+          let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="il percettrone impara a separare due gruppi di punti">';
+          s += '<rect x="' + M + '" y="' + M + '" width="' + (W - 2 * M) + '" height="' + (H - 2 * M) + '" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>';
+          // retta di separazione  w0 x + w1 y + b = 0
+          if (Math.abs(w[1]) > 1e-6) {
+            const y1 = (-b - w[0] * (-1)) / w[1], y2 = (-b - w[0] * (1)) / w[1];
+            s += '<line x1="' + X(-1) + '" y1="' + Y(y1) + '" x2="' + X(1) + '" y2="' + Y(y2) + '" stroke="var(--accent)" stroke-width="3"/>';
+          } else if (Math.abs(w[0]) > 1e-6) {
+            const x0 = -b / w[0];
+            s += '<line x1="' + X(x0) + '" y1="' + Y(-1) + '" x2="' + X(x0) + '" y2="' + Y(1) + '" stroke="var(--accent)" stroke-width="3"/>';
+          }
+          P.forEach(function (p) {
+            const ok = pred(p) === p.c;
+            const col = p.c > 0 ? '#ef4444' : '#3b82f6';
+            s += '<circle cx="' + X(p.x).toFixed(1) + '" cy="' + Y(p.y).toFixed(1) + '" r="' + (ok ? 6 : 8) + '" fill="' + col +
+              '" stroke="' + (ok ? 'none' : 'var(--gold)') + '" stroke-width="3"/>';
+          });
+          s += '</svg>';
+          host.innerHTML = s;
+          const err = P.filter(p => pred(p) !== p.c).length;
+          eEp.textContent = ep; eEr.textContent = err;
+          out.innerHTML = err === 0
+            ? '🎉 <strong>Ha imparato!</strong> Zero errori: la retta separa perfettamente i due gruppi. Nessuno le ha detto <em>dove</em> metterla — l\'ha trovata da sola, correggendosi un pezzetto alla volta a ogni sbaglio. Questo, moltiplicato per miliardi di pesi, è l\'addestramento di una rete neurale.'
+            : 'Ci sono ancora <strong>' + err + ' punti sbagliati</strong> (cerchiati in oro). A ogni passo la macchina ne prende uno, si accorge dell\'errore e <strong>sposta un pochino la retta</strong> nella direzione giusta. Continua a premere…';
+        }
+        document.getElementById('pc-step').addEventListener('click', passo);
+        document.getElementById('pc-many').addEventListener('click', function () {
+          for (let i = 0; i < 50; i++) { if (!passo()) { break; } }
+        });
+        document.getElementById('pc-new').addEventListener('click', nuovi);
+        nuovi();
+      })();
+
+      /* ===== 7 — approssimatore universale ===== */
+      (function () {
+        const host = document.getElementById('ua-svg'); if (!host) return;
+        const sn = document.getElementById('ua-n'), vn = document.getElementById('ua-n-val');
+        const fEl = document.getElementById('ua-fn'), eE = document.getElementById('ua-err'), eP = document.getElementById('ua-par');
+        const out = document.getElementById('ua-out');
+        const FUN = [
+          { nome: '🌊 onda', f: x => 0.5 + 0.42 * Math.sin(2 * Math.PI * x * 1.4) },
+          { nome: '⛰️ collina', f: x => 0.12 + 0.8 * Math.exp(-28 * (x - 0.45) * (x - 0.45)) },
+          { nome: '🪜 gradino', f: x => x < 0.38 ? 0.2 : (x < 0.7 ? 0.8 : 0.45) },
+          { nome: '🎢 mista', f: x => 0.5 + 0.3 * Math.sin(9 * x) * Math.exp(-1.4 * x) + 0.15 * x }
+        ];
+        let fi = 0;
+        const sig = t => 1 / (1 + Math.exp(-t));
+        function draw() {
+          const N = +sn.value, f = FUN[fi].f;
+          vn.textContent = N;
+          const k = 14 * N;
+          const t = [], d = [];
+          for (let i = 0; i <= N; i++) { t.push(i / N); }
+          for (let i = 1; i <= N; i++) { d.push(f(t[i]) - f(t[i - 1])); }
+          function ap(x) {
+            let y = f(t[0]);
+            for (let i = 1; i <= N; i++) { y += d[i - 1] * sig(k * (x - (t[i - 1] + t[i]) / 2)); }
+            return y;
+          }
+          const W = 440, H = 260, M = 26;
+          const PX = x => M + x * (W - 2 * M), PY = y => H - M - y * (H - 2 * M);
+          let veri = '', appr = '', err = 0, n = 0;
+          for (let i = 0; i <= 220; i++) {
+            const x = i / 220;
+            veri += (i ? ' L ' : 'M ') + PX(x).toFixed(1) + ' ' + PY(f(x)).toFixed(1);
+            appr += (i ? ' L ' : 'M ') + PX(x).toFixed(1) + ' ' + PY(ap(x)).toFixed(1);
+            err += Math.abs(f(x) - ap(x)); n++;
+          }
+          let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="approssimazione di una funzione con un numero crescente di neuroni">';
+          s += '<rect x="' + M + '" y="' + M + '" width="' + (W - 2 * M) + '" height="' + (H - 2 * M) + '" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>';
+          s += '<path d="' + veri + '" fill="none" stroke="var(--magenta)" stroke-width="3.5" opacity="0.95"/>';
+          s += '<path d="' + appr + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="7 4"/>';
+          s += '<text x="' + (M + 8) + '" y="' + (M + 16) + '" class="lbl-s" style="fill:var(--magenta);">funzione da imitare</text>';
+          s += '<text x="' + (M + 8) + '" y="' + (M + 32) + '" class="lbl-s" style="fill:var(--accent);">rete neurale con ' + N + ' neuroni</text>';
+          s += '</svg>';
+          host.innerHTML = s;
+          const em = err / n;
+          eE.textContent = nf(em, 3);
+          eP.textContent = 2 * N + 1;
+          Array.prototype.forEach.call(fEl.children, (b, i) => b.classList.toggle('active', i === fi));
+          out.innerHTML = N <= 3
+            ? 'Con pochissimi neuroni la rete riesce solo a fare una cosa grossolana: intuisce l\'andamento generale e basta.'
+            : (em < 0.02
+              ? '🎯 Errore quasi nullo: con <strong>' + N + ' neuroni</strong> la curva tratteggiata è ormai sovrapposta all\'originale. Ed è così per <em>qualunque</em> funzione tu scelga: è il teorema di approssimazione universale. Nota però il prezzo: servono ' + (2 * N + 1) + ' numeri da regolare. Per imitare il linguaggio umano ne servono centinaia di miliardi.'
+              : 'Aggiungendo neuroni l\'errore cala: ogni neurone in più aggiunge un «gradino» morbido, e sommandoli si riesce a inseguire qualunque curva.');
+        }
+        FUN.forEach(function (f, i) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = f.nome;
+          b.addEventListener('click', function () { fi = i; draw(); });
+          fEl.appendChild(b);
+        });
+        sn.addEventListener('input', draw);
+        draw();
+      })();
+
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Di che cosa è fatta una <strong>macchina di Turing</strong>?',
+        options: ['un processore, una memoria e un disco', 'un nastro, una testina che legge e scrive, e uno stato interno con delle regole', 'una rete di neuroni artificiali', 'un insieme di transistor', 'un programma scritto in Python'],
+        correct: 1, explain: 'Solo questo: un nastro di caselle, una testina che legge/scrive/si sposta, e una tabella di regole che dipende dallo stato. Ed è sufficiente per qualunque calcolo eseguibile.' },
+      { type: 'mc', diff: 'medium', text: 'Che cos\'è la <strong>macchina universale</strong> di Turing, e perché è importante?',
+        options: ['la macchina più veloce possibile', 'una macchina che legge sul nastro la descrizione di un\'altra macchina e si comporta come quella: è l\'idea del computer', 'una macchina che risolve tutti i problemi, nessuno escluso', 'la macchina che decifrò Enigma', 'una rete neurale molto grande'],
+        correct: 1, explain: 'Poiché le regole si possono scrivere come simboli sul nastro, una sola macchina può simularle tutte. È esattamente ciò che fa un computer quando esegue un programma.' },
+      { type: 'mc', diff: 'hard', text: 'Turing dimostrò anche che <strong>esistono problemi che nessuna macchina potrà mai risolvere</strong>. Il più famoso è:',
+        options: ['la fattorizzazione dei numeri grandi', 'il problema della fermata', 'il gioco degli scacchi', 'la traduzione automatica', 'il calcolo di π'],
+        correct: 1, explain: 'Il problema della fermata: non esiste un programma che, dato un qualunque altro programma, sappia dire se questo si fermerà o andrà avanti per sempre.' },
+      { type: 'mc', diff: 'medium', text: 'Che cosa stabilisce il <strong>test di Turing</strong>?',
+        options: ['se una macchina è cosciente', 'se una macchina calcola più in fretta di un uomo', 'se un giudice umano, conversando per iscritto, riesce a distinguere la macchina da una persona', 'se una macchina può risolvere qualunque problema', 'quanti neuroni servono a una rete'],
+        correct: 2, explain: 'Turing sostituì la domanda «le macchine pensano?», troppo vaga, con una verificabile: il comportamento è distinguibile da quello umano oppure no?' },
+      { type: 'mc', diff: 'medium', text: 'Nel generatore statistico della lezione, che cosa fa la macchina per scrivere la parola successiva?',
+        options: ['sceglie la parola più bella', 'la estrae a sorte fra quelle che, nel testo originale, seguivano quel contesto', 'traduce dall\'inglese', 'consulta un dizionario', 'usa sempre la stessa parola'],
+        correct: 1, explain: 'È una catena di Markov: si contano le parole che seguono ciascun contesto e si estrae a sorte rispettando quelle frequenze.' },
+      { type: 'mc', diff: 'hard', text: 'Perché un LLM non può limitarsi a memorizzare una <strong>tabella</strong> «contesto → parola successiva»?',
+        options: ['perché le tabelle sono lente', 'perché il numero di contesti possibili è enormemente maggiore del numero di atomi dell\'universo', 'perché le parole cambiano nel tempo', 'perché servirebbe internet', 'perché la tabella non si può ordinare'],
+        correct: 1, explain: 'Con 50 000 parole e solo 3 di contesto le righe sarebbero già $1{,}25\\times10^{14}$. Serve una <em>funzione da calcolare</em>, non un elenco da consultare: ecco perché la rete neurale.' },
+      { type: 'mc', diff: 'medium', text: 'Le reti neurali artificiali:',
+        options: ['sono simulazioni fedeli del cervello umano', 'sono ispirate al cervello, ma non ne riproducono la fisiologia: sono strumenti costruiti per risolvere compiti', 'contengono neuroni biologici', 'funzionano solo per il linguaggio', 'non hanno bisogno di dati'],
+        correct: 1, explain: 'Come gli aerei rispetto agli uccelli: l\'ispirazione viene dalla biologia, ma l\'obiettivo è l\'ingegneria, non la copia. Un neurone vero è incomparabilmente più complesso.' },
+      { type: 'mc', diff: 'medium', text: 'Che cosa significa <strong>addestrare</strong> una rete neurale?',
+        options: ['scrivere le regole una per una', 'mostrarle esempi, misurare l\'errore e correggere un po\' alla volta i pesi', 'aumentare la velocità del processore', 'collegarla a internet', 'tradurla in un altro linguaggio'],
+        correct: 1, explain: 'I pesi partono casuali e vengono corretti milioni di volte nella direzione che riduce l\'errore. Non si programma: si allena.' },
+      { type: 'mc', diff: 'hard', text: 'Dire che una rete neurale è un <strong>approssimatore universale</strong> significa che:',
+        options: ['sa rispondere a qualunque domanda in modo corretto', 'con abbastanza neuroni può imitare qualunque funzione continua, con la precisione voluta', 'non sbaglia mai', 'funziona senza dati', 'è più intelligente di un uomo'],
+        correct: 1, explain: 'Attenzione a due cose che il teorema NON dice: che la rete giusta si riesca a <em>trovare</em> con l\'addestramento, e che funzioni anche sui casi mai visti.' },
+      { type: 'open', diff: 'hard', text: 'Un compagno ti dice: «Uso l\'intelligenza artificiale per farmi fare i compiti, tanto le risposte sono giuste». Rispondigli usando <strong>almeno due</strong> argomenti diversi presi da questa lezione.',
+        keywords: ['verific', 'sbagli', 'allucinaz', 'verosimil', 'non è vero', 'impar', 'palestra', 'muscoli', 'delegare', 'pensiero', 'verifica in classe', 'controllar', 'determinis', 'a memoria'], requiredMatches: 2,
+        explain: 'Almeno tre argomenti sono validi. (1) <strong>Le risposte non sono affatto sempre giuste</strong>: un approssimatore produce testo <em>verosimile</em>, non vero, e sbaglia con la stessa sicurezza con cui dice le cose esatte — quindi vanno comunque verificate, e per verificarle bisogna sapere la materia. (2) <strong>Delegare il pensiero significa non imparare</strong>: è come pagare qualcuno per andare in palestra al posto tuo, i muscoli restano suoi; e alla prima verifica in classe, senza aiuti, il conto arriva. (3) Ha senso invece delegare il lavoro ripetitivo che si sa già fare, o farsi spiegare un passaggio che non si è capito: lì lo strumento ti rende più bravo invece che più fragile.' }
+    ];
+  </script>
+
+</body>
+
+</html>
+
+  </main>
+
+</body>
+
+</html>

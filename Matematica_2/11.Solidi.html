@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 11 — I solidi</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+    .simbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1rem; margin: 1.1rem 0; }
+    .simbox svg { display: block; width: 100%; height: auto; max-width: 520px; margin: 0.3rem auto; }
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .sim-out { margin-top: 0.6rem; font-size: 1rem; min-height: 1.5em; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.7rem; text-align: center; }
+    .stat .n { font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
+    .stat .l { font-size: 0.78rem; color: var(--muted); }
+    .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .lbl-s { fill: var(--muted); font-size: 11px; }
+    .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .sol-tab { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .sol-tab th, .sol-tab td { border: 1px solid var(--border); padding: 0.42rem 0.6rem; text-align: center; }
+    .sol-tab th { background: var(--surface-2); }
+    .sol-tab td.nome { text-align: left; font-weight: 600; }
+    .sol-tab td.ok { background: color-mix(in srgb, var(--green) 16%, transparent); font-weight: 700; }
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 1rem 0; }
+    .kep-list { list-style: none; padding: 0; margin: 0.8rem 0; }
+    .kep-list li { padding: 0.32rem 0 0.32rem 2.4rem; position: relative; border-top: 1px dashed var(--border); }
+    .kep-list li:first-child { border-top: none; }
+    .kep-list li .pl { position: absolute; left: 0; font-size: 1.2rem; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Secondo anno · Lezione 11</div>
+    <h1>I solidi</h1>
+    <p>Dai cinque solidi platonici alla misura della Terra — e poi oltre, dove le dimensioni diventano quattro</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Secondo anno</a>
+    <span class="sep">/</span> I solidi
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Usciamo dal foglio.</strong> Finora la geometria è stata piatta: punti, rette, poligoni. Ma il mondo ha
+      tre dimensioni, e le figure solide nascondono sorprese che il piano non ha. Scopriremo che i solidi
+      «perfettamente regolari» sono <strong>cinque</strong> e non uno di più; che una formula scoperta da Eulero lega
+      facce, spigoli e vertici di <em>qualunque</em> poliedro; che un uomo, con un bastone e un pozzo, misurò la
+      Terra ventidue secoli fa. E in fondo, per chi vuole, ci spingeremo dove le dimensioni sono quattro e le
+      superfici hanno un solo lato.
+    </div>
+
+    <!-- 1 — POLIEDRI -->
+    <section id="sec1">
+      <h2>1. I poliedri: facce, spigoli e vertici</h2>
+
+      <p>Un <strong>solido</strong> è una porzione di spazio delimitata da una superficie chiusa. Quando la superficie
+        è fatta tutta di pezzi piani, il solido si chiama <strong>poliedro</strong> (dal greco: «molte facce»).</p>
+
+      <div class="definition">
+        In un poliedro:
+        <ul style="margin:0.45rem 0 0;">
+          <li>le <strong>facce</strong> sono i <strong>poligoni piani</strong> che lo delimitano (le «pareti»);</li>
+          <li>gli <strong>spigoli</strong> sono i <strong>segmenti</strong> in cui due facce si incontrano (i
+            «bordi»);</li>
+          <li>i <strong>vertici</strong> sono i <strong>punti</strong> in cui si incontrano tre o più spigoli (gli
+            «angoli»).</li>
+        </ul>
+      </div>
+
+      <p>Prendi una scatola da scarpe: le facce sono i sei cartoni, gli spigoli le dodici pieghe, i vertici gli otto
+        angoli che ti pungono le mani. Ruota il solido qui sotto e conta tu stesso.</p>
+
+      <div class="simbox">
+        <div class="sim-btns" id="p1-btns"></div>
+        <div class="controls">
+          <div class="control-group"><label>gira in orizzontale</label><input type="range" id="p1-yaw" min="0" max="360" step="2" value="35"></div>
+          <div class="control-group"><label>gira in verticale</label><input type="range" id="p1-pitch" min="-80" max="80" step="2" value="18"></div>
+        </div>
+        <div id="p1-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="p1-f">—</div><div class="l">facce (F)</div></div>
+          <div class="stat"><div class="n" id="p1-s">—</div><div class="l">spigoli (S)</div></div>
+          <div class="stat"><div class="n" id="p1-v">—</div><div class="l">vertici (V)</div></div>
+        </div>
+        <p class="sim-out" id="p1-out"></p>
+      </div>
+    </section>
+
+    <!-- 2 — EULERO -->
+    <section id="sec2">
+      <h2>2. La formula di Eulero</h2>
+
+      <p>Hai notato qualcosa, giocando col widget qui sopra? I tre numeri cambiano da solido a solido, ma se li
+        combini nel modo giusto succede una cosa che ha dell'incredibile.</p>
+
+      <div class="theorem">
+        <strong>Formula di Eulero per i poliedri (1750).</strong> In <strong>ogni</strong> poliedro convesso, il
+        numero delle facce meno il numero degli spigoli più il numero dei vertici vale sempre <strong>2</strong>:
+        $$F - S + V = 2$$
+      </div>
+
+      <p>Sempre. Per un cubo, per una piramide, per un pallone da calcio, per un poliedro con un milione di facce
+        disegnato a caso. Non importa quanto sia grande, né che forma abbia, né quanto sia storto: quel conto fa due.
+        Verifichiamolo:</p>
+
+      <table class="sol-tab">
+        <tr><th>Poliedro</th><th>facce $F$</th><th>spigoli $S$</th><th>vertici $V$</th><th>$F - S + V$</th></tr>
+        <tr><td class="nome">Tetraedro</td><td>4</td><td>6</td><td>4</td><td class="ok">2</td></tr>
+        <tr><td class="nome">Cubo</td><td>6</td><td>12</td><td>8</td><td class="ok">2</td></tr>
+        <tr><td class="nome">Ottaedro</td><td>8</td><td>12</td><td>6</td><td class="ok">2</td></tr>
+        <tr><td class="nome">Dodecaedro</td><td>12</td><td>30</td><td>20</td><td class="ok">2</td></tr>
+        <tr><td class="nome">Icosaedro</td><td>20</td><td>30</td><td>12</td><td class="ok">2</td></tr>
+        <tr><td class="nome">Piramide a base quadrata</td><td>5</td><td>8</td><td>5</td><td class="ok">2</td></tr>
+        <tr><td class="nome">Prisma triangolare</td><td>5</td><td>9</td><td>6</td><td class="ok">2</td></tr>
+        <tr><td class="nome">Pallone da calcio (icosaedro troncato)</td><td>32</td><td>90</td><td>60</td><td class="ok">2</td></tr>
+      </table>
+
+      <p>Una formula che vale per infiniti oggetti diversissimi fra loro è una cosa rara e preziosa: significa che
+        sotto quella varietà c'è una <strong>struttura comune</strong> che non dipende dalla forma. È l'inizio di un
+        intero ramo della matematica, la <strong>topologia</strong>, che studia proprio le proprietà che non cambiano
+        quando una figura viene deformata senza strapparla.</p>
+
+      <div class="curiosita">
+        <strong>🍩 Se il solido ha un buco, però...</strong> La formula vale per i poliedri <em>convessi</em> (senza
+        rientranze né buchi). Prova a costruire una «cornice» quadrata, cioè un poliedro a forma di ciambella: il
+        conto non dà più 2, dà <strong>0</strong>! In generale $F - S + V = 2 - 2g$, dove $g$ è il numero di
+        <strong>buchi</strong>. Quel numero si chiama <em>caratteristica di Eulero</em> e, in un certo senso,
+        «conta i buchi» di un oggetto senza bisogno di guardarlo: sa dire che una tazza col manico e una ciambella
+        sono la stessa cosa, mentre una palla è un'altra cosa.
+      </div>
+    </section>
+
+    <!-- 3 — SOLIDI PLATONICI -->
+    <section id="sec3">
+      <h2>3. I solidi platonici e il duale</h2>
+
+      <p>Fra tutti i poliedri ce ne sono alcuni particolarmente belli: quelli in cui <strong>tutte le facce sono lo
+        stesso poligono regolare</strong> e in <strong>ogni vertice si incontra lo stesso numero di facce</strong>.
+        Si chiamano <strong>solidi platonici</strong> (o poliedri regolari). Domanda: quanti sono?</p>
+
+      <div class="theorem">
+        <strong>I solidi platonici sono esattamente cinque.</strong> Non quattro, non sei, non infiniti:
+        <strong>cinque</strong>. Sono il <strong>tetraedro</strong> (4 triangoli), il <strong>cubo</strong> (6
+        quadrati), l'<strong>ottaedro</strong> (8 triangoli), il <strong>dodecaedro</strong> (12 pentagoni) e
+        l'<strong>icosaedro</strong> (20 triangoli).
+      </div>
+
+      <p><strong>Perché solo cinque?</strong> Il ragionamento è sorprendentemente semplice e lo puoi seguire tutto. In
+        ogni vertice devono incontrarsi <strong>almeno tre facce</strong> (con due sole non si «chiude» uno spigolo),
+        e la somma dei loro angoli deve essere <strong>minore di $360°$</strong>: se fosse esattamente $360°$ le
+        facce starebbero piatte sul piano e non si formerebbe nessuna punta!</p>
+      <ul>
+        <li><strong>Triangoli equilateri</strong> ($60°$ ciascuno): ne puoi mettere 3 ($180°$), 4 ($240°$) o 5
+          ($300°$). Con 6 fai $360°$ esatti: piatto, niente da fare. → <strong>3 solidi</strong> (tetraedro,
+          ottaedro, icosaedro).</li>
+        <li><strong>Quadrati</strong> ($90°$): solo 3 ($270°$); con 4 fai $360°$. → <strong>1 solido</strong> (cubo).</li>
+        <li><strong>Pentagoni regolari</strong> ($108°$): solo 3 ($324°$); con 4 si supera $360°$. →
+          <strong>1 solido</strong> (dodecaedro).</li>
+        <li><strong>Esagoni</strong> ($120°$): già con 3 fai $360°$ esatti. E con più lati va sempre peggio. →
+          <strong>nessun solido</strong>.</li>
+      </ul>
+      <p>Cinque possibilità, cinque solidi. Fine: la geometria non ne concede altri.</p>
+
+      <h3>3.1 — Il duale di un solido</h3>
+
+      <div class="definition">
+        Il <strong>duale</strong> di un poliedro si ottiene mettendo un <strong>vertice al centro di ogni faccia</strong>
+        e collegando fra loro i vertici delle facce confinanti. In pratica: <strong>facce e vertici si
+        scambiano</strong> i ruoli, mentre il numero degli spigoli resta lo stesso.
+      </div>
+
+      <p>Guardalo succedere: scegli un solido e premi il pulsante per far comparire il suo duale, costruito
+        davvero mettendo un punto al centro di ogni faccia.</p>
+
+      <div class="simbox">
+        <div class="sim-btns" id="du-btns"></div>
+        <div class="controls">
+          <div class="control-group"><label>gira in orizzontale</label><input type="range" id="du-yaw" min="0" max="360" step="2" value="30"></div>
+          <div class="control-group"><label>gira in verticale</label><input type="range" id="du-pitch" min="-80" max="80" step="2" value="20"></div>
+        </div>
+        <div class="sim-btns">
+          <button class="btn btn-primary" id="du-dual">🔄 mostra il duale</button>
+        </div>
+        <div id="du-svg"></div>
+        <p class="sim-out" id="du-out"></p>
+      </div>
+
+      <table class="sol-tab">
+        <tr><th>Solido</th><th>facce</th><th>vertici</th><th>spigoli</th><th>il suo duale è</th></tr>
+        <tr><td class="nome">Tetraedro</td><td>4</td><td>4</td><td>6</td><td>il tetraedro (è duale di sé stesso!)</td></tr>
+        <tr><td class="nome">Cubo</td><td>6</td><td>8</td><td>12</td><td>l'ottaedro</td></tr>
+        <tr><td class="nome">Ottaedro</td><td>8</td><td>6</td><td>12</td><td>il cubo</td></tr>
+        <tr><td class="nome">Dodecaedro</td><td>12</td><td>20</td><td>30</td><td>l'icosaedro</td></tr>
+        <tr><td class="nome">Icosaedro</td><td>20</td><td>12</td><td>30</td><td>il dodecaedro</td></tr>
+      </table>
+
+      <p>Guarda i numeri delle coppie: cubo $(6, 8)$ e ottaedro $(8, 6)$; dodecaedro $(12, 20)$ e icosaedro
+        $(20, 12)$. Sono <strong>gli stessi numeri scambiati</strong> — ed è proprio per questo che nella formula di
+        Eulero $F - S + V$ il risultato non cambia: scambiare $F$ e $V$ lascia tutto com'era.</p>
+
+      <div class="curiosita">
+        <strong>🎲 I dadi dei giochi di ruolo.</strong> Se hai mai visto un set di dadi da gioco di ruolo, li hai già
+        tenuti in mano tutti e cinque: d4 (tetraedro), d6 (cubo), d8 (ottaedro), d12 (dodecaedro), d20 (icosaedro).
+        Non è un vezzo: sono gli <em>unici</em> solidi che garantiscono a ogni faccia la stessa probabilità di
+        uscire, perché sono perfettamente simmetrici. Un dado a 7 facce equo, con facce tutte uguali,
+        <strong>non esiste</strong>.
+      </div>
+    </section>
+
+    <!-- 4 — KEPLERO -->
+    <section id="sec4">
+      <h2>4. Keplero e il sistema solare dentro i cinque solidi</h2>
+
+      <p>Che i solidi regolari fossero cinque era noto ai Greci, e Platone ci vide un ordine cosmico: associò quattro
+        solidi ai quattro elementi (tetraedro = fuoco, cubo = terra, ottaedro = aria, icosaedro = acqua) e il
+        dodecaedro all'universo intero. Da lì il nome «solidi platonici». Ma la storia più affascinante arriva
+        duemila anni dopo.</p>
+
+      <p>Nel <strong>1596</strong> un giovanissimo <strong>Giovanni Keplero</strong> pubblica il
+        <em>Mysterium Cosmographicum</em>. All'epoca si conoscevano <strong>sei</strong> pianeti (Urano sarà scoperto
+        nel 1781, Nettuno nel 1846), e Keplero notò una coincidenza che lo folgorò: <strong>sei pianeti</strong>
+        lasciano <strong>cinque spazi</strong> fra le loro orbite — esattamente quanti sono i solidi platonici.</p>
+
+      <p>La sua idea fu di incastrare i cinque solidi uno dentro l'altro, alternandoli con le sfere delle orbite, in
+        quest'ordine a partire dal Sole:</p>
+
+      <ul class="kep-list">
+        <li><span class="pl">☿</span><strong>Mercurio</strong> — poi un <strong>ottaedro</strong></li>
+        <li><span class="pl">♀</span><strong>Venere</strong> — poi un <strong>icosaedro</strong></li>
+        <li><span class="pl">🜨</span><strong>Terra</strong> — poi un <strong>dodecaedro</strong></li>
+        <li><span class="pl">♂</span><strong>Marte</strong> — poi un <strong>tetraedro</strong></li>
+        <li><span class="pl">♃</span><strong>Giove</strong> — poi un <strong>cubo</strong></li>
+        <li><span class="pl">♄</span><strong>Saturno</strong></li>
+      </ul>
+
+      <p>Ogni solido era inscritto in una sfera e ne conteneva un'altra: le proporzioni fra i raggi avrebbero dovuto
+        dare le distanze dei pianeti dal Sole. Per Keplero non era un gioco: era la prova che Dio aveva progettato
+        l'universo secondo la geometria.</p>
+
+      <div class="warnbox">
+        <strong>Il modello era sbagliato.</strong> Le distanze non tornavano davvero — e con la scoperta di Urano e
+        Nettuno l'idea dei «cinque spazi» è crollata del tutto. Ma la storia non finisce male, anzi: proprio
+        l'ostinazione con cui Keplero confrontò il suo modello con le <strong>osservazioni</strong> di Tycho Brahe,
+        e la sua onestà nel prendere sul serio i disaccordi, lo portarono a scoprire che le orbite non sono affatto
+        circolari ma <strong>ellittiche</strong>. Le tre <strong>leggi di Keplero</strong>, che studierai in fisica,
+        nascono dal fallimento di questo bellissimo sbaglio.
+        <p style="margin:0.55rem 0 0;">C'è una lezione di metodo, qui: un'idea elegante non è per questo vera, e il
+          modo di scoprirlo è <strong>confrontarla con i dati</strong>. Keplero è grande non perché ebbe l'intuizione
+          dei solidi, ma perché fu disposto ad abbandonarla.</p>
+      </div>
+    </section>
+
+    <!-- 5 — SUPERFICIE E VOLUME DEI POLIEDRI -->
+    <section id="sec5">
+      <h2>5. Superficie e volume dei poliedri</h2>
+
+      <p>Due domande diverse: «quanta carta serve per incartarlo?» (è la <strong>superficie</strong>, si misura in
+        m²) e «quanta acqua ci sta dentro?» (è il <strong>volume</strong>, si misura in m³). Non confonderle mai:
+        sono grandezze di natura diversa.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">L'idea che sta sotto a tutto</div>
+        <p style="margin:0;">La <strong>superficie totale</strong> di un poliedro è semplicemente la
+          <strong>somma delle aree di tutte le facce</strong>: se sai «srotolare» il solido nel suo
+          <em>sviluppo piano</em>, sai calcolarne la superficie. Per il <strong>volume</strong> di prismi e cilindri
+          vale invece l'idea di impilare: $V = \text{area di base} \times \text{altezza}$. E per ogni solido che
+          «finisce a punta» (piramidi e coni) c'è un fattore $\dfrac{1}{3}$ che, sorprendentemente, non dipende dalla
+          forma della base.</p>
+      </div>
+
+      <p>Ecco le formule che useremo. Le diamo <strong>senza dimostrazione</strong> — alcune richiedono strumenti che
+        vedrai al quinto anno — ma il widget ti permette di verificarle e di «sentirle» cambiando le dimensioni.</p>
+
+      <table class="sol-tab">
+        <tr><th>Solido</th><th>Superficie totale</th><th>Volume</th></tr>
+        <tr><td class="nome">Cubo di spigolo $l$</td><td>$S = 6\,l^2$</td><td>$V = l^3$</td></tr>
+        <tr><td class="nome">Parallelepipedo $a \times b \times c$</td><td>$S = 2(ab + bc + ca)$</td><td>$V = a\,b\,c$</td></tr>
+        <tr><td class="nome">Prisma retto</td><td>$S = 2 S_b + P_b \cdot h$</td><td>$V = S_b \cdot h$</td></tr>
+        <tr><td class="nome">Piramide</td><td>$S = S_b + S_{\text{lat}}$</td><td>$V = \dfrac{1}{3} S_b \cdot h$</td></tr>
+        <tr><td class="nome">Tetraedro regolare di spigolo $l$</td><td>$S = \sqrt{3}\,l^2$</td><td>$V = \dfrac{\sqrt{2}}{12}\,l^3$</td></tr>
+      </table>
+      <p class="formula-note">$S_b$ = area di base, $P_b$ = perimetro di base, $h$ = altezza, $S_{\text{lat}}$ =
+        superficie laterale.</p>
+
+      <p>Scegli un solido, muovi le dimensioni e guarda che cosa succede ai due numeri:</p>
+
+      <div class="simbox">
+        <div class="sim-btns" id="vo-btns"></div>
+        <div class="controls">
+          <div class="control-group"><label>lato di base a = <span class="val" id="vo-a-val">3</span></label>
+            <input type="range" id="vo-a" min="1" max="6" step="0.5" value="3"></div>
+          <div class="control-group"><label>altezza h = <span class="val" id="vo-h-val">4</span></label>
+            <input type="range" id="vo-h" min="1" max="8" step="0.5" value="4"></div>
+        </div>
+        <div class="controls">
+          <div class="control-group"><label>gira in orizzontale</label><input type="range" id="vo-yaw" min="0" max="360" step="2" value="30"></div>
+          <div class="control-group"><label>gira in verticale</label><input type="range" id="vo-pitch" min="-80" max="80" step="2" value="18"></div>
+        </div>
+        <div id="vo-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="vo-s">—</div><div class="l">superficie</div></div>
+          <div class="stat"><div class="n" id="vo-v">—</div><div class="l">volume</div></div>
+        </div>
+        <p class="sim-out" id="vo-out"></p>
+      </div>
+
+      <div class="curiosita">
+        <strong>📏 Attenzione alle unità: 1 m³ non è 100 cm³.</strong> Se raddoppi tutte le dimensioni di un solido,
+        la superficie diventa $4$ volte e il volume <strong>$8$ volte</strong> — è la regola d'oro della lezione
+        precedente, estesa allo spazio: lunghezze $\times k$, aree $\times k^2$, volumi $\times k^3$. Per questo
+        $1$ m$^3 = 100 \times 100 \times 100 = 1\,000\,000$ cm³, e non centomila come verrebbe da dire in fretta.
+      </div>
+    </section>
+
+    <!-- 6 — CILINDRO E SFERA -->
+    <section id="sec6">
+      <h2>6. Quando le facce si curvano: cilindro e sfera</h2>
+
+      <p>Non tutti i solidi sono poliedri: se la superficie si incurva, le facce piane spariscono. I due esempi più
+        importanti nascono entrambi da una <strong>rotazione</strong>: fai girare un rettangolo attorno a un suo lato
+        e ottieni un <strong>cilindro</strong>; fai girare un semicerchio attorno al diametro e ottieni una
+        <strong>sfera</strong>.</p>
+
+      <div class="two-col">
+        <div class="formula-box">
+          <div class="formula-title">Cilindro (raggio $r$, altezza $h$)</div>
+          $$S = 2\pi r^2 + 2\pi r h$$
+          $$V = \pi r^2 h$$
+          <p class="formula-note">Le due basi sono cerchi ($\pi r^2$ ciascuno); la superficie laterale, srotolata, è
+            un <strong>rettangolo</strong> alto $h$ e largo quanto la circonferenza $2\pi r$. Il volume è area di
+            base per altezza, come in ogni prisma.</p>
+        </div>
+        <div class="formula-box">
+          <div class="formula-title">Sfera (raggio $r$)</div>
+          $$S = 4\pi r^2$$
+          $$V = \frac{4}{3}\pi r^3$$
+          <p class="formula-note">La superficie della sfera è <strong>esattamente quattro volte</strong> l'area del
+            suo cerchio massimo: un risultato tutt'altro che ovvio, trovato da <strong>Archimede</strong> più di
+            duemila anni fa — e ne era così fiero che volle una sfera inscritta in un cilindro incisa sulla propria
+            tomba.</p>
+        </div>
+      </div>
+
+      <div class="simbox">
+        <div class="controls">
+          <div class="control-group"><label>raggio r = <span class="val" id="cs-r-val">3</span></label>
+            <input type="range" id="cs-r" min="1" max="6" step="0.5" value="3"></div>
+          <div class="control-group"><label>altezza del cilindro h = <span class="val" id="cs-h-val">6</span></label>
+            <input type="range" id="cs-h" min="1" max="10" step="0.5" value="6"></div>
+        </div>
+        <div id="cs-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="cs-sc">—</div><div class="l">superficie cilindro</div></div>
+          <div class="stat"><div class="n" id="cs-vc">—</div><div class="l">volume cilindro</div></div>
+          <div class="stat"><div class="n" id="cs-ss">—</div><div class="l">superficie sfera</div></div>
+          <div class="stat"><div class="n" id="cs-vs">—</div><div class="l">volume sfera</div></div>
+        </div>
+        <p class="sim-out" id="cs-out"></p>
+      </div>
+
+      <div class="curiosita">
+        <strong>⚱️ Il teorema di cui Archimede andava più fiero.</strong> Prendi una sfera e il cilindro più stretto
+        che riesce a contenerla (stesso raggio, altezza $2r$). Allora il volume della sfera è esattamente
+        <strong>due terzi</strong> di quello del cilindro, <em>e anche</em> la superficie della sfera è due terzi
+        della superficie totale del cilindro. Prova nel widget a mettere $h = 2r$ e verifica: il rapporto è
+        $2:3$ per entrambe le grandezze. Cicerone racconta di aver ritrovato, a Siracusa, la tomba di Archimede
+        ormai dimenticata proprio grazie alla sfera nel cilindro scolpita sopra.
+      </div>
+    </section>
+
+    <!-- 7 — LA SFERA E' SPECIALE -->
+    <section id="sec7">
+      <h2>7. Perché la sfera è speciale (e perché i gatti si appallottolano)</h2>
+
+      <p>Fra tutti i solidi possibili, la sfera ha un primato che nessun altro può toccare.</p>
+
+      <div class="theorem">
+        <strong>Proprietà isoperimetrica della sfera.</strong> Fra tutti i solidi che hanno lo <strong>stesso
+        volume</strong>, la sfera è quello con la <strong>superficie minima</strong>. Detto al contrario: a parità di
+        superficie, la sfera è il solido che <strong>contiene di più</strong>.
+      </div>
+
+      <p>Confrontiamo: prendiamo solidi diversi tutti con lo stesso volume, un metro cubo, e vediamo quanta
+        superficie hanno.</p>
+
+      <table class="sol-tab">
+        <tr><th>Solido (volume $= 1$ m³)</th><th>Superficie</th><th>Rispetto alla sfera</th></tr>
+        <tr><td class="nome">Sfera</td><td class="ok">$4{,}84$ m²</td><td class="ok">— (la minima)</td></tr>
+        <tr><td class="nome">Cilindro (con $h = 2r$)</td><td>$5{,}54$ m²</td><td>$+14{,}5\%$</td></tr>
+        <tr><td class="nome">Cubo</td><td>$6{,}00$ m²</td><td>$+24\%$</td></tr>
+        <tr><td class="nome">Tetraedro regolare</td><td>$7{,}21$ m²</td><td>$+49\%$</td></tr>
+      </table>
+
+      <p>Più un solido è «appuntito» e allungato, più superficie sventola in giro a parità di contenuto. La sfera è
+        il massimo del raccoglimento.</p>
+
+      <div class="curiosita">
+        <strong>🐱 Ecco perché gli animali si appallottolano quando hanno freddo.</strong> Un corpo caldo perde
+        calore <strong>attraverso la superficie</strong>: più pelle è esposta all'aria, più calore se ne va. Ma il
+        calore lo produce tutto il <strong>volume</strong> del corpo, che appallottolandosi non cambia di un
+        grammo. Un gatto che si arrotola a palla sta facendo, senza saperlo, un problema di minimo: tiene lo stesso
+        volume e <strong>riduce la superficie</strong> avvicinandosi il più possibile alla forma sferica. Meno
+        superficie, meno calore disperso.
+        <p style="margin:0.55rem 0 0;">La stessa matematica spiega molte altre cose: perché le
+          <strong>bolle di sapone</strong> sono sferiche (la tensione superficiale «tira» per minimizzare la
+          superficie a volume dato); perché gli animali dei climi freddi tendono a essere <strong>grandi e
+          compatti</strong> mentre quelli dei climi caldi hanno appendici lunghe (orecchie della volpe del deserto!)
+          per <em>aumentare</em> la superficie e disperdere calore; e perché i pinguini in Antartide si stringono a
+          migliaia, formando un unico corpo quasi sferico.</p>
+      </div>
+    </section>
+
+    <!-- 8 — LA TERRA -->
+    <section id="sec8">
+      <h2>8. La sfera più importante di tutte: la Terra</h2>
+
+      <p>E adesso la domanda: tu lo sapevi che la Terra, in prima approssimazione, è una <strong>sfera</strong>?
+        Certo che sì. Ma sai da <em>quanto tempo</em> lo sa l'essere umano? Non da Colombo, non da Magellano, non
+        dalle foto dallo spazio. Da oltre <strong>duemilatrecento anni</strong> — e non solo: già allora ne era stato
+        <strong>misurato il raggio</strong>, con un errore di pochi punti percentuali.</p>
+
+      <div class="warnbox">
+        <strong>🌍 Sfatiamo subito un mito.</strong> «Nel Medioevo credevano che la Terra fosse piatta» è una
+        <strong>leggenda</strong>, nata soprattutto nell'Ottocento (un ruolo importante lo ebbe una biografia
+        romanzata di Colombo scritta da Washington Irving nel 1828). Le persone istruite sapevano benissimo che la
+        Terra è sferica fin dall'antichità greca: la questione, come vedremo, non era la <em>forma</em> — era la
+        <em>dimensione</em>.
+      </div>
+
+      <h3>8.1 — Prima prova: l'ombra sulla Luna</h3>
+      <p>Durante un'<strong>eclissi di Luna</strong>, la Terra si mette fra il Sole e la Luna e vi proietta sopra la
+        propria ombra. Gli antichi osservarono che quel bordo d'ombra è <strong>sempre un arco di cerchio</strong>:
+        in ogni eclissi, a qualunque ora, in qualunque stagione, con la Terra comunque orientata.</p>
+      <p>Aristotele ne trasse la conclusione giusta, e il ragionamento è impeccabile: la <strong>sfera è l'unico
+        solido che proietta un'ombra circolare da qualunque direzione la si illumini</strong>. Un disco piatto
+        darebbe a volte un cerchio, a volte un'ellisse, a volte una linea; un cubo darebbe quadrati ed esagoni.
+        Provalo tu:</p>
+
+      <div class="simbox">
+        <div class="sim-btns" id="ob-btns"></div>
+        <div class="controls">
+          <div class="control-group"><label>ruota il corpo celeste</label><input type="range" id="ob-rot" min="0" max="180" step="1" value="0"></div>
+        </div>
+        <div id="ob-svg"></div>
+        <p class="sim-out" id="ob-out"></p>
+      </div>
+
+      <h3>8.2 — Seconda prova: le navi che spariscono dal basso</h3>
+      <p>La seconda prova la conoscevano tutti i marinai del Mediterraneo. Quando una nave si allontana, non
+        rimpicciolisce e basta: <strong>sprofonda</strong>. Prima sparisce lo scafo, poi via via l'alberatura, e per
+        ultimo la cima dell'albero maestro — e in avvicinamento succede l'esatto contrario, con i
+        <strong>pennoni</strong> che spuntano dall'orizzonte prima del resto. Se la Terra fosse piatta la nave
+        diventerebbe soltanto sempre più piccola, restando tutta visibile fino a scomparire nella foschia.</p>
+
+      <div class="simbox">
+        <div class="sim-btns">
+          <button class="btn active" id="nv-sfera">🌍 Terra sferica</button>
+          <button class="btn" id="nv-piatta">▭ Terra piatta</button>
+        </div>
+        <div class="controls">
+          <div class="control-group"><label>distanza della nave: <span class="val" id="nv-d-val">10</span> km</label>
+            <input type="range" id="nv-d" min="1" max="25" step="1" value="10"></div>
+        </div>
+        <div id="nv-svg"></div>
+        <p class="sim-out" id="nv-out"></p>
+      </div>
+
+      <h3>8.3 — Eratostene misura la Terra (240 a.C. circa)</h3>
+
+      <p>Sapere che è una sfera è una cosa; sapere <strong>quanto è grande</strong> è un'altra. Il primo a
+        misurarla — o almeno il primo di cui ci sia rimasta prova scritta — fu <strong>Eratostene di Cirene</strong>,
+        direttore della Biblioteca di Alessandria, attorno al <strong>240 a.C.</strong> Gli bastarono un bastone,
+        un'ombra e un'idea.</p>
+
+      <div class="steps-box" style="background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:0.4rem 1rem; margin:1rem 0;">
+        <ol>
+          <li>Eratostene sapeva che a <strong>Siene</strong> (l'odierna Assuan), a mezzogiorno del
+            <strong>solstizio d'estate</strong>, il Sole era esattamente <strong>allo zenit</strong>: i bastoni non
+            facevano ombra e il fondo di un pozzo profondo si illuminava tutto.</li>
+          <li>Nello <strong>stesso istante</strong>, ad <strong>Alessandria</strong> (più a nord), un bastone
+            verticale faceva invece un'ombra. Misurò l'angolo: circa <strong>7,2°</strong>.</li>
+          <li>I raggi del Sole arrivano <strong>paralleli</strong>. Se la Terra fosse piatta, i due bastoni
+            dovrebbero fare la stessa ombra — cioè nessuna. Il fatto che una ci sia e l'altra no
+            <strong>dimostra</strong> che la superficie è curva. E quell'angolo di $7{,}2°$ è esattamente
+            l'angolo al centro della Terra fra le due città.</li>
+          <li>Ora la proporzione: $7{,}2°$ è $\dfrac{1}{50}$ dell'angolo giro ($360° : 7{,}2° = 50$). Quindi la
+            distanza fra le due città è <strong>un cinquantesimo</strong> dell'intera circonferenza terrestre!</li>
+          <li>La distanza Alessandria-Siene era stimata in <strong>5000 stadi</strong>. Dunque:
+            $$C = 50 \times 5000 = 250\,000 \text{ stadi}.$$</li>
+        </ol>
+      </div>
+
+      <p>Muovi l'angolo misurato ad Alessandria e guarda come cambia la Terra che ne risulta: più l'angolo è piccolo,
+        più il pianeta è grande (perché la stessa distanza corrisponde a una fetta più sottile).</p>
+
+      <div class="simbox">
+        <div class="controls">
+          <div class="control-group"><label>angolo dell'ombra ad Alessandria: <span class="val" id="er-a-val">7,2</span>°</label>
+            <input type="range" id="er-a" min="3" max="20" step="0.2" value="7.2"></div>
+        </div>
+        <div id="er-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="er-fr">—</div><div class="l">frazione di giro</div></div>
+          <div class="stat"><div class="n" id="er-c">—</div><div class="l">circonferenza (km)</div></div>
+          <div class="stat"><div class="n" id="er-r">—</div><div class="l">raggio (km)</div></div>
+        </div>
+        <p class="sim-out" id="er-out"></p>
+      </div>
+
+      <div class="curiosita">
+        <strong>📏 Quanto ci prese?</strong> Il problema è che non sappiamo con certezza quanto misurasse il suo
+        «stadio». Se usiamo lo <strong>stadio egizio</strong> (circa $157{,}5$ m), i $250\,000$ stadi diventano
+        <strong>39 375 km</strong>, contro i <strong>40 075 km</strong> reali all'equatore: un errore dell'
+        <strong>1,7%</strong>. Il raggio che ne risulta è $6267$ km contro i $6371$ veri. Con lo stadio attico
+        ($185$ m) l'errore sarebbe molto più grande. Diciamo allora la cosa onesta: <strong>non sappiamo esattamente
+        quanto fu preciso</strong>, ma sappiamo che il <em>metodo</em> era perfetto — e che con due bastoni e una
+        proporzione un uomo ha misurato il pianeta.
+      </div>
+
+      <h3>8.4 — E allora perché sconsigliavano a Colombo di partire?</h3>
+
+      <p>Ed eccoci al punto che ribalta la storia che ci hanno raccontato da bambini. Quando nel 1492 Cristoforo
+        Colombo cercò finanziamenti per raggiungere le Indie <strong>navigando verso ovest</strong>, gli esperti
+        consultati dai sovrani gli dissero di no. Non perché credessero che sarebbe caduto oltre il bordo del mondo:
+        perché <strong>sapevano fare i conti</strong>.</p>
+
+      <p>Loro conoscevano — grazie a Eratostene e a chi ne aveva raccolto l'eredità — le <strong>dimensioni reali
+        della Terra</strong>. Sapevano quindi che, andando a ovest, dalle Canarie al Giappone ci sono qualcosa come
+        <strong>19 000 km</strong> di oceano aperto. E sapevano che <strong>nessuna nave dell'epoca poteva
+        imbarcare cibo e acqua sufficienti</strong> per un viaggio simile: l'equipaggio sarebbe morto di fame e di
+        sete molto prima di vedere terra.</p>
+
+      <p>Colombo, invece, aveva sbagliato i conti: usando stime antiche più piccole e allungando l'Asia verso est,
+        era convinto che il Giappone distasse appena <strong>3 700 km</strong> — cinque volte meno del vero.</p>
+
+      <div class="warnbox">
+        <strong>Chi aveva ragione?</strong> <strong>Gli esperti.</strong> Su tutta la linea: la Terra era grande come
+        dicevano loro, la traversata era impossibile come dicevano loro, e se l'oceano fosse stato davvero vuoto
+        Colombo e i suoi uomini sarebbero morti. Si salvarono perché <strong>in mezzo c'era qualcosa che nessuno dei
+        due si aspettava</strong>: un intero continente. Colombo non arrivò mai nelle Indie — arrivò in
+        <strong>America</strong>, e morì convinto di essere stato in Asia.
+        <p style="margin:0.55rem 0 0;">Ci sono due morali, e vale la pena tenerle insieme. La prima: i conti fatti
+          bene contano, e chi li fa va ascoltato. La seconda: la realtà è più grande dei nostri modelli, e
+          l'imprevisto esiste. Ma attenzione a non trarne la lezione sbagliata — Colombo non ebbe ragione, ebbe
+          <strong>fortuna</strong>.</p>
+      </div>
+    </section>
+
+    <!-- 9 — FACOLTATIVA -->
+    <section id="sec9" class="optional">
+      <h2>9. Oltre le tre dimensioni (e oltre il buon senso)</h2>
+
+      <p>Da qui in avanti si esce dal programma e si entra nel territorio delle cose che sembrano impossibili — ma
+        che la matematica descrive senza battere ciglio.</p>
+
+      <h3>9.1 — E se le dimensioni fossero quattro? L'ipercubo</h3>
+
+      <p>Ne abbiamo già parlato nella <a href="4.Piano_cartesiano.html#sec6">lezione sul piano cartesiano</a>: nulla
+        vieta, in matematica, di immaginare uno spazio con più di tre dimensioni. Basta aggiungere un'altra
+        coordinata. E se lo facciamo, possiamo costruire il fratello maggiore del cubo.</p>
+
+      <p>Guarda la scaletta, e nota che ogni gradino si costruisce <strong>allo stesso modo</strong>: prendi la
+        figura precedente e <strong>trascinala</strong> in una direzione perpendicolare a tutte quelle che hai già,
+        poi collega ogni vertice con il suo corrispondente.</p>
+
+      <table class="sol-tab">
+        <tr><th>Dimensioni</th><th>Figura</th><th>Vertici</th><th>Spigoli</th><th>Facce quadrate</th><th>Cubi</th></tr>
+        <tr><td>0</td><td class="nome">punto</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+        <tr><td>1</td><td class="nome">segmento</td><td>2</td><td>1</td><td>0</td><td>0</td></tr>
+        <tr><td>2</td><td class="nome">quadrato</td><td>4</td><td>4</td><td>1</td><td>0</td></tr>
+        <tr><td>3</td><td class="nome">cubo</td><td>8</td><td>12</td><td>6</td><td>1</td></tr>
+        <tr><td>4</td><td class="nome">ipercubo (tesseratto)</td><td class="ok">16</td><td class="ok">32</td><td class="ok">24</td><td class="ok">8</td></tr>
+      </table>
+
+      <p>Ecco la cosa che il tuo cervello farà fatica ad accettare: l'ipercubo è delimitato da <strong>otto
+        cubi</strong>. Proprio come il cubo è delimitato da sei <em>quadrati</em> e il quadrato da quattro
+        <em>segmenti</em>, così le «iperfacce» dell'ipercubo sono <strong>cubi interi</strong>.</p>
+
+      <p><strong>E come lo disegniamo?</strong> Con lo stesso trucco che usiamo da sempre. Quando disegni un cubo sul
+        quaderno stai <em>proiettando</em> una figura a tre dimensioni su un foglio a due: la faccia lontana la
+        disegni più piccola, dentro quella vicina, e accetti che gli angoli retti sembrino storti. Per l'ipercubo
+        facciamo lo stesso, un piano più in là: lo proiettiamo dallo spazio a quattro dimensioni al nostro, e vediamo
+        un <strong>cubo dentro un cubo</strong>, con i vertici collegati. Quei due cubi, in quattro dimensioni, sono
+        <strong>identici</strong>: uno sembra più piccolo solo perché è «più lontano» nella quarta direzione.</p>
+
+      <div class="simbox">
+        <div class="controls">
+          <div class="control-group"><label>rotazione nello spazio ordinario</label><input type="range" id="ip-yaw" min="0" max="360" step="2" value="25"></div>
+          <div class="control-group"><label>rotazione <strong>nella quarta dimensione</strong></label><input type="range" id="ip-w" min="0" max="360" step="2" value="0"></div>
+        </div>
+        <div class="sim-btns">
+          <button class="btn btn-primary" id="ip-auto">▶ ruota da solo nella 4ª dimensione</button>
+          <button class="btn" id="ip-stop">⏸ ferma</button>
+        </div>
+        <div id="ip-svg"></div>
+        <p class="sim-out" id="ip-out"></p>
+      </div>
+
+      <div class="curiosita">
+        <strong>🎨 Il tesseratto fuori dalla matematica.</strong> Salvador Dalí dipinse la sua
+        <em>Crocifissione (Corpus Hypercubus)</em> nel 1954 usando come croce un ipercubo aperto e srotolato — così
+        come un cubo si srotola in una croce di sei quadrati, un ipercubo si «srotola» in otto cubi. E se ti sembra
+        di aver già sentito la parola «tesseract», hai ragione: il cinema di fantascienza l'ha presa in prestito
+        parecchie volte.
+      </div>
+
+      <h3>9.2 — Una superficie con un solo lato: il nastro di Möbius</h3>
+
+      <p>Un foglio di carta ha due facce: quella su cui scrivi e quella dietro. Per passare dall'una all'altra devi
+        <strong>scavalcare il bordo</strong>. Sembra ovvio, no? Nel 1858 due matematici tedeschi,
+        <strong>August Möbius</strong> e <strong>Johann Listing</strong>, scoprirono (indipendentemente, nello stesso
+        anno) che non è affatto obbligatorio.</p>
+
+      <div class="definition">
+        Prendi una striscia di carta, dai a un'estremità <strong>mezzo giro di torsione</strong> e incollala
+        all'altra. Ottieni il <strong>nastro di Möbius</strong>: una superficie con <strong>una sola faccia</strong>
+        e <strong>un solo bordo</strong>. Una formica può raggiungere qualunque punto del nastro — compreso quello
+        che sembrava «il rovescio» — <strong>senza mai scavalcare un bordo</strong>.
+      </div>
+
+      <p>Guarda la formica fare il giro: dopo un giro completo si ritrova <em>sotto</em> al punto di partenza, e solo
+        dopo il <strong>secondo</strong> giro torna davvero a casa.</p>
+
+      <div class="simbox">
+        <div class="controls">
+          <div class="control-group"><label>gira il nastro</label><input type="range" id="mo-yaw" min="0" max="360" step="2" value="30"></div>
+          <div class="control-group"><label>posizione della formica</label><input type="range" id="mo-t" min="0" max="720" step="2" value="0"></div>
+        </div>
+        <div class="sim-btns">
+          <button class="btn btn-primary" id="mo-walk">🐜 fai camminare la formica</button>
+          <button class="btn" id="mo-stop">⏸ ferma</button>
+          <button class="btn" id="mo-cut">✂️ taglialo a metà!</button>
+        </div>
+        <div id="mo-svg"></div>
+        <p class="sim-out" id="mo-out"></p>
+      </div>
+
+      <div class="curiosita">
+        <strong>⚙️ A che cosa serve davvero.</strong> Non è solo un giocattolo:
+        <ul style="margin:0.45rem 0 0;">
+          <li><strong>Nastri trasportatori e cinghie di trasmissione</strong> montati «alla Möbius»: poiché la
+            superficie è una sola, l'usura si distribuisce su <em>tutto</em> il nastro invece che su una faccia
+            sola — e il nastro dura all'incirca il doppio.</li>
+          <li><strong>Nastri inchiostrati</strong> di vecchie macchine da scrivere e stampanti, per usare tutto
+            l'inchiostro; e i <strong>nastri magnetici</strong> a ciclo continuo, che registrano il doppio senza
+            essere girati.</li>
+          <li>Il <strong>simbolo del riciclo</strong> è un nastro di Möbius (tre frecce che si inseguono senza fine:
+            la materia che torna sempre indietro).</li>
+          <li>In elettronica esistono i <strong>resistori di Möbius</strong>, avvolti in modo da annullare la propria
+            induttanza.</li>
+        </ul>
+      </div>
+
+      <h3>9.3 — Un solido senza dentro e senza fuori: la bottiglia di Klein</h3>
+
+      <p>Se una superficie può avere un solo lato, perché un <em>contenitore</em> dovrebbe avere per forza un dentro
+        e un fuori? Nel <strong>1882</strong> il matematico <strong>Felix Klein</strong> descrisse un oggetto che non
+        li ha: la <strong>bottiglia di Klein</strong>.</p>
+
+      <div class="definition">
+        La <strong>bottiglia di Klein</strong> è una superficie <strong>chiusa</strong> (senza alcun bordo) e con
+        <strong>una sola faccia</strong>: non separa lo spazio in un «dentro» e un «fuori». Una formica può passare
+        da quella che sembra la parete interna a quella esterna <strong>senza attraversare nulla</strong>. Si
+        ottiene, idealmente, incollando fra loro i bordi di <strong>due nastri di Möbius</strong>.
+      </div>
+
+      <div class="warnbox">
+        <strong>⚠ Quella che vedi non è la vera bottiglia di Klein.</strong> La bottiglia di Klein «autentica» vive
+        nello spazio a <strong>quattro dimensioni</strong>: nel nostro spazio a tre non ci sta, e ogni modello
+        tridimensionale è costretto a <strong>bucarsi e attraversare sé stesso</strong>. Quell'auto-intersezione non
+        esiste davvero — è un artefatto della proiezione, esattamente come quando disegni un cubo su un foglio e due
+        spigoli sembrano incrociarsi pur essendo lontanissimi.
+      </div>
+
+      <div class="simbox">
+        <div class="controls">
+          <div class="control-group"><label>gira in orizzontale</label><input type="range" id="kl-yaw" min="0" max="360" step="2" value="40"></div>
+          <div class="control-group"><label>gira in verticale</label><input type="range" id="kl-pitch" min="-80" max="80" step="2" value="15"></div>
+        </div>
+        <div id="kl-svg"></div>
+        <p class="sim-out" id="kl-out"></p>
+      </div>
+
+      <div class="curiosita">
+        <strong>🍾 Due chicche.</strong> La prima è linguistica: si racconta che in tedesco Klein l'avesse chiamata
+        <em>Kleinsche Fläche</em>, «superficie di Klein», e che qualcuno abbia letto <em>Fläche</em> come
+        <em>Flasche</em>, «bottiglia» — da cui il nome con cui la conosciamo in tutto il mondo. La seconda è una
+        filastrocca che gira fra i matematici da un secolo:
+        <p style="margin:0.6rem 0 0; font-style:italic; border-left:3px solid var(--gold); padding-left:1rem;">
+          Un matematico di nome Klein<br>
+          trovava il nastro di Möbius divino.<br>
+          Diceva: «Se attacchi<br>
+          i bordi di due,<br>
+          ti viene una bottiglia come la mia».
+        </p>
+        <p style="margin:0.5rem 0 0;">E no, non ci puoi mettere il vino: una bottiglia di Klein
+          <strong>non ha volume</strong>, perché non ha un dentro da riempire. Il che non ha impedito a qualche
+          vetraio di costruirne di bellissime — e ad altri di venderne come cappelli.</p>
+      </div>
+    </section>
+
+    <!-- 10 — QUIZ -->
+    <section id="quiz">
+      <h2>10. Quiz finale</h2>
+      <p>Dieci domande su poliedri, formula di Eulero, solidi platonici, volumi, sfera e misura della Terra.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 11 — I solidi · Matematica · Secondo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toString().replace('.', ','); }
+
+      /* ============ piccolo motore 3D condiviso ============ */
+      function rot3(v, yaw, pitch) {
+        const x = v[0] * Math.cos(yaw) + v[1] * Math.sin(yaw);
+        const y = -v[0] * Math.sin(yaw) + v[1] * Math.cos(yaw);
+        const y2 = y * Math.cos(pitch) - v[2] * Math.sin(pitch);
+        const z = y * Math.sin(pitch) + v[2] * Math.cos(pitch);
+        return [x, y2, z];
+      }
+      function newell(R, f) {
+        let nx = 0, ny = 0, nz = 0;
+        for (let i = 0; i < f.length; i++) {
+          const a = R[f[i]], b = R[f[(i + 1) % f.length]];
+          nx += (a[1] - b[1]) * (a[2] + b[2]); ny += (a[2] - b[2]) * (a[0] + b[0]); nz += (a[0] - b[0]) * (a[1] + b[1]);
+        }
+        return [nx, ny, nz];
+      }
+      const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+      const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+      const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+      const len3 = a => Math.hypot(a[0], a[1], a[2]);
+      const norm3 = a => { const l = len3(a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+      function centro(pts) {
+        const c = [0, 0, 0];
+        pts.forEach(p => { c[0] += p[0]; c[1] += p[1]; c[2] += p[2]; });
+        return [c[0] / pts.length, c[1] / pts.length, c[2] / pts.length];
+      }
+      function scala(V) {   // porta il solido su una sfera di raggio 1
+        const m = Math.max.apply(null, V.map(len3)) || 1;
+        return V.map(v => [v[0] / m, v[1] / m, v[2] / m]);
+      }
+      function autoFacce(V) {   // facce triangolari: terne a distanza minima reciproca
+        let d = Infinity;
+        for (let i = 0; i < V.length; i++) {
+          for (let j = i + 1; j < V.length; j++) { d = Math.min(d, len3(sub(V[i], V[j]))); }
+        }
+        const F = [], eq = (a, b) => Math.abs(a - b) < 1e-6;
+        for (let i = 0; i < V.length; i++) {
+          for (let j = i + 1; j < V.length; j++) {
+            for (let k = j + 1; k < V.length; k++) {
+              if (eq(len3(sub(V[i], V[j])), d) && eq(len3(sub(V[j], V[k])), d) && eq(len3(sub(V[i], V[k])), d)) { F.push([i, j, k]); }
+            }
+          }
+        }
+        return F;
+      }
+      function duale(V, F) {   // un vertice al centro di ogni faccia
+        const NV = F.map(f => norm3(centro(f.map(i => V[i]))));
+        const NF = [];
+        for (let v = 0; v < V.length; v++) {
+          const inc = [];
+          F.forEach((f, i) => { if (f.indexOf(v) >= 0) { inc.push(i); } });
+          const n = norm3(V[v]);
+          const a = norm3(cross(n, Math.abs(n[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0]));
+          const b = cross(n, a);
+          inc.sort((i, j) => Math.atan2(dot(NV[i], b), dot(NV[i], a)) - Math.atan2(dot(NV[j], b), dot(NV[j], a)));
+          NF.push(inc);
+        }
+        return { V: NV, F: NF };
+      }
+      function spigoli(F) {
+        const s = {};
+        F.forEach(f => f.forEach((v, i) => {
+          const w = f[(i + 1) % f.length];
+          s[Math.min(v, w) + '-' + Math.max(v, w)] = 1;
+        }));
+        return Object.keys(s).length;
+      }
+      // disegna un solido; o = {yaw, pitch, s, ox, oy, col, cull, op}
+      function facce3D(V, F, o) {
+        const R = V.map(v => rot3(v, o.yaw, o.pitch));
+        const items = F.map(f => {
+          let n = newell(R, f);
+          const fc = centro(f.map(i => R[i]));
+          if (dot(n, fc) < 0) { n = [-n[0], -n[1], -n[2]]; }
+          return { f: f, n: n, dep: fc[1] };
+        }).filter(q => (o.cull === false) || q.n[1] < 0)
+          .sort((a, b) => b.dep - a.dep);
+        let s = '';
+        items.forEach(q => {
+          const pts = q.f.map(i => (o.ox + R[i][0] * o.s).toFixed(1) + ',' + (o.oy - R[i][2] * o.s).toFixed(1)).join(' ');
+          const l = len3(q.n) || 1;
+          const op = ((o.op || 0.14) + 0.3 * (0.5 + 0.5 * (q.n[2] / l))).toFixed(2);
+          s += '<polygon points="' + pts + '" fill="' + (o.col || 'var(--accent)') + '" fill-opacity="' + op +
+            '" stroke="' + (o.col || 'var(--accent)') + '" stroke-width="' + (o.sw || 1.5) + '" stroke-linejoin="round"/>';
+        });
+        return s;
+      }
+
+      /* ============ i cinque solidi platonici ============ */
+      const PHI = (1 + Math.sqrt(5)) / 2;
+      const CUBO_V = [[-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1], [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]];
+      const CUBO_F = [[0, 1, 2, 3], [7, 6, 5, 4], [0, 4, 5, 1], [3, 2, 6, 7], [0, 3, 7, 4], [1, 5, 6, 2]];
+      const TETRA_V = scala([[1, 1, 1], [1, -1, -1], [-1, 1, -1], [-1, -1, 1]]);
+      const OTTA_V = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
+      const ICO_V = scala((function () {
+        const v = [];
+        [[0, 1, PHI], [0, 1, -PHI], [0, -1, PHI], [0, -1, -PHI],
+         [1, PHI, 0], [1, -PHI, 0], [-1, PHI, 0], [-1, -PHI, 0],
+         [PHI, 0, 1], [PHI, 0, -1], [-PHI, 0, 1], [-PHI, 0, -1]].forEach(p => v.push(p));
+        return v;
+      })());
+      const DODE = duale(ICO_V, autoFacce(ICO_V));
+      const PLATONICI = {
+        tetraedro: { V: TETRA_V, F: autoFacce(TETRA_V), nome: 'Tetraedro', duale: 'tetraedro' },
+        cubo: { V: scala(CUBO_V), F: CUBO_F, nome: 'Cubo', duale: 'ottaedro' },
+        ottaedro: { V: OTTA_V, F: autoFacce(OTTA_V), nome: 'Ottaedro', duale: 'cubo' },
+        dodecaedro: { V: DODE.V, F: DODE.F, nome: 'Dodecaedro', duale: 'icosaedro' },
+        icosaedro: { V: ICO_V, F: autoFacce(ICO_V), nome: 'Icosaedro', duale: 'dodecaedro' }
+      };
+
+      /* ===== 1 — poliedri: contare F, S, V ===== */
+      (function () {
+        const host = document.getElementById('p1-svg'); if (!host) return;
+        const btns = document.getElementById('p1-btns');
+        const yEl = document.getElementById('p1-yaw'), pEl = document.getElementById('p1-pitch');
+        const eF = document.getElementById('p1-f'), eS = document.getElementById('p1-s'), eV = document.getElementById('p1-v');
+        const out = document.getElementById('p1-out');
+        const PIRA = {
+          V: [[-1, -1, -0.7], [1, -1, -0.7], [1, 1, -0.7], [-1, 1, -0.7], [0, 0, 1.2]],
+          F: [[3, 2, 1, 0], [0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4]], nome: 'Piramide a base quadrata'
+        };
+        const PRIS = {
+          V: [[-1, -0.87, -1], [1, -0.87, -1], [0, 0.87, -1], [-1, -0.87, 1], [1, -0.87, 1], [0, 0.87, 1]],
+          F: [[2, 1, 0], [3, 4, 5], [0, 1, 4, 3], [1, 2, 5, 4], [2, 0, 3, 5]], nome: 'Prisma triangolare'
+        };
+        const LISTA = [
+          ['cubo', PLATONICI.cubo], ['tetraedro', PLATONICI.tetraedro],
+          ['ottaedro', PLATONICI.ottaedro], ['piramide', PIRA], ['prisma', PRIS],
+          ['dodecaedro', PLATONICI.dodecaedro], ['icosaedro', PLATONICI.icosaedro]
+        ];
+        let cur = 0;
+        function draw() {
+          const o = LISTA[cur][1];
+          const s = facce3D(o.V, o.F, { yaw: (+yEl.value) * Math.PI / 180, pitch: (+pEl.value) * Math.PI / 180, s: 105, ox: 200, oy: 150 });
+          host.innerHTML = '<svg viewBox="0 0 400 300" role="img" aria-label="poliedro ruotabile">' + s + '</svg>';
+          const F = o.F.length, S = spigoli(o.F), V = o.V.length;
+          eF.textContent = F; eS.textContent = S; eV.textContent = V;
+          Array.prototype.forEach.call(btns.children, (b, i) => b.classList.toggle('active', i === cur));
+          out.innerHTML = '<strong>' + (o.nome || LISTA[cur][0]) + '</strong>: ' + F + ' facce, ' + S + ' spigoli, ' + V +
+            ' vertici. Prova a fare il conto <strong>F − S + V</strong> = ' + F + ' − ' + S + ' + ' + V + ' = <strong>' + (F - S + V) + '</strong>… e prova con un altro solido!';
+        }
+        LISTA.forEach(function (p, i) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = p[1].nome || p[0];
+          b.addEventListener('click', function () { cur = i; draw(); });
+          btns.appendChild(b);
+        });
+        [yEl, pEl].forEach(e => e.addEventListener('input', draw));
+        draw();
+      })();
+
+      /* ===== 3 — il duale ===== */
+      (function () {
+        const host = document.getElementById('du-svg'); if (!host) return;
+        const btns = document.getElementById('du-btns');
+        const yEl = document.getElementById('du-yaw'), pEl = document.getElementById('du-pitch');
+        const bD = document.getElementById('du-dual'), out = document.getElementById('du-out');
+        const KEYS = ['tetraedro', 'cubo', 'ottaedro', 'dodecaedro', 'icosaedro'];
+        let cur = 1, mostraD = false;
+        function draw() {
+          const o = PLATONICI[KEYS[cur]];
+          const yaw = (+yEl.value) * Math.PI / 180, pitch = (+pEl.value) * Math.PI / 180;
+          let s = '';
+          if (mostraD) {
+            const d = duale(o.V, o.F);
+            s += facce3D(o.V, o.F, { yaw: yaw, pitch: pitch, s: 105, ox: 200, oy: 150, op: 0.02, sw: 1, col: 'var(--muted)' });
+            s += facce3D(d.V, d.F, { yaw: yaw, pitch: pitch, s: 105, ox: 200, oy: 150, col: 'var(--magenta)', op: 0.18 });
+            const R = d.V.map(v => rot3(v, yaw, pitch));
+            R.forEach(p => { s += '<circle cx="' + (200 + p[0] * 105).toFixed(1) + '" cy="' + (150 - p[2] * 105).toFixed(1) + '" r="3" fill="var(--gold)"/>'; });
+          } else {
+            s += facce3D(o.V, o.F, { yaw: yaw, pitch: pitch, s: 105, ox: 200, oy: 150 });
+          }
+          host.innerHTML = '<svg viewBox="0 0 400 300" role="img" aria-label="solido platonico e il suo duale">' + s + '</svg>';
+          Array.prototype.forEach.call(btns.children, (b, i) => b.classList.toggle('active', i === cur));
+          bD.textContent = mostraD ? '↩ nascondi il duale' : '🔄 mostra il duale';
+          out.innerHTML = mostraD
+            ? 'I pallini oro sono i <strong>centri delle facce</strong> del ' + o.nome.toLowerCase() +
+              ': collegandoli si ottiene il suo duale, cioè <strong>l\'' + o.duale + '</strong>. Le ' + o.F.length +
+              ' facce sono diventate ' + o.F.length + ' vertici, e i ' + o.V.length + ' vertici sono diventati ' + o.V.length + ' facce.'
+            : '<strong>' + o.nome + '</strong>: ' + o.F.length + ' facce, ' + o.V.length + ' vertici. Premi «mostra il duale» e guarda che cosa succede.';
+        }
+        KEYS.forEach(function (k, i) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = PLATONICI[k].nome;
+          b.addEventListener('click', function () { cur = i; draw(); });
+          btns.appendChild(b);
+        });
+        bD.addEventListener('click', function () { mostraD = !mostraD; draw(); });
+        [yEl, pEl].forEach(e => e.addEventListener('input', draw));
+        draw();
+      })();
+
+      /* ===== 5 — superficie e volume ===== */
+      (function () {
+        const host = document.getElementById('vo-svg'); if (!host) return;
+        const btns = document.getElementById('vo-btns');
+        const sa = document.getElementById('vo-a'), sh = document.getElementById('vo-h');
+        const va = document.getElementById('vo-a-val'), vh = document.getElementById('vo-h-val');
+        const yEl = document.getElementById('vo-yaw'), pEl = document.getElementById('vo-pitch');
+        const eS = document.getElementById('vo-s'), eV = document.getElementById('vo-v'), out = document.getElementById('vo-out');
+        const TIPI = ['Cubo', 'Parallelepipedo', 'Piramide', 'Prisma triangolare'];
+        let cur = 0;
+        function geo(a, h) {
+          if (cur === 0) {
+            const V = CUBO_V.map(v => [v[0] * a / 2, v[1] * a / 2, v[2] * a / 2]);
+            return { V: V, F: CUBO_F, S: 6 * a * a, Vol: a * a * a, fs: 'S = 6a^2', fv: 'V = a^3' };
+          }
+          if (cur === 1) {
+            const V = CUBO_V.map(v => [v[0] * a / 2, v[1] * a / 2, v[2] * h / 2]);
+            return { V: V, F: CUBO_F, S: 2 * a * a + 4 * a * h, Vol: a * a * h, fs: 'S = 2a^2 + 4ah', fv: 'V = a^2 h' };
+          }
+          if (cur === 2) {
+            const V = [[-a / 2, -a / 2, -h / 2], [a / 2, -a / 2, -h / 2], [a / 2, a / 2, -h / 2], [-a / 2, a / 2, -h / 2], [0, 0, h / 2]];
+            const ap = Math.sqrt(h * h + a * a / 4);
+            return { V: V, F: [[3, 2, 1, 0], [0, 1, 4], [1, 2, 4], [2, 3, 4], [3, 0, 4]], S: a * a + 2 * a * ap, Vol: a * a * h / 3, fs: 'S = a^2 + 2a·apotema', fv: 'V = a^2 h / 3' };
+          }
+          const r = a / Math.sqrt(3);
+          const V = [];
+          for (let i = 0; i < 3; i++) {
+            const t = i * 2 * Math.PI / 3 + Math.PI / 2;
+            V.push([r * Math.cos(t), r * Math.sin(t), -h / 2]);
+          }
+          for (let i = 0; i < 3; i++) {
+            const t = i * 2 * Math.PI / 3 + Math.PI / 2;
+            V.push([r * Math.cos(t), r * Math.sin(t), h / 2]);
+          }
+          const Sb = Math.sqrt(3) / 4 * a * a;
+          return { V: V, F: [[2, 1, 0], [3, 4, 5], [0, 1, 4, 3], [1, 2, 5, 4], [2, 0, 3, 5]], S: 2 * Sb + 3 * a * h, Vol: Sb * h, fs: 'S = 2S_b + 3ah', fv: 'V = S_b · h' };
+        }
+        function draw() {
+          const a = +sa.value, h = +sh.value;
+          va.textContent = nf(a, 1); vh.textContent = nf(h, 1);
+          const g = geo(a, h);
+          const s = facce3D(g.V, g.F, { yaw: (+yEl.value) * Math.PI / 180, pitch: (+pEl.value) * Math.PI / 180, s: 26, ox: 200, oy: 150 });
+          host.innerHTML = '<svg viewBox="0 0 400 300" role="img" aria-label="solido ruotabile con le sue misure">' + s + '</svg>';
+          eS.textContent = nf(g.S, 2); eV.textContent = nf(g.Vol, 2);
+          Array.prototype.forEach.call(btns.children, (b, i) => b.classList.toggle('active', i === cur));
+          out.innerHTML = '<strong>' + TIPI[cur] + '</strong> — superficie: ' + g.fs.replace(/\^2/g, '²').replace(/\^3/g, '³') +
+            ' = <strong>' + nf(g.S, 2) + '</strong> · volume: ' + g.fv.replace(/\^2/g, '²').replace(/\^3/g, '³') +
+            ' = <strong>' + nf(g.Vol, 2) + '</strong>' + (cur === 0 ? ' (per il cubo il cursore dell\'altezza non serve)' : '');
+        }
+        TIPI.forEach(function (t, i) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = t;
+          b.addEventListener('click', function () { cur = i; draw(); });
+          btns.appendChild(b);
+        });
+        [sa, sh, yEl, pEl].forEach(e => e.addEventListener('input', draw));
+        draw();
+      })();
+
+      /* ===== 6 — cilindro e sfera ===== */
+      (function () {
+        const host = document.getElementById('cs-svg'); if (!host) return;
+        const sr = document.getElementById('cs-r'), sh = document.getElementById('cs-h');
+        const vr = document.getElementById('cs-r-val'), vh = document.getElementById('cs-h-val');
+        const eSc = document.getElementById('cs-sc'), eVc = document.getElementById('cs-vc');
+        const eSs = document.getElementById('cs-ss'), eVs = document.getElementById('cs-vs');
+        const out = document.getElementById('cs-out');
+        function draw() {
+          const r = +sr.value, h = +sh.value, U = 17;
+          vr.textContent = nf(r, 1); vh.textContent = nf(h, 1);
+          const Sc = 2 * Math.PI * r * r + 2 * Math.PI * r * h, Vc = Math.PI * r * r * h;
+          const Ss = 4 * Math.PI * r * r, Vs = 4 / 3 * Math.PI * r * r * r;
+          const cx = 130, cy = 210, rx = r * U, hh = h * U;
+          let s = '<svg viewBox="0 0 460 260" role="img" aria-label="cilindro e sfera a confronto">';
+          s += '<ellipse cx="' + cx + '" cy="' + (cy - hh) + '" rx="' + rx + '" ry="' + (rx * 0.32) + '" fill="color-mix(in srgb, var(--accent) 26%, transparent)" stroke="var(--accent)" stroke-width="2"/>';
+          s += '<path d="M ' + (cx - rx) + ' ' + (cy - hh) + ' L ' + (cx - rx) + ' ' + cy + ' A ' + rx + ' ' + (rx * 0.32) + ' 0 0 0 ' + (cx + rx) + ' ' + cy + ' L ' + (cx + rx) + ' ' + (cy - hh) + ' Z" fill="color-mix(in srgb, var(--accent) 14%, transparent)" stroke="var(--accent)" stroke-width="2"/>';
+          s += '<line x1="' + cx + '" y1="' + (cy - hh) + '" x2="' + cx + '" y2="' + cy + '" stroke="var(--magenta)" stroke-width="1.5" stroke-dasharray="4 3"/>';
+          s += '<text x="' + (cx + 6) + '" y="' + (cy - hh / 2) + '" class="em">h</text>';
+          s += '<line x1="' + cx + '" y1="' + (cy - hh) + '" x2="' + (cx + rx) + '" y2="' + (cy - hh) + '" stroke="var(--gold)" stroke-width="2"/>';
+          s += '<text x="' + (cx + rx / 2) + '" y="' + (cy - hh - 8) + '" text-anchor="middle" class="lbl-s" style="fill:var(--gold);">r</text>';
+          s += '<text x="' + cx + '" y="' + (cy + 32) + '" text-anchor="middle" class="lbl">cilindro</text>';
+          const sx = 350, sy = cy - rx;
+          s += '<circle cx="' + sx + '" cy="' + sy + '" r="' + rx + '" fill="color-mix(in srgb, var(--magenta) 20%, transparent)" stroke="var(--magenta)" stroke-width="2"/>';
+          s += '<ellipse cx="' + sx + '" cy="' + sy + '" rx="' + rx + '" ry="' + (rx * 0.32) + '" fill="none" stroke="var(--magenta)" stroke-width="1" stroke-dasharray="4 3" opacity="0.8"/>';
+          s += '<line x1="' + sx + '" y1="' + sy + '" x2="' + (sx + rx) + '" y2="' + sy + '" stroke="var(--gold)" stroke-width="2"/>';
+          s += '<text x="' + (sx + rx / 2) + '" y="' + (sy - 6) + '" text-anchor="middle" class="lbl-s" style="fill:var(--gold);">r</text>';
+          s += '<text x="' + sx + '" y="' + (cy + 32) + '" text-anchor="middle" class="lbl">sfera</text>';
+          s += '</svg>';
+          host.innerHTML = s;
+          eSc.textContent = nf(Sc, 1); eVc.textContent = nf(Vc, 1);
+          eSs.textContent = nf(Ss, 1); eVs.textContent = nf(Vs, 1);
+          out.innerHTML = Math.abs(h - 2 * r) < 0.01
+            ? '🎯 Hai messo <strong>h = 2r</strong>: il cilindro è il più stretto che può contenere la sfera. Guarda i rapporti: volumi ' +
+              nf(Vs, 1) + ' : ' + nf(Vc, 1) + ' e superfici ' + nf(Ss, 1) + ' : ' + nf(Sc, 1) + ', <strong>entrambi uguali a 2 : 3</strong>. È il teorema di Archimede.'
+            : 'Muovi i cursori. Suggerimento: prova a mettere l\'altezza del cilindro <strong>uguale al diametro</strong> della sfera (h = 2r) e guarda i rapporti fra i numeri…';
+        }
+        [sr, sh].forEach(e => e.addEventListener('input', draw));
+        draw();
+      })();
+
+      /* ===== 8.1 — l'ombra di un corpo celeste ===== */
+      (function () {
+        const host = document.getElementById('ob-svg'); if (!host) return;
+        const btns = document.getElementById('ob-btns'), sr = document.getElementById('ob-rot');
+        const out = document.getElementById('ob-out');
+        const FORME = ['Sfera', 'Disco piatto', 'Cubo'];
+        let cur = 0;
+        function hull(P) {           // inviluppo convesso (monotone chain)
+          const p = P.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+          const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+          const lo = [], up = [];
+          p.forEach(q => { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) { lo.pop(); } lo.push(q); });
+          p.slice().reverse().forEach(q => { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) { up.pop(); } up.push(q); });
+          lo.pop(); up.pop();
+          return lo.concat(up);
+        }
+        function draw() {
+          const a = (+sr.value) * Math.PI / 180;
+          let pts = [];
+          if (cur === 1) {
+            for (let i = 0; i < 60; i++) { const t = i * 2 * Math.PI / 60; pts.push([Math.cos(t), Math.sin(t), 0]); }
+          } else if (cur === 2) {
+            pts = CUBO_V.map(v => [v[0] * 0.62, v[1] * 0.62, v[2] * 0.62]);
+          }
+          // rotazione attorno a un asse obliquo, poi proiezione lungo la direzione della luce (asse x)
+          const R = pts.map(function (v) {
+            const y = v[1] * Math.cos(a) - v[2] * Math.sin(a), z = v[1] * Math.sin(a) + v[2] * Math.cos(a);
+            const x = v[0] * Math.cos(a * 0.6) + z * Math.sin(a * 0.6), z2 = -v[0] * Math.sin(a * 0.6) + z * Math.cos(a * 0.6);
+            return [x, y, z2];
+          });
+          const SC = 62, OX = 120, OY = 130, SX = 350;
+          let s = '<svg viewBox="0 0 470 260" role="img" aria-label="il corpo celeste e la sua ombra">';
+          // raggi di luce
+          for (let i = 0; i < 5; i++) {
+            const yy = 40 + i * 45;
+            s += '<line x1="8" y1="' + yy + '" x2="' + (SX + 78) + '" y2="' + yy + '" stroke="var(--gold)" stroke-width="1" opacity="0.35"/>';
+          }
+          // il corpo
+          if (cur === 0) {
+            s += '<circle cx="' + OX + '" cy="' + OY + '" r="' + SC + '" fill="color-mix(in srgb, var(--accent) 30%, transparent)" stroke="var(--accent)" stroke-width="2"/>';
+            s += '<ellipse cx="' + OX + '" cy="' + OY + '" rx="' + SC + '" ry="' + (SC * 0.3) + '" fill="none" stroke="var(--accent)" stroke-width="1" stroke-dasharray="4 3" opacity="0.7" transform="rotate(' + (+sr.value) + ' ' + OX + ' ' + OY + ')"/>';
+          } else {
+            const proj = R.map(v => [OX + v[1] * SC, OY - v[2] * SC]);
+            const h = hull(proj);
+            s += '<polygon points="' + h.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ') +
+              '" fill="color-mix(in srgb, var(--accent) 26%, transparent)" stroke="var(--accent)" stroke-width="2"/>';
+            if (cur === 2) { s += facce3D(pts, CUBO_F, { yaw: a * 0.6, pitch: a, s: SC, ox: OX, oy: OY, op: 0.05, sw: 1, col: 'var(--accent)' }); }
+          }
+          s += '<text x="' + OX + '" y="' + (OY + SC + 34) + '" text-anchor="middle" class="lbl">il corpo</text>';
+          // lo schermo (la Luna) e l'ombra
+          s += '<rect x="' + (SX - 78) + '" y="18" width="156" height="224" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"/>';
+          let om = '';
+          if (cur === 0) {
+            om = '<circle cx="' + SX + '" cy="' + OY + '" r="' + SC + '" fill="var(--text)" opacity="0.72"/>';
+          } else {
+            const proj = R.map(v => [SX + v[1] * SC, OY - v[2] * SC]);
+            const h = hull(proj);
+            om = '<polygon points="' + h.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ') + '" fill="var(--text)" opacity="0.72"/>';
+          }
+          s += om;
+          s += '<text x="' + SX + '" y="' + (OY + SC + 34) + '" text-anchor="middle" class="lbl">l\'ombra sulla Luna</text>';
+          s += '</svg>';
+          host.innerHTML = s;
+          Array.prototype.forEach.call(btns.children, (b, i) => b.classList.toggle('active', i === cur));
+          out.innerHTML = cur === 0
+            ? '✅ Ruota quanto vuoi: l\'ombra della <strong>sfera</strong> resta un <strong>cerchio perfetto</strong>. Sempre, da qualunque direzione.'
+            : (cur === 1
+              ? '❌ Il <strong>disco piatto</strong> tradisce subito: girandolo l\'ombra diventa un\'<strong>ellisse</strong> sempre più schiacciata, fino a ridursi a una linea. Non è quello che si vede nelle eclissi.'
+              : '❌ Il <strong>cubo</strong> proietta quadrati, rettangoli ed <strong>esagoni</strong> a seconda di come lo giri. Anche lui è escluso.');
+        }
+        FORME.forEach(function (t, i) {
+          const b = document.createElement('button');
+          b.className = 'btn'; b.textContent = t;
+          b.addEventListener('click', function () { cur = i; draw(); });
+          btns.appendChild(b);
+        });
+        sr.addEventListener('input', draw);
+        draw();
+      })();
+
+      /* ===== 8.2 — le navi all'orizzonte ===== */
+      (function () {
+        const host = document.getElementById('nv-svg'); if (!host) return;
+        const sd = document.getElementById('nv-d'), vd = document.getElementById('nv-d-val');
+        const bS = document.getElementById('nv-sfera'), bP = document.getElementById('nv-piatta');
+        const out = document.getElementById('nv-out');
+        const R = 6371000, HOBS = 2, HNAVE = 25;      // metri
+        let sferica = true;
+        function draw() {
+          const dkm = +sd.value, d = dkm * 1000;
+          vd.textContent = dkm;
+          const dh = Math.sqrt(2 * R * HOBS);
+          const nasc = sferica ? Math.max(0, (d - dh) * (d - dh) / (2 * R)) : 0;
+          const fr = Math.min(1, nasc / HNAVE);
+          const W = 480, H = 240, MARE = 165;
+          const sc = 1 / (1 + dkm / 7);
+          const shipH = 108 * sc, shipW = 74 * sc, sx = 80 + dkm * 15;
+          let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="una nave che si allontana">';
+          s += '<rect x="0" y="0" width="' + W + '" height="' + MARE + '" fill="color-mix(in srgb, var(--primary) 8%, transparent)"/>';
+          s += '<rect x="0" y="' + MARE + '" width="' + W + '" height="' + (H - MARE) + '" fill="color-mix(in srgb, var(--primary) 22%, transparent)"/>';
+          // nave: scafo + albero + vela, disegnata dal pelo dell'acqua verso l'alto
+          const base = MARE;
+          const visH = shipH * (1 - fr);
+          s += '<clipPath id="nvclip"><rect x="' + (sx - shipW) + '" y="' + (base - visH) + '" width="' + (shipW * 2) + '" height="' + (visH + 4) + '"/></clipPath>';
+          let nave = '';
+          nave += '<path d="M ' + (sx - shipW / 2) + ' ' + base + ' L ' + (sx + shipW / 2) + ' ' + base + ' L ' + (sx + shipW / 2.6) + ' ' + (base - 15 * sc) + ' L ' + (sx - shipW / 2.6) + ' ' + (base - 15 * sc) + ' Z" fill="var(--accent)" opacity="0.85"/>';
+          nave += '<line x1="' + sx + '" y1="' + (base - 15 * sc) + '" x2="' + sx + '" y2="' + (base - shipH) + '" stroke="var(--text)" stroke-width="' + (2.5 * sc) + '"/>';
+          nave += '<path d="M ' + sx + ' ' + (base - shipH + 6 * sc) + ' L ' + (sx + 30 * sc) + ' ' + (base - shipH / 2 - 6 * sc) + ' L ' + sx + ' ' + (base - shipH / 2 - 6 * sc) + ' Z" fill="var(--magenta)" opacity="0.8"/>';
+          nave += '<circle cx="' + sx + '" cy="' + (base - shipH) + '" r="' + (3 * sc) + '" fill="var(--gold)"/>';
+          s += '<g clip-path="url(#nvclip)">' + nave + '</g>';
+          // linea dell'orizzonte / del mare
+          s += '<line x1="0" y1="' + MARE + '" x2="' + W + '" y2="' + MARE + '" stroke="var(--text)" stroke-width="1.5" opacity="0.6"/>';
+          s += '<text x="8" y="' + (MARE - 8) + '" class="lbl-s">' + (sferica ? 'orizzonte (a ' + nf(dh / 1000, 1) + ' km)' : 'linea del mare') + '</text>';
+          s += '<circle cx="30" cy="' + (MARE + 30) + '" r="7" fill="var(--text)"/>';
+          s += '<text x="30" y="' + (MARE + 58) + '" text-anchor="middle" class="lbl-s">tu (2 m)</text>';
+          s += '</svg>';
+          host.innerHTML = s;
+          bS.classList.toggle('active', sferica); bP.classList.toggle('active', !sferica);
+          out.innerHTML = sferica
+            ? (nasc <= 0.05
+              ? 'A <strong>' + dkm + ' km</strong> la nave è ancora tutta visibile: non ha superato l\'orizzonte, che per un osservatore alto 2 m sta a circa <strong>5 km</strong>. Allontanala ancora…'
+              : 'A <strong>' + dkm + ' km</strong> la curvatura nasconde i <strong>' + nf(nasc, 1) + ' m più bassi</strong> della nave: lo scafo è sparito e si vede solo la parte alta dell\'alberatura. Oltre i <strong>21 km</strong> scompare anche la cima dell\'albero.')
+            : 'Su una <strong>Terra piatta</strong> la nave si limita a rimpicciolire: lo scafo resta visibile a qualunque distanza, fino a svanire nella foschia. <strong>Non è quello che vedono i marinai.</strong>';
+        }
+        bS.addEventListener('click', function () { sferica = true; draw(); });
+        bP.addEventListener('click', function () { sferica = false; draw(); });
+        sd.addEventListener('input', draw);
+        draw();
+      })();
+
+      /* ===== 8.3 — Eratostene ===== */
+      (function () {
+        const host = document.getElementById('er-svg'); if (!host) return;
+        const sa = document.getElementById('er-a'), va = document.getElementById('er-a-val');
+        const eF = document.getElementById('er-fr'), eC = document.getElementById('er-c'), eR = document.getElementById('er-r');
+        const out = document.getElementById('er-out');
+        const STADIO = 0.1575, DIST = 5000;    // km per stadio, distanza in stadi
+        function draw() {
+          const al = +sa.value;
+          va.textContent = nf(al, 1);
+          const frazione = 360 / al;
+          const Cst = frazione * DIST, Ckm = Cst * STADIO, Rkm = Ckm / (2 * Math.PI);
+          const CX = 210, CY = 175, RR = 105;
+          const aS = -90, aA = -90 - al;         // Siene sotto il Sole, Alessandria piu' a nord
+          const P = (deg, k) => [CX + RR * k * Math.cos(deg * Math.PI / 180), CY + RR * k * Math.sin(deg * Math.PI / 180)];
+          const S = P(aS, 1), A = P(aA, 1);
+          let s = '<svg viewBox="0 0 460 300" role="img" aria-label="il metodo di Eratostene per misurare la Terra">';
+          s += '<circle cx="' + CX + '" cy="' + CY + '" r="' + RR + '" fill="color-mix(in srgb, var(--primary) 14%, transparent)" stroke="var(--primary)" stroke-width="2"/>';
+          // raggi solari paralleli (verticali, verso il basso)
+          [0, 1, 2, 3].forEach(function (i) {
+            const x = S[0] - 46 + i * 31;
+            s += '<line x1="' + x + '" y1="6" x2="' + x + '" y2="' + (CY - Math.sqrt(Math.max(0, RR * RR - (x - CX) * (x - CX)))) + '" stroke="var(--gold)" stroke-width="1.6"/>';
+          });
+          s += '<text x="' + (S[0] + 62) + '" y="16" class="lbl-s" style="fill:var(--gold);">raggi paralleli</text>';
+          // raggi verso il centro
+          s += '<line x1="' + CX + '" y1="' + CY + '" x2="' + S[0].toFixed(1) + '" y2="' + S[1].toFixed(1) + '" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="4 3"/>';
+          s += '<line x1="' + CX + '" y1="' + CY + '" x2="' + A[0].toFixed(1) + '" y2="' + A[1].toFixed(1) + '" stroke="var(--magenta)" stroke-width="1.8"/>';
+          // angolo al centro
+          const ar = 34;
+          s += '<path d="M ' + (CX + ar * Math.cos(aA * Math.PI / 180)).toFixed(1) + ' ' + (CY + ar * Math.sin(aA * Math.PI / 180)).toFixed(1) +
+            ' A ' + ar + ' ' + ar + ' 0 0 1 ' + (CX + ar * Math.cos(aS * Math.PI / 180)).toFixed(1) + ' ' + (CY + ar * Math.sin(aS * Math.PI / 180)).toFixed(1) +
+            '" fill="none" stroke="var(--magenta)" stroke-width="2.5"/>';
+          s += '<text x="' + (CX - 6) + '" y="' + (CY - 44) + '" text-anchor="middle" class="em">' + nf(al, 1) + '°</text>';
+          // bastoni
+          const bl = 26;
+          s += '<line x1="' + S[0].toFixed(1) + '" y1="' + S[1].toFixed(1) + '" x2="' + S[0].toFixed(1) + '" y2="' + (S[1] - bl).toFixed(1) + '" stroke="var(--text)" stroke-width="3"/>';
+          const dirA = [Math.cos(aA * Math.PI / 180), Math.sin(aA * Math.PI / 180)];
+          const A2 = [A[0] + dirA[0] * bl, A[1] + dirA[1] * bl];
+          s += '<line x1="' + A[0].toFixed(1) + '" y1="' + A[1].toFixed(1) + '" x2="' + A2[0].toFixed(1) + '" y2="' + A2[1].toFixed(1) + '" stroke="var(--text)" stroke-width="3"/>';
+          // ombra ad Alessandria: dal piede del bastone, lungo la superficie
+          const tang = [-dirA[1], dirA[0]];
+          const omb = bl * Math.tan(al * Math.PI / 180);
+          s += '<line x1="' + A[0].toFixed(1) + '" y1="' + A[1].toFixed(1) + '" x2="' + (A[0] - tang[0] * omb).toFixed(1) + '" y2="' + (A[1] - tang[1] * omb).toFixed(1) + '" stroke="var(--magenta)" stroke-width="3.5"/>';
+          s += '<circle cx="' + S[0].toFixed(1) + '" cy="' + S[1].toFixed(1) + '" r="4" fill="var(--gold)"/>';
+          s += '<circle cx="' + A[0].toFixed(1) + '" cy="' + A[1].toFixed(1) + '" r="4" fill="var(--magenta)"/>';
+          s += '<text x="' + (S[0] + 10) + '" y="' + (S[1] - 30) + '" class="lbl-s">Siene: nessuna ombra</text>';
+          s += '<text x="' + (A[0] - 96) + '" y="' + (A[1] - 26) + '" class="lbl-s" style="fill:var(--magenta);">Alessandria: ombra</text>';
+          s += '<text x="' + CX + '" y="' + (CY + 8) + '" text-anchor="middle" class="lbl">Terra</text>';
+          s += '</svg>';
+          host.innerHTML = s;
+          eF.textContent = '1/' + nf(frazione, 0);
+          eC.textContent = nf(Ckm, 0);
+          eR.textContent = nf(Rkm, 0);
+          const vicino = Math.abs(al - 7.2) < 0.15;
+          out.innerHTML = 'Con un angolo di ' + nf(al, 1) + '° la distanza Alessandria-Siene è <strong>1/' + nf(frazione, 0) +
+            '</strong> di giro, quindi $C = ' + nf(frazione, 0) + ' \\times 5000 = ' + nf(Cst, 0) + '$ stadi = <strong>' + nf(Ckm, 0) + ' km</strong>. ' +
+            (vicino
+              ? '🎯 È proprio il valore misurato da Eratostene: la circonferenza vera è <strong>40 075 km</strong> — ha sbagliato meno del <strong>2%</strong>!'
+              : 'La circonferenza vera è 40 075 km: prova a riportare l\'angolo a <strong>7,2°</strong>, il valore misurato da Eratostene.');
+          if (typeof renderMathIn === 'function') renderMathIn(out);
+        }
+        sa.addEventListener('input', draw);
+        draw();
+      })();
+
+      /* ===== 9.1 — l'ipercubo ===== */
+      (function () {
+        const host = document.getElementById('ip-svg'); if (!host) return;
+        const sy = document.getElementById('ip-yaw'), sw = document.getElementById('ip-w');
+        const out = document.getElementById('ip-out');
+        const V4 = [], E4 = [];
+        for (let i = 0; i < 16; i++) { V4.push([(i & 1) ? 1 : -1, (i & 2) ? 1 : -1, (i & 4) ? 1 : -1, (i & 8) ? 1 : -1]); }
+        for (let i = 0; i < 16; i++) {
+          for (let j = i + 1; j < 16; j++) {
+            let dif = 0;
+            for (let k = 0; k < 4; k++) { if (V4[i][k] !== V4[j][k]) { dif++; } }
+            if (dif === 1) { E4.push([i, j]); }
+          }
+        }
+        let timer = null;
+        function draw() {
+          const yaw = (+sy.value) * Math.PI / 180, aw = (+sw.value) * Math.PI / 180;
+          const P = V4.map(function (v) {
+            const x = v[0] * Math.cos(aw) - v[3] * Math.sin(aw);
+            const w = v[0] * Math.sin(aw) + v[3] * Math.cos(aw);
+            const f = 2.4 / (3.2 - w);                    // prospettiva dalla 4ª dimensione
+            const p = rot3([x * f, v[1] * f, v[2] * f], yaw, 0.35);
+            return [200 + p[0] * 78, 150 - p[2] * 78, w];
+          });
+          let s = '<svg viewBox="0 0 400 300" role="img" aria-label="ipercubo in rotazione nella quarta dimensione">';
+          E4.forEach(function (e) {
+            const a = P[e[0]], b = P[e[1]];
+            const op = (0.35 + 0.3 * (a[2] + b[2] + 2) / 4).toFixed(2);
+            s += '<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) +
+              '" stroke="var(--accent)" stroke-width="1.8" opacity="' + op + '"/>';
+          });
+          P.forEach(function (p) { s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3" fill="var(--magenta)"/>'; });
+          s += '</svg>';
+          host.innerHTML = s;
+          out.innerHTML = '<strong>16 vertici</strong> e <strong>32 spigoli</strong>: quello che vedi è l\'ombra dell\'ipercubo nel nostro spazio. ' +
+            'Ruotandolo nella <strong>quarta dimensione</strong> il cubo «interno» esce e diventa quello esterno: sono <em>identici</em>, e si scambiano il posto.';
+        }
+        [sy, sw].forEach(e => e.addEventListener('input', draw));
+        document.getElementById('ip-auto').addEventListener('click', function () {
+          if (timer) { return; }
+          timer = setInterval(function () { sw.value = (+sw.value + 2) % 360; draw(); }, 60);
+        });
+        document.getElementById('ip-stop').addEventListener('click', function () { clearInterval(timer); timer = null; });
+        draw();
+      })();
+
+      /* ===== 9.2 — il nastro di Möbius ===== */
+      (function () {
+        const host = document.getElementById('mo-svg'); if (!host) return;
+        const sy = document.getElementById('mo-yaw'), st = document.getElementById('mo-t');
+        const out = document.getElementById('mo-out');
+        const NU = 60, NV = 6, RM = 1, WM = 0.38;
+        let timer = null, tagliato = false;
+        function pt(u, v) {
+          const c = Math.cos(u / 2), s2 = Math.sin(u / 2);
+          return [(RM + v * c) * Math.cos(u), (RM + v * c) * Math.sin(u), v * s2];
+        }
+        function draw() {
+          const yaw = (+sy.value) * Math.PI / 180, pitch = 0.55;
+          const quads = [], verts = [];
+          for (let i = 0; i <= NU; i++) {
+            for (let j = 0; j <= NV; j++) {
+              verts.push(pt(i * 2 * Math.PI / NU, -WM + 2 * WM * j / NV));
+            }
+          }
+          const idx = (i, j) => i * (NV + 1) + j;
+          for (let i = 0; i < NU; i++) {
+            for (let j = 0; j < NV; j++) { quads.push([idx(i, j), idx(i + 1, j), idx(i + 1, j + 1), idx(i, j + 1)]); }
+          }
+          let s = '<svg viewBox="0 0 400 300" role="img" aria-label="nastro di Möbius ruotabile">';
+          s += facce3D(verts, quads, { yaw: yaw, pitch: pitch, s: 88, ox: 200, oy: 150, cull: false, op: 0.22, sw: 0.6 });
+          if (tagliato) {
+            let lc = '';
+            for (let i = 0; i <= NU; i++) {
+              const p = rot3(pt(i * 2 * Math.PI / NU, 0), yaw, pitch);
+              lc += (200 + p[0] * 88).toFixed(1) + ',' + (150 - p[2] * 88).toFixed(1) + ' ';
+            }
+            s += '<polyline points="' + lc + '" fill="none" stroke="var(--magenta)" stroke-width="2.5" stroke-dasharray="7 5"/>';
+          }
+          const tt = (+st.value) * Math.PI / 180;
+          const pa = rot3(pt(tt, WM * 0.62), yaw, pitch);
+          s += '<circle cx="' + (200 + pa[0] * 88).toFixed(1) + '" cy="' + (150 - pa[2] * 88).toFixed(1) + '" r="6" fill="var(--gold)" stroke="var(--text)" stroke-width="1.5"/>';
+          s += '<text x="' + (200 + pa[0] * 88).toFixed(1) + '" y="' + (150 - pa[2] * 88 - 12).toFixed(1) + '" text-anchor="middle" class="lbl-s">🐜</text>';
+          s += '</svg>';
+          host.innerHTML = s;
+          const giri = (+st.value) / 360;
+          out.innerHTML = tagliato
+            ? '✂️ La linea tratteggiata è il taglio a metà. Che cosa ottieni? <strong>Non due anelli</strong>, come tutti si aspettano, ma <strong>un unico nastro</strong>, lungo il doppio e con due torsioni complete. Provalo davvero con carta e forbici: è la cosa più sorprendente che tu possa fare in due minuti.'
+            : (giri >= 0.98 && giri < 1.98
+              ? '👀 La formica ha fatto <strong>un giro completo</strong> ed è tornata sopra il punto di partenza… ma <strong>dall\'altra parte del foglio</strong>! Non ha mai scavalcato un bordo: se ne accorge solo perché si ritrova a testa in giù.'
+              : (giri >= 1.98
+                ? '✅ <strong>Due giri</strong>: solo adesso la formica è davvero tornata a casa. Questa è la prova che la faccia è <strong>una sola</strong>: per percorrerla tutta ci vuole il doppio del giro.'
+                : 'Fai camminare la formica e conta i giri: dopo <strong>uno</strong> si ritrova capovolta, dopo <strong>due</strong> torna al punto di partenza.'));
+        }
+        [sy, st].forEach(e => e.addEventListener('input', draw));
+        document.getElementById('mo-walk').addEventListener('click', function () {
+          if (timer) { return; }
+          timer = setInterval(function () { st.value = (+st.value + 4) % 722; draw(); }, 45);
+        });
+        document.getElementById('mo-stop').addEventListener('click', function () { clearInterval(timer); timer = null; });
+        document.getElementById('mo-cut').addEventListener('click', function () { tagliato = !tagliato; draw(); });
+        draw();
+      })();
+
+      /* ===== 9.3 — la bottiglia di Klein ===== */
+      (function () {
+        const host = document.getElementById('kl-svg'); if (!host) return;
+        const sy = document.getElementById('kl-yaw'), sp = document.getElementById('kl-pitch');
+        const out = document.getElementById('kl-out');
+        const N = 44, RK = 2.1;
+        function pt(u, v) {
+          const c = Math.cos(u / 2), s2 = Math.sin(u / 2);
+          const r = RK + c * Math.sin(v) - s2 * Math.sin(2 * v);
+          return [r * Math.cos(u) * 0.42, r * Math.sin(u) * 0.42, (s2 * Math.sin(v) + c * Math.sin(2 * v)) * 0.42];
+        }
+        function draw() {
+          const verts = [], quads = [];
+          for (let i = 0; i <= N; i++) {
+            for (let j = 0; j <= N; j++) { verts.push(pt(i * 2 * Math.PI / N, j * 2 * Math.PI / N)); }
+          }
+          const idx = (i, j) => i * (N + 1) + j;
+          for (let i = 0; i < N; i++) {
+            for (let j = 0; j < N; j++) { quads.push([idx(i, j), idx(i + 1, j), idx(i + 1, j + 1), idx(i, j + 1)]); }
+          }
+          const s = facce3D(verts, quads, {
+            yaw: (+sy.value) * Math.PI / 180, pitch: (+sp.value) * Math.PI / 180,
+            s: 92, ox: 200, oy: 150, cull: false, op: 0.16, sw: 0.35, col: 'var(--magenta)'
+          });
+          host.innerHTML = '<svg viewBox="0 0 400 300" role="img" aria-label="bottiglia di Klein ruotabile">' + s + '</svg>';
+          out.innerHTML = 'Questa è una delle possibili «ombre» tridimensionali della bottiglia di Klein (immersione a otto). ' +
+            'Giralla e cerca il punto in cui la superficie <strong>attraversa sé stessa</strong>: nello spazio a quattro dimensioni quell\'incrocio <strong>non esiste</strong>.';
+        }
+        [sy, sp].forEach(e => e.addEventListener('input', draw));
+        draw();
+      })();
+
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'In un poliedro, i <strong>segmenti</strong> in cui due facce si incontrano si chiamano:',
+        options: ['vertici', 'spigoli', 'diagonali', 'basi', 'apotemi'],
+        correct: 1, explain: 'Le facce sono i poligoni, gli spigoli i segmenti dove due facce si incontrano, i vertici i punti dove si incontrano gli spigoli.' },
+      { type: 'mc', diff: 'medium', text: 'Un poliedro convesso ha $12$ facce e $30$ spigoli. Quanti vertici ha?',
+        options: ['$18$', '$20$', '$24$', '$42$', 'non si può sapere'],
+        correct: 1, explain: 'Formula di Eulero: $F - S + V = 2 \\Rightarrow 12 - 30 + V = 2 \\Rightarrow V = 20$. È il dodecaedro.' },
+      { type: 'mc', diff: 'medium', text: 'Quanti sono i solidi platonici (poliedri regolari)?',
+        options: ['tre', 'quattro', 'cinque', 'sei', 'infiniti'],
+        correct: 2, explain: 'Cinque: tetraedro, cubo, ottaedro, dodecaedro, icosaedro. In ogni vertice la somma degli angoli deve stare sotto $360°$, e questo lascia solo cinque possibilità.' },
+      { type: 'mc', diff: 'medium', text: 'Il <strong>duale</strong> del cubo è:',
+        options: ['il cubo stesso', 'il tetraedro', 'l\'ottaedro', 'il dodecaedro', 'l\'icosaedro'],
+        correct: 2, explain: 'Mettendo un vertice al centro di ognuna delle 6 facce del cubo si ottiene l\'ottaedro, che ha 6 vertici e 8 facce: i numeri si scambiano.' },
+      { type: 'mc', diff: 'medium', text: 'Se raddoppio lo spigolo di un cubo, il suo <strong>volume</strong> diventa:',
+        options: ['il doppio', 'il quadruplo', 'sei volte', 'otto volte', 'uguale'],
+        correct: 3, explain: 'I volumi si moltiplicano per $k^3 = 2^3 = 8$ (le superfici, invece, per $k^2 = 4$).' },
+      { type: 'mc', diff: 'medium', text: 'La superficie di una sfera di raggio $r$ vale:',
+        options: ['$2\\pi r^2$', '$4\\pi r^2$', '$\\pi r^2$', '$\\dfrac{4}{3}\\pi r^3$', '$2\\pi r$'],
+        correct: 1, explain: '$S = 4\\pi r^2$, cioè quattro volte l\'area del cerchio massimo. $\\frac{4}{3}\\pi r^3$ è invece il volume.' },
+      { type: 'mc', diff: 'hard', text: 'A parità di <strong>volume</strong>, quale solido ha la <strong>minima superficie</strong>?',
+        options: ['il cubo', 'il tetraedro regolare', 'la sfera', 'il cilindro', 'sono tutti uguali'],
+        correct: 2, explain: 'È la proprietà isoperimetrica della sfera. Per questo gli animali si appallottolano quando hanno freddo: stesso volume, meno superficie che disperde calore.' },
+      { type: 'mc', diff: 'hard', text: 'Eratostene misurò un angolo di $7{,}2°$ fra Alessandria e Siene. Perché ne concluse che la distanza fra le due città era $1/50$ della circonferenza terrestre?',
+        options: ['perché $7{,}2 \\times 50 = 360$', 'perché $360 : 50 = 7{,}2$… anzi, perché $360 : 7{,}2 = 50$', 'perché le città distavano 5000 stadi', 'perché il Sole è molto lontano', 'per una misura sperimentale'],
+        correct: 1, explain: 'L\'angolo al centro di $7{,}2°$ sta all\'angolo giro come la distanza sta all\'intera circonferenza: $360 : 7{,}2 = 50$.' },
+      { type: 'mc', diff: 'medium', text: 'Perché gli esperti sconsigliarono a Colombo di raggiungere le Indie navigando verso ovest?',
+        options: ['perché credevano che la Terra fosse piatta', 'perché sapevano quanto è grande la Terra e che le provviste non sarebbero bastate', 'perché non conoscevano l\'America', 'perché temevano i mostri marini', 'perché le navi non erano abbastanza veloci'],
+        correct: 1, explain: 'Sapevano benissimo che la Terra è sferica e conoscevano le sue dimensioni: la traversata era troppo lunga per le provviste dell\'epoca. Avevano ragione — Colombo si salvò solo perché in mezzo c\'era l\'America.' },
+      { type: 'open', diff: 'hard', text: 'Che cosa ha di speciale il <strong>nastro di Möbius</strong> rispetto a un normale anello di carta? Descrivi anche un\'applicazione pratica che sfrutta questa proprietà.',
+        keywords: ['una sola faccia', 'una faccia', 'un solo lato', 'un solo bordo', 'formica', 'senza scavalcare', 'nastro trasportat', 'cinghia', 'usura', 'riciclo', 'doppio'], requiredMatches: 2,
+        explain: 'Un anello normale ha due facce e due bordi; il nastro di Möbius, ottenuto con mezza torsione, ha <strong>una sola faccia e un solo bordo</strong>: una formica può raggiungere qualunque punto senza mai scavalcare il bordo, e per tornare al punto di partenza deve fare due giri. Applicazioni: i nastri trasportatori e le cinghie di trasmissione montati «alla Möbius» distribuiscono l\'usura su tutta la superficie e durano circa il doppio; i nastri inchiostrati e i nastri magnetici a ciclo continuo sfruttano la stessa idea; e il simbolo del riciclo è proprio un nastro di Möbius.' }
+    ];
+  </script>
+
+</body>
+
+</html>
