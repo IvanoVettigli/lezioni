@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 9 — La legge di Hooke</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox svg.stretta { max-width: 420px; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .figbox .grid { stroke: var(--border); stroke-width: 1; }
+    .figbox .axis { stroke: var(--muted); stroke-width: 2; }
+    .figbox .dash { stroke: var(--muted); stroke-width: 1.6; stroke-dasharray: 6 5; fill: none; }
+    .figbox .v  { stroke: var(--accent); stroke-width: 3.2; fill: none; stroke-linecap: round; }
+    .figbox .vp { fill: var(--accent); }
+    .figbox .w  { stroke: var(--magenta); stroke-width: 3.2; fill: none; stroke-linecap: round; }
+    .figbox .wp { fill: var(--magenta); }
+    .figbox .spira { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linejoin: round; }
+    .figbox .supporto { fill: color-mix(in srgb, var(--muted) 35%, transparent); stroke: var(--text); stroke-width: 1.5; }
+    .figbox .peso { fill: color-mix(in srgb, var(--magenta) 30%, transparent); stroke: var(--magenta); stroke-width: 2; }
+    .figbox .curva { fill: none; stroke: var(--accent); stroke-width: 3; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+
+    .lab { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(240px, 1.2fr); gap: 1rem; align-items: start; }
+    @media (max-width: 640px) { .lab { grid-template-columns: 1fr; } }
+
+    .inp { width: 7rem; font-size: 1rem; font-family: inherit; padding: 0.3rem 0.45rem; border-radius: 8px;
+           border: 2px solid var(--border); background: var(--surface); color: var(--text); text-align: right; }
+    .inp:focus { outline: none; border-color: var(--accent); }
+    .inp.w6 { width: 5rem; }
+    .qbox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.8rem 0; }
+    .qbox .qt { font-weight: 600; margin-bottom: 0.45rem; }
+    .qrow { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .fb { min-height: 1.4em; margin-top: 0.45rem; font-weight: 600; font-size: 0.95rem; }
+    .fb.ok { color: var(--green); }
+    .fb.no { color: var(--red); }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.9rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.4rem 0.5rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+    .tabf tr.tot td { font-weight: 700; background: color-mix(in srgb, var(--accent) 9%, transparent); }
+    .tabf td.vuoto { color: var(--muted); }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.7rem; text-align: center; }
+    .stat .n { font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
+    .stat .l { font-size: 0.76rem; color: var(--muted); }
+
+    .prop { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .prop-card { background: var(--surface-2); border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px; padding: 0.8rem 0.95rem; }
+    .prop-card h4 { margin: 0 0 0.3rem; color: var(--accent); font-size: 1.03rem; }
+    .prop-card p { margin: 0.35rem 0; font-size: 0.93rem; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Terzo anno · Lezione 9</div>
+    <h1>La legge di Hooke</h1>
+    <p>Un'esperienza di laboratorio dall'inizio alla fine: la molla, la legge, la raccolta dei dati,
+      l'analisi degli errori — e alla fine uno strumento che misura le forze</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Terzo anno</a>
+    <span class="sep">/</span> La legge di Hooke
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove eravamo rimasti.</strong> Alla fine della <a href="8_Movimento.html">lezione 8</a> ci era
+      rimasta in mano una domanda scomoda: sappiamo che cos'è una forza, sappiamo che è un vettore e che si
+      misura in newton — ma <em>come si fa a misurarla</em>? Una forza non si vede: si vedono i suoi effetti.
+      In questa lezione useremo uno di quegli effetti, la deformazione, per costruirci uno strumento. E lo
+      faremo nel modo giusto: con un <strong>esperimento</strong>, condotto passo per passo esattamente come
+      lo faremmo in laboratorio, con tanto di analisi degli errori.
+    </div>
+
+    <!-- 1 — MISURARE ATTRAVERSO GLI EFFETTI -->
+    <section id="sec1">
+      <h2>1. Misurare una forza attraverso i suoi effetti</h2>
+
+      <p>Ricapitoliamo il problema. Una forza produce due effetti: <strong>deforma</strong> i corpi e ne
+        <strong>cambia il movimento</strong>. Per misurarla dobbiamo agganciarci a uno dei due, e la scelta è
+        più facile di quanto sembri.</p>
+
+      <p>L'effetto dinamico, per ora, non ci serve: per risalire dalla accelerazione alla forza servirebbe
+        conoscere la massa e la legge che le lega, che studieremo l'anno prossimo. L'effetto statico invece è
+        perfetto, perché una deformazione è una <strong>lunghezza</strong>, e le lunghezze le sappiamo misurare
+        benissimo — ci basta un righello.</p>
+
+      <p>Serve però un corpo speciale: uno che si deformi in modo <strong>regolare, ripetibile e
+        reversibile</strong>. Non va bene la plastilina, che resta deformata; non va bene un sasso, che non si
+        deforma affatto. Serve qualcosa che si allunghi <em>tanto quanto</em> è grande la forza, e che poi
+        torni com'era. Quel qualcosa è la <strong>molla</strong>.</p>
+
+      <div class="rule">
+        <p class="formula-title">La strategia dell'esperimento</p>
+        <p>Applichiamo alla molla forze di cui conosciamo già il valore (i <strong>pesi</strong> di masse
+          note), misuriamo di quanto si allunga, e vediamo se fra le due grandezze c'è una relazione
+          semplice. Se c'è, potremo invertire il ragionamento: <em>data una forza sconosciuta, la misuro
+          leggendo l'allungamento</em>.</p>
+      </div>
+    </section>
+
+    <!-- 2 — CHE COS'È UNA MOLLA -->
+    <section id="sec2">
+      <h2>2. Che cos'è una molla</h2>
+
+      <p>Una <strong>molla elicoidale</strong> è un filo metallico avvolto a elica. Non è il materiale a
+        renderla speciale — l'acciaio di per sé è rigidissimo — ma la <em>forma</em>: avvolgendolo a spirale,
+        tirare la molla non significa allungare il filo, ma «srotolarlo» un pochino, e questo si fa con forze
+        molto più piccole.</p>
+
+      <p>Quando la molla non è sollecitata ha una sua lunghezza, che chiamiamo <strong>lunghezza a
+        riposo</strong> e indichiamo con <span>$L_0$</span>. È la sua lunghezza «naturale»: quella che ha
+        quando nessuno la tocca.</p>
+
+      <p>Se la tiriamo, si allunga; se la comprimiamo, si accorcia. In tutti e due i casi la molla
+        <strong>reagisce</strong>, cioè esercita una forza che tende a riportarla alla lunghezza di partenza.
+        Questa forza si chiama <strong>forza elastica</strong>, o forza di richiamo — e il nome dice già tutto:
+        <em>richiama</em> verso la posizione di equilibrio.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Deformazione elastica</h4>
+          <p>Tolta la forza, il corpo torna esattamente com'era. È il caso della molla entro certi limiti, di
+            un elastico, di una gomma. È il comportamento che ci serve.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Deformazione plastica</h4>
+          <p>Tolta la forza, il corpo resta deformato. È il caso della plastilina, di una lattina schiacciata
+            — e purtroppo anche di una molla tirata troppo. Ne riparliamo alla sezione 10.</p>
+        </div>
+      </div>
+
+      <div class="curiosita">
+        <strong>Chi era Hooke.</strong> Robert Hooke (1635-1703) fu uno degli scienziati più versatili del
+        Seicento: microscopista (fu lui a coniare la parola «cellula», guardando una fetta di sughero),
+        astronomo, architetto, e curatore degli esperimenti della Royal Society — un mestiere che consisteva
+        nel presentare ogni settimana un esperimento nuovo davanti ai soci. Pubblicò la sua legge nel 1678, ma
+        l'aveva scoperta due anni prima e — per non farsela rubare — l'aveva pubblicata come
+        <strong>anagramma</strong>: <em>ceiiinosssttuv</em>. Sciolto, era <em>ut tensio sic vis</em>: «come
+        l'estensione, così la forza». Un modo bizzarro di rivendicare una priorità, ma all'epoca si usava.
+      </div>
+    </section>
+
+    <!-- 3 — LA LEGGE DI HOOKE -->
+    <section id="sec3">
+      <h2>3. La legge di Hooke</h2>
+
+      <p>Quello che Hooke scoprì è che la forza elastica è <strong>proporzionale</strong> alla deformazione,
+        e diretta in verso opposto:</p>
+
+      <div class="rule">
+        <p class="formula-title">Legge di Hooke</p>
+        <p style="text-align:center; font-size:1.35rem;">$$F = -k\,\Delta x$$</p>
+        <p>dove:</p>
+        <ul style="margin:0.3rem 0 0;">
+          <li><span>$F$</span> è la <strong>forza elastica</strong>, cioè quella esercitata dalla molla,
+            misurata in newton (N);</li>
+          <li><span>$k$</span> è la <strong>costante elastica</strong> della molla, in newton al metro (N/m);</li>
+          <li><span>$\Delta x = L - L_0$</span> è l'<strong>allungamento</strong> rispetto alla lunghezza a
+            riposo, in metri (m);</li>
+          <li>il <strong>segno meno</strong> indica che la forza è di richiamo, cioè opposta allo
+            spostamento.</li>
+        </ul>
+      </div>
+
+      <p>Quel segno meno merita una spiegazione, perché è la parte della formula che si dimentica più spesso e
+        che nasconde tutta la fisica. Se allungo la molla verso il basso
+        (<span>$\Delta x \gt 0$</span>), la molla tira verso l'alto (<span>$F \lt 0$</span>). Se la comprimo
+        (<span>$\Delta x \lt 0$</span>), la molla spinge verso il basso (<span>$F \gt 0$</span>).
+        <strong>Qualunque cosa io faccia, lei fa il contrario</strong>: è questo che il segno meno esprime, e
+        siccome forza e spostamento sono vettori diretti lungo la stessa retta, quel segno è tutto ciò che
+        serve.</p>
+
+      <h3>3.1 La costante elastica</h3>
+
+      <p>La <span>$k$</span> è la carta d'identità della molla: dice quanto è <strong>rigida</strong>.</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.05rem;">$$k = \frac{F}{\Delta x} \qquad [k] = \frac{\text{N}}{\text{m}}$$</p>
+        <p class="formula-note">Si legge: <em>quanti newton servono per allungare la molla di un metro</em>.
+          Una molla con <span>$k = 500$</span> N/m è rigida (per allungarla di un centimetro servono 5 N);
+          una con <span>$k = 5$</span> N/m è morbida (bastano 5 centesimi di newton).</p>
+      </div>
+
+      <table class="tabf">
+        <thead><tr><th>Oggetto</th><th>$k$ indicativa</th><th>Commento</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">molla da laboratorio</td><td>$10$ – $50$ N/m</td><td class="l">si allunga di parecchi centimetri con pochi pesetti</td></tr>
+          <tr><td class="lab">molla di una penna a scatto</td><td>$\approx 200$ N/m</td><td class="l">serve un dito deciso per comprimerla</td></tr>
+          <tr><td class="lab">ammortizzatore di un'automobile</td><td>$\approx 30\,000$ N/m</td><td class="l">deve reggere una tonnellata senza schiacciarsi</td></tr>
+          <tr><td class="lab">corda da arrampicata</td><td>$\approx 20\,000$ N/m</td><td class="l">si allunga apposta, per attutire la caduta</td></tr>
+        </tbody>
+      </table>
+
+      <p>Provate voi con il simulatore: cambiate la costante elastica e la forza applicata, e guardate come si
+        comporta la molla.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="ml-k">costante elastica k = <span id="ml-kv">24</span> N/m</label>
+          <input type="range" id="ml-k" min="8" max="60" step="1" value="24">
+          <label for="ml-f">forza applicata = <span id="ml-fv">2,0</span> N</label>
+          <input type="range" id="ml-f" min="-1.5" max="4" step="0.1" value="2">
+        </div>
+        <svg viewBox="0 0 420 380" id="ml-svg" class="stretta" role="img" aria-label="molla che si allunga sotto una forza"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="ml-dx">8,3</div><div class="l">allungamento $\Delta x$ (cm)</div></div>
+          <div class="stat"><div class="n" id="ml-l">20,3</div><div class="l">lunghezza L (cm)</div></div>
+          <div class="stat"><div class="n" id="ml-fe">−2,0</div><div class="l">forza elastica (N)</div></div>
+        </div>
+        <p class="cap">La lunghezza a riposo è $L_0 = 12$ cm. Con forza negativa la molla viene compressa: notate che la forza elastica cambia verso.</p>
+      </div>
+    </section>
+
+    <!-- 4 — ALLUNGAMENTO NON È LUNGHEZZA -->
+    <section id="sec4">
+      <h2>4. Attenzione: allungamento non è lunghezza</h2>
+
+      <p>È l'errore numero uno di questa esperienza, e costa più punti di qualunque errore di calcolo. Quindi
+        lo mettiamo in evidenza prima ancora di cominciare a misurare.</p>
+
+      <div class="warnbox">
+        <span>$\Delta x$</span> <strong>non</strong> è la lunghezza della molla con il peso appeso. È la
+        <em>differenza</em> fra la lunghezza con il peso (<span>$L$</span>) e la lunghezza a riposo
+        (<span>$L_0$</span>):
+        <p style="text-align:center; font-size:1.1rem; margin:0.5rem 0 0;">$$\Delta x = L - L_0$$</p>
+        <p style="margin:0.5rem 0 0;">Ne segue una regola pratica: <strong>misurate
+          <span>$L_0$</span> per prima cosa</strong>, prima di appendere qualunque peso. Se ve la dimenticate,
+          l'esperimento è da rifare da capo.</p>
+      </div>
+
+      <div class="figbox">
+        <svg viewBox="0 0 660 400" role="img" aria-label="molla a riposo e molla con una massa appesa">
+          <!-- supporto sinistro -->
+          <rect x="120" y="30" width="150" height="16" class="supporto"/>
+          <line x1="120" y1="46" x2="270" y2="46" stroke="var(--text)" stroke-width="2"/>
+          <path d="M 195 46 L 195 62 L 213 70 L 177 84 L 213 98 L 177 112 L 213 126 L 177 140 L 213 154 L 177 168 L 213 182 L 195 190 L 195 206" class="spira"/>
+          <line x1="150" y1="46" x2="150" y2="206" stroke="var(--gold)" stroke-width="2"/>
+          <line x1="144" y1="46" x2="156" y2="46" stroke="var(--gold)" stroke-width="2"/>
+          <line x1="144" y1="206" x2="156" y2="206" stroke="var(--gold)" stroke-width="2"/>
+          <text x="140" y="130" text-anchor="end" class="lbl" style="fill:var(--gold);">L₀</text>
+          <text x="195" y="240" text-anchor="middle" class="lbl">a riposo</text>
+
+          <!-- supporto destro -->
+          <rect x="390" y="30" width="150" height="16" class="supporto"/>
+          <line x1="390" y1="46" x2="540" y2="46" stroke="var(--text)" stroke-width="2"/>
+          <path d="M 465 46 L 465 66 L 483 78 L 447 96 L 483 114 L 447 132 L 483 150 L 447 168 L 483 186 L 447 204 L 483 222 L 465 234 L 465 254" class="spira"/>
+          <rect x="440" y="254" width="50" height="38" rx="4" class="peso"/>
+          <text x="465" y="278" text-anchor="middle" class="lbl">m</text>
+          <line x1="560" y1="46" x2="560" y2="254" stroke="var(--gold)" stroke-width="2"/>
+          <line x1="554" y1="46" x2="566" y2="46" stroke="var(--gold)" stroke-width="2"/>
+          <line x1="554" y1="254" x2="566" y2="254" stroke="var(--gold)" stroke-width="2"/>
+          <text x="572" y="154" class="lbl" style="fill:var(--gold);">L</text>
+
+          <!-- il Δx fra i due livelli -->
+          <line x1="195" y1="206" x2="350" y2="206" class="dash"/>
+          <line x1="465" y1="254" x2="350" y2="254" class="dash"/>
+          <line x1="350" y1="206" x2="350" y2="254" stroke="var(--magenta)" stroke-width="3"/>
+          <line x1="344" y1="206" x2="356" y2="206" stroke="var(--magenta)" stroke-width="3"/>
+          <line x1="344" y1="254" x2="356" y2="254" stroke="var(--magenta)" stroke-width="3"/>
+          <text x="340" y="234" text-anchor="end" class="em">Δx</text>
+          <text x="465" y="320" text-anchor="middle" class="lbl">con la massa m appesa</text>
+          <text x="330" y="360" text-anchor="middle" class="lbl-s">L₀ e L si misurano dal supporto; Δx è la loro differenza, cioè solo il pezzo in più.</text>
+        </svg>
+        <p class="cap">Figura 1 — la molla a riposo e con una massa appesa. Δx è solo la differenza fra le due lunghezze.</p>
+      </div>
+    </section>
+
+    <!-- 5 — PERCHÉ DEVE VENIRE UNA RETTA -->
+    <section id="sec5">
+      <h2>5. Perché il grafico deve venire una retta</h2>
+
+      <p>Nel nostro esperimento applicheremo alla molla forze dirette verso il basso e misureremo allungamenti
+        verso il basso. Poiché forza e allungamento sono entrambi lungo la stessa retta, e a noi interessa solo
+        <em>quanto</em> valgono, possiamo lavorare con i moduli e lasciar perdere il segno meno:</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.2rem;">$$F = k\,\Delta x$$</p>
+        <p class="formula-note">Questa è la legge di Hooke «in modulo», quella che useremo per i conti. Il
+          segno meno resta vero e importante, ma qui non ci servirebbe che a confondere i calcoli.</p>
+      </div>
+
+      <p>Scritta così, la legge dice una cosa molto precisa: fra <span>$F$</span> e <span>$\Delta x$</span> c'è
+        una <strong>proporzionalità diretta</strong>. Raddoppiando l'allungamento raddoppia la forza,
+        triplicandolo triplica. E la proporzionalità diretta, in matematica, ha un grafico e uno solo.</p>
+
+      <table class="tabf">
+        <thead><tr><th>Retta nel piano cartesiano</th><th>Legge di Hooke</th></tr></thead>
+        <tbody>
+          <tr><td>$y = m\,x$</td><td>$F = k\,\Delta x$</td></tr>
+          <tr><td class="l">$y$ → variabile dipendente</td><td class="l">$F$ → forza (N), sull'asse verticale</td></tr>
+          <tr><td class="l">$x$ → variabile indipendente</td><td class="l">$\Delta x$ → allungamento (m), sull'asse orizzontale</td></tr>
+          <tr><td class="l">$m$ → coefficiente angolare</td><td class="l">$k$ → costante elastica (N/m)</td></tr>
+          <tr><td class="l">retta passante per l'origine</td><td class="l">se $\Delta x = 0$ allora $F = 0$: senza allungamento, nessuna forza</td></tr>
+        </tbody>
+      </table>
+
+      <div class="rule">
+        Se la legge di Hooke vale, riportando <span>$F$</span> in funzione di <span>$\Delta x$</span> si
+        ottiene una <strong>retta passante per l'origine</strong>, il cui <strong>coefficiente angolare è
+        proprio <span>$k$</span></strong>.
+      </div>
+
+      <p>Ed è questa la vera potenza del metodo grafico: non stiamo solo disegnando i dati per farli vedere.
+        Stiamo <strong>mettendo alla prova la legge</strong>. Se i punti si dispongono lungo una retta per
+        l'origine, la legge è confermata; se si incurvano, o se la retta non passa per l'origine, qualcosa non
+        va — o nella legge, o nel nostro modo di misurare. Un grafico è un giudice.</p>
+
+      <div class="curiosita">
+        <strong>Rigida o morbida, si vede a colpo d'occhio.</strong> Una molla rigida (grande
+        <span>$k$</span>) dà una retta <em>ripida</em>: basta poco allungamento per forze grandi. Una molla
+        morbida dà una retta poco inclinata. Nel simulatore della sezione 11 potete confrontare due molle
+        diverse sullo stesso grafico.
+      </div>
+    </section>
+
+    <!-- 6 — FORZA PESO E MASSA -->
+    <section id="sec6">
+      <h2>6. Un dettaglio che vale metà dell'esperimento: peso ≠ massa</h2>
+
+      <p>Come facciamo ad applicare alla molla forze <em>note</em>? Il trucco è appendere masse note e
+        lasciare che sia la <strong>gravità</strong> a fare la forza per noi. Ma attenzione a non confondere
+        due grandezze diverse.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>La massa $m$</h4>
+          <p>Misura la quantità di materia di un corpo. È una grandezza <strong>scalare</strong>,
+            <strong>fondamentale</strong>, si misura in <strong>kilogrammi</strong> e non cambia mai: sulla
+            Terra, sulla Luna o nello spazio è la stessa.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Il peso $P$</h4>
+          <p>È la <strong>forza</strong> con cui la Terra attira quel corpo. È una grandezza
+            <strong>vettoriale</strong>, <strong>derivata</strong>, si misura in <strong>newton</strong> e
+            cambia da luogo a luogo: sulla Luna è sei volte minore.</p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <p class="formula-title">Il legame fra le due</p>
+        <p style="text-align:center; font-size:1.2rem;">$$P = m\,g \qquad\qquad g = 9{,}81\ \text{m/s}^2$$</p>
+        <p class="formula-note">dove <span>$m$</span> va messa in <strong>kilogrammi</strong> e
+          <span>$g$</span> è l'accelerazione di gravità — la stessa che abbiamo incontrato nella lezione
+          scorsa parlando dei corpi che cadono. Non è un caso che sia la stessa: è il primo indizio di un
+          collegamento profondo, che scoprirete l'anno prossimo.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>Le due trappole del laboratorio.</strong> Primo: i pesetti sono etichettati in
+        <strong>grammi</strong>, e vanno convertiti in kilogrammi <em>prima</em> di moltiplicare per
+        <span>$g$</span>. Esempio: <span>$m = 100$</span> g <span>$= 0{,}100$</span> kg, quindi
+        <span>$P = 0{,}100 \cdot 9{,}81 = 0{,}981$</span> N. Secondo: nella tabella e nel grafico va sempre
+        la <strong>forza in newton</strong>, non la massa in grammi. Se mettete i grammi, il coefficiente
+        angolare non sarà <span>$k$</span> ma un numero senza significato.
+      </div>
+
+      <div class="qbox" id="pm-box">
+        <div class="qt" id="pm-testo">—</div>
+        <div class="qrow">
+          <span>$P = $</span>
+          <input class="inp w6" id="pm-val" inputmode="decimal" aria-label="peso in newton">
+          <span>N</span>
+          <button class="btn" id="pm-ver">Verifica</button>
+          <button class="btn btn-secondary" id="pm-new">Un'altra massa</button>
+        </div>
+        <div class="fb" id="pm-fb"></div>
+      </div>
+    </section>
+
+    <!-- 7 — L'ESPERIMENTO: MONTAGGIO E L0 -->
+    <section id="sec7">
+      <h2>7. L'esperimento, passo A: la lunghezza a riposo</h2>
+
+      <p>Basta teoria: andiamo in laboratorio. Da qui in avanti seguiremo esattamente la scheda
+        dell'esperienza, come se aveste la molla davanti.</p>
+
+      <div class="rule">
+        <p class="formula-title">Materiale occorrente</p>
+        <ul style="margin:0.3rem 0 0;">
+          <li>una <strong>molla elicoidale</strong> appesa a un supporto verticale;</li>
+          <li>un set di <strong>pesetti di massa nota</strong> (almeno 6-8 valori);</li>
+          <li>un <strong>metro</strong> o una squadretta per misurare le lunghezze;</li>
+          <li>la scheda, una matita e una calcolatrice.</li>
+        </ul>
+        <p class="formula-note"><strong>Montaggio.</strong> Appendete la molla al supporto e lasciatela a
+          riposo, senza pesi. Appendete poi i pesetti uno alla volta e <em>aspettate che la molla sia
+          ferma</em> prima di misurare. Non superate il carico massimo indicato dal docente.</p>
+      </div>
+
+      <p>La prima misura è quella della lunghezza a riposo <span>$L_0$</span>, e va fatta <strong>tre
+        volte</strong>. Perché tre? Perché una misura sola non dice nulla sulla propria incertezza: ripetendo,
+        gli errori casuali si manifestano e possiamo stimarli, come abbiamo imparato nella
+        <a href="2_Statistica_descrittiva.html">lezione 2</a>.</p>
+
+      <p>Premete il pulsante per misurare. Ogni volta leggerete un valore leggermente diverso — non perché la
+        molla cambi, ma perché l'occhio, il righello e il parallasse fanno il loro mestiere.</p>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn" id="l0-mis">📏 Esegui una misura</button>
+          <button class="btn btn-secondary" id="l0-reset">↺ Ricomincia</button>
+        </div>
+        <table class="tabf" id="l0-tab">
+          <thead><tr><th>1ª misura</th><th>2ª misura</th><th>3ª misura</th><th>media</th><th>semidispersione</th></tr></thead>
+          <tbody><tr>
+            <td class="vuoto" id="l0-1">—</td><td class="vuoto" id="l0-2">—</td><td class="vuoto" id="l0-3">—</td>
+            <td class="vuoto" id="l0-m">—</td><td class="vuoto" id="l0-s">—</td>
+          </tr></tbody>
+        </table>
+        <div class="eq-out" id="l0-out">Servono tre misure indipendenti.</div>
+      </div>
+
+      <div class="rule">
+        <p class="formula-title">Il risultato del passo A</p>
+        <p style="text-align:center; font-size:1.15rem;">$$L_0 = (0{,}120 \pm 0{,}001)\ \text{m}$$</p>
+        <p class="formula-note">Cioè 12,0 cm con un'incertezza di 1 mm, che è la sensibilità del righello.
+          Da qui in avanti useremo <span>$L_0 = 0{,}120$</span> m per tutti i calcoli.</p>
+      </div>
+    </section>
+
+    <!-- 8 — RACCOLTA DATI -->
+    <section id="sec8">
+      <h2>8. L'esperimento, passo B: raccolta dei dati</h2>
+
+      <p>Adesso appendiamo i pesetti uno alla volta. Per ognuno misuriamo la nuova lunghezza
+        <span>$L$</span>, poi calcoliamo tre cose: l'allungamento <span>$\Delta x = L - L_0$</span>, la forza
+        peso <span>$P = m\,g$</span> e il rapporto <span>$k_i = P / \Delta x$</span>.</p>
+
+      <p>Nel banco simulato qui sotto, ogni volta che aggiungete un pesetto la molla si allunga e potete
+        leggere la nuova lunghezza sul righello. La tabella si riempie da sola con i valori letti.</p>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn" id="rd-add">➕ Aggiungi un pesetto da 50 g</button>
+          <button class="btn btn-secondary" id="rd-del">➖ Togli l'ultimo</button>
+          <button class="btn btn-secondary" id="rd-all">⏩ Riempi tutta la tabella</button>
+          <button class="btn btn-secondary" id="rd-reset">↺ Azzera</button>
+        </div>
+        <div class="lab">
+          <svg viewBox="0 0 300 420" id="rd-svg" role="img" aria-label="banco di laboratorio con la molla e i pesetti"></svg>
+          <div>
+            <table class="tabf" id="rd-tab">
+              <thead>
+                <tr><th>n°</th><th>$m$ (kg)</th><th>$P = mg$ (N)</th><th>$L$ (m)</th><th>$\Delta x$ (m)</th><th>$k_i$ (N/m)</th></tr>
+              </thead>
+              <tbody id="rd-body"></tbody>
+            </table>
+            <div class="eq-out" id="rd-out">Appendete il primo pesetto.</div>
+          </div>
+        </div>
+        <p class="cap">Le lunghezze sono lette al millimetro, come si farebbe davvero: è per questo che i valori di $k_i$ non vengono tutti identici.</p>
+      </div>
+
+      <p>Ecco la tabella completa, con i valori che avrete ottenuto:</p>
+
+      <table class="tabf">
+        <thead>
+          <tr><th>n°</th><th>$m$ (g)</th><th>$m$ (kg)</th><th>$P = mg$ (N)</th><th>$L$ (m)</th><th>$\Delta x = L - L_0$ (m)</th><th>$k_i = P/\Delta x$ (N/m)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>50</td><td>0,050</td><td>0,491</td><td>0,140</td><td>0,020</td><td>24,55</td></tr>
+          <tr><td>2</td><td>100</td><td>0,100</td><td>0,981</td><td>0,161</td><td>0,041</td><td>23,93</td></tr>
+          <tr><td>3</td><td>150</td><td>0,150</td><td>1,472</td><td>0,181</td><td>0,061</td><td>24,13</td></tr>
+          <tr><td>4</td><td>200</td><td>0,200</td><td>1,962</td><td>0,202</td><td>0,082</td><td>23,93</td></tr>
+          <tr><td>5</td><td>250</td><td>0,250</td><td>2,453</td><td>0,222</td><td>0,102</td><td>24,05</td></tr>
+          <tr><td>6</td><td>300</td><td>0,300</td><td>2,943</td><td>0,243</td><td>0,123</td><td>23,93</td></tr>
+          <tr><td>7</td><td>350</td><td>0,350</td><td>3,433</td><td>0,263</td><td>0,143</td><td>24,01</td></tr>
+          <tr><td>8</td><td>400</td><td>0,400</td><td>3,924</td><td>0,284</td><td>0,164</td><td>23,93</td></tr>
+        </tbody>
+      </table>
+
+      <div class="curiosita">
+        <strong>Guardate la sesta colonna, prima di fare qualunque conto.</strong> Gli allungamenti sono
+        0,020 · 0,041 · 0,061 · 0,082 · 0,102 · 0,123 · 0,143 · 0,164. Ogni volta che aggiungiamo 50 g,
+        l'allungamento cresce di circa <strong>due centimetri</strong>, sempre gli stessi. Questa è la legge
+        di Hooke che si manifesta: <em>a incrementi uguali di forza corrispondono incrementi uguali di
+        allungamento</em>. Non serve il grafico per intuirlo — ma serve il grafico per dimostrarlo.
+      </div>
+    </section>
+
+    <!-- 9 — ANALISI DEI DATI -->
+    <section id="sec9">
+      <h2>9. L'esperimento, passo C: analisi dei dati</h2>
+
+      <p>Abbiamo otto stime della stessa grandezza, tutte diverse fra loro. È la situazione tipica del
+        laboratorio, e sappiamo già come si affronta: si calcola il <strong>valore medio</strong> e si stima
+        l'<strong>incertezza</strong>.</p>
+
+      <h3>9.1 Il valore medio</h3>
+
+      <p style="text-align:center;">$$\bar{k} = \frac{k_1 + k_2 + \cdots + k_8}{8} = \frac{192{,}46}{8} = 24{,}06\ \text{N/m}$$</p>
+
+      <h3>9.2 La semidispersione</h3>
+
+      <p>Il modo più rapido di stimare l'incertezza: metà della differenza fra il valore massimo e quello
+        minimo.</p>
+
+      <p style="text-align:center;">$$\Delta k = \frac{k_{\max} - k_{\min}}{2} = \frac{24{,}55 - 23{,}93}{2} = 0{,}31\ \text{N/m}$$</p>
+
+      <h3>9.3 Lo scarto quadratico medio</h3>
+
+      <p>La stima più raffinata, quella che tiene conto di <em>tutti</em> i valori e non solo dei due estremi.
+        Si costruisce la tabella degli scarti:</p>
+
+      <table class="tabf">
+        <thead><tr><th>n°</th><th>$k_i$ (N/m)</th><th>$d_i = k_i - \bar{k}$</th><th>$d_i^{\,2}$</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>24,55</td><td>+0,49</td><td>0,2401</td></tr>
+          <tr><td>2</td><td>23,93</td><td>−0,13</td><td>0,0169</td></tr>
+          <tr><td>3</td><td>24,13</td><td>+0,07</td><td>0,0049</td></tr>
+          <tr><td>4</td><td>23,93</td><td>−0,13</td><td>0,0169</td></tr>
+          <tr><td>5</td><td>24,05</td><td>−0,01</td><td>0,0001</td></tr>
+          <tr><td>6</td><td>23,93</td><td>−0,13</td><td>0,0169</td></tr>
+          <tr><td>7</td><td>24,01</td><td>−0,05</td><td>0,0025</td></tr>
+          <tr><td>8</td><td>23,93</td><td>−0,13</td><td>0,0169</td></tr>
+          <tr class="tot"><td colspan="2">somma</td><td>$-0{,}02 \approx 0$</td><td>0,3152</td></tr>
+        </tbody>
+      </table>
+
+      <p>Notate la terza colonna: la somma degli scarti viene <strong>zero</strong> (qui
+        <span>$-0{,}02$</span>, e la differenza è solo colpa degli arrotondamenti a due decimali). Non è un
+        caso: è la proprietà che <em>definisce</em> la media. Ed è anche il motivo per cui gli scarti si
+        elevano al quadrato prima di sommarli: altrimenti si annullerebbero sempre a vicenda e non
+        misurerebbero nulla.</p>
+
+      <p style="text-align:center;">$$\sigma_k = \sqrt{\frac{\sum d_i^2}{n}} = \sqrt{\frac{0{,}3152}{8}} = \sqrt{0{,}0394} = 0{,}20\ \text{N/m}$$</p>
+
+      <h3>9.4 Il risultato del metodo dei rapporti</h3>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.25rem;">$$k = (24{,}06 \pm 0{,}31)\ \text{N/m}$$</p>
+        <p class="formula-note">Abbiamo scelto la semidispersione, che è la stima più prudente (più grande
+          dello scarto quadratico medio: 0,31 contro 0,20). In laboratorio si preferisce sbagliare per
+          eccesso quando si dichiara un'incertezza.</p>
+      </div>
+
+      <p>E il giudizio sulla qualità della misura si dà con l'<strong>errore relativo</strong>:</p>
+
+      <p style="text-align:center;">$$\varepsilon_k = \frac{\Delta k}{\bar{k}} = \frac{0{,}31}{24{,}06} = 0{,}0129 \qquad\qquad \varepsilon_k\% = 1{,}3\%$$</p>
+
+      <p>Un errore dell'1,3% su una misura fatta con un righello da un millimetro è un ottimo risultato. E si
+        capisce anche <em>perché</em> è così buono: le incertezze sulle singole lunghezze sono fisse (1 mm),
+        ma gli allungamenti crescono, quindi il loro peso relativo diminuisce. Ecco perché conviene arrivare
+        fino a 400 g invece di fermarsi a 100.</p>
+
+      <div class="warnbox">
+        <strong>Il primo valore è quello che rovina tutto.</strong> Guardate la tabella degli scarti:
+        <span>$k_1 = 24{,}55$</span> ha uno scarto di <span>$+0{,}49$</span>, quattro volte più grande di
+        tutti gli altri messi insieme. Non è un errore di calcolo: con 50 g la molla si allunga di soli 2 cm,
+        e 1 mm di incertezza su 2 cm è il <strong>5%</strong>, contro lo 0,6% che si ha su 16 cm. È la lezione
+        pratica dell'esperienza: <em>quando si misura un rapporto, i punti con denominatore piccolo sono i
+        meno affidabili</em>.
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn active" id="an-tutti">Tutti gli 8 valori</button>
+          <button class="btn" id="an-senza">Senza il primo punto</button>
+        </div>
+        <svg viewBox="0 0 660 300" id="an-svg" role="img" aria-label="i valori di k con la loro media"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="an-media">24,06</div><div class="l">media (N/m)</div></div>
+          <div class="stat"><div class="n" id="an-semi">0,31</div><div class="l">semidispersione (N/m)</div></div>
+          <div class="stat"><div class="n" id="an-sq">0,20</div><div class="l">scarto quadratico medio (N/m)</div></div>
+          <div class="stat"><div class="n" id="an-rel">1,3%</div><div class="l">errore relativo</div></div>
+        </div>
+        <p class="cap">Togliendo il primo punto, quello meno affidabile, l'incertezza si riduce di parecchio — ma buttare via un dato va sempre dichiarato e motivato.</p>
+      </div>
+    </section>
+
+    <!-- 10 — IL METODO GRAFICO -->
+    <section id="sec10">
+      <h2>10. Il metodo grafico: la legge sotto processo</h2>
+
+      <p>Il metodo dei rapporti ci ha dato un numero, ma non ha ancora <em>verificato</em> nulla: abbiamo
+        calcolato <span>$k_i = P/\Delta x$</span> assumendo che la legge fosse vera. Il grafico invece la mette
+        alla prova.</p>
+
+      <div class="rule">
+        <p class="formula-title">Come si costruisce il grafico</p>
+        <ol style="margin:0.3rem 0 0;">
+          <li>sull'asse <span>$x$</span> l'allungamento <span>$\Delta x$</span> (m), sull'asse
+            <span>$y$</span> la forza peso <span>$P$</span> (N);</li>
+          <li>si sceglie una scala adatta, dividendo l'estensione dei dati per i quadretti disponibili;</li>
+          <li>si etichettano gli assi <strong>con grandezza e unità di misura</strong>;</li>
+          <li>si segnano i punti sperimentali con una crocetta o un pallino;</li>
+          <li>si traccia con il righello la retta che <strong>meglio interpola</strong> i punti —
+            <em>non</em> si uniscono i punti uno per uno!</li>
+        </ol>
+      </div>
+
+      <div class="warnbox">
+        <strong>L'errore da non fare mai.</strong> Unire i punti sperimentali con una spezzata è sbagliato,
+        perché darebbe l'impressione che fra un punto e l'altro la grandezza faccia quei bruschi cambi di
+        direzione. I punti sono <em>misure</em>, ognuna con la sua incertezza; la legge è la <em>retta</em> che
+        ci passa in mezzo. Il compito del grafico è mostrare che i punti sono compatibili con una retta, non
+        seguirli uno per uno.
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn active" id="gr-p">Solo i punti</button>
+          <button class="btn" id="gr-r">Con la retta interpolante</button>
+          <button class="btn" id="gr-mm">Rette di massima e minima pendenza</button>
+          <button class="btn" id="gr-sp">L'errore: unire i punti</button>
+        </div>
+        <svg viewBox="0 0 660 420" id="gr-svg" role="img" aria-label="grafico della forza in funzione dell'allungamento"></svg>
+        <div class="eq-out" id="gr-out"></div>
+      </div>
+
+      <p>I punti si dispongono lungo una retta e la retta passa per l'origine: <strong>la legge di Hooke è
+        verificata</strong> per questa molla, nell'intervallo di forze che abbiamo esplorato. Questa frase, con
+        tutte le sue precisazioni, è la conclusione dell'esperimento.</p>
+
+      <h3>10.1 Ricavare k dal coefficiente angolare</h3>
+
+      <p>Adesso misuriamo la pendenza. Si scelgono <strong>due punti sulla retta</strong> — non
+        necessariamente due punti sperimentali, anzi meglio di no — ben distanziati fra loro, e si calcola:</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.15rem;">$$k = \frac{P_2 - P_1}{\Delta x_2 - \Delta x_1}$$</p>
+      </div>
+
+      <p>Prendendo il secondo e l'ottavo punto:</p>
+
+      <p style="text-align:center;">$$k_{\text{graf}} = \frac{3{,}924 - 0{,}981}{0{,}164 - 0{,}041} = \frac{2{,}943}{0{,}123} = 23{,}93\ \text{N/m}$$</p>
+
+      <p>Perché scegliere punti lontani? Perché così l'incertezza sulle letture pesa di meno: dividendo per un
+        <span>$\Delta x$</span> grande, un errore fisso conta percentualmente meno. È lo stesso ragionamento
+        della sezione 9.</p>
+
+      <h3>10.2 L'incertezza con le rette di massima e minima pendenza</h3>
+
+      <p>E l'incertezza sul metodo grafico? Si traccia la retta <strong>più ripida</strong> e quella
+        <strong>meno ripida</strong> che passano ancora ragionevolmente fra i punti (premete il terzo pulsante
+        del simulatore per vederle). La semidifferenza fra le due pendenze è l'incertezza:</p>
+
+      <p style="text-align:center;">$$\Delta k_{\text{graf}} = \frac{k_{\max} - k_{\min}}{2} = \frac{24{,}55 - 23{,}93}{2} = 0{,}31\ \text{N/m}$$</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.25rem;">$$k_{\text{graf}} = (23{,}93 \pm 0{,}31)\ \text{N/m}$$</p>
+      </div>
+    </section>
+
+    <!-- 11 — CONFRONTO -->
+    <section id="sec11">
+      <h2>11. Confronto fra i due metodi</h2>
+
+      <p>Abbiamo misurato la stessa grandezza in due modi indipendenti. Adesso arriva la domanda che chiude
+        ogni esperienza di laboratorio: <strong>i due risultati sono compatibili?</strong></p>
+
+      <p>Il criterio lo conosciamo dalla <a href="2_Statistica_descrittiva.html">lezione 2</a>: due misure sono
+        compatibili se i loro intervalli di incertezza si sovrappongono, cioè se</p>
+
+      <p style="text-align:center;">$$|k_1 - k_2| \le \Delta k_1 + \Delta k_2$$</p>
+
+      <table class="tabf">
+        <thead><tr><th>Metodo</th><th>Risultato</th><th>Errore relativo</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">media dei rapporti</td><td>$(24{,}06 \pm 0{,}31)$ N/m</td><td>$1{,}3\%$</td></tr>
+          <tr><td class="lab">coefficiente angolare</td><td>$(23{,}93 \pm 0{,}31)$ N/m</td><td>$1{,}3\%$</td></tr>
+          <tr class="tot"><td>differenza</td><td>$0{,}13$ N/m</td><td>somma delle incertezze: $0{,}62$ N/m</td></tr>
+        </tbody>
+      </table>
+
+      <p>Poiché <span>$0{,}13 \le 0{,}62$</span>, le due misure sono <strong>compatibili</strong>: gli
+        intervalli <span>$[23{,}75; 24{,}37]$</span> e <span>$[23{,}62; 24{,}24]$</span> si sovrappongono
+        ampiamente. Le due strade portano allo stesso risultato, ed è esattamente la conferma che cercavamo —
+        se avessero dato numeri incompatibili, ci sarebbe stato un errore sistematico da scovare.</p>
+
+      <div class="curiosita">
+        <strong>Quale dei due metodi è meglio?</strong> Il metodo grafico, quasi sempre, per due ragioni.
+        Primo: <em>verifica</em> la legge invece di darla per buona, perché un andamento curvo si vedrebbe
+        subito. Secondo: usa tutti i punti insieme e attenua gli errori casuali, mentre la media dei rapporti
+        tratta ogni punto come se valesse quanto gli altri — e abbiamo visto che non è vero, perché il primo
+        punto è molto meno affidabile. Qui i due risultati coincidono perché i dati sono buoni; su dati più
+        sporchi, la differenza si vedrebbe.
+      </div>
+
+      <h3>11.1 Le conclusioni dell'esperienza</h3>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>C1 — La legge è verificata?</h4>
+          <p><strong>Sì.</strong> I punti sperimentali si dispongono lungo una retta passante per l'origine
+            entro le incertezze di misura, come previsto dalla legge di Hooke. La costante elastica della
+            molla vale <span>$(24{,}0 \pm 0{,}3)$</span> N/m.</p>
+        </div>
+        <div class="prop-card">
+          <h4>C2 — Se qualcosa non torna?</h4>
+          <p>Retta che non passa per l'origine: probabile errore sistematico su
+            <span>$L_0$</span>, oppure molla già stressata. Punti che si incurvano verso il basso alle forze
+            alte: si è superato il limite di elasticità (sezione 12).</p>
+        </div>
+        <div class="prop-card">
+          <h4>C3 — Rigida o morbida?</h4>
+          <p>24 N/m è una molla <strong>morbida</strong>: 24 newton per allungarla di un metro. Un
+            ammortizzatore d'auto è mille volte più rigido. Con un pesetto da mezzo chilo questa molla si
+            allunga di 20 cm.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 — IL LIMITE DI ELASTICITÀ -->
+    <section id="sec12">
+      <h2>12. Fin dove vale? Il limite di elasticità</h2>
+
+      <p>C'è una precisazione che abbiamo tenuto in sospeso e che adesso va fatta, perché riguarda uno dei
+        temi ricorrenti di quest'anno: <strong>ogni legge fisica ha un campo di validità</strong>.</p>
+
+      <p>La legge di Hooke non vale per qualunque forza. Continuando ad appendere pesetti si arriva a un punto
+        oltre il quale la molla non si comporta più come prima: prima si allunga più di quanto dovrebbe, poi
+        resta deformata anche quando si tolgono i pesi, e infine si snerva del tutto. Quel punto si chiama
+        <strong>limite di elasticità</strong>.</p>
+
+      <div class="figbox">
+        <svg viewBox="0 0 660 380" role="img" aria-label="il grafico oltre il limite di elasticità">
+          <line x1="80" y1="330" x2="620" y2="330" class="axis"/>
+          <line x1="80" y1="330" x2="80" y2="40" class="axis"/>
+          <text x="624" y="336" class="lbl">Δx</text>
+          <text x="74" y="36" text-anchor="end" class="lbl">F</text>
+          <line x1="80" y1="330" x2="360" y2="120" class="curva"/>
+          <path d="M 360 120 Q 440 76 500 62 Q 545 54 570 70" fill="none" stroke="var(--magenta)" stroke-width="3"/>
+          <line x1="360" y1="120" x2="360" y2="330" class="dash"/>
+          <circle cx="360" cy="120" r="7" fill="var(--magenta)"/>
+          <text x="360" y="352" text-anchor="middle" class="em">limite di elasticità</text>
+          <text x="150" y="230" class="lbl" style="fill:var(--accent);">zona elastica:</text>
+          <text x="150" y="250" class="lbl" style="fill:var(--accent);">F = k·Δx, la retta</text>
+          <text x="150" y="270" class="lbl-s">tolta la forza, torna com'era</text>
+          <text x="410" y="180" class="lbl" style="fill:var(--magenta);">zona plastica:</text>
+          <text x="410" y="200" class="lbl" style="fill:var(--magenta);">la legge non vale più</text>
+          <text x="410" y="220" class="lbl-s">la molla resta deformata</text>
+          <text x="556" y="110" class="lbl-s">rottura</text>
+        </svg>
+        <p class="cap">Figura 2 — la legge di Hooke è la parte rettilinea del grafico. Oltre il limite, la retta si piega.</p>
+      </div>
+
+      <p>Notate una cosa importante: il grafico non «smette di esistere» oltre il limite. Semplicemente
+        <strong>non è più una retta</strong>, e quindi la legge di Hooke smette di descriverlo. È la stessa
+        storia del modello a raggi in ottica: un modello vale entro il suo campo, e il compito dello
+        sperimentatore è sapere qual è quel campo.</p>
+
+      <div class="warnbox">
+        <strong>Nel vostro esperimento.</strong> Se in laboratorio i punti alle masse maggiori cominciano a
+        scendere sotto la retta, non buttate via i dati: avete trovato il limite di elasticità della vostra
+        molla, ed è un risultato interessante da riportare nella relazione. Quello che <em>non</em> si può
+        fare è tirare una retta a forza attraverso punti che chiaramente non ci stanno.
+      </div>
+    </section>
+
+    <!-- 13 — IL DINAMOMETRO -->
+    <section id="sec13">
+      <h2>13. Il dinamometro: finalmente misuriamo una forza</h2>
+
+      <p>Adesso abbiamo tutto per costruire lo strumento che cercavamo dall'inizio della lezione 8. Basta
+        invertire il ragionamento.</p>
+
+      <p>Finora abbiamo applicato forze note e misurato allungamenti, per ricavare <span>$k$</span>. Ma una
+        volta che <span>$k$</span> la conosciamo, possiamo fare il contrario: applicare una forza
+        <strong>sconosciuta</strong>, misurare l'allungamento e ricavare la forza.</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.25rem;">$$F = k\,\Delta x$$</p>
+        <p class="formula-note">Con <span>$k$</span> nota e <span>$\Delta x$</span> misurato con un righello,
+          questa formula <strong>è</strong> una misura di forza. Uno strumento costruito così si chiama
+          <strong>dinamometro</strong> (dal greco <em>dýnamis</em>, forza, e <em>métron</em>, misura).</p>
+      </div>
+
+      <p>In pratica non si fa nemmeno il conto: si <strong>tara</strong> lo strumento una volta per tutte,
+        cioè si disegna direttamente sulla scala, accanto a ogni tacca, il valore della forza in newton
+        corrispondente a quell'allungamento. Poi si legge e basta. È esattamente ciò che c'è dentro una
+        bilancia da pescheria e in quelle da valigia.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="di-f">forza applicata al gancio = <span id="di-fv">2,0</span> N</label>
+          <input type="range" id="di-f" min="0" max="4" step="0.05" value="2">
+        </div>
+        <svg viewBox="0 0 420 400" id="di-svg" class="stretta" role="img" aria-label="dinamometro tarato in newton"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="di-let">2,00</div><div class="l">lettura (N)</div></div>
+          <div class="stat"><div class="n" id="di-all">8,3</div><div class="l">allungamento (cm)</div></div>
+          <div class="stat"><div class="n" id="di-mas">204</div><div class="l">massa corrispondente (g)</div></div>
+        </div>
+        <p class="cap">La molla è quella dell'esperimento, $k = 24{,}0$ N/m. Il fondo scala è a 4 N.</p>
+      </div>
+
+      <h3>13.1 Portata e sensibilità di un dinamometro</h3>
+
+      <p>Come ogni strumento (lezione 2), anche il dinamometro ha le sue caratteristiche — e adesso possiamo
+        capire da che cosa dipendono.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Portata</h4>
+          <p>La forza massima misurabile, cioè quella che porta la molla al fondo scala (mai oltre il limite
+            di elasticità!). Con <span>$k = 24$</span> N/m e 17 cm di corsa utile, la portata è circa
+            <strong>4 N</strong>.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Sensibilità</h4>
+          <p>La più piccola variazione di forza apprezzabile. Se le tacche sono al millimetro, è
+            <span>$k \cdot 0{,}001 = 0{,}024$</span> N: circa <strong>2 centesimi di newton</strong>.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Il compromesso</h4>
+          <p>Molla morbida (<span>$k$</span> piccola) = strumento sensibile ma di portata modesta. Molla
+            rigida = grande portata ma letture grossolane. <strong>Non esiste il dinamometro buono per
+            tutto</strong>: se ne tengono diversi.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 1 — progettare un dinamometro</span></div>
+        <p>Volete costruire un dinamometro con portata <span>$10$</span> N usando una molla che a fondo scala
+          può allungarsi al massimo di <span>$20$</span> cm. <strong>(a)</strong> Che costante elastica deve
+          avere la molla? <strong>(b)</strong> Se la scala è graduata al millimetro, qual è la sensibilità
+          dello strumento? <strong>(c)</strong> Che allungamento produce una massa di <span>$500$</span> g?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-h1">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-h1">
+          <p><strong>(a)</strong> Dalla legge di Hooke, con <span>$F = 10$</span> N e
+            <span>$\Delta x = 0{,}20$</span> m:</p>
+          <p style="text-align:center;">$$k = \frac{F}{\Delta x} = \frac{10}{0{,}20} = 50\ \text{N/m}$$</p>
+          <p><strong>(b)</strong> A un millimetro di allungamento corrisponde una forza di</p>
+          <p style="text-align:center;">$$F = k \cdot 0{,}001 = 50 \cdot 0{,}001 = 0{,}05\ \text{N}$$</p>
+          <p>La sensibilità è dunque <span>$0{,}05$</span> N, cioè 5 centesimi di newton.</p>
+          <p><strong>(c)</strong> Prima il peso, e attenzione ai grammi:</p>
+          <p style="text-align:center;">$$P = m\,g = 0{,}500 \cdot 9{,}81 = 4{,}905\ \text{N}$$</p>
+          <p style="text-align:center;">$$\Delta x = \frac{P}{k} = \frac{4{,}905}{50} = 0{,}098\ \text{m} \approx 9{,}8\ \text{cm}$$</p>
+          <p>Circa la metà della corsa, come è ragionevole aspettarsi dato che 4,9 N è circa metà della
+            portata.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$k = 50$ N/m &nbsp;·&nbsp; sensibilità $0{,}05$ N &nbsp;·&nbsp; $9{,}8$ cm</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2 — due molle, una domanda</span></div>
+        <p>La molla A ha <span>$k_A = 15$</span> N/m, la molla B ha <span>$k_B = 60$</span> N/m.
+          <strong>(a)</strong> Quale delle due è più rigida? <strong>(b)</strong> Appendendo lo stesso peso di
+          <span>$3{,}0$</span> N a entrambe, di quanto si allungano? <strong>(c)</strong> Quale conviene per
+          un dinamometro da usare con forze molto piccole?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-h2">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-h2">
+          <p><strong>(a)</strong> La <strong>B</strong>: costante elastica maggiore significa che serve più
+            forza per lo stesso allungamento. Attenzione a non confondersi — «più grande» non vuol dire «si
+            allunga di più», anzi esattamente il contrario.</p>
+          <p><strong>(b)</strong> Con <span>$\Delta x = F/k$</span>:</p>
+          <p style="text-align:center;">$$\Delta x_A = \frac{3{,}0}{15} = 0{,}20\ \text{m} = 20\ \text{cm} \qquad \Delta x_B = \frac{3{,}0}{60} = 0{,}050\ \text{m} = 5{,}0\ \text{cm}$$</p>
+          <p>La molla A si allunga <strong>quattro volte</strong> di più, esattamente come il rapporto delle
+            costanti — perché a parità di forza l'allungamento è inversamente proporzionale a
+            <span>$k$</span>.</p>
+          <p><strong>(c)</strong> La <strong>A</strong>, quella morbida: con forze piccole produce
+            allungamenti ben visibili, quindi è più sensibile. Il prezzo da pagare è la portata ridotta —
+            con 10 N andrebbe fuori scala o si rovinerebbe.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">B più rigida &nbsp;·&nbsp; $20$ cm e $5{,}0$ cm &nbsp;·&nbsp; per forze piccole si usa A</span></div>
+        </div>
+      </div>
+
+      <h3>13.2 Allenamento con il dinamometro</h3>
+
+      <div class="qbox" id="dn-box">
+        <div class="qt" id="dn-testo">—</div>
+        <div class="qrow">
+          <span id="dn-eti">risposta:</span>
+          <input class="inp" id="dn-val" inputmode="decimal" aria-label="risposta">
+          <span id="dn-um">N</span>
+          <button class="btn" id="dn-ver">Verifica</button>
+          <button class="btn btn-secondary" id="dn-new">Nuovo esercizio</button>
+        </div>
+        <div class="fb" id="dn-fb"></div>
+      </div>
+
+      <div class="note">
+        <strong>Che cosa abbiamo guadagnato.</strong> All'inizio della lezione 8 la forza era un concetto:
+        sapevamo che cos'era e come si sommava, ma non avremmo saputo dire quanto vale. Adesso abbiamo uno
+        strumento, con la sua portata, la sua sensibilità e il suo campo di validità — e sappiamo esattamente
+        su quale legge fisica si regge, perché l'abbiamo verificata noi. È il percorso completo della fisica
+        sperimentale: da un fenomeno a una legge, da una legge a uno strumento.
+      </div>
+    </section>
+
+<!--SENTINEL-->
+
+    <!-- 14 — LA CALIBRAZIONE -->
+    <section id="sec14">
+      <h2>14. Calibrare uno strumento</h2>
+
+      <p>Abbiamo costruito un dinamometro dando per scontata una cosa che scontata non è affatto: che la
+        scala, quella con i numeri già scritti accanto alle tacche, sia <strong>giusta</strong>. Ma chi ce li
+        ha messi, quei numeri? E come facciamo a fidarci?</p>
+
+      <p>La risposta è che quei numeri ce li ha messi qualcuno che ha fatto un'operazione precisa, ed è
+        l'operazione che chiude il cerchio di tutta questa lezione: la <strong>calibrazione</strong>.</p>
+
+      <h3>14.1 Che cosa significa calibrare</h3>
+
+      <div class="rule">
+        <strong>Calibrare</strong> uno strumento significa confrontarlo con <strong>campioni di valore
+        noto</strong> e ricavare la relazione fra ciò che lo strumento <em>indica</em> e il valore
+        <em>vero</em> della grandezza. Il risultato della calibrazione è quella relazione: una formula, una
+        tabella o un grafico che permette di tradurre le indicazioni in misure.
+      </div>
+
+      <p>Il punto chiave è che <strong>uno strumento, di per sé, non misura nulla</strong>: si limita a
+        reagire. Una molla si allunga, una colonnina di mercurio sale, un sensore elettronico produce una
+        tensione. Nessuna di queste cose è una misura finché qualcuno non ha stabilito la corrispondenza fra
+        la reazione e la grandezza — ed è per questo che nella lezione abbiamo dovuto prima <em>misurare</em>
+        la costante elastica, e solo dopo abbiamo potuto usare la molla come strumento.</p>
+
+      <div class="curiosita">
+        <strong>Una nota di vocabolario, perché in Italia c'è un piccolo pasticcio.</strong> Nel linguaggio
+        tecnico rigoroso si distingue fra <strong>taratura</strong> — il confronto con un campione, che
+        <em>documenta</em> lo scostamento senza toccare lo strumento — e <strong>regolazione</strong>, che
+        invece lo aggiusta. La parola «calibrazione» è entrata nell'uso dall'inglese <em>calibration</em> ed è
+        oggi la più diffusa, soprattutto in laboratorio e nella ricerca. In questa lezione le useremo come
+        sinonimi, ma se un giorno leggerete un certificato ufficiale saprete che c'è scritto «taratura».
+      </div>
+
+      <p>E una calibrazione non vale per sempre. Gli strumenti <strong>derivano</strong>: la molla si stanca,
+        i componenti elettronici invecchiano, la temperatura sposta le letture. Per questo gli strumenti seri
+        vengono <strong>ricalibrati periodicamente</strong>, e ogni taratura è agganciata a una catena di
+        confronti — il laboratorio si riferisce a un campione più preciso, quello a uno ancora più preciso, e
+        così via fino ai campioni nazionali (in Italia li custodisce l'INRIM di Torino) e da lì alle costanti
+        fondamentali del Sistema Internazionale di cui parlavamo nella
+        <a href="4_Unita_di_misura.html">lezione 4</a>. Questa catena si chiama
+        <strong>riferibilità</strong>, ed è il motivo per cui una misura fatta a Torino e una fatta a Tokyo
+        possono essere confrontate.</p>
+
+      <h3>14.2 La retta di calibrazione</h3>
+
+      <p>Nel caso più fortunato — e più frequente — la relazione fra indicazione e grandezza è
+        <strong>lineare</strong>, cioè è una retta. Ma attenzione: una retta, non una proporzionalità
+        diretta. Servono <strong>due</strong> numeri, non uno:</p>
+
+      <div class="rule">
+        <p class="formula-title">Retta di calibrazione</p>
+        <p style="text-align:center; font-size:1.2rem;">$$d = m\,F + q$$</p>
+        <p>dove <span>$d$</span> è l'<strong>indicazione</strong> dello strumento (divisioni, millimetri,
+          millivolt…) e <span>$F$</span> è la <strong>grandezza</strong> da misurare. I due coefficienti hanno
+          nomi e significati precisi:</p>
+        <ul style="margin:0.4rem 0 0;">
+          <li><span>$m$</span> è la <strong>sensibilità</strong> (o guadagno): di quanto si muove l'indice per
+            ogni unità di grandezza. Nel nostro dinamometro sono divisioni per newton.</li>
+          <li><span>$q$</span> è lo <strong>zero</strong> (o offset): che cosa indica lo strumento quando la
+            grandezza vale zero. In un mondo perfetto sarebbe nullo. Nel mondo vero non lo è quasi mai.</li>
+        </ul>
+      </div>
+
+      <p>Quel <span>$q$</span> è la ragione per cui la calibrazione non è una formalità burocratica. Un
+        dinamometro il cui indice, a vuoto, sta già su 6 divisioni non è rotto: è semplicemente uno strumento
+        con un offset, e se lo si sa è perfettamente utilizzabile. È lo stesso motivo per cui su una bilancia
+        da cucina si preme «tara» prima di versare la farina.</p>
+
+      <h3>14.3 Calibriamo un dinamometro</h3>
+
+      <p>Immaginiamo di trovare in laboratorio un dinamometro senza scala: solo un indice che scorre davanti a
+        una striscia graduata in <strong>divisioni</strong> anonime, da 0 a 80. Non sappiamo quanti newton
+        valga una divisione, e non sappiamo nemmeno se a forza nulla l'indice stia sullo zero.</p>
+
+      <p>Il procedimento è quello di sempre: appendiamo <strong>masse campione</strong>, di cui conosciamo il
+        peso, e annotiamo che cosa segna l'indice. Poi mettiamo tutto in grafico.</p>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn" id="cal-next">⚖ Appendi il prossimo campione</button>
+          <button class="btn btn-secondary" id="cal-all">⏩ Fai tutte le misure</button>
+          <button class="btn btn-secondary" id="cal-reset">↺ Azzera</button>
+          <button class="btn" id="cal-retta">📈 Traccia la retta di calibrazione</button>
+        </div>
+        <svg viewBox="0 0 660 400" id="cal-svg" role="img" aria-label="calibrazione di un dinamometro con masse campione"></svg>
+        <table class="tabf" id="cal-tab">
+          <thead>
+            <tr><th>Massa campione (g)</th><th>$F = mg$ (N)</th><th>Indicazione $d$ (divisioni)</th></tr>
+          </thead>
+          <tbody id="cal-body"></tbody>
+        </table>
+        <div class="eq-out" id="cal-out">Nessuna misura ancora eseguita.</div>
+      </div>
+
+      <p>Ecco i dati che avrete ottenuto:</p>
+
+      <table class="tabf">
+        <thead><tr><th>Massa (g)</th><th>$F$ (N)</th><th>$d$ (div)</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>0,000</td><td>6</td></tr>
+          <tr><td>100</td><td>0,981</td><td>18</td></tr>
+          <tr><td>200</td><td>1,962</td><td>31</td></tr>
+          <tr><td>300</td><td>2,943</td><td>43</td></tr>
+          <tr><td>400</td><td>3,924</td><td>55</td></tr>
+          <tr><td>500</td><td>4,905</td><td>67</td></tr>
+        </tbody>
+      </table>
+
+      <p>Due cose saltano all'occhio prima ancora di fare i conti. La prima: <strong>a forza nulla l'indice
+        segna 6</strong>, non zero. La seconda: i punti sono <strong>allineati</strong>, quindi la retta di
+        calibrazione esiste davvero e possiamo calcolarne i coefficienti prendendo, come sempre, due punti ben
+        distanziati:</p>
+
+      <div class="eqsteps" style="margin:0.8rem 0;">
+        <p style="text-align:center;">$$m = \frac{d_2 - d_1}{F_2 - F_1} = \frac{67 - 6}{4{,}905 - 0} = \frac{61}{4{,}905} = 12{,}44\ \text{div/N}$$</p>
+        <p style="text-align:center;">$$q = 6{,}0\ \text{div}$$</p>
+      </div>
+
+      <div class="rule">
+        <p class="formula-title">La retta di calibrazione del nostro dinamometro</p>
+        <p style="text-align:center; font-size:1.2rem;">$$d = 12{,}44\,F + 6{,}0$$</p>
+        <p class="formula-note">Da questo momento lo strumento è calibrato: sappiamo tradurre qualunque sua
+          indicazione in newton.</p>
+      </div>
+
+      <h3>14.4 Usare la calibrazione all'incontrario</h3>
+
+      <p>La retta serve però nel verso opposto a come l'abbiamo costruita. Noi, con lo strumento in mano,
+        leggiamo <span>$d$</span> e vogliamo <span>$F$</span>: dobbiamo quindi <strong>invertire</strong> la
+        formula, cioè fare esattamente quello che facciamo da tre lezioni con le formule inverse.</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.2rem;">$$F = \frac{d - q}{m} = \frac{d - 6{,}0}{12{,}44}$$</p>
+      </div>
+
+      <p>Provate: appendete un oggetto sconosciuto e leggete l'indicazione.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="cu-d">indicazione letta = <span id="cu-dv">40</span> divisioni</label>
+          <input type="range" id="cu-d" min="6" max="70" step="1" value="40">
+        </div>
+        <svg viewBox="0 0 660 260" id="cu-svg" role="img" aria-label="lettura di una forza incognita con la retta di calibrazione"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="cu-f">2,73</div><div class="l">forza misurata (N)</div></div>
+          <div class="stat"><div class="n" id="cu-m">279</div><div class="l">massa corrispondente (g)</div></div>
+          <div class="stat"><div class="n" id="cu-err">3,22</div><div class="l">che cosa direbbe chi ignora lo zero (N)</div></div>
+          <div class="stat"><div class="n" id="cu-perc">+18%</div><div class="l">errore commesso ignorandolo</div></div>
+        </div>
+        <p class="cap">Il terzo riquadro mostra il risultato di chi usa $F = d/m$ dimenticando l'offset: l'errore è tanto più grave quanto più piccola è la forza.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>Perché l'offset fa così male alle misure piccole.</strong> Trascurare le 6 divisioni di zero
+        significa aggiungere sempre lo stesso errore, circa mezzo newton. Su una forza di 5 N è il 10%; su una
+        forza di 1 N è il 50%. È lo stesso ragionamento del primo pesetto della sezione 9: <em>un errore
+        costante pesa percentualmente di più quando la grandezza misurata è piccola</em>. Se questa frase
+        v'è già capitato di leggerla tre volte in questa lezione, è perché è una delle idee più importanti
+        di tutto il corso.
+      </div>
+
+      <h3>14.5 Quando la calibrazione non è una retta</h3>
+
+      <p>Con la molla siamo stati fortunati, ma non tutti gli strumenti sono lineari. Anzi: la maggior parte
+        dei sensori moderni non lo è affatto, e in quel caso si parla più in generale di <strong>curva di
+        calibrazione</strong>.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>La termocoppia</h4>
+          <p>Due metalli diversi saldati insieme producono una tensione che dipende dalla temperatura — pochi
+            millivolt. Ma il legame fra millivolt e gradi <strong>non è una retta</strong>: si descrive con un
+            polinomio di grado alto, e le tabelle ufficiali arrivano a nove coefficienti.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Il termistore</h4>
+          <p>La sua resistenza cambia con la temperatura in modo fortemente <strong>non lineare</strong>. La
+            curva di calibrazione è una funzione esponenziale, e senza di essa i valori letti non
+            significherebbero nulla.</p>
+        </div>
+        <div class="prop-card">
+          <h4>La molla stessa</h4>
+          <p>Oltre il <strong>limite di elasticità</strong> (sezione 12) anche la nostra retta smette di
+            valere: la curva si piega. La zona lineare di uno strumento si chiama <em>campo di misura</em>, e
+            fuori da lì la calibrazione non è valida.</p>
+        </div>
+      </div>
+
+      <p>La procedura però non cambia di una virgola: si prendono campioni noti, si misura la risposta, si
+        traccia la curva. Cambia solo il tipo di funzione che ci si aspetta — una retta, una parabola, un
+        esponenziale. Ed è per questo che la <em>linearità</em> di uno strumento è considerata un pregio: un
+        sensore lineare si calibra con due soli punti, uno non lineare ne richiede decine.</p>
+
+      <h3>14.6 Calibrare strumenti complessi (e perché ci si scrive una tesi)</h3>
+
+      <p>Fin qui abbiamo calibrato una molla con cinque pesetti, in dieci minuti. Ma il procedimento è
+        <em>esattamente lo stesso</em> per strumenti che costano miliardi, con una differenza: la difficoltà
+        sta nel trovare i campioni e nel tenere sotto controllo tutto ciò che può sporcare la risposta.</p>
+
+      <table class="tabf">
+        <thead><tr><th>Strumento</th><th>Che cosa misura davvero</th><th>Con che cosa si calibra</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Bilancia analitica</td><td class="l">la deformazione di un sensore</td><td class="l">masse campione certificate, in ambiente a temperatura controllata</td></tr>
+          <tr><td class="lab">Calorimetro di un rivelatore di particelle</td><td class="l">una carica elettrica</td><td class="l">fasci di particelle di energia nota, e particelle già conosciute prodotte nelle collisioni</td></tr>
+          <tr><td class="lab">Telescopio con sensore CCD</td><td class="l">conteggi di elettroni per pixel</td><td class="l">stelle standard di luminosità nota, più immagini di buio e di campo uniforme</td></tr>
+          <tr><td class="lab">Macchina per la TAC</td><td class="l">l'assorbimento dei raggi X</td><td class="l">un «fantoccio», cioè un oggetto di materiali noti che simula un corpo umano</td></tr>
+          <tr><td class="lab">Interferometro per onde gravitazionali</td><td class="l">uno spostamento di frange</td><td class="l">specchi mossi da forze note prodotte con la luce di un laser ausiliario</td></tr>
+        </tbody>
+      </table>
+
+      <p>Guardate la seconda colonna: <strong>nessuno di questi strumenti misura direttamente la grandezza che
+        ci interessa</strong>. Il rivelatore non misura energie: misura cariche. Il telescopio non misura la
+        luminosità di una stella: conta elettroni. La calibrazione è il ponte fra le due cose, e senza quel
+        ponte i dati raccolti sono numeri senza significato.</p>
+
+      <div class="curiosita">
+        <strong>Sì, ci si scrive una tesi.</strong> E non una tesina: esistono <strong>tesi di laurea
+        magistrale, e anche dottorati interi</strong>, il cui oggetto è la calibrazione di un singolo
+        strumento. Al CERN ci sono gruppi di ricerca che passano anni sulla calibrazione dei calorimetri di
+        un esperimento; il telescopio spaziale James Webb, dopo il lancio del 2021, ha richiesto
+        <em>mesi</em> di operazioni di calibrazione prima di poter produrre la sua prima immagine
+        scientifica; e nella collaborazione LIGO, quella delle onde gravitazionali, il gruppo che si occupa
+        della calibrazione firma articoli propri.
+        <p style="margin:0.6rem 0 0;">A chi lo trova strano — «una tesi per tarare uno strumento?» — vale la
+          pena rispondere con una domanda: a che cosa serve un rivelatore capacissimo, se non sappiamo
+          tradurre quello che segna? Una scoperta annunciata con uno strumento mal calibrato non è una
+          scoperta: è un errore in attesa di essere smascherato. E infatti succede — la storia della fisica è
+          piena di «segnali» rivelatisi problemi di calibrazione.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3 — calibrare un sensore</span></div>
+        <p>Un sensore di forza produce una tensione. Con il gancio scarico segna <span>$0{,}50$</span> V; con
+          una massa campione da <span>$2{,}0$</span> kg appesa segna <span>$4{,}42$</span> V.
+          <strong>(a)</strong> Scrivi la retta di calibrazione. <strong>(b)</strong> Che forza corrisponde a
+          una lettura di <span>$3{,}00$</span> V? <strong>(c)</strong> Che errore percentuale commetterebbe,
+          su quella lettura, chi dimenticasse l'offset?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-h3">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-h3">
+          <p><strong>(a)</strong> I due punti di calibrazione sono <span>$(0;\ 0{,}50)$</span> e
+            <span>$(19{,}62;\ 4{,}42)$</span>, perché la massa da 2,0 kg pesa
+            <span>$P = 2{,}0 \cdot 9{,}81 = 19{,}62$</span> N. Quindi:</p>
+          <p style="text-align:center;">$$m = \frac{4{,}42 - 0{,}50}{19{,}62 - 0} = \frac{3{,}92}{19{,}62} = 0{,}200\ \text{V/N} \qquad q = 0{,}50\ \text{V}$$</p>
+          <p style="text-align:center;">$$V = 0{,}200\,F + 0{,}50$$</p>
+          <p><strong>(b)</strong> Formula inversa:</p>
+          <p style="text-align:center;">$$F = \frac{V - q}{m} = \frac{3{,}00 - 0{,}50}{0{,}200} = \frac{2{,}50}{0{,}200} = 12{,}5\ \text{N}$$</p>
+          <p><strong>(c)</strong> Chi ignora l'offset calcola <span>$F = 3{,}00/0{,}200 = 15{,}0$</span> N,
+            cioè 2,5 N in più: un errore del</p>
+          <p style="text-align:center;">$$\frac{15{,}0 - 12{,}5}{12{,}5} = 0{,}20 = 20\%$$</p>
+          <p>Notate che l'errore assoluto sarebbe sempre di 2,5 N, qualunque forza si misuri: su 100 N
+            sarebbe un trascurabile 2,5%, su 5 N sarebbe un catastrofico 50%.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$V = 0{,}200F + 0{,}50$ &nbsp;·&nbsp; $F = 12{,}5$ N &nbsp;·&nbsp; errore del $20\%$</span></div>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Il cerchio si chiude.</strong> In questa lezione abbiamo fatto, nell'ordine, tutto il mestiere
+        dello sperimentatore: abbiamo studiato un fenomeno (la molla che si allunga), ne abbiamo ricavato una
+        legge (Hooke), abbiamo misurato una costante con l'analisi degli errori, abbiamo costruito uno
+        strumento (il dinamometro) e infine lo abbiamo calibrato, agganciandolo a campioni noti. Ogni pezzo di
+        laboratorio del mondo, dal termometro della cucina al rivelatore da tremila tonnellate, sta in piedi
+        su questa stessa catena.
+      </div>
+    </section>
+
+    <section id="quiz">
+      <h2>15. Quiz finale</h2>
+      <p>Domande sulla legge di Hooke, sull'esperimento, sull'analisi dei dati e sul dinamometro.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 9 — La legge di Hooke · Fisica · Terzo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX. Basata sulla scheda di laboratorio
+      <em>Verifica sperimentale della legge di Hooke</em>.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      /* ---------- utilità comuni ---------- */
+      var G = 9.81;
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+      function num(s) { return parseFloat(String(s).replace(',', '.').replace(/\s/g, '').trim()); }
+
+      function freccia(x1, y1, x2, y2, cls, s) {
+        s = s || 11;
+        var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy) || 1;
+        var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+        if (L < s * 1.2) { s = Math.max(4, L * 0.8); }
+        var bx = x2 - ux * s, by = y2 - uy * s;
+        var pts = x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+                  (bx + px * s * 0.42).toFixed(1) + ',' + (by + py * s * 0.42).toFixed(1) + ' ' +
+                  (bx - px * s * 0.42).toFixed(1) + ',' + (by - py * s * 0.42).toFixed(1);
+        return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) +
+               '" y2="' + by.toFixed(1) + '" class="' + cls + '"/>' +
+               '<polygon points="' + pts + '" class="' + cls + 'p"/>';
+      }
+
+      // disegna una molla elicoidale verticale fra y0 e y1, con n spire di ampiezza amp
+      function molla(x, y0, y1, n, amp) {
+        var L = y1 - y0, coda = Math.min(16, Math.abs(L) * 0.12);
+        var d = 'M ' + x + ' ' + y0 + ' L ' + x + ' ' + (y0 + coda);
+        var alto = L - 2 * coda, passo = alto / (2 * n);
+        for (var i = 0; i < 2 * n; i++) {
+          var y = y0 + coda + (i + 1) * passo;
+          d += ' L ' + (x + (i % 2 === 0 ? amp : -amp)) + ' ' + y.toFixed(1);
+        }
+        d += ' L ' + x + ' ' + (y1 - coda).toFixed(1) + ' L ' + x + ' ' + y1.toFixed(1);
+        return '<path d="' + d + '" class="spira"/>';
+      }
+
+      // un righello verticale con tacche ogni centimetro
+      function righello(x, ytop, pxcm, ncm) {
+        var g = '<rect x="' + x + '" y="' + ytop + '" width="34" height="' + (ncm * pxcm) +
+                '" fill="color-mix(in srgb, var(--gold) 12%, var(--surface))" stroke="var(--border)" stroke-width="1"/>';
+        for (var i = 0; i <= ncm; i++) {
+          var y = ytop + i * pxcm, lung = (i % 5 === 0) ? 16 : 8;
+          g += '<line x1="' + x + '" y1="' + y + '" x2="' + (x + lung) + '" y2="' + y + '" stroke="var(--muted)" stroke-width="1.2"/>';
+          if (i % 5 === 0) {
+            g += '<text x="' + (x + 30) + '" y="' + (y + 4) + '" text-anchor="end" class="lbl-s">' + i + '</text>';
+          }
+        }
+        return g;
+      }
+
+      /* ================= 3 — la molla interattiva ================= */
+      (function () {
+        var svg = document.getElementById('ml-svg');
+        if (!svg) { return; }
+        var L0 = 0.12, YTOP = 60, PXM = 900;      // 900 px per metro -> 12 cm = 108 px
+        function disegna() {
+          var k = parseFloat(document.getElementById('ml-k').value);
+          var F = parseFloat(document.getElementById('ml-f').value);
+          var dx = F / k;
+          var L = Math.max(0.03, L0 + dx);
+          var ybot = YTOP + L * PXM;
+          var g = '';
+          g += '<rect x="90" y="30" width="180" height="16" class="supporto"/>';
+          g += '<line x1="90" y1="46" x2="270" y2="46" stroke="var(--text)" stroke-width="2"/>';
+          g += righello(300, YTOP, PXM / 100, 26);
+          g += '<text x="317" y="' + (YTOP - 8) + '" text-anchor="middle" class="lbl-s">cm</text>';
+          // livello di riposo
+          g += '<line x1="120" y1="' + (YTOP + L0 * PXM) + '" x2="300" y2="' + (YTOP + L0 * PXM) + '" class="dash"/>';
+          g += '<text x="118" y="' + (YTOP + L0 * PXM - 6) + '" text-anchor="end" class="lbl-s">riposo</text>';
+          g += molla(180, YTOP, ybot, 9, 20);
+          // il gancio e la forza applicata
+          g += '<circle cx="180" cy="' + ybot.toFixed(1) + '" r="5" fill="var(--accent)"/>';
+          if (Math.abs(F) > 0.02) {
+            g += freccia(180, ybot, 180, ybot + F * 26, 'w', 12);
+            g += '<text x="192" y="' + (ybot + F * 13).toFixed(1) + '" class="lbl" style="fill:var(--magenta);">F = ' + nf(F, 1) + ' N</text>';
+            // la forza elastica, opposta
+            g += freccia(140, ybot, 140, ybot - F * 26, 'v', 12);
+            g += '<text x="132" y="' + (ybot - F * 13).toFixed(1) + '" text-anchor="end" class="lbl" style="fill:var(--accent);">Fel</text>';
+          }
+          svg.innerHTML = g;
+          document.getElementById('ml-kv').textContent = k;
+          document.getElementById('ml-fv').textContent = nf(F, 1);
+          document.getElementById('ml-dx').textContent = nf(dx * 100, 1);
+          document.getElementById('ml-l').textContent = nf(L * 100, 1);
+          document.getElementById('ml-fe').textContent = nf(-F, 1);
+        }
+        document.getElementById('ml-k').addEventListener('input', disegna);
+        document.getElementById('ml-f').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 6 — massa e peso ================= */
+      (function () {
+        var box = document.getElementById('pm-box');
+        if (!box) { return; }
+        var att = 0, mg = 0;
+        function nuovo() {
+          mg = [20, 50, 80, 100, 150, 200, 250, 300, 400, 500][Math.floor(Math.random() * 10)];
+          att = Math.round(mg / 1000 * G * 1000) / 1000;
+          var el = document.getElementById('pm-testo');
+          el.innerHTML = 'Un pesetto ha massa $m = ' + mg + '$ g. Quanto vale la sua forza peso, ' +
+                         'con $g = 9{,}81$ m/s²? (tre cifre decimali)';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          document.getElementById('pm-val').value = '';
+          document.getElementById('pm-fb').textContent = '';
+          document.getElementById('pm-fb').className = 'fb';
+        }
+        function verifica() {
+          var v = num(document.getElementById('pm-val').value);
+          var fb = document.getElementById('pm-fb');
+          if (isNaN(v)) { fb.className = 'fb no'; fb.textContent = 'Scrivi un numero.'; return; }
+          if (Math.abs(v - att) < 0.006) {
+            fb.className = 'fb ok';
+            fb.innerHTML = '✓ Esatto: ' + nf(mg / 1000, 3) + ' kg × 9,81 = ' + nf(att, 3) + ' N.';
+          } else if (Math.abs(v - mg * G) < 0.5) {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ Hai moltiplicato i <strong>grammi</strong> per g. Prima converti in kilogrammi: ' +
+                           mg + ' g = ' + nf(mg / 1000, 3) + ' kg.';
+          } else if (Math.abs(v - mg / 1000) < 0.005) {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ Quella è la massa in kg, non il peso: manca la moltiplicazione per $g$.';
+            renderMathIn(fb);
+          } else {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ No. La formula è $P = m\\,g$ con $m$ in kilogrammi.';
+            renderMathIn(fb);
+          }
+        }
+        document.getElementById('pm-ver').addEventListener('click', verifica);
+        document.getElementById('pm-new').addEventListener('click', nuovo);
+        nuovo();
+      })();
+
+      /* ---------- i dati dell'esperimento (letti al millimetro) ---------- */
+      var L0 = 0.120;
+      var DATI = [[50, 0.140], [100, 0.161], [150, 0.181], [200, 0.202],
+                  [250, 0.222], [300, 0.243], [350, 0.263], [400, 0.284]];
+      function pesoDi(mg) { return Math.round(mg / 1000 * G * 1000) / 1000; }
+      function allungDi(L) { return Math.round((L - L0) * 1000) / 1000; }
+
+      function statistiche(ks) {
+        var n = ks.length, i, s = 0;
+        for (i = 0; i < n; i++) { s += ks[i]; }
+        var media = s / n, q = 0;
+        for (i = 0; i < n; i++) { q += (ks[i] - media) * (ks[i] - media); }
+        return {
+          media: media,
+          semi: (Math.max.apply(null, ks) - Math.min.apply(null, ks)) / 2,
+          sq: Math.sqrt(q / n)
+        };
+      }
+
+      /* ================= 7 — la misura di L0, ripetuta ================= */
+      (function () {
+        var btn = document.getElementById('l0-mis');
+        if (!btn) { return; }
+        var mis = [];
+        var POSSIBILI = [0.119, 0.120, 0.120, 0.121, 0.120, 0.119, 0.121, 0.120];
+        function aggiorna() {
+          for (var i = 0; i < 3; i++) {
+            var c = document.getElementById('l0-' + (i + 1));
+            c.textContent = (i < mis.length) ? nf(mis[i], 3) + ' m' : '—';
+            c.className = (i < mis.length) ? '' : 'vuoto';
+          }
+          var out = document.getElementById('l0-out');
+          if (mis.length < 3) {
+            document.getElementById('l0-m').textContent = '—';
+            document.getElementById('l0-s').textContent = '—';
+            out.textContent = 'Misure eseguite: ' + mis.length + ' su 3.';
+            return;
+          }
+          var st = statistiche(mis);
+          document.getElementById('l0-m').textContent = nf(st.media, 4) + ' m';
+          document.getElementById('l0-m').className = '';
+          document.getElementById('l0-s').textContent = '± ' + nf(Math.max(st.semi, 0.001), 3) + ' m';
+          document.getElementById('l0-s').className = '';
+          out.innerHTML = 'Le tre letture non coincidono, e non è un errore: è l\'<strong>errore casuale</strong>. ' +
+                          'La media è la stima migliore, la semidispersione (mai minore della sensibilità dello ' +
+                          'strumento, cioè 1 mm) è la sua incertezza.';
+        }
+        btn.addEventListener('click', function () {
+          if (mis.length >= 3) { return; }
+          mis.push(POSSIBILI[Math.floor(Math.random() * POSSIBILI.length)]);
+          aggiorna();
+        });
+        document.getElementById('l0-reset').addEventListener('click', function () { mis = []; aggiorna(); });
+        aggiorna();
+      })();
+
+      /* ================= 8 — il banco: raccolta dati ================= */
+      (function () {
+        var svg = document.getElementById('rd-svg');
+        if (!svg) { return; }
+        var n = 0, YTOP = 46, PXM = 900;
+        function disegna() {
+          var L = (n === 0) ? L0 : DATI[n - 1][1];
+          var ybot = YTOP + L * PXM;
+          var g = '';
+          g += '<rect x="40" y="30" width="140" height="16" class="supporto"/>';
+          g += '<line x1="40" y1="46" x2="180" y2="46" stroke="var(--text)" stroke-width="2"/>';
+          g += righello(210, YTOP, PXM / 100, 34);
+          g += '<text x="227" y="' + (YTOP - 8) + '" text-anchor="middle" class="lbl-s">cm</text>';
+          g += '<line x1="80" y1="' + (YTOP + L0 * PXM) + '" x2="210" y2="' + (YTOP + L0 * PXM) + '" class="dash"/>';
+          g += '<text x="78" y="' + (YTOP + L0 * PXM - 5) + '" text-anchor="end" class="lbl-s">L₀</text>';
+          g += molla(110, YTOP, ybot, 10, 18);
+          if (n > 0) {
+            var alt = 12 + n * 3.5;
+            g += '<rect x="' + (110 - 22) + '" y="' + ybot.toFixed(1) + '" width="44" height="' + alt.toFixed(1) +
+                 '" rx="3" class="peso"/>';
+            g += '<text x="110" y="' + (ybot + alt + 16).toFixed(1) + '" text-anchor="middle" class="lbl">' +
+                 (n * 50) + ' g</text>';
+          } else {
+            g += '<circle cx="110" cy="' + ybot.toFixed(1) + '" r="5" fill="var(--accent)"/>';
+            g += '<text x="110" y="' + (ybot + 24) + '" text-anchor="middle" class="lbl-s">a riposo</text>';
+          }
+          g += '<line x1="180" y1="' + ybot.toFixed(1) + '" x2="210" y2="' + ybot.toFixed(1) +
+               '" stroke="var(--magenta)" stroke-width="2"/>';
+          g += '<text x="176" y="' + (ybot - 6).toFixed(1) + '" text-anchor="end" class="em">L = ' + nf(L, 3) + ' m</text>';
+          svg.innerHTML = g;
+
+          var tb = document.getElementById('rd-body'), righe = '';
+          var ks = [];
+          for (var i = 0; i < n; i++) {
+            var mg = DATI[i][0], Li = DATI[i][1];
+            var P = pesoDi(mg), dx = allungDi(Li), k = P / dx;
+            ks.push(k);
+            righe += '<tr><td>' + (i + 1) + '</td><td>' + nf(mg / 1000, 3) + '</td><td>' + nf(P, 3) +
+                     '</td><td>' + nf(Li, 3) + '</td><td>' + nf(dx, 3) + '</td><td>' + nf(k, 2) + '</td></tr>';
+          }
+          if (n === 0) {
+            righe = '<tr><td colspan="6" class="vuoto">nessun dato: appendete il primo pesetto</td></tr>';
+          }
+          tb.innerHTML = righe;
+          var out = document.getElementById('rd-out');
+          if (n === 0) {
+            out.textContent = 'Appendete il primo pesetto.';
+          } else if (n < 3) {
+            out.innerHTML = 'Osservate la colonna $k_i$: continuate ad aggiungere pesetti e guardate se ' +
+                            'i valori si assomigliano.';
+            renderMathIn(out);
+          } else {
+            var st = statistiche(ks);
+            out.innerHTML = 'Con ' + n + ' misure: $\\bar{k} = ' + nf(st.media, 2).replace(',', '{,}') +
+                            '$ N/m, semidispersione $' + nf(st.semi, 2).replace(',', '{,}') + '$ N/m.';
+            renderMathIn(out);
+          }
+        }
+        document.getElementById('rd-add').addEventListener('click', function () {
+          if (n < DATI.length) { n++; disegna(); }
+        });
+        document.getElementById('rd-del').addEventListener('click', function () {
+          if (n > 0) { n--; disegna(); }
+        });
+        document.getElementById('rd-all').addEventListener('click', function () { n = DATI.length; disegna(); });
+        document.getElementById('rd-reset').addEventListener('click', function () { n = 0; disegna(); });
+        disegna();
+      })();
+
+      /* ================= 9 — i valori di k e la loro dispersione ================= */
+      (function () {
+        var svg = document.getElementById('an-svg');
+        if (!svg) { return; }
+        var tutti = true;
+        function disegna() {
+          var ks = [], eti = [];
+          for (var i = (tutti ? 0 : 1); i < DATI.length; i++) {
+            ks.push(pesoDi(DATI[i][0]) / allungDi(DATI[i][1]));
+            eti.push(i + 1);
+          }
+          var st = statistiche(ks);
+          var OX = 70, OY = 220, W = 540, kmin = 23.7, kmax = 24.7;
+          function py(k) { return OY - (k - kmin) / (kmax - kmin) * 160; }
+          var g = '';
+          // fascia della semidispersione
+          g += '<rect x="' + OX + '" y="' + py(st.media + st.semi).toFixed(1) + '" width="' + W +
+               '" height="' + (py(st.media - st.semi) - py(st.media + st.semi)).toFixed(1) +
+               '" fill="color-mix(in srgb, var(--gold) 22%, transparent)"/>';
+          g += '<line x1="' + OX + '" y1="' + py(st.media).toFixed(1) + '" x2="' + (OX + W) + '" y2="' +
+               py(st.media).toFixed(1) + '" stroke="var(--gold)" stroke-width="2.5"/>';
+          g += '<text x="' + (OX + W + 4) + '" y="' + (py(st.media) + 4).toFixed(1) +
+               '" class="lbl" style="fill:var(--gold);">media</text>';
+          // assi
+          g += '<line x1="' + OX + '" y1="' + OY + '" x2="' + OX + '" y2="' + (OY - 175) + '" class="axis"/>';
+          for (var v = 23.8; v <= 24.65; v += 0.2) {
+            g += '<line x1="' + (OX - 5) + '" y1="' + py(v).toFixed(1) + '" x2="' + (OX + W) + '" y2="' +
+                 py(v).toFixed(1) + '" class="grid"/>';
+            g += '<text x="' + (OX - 10) + '" y="' + (py(v) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' +
+                 nf(v, 1) + '</text>';
+          }
+          g += '<text x="' + (OX - 6) + '" y="' + (OY - 186) + '" text-anchor="middle" class="lbl">k (N/m)</text>';
+          // i punti
+          for (var j = 0; j < ks.length; j++) {
+            var x = OX + (j + 0.5) * (W / ks.length);
+            g += '<circle cx="' + x.toFixed(1) + '" cy="' + py(ks[j]).toFixed(1) + '" r="7" fill="var(--accent)"/>';
+            g += '<text x="' + x.toFixed(1) + '" y="' + (OY + 20) + '" text-anchor="middle" class="lbl-s">n.' + eti[j] + '</text>';
+            g += '<text x="' + x.toFixed(1) + '" y="' + (py(ks[j]) - 13).toFixed(1) + '" text-anchor="middle" class="lbl-s">' +
+                 nf(ks[j], 2) + '</text>';
+          }
+          g += '<text x="' + (OX + W / 2) + '" y="' + (OY + 46) + '" text-anchor="middle" class="lbl-s">le otto stime di k, con la loro media e la fascia di semidispersione</text>';
+          svg.innerHTML = g;
+          document.getElementById('an-media').textContent = nf(st.media, 2);
+          document.getElementById('an-semi').textContent = nf(st.semi, 2);
+          document.getElementById('an-sq').textContent = nf(st.sq, 2);
+          document.getElementById('an-rel').textContent = nf(st.semi / st.media * 100, 1) + '%';
+          document.getElementById('an-tutti').classList.toggle('active', tutti);
+          document.getElementById('an-senza').classList.toggle('active', !tutti);
+        }
+        document.getElementById('an-tutti').addEventListener('click', function () { tutti = true; disegna(); });
+        document.getElementById('an-senza').addEventListener('click', function () { tutti = false; disegna(); });
+        disegna();
+      })();
+
+      /* ================= 10 — il grafico F vs Δx ================= */
+      (function () {
+        var svg = document.getElementById('gr-svg');
+        if (!svg) { return; }
+        var modo = 1;
+        var TESTI = {
+          1: 'Otto punti sperimentali. Prima di tracciare qualunque retta, guardate se stanno allineati: ' +
+             'questa è la domanda a cui il grafico deve rispondere.',
+          2: 'La retta che meglio interpola i punti passa per l\'origine, come previsto dalla legge. La sua ' +
+             'pendenza è la costante elastica: circa $24$ N/m.',
+          3: 'In rosso le rette di pendenza <strong>massima</strong> e <strong>minima</strong> ancora ' +
+             'compatibili con i punti: la loro semidifferenza è l\'incertezza su $k$.',
+          4: 'Così <strong>non</strong> va fatto: unendo i punti si suggerisce che fra una misura e l\'altra ' +
+             'la molla faccia degli scatti. I punti sono misure, la legge è la retta.'
+        };
+        function disegna() {
+          var OX = 90, OY = 340, W = 490, H = 280;
+          var xmax = 0.18, ymax = 4.4;
+          function px(x) { return OX + x / xmax * W; }
+          function py(y) { return OY - y / ymax * H; }
+          var g = '', i;
+          for (i = 0; i <= 9; i++) {
+            g += '<line x1="' + px(i * 0.02) + '" y1="' + OY + '" x2="' + px(i * 0.02) + '" y2="' + py(ymax) + '" class="grid"/>';
+          }
+          for (i = 0; i <= 4; i++) {
+            g += '<line x1="' + OX + '" y1="' + py(i) + '" x2="' + px(xmax) + '" y2="' + py(i) + '" class="grid"/>';
+            g += '<text x="' + (OX - 10) + '" y="' + (py(i) + 4) + '" text-anchor="end" class="lbl-s">' + i + '</text>';
+          }
+          for (i = 0; i <= 9; i++) {
+            if (i % 2 === 0) {
+              g += '<text x="' + px(i * 0.02) + '" y="' + (OY + 18) + '" text-anchor="middle" class="lbl-s">' +
+                   nf(i * 0.02, 2) + '</text>';
+            }
+          }
+          g += '<line x1="' + OX + '" y1="' + OY + '" x2="' + (px(xmax) + 14) + '" y2="' + OY + '" class="axis"/>';
+          g += '<line x1="' + OX + '" y1="' + OY + '" x2="' + OX + '" y2="' + (py(ymax) - 14) + '" class="axis"/>';
+          g += '<text x="' + (px(xmax) + 4) + '" y="' + (OY + 34) + '" text-anchor="end" class="lbl">Δx (m)</text>';
+          g += '<text x="' + (OX + 6) + '" y="' + (py(ymax) - 20) + '" class="lbl">P (N)</text>';
+
+          var X = [], Y = [];
+          for (i = 0; i < DATI.length; i++) {
+            X.push(allungDi(DATI[i][1]));
+            Y.push(pesoDi(DATI[i][0]));
+          }
+          // rette
+          if (modo === 2) {
+            var sxx = 0, sxy = 0;
+            for (i = 0; i < X.length; i++) { sxx += X[i] * X[i]; sxy += X[i] * Y[i]; }
+            var kk = sxy / sxx;
+            g += '<line x1="' + px(0) + '" y1="' + py(0) + '" x2="' + px(xmax) + '" y2="' + py(kk * xmax) +
+                 '" stroke="var(--accent)" stroke-width="3"/>';
+            g += '<text x="' + px(0.135) + '" y="' + (py(kk * 0.135) + 24) + '" class="lbl" style="fill:var(--accent);">pendenza ≈ ' + nf(kk, 2) + ' N/m</text>';
+          }
+          if (modo === 3) {
+            var kmax = 0, kmin = 1e9;
+            for (i = 0; i < X.length; i++) {
+              kmax = Math.max(kmax, Y[i] / X[i]);
+              kmin = Math.min(kmin, Y[i] / X[i]);
+            }
+            g += '<line x1="' + px(0) + '" y1="' + py(0) + '" x2="' + px(xmax) + '" y2="' + py(kmax * xmax) +
+                 '" stroke="var(--magenta)" stroke-width="2.4"/>';
+            g += '<line x1="' + px(0) + '" y1="' + py(0) + '" x2="' + px(xmax) + '" y2="' + py(kmin * xmax) +
+                 '" stroke="var(--magenta)" stroke-width="2.4" stroke-dasharray="7 5"/>';
+            g += '<text x="' + px(0.148) + '" y="' + (py(kmax * 0.148) - 8) + '" class="em">k max = ' + nf(kmax, 2) + '</text>';
+            g += '<text x="' + px(0.148) + '" y="' + (py(kmin * 0.148) + 22) + '" class="em">k min = ' + nf(kmin, 2) + '</text>';
+          }
+          if (modo === 4) {
+            var pts = [];
+            for (i = 0; i < X.length; i++) { pts.push(px(X[i]).toFixed(1) + ',' + py(Y[i]).toFixed(1)); }
+            g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--red)" stroke-width="2.6"/>';
+            g += '<text x="' + px(0.055) + '" y="' + py(3.4) + '" class="lbl" style="fill:var(--red);">✗ così no!</text>';
+          }
+          // i punti, con le barre d'errore sull'allungamento (1 mm su ciascuna lunghezza -> 2 mm)
+          for (i = 0; i < X.length; i++) {
+            var bx = px(X[i]), by = py(Y[i]), e = px(0.002) - px(0);
+            g += '<line x1="' + (bx - e).toFixed(1) + '" y1="' + by.toFixed(1) + '" x2="' + (bx + e).toFixed(1) +
+                 '" y2="' + by.toFixed(1) + '" stroke="var(--muted)" stroke-width="1.6"/>';
+            g += '<circle cx="' + bx.toFixed(1) + '" cy="' + by.toFixed(1) + '" r="5.5" fill="var(--accent)"/>';
+          }
+          svg.innerHTML = g;
+          var out = document.getElementById('gr-out');
+          out.innerHTML = TESTI[modo];
+          if (typeof renderMathIn === 'function') { renderMathIn(out); }
+          [['gr-p', 1], ['gr-r', 2], ['gr-mm', 3], ['gr-sp', 4]].forEach(function (b) {
+            document.getElementById(b[0]).classList.toggle('active', b[1] === modo);
+          });
+        }
+        [['gr-p', 1], ['gr-r', 2], ['gr-mm', 3], ['gr-sp', 4]].forEach(function (b) {
+          document.getElementById(b[0]).addEventListener('click', function () { modo = b[1]; disegna(); });
+        });
+        disegna();
+      })();
+
+      /* ================= 13 — il dinamometro ================= */
+      (function () {
+        var svg = document.getElementById('di-svg');
+        if (!svg) { return; }
+        var K = 24.0, YTOP = 40, PXM = 1000;
+        function disegna() {
+          var F = parseFloat(document.getElementById('di-f').value);
+          var dx = F / K;
+          var ybot = YTOP + (0.05 + dx) * PXM;
+          var g = '';
+          g += '<rect x="60" y="20" width="120" height="14" class="supporto"/>';
+          g += '<line x1="60" y1="34" x2="180" y2="34" stroke="var(--text)" stroke-width="2"/>';
+          // il corpo del dinamometro: la scala tarata in newton
+          g += '<rect x="196" y="' + YTOP + '" width="66" height="' + (0.05 * PXM + 4.2 / K * PXM) +
+               '" rx="6" fill="color-mix(in srgb, var(--gold) 10%, var(--surface))" stroke="var(--border)" stroke-width="1.5"/>';
+          for (var i = 0; i <= 40; i++) {
+            var Fi = i / 10, y = YTOP + (0.05 + Fi / K) * PXM;
+            var lung = (i % 5 === 0) ? 18 : 9;
+            g += '<line x1="196" y1="' + y.toFixed(1) + '" x2="' + (196 + lung) + '" y2="' + y.toFixed(1) +
+                 '" stroke="var(--muted)" stroke-width="1.2"/>';
+            if (i % 5 === 0) {
+              g += '<text x="' + (196 + 60) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' +
+                   nf(Fi, 1) + '</text>';
+            }
+          }
+          g += '<text x="229" y="' + (YTOP - 10) + '" text-anchor="middle" class="lbl-s">N</text>';
+          g += molla(120, 34, ybot, 10, 18);
+          // l'indice, solidale con l'estremo della molla
+          g += '<line x1="120" y1="' + ybot.toFixed(1) + '" x2="262" y2="' + ybot.toFixed(1) +
+               '" stroke="var(--magenta)" stroke-width="2.4"/>';
+          g += '<polygon points="196,' + ybot.toFixed(1) + ' 186,' + (ybot - 6).toFixed(1) + ' 186,' +
+               (ybot + 6).toFixed(1) + '" fill="var(--magenta)"/>';
+          // il gancio e il carico
+          g += '<path d="M 120 ' + ybot.toFixed(1) + ' q 0 14 10 14 q 10 0 10 -10" fill="none" stroke="var(--text)" stroke-width="2.5"/>';
+          if (F > 0.02) {
+            g += '<rect x="' + (120 - 26) + '" y="' + (ybot + 22).toFixed(1) + '" width="52" height="' +
+                 (14 + F * 8).toFixed(1) + '" rx="3" class="peso"/>';
+            g += freccia(120, ybot + 44 + F * 8, 120, ybot + 64 + F * 8 + F * 14, 'w', 11);
+            g += '<text x="134" y="' + (ybot + 78 + F * 20).toFixed(1) + '" class="lbl" style="fill:var(--magenta);">F = ' + nf(F, 2) + ' N</text>';
+          }
+          svg.innerHTML = g;
+          document.getElementById('di-fv').textContent = nf(F, 2);
+          document.getElementById('di-let').textContent = nf(F, 2);
+          document.getElementById('di-all').textContent = nf(dx * 100, 1);
+          document.getElementById('di-mas').textContent = Math.round(F / G * 1000);
+        }
+        document.getElementById('di-f').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 13.2 — allenamento sul dinamometro ================= */
+      (function () {
+        var box = document.getElementById('dn-box');
+        if (!box) { return; }
+        var att = 0, um = 'N';
+        function nuovo() {
+          var tipo = Math.floor(Math.random() * 3);
+          var k = [15, 20, 25, 30, 40, 50, 60][Math.floor(Math.random() * 7)];
+          var dxcm = [2, 4, 5, 8, 10, 12, 15][Math.floor(Math.random() * 7)];
+          var testo;
+          if (tipo === 0) {
+            att = Math.round(k * dxcm / 100 * 1000) / 1000; um = 'N';
+            testo = 'Una molla con $k = ' + k + '$ N/m si allunga di $' + dxcm +
+                    '$ cm. Quanto vale la forza applicata?';
+            document.getElementById('dn-eti').textContent = 'F =';
+          } else if (tipo === 1) {
+            att = dxcm; um = 'cm';
+            testo = 'A una molla con $k = ' + k + '$ N/m si applica una forza di $' +
+                    nf(k * dxcm / 100, 2).replace(',', '{,}') + '$ N. Di quanti centimetri si allunga?';
+            document.getElementById('dn-eti').textContent = 'Δx =';
+          } else {
+            att = k; um = 'N/m';
+            testo = 'Una molla si allunga di $' + dxcm + '$ cm quando le si applica una forza di $' +
+                    nf(k * dxcm / 100, 2).replace(',', '{,}') + '$ N. Quanto vale la sua costante elastica?';
+            document.getElementById('dn-eti').textContent = 'k =';
+          }
+          document.getElementById('dn-um').textContent = um;
+          var el = document.getElementById('dn-testo');
+          el.innerHTML = testo;
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          document.getElementById('dn-val').value = '';
+          document.getElementById('dn-fb').textContent = '';
+          document.getElementById('dn-fb').className = 'fb';
+        }
+        function verifica() {
+          var v = num(document.getElementById('dn-val').value);
+          var fb = document.getElementById('dn-fb');
+          if (isNaN(v)) { fb.className = 'fb no'; fb.textContent = 'Scrivi un numero.'; return; }
+          if (Math.abs(v - att) < Math.max(0.01, Math.abs(att) * 0.005)) {
+            fb.className = 'fb ok';
+            fb.textContent = '✓ Esatto: ' + nf(att, 2) + ' ' + um + '.';
+          } else if (um === 'N' && Math.abs(v - att * 100) < 0.5) {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ Attenzione alle unità: l\'allungamento va messo in <strong>metri</strong>, non in centimetri.';
+          } else {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ No. Riparti da $F = k\\,\\Delta x$ e isola la grandezza richiesta, ' +
+                           'ricordando che $\\Delta x$ va in metri.';
+            renderMathIn(fb);
+          }
+        }
+        document.getElementById('dn-ver').addEventListener('click', verifica);
+        document.getElementById('dn-new').addEventListener('click', nuovo);
+        nuovo();
+      })();
+
+      /* ================= 14.3 — calibrazione del dinamometro ================= */
+      // lo strumento "vero": d = 12,5 F + 6, letto alla divisione intera
+      var CAL = [[0, 0.000, 6], [100, 0.981, 18], [200, 1.962, 31],
+                 [300, 2.943, 43], [400, 3.924, 55], [500, 4.905, 67]];
+      var CAL_M = (67 - 6) / 4.905;      // sensibilità dai due punti estremi
+      var CAL_Q = 6.0;                   // zero
+
+      (function () {
+        var svg = document.getElementById('cal-svg');
+        if (!svg) { return; }
+        var n = 0, retta = false;
+        // grafico a destra
+        var GX = 330, GY = 330, GW = 290, GH = 250, FMAX = 5.2, DMAX = 80;
+        function px(F) { return GX + F / FMAX * GW; }
+        function py(d) { return GY - d / DMAX * GH; }
+        function disegna() {
+          var d = (n > 0) ? CAL[n - 1][2] : CAL[0][2];
+          var g = '', i;
+          // ---- lo strumento, a sinistra ----
+          g += '<rect x="60" y="30" width="120" height="14" class="supporto"/>';
+          g += '<line x1="60" y1="44" x2="180" y2="44" stroke="var(--text)" stroke-width="2"/>';
+          // la striscia graduata in divisioni anonime
+          var YT = 60, PXD = 3.2;          // 3,2 px per divisione
+          g += '<rect x="150" y="' + YT + '" width="52" height="' + (DMAX * PXD) +
+               '" rx="5" fill="color-mix(in srgb, var(--gold) 10%, var(--surface))" stroke="var(--border)" stroke-width="1.4"/>';
+          for (i = 0; i <= DMAX; i += 2) {
+            var y = YT + i * PXD, lu = (i % 10 === 0) ? 15 : 7;
+            g += '<line x1="150" y1="' + y.toFixed(1) + '" x2="' + (150 + lu) + '" y2="' + y.toFixed(1) +
+                 '" stroke="var(--muted)" stroke-width="1"/>';
+            if (i % 10 === 0) {
+              g += '<text x="198" y="' + (y + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + i + '</text>';
+            }
+          }
+          g += '<text x="176" y="' + (YT - 8) + '" text-anchor="middle" class="lbl-s">div</text>';
+          // la molla e l'indice
+          var ybot = YT + d * PXD;
+          g += molla(110, 44, ybot, 9, 15);
+          g += '<line x1="110" y1="' + ybot.toFixed(1) + '" x2="202" y2="' + ybot.toFixed(1) +
+               '" stroke="var(--magenta)" stroke-width="2.4"/>';
+          g += '<polygon points="150,' + ybot.toFixed(1) + ' 140,' + (ybot - 6).toFixed(1) + ' 140,' +
+               (ybot + 6).toFixed(1) + '" fill="var(--magenta)"/>';
+          g += '<text x="106" y="' + (ybot - 10).toFixed(1) + '" text-anchor="end" class="em">' + d + '</text>';
+          // il campione appeso
+          if (n > 1) {
+            var mg = CAL[n - 1][0];
+            g += '<rect x="' + (110 - 24) + '" y="' + (ybot + 6).toFixed(1) + '" width="48" height="' +
+                 (14 + n * 2.5).toFixed(1) + '" rx="3" class="peso"/>';
+            g += '<text x="110" y="' + (ybot + 34 + n * 2.5).toFixed(1) + '" text-anchor="middle" class="lbl">' +
+                 mg + ' g</text>';
+          } else if (n === 1) {
+            g += '<text x="110" y="' + (ybot + 24).toFixed(1) + '" text-anchor="middle" class="lbl-s">a vuoto</text>';
+          }
+          // ---- il grafico, a destra ----
+          for (i = 0; i <= 5; i++) {
+            g += '<line x1="' + px(i) + '" y1="' + GY + '" x2="' + px(i) + '" y2="' + py(DMAX) + '" class="grid"/>';
+            g += '<text x="' + px(i) + '" y="' + (GY + 17) + '" text-anchor="middle" class="lbl-s">' + i + '</text>';
+          }
+          for (i = 0; i <= DMAX; i += 20) {
+            g += '<line x1="' + GX + '" y1="' + py(i) + '" x2="' + px(FMAX) + '" y2="' + py(i) + '" class="grid"/>';
+            g += '<text x="' + (GX - 8) + '" y="' + (py(i) + 4) + '" text-anchor="end" class="lbl-s">' + i + '</text>';
+          }
+          g += '<line x1="' + GX + '" y1="' + GY + '" x2="' + (px(FMAX) + 12) + '" y2="' + GY + '" class="axis"/>';
+          g += '<line x1="' + GX + '" y1="' + GY + '" x2="' + GX + '" y2="' + (py(DMAX) - 12) + '" class="axis"/>';
+          g += '<text x="' + (px(FMAX) + 6) + '" y="' + (GY + 32) + '" text-anchor="end" class="lbl">F (N)</text>';
+          g += '<text x="' + (GX + 6) + '" y="' + (py(DMAX) - 18) + '" class="lbl">d (div)</text>';
+          if (retta && n >= 2) {
+            g += '<line x1="' + px(0) + '" y1="' + py(CAL_Q) + '" x2="' + px(FMAX) + '" y2="' +
+                 py(CAL_M * FMAX + CAL_Q) + '" stroke="var(--accent)" stroke-width="2.6"/>';
+            g += '<circle cx="' + px(0) + '" cy="' + py(CAL_Q) + '" r="5" fill="none" stroke="var(--magenta)" stroke-width="2.5"/>';
+            g += '<text x="' + (px(0) + 12) + '" y="' + (py(CAL_Q) - 10) + '" class="em">q = 6 div</text>';
+          }
+          for (i = 0; i < n; i++) {
+            g += '<circle cx="' + px(CAL[i][1]).toFixed(1) + '" cy="' + py(CAL[i][2]).toFixed(1) +
+                 '" r="5.5" fill="var(--accent)"/>';
+          }
+          svg.innerHTML = g;
+
+          // ---- la tabella ----
+          var righe = '';
+          for (i = 0; i < n; i++) {
+            righe += '<tr><td>' + CAL[i][0] + '</td><td>' + nf(CAL[i][1], 3) + '</td><td>' + CAL[i][2] + '</td></tr>';
+          }
+          if (n === 0) { righe = '<tr><td colspan="3" class="vuoto">nessuna misura eseguita</td></tr>'; }
+          document.getElementById('cal-body').innerHTML = righe;
+
+          var out = document.getElementById('cal-out');
+          if (n === 0) {
+            out.textContent = 'Nessuna misura ancora eseguita.';
+          } else if (n === 1) {
+            out.innerHTML = 'Prima sorpresa: <strong>a gancio scarico l\'indice non segna zero</strong>, ' +
+                            'ma 6 divisioni. È l\'<em>offset</em> dello strumento.';
+          } else if (!retta) {
+            out.innerHTML = 'Misure eseguite: ' + n + ' su 6. Guardate se i punti sul grafico stanno ' +
+                            'allineati: è quello che decide se la calibrazione può essere una retta.';
+          } else {
+            out.innerHTML = 'Retta di calibrazione: $d = ' + nf(CAL_M, 2).replace(',', '{,}') +
+                            '\\,F + ' + nf(CAL_Q, 1).replace(',', '{,}') + '$, con sensibilità $' +
+                            nf(CAL_M, 2).replace(',', '{,}') + '$ div/N e zero $' +
+                            nf(CAL_Q, 1).replace(',', '{,}') + '$ div.';
+            renderMathIn(out);
+          }
+        }
+        document.getElementById('cal-next').addEventListener('click', function () {
+          if (n < CAL.length) { n++; disegna(); }
+        });
+        document.getElementById('cal-all').addEventListener('click', function () { n = CAL.length; disegna(); });
+        document.getElementById('cal-reset').addEventListener('click', function () { n = 0; retta = false; disegna(); });
+        document.getElementById('cal-retta').addEventListener('click', function () {
+          if (n < 2) { n = CAL.length; }
+          retta = !retta;
+          this.classList.toggle('active', retta);
+          disegna();
+        });
+        disegna();
+      })();
+
+      /* ================= 14.4 — la calibrazione usata all'incontrario ================= */
+      (function () {
+        var svg = document.getElementById('cu-svg');
+        if (!svg) { return; }
+        var GX = 90, GY = 210, GW = 420, GH = 160, FMAX = 5.2, DMAX = 80;
+        function px(F) { return GX + F / FMAX * GW; }
+        function py(d) { return GY - d / DMAX * GH; }
+        function disegna() {
+          var d = parseFloat(document.getElementById('cu-d').value);
+          var F = (d - CAL_Q) / CAL_M;
+          var Fsb = d / CAL_M;
+          var g = '', i;
+          for (i = 0; i <= 5; i++) {
+            g += '<line x1="' + px(i) + '" y1="' + GY + '" x2="' + px(i) + '" y2="' + py(DMAX) + '" class="grid"/>';
+            g += '<text x="' + px(i) + '" y="' + (GY + 17) + '" text-anchor="middle" class="lbl-s">' + i + '</text>';
+          }
+          for (i = 0; i <= DMAX; i += 20) {
+            g += '<line x1="' + GX + '" y1="' + py(i) + '" x2="' + px(FMAX) + '" y2="' + py(i) + '" class="grid"/>';
+            g += '<text x="' + (GX - 8) + '" y="' + (py(i) + 4) + '" text-anchor="end" class="lbl-s">' + i + '</text>';
+          }
+          g += '<line x1="' + GX + '" y1="' + GY + '" x2="' + (px(FMAX) + 12) + '" y2="' + GY + '" class="axis"/>';
+          g += '<line x1="' + GX + '" y1="' + GY + '" x2="' + GX + '" y2="' + (py(DMAX) - 12) + '" class="axis"/>';
+          g += '<text x="' + (px(FMAX) + 8) + '" y="' + (GY + 32) + '" text-anchor="end" class="lbl">F (N)</text>';
+          g += '<text x="' + (GX + 6) + '" y="' + (py(DMAX) - 18) + '" class="lbl">d (div)</text>';
+          // la retta di calibrazione
+          g += '<line x1="' + px(0) + '" y1="' + py(CAL_Q) + '" x2="' + px(FMAX) + '" y2="' +
+               py(CAL_M * FMAX + CAL_Q) + '" stroke="var(--accent)" stroke-width="2.6"/>';
+          // la lettura: si parte da d, si va sulla retta, si scende su F
+          g += '<line x1="' + GX + '" y1="' + py(d).toFixed(1) + '" x2="' + px(F).toFixed(1) + '" y2="' +
+               py(d).toFixed(1) + '" class="dash" stroke="var(--magenta)"/>';
+          g += '<line x1="' + px(F).toFixed(1) + '" y1="' + py(d).toFixed(1) + '" x2="' + px(F).toFixed(1) +
+               '" y2="' + GY + '" class="dash" stroke="var(--magenta)"/>';
+          g += '<circle cx="' + px(F).toFixed(1) + '" cy="' + py(d).toFixed(1) + '" r="6" fill="var(--magenta)"/>';
+          g += '<text x="' + (GX + 10) + '" y="' + (py(d) - 8).toFixed(1) + '" class="em">leggo d = ' + d + '</text>';
+          g += '<text x="' + px(F).toFixed(1) + '" y="' + (GY + 34) + '" text-anchor="middle" class="em">F = ' +
+               nf(F, 2) + ' N</text>';
+          // il confronto con chi ignora lo zero
+          g += '<line x1="' + px(Fsb).toFixed(1) + '" y1="' + py(d).toFixed(1) + '" x2="' + px(Fsb).toFixed(1) +
+               '" y2="' + GY + '" stroke="var(--red)" stroke-width="1.8" stroke-dasharray="4 4"/>';
+          g += '<text x="' + px(Fsb).toFixed(1) + '" y="' + (GY + 52) + '" text-anchor="middle" class="lbl-s" style="fill:var(--red);">senza offset: ' +
+               nf(Fsb, 2) + ' N</text>';
+          svg.innerHTML = g;
+          document.getElementById('cu-dv').textContent = d;
+          document.getElementById('cu-f').textContent = nf(F, 2);
+          document.getElementById('cu-m').textContent = Math.round(F / G * 1000);
+          document.getElementById('cu-err').textContent = nf(Fsb, 2);
+          var perc = (F > 0.001) ? (Fsb - F) / F * 100 : 0;
+          var el = document.getElementById('cu-perc');
+          el.textContent = (F > 0.001) ? ('+' + nf(perc, 0) + '%') : '—';
+          el.style.color = (perc > 25) ? 'var(--red)' : '';
+        }
+        document.getElementById('cu-d').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      //JSSENTINEL
+
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Che cosa afferma la <strong>legge di Hooke</strong>?',
+        options: ['la forza elastica è proporzionale all\'allungamento e di verso opposto', 'la forza elastica è costante', 'la forza elastica è proporzionale alla lunghezza della molla', 'la forza elastica dipende solo dal materiale', 'la forza elastica è proporzionale al quadrato dell\'allungamento'],
+        correct: 0, explain: '$F = -k\\,\\Delta x$. Il segno meno dice che la forza è di <strong>richiamo</strong>: qualunque cosa faccia io, la molla fa il contrario. Se la allungo, tira indietro; se la comprimo, spinge in fuori.' },
+
+      { type: 'mc', diff: 'medium', text: 'Che cosa rappresenta $\\Delta x$ nella legge di Hooke?',
+        options: ['la lunghezza della molla con il peso appeso', 'la lunghezza a riposo', 'la differenza $L - L_0$, cioè l\'allungamento', 'la massa appesa', 'lo spessore del filo'],
+        correct: 2, explain: 'È l\'errore numero uno dell\'esperienza. $\\Delta x$ è solo il «pezzo in più» rispetto alla lunghezza naturale, ed è per questo che $L_0$ va misurata <strong>prima</strong> di appendere qualunque peso.' },
+
+      { type: 'mc', diff: 'easy', text: 'In quale unità si misura la costante elastica $k$?',
+        options: ['newton (N)', 'metri (m)', 'kilogrammi (kg)', 'newton per metro (N·m)', 'newton al metro (N/m)'],
+        correct: 4, explain: 'Da $k = F/\\Delta x$ segue subito N/m. Si legge: quanti newton servono per allungare la molla di un metro. Attenzione a non confondere N/m con N·m, che è invece l\'unità del momento di una forza.' },
+
+      { type: 'mc', diff: 'medium', text: 'Riportando $F$ in funzione di $\\Delta x$, se la legge di Hooke vale si ottiene:',
+        options: ['una parabola', 'una retta passante per l\'origine', 'una retta con intercetta uguale a $L_0$', 'un\'iperbole', 'una curva esponenziale'],
+        correct: 1, explain: 'È una proporzionalità diretta, $F = k\\,\\Delta x$, cioè $y = m x$: retta per l\'origine, con coefficiente angolare uguale a $k$. E il fatto che passi per l\'origine ha un senso fisico preciso: nessun allungamento, nessuna forza.' },
+
+      { type: 'mc', diff: 'hard', text: 'Un pesetto di $200$ g viene appeso a una molla. Quanto vale la forza applicata (con $g = 9{,}81$ m/s²)?',
+        options: ['$200$ N', '$1962$ N', '$0{,}200$ N', '$1{,}962$ N', '$20{,}4$ N'],
+        correct: 3, explain: 'Prima si converte: $200$ g $= 0{,}200$ kg. Poi $P = m\\,g = 0{,}200 \\cdot 9{,}81 = 1{,}962$ N. Chi ottiene $1962$ ha moltiplicato i grammi per $g$ dimenticando la conversione: è la trappola classica.' },
+
+      { type: 'mc', diff: 'medium', text: 'Qual è la differenza fra <strong>massa</strong> e <strong>peso</strong>?',
+        options: ['la massa è la quantità di materia ed è scalare; il peso è la forza di gravità ed è vettoriale', 'sono la stessa cosa con nomi diversi', 'la massa è in newton, il peso in kilogrammi', 'la massa vale solo sulla Terra', 'il peso non cambia mai, la massa sì'],
+        correct: 0, explain: 'La massa (kg) è una grandezza fondamentale e non cambia mai: sulla Luna siete gli stessi. Il peso (N) è una forza, ed è sei volte minore sulla Luna. In laboratorio si appendono masse ma si riportano in tabella <strong>forze</strong>.' },
+
+      { type: 'mc', diff: 'medium', text: 'Perché la lunghezza a riposo $L_0$ va misurata <strong>tre volte</strong>?',
+        options: ['per non sbagliare a leggere il righello', 'per far durare di più l\'esperimento', 'perché ripetendo si evidenziano gli errori casuali e si può stimarne l\'incertezza', 'perché la molla cambia lunghezza ogni volta', 'perché lo prescrive il Sistema Internazionale'],
+        correct: 2, explain: 'Una misura sola non dice nulla sulla propria incertezza. Ripetendola, la <strong>media</strong> dà la stima migliore e la <strong>semidispersione</strong> — mai minore della sensibilità dello strumento — ne dà l\'incertezza.' },
+
+      { type: 'mc', diff: 'hard', text: 'Nella nostra esperienza, perché il valore $k_1$ ricavato dal primo pesetto è il meno affidabile?',
+        options: ['perché il primo pesetto è più leggero degli altri', 'perché la molla non era ancora in equilibrio', 'perché la bilancia non era tarata', 'perché il primo dato si scarta sempre', 'perché con un allungamento piccolo l\'incertezza fissa di 1 mm pesa percentualmente molto di più'],
+        correct: 4, explain: '1 mm su 2 cm è il 5%; lo stesso millimetro su 16 cm è lo 0,6%. È la regola generale delle misure indirette che sono <em>rapporti</em>: i punti con denominatore piccolo sono i più fragili. Per questo conviene arrivare fino a 400 g.' },
+
+      { type: 'mc', diff: 'medium', text: 'Nel grafico $F$-$\\Delta x$, che cosa rappresenta il <strong>coefficiente angolare</strong> della retta interpolante?',
+        options: ['la lunghezza a riposo', 'la costante elastica $k$', 'la massa totale appesa', 'l\'incertezza sulla misura', 'l\'accelerazione di gravità'],
+        correct: 1, explain: 'Confrontando $F = k\\,\\Delta x$ con $y = m x$ si vede subito che $k$ occupa il posto di $m$. Si calcola prendendo <strong>due punti sulla retta</strong> ben distanziati, non necessariamente sperimentali.' },
+
+      { type: 'mc', diff: 'medium', text: 'Perché nel grafico <strong>non</strong> si devono unire i punti sperimentali con una spezzata?',
+        options: ['perché è più difficile da disegnare', 'perché la spezzata non ha coefficiente angolare', 'perché si consuma più inchiostro', 'perché suggerirebbe bruschi cambi di comportamento fra una misura e l\'altra, mentre i punti sono misure con la loro incertezza', 'perché la legge di Hooke non è lineare'],
+        correct: 3, explain: 'Il compito del grafico è mostrare che i punti sono <em>compatibili</em> con una retta, non seguirli uno per uno. Ogni punto è una misura con la sua barra d\'errore: la legge è la retta che ci passa in mezzo.' },
+
+      { type: 'mc', diff: 'hard', text: 'Due misure di $k$ danno $(24{,}06 \\pm 0{,}31)$ N/m e $(23{,}93 \\pm 0{,}31)$ N/m. Sono compatibili?',
+        options: ['sì, perché $|24{,}06 - 23{,}93| = 0{,}13$ è minore di $0{,}31 + 0{,}31 = 0{,}62$', 'no, perché i valori centrali sono diversi', 'no, perché hanno la stessa incertezza', 'sì, perché entrambe sono maggiori di 20', 'non si può dire senza conoscere il numero di misure'],
+        correct: 0, explain: 'Il criterio è $|k_1 - k_2| \\le \\Delta k_1 + \\Delta k_2$: gli intervalli $[23{,}75; 24{,}37]$ e $[23{,}62; 24{,}24]$ si sovrappongono ampiamente. Due valori centrali diversi non significano nulla, se le incertezze li abbracciano.' },
+
+      { type: 'mc', diff: 'medium', text: 'Che cos\'è il <strong>limite di elasticità</strong>?',
+        options: ['la massima lunghezza che una molla può avere', 'la massima velocità con cui si può tirare una molla', 'la forza oltre la quale la legge di Hooke smette di valere e la molla resta deformata', 'il punto in cui la molla si rompe', 'il valore massimo della costante elastica'],
+        correct: 2, explain: 'Oltre quel punto il grafico non è più una retta e la deformazione diventa <strong>plastica</strong>: tolta la forza, la molla non torna com\'era. È l\'ennesimo esempio del fatto che ogni legge fisica ha un campo di validità — come il modello a raggi in ottica.' },
+
+      { type: 'mc', diff: 'hard', text: 'Un dinamometro deve avere portata $10$ N e la sua molla può allungarsi al massimo di $20$ cm. Che costante elastica serve?',
+        options: ['$0{,}5$ N/m', '$2$ N/m', '$200$ N/m', '$10$ N/m', '$50$ N/m'],
+        correct: 4, explain: '$k = F/\\Delta x = 10 / 0{,}20 = 50$ N/m. Attenzione a mettere l\'allungamento in <strong>metri</strong>: usando i centimetri verrebbe $0{,}5$, che è l\'errore più frequente in questo tipo di esercizio.' },
+
+      { type: 'mc', diff: 'medium', text: 'Fra due molle, una con $k = 15$ N/m e una con $k = 60$ N/m, quale conviene per misurare forze molto piccole?',
+        options: ['quella con $k = 60$ N/m, perché è più robusta', 'quella con $k = 15$ N/m, perché a parità di forza si allunga di più ed è quindi più sensibile', 'sono equivalenti', 'nessuna delle due: serve una molla rigidissima', 'quella con $k = 60$ N/m, perché ha la scala più fitta'],
+        correct: 1, explain: 'Con la stessa forza di $3$ N, la molla morbida si allunga di $20$ cm e quella rigida di $5$ cm: la prima è quattro volte più sensibile. Il prezzo è la <strong>portata</strong> ridotta — ed è per questo che in laboratorio si tengono dinamometri diversi.' },
+
+      { type: 'mc', diff: 'medium', text: 'Che cosa significa <strong>calibrare</strong> uno strumento di misura?',
+        options: ['pulirlo e rimetterlo a nuovo', 'renderlo più sensibile', 'costruirlo con materiali migliori', 'confrontarlo con campioni di valore noto e ricavare la relazione fra ciò che indica e il valore vero', 'usarlo per la prima volta'],
+        correct: 3, explain: 'Uno strumento, di per sé, non misura: <em>reagisce</em>. La molla si allunga, il sensore produce una tensione. La calibrazione è il ponte fra la reazione e la grandezza, e senza di essa i dati raccolti sono numeri senza significato.' },
+
+      { type: 'mc', diff: 'hard', text: 'Un dinamometro ha retta di calibrazione $d = 12{,}44\\,F + 6{,}0$ (in divisioni). Leggendo $d = 43$ divisioni, la forza vale:',
+        options: ['$2{,}97$ N', '$3{,}46$ N', '$43$ N', '$0{,}29$ N', '$537$ N'],
+        correct: 0, explain: 'Si <strong>inverte</strong> la retta: $F = \\dfrac{d - q}{m} = \\dfrac{43 - 6{,}0}{12{,}44} = 2{,}97$ N. Chi risponde $3{,}46$ N ha calcolato $d/m$ dimenticando lo <strong>zero</strong>: un errore costante di mezzo newton, che sulle forze piccole diventa enorme in percentuale.' },
+
+      { type: 'mc', diff: 'medium', text: 'In una retta di calibrazione $d = m\\,F + q$, che cosa rappresenta il termine $q$?',
+        options: ['la sensibilità dello strumento', 'la portata dello strumento', 'l\'indicazione dello strumento quando la grandezza vale zero', 'l\'incertezza della misura', 'il numero di campioni usati'],
+        correct: 2, explain: 'È l\'<strong>offset</strong>, o zero. Un dinamometro che a vuoto segna già 6 divisioni non è rotto: ha semplicemente un offset, e se lo si conosce lo strumento è perfettamente utilizzabile. È lo stesso motivo per cui su una bilancia da cucina si preme «tara».' },
+
+      { type: 'open', diff: 'hard', text: 'Spiega perché il metodo grafico è considerato <strong>migliore</strong> della media dei rapporti $k_i = P/\\Delta x$, pur dando (nel nostro caso) lo stesso risultato.',
+        keywords: ['verifica', 'legge', 'retta', 'origine', 'curv', 'tutti i punti', 'errori casuali', 'sistematico', 'primo punto', 'peso', 'affidabil', 'incertezza'],
+        requiredMatches: 3,
+        explain: 'Ci sono due ragioni, e la prima è di gran lunga la più importante.<br><br><strong>1. Il grafico verifica la legge, il calcolo la dà per buona.</strong> Quando calcolo $k_i = P/\\Delta x$ sto già assumendo che valga $F = k\\,\\Delta x$: qualunque cosa succeda, un numero mi esce. Se la legge fosse sbagliata — se per esempio la forza crescesse con il quadrato dell\'allungamento — otterrei otto valori diversi e non capirei perché. Il grafico invece mostra <em>la forma</em> dell\'andamento: se i punti si incurvano, o se la retta non passa per l\'origine, me ne accorgo subito. Nel secondo caso ho anche un\'informazione preziosa: la retta che non passa per l\'origine è la firma di un <strong>errore sistematico</strong>, tipicamente sulla misura di $L_0$.<br><br><strong>2. Il grafico pesa meglio i dati.</strong> La media dei rapporti tratta tutti gli otto valori come se fossero ugualmente affidabili, e abbiamo visto che non è vero: il primo punto, con soli 2 cm di allungamento, ha un errore relativo del 5% contro lo 0,6% dell\'ultimo. La retta interpolante, appoggiandosi a tutti i punti e privilegiando naturalmente quelli lontani dall\'origine, attenua gli errori casuali.<br><br>Nel nostro esperimento i due metodi danno $24{,}06$ e $23{,}93$ N/m, compatibili fra loro: i dati erano buoni e la differenza non si vede. Su dati più sporchi si vedrebbe eccome — ed è proprio allora che serve il metodo migliore.' }
+    ];
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,2588 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 10 — I fluidi</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox svg.stretta { max-width: 460px; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .figbox .grid { stroke: var(--border); stroke-width: 1; }
+    .figbox .axis { stroke: var(--muted); stroke-width: 2; }
+    .figbox .dash { stroke: var(--muted); stroke-width: 1.6; stroke-dasharray: 6 5; fill: none; }
+    .figbox .v  { stroke: var(--accent); stroke-width: 3.2; fill: none; stroke-linecap: round; }
+    .figbox .vp { fill: var(--accent); }
+    .figbox .w  { stroke: var(--magenta); stroke-width: 3.2; fill: none; stroke-linecap: round; }
+    .figbox .wp { fill: var(--magenta); }
+    .figbox .s  { stroke: var(--green); stroke-width: 3.4; fill: none; stroke-linecap: round; }
+    .figbox .sp { fill: var(--green); }
+    .figbox .tubo { fill: color-mix(in srgb, var(--muted) 22%, transparent); stroke: var(--text); stroke-width: 2.4; }
+    .figbox .acqua { fill: color-mix(in srgb, #3b82f6 42%, transparent); }
+    .figbox .acqua-b { fill: none; stroke: #3b82f6; stroke-width: 2; }
+    .figbox .filetto { fill: none; stroke: #3b82f6; stroke-width: 2; opacity: 0.85; }
+    .figbox .curva { fill: none; stroke: var(--accent); stroke-width: 3; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+
+    .inp { width: 7rem; font-size: 1rem; font-family: inherit; padding: 0.3rem 0.45rem; border-radius: 8px;
+           border: 2px solid var(--border); background: var(--surface); color: var(--text); text-align: right; }
+    .inp:focus { outline: none; border-color: var(--accent); }
+    .inp.w6 { width: 5rem; }
+    .qbox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.8rem 0; }
+    .qbox .qt { font-weight: 600; margin-bottom: 0.45rem; }
+    .qrow { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .fb { min-height: 1.4em; margin-top: 0.45rem; font-weight: 600; font-size: 0.95rem; }
+    .fb.ok { color: var(--green); }
+    .fb.no { color: var(--red); }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.42rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+    .tabf tr.tot td { font-weight: 700; background: color-mix(in srgb, var(--accent) 9%, transparent); }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.7rem; text-align: center; }
+    .stat .n { font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
+    .stat .l { font-size: 0.76rem; color: var(--muted); }
+
+    .prop { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .prop-card { background: var(--surface-2); border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px; padding: 0.8rem 0.95rem; }
+    .prop-card h4 { margin: 0 0 0.3rem; color: var(--accent); font-size: 1.03rem; }
+    .prop-card p { margin: 0.35rem 0; font-size: 0.93rem; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Terzo anno · Lezione 10</div>
+    <h1>I fluidi</h1>
+    <p>Acqua che scorre, aria che preme, sangue che circola: come si descrive ciò che non ha una forma —
+      e le leggi di conservazione che ci accompagneranno per tutto il corso</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Terzo anno</a>
+    <span class="sep">/</span> I fluidi
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove eravamo rimasti.</strong> Nelle tre lezioni precedenti abbiamo imparato a descrivere il moto
+      di un <em>corpo</em>: un carrello, un sasso, un'automobile. Oggetti che hanno una forma, che stanno da
+      qualche parte, di cui si può indicare la posizione. Adesso cambiamo mondo: studiamo le cose che
+      <strong>non hanno una forma propria</strong> e che si muovono tutte insieme, ciascun pezzetto in modo
+      diverso dagli altri. Un fiume, l'aria di questa stanza, il sangue nelle vostre vene. E scopriremo che per
+      cavarcela servono idee nuove — la portata, la pressione — e soprattutto un tipo di ragionamento che
+      diventerà il vostro pane quotidiano: le <strong>leggi di conservazione</strong>.
+    </div>
+
+    <!-- 1 — CHE COS'È UN FLUIDO -->
+    <section id="sec1">
+      <h2>1. Che cos'è un fluido</h2>
+
+      <p>Partiamo dall'osservazione più banale del mondo. Se prendo un cubetto di ferro e lo metto in una
+        pentola, resta un cubetto. Se ci verso dell'acqua, l'acqua <em>diventa</em> la pentola: prende la sua
+        forma, si adatta al fondo, sale lungo le pareti. E se apro il gas, quello riempie tutta la stanza senza
+        che nessuno glielo chieda.</p>
+
+      <div class="rule">
+        Un <strong>fluido</strong> è una sostanza che <strong>non ha forma propria</strong> e che
+        <strong>scorre</strong>, cioè si deforma con continuità anche sotto forze piccolissime. Sono fluidi i
+        <strong>liquidi</strong> e i <strong>gas</strong>.
+      </div>
+
+      <p>La differenza fra un solido e un fluido non è la durezza, ma il modo di reagire a una forza. Se spingo
+        di lato la faccia di un cubo di ferro, quello si deforma un pochino e poi <em>si ferma lì</em>: resiste
+        e raggiunge un equilibrio. Se spingo di lato la superficie dell'acqua, l'acqua non si ferma mai: continua
+        a spostarsi finché continuo a spingere. Ecco che cosa vuol dire «scorrere».</p>
+
+      <table class="tabf">
+        <thead><tr><th></th><th>Liquidi</th><th>Gas</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Forma propria</td><td>no</td><td>no</td></tr>
+          <tr><td class="lab">Volume proprio</td><td><strong>sì</strong>: un litro d'acqua resta un litro</td><td><strong>no</strong>: occupano tutto lo spazio disponibile</td></tr>
+          <tr><td class="lab">Comprimibilità</td><td>quasi nulla</td><td>alta: si possono schiacciare</td></tr>
+          <tr><td class="lab">Densità tipica</td><td>circa $1000$ kg/m³ (acqua)</td><td>circa $1{,}2$ kg/m³ (aria)</td></tr>
+        </tbody>
+      </table>
+
+      <p>Quella riga sulla comprimibilità è importante e la useremo per tutta la lezione. I liquidi sono
+        talmente poco comprimibili che, alle pressioni di cui parleremo, possiamo trattarli come
+        <strong>incomprimibili</strong>: un litro d'acqua è un litro, punto. È un'approssimazione — a mille
+        metri di profondità l'acqua è davvero un po' più densa — ma è ottima e ci semplifica moltissimo la
+        vita.</p>
+
+      <div class="curiosita">
+        <strong>Il vetro delle cattedrali non cola.</strong> Avrete forse sentito dire che i vetri delle
+        finestre antiche sono più spessi in basso perché il vetro è un liquido lentissimo che nei secoli è
+        colato verso il basso. È una bella storia e circola dappertutto, ma è <strong>falsa</strong>: il vetro
+        a temperatura ambiente è un solido a tutti gli effetti, e i tempi di scorrimento sarebbero
+        astronomicamente più lunghi dell'età dell'universo. Quei vetri sono più spessi in basso semplicemente
+        perché venivano fabbricati con spessore irregolare, e i vetrai li montavano — sensatamente — con il
+        lato pesante in giù.
+      </div>
+    </section>
+
+    <!-- 2 — IL VOLUME -->
+    <section id="sec2">
+      <h2>2. Il volume e le sue unità di misura</h2>
+
+      <p>Per parlare di fluidi ci serve prima di tutto sapere <em>quanto</em> fluido abbiamo. La grandezza che
+        lo dice è il <strong>volume</strong>, e vale la pena richiamarla perché nasconde una delle trappole più
+        classiche di tutto il programma.</p>
+
+      <div class="rule">
+        Il <strong>volume</strong> è la porzione di spazio occupata da un corpo. È una grandezza
+        <strong>derivata</strong> — si ottiene da tre lunghezze — ed è <strong>estensiva</strong>: due sistemi
+        uniti hanno la somma dei volumi. La sua unità nel Sistema Internazionale è il <strong>metro
+        cubo</strong> (m³).
+      </div>
+
+      <p>Il metro cubo però, per la vita quotidiana, è enorme: è il volume di un cubo di un metro di lato, e ci
+        stanno dentro mille bottiglie da un litro. Per questo si usa quasi sempre un'altra unità, che nel
+        Sistema Internazionale è tollerata ma non fondamentale: il <strong>litro</strong>.</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.15rem;">$$1\ \text{L} = 1\ \text{dm}^3 = 0{,}001\ \text{m}^3 \qquad\qquad 1\ \text{m}^3 = 1000\ \text{L}$$</p>
+        <p class="formula-note">Un litro è il volume di un cubo di <strong>un decimetro</strong> di lato, cioè
+          10 cm × 10 cm × 10 cm. E poiché <span>$1\ \text{mL} = 1\ \text{cm}^3$</span>, il millilitro della
+          siringa e il centimetro cubo del compito di matematica sono <em>esattamente</em> la stessa cosa.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>La trappola dei prefissi elevati a potenza</strong>, la stessa della lezione 4. Un metro cubo
+        <strong>non</strong> fa cento centimetri cubi: ne fa un milione, perché
+        <span>$1\ \text{m}^3 = (100\ \text{cm})^3 = 10^6\ \text{cm}^3$</span>. Quando un'unità con prefisso
+        viene elevata al cubo, <em>anche il fattore di conversione va elevato al cubo</em>. Chi sbaglia questo
+        passaggio non si accorge quasi mai dell'errore, perché il risultato «sembra» un numero.
+      </div>
+
+      <table class="tabf">
+        <thead><tr><th>Unità</th><th>In metri cubi</th><th>In litri</th><th>Dove si incontra</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">metro cubo (m³)</td><td>$1$</td><td>$1000$</td><td class="l">bolletta del gas, calcestruzzo, portate dei fiumi</td></tr>
+          <tr><td class="lab">litro (L)</td><td>$0{,}001$</td><td>$1$</td><td class="l">bottiglie, benzina, motori</td></tr>
+          <tr><td class="lab">decilitro (dL)</td><td>$10^{-4}$</td><td>$0{,}1$</td><td class="l">ricette di cucina</td></tr>
+          <tr><td class="lab">centilitro (cL)</td><td>$10^{-5}$</td><td>$0{,}01$</td><td class="l">bottiglie di bibite (una lattina è 33 cL)</td></tr>
+          <tr><td class="lab">millilitro (mL) = cm³</td><td>$10^{-6}$</td><td>$0{,}001$</td><td class="l">siringhe, medicinali, laboratorio</td></tr>
+          <tr><td class="lab">gallone USA (gal)</td><td>$0{,}003785$</td><td>$3{,}785$</td><td class="l">benzina e latte negli Stati Uniti</td></tr>
+          <tr><td class="lab">gallone imperiale</td><td>$0{,}004546$</td><td>$4{,}546$</td><td class="l">Regno Unito, Canada (birra e carburante)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="curiosita">
+        <strong>Due galloni diversi, e non è una sottigliezza.</strong> Il gallone britannico vale
+        <span>$4{,}546$</span> litri, quello statunitense <span>$3{,}785$</span>: il primo è più grande del
+        <strong>20%</strong>. Quindi un'automobile che «fa 30 miglia per gallone» negli Stati Uniti è
+        sensibilmente meno efficiente di una che ne fa 30 nel Regno Unito, e i confronti fra le due sponde
+        dell'Atlantico vanno fatti con attenzione. Come dicevamo nella lezione 4: senza standard condivisi si
+        litiga, e ogni tanto si perde una sonda su Marte.
+      </div>
+
+      <h3>2.1 Esercitatore di conversioni</h3>
+
+      <p>Il metodo è sempre quello dei <strong>fattori di conversione</strong>: si scrive il fattore nel verso
+        che fa semplificare l'unità da eliminare, e si controlla che resti quella giusta.</p>
+
+      <div class="qbox" id="cv-box">
+        <div class="qt" id="cv-testo">—</div>
+        <div class="qrow">
+          <span id="cv-eti">risposta:</span>
+          <input class="inp" id="cv-val" inputmode="decimal" aria-label="risposta">
+          <span id="cv-um">L</span>
+          <button class="btn" id="cv-ver">Verifica</button>
+          <button class="btn btn-secondary" id="cv-new">Nuova conversione</button>
+        </div>
+        <div class="fb" id="cv-fb"></div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 1 — la piscina e il serbatoio</span></div>
+        <p>Una piscina misura <span>$25$</span> m × <span>$10$</span> m ed è profonda <span>$2{,}0$</span> m.
+          <strong>(a)</strong> Quanti metri cubi d'acqua contiene? <strong>(b)</strong> Quanti litri?
+          <strong>(c)</strong> Un'autobotte trasporta <span>$8000$</span> litri: quanti viaggi servono per
+          riempirla?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-f1">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-f1">
+          <p><strong>(a)</strong> Il volume di un parallelepipedo è il prodotto delle tre dimensioni:</p>
+          <p style="text-align:center;">$$V = 25 \cdot 10 \cdot 2{,}0 = 500\ \text{m}^3$$</p>
+          <p><strong>(b)</strong> Un metro cubo sono mille litri, quindi</p>
+          <p style="text-align:center;">$$500\ \text{m}^3 \times \frac{1000\ \text{L}}{1\ \text{m}^3} = 500\,000\ \text{L}$$</p>
+          <p><strong>(c)</strong> <span>$500\,000 \div 8000 = 62{,}5$</span>, cioè <strong>63 viaggi</strong>:
+            il mezzo viaggio va arrotondato per eccesso, perché con 62 viaggi la piscina resterebbe a metà
+            dell'ultima autobotte.</p>
+          <p>Mezzo milione di litri è anche mezzo milione di chili, cioè <strong>500 tonnellate</strong>
+            d'acqua: è il motivo per cui una piscina interrata richiede fondamenta serie.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$500$ m³ &nbsp;·&nbsp; $500\,000$ L &nbsp;·&nbsp; $63$ viaggi</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — LA DENSITÀ -->
+    <section id="sec3">
+      <h2>3. La densità</h2>
+
+      <p>Massa e volume da soli non bastano a rispondere alla domanda «che cosa pesa di più, un chilo di
+        piombo o un chilo di piume?» — che è una domanda mal posta, perché la risposta ovviamente è «pesano
+        uguale». La domanda giusta è un'altra: <em>a parità di volume</em>, che cosa pesa di più? E la
+        grandezza che risponde è la <strong>densità</strong>.</p>
+
+      <div class="rule">
+        <p class="formula-title">Densità</p>
+        <p style="text-align:center; font-size:1.25rem;">$$\rho = \frac{m}{V}$$</p>
+        <p class="formula-note">Si legge «ro», è la lettera greca <span>$\rho$</span>. Si misura in
+          <strong>kg/m³</strong> nel Sistema Internazionale, ma in laboratorio si usano moltissimo anche i
+          <strong>g/cm³</strong>. Il fattore di conversione è comodo da ricordare:
+          <span>$1\ \text{g/cm}^3 = 1000\ \text{kg/m}^3$</span>.</p>
+      </div>
+
+      <p>La densità è il nostro vecchio esempio di grandezza <strong>intensiva</strong> (lezione 7): è il
+        rapporto fra due grandezze estensive, quindi raddoppiando il sistema non cambia. Un chiodo di ferro e
+        una nave di ferro hanno la stessa densità.</p>
+
+      <table class="tabf">
+        <thead><tr><th>Sostanza</th><th>$\rho$ (kg/m³)</th><th>$\rho$ (g/cm³)</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">aria (a 20 °C)</td><td>$1{,}2$</td><td>$0{,}0012$</td></tr>
+          <tr><td class="lab">sughero</td><td>$240$</td><td>$0{,}24$</td></tr>
+          <tr><td class="lab">alcol etilico</td><td>$789$</td><td>$0{,}789$</td></tr>
+          <tr><td class="lab">olio d'oliva</td><td>$916$</td><td>$0{,}916$</td></tr>
+          <tr><td class="lab">ghiaccio</td><td>$917$</td><td>$0{,}917$</td></tr>
+          <tr class="tot"><td class="lab">acqua</td><td>$1000$</td><td>$1{,}000$</td></tr>
+          <tr><td class="lab">alluminio</td><td>$2700$</td><td>$2{,}70$</td></tr>
+          <tr><td class="lab">ferro</td><td>$7874$</td><td>$7{,}87$</td></tr>
+          <tr><td class="lab">piombo</td><td>$11\,340$</td><td>$11{,}34$</td></tr>
+          <tr><td class="lab">mercurio</td><td>$13\,595$</td><td>$13{,}60$</td></tr>
+          <tr><td class="lab">oro</td><td>$19\,300$</td><td>$19{,}30$</td></tr>
+        </tbody>
+      </table>
+
+      <p>La riga dell'acqua è evidenziata perché è la più utile di tutte, e per due motivi. Il primo è pratico:
+        <strong>un litro d'acqua ha la massa di un chilogrammo</strong>, e questo rende immediati un sacco di
+        conti. Il secondo è che l'acqua fa da <em>spartiacque</em>: tutto ciò che sta sopra i 1000 kg/m³ affonda
+        in acqua, tutto ciò che sta sotto galleggia. Guardate la tabella e ritrovate perché il ghiaccio
+        galleggia, perché l'olio resta sopra l'acqua nel condimento, e perché una moneta d'oro va a fondo
+        immediatamente.</p>
+
+      <div class="curiosita">
+        <strong>Il ghiaccio che galleggia è una stranezza cosmica.</strong> Quasi tutte le sostanze, passando
+        da liquido a solido, diventano <em>più</em> dense: le particelle si sistemano in ordine e si
+        avvicinano. L'acqua no: la sua struttura cristallina lascia dei buchi, e il ghiaccio risulta più
+        leggero del 9%. Se non fosse così, i laghi ghiaccerebbero dal fondo verso l'alto e nessun pesce
+        sopravviverebbe all'inverno. Una piccola anomalia molecolare, e un intero pianeta abitabile.
+      </div>
+
+      <p>La formula inversa serve almeno quanto quella diretta:</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.1rem;">$$\rho = \frac{m}{V} \qquad\Longrightarrow\qquad m = \rho\,V \qquad\Longrightarrow\qquad V = \frac{m}{\rho}$$</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2 — il cubo misterioso</span></div>
+        <p>Un cubo di lato <span>$5{,}0$</span> cm ha una massa di <span>$337{,}5$</span> g.
+          <strong>(a)</strong> Qual è la sua densità? <strong>(b)</strong> Di che materiale è fatto, secondo la
+          tabella? <strong>(c)</strong> Galleggia in acqua?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-f2">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-f2">
+          <p><strong>(a)</strong> Prima il volume, e attenzione al cubo del prefisso:</p>
+          <p style="text-align:center;">$$V = (5{,}0\ \text{cm})^3 = 125\ \text{cm}^3 = 1{,}25 \times 10^{-4}\ \text{m}^3$$</p>
+          <p>Poi la densità. Conviene farla in g/cm³, che è più immediata:</p>
+          <p style="text-align:center;">$$\rho = \frac{337{,}5\ \text{g}}{125\ \text{cm}^3} = 2{,}70\ \text{g/cm}^3 = 2700\ \text{kg/m}^3$$</p>
+          <p><strong>(b)</strong> Guardando la tabella: <strong>alluminio</strong>.</p>
+          <p><strong>(c)</strong> No: <span>$2700 \gt 1000$</span>, quindi affonda. Galleggerebbe solo se
+            fosse cavo — ed è esattamente il trucco con cui una nave d'acciaio, che ha densità 7874, riesce a
+            stare a galla: quello che conta è la densità <em>media</em> dello scafo, aria compresa.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$2700$ kg/m³ · alluminio · affonda</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — LA PORTATA -->
+    <section id="sec4">
+      <h2>4. La portata: quanto fluido passa</h2>
+
+      <p>Adesso mettiamo il fluido in movimento. E qui c'è un problema nuovo: che cosa vuol dire «la velocità
+        del fiume»? Il fiume non è un oggetto: ogni goccia va per conto suo, quelle al centro corrono, quelle
+        vicino alla riva quasi si fermano. Chiedere «dov'è il fiume» non ha senso.</p>
+
+      <p>La grandezza che risolve il problema non guarda le singole gocce: guarda <strong>quanto fluido
+        attraversa una sezione</strong> in un certo tempo.</p>
+
+      <div class="rule">
+        <p class="formula-title">Portata (volumetrica)</p>
+        <p style="text-align:center; font-size:1.25rem;">$$Q = \frac{V}{\Delta t}$$</p>
+        <p class="formula-note">È il volume che attraversa una data sezione nell'unità di tempo. Si misura in
+          <strong>metri cubi al secondo</strong> (m³/s) nel Sistema Internazionale, ma in pratica si usano
+          moltissimo i <strong>litri al secondo</strong> e i litri al minuto.</p>
+      </div>
+
+      <p>È una definizione operativa e concreta: per misurare la portata di un rubinetto basta un secchio e un
+        cronometro. Trenta litri in due minuti fanno <span>$30/120 = 0{,}25$</span> L/s.</p>
+
+      <h3>4.1 Portata, sezione e velocità</h3>
+
+      <p>C'è però un legame bellissimo fra la portata e la velocità con cui il fluido scorre, e si ricava con
+        un ragionamento di pura geometria. Immaginate un tubo di sezione <span>$A$</span> in cui il fluido si
+        muove a velocità <span>$v$</span>. In un secondo, ogni particella avanza di <span>$v$</span> metri:
+        quindi il fluido che attraversa la sezione in un secondo è un cilindro di base <span>$A$</span> e
+        altezza <span>$v$</span>.</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.25rem;">$$Q = A\,v$$</p>
+        <p class="formula-note">Portata uguale sezione per velocità. Da qui si legge subito una cosa non
+          ovvia: <em>a parità di portata, se la sezione si stringe la velocità deve aumentare</em>.</p>
+      </div>
+
+      <h3>4.2 Il flusso laminare</h3>
+
+      <p>Prima di andare avanti dobbiamo dichiarare un'<strong>approssimazione</strong>, come abbiamo fatto per
+        i raggi di luce in ottica.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Flusso laminare</h4>
+          <p>Il fluido scorre in <strong>strati ordinati</strong> (in latino <em>lamina</em> significa
+            «lamina, strato») che non si mescolano. Ogni particella segue una linea regolare e prevedibile,
+            detta <strong>linea di flusso</strong>. È il getto sottile e trasparente di un rubinetto appena
+            aperto.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Flusso turbolento</h4>
+          <p>Gli strati si mescolano, compaiono vortici, il moto diventa caotico e imprevedibile nel dettaglio.
+            È il rubinetto aperto al massimo, il fumo che sale e a un certo punto «si sfrangia», l'acqua dietro
+            un remo.</p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <strong>In questa lezione lavoreremo sempre in regime laminare.</strong> Non perché la turbolenza sia
+        rara — anzi, è la regola in natura — ma perché è di gran lunga il problema più difficile della fisica
+        classica: le sue equazioni non si sanno risolvere, e chi ci riuscisse in generale vincerebbe un premio
+        da un milione di dollari.
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="po-q">portata Q = <span id="po-qv">1,5</span> L/s</label>
+          <input type="range" id="po-q" min="0.2" max="4" step="0.1" value="1.5">
+          <label for="po-d">diametro del tubo = <span id="po-dv">5,0</span> cm</label>
+          <input type="range" id="po-d" min="2" max="10" step="0.5" value="5">
+        </div>
+        <div class="sim-btns">
+          <button class="btn active" id="po-lam">Flusso laminare</button>
+          <button class="btn" id="po-tur">Flusso turbolento</button>
+        </div>
+        <svg viewBox="0 0 660 260" id="po-svg" role="img" aria-label="flusso in un tubo, laminare e turbolento"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="po-a">19,6</div><div class="l">sezione A (cm²)</div></div>
+          <div class="stat"><div class="n" id="po-v">0,76</div><div class="l">velocità v = Q/A (m/s)</div></div>
+          <div class="stat"><div class="n" id="po-t">6,7</div><div class="l">tempo per riempire 10 L (s)</div></div>
+        </div>
+        <p class="cap">Le linee blu sono le <em>linee di flusso</em>. Stringete il tubo a portata costante e guardate la velocità salire.</p>
+      </div>
+    </section>
+
+    <!-- 5 — LA CONSERVAZIONE -->
+    <section id="sec5">
+      <h2>5. La conservazione: la prima delle grandi leggi</h2>
+
+      <p>Adesso arriva l'idea più importante della lezione, e forse dell'anno. Prendiamo un tubo che si
+        restringe e chiediamoci: <em>quanta acqua esce, rispetto a quella che entra?</em></p>
+
+      <p>La risposta è ovvia fino a sembrare stupida: <strong>esce tutta quella che entra</strong>. L'acqua non
+        si crea dal nulla dentro il tubo, non sparisce, e — essendo incomprimibile — non può nemmeno
+        accumularsi da qualche parte comprimendosi. Se in un secondo entrano due litri, in un secondo devono
+        uscirne due.</p>
+
+      <div class="rule">
+        <p class="formula-title">Equazione di continuità</p>
+        <p style="text-align:center; font-size:1.25rem;">$$Q_1 = Q_2 \qquad\Longleftrightarrow\qquad A_1 v_1 = A_2 v_2$$</p>
+        <p class="formula-note">In un tubo senza perdite né derivazioni, la portata è la <strong>stessa in
+          ogni sezione</strong>. Dove il tubo è stretto il fluido corre, dove è largo rallenta.</p>
+      </div>
+
+      <p>Sembra poco, e invece è enorme, perché ci permette di <strong>calcolare</strong> una cosa che non
+        abbiamo misurato. Non so nulla di come si muovono le singole particelle d'acqua nel restringimento —
+        una domanda difficilissima — eppure so con certezza quanto vale la velocità media all'uscita. Questo è
+        il potere delle leggi di conservazione.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="co-r">raggio della strozzatura = <span id="co-rv">1,0</span> cm</label>
+          <input type="range" id="co-r" min="0.5" max="2" step="0.1" value="1">
+        </div>
+        <svg viewBox="0 0 660 280" id="co-svg" role="img" aria-label="tubo che si restringe: equazione di continuità"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="co-a1">12,6</div><div class="l">$A_1$ (cm²)</div></div>
+          <div class="stat"><div class="n" id="co-a2">3,1</div><div class="l">$A_2$ (cm²)</div></div>
+          <div class="stat"><div class="n" id="co-v2">4,00</div><div class="l">$v_2$ con $v_1 = 1{,}00$ m/s</div></div>
+          <div class="stat"><div class="n" id="co-rap">4,0×</div><div class="l">rapporto delle velocità</div></div>
+        </div>
+        <p class="cap">Il tubo largo ha raggio fisso di 2 cm. Notate che dimezzando il <em>raggio</em> la velocità diventa <strong>quattro</strong> volte più grande: l'area va con il quadrato.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>L'errore da non fare: raddoppiare il raggio non raddoppia l'area.</strong> L'area di un cerchio
+        è <span>$A = \pi r^2$</span>, quindi va con il <strong>quadrato</strong> del raggio. Un tubo di raggio
+        doppio ha sezione <em>quadrupla</em> e, a parità di portata, il fluido ci va quattro volte più piano.
+        È lo stesso ragionamento del telescopio della lezione 6, dove la luce raccolta andava come
+        <span>$D^2$</span>.
+      </div>
+
+      <h3>5.1 Le leggi di conservazione, in generale</h3>
+
+      <p>Vale la pena fermarsi, perché quello che abbiamo appena fatto è un <em>modo di ragionare</em> che
+        incontrerete decine di volte da qui alla maturità.</p>
+
+      <div class="rule">
+        Una <strong>legge di conservazione</strong> dice che una certa grandezza <em>non cambia</em> nel tempo,
+        oppure che <em>quello che entra è uguale a quello che esce</em>. Non descrive il processo: lo
+        <strong>vincola</strong>.
+      </div>
+
+      <p>Ed è proprio questa la sua forza. Una legge di conservazione non ci dice <em>come</em> vanno le cose
+        — non descrive il dettaglio del moto, non risolve la fisica del problema — ma ci dice che, comunque
+        vadano, un certo bilancio deve tornare. E da un bilancio si ricava un'<strong>equazione</strong>, e da
+        un'equazione si ricava l'incognita.</p>
+
+      <table class="tabf">
+        <thead><tr><th>Grandezza conservata</th><th>Dove</th><th>Quando la incontrerete</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">volume (o massa)</td><td class="l">tubi, fiumi, condotte</td><td class="l">adesso, in questa lezione</td></tr>
+          <tr><td class="lab">energia</td><td class="l">ovunque, senza eccezioni note</td><td class="l">l'anno prossimo, e poi per sempre</td></tr>
+          <tr><td class="lab">quantità di moto</td><td class="l">urti, esplosioni, razzi</td><td class="l">quarto anno</td></tr>
+          <tr><td class="lab">carica elettrica</td><td class="l">circuiti, reazioni nucleari</td><td class="l">quinto anno</td></tr>
+          <tr><td class="lab">massa (in chimica)</td><td class="l">reazioni chimiche</td><td class="l">l'avete già incontrata con Lavoisier</td></tr>
+        </tbody>
+      </table>
+
+      <p>Notate la seconda riga della tabella e il modo in cui è scritta: <em>senza eccezioni note</em>. Le
+        leggi di conservazione sono fra gli enunciati più solidi di tutta la fisica, e quando un esperimento
+        sembra violarne una, storicamente, la conclusione giusta è quasi sempre stata «manca qualcosa che non
+        abbiamo visto». È così che si è scoperto il <strong>neutrino</strong>: i conti dell'energia in un
+        decadimento non tornavano, e invece di buttare la legge si è ipotizzata una particella invisibile.
+        Ventisei anni dopo l'hanno trovata.</p>
+
+      <div class="curiosita">
+        <strong>Il conto in banca.</strong> Se volete un'immagine per ricordarvi che cos'è una legge di
+        conservazione, pensate all'estratto conto: <em>saldo finale = saldo iniziale + entrate − uscite</em>.
+        Non vi dice nulla su come avete speso i soldi, ma il conto deve tornare — e se non torna, non è che
+        l'aritmetica sia sbagliata: è che c'è un movimento che non avete registrato. La fisica funziona
+        esattamente così, e non è un caso che gli economisti chiamino «equazioni di bilancio» le proprie.
+      </div>
+
+      <h3>5.2 Quando il tubo si divide</h3>
+
+      <p>Se il tubo si dirama, la conservazione non cambia: <strong>quello che entra dal ramo principale è la
+        somma di quello che esce dai rami</strong>. Questa scrittura vi tornerà familiare al quinto anno, in
+        elettrotecnica: è la stessa forma della prima legge di Kirchhoff per le correnti in un nodo.</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.15rem;">$$Q_{\text{entrante}} = Q_1 + Q_2 + \cdots + Q_n$$</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="di-q1">ramo 1 = <span id="di-q1v">7,0</span> L/s</label>
+          <input type="range" id="di-q1" min="1" max="11" step="0.5" value="7">
+        </div>
+        <svg viewBox="0 0 660 280" id="di-svg" role="img" aria-label="tubo che si divide in due rami"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n">12,0</div><div class="l">portata entrante (L/s)</div></div>
+          <div class="stat"><div class="n" id="di-q2">5,0</div><div class="l">ramo 2, obbligato (L/s)</div></div>
+          <div class="stat"><div class="n" id="di-perc">58%</div><div class="l">quota del ramo 1</div></div>
+        </div>
+        <p class="cap">La portata del secondo ramo non è una scelta: è <em>obbligata</em> dalla conservazione. È questo che rende utili queste leggi.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3 — l'impianto di irrigazione</span></div>
+        <p>Un tubo principale porta <span>$18$</span> L/s a un impianto che si divide in <strong>tre</strong>
+          rami uguali. <strong>(a)</strong> Quanta acqua scorre in ciascun ramo? <strong>(b)</strong> Se ogni
+          ramo ha sezione di <span>$4{,}0$</span> cm², con che velocità esce l'acqua? <strong>(c)</strong>
+          Quanti litri escono complessivamente in mezz'ora?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-f3">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-f3">
+          <p><strong>(a)</strong> Per la conservazione, <span>$18 = 3Q$</span>, quindi ogni ramo porta
+            <span>$Q = 6{,}0$</span> L/s.</p>
+          <p><strong>(b)</strong> Qui bisogna passare al Sistema Internazionale prima di dividere:</p>
+          <p style="text-align:center;">$$Q = 6{,}0\ \text{L/s} = 0{,}0060\ \text{m}^3\text{/s} \qquad A = 4{,}0\ \text{cm}^2 = 4{,}0 \times 10^{-4}\ \text{m}^2$$</p>
+          <p style="text-align:center;">$$v = \frac{Q}{A} = \frac{0{,}0060}{4{,}0 \times 10^{-4}} = 15\ \text{m/s}$$</p>
+          <p>Quindici metri al secondo, cioè 54 km/h: è tantissimo, e infatti un impianto del genere farebbe
+            un bel po' di danni. Il controllo di ragionevolezza vi dice che, per irrigare davvero, o si
+            allargano i tubi o si riduce la portata.</p>
+          <p><strong>(c)</strong> Mezz'ora sono <span>$1800$</span> s, e la portata totale è sempre 18 L/s:</p>
+          <p style="text-align:center;">$$V = Q\,\Delta t = 18 \cdot 1800 = 32\,400\ \text{L} = 32{,}4\ \text{m}^3$$</p>
+          <p>Notate che per il punto (c) non serviva sapere nulla dei tre rami: la conservazione garantisce
+            che il totale in uscita sia sempre uguale al totale in entrata.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$6{,}0$ L/s per ramo &nbsp;·&nbsp; $15$ m/s &nbsp;·&nbsp; $32\,400$ L</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 4 — il pollice sul tubo del giardino</span></div>
+        <p>Un tubo da giardino ha sezione interna di <span>$2{,}0$</span> cm² e l'acqua vi scorre a
+          <span>$1{,}2$</span> m/s. Mettendo il pollice sull'apertura la si riduce a <span>$0{,}40$</span> cm².
+          <strong>(a)</strong> Qual è la portata? <strong>(b)</strong> Con che velocità esce l'acqua dal
+          restringimento? <strong>(c)</strong> Perché è proprio così che si annaffiano le piante lontane?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-f4">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-f4">
+          <p><strong>(a)</strong> Con le unità del SI, <span>$A_1 = 2{,}0 \times 10^{-4}$</span> m²:</p>
+          <p style="text-align:center;">$$Q = A_1 v_1 = 2{,}0 \times 10^{-4} \cdot 1{,}2 = 2{,}4 \times 10^{-4}\ \text{m}^3\text{/s} = 0{,}24\ \text{L/s}$$</p>
+          <p><strong>(b)</strong> La portata non cambia (l'acqua che arriva deve uscire), quindi</p>
+          <p style="text-align:center;">$$v_2 = \frac{Q}{A_2} = \frac{2{,}4 \times 10^{-4}}{4{,}0 \times 10^{-5}} = 6{,}0\ \text{m/s}$$</p>
+          <p>La sezione si è ridotta a un quinto e la velocità è diventata cinque volte più grande: è
+            esattamente <span>$A_1v_1 = A_2v_2$</span>.</p>
+          <p><strong>(c)</strong> Perché quello che fa arrivare lontano il getto è la <strong>velocità</strong>
+            di uscita, non la portata. Con il pollice non esce più acqua — anzi, ne esce esattamente la stessa
+            — ma esce cinque volte più veloce, e un getto veloce percorre molta più strada prima che la gravità
+            lo faccia cadere. La conservazione della portata, applicata al giardinaggio.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$Q = 0{,}24$ L/s &nbsp;·&nbsp; $v_2 = 6{,}0$ m/s</span></div>
+        </div>
+      </div>
+
+      <h3>5.3 Allenamento sulla continuità</h3>
+
+      <div class="qbox" id="ct-box">
+        <div class="qt" id="ct-testo">—</div>
+        <div class="qrow">
+          <span id="ct-eti">risposta:</span>
+          <input class="inp" id="ct-val" inputmode="decimal" aria-label="risposta">
+          <span id="ct-um">m/s</span>
+          <button class="btn" id="ct-ver">Verifica</button>
+          <button class="btn btn-secondary" id="ct-new">Nuovo esercizio</button>
+        </div>
+        <div class="fb" id="ct-fb"></div>
+      </div>
+    </section>
+
+    <!-- 6 — FACOLTATIVA: CAMPI VETTORIALI -->
+    <section id="sec6" class="optional">
+      <h2>6. Il campo di velocità: flusso e rotore</h2>
+
+      <p>Finora abbiamo barato, e conviene dirlo. Parlando di «velocità del fluido» abbiamo fatto finta che
+        dentro il tubo tutte le particelle andassero alla stessa andatura — l'approssimazione laminare. Ma nel
+        caso generale non è così: <strong>ogni punto del fluido ha la sua velocità</strong>, diversa da quella
+        del punto accanto, e per giunta che cambia nel tempo.</p>
+
+      <p>Come si descrive una cosa del genere? Con l'oggetto matematico che avete costruito nella lezione 7,
+        usato in un modo nuovo: si associa <strong>un vettore a ogni punto dello spazio</strong>.</p>
+
+      <div class="rule">
+        Un <strong>campo vettoriale</strong> è una regola che assegna a ogni punto dello spazio un vettore.
+        Nel nostro caso è il <strong>campo di velocità</strong> del fluido: in ogni punto, la freccia dice
+        dove e quanto velocemente si sta muovendo il fluido lì.
+      </div>
+
+      <p>È un'idea che vi accompagnerà per anni: il campo elettrico e il campo magnetico del quinto anno sono
+        esattamente questo, e non a caso Faraday e Maxwell li immaginavano proprio pensando ai fluidi. Su un
+        campo vettoriale si possono fare due domande fondamentali, e da esse nascono due grandezze.</p>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn active" id="cf-b0">Uniforme</button>
+          <button class="btn" id="cf-b1">Sorgente</button>
+          <button class="btn" id="cf-b2">Pozzo</button>
+          <button class="btn" id="cf-b3">Vortice</button>
+          <button class="btn" id="cf-b4">Corrente a strati</button>
+        </div>
+        <svg viewBox="0 0 660 380" id="cf-svg" role="img" aria-label="campo vettoriale con flusso e rotore"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="cf-flusso">0,00</div><div class="l">flusso uscente dalla curva rossa</div></div>
+          <div class="stat"><div class="n" id="cf-rot">0,00</div><div class="l">rotore nel punto verde</div></div>
+        </div>
+        <div class="eq-out" id="cf-out"></div>
+      </div>
+
+      <h3>6.1 Il flusso: quanto ne esce?</h3>
+
+      <p>Prima domanda: <em>prendo una curva chiusa (in tre dimensioni una superficie chiusa) e mi chiedo
+        quanto fluido, complessivamente, la attraversa uscendo</em>. Questa quantità si chiama
+        <strong>flusso</strong>.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Intuitivamente</h4>
+          <p>Immaginate una retina da pesca chiusa a sacchetto, immersa nel fiume. Il flusso è quanta acqua
+            netta esce dal sacchetto ogni secondo. Se l'acqua entra da una parte ed esce dall'altra nella
+            stessa quantità, il flusso è <strong>zero</strong>: il bilancio torna.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Matematicamente</h4>
+          <p>Si spezza la superficie in pezzetti <span>$\Delta S$</span>, per ciascuno si prende la
+            <strong>componente della velocità perpendicolare</strong> al pezzetto — cioè il prodotto scalare
+            <span>$\vec{v} \cdot \hat{n}$</span> con la normale uscente — e si somma tutto:</p>
+          <p style="text-align:center;">$$\Phi = \sum_i \vec{v}_i \cdot \hat{n}_i \, \Delta S_i$$</p>
+        </div>
+      </div>
+
+      <p>Notate che il prodotto scalare fa esattamente il lavoro che ci serve: se il fluido scorre
+        <em>parallelo</em> alla superficie non la attraversa affatto, e infatti il prodotto scalare con la
+        normale è nullo (sono perpendicolari). Se la attraversa perpendicolarmente, il contributo è massimo.
+        Tutto quello che avete imparato nella sezione 11 della lezione 7 serve qui.</p>
+
+      <div class="rule">
+        <p class="formula-title">Che cosa significa il segno</p>
+        <p><span>$\Phi \gt 0$</span>: esce più fluido di quanto entri, quindi dentro c'è una
+          <strong>sorgente</strong> (un rubinetto). <span>$\Phi \lt 0$</span>: c'è un
+          <strong>pozzo</strong> (uno scarico). <span>$\Phi = 0$</span>: dentro non si crea né si distrugge
+          nulla — ed è, di nuovo, la <strong>conservazione</strong> della sezione 5, scritta in modo più
+          generale.</p>
+      </div>
+
+      <p>Provate il simulatore con «sorgente» e con «vortice»: nel primo caso il flusso attraverso la curva è
+        chiaramente positivo, nel secondo è esattamente zero, perché il fluido gira in tondo senza mai
+        attraversare il confine.</p>
+
+      <h3>6.2 Il rotore: gira?</h3>
+
+      <p>Seconda domanda, del tutto indipendente dalla prima: <em>in questo punto, il fluido sta ruotando su
+        sé stesso?</em> La grandezza che risponde si chiama <strong>rotore</strong>.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Intuitivamente</h4>
+          <p>Immaginate di mettere nel punto una minuscola <strong>girandola</strong> con le palette, tenuta
+            ferma nel suo centro. Se comincia a girare, lì il rotore non è nullo; e il suo verso di rotazione
+            dà il verso del rotore. È un test locale: la girandola non si sposta, guarda solo che cosa fa il
+            fluido <em>attorno</em> a lei.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Matematicamente</h4>
+          <p>Si prende una piccola curva chiusa attorno al punto, si somma la componente della velocità
+            <strong>tangente</strong> alla curva lungo tutto il giro (è la <em>circuitazione</em>) e si divide
+            per l'area racchiusa:</p>
+          <p style="text-align:center;">$$\text{rot}\,\vec{v} \approx \frac{1}{\Delta S}\sum_i \vec{v}_i \cdot \Delta \vec{\ell}_i$$</p>
+        </div>
+      </div>
+
+      <p>Confrontate le due formule e godetevi la simmetria: nel flusso si prende la componente
+        <strong>perpendicolare</strong> al bordo e si somma sull'area; nel rotore si prende la componente
+        <strong>tangente</strong> al bordo e si somma lungo il giro. Due domande diverse, due prodotti scalari
+        diversi, due grandezze diverse.</p>
+
+      <div class="curiosita">
+        <strong>E il rotore è uno pseudovettore.</strong> Ve lo aspettavate? Il rotore descrive una rotazione,
+        e nella lezione 7 avevamo visto che per descrivere una rotazione serve una freccia perpendicolare al
+        piano in cui avviene, con il verso fissato dalla regola della mano destra. Il rotore si costruisce
+        proprio così — e infatti, in tre dimensioni, si scrive come un <strong>prodotto vettoriale</strong>
+        simbolico. Non a caso il rotore del campo magnetico compare in una delle equazioni di Maxwell, e il
+        campo magnetico è uno pseudovettore.
+      </div>
+
+      <div class="warnbox">
+        <strong>Attenzione a un'intuizione sbagliata.</strong> «Il fluido gira in tondo, quindi il rotore non
+        è nullo» <em>non</em> è sempre vero, e viceversa. Nel simulatore, provate «corrente a strati»: il
+        fluido va tutto dritto, nessuna traiettoria è curva, eppure il rotore non è nullo — perché la girandola,
+        avendo il fluido più veloce da un lato e più lento dall'altro, viene messa in rotazione. Il rotore
+        misura la rotazione <strong>locale</strong> delle particelle, non la forma delle traiettorie. Esistono
+        anche vortici in cui il fluido gira ma il rotore è nullo ovunque tranne al centro: è il caso del
+        <em>vortice libero</em>, quello che si forma nello scarico della vasca.
+      </div>
+
+      <h3>6.3 Le equazioni di Navier-Stokes</h3>
+
+      <p>Queste due grandezze sono l'alfabeto con cui si scrivono le equazioni dei fluidi. Adesso le
+        scriviamo davvero. Non avete ancora gli strumenti matematici per <em>risolverle</em> — servono le
+        derivate del quinto anno, e anche allora non basterebbero — ma potete benissimo capire
+        <strong>che cosa dicono</strong>, perché ogni pezzo è qualcosa che abbiamo già incontrato.</p>
+
+      <div class="rule">
+        <p class="formula-title">Le equazioni di Navier-Stokes (fluido incomprimibile)</p>
+        <p style="text-align:center; font-size:1.15rem;">$$\nabla \cdot \vec{v} = 0$$</p>
+        <p style="text-align:center; font-size:1.15rem;">$$\rho\left(\frac{\partial \vec{v}}{\partial t} + (\vec{v} \cdot \nabla)\vec{v}\right) = -\nabla p + \mu \nabla^2 \vec{v} + \rho\,\vec{g}$$</p>
+        <p class="formula-note">Due righe. In esse c'è, letteralmente, tutto il comportamento di qualunque
+          fluido: l'acqua del rubinetto, l'aria di un uragano, il sangue nelle vostre arterie, il plasma
+          dentro una stella.</p>
+      </div>
+
+      <h4>La prima equazione: la conservazione</h4>
+
+      <p>La prima riga la conoscete già. Il simbolo <span>$\nabla \cdot \vec{v}$</span> si legge
+        «divergenza di v» ed è esattamente il <strong>flusso</strong> della sezione 6.1, calcolato però su una
+        superficie infinitamente piccola attorno a un punto: dice quanto fluido «sgorga» da quel punto.</p>
+
+      <p>Scrivere <span>$\nabla \cdot \vec{v} = 0$</span> significa dunque: <em>in nessun punto si crea o si
+        distrugge fluido</em>. È la nostra equazione di continuità della sezione 5, scritta punto per punto
+        invece che fra due sezioni di un tubo. La stessa idea, in versione locale.</p>
+
+      <h4>La seconda equazione: il secondo principio della dinamica</h4>
+
+      <p>La seconda riga sembra spaventosa e invece è una vecchia conoscenza travestita. È
+        <span>$F = ma$</span> — il principio che studierete per esteso l'anno prossimo — applicato non a un
+        corpo, ma a ogni singolo pezzetto di fluido. A sinistra c'è la <em>massa per l'accelerazione</em>, a
+        destra la <em>somma delle forze</em>. Leggiamola pezzo per pezzo:</p>
+
+      <table class="tabf">
+        <thead><tr><th>Termine</th><th>Che cosa significa</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">$\dfrac{\partial \vec{v}}{\partial t}$</td><td class="l">quanto rapidamente cambia la velocità <strong>in un punto fisso</strong>, con il passare del tempo. È l'accelerazione «vista da un osservatore fermo sulla riva»</td></tr>
+          <tr><td class="lab">$(\vec{v} \cdot \nabla)\vec{v}$</td><td class="l">l'accelerazione che una particella subisce perché <strong>si sposta</strong> in una regione dove la velocità è diversa. È il termine <em>convettivo</em>, ed è quello che rovina tutto: tenetelo d'occhio</td></tr>
+          <tr><td class="lab">$-\nabla p$</td><td class="l">la forza dovuta alle <strong>differenze di pressione</strong>: il fluido viene spinto da dove la pressione è alta verso dove è bassa. Il segno meno dice proprio questo</td></tr>
+          <tr><td class="lab">$\mu \nabla^2 \vec{v}$</td><td class="l">l'<strong>attrito interno</strong>, cioè la viscosità: gli strati che si trascinano a vicenda. La costante $\mu$ è la viscosità del fluido — piccolissima per l'aria, enorme per il miele</td></tr>
+          <tr><td class="lab">$\rho\,\vec{g}$</td><td class="l">il <strong>peso</strong>: la gravità che tira giù ogni pezzetto di fluido. È il termine da cui, in condizioni statiche, si ricava la legge di Stevino</td></tr>
+        </tbody>
+      </table>
+
+      <p>Notate una cosa bellissima: <strong>tutte le leggi che abbiamo studiato in questa lezione sono casi
+        particolari di quelle due righe</strong>. Spegnete il moto (<span>$\vec{v} = 0$</span>) e resta
+        <span>$\nabla p = \rho \vec{g}$</span>, cioè Stevino. Trascurate viscosità e dipendenza dal tempo e,
+        integrando lungo una linea di flusso, esce Bernoulli. La continuità è la prima riga. Pascal è quello
+        che succede quando si aggiunge pressione a un fluido fermo. Navier-Stokes le contiene tutte.</p>
+
+      <h3>6.4 Perché sarebbe importante saperle risolvere</h3>
+
+      <p>«Risolvere» un'equazione differenziale significa trovare la funzione <span>$\vec{v}(x,y,z,t)$</span>
+        che la soddisfa: cioè sapere, per ogni punto e per ogni istante futuro, che cosa farà il fluido.
+        Riuscirci in generale significherebbe poter <strong>prevedere</strong>, con esattezza e senza
+        approssimazioni, il comportamento di:</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>🌍 L'atmosfera e gli oceani</h4>
+          <p>Il meteo <em>è</em> Navier-Stokes applicato all'aria. Previsioni affidabili a due settimane
+            invece che a cinque giorni significherebbero agricoltura, protezione civile ed energia
+            rinnovabile gestite in modo completamente diverso. E i modelli climatici, che stimano che cosa
+            succederà nel prossimo secolo, poggiano sulle stesse equazioni.</p>
+        </div>
+        <div class="prop-card">
+          <h4>✈️ Aerei, auto, navi</h4>
+          <p>Oggi ogni ala si progetta con mesi di simulazioni numeriche e prove in galleria del vento.
+            Risparmiare l'1% di carburante su tutta l'aviazione mondiale vale miliardi e milioni di
+            tonnellate di CO₂.</p>
+        </div>
+        <div class="prop-card">
+          <h4>🫀 Medicina</h4>
+          <p>Il flusso del sangue nelle arterie, specie dove si biforcano o si restringono, è esattamente il
+            problema che decide dove si formano le placche e quando un aneurisma cede. Simularlo bene
+            significa decidere se e quando operare.</p>
+        </div>
+        <div class="prop-card">
+          <h4>⚡ Energia</h4>
+          <p>Turbine, motori a combustione, reattori nucleari, condotte, pale eoliche: sono tutti oggetti il
+            cui rendimento dipende da come si comporta un fluido turbolento. Qui un punto percentuale di
+            efficienza in più vale quanto una centrale.</p>
+        </div>
+      </div>
+
+      <p>E c'è una ragione ancora più profonda, che riguarda la matematica in sé. Il premio non è per «trovare
+        le soluzioni»: è per dimostrare che <strong>esistono</strong> e che restano <em>regolari</em>, cioè
+        che non impazziscono. Detto in modo brutale: nessuno oggi può escludere che, partendo da un fluido
+        perfettamente tranquillo, le equazioni producano dopo un certo tempo una velocità
+        <strong>infinita</strong> in un punto. Una cosa del genere si chiama <em>singolarità</em>, e in
+        natura non si è mai vista — ma «non si è mai vista» non è una dimostrazione. Se esistesse, vorrebbe
+        dire che le equazioni con cui progettiamo aerei e prevediamo il clima, a un certo punto, smettono di
+        descrivere la realtà.</p>
+
+      <h3>6.5 Perché non ci si riesce</h3>
+
+      <p>Il colpevole ha un nome e cognome: è il termine <span>$(\vec{v} \cdot \nabla)\vec{v}$</span>, il
+        secondo della lista. Guardatelo bene: <strong>c'è la velocità moltiplicata per sé stessa</strong>.</p>
+
+      <div class="rule">
+        Un'equazione in cui l'incognita compare moltiplicata per sé stessa si dice <strong>non
+        lineare</strong>. E le equazioni non lineari sono di un'altra specie rispetto a quelle che risolvete a
+        scuola: non vale il principio per cui «se sommo due soluzioni ottengo ancora una soluzione», e quasi
+        sempre non esiste nessuna formula che le risolva.
+      </div>
+
+      <p>Le conseguenze di quella non linearità sono tre, e vale la pena vederle una per una.</p>
+
+      <p><strong>1. Il fluido si dà retta da solo.</strong> Il moto del fluido determina le forze, e le forze
+        determinano il moto: è un anello che si morde la coda. Un vortice ne genera altri più piccoli, che ne
+        generano altri ancora. Questa <em>cascata</em> di vortici sempre più piccoli è la turbolenza, e non ha
+        una scala privilegiata: continua fino a quando la viscosità non la spegne, moltissimi ordini di
+        grandezza più in basso.</p>
+
+      <p><strong>2. Il numero di scale è proibitivo.</strong> Ed è qui che muoiono anche i calcolatori. Per
+        simulare l'aria attorno a un aereo bisognerebbe descrivere insieme i vortici grandi come l'ala (metri)
+        e quelli grandi come un capello (frazioni di millimetro), perché i secondi influenzano i primi. Il
+        numero di punti necessari cresce all'incirca come il numero di Reynolds elevato alla potenza
+        <span>$9/4$</span>: per un aereo di linea si arriva a numeri di celle che nessun supercalcolatore
+        esistente potrà mai gestire. Per questo si usano <em>modelli di turbolenza</em>: scorciatoie che
+        mediano ciò che non si riesce a calcolare, e che funzionano ragionevolmente bene ma vanno tarate caso
+        per caso — con misure sperimentali.</p>
+
+      <p><strong>3. La sensibilità alle condizioni iniziali.</strong> Piccolissime differenze di partenza
+        producono, dopo un po', evoluzioni completamente diverse. È il <strong>caos deterministico</strong>:
+        le equazioni sono perfettamente determinate, eppure il futuro lontano resta imprevedibile perché non
+        potremo mai conoscere lo stato iniziale con precisione infinita. Fu proprio studiando un modello
+        semplificato dell'atmosfera che Edward Lorenz, nel 1963, scoprì la cosa — e coniò l'immagine del
+        battito d'ali di una farfalla in Brasile che scatena un tornado in Texas.</p>
+
+      <div class="curiosita">
+        <strong>Il problema del millennio, per esteso.</strong> Nel 2000 il Clay Mathematics Institute mise in
+        palio un milione di dollari per ciascuno di <strong>sette problemi</strong> aperti. Uno è
+        «esistenza e regolarità delle soluzioni di Navier-Stokes», e la domanda precisa è: <em>dato un fluido
+        che parte da uno stato regolare, le equazioni ammettono sempre una soluzione che resta regolare per
+        sempre?</em>
+        <p style="margin:0.5rem 0 0;">Il fatto curioso è che in <strong>due</strong> dimensioni la risposta si
+          conosce ed è sì: dimostrato nel 1934 da Jean Leray e completato negli anni Sessanta. In
+          <strong>tre</strong> dimensioni no, e il motivo è proprio quella cascata di vortici, che in due
+          dimensioni non può innescarsi allo stesso modo. Dei sette problemi ne è stato risolto uno solo — la
+          congettura di Poincaré, dimostrata da Grigorij Perel'man, che poi rifiutò sia il milione sia la
+          medaglia Fields.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>E allora come fanno gli aerei a volare?</strong> Perché non serve <em>risolvere</em> le
+        equazioni per usarle. Si fa quello che si fa sempre in fisica applicata: si spezza lo spazio in
+        milioni di celle, si trasformano le derivate in differenze fra celle vicine, e si lascia calcolare al
+        computer un passo temporale alla volta. È la <strong>fluidodinamica computazionale</strong>, e
+        funziona benissimo — con tre avvertenze: costa una quantità enorme di calcolo, dà un numero e non una
+        formula (quindi non si capisce <em>perché</em> viene così), e nessuno può garantire che la soluzione
+        numerica assomigli a quella vera, visto che non sappiamo nemmeno se quella vera esista. Si controlla
+        allora nell'unico modo possibile: <strong>confrontando con gli esperimenti</strong> — la galleria del
+        vento, il modellino in vasca. Esattamente il metodo della lezione 1.
+      </div>
+
+      <p>C'è qualcosa di istruttivo in tutto questo. Le equazioni che governano l'acqua che esce dal
+        rubinetto le sappiamo scrivere dal 1845, ci stanno in due righe, e non le sappiamo risolvere. La
+        fisica sa scrivere le regole del mondo molto meglio di quanto sappia prevederne le conseguenze — e
+        chi vi racconta che la scienza «ha capito tutto» probabilmente non ha mai provato ad aprire un
+        rubinetto e a guardare bene che cosa succede.</p>
+    </section>
+
+    <!-- 7 — LA PRESSIONE -->
+    <section id="sec7">
+      <h2>7. La pressione</h2>
+
+      <p>Chiudiamo il capitolo del movimento e apriamo quello dell'equilibrio. Qui la protagonista è un'altra
+        grandezza derivata, che ha una storia curiosa: è quella che spiega perché una puntina da disegno entra
+        nel muro con la spinta di un dito, mentre lo stesso dito da solo non lascia il segno.</p>
+
+      <div class="rule">
+        <p class="formula-title">Pressione</p>
+        <p style="text-align:center; font-size:1.25rem;">$$p = \frac{F_\perp}{A}$$</p>
+        <p class="formula-note">È la <strong>forza perpendicolare</strong> a una superficie, divisa per l'area
+          della superficie. Il pedice <span>$\perp$</span> è importante: la componente parallela non preme, e
+          per estrarla serve — ancora una volta — la scomposizione della lezione 7.</p>
+      </div>
+
+      <p>Attenzione a un punto che genera sempre confusione: la pressione <strong>non è una forza</strong>. È
+        uno <strong>scalare</strong>: non ha direzione né verso. Sembra strano, visto che nasce da una forza,
+        ma ha un senso profondo: in un fluido in quiete la pressione in un punto è la stessa in tutte le
+        direzioni. Se immergete un orecchio in piscina, sentite la stessa pressione qualunque sia
+        l'orientamento della testa.</p>
+
+      <div class="rule">
+        <p class="formula-title">L'unità di misura</p>
+        <p style="text-align:center; font-size:1.15rem;">$$1\ \text{Pa} = 1\ \frac{\text{N}}{\text{m}^2}$$</p>
+        <p class="formula-note">Il <strong>pascal</strong> (Pa), dal nome di Blaise Pascal, che incontreremo
+          fra due sezioni. È un'unità <em>piccolissima</em>: un pascal è la pressione di un etto di roba
+          distribuito su un metro quadrato. Per questo, in pratica, non si usa quasi mai da solo.</p>
+      </div>
+
+      <table class="tabf">
+        <thead><tr><th>Unità</th><th>In pascal</th><th>Dove si usa</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">pascal (Pa)</td><td>$1$</td><td class="l">unità del SI, usata in fisica e ingegneria</td></tr>
+          <tr><td class="lab">ettopascal (hPa)</td><td>$100$</td><td class="l">meteorologia: le carte del tempo</td></tr>
+          <tr><td class="lab">bar</td><td>$100\,000$</td><td class="l">industria, pneumatici, subacquea</td></tr>
+          <tr><td class="lab">millibar (mbar)</td><td>$100$</td><td class="l">meteorologia (identico all'hPa)</td></tr>
+          <tr><td class="lab">atmosfera (atm)</td><td>$101\,325$</td><td class="l">chimica, valore di riferimento</td></tr>
+          <tr><td class="lab">millimetro di mercurio (mmHg)</td><td>$133{,}3$</td><td class="l">medicina: la pressione del sangue</td></tr>
+          <tr><td class="lab">psi (libbre per pollice quadrato)</td><td>$6895$</td><td class="l">mondo anglosassone: gomme, compressori</td></tr>
+        </tbody>
+      </table>
+
+      <div class="curiosita">
+        <strong>Sapete qual è il bar preferito dei meteorologi?</strong> Il <strong>millibar</strong>.
+        <p style="margin:0.5rem 0 0;">Battute a parte, la coincidenza fra millibar ed ettopascal è vera e
+          comoda: <span>$1\ \text{mbar} = 1\ \text{hPa} = 100$</span> Pa esatti. Quando il telegiornale dice
+          «alta pressione a 1030 hPa» sta dicendo esattamente «1030 millibar», e chi ha imparato la
+          meteorologia trent'anni fa continua tranquillamente a usare la seconda parola.</p>
+      </div>
+
+      <p>Qualche ordine di grandezza, che vale più di mille definizioni:</p>
+
+      <table class="tabf">
+        <thead><tr><th>Situazione</th><th>Pressione</th></tr></thead>
+        <tbody>
+          <tr><td class="l">pressione atmosferica al livello del mare</td><td>$101\,325$ Pa $= 1013$ hPa $= 1$ atm</td></tr>
+          <tr><td class="l">persona di 70 kg in piedi (due scarpe, 300 cm²)</td><td>$\approx 23\,000$ Pa $= 0{,}23$ bar</td></tr>
+          <tr><td class="l">la stessa persona su un tacco a spillo (1 cm²)</td><td>$\approx 6{,}9$ milioni di Pa $= 69$ bar</td></tr>
+          <tr><td class="l">pneumatico di un'automobile</td><td>$2{,}2$ bar $= 220\,000$ Pa $= 32$ psi</td></tr>
+          <tr><td class="l">pressione del sangue (massima)</td><td>$120$ mmHg $= 16\,000$ Pa</td></tr>
+          <tr><td class="l">fondo della Fossa delle Marianne</td><td>$\approx 1100$ bar</td></tr>
+        </tbody>
+      </table>
+
+      <p>Guardate la seconda e la terza riga: <strong>è la stessa persona</strong>, con lo stesso peso. Cambia
+        solo l'area su cui quel peso si distribuisce, e la pressione diventa trecento volte più grande. Ecco
+        perché i tacchi a spillo rovinano il parquet e gli sci permettono di camminare sulla neve fresca: in
+        entrambi i casi non è cambiato il peso, è cambiata l'area.</p>
+    </section>
+
+    <!-- 8 — TORRICELLI -->
+    <section id="sec8">
+      <h2>8. L'esperimento di Torricelli</h2>
+
+      <p>Nel 1643 Evangelista Torricelli, allievo di Galileo, fece un esperimento che risolse un problema
+        pratico e, di passaggio, cambiò le idee di tutti su che cosa ci sia sopra le nostre teste.</p>
+
+      <p>Il problema era questo: i pompieri e i fontanieri sapevano da sempre che una pompa aspirante non
+        riesce a sollevare l'acqua oltre i <strong>dieci metri</strong> circa, per quanto sia potente. Perché
+        proprio dieci? La risposta dell'epoca era che «la natura ha orrore del vuoto», ma evidentemente
+        quest'orrore aveva un limite ben preciso, e nessuno sapeva dire quale.</p>
+
+      <div class="rule">
+        <p class="formula-title">L'esperimento</p>
+        <p>Si riempie di mercurio un tubo di vetro lungo circa un metro, chiuso a un'estremità. Lo si capovolge
+          tenendo il dito sull'apertura e lo si immerge in una bacinella piena di mercurio. Poi si toglie il
+          dito.</p>
+        <p>Il mercurio nel tubo <strong>scende</strong> — ma non si svuota: si ferma a circa
+          <strong>760 mm</strong> sopra il livello della bacinella, lasciando sopra di sé uno spazio vuoto.</p>
+      </div>
+
+      <p>Perché si ferma lì? Perché la colonna di mercurio è tenuta su dalla <strong>pressione
+        dell'atmosfera</strong>, che preme sulla superficie libera della bacinella. Quando il peso della
+        colonna equilibra quella spinta, tutto si ferma. E allora l'altezza della colonna <em>misura</em> la
+        pressione atmosferica:</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.2rem;">$$p_{\text{atm}} = \rho_{\text{Hg}}\, g\, h$$</p>
+        <p class="formula-note">Con <span>$\rho_{\text{Hg}} = 13\,595$</span> kg/m³ e
+          <span>$h = 0{,}760$</span> m si ottiene circa <span>$101\,000$</span> Pa, cioè una atmosfera.</p>
+      </div>
+
+      <p>E la risposta al mistero dei dieci metri arriva da sola: rifate il conto con l'<strong>acqua</strong>,
+        che è 13,6 volte meno densa del mercurio, e otterrete</p>
+
+      <p style="text-align:center;">$$h = \frac{p_{\text{atm}}}{\rho_{\text{acqua}}\,g} = \frac{101\,325}{1000 \cdot 9{,}81} = 10{,}33\ \text{m}$$</p>
+
+      <p>Dieci metri e trentatré. Non è la pompa a essere debole: è l'atmosfera a non riuscire a spingere più
+        su di così. Nessuna pompa aspirante al mondo, per quanto potente, potrà mai superare quel limite —
+        e infatti i pozzi profondi si fanno con pompe che <em>spingono</em> dal basso, non che aspirano
+        dall'alto.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="to-p">pressione atmosferica = <span id="to-pv">1013</span> hPa</label>
+          <input type="range" id="to-p" min="950" max="1050" step="1" value="1013">
+        </div>
+        <div class="sim-btns">
+          <button class="btn active" id="to-hg">Mercurio</button>
+          <button class="btn" id="to-h2o">Acqua</button>
+        </div>
+        <svg viewBox="0 0 660 400" id="to-svg" role="img" aria-label="esperimento di Torricelli"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="to-h">760</div><div class="l">altezza della colonna (mm)</div></div>
+          <div class="stat"><div class="n" id="to-pa">101300</div><div class="l">pressione (Pa)</div></div>
+          <div class="stat"><div class="n" id="to-atm">1,000</div><div class="l">in atmosfere</div></div>
+        </div>
+        <p class="cap">Provate a passare all'acqua: il tubo dovrebbe essere alto come un palazzo di quattro piani. È il motivo per cui Torricelli usò il mercurio.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>Sopra la colonna c'è il vuoto.</strong> Quello spazio che resta in cima al tubo è passato alla
+        storia come <em>vuoto di Torricelli</em>, e all'epoca fu una piccola bomba filosofica: Aristotele aveva
+        insegnato per duemila anni che il vuoto non può esistere, e qui c'era un tubo di vetro che ne conteneva
+        un pezzo. Non è vuoto assolutamente perfetto — c'è un pochissimo di vapore di mercurio — ma è
+        abbastanza vuoto da chiudere la questione.
+        <p style="margin:0.5rem 0 0;">Pochi anni dopo Blaise Pascal ebbe l'idea decisiva: se la colonna è
+          sostenuta dall'aria sovrastante, portando il barometro <strong>in montagna</strong> — dove di aria
+          sopra ce n'è meno — la colonna deve <em>abbassarsi</em>. Fece portare l'apparecchio in cima al
+          Puy-de-Dôme, 1465 metri, da suo cognato: la colonna scese di circa 8 centimetri. Fine della
+          discussione.</p>
+      </div>
+
+      <h3>8.1 Costruite un barometro in casa</h3>
+
+      <p>Il mercurio è tossico e in casa non lo avete (per fortuna). Ma un barometro si può costruire lo stesso,
+        con un principio leggermente diverso: invece di equilibrare una colonna di liquido, si usa
+        <strong>aria chiusa</strong> in un contenitore, che si dilata o si comprime al variare della pressione
+        esterna. Serve mezz'ora e roba da cucina.</p>
+
+      <div class="rule">
+        <p class="formula-title">🔧 Barometro a barattolo — istruzioni</p>
+        <ol style="margin:0.3rem 0 0;">
+          <li>Prendete un <strong>barattolo di vetro</strong> a bocca larga (tipo quelli della marmellata) e
+            tagliate un pezzo di <strong>palloncino</strong> abbastanza grande da coprirne l'apertura.</li>
+          <li>Tendete bene il palloncino sulla bocca del barattolo, <em>senza pieghe</em>, e fissatelo con un
+            elastico robusto o due giri di nastro adesivo. Deve essere a tenuta stagna: ora dentro c'è aria a
+            pressione atmosferica di oggi.</li>
+          <li>Incollate una <strong>cannuccia</strong> orizzontalmente sopra la membrana, con un'estremità al
+            centro e l'altra che sporge oltre il bordo. Se avete una cannuccia sottile, appuntitela con un
+            pezzetto di cartoncino: sarà l'indice.</li>
+          <li>Mettete accanto un <strong>cartoncino verticale</strong> con delle tacche, in modo che la punta
+            della cannuccia le indichi.</li>
+          <li>Sistemate tutto in un posto dove la <strong>temperatura sia il più costante possibile</strong>
+            (lontano da finestre e termosifoni) e segnate la posizione dell'indice ogni giorno alla stessa
+            ora.</li>
+        </ol>
+      </div>
+
+      <p><strong>Come funziona.</strong> Se la pressione esterna <em>aumenta</em>, l'aria fuori schiaccia la
+        membrana verso l'interno: l'estremità interna della cannuccia si abbassa e quindi la punta esterna,
+        facendo leva sul bordo del barattolo, <strong>si alza</strong>. Se la pressione esterna
+        <em>diminuisce</em>, l'aria intrappolata spinge in fuori e la punta si abbassa. La cannuccia è una
+        leva, come quella della lezione 7: amplifica un movimento di frazioni di millimetro fino a renderlo
+        visibile.</p>
+
+      <div class="warnbox">
+        <strong>Il limite del barometro casalingo, che è anche la sua lezione.</strong> Questo strumento non è
+        <em>calibrato</em>: dice se la pressione sta salendo o scendendo, non quanto vale. E soprattutto è
+        sensibilissimo alla <strong>temperatura</strong>, perché anche l'aria chiusa si dilata quando si scalda
+        — il che confonde la misura. Per farne uno strumento vero bisognerebbe calibrarlo (sezione 14 della
+        <a href="9_Legge_di_Hooke.html#sec14">lezione 9</a>) confrontandolo con un barometro certificato, e
+        tenere sotto controllo la temperatura. Provateci: annotate le letture per un paio di settimane e
+        confrontatele con la pressione delle previsioni del tempo. Vedrete l'andamento coincidere — e sarà
+        molto più istruttivo di qualunque esercizio.
+      </div>
+    </section>
+
+    <!-- 9 — LEGGE DI PASCAL -->
+    <section id="sec9">
+      <h2>9. La legge di Pascal e il torchio idraulico</h2>
+
+      <p>Blaise Pascal, lo stesso del Puy-de-Dôme, si accorse di una proprietà dei fluidi che a prima vista
+        sembra banale e che invece è alla base di metà delle macchine che ci circondano.</p>
+
+      <div class="rule">
+        <p class="formula-title">Legge di Pascal (1653)</p>
+        <p>La pressione esercitata su un punto qualsiasi di un fluido <strong>incomprimibile</strong> in
+          equilibrio si trasmette <strong>inalterata in ogni punto</strong> del fluido e in tutte le
+          direzioni.</p>
+      </div>
+
+      <p>«Inalterata» è la parola chiave, e non è affatto ovvia. Se spingo un'estremità di una sbarra di ferro,
+        la <em>forza</em> si trasmette all'altra estremità. In un fluido invece a trasmettersi non è la forza:
+        è la <strong>pressione</strong>. E poiché la pressione è forza <em>diviso area</em>, se all'altro capo
+        l'area è più grande, la forza che ne esce è più grande. Da qui nasce la macchina.</p>
+
+      <h3>9.1 Il torchio idraulico</h3>
+
+      <p>Due cilindri di sezione diversa, collegati e pieni dello stesso liquido, ciascuno chiuso da un pistone.
+        Spingo il pistone piccolo con una forza <span>$F_1$</span>: si crea nel liquido una pressione
+        <span>$p = F_1/A_1$</span>, che si trasmette dappertutto, quindi anche sotto il pistone grande, dove
+        produce una forza <span>$F_2 = p\,A_2$</span>. Mettendo insieme:</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.25rem;">$$\frac{F_1}{A_1} = \frac{F_2}{A_2} \qquad\Longrightarrow\qquad F_2 = F_1 \cdot \frac{A_2}{A_1}$$</p>
+        <p class="formula-note">Il rapporto <span>$A_2/A_1$</span> si chiama <strong>vantaggio
+          meccanico</strong>. E poiché le aree vanno con il <em>quadrato</em> dei diametri, un pistone di
+          diametro dieci volte più grande dà una forza <strong>cento</strong> volte più grande.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="tk-d1">diametro piccolo = <span id="tk-d1v">2,0</span> cm</label>
+          <input type="range" id="tk-d1" min="1" max="6" step="0.5" value="2">
+          <label for="tk-d2">diametro grande = <span id="tk-d2v">20</span> cm</label>
+          <input type="range" id="tk-d2" min="6" max="30" step="1" value="20">
+          <label for="tk-f1">forza applicata = <span id="tk-f1v">50</span> N</label>
+          <input type="range" id="tk-f1" min="10" max="200" step="5" value="50">
+        </div>
+        <svg viewBox="0 0 660 320" id="tk-svg" role="img" aria-label="torchio idraulico"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="tk-rap">100</div><div class="l">vantaggio meccanico $A_2/A_1$</div></div>
+          <div class="stat"><div class="n" id="tk-f2">5000</div><div class="l">forza ottenuta $F_2$ (N)</div></div>
+          <div class="stat"><div class="n" id="tk-kg">510</div><div class="l">massa sollevabile (kg)</div></div>
+          <div class="stat"><div class="n" id="tk-corsa">100</div><div class="l">corsa del pistone piccolo per alzare di 1 cm il grande (cm)</div></div>
+        </div>
+        <p class="cap">La pressione (in giallo) è la stessa dappertutto: è questo che la legge di Pascal garantisce.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>Non è una macchina che regala energia.</strong> Guardate l'ultimo riquadro: per far salire il
+        pistone grande di un centimetro, quello piccolo deve scendere di <em>cento</em>. Il volume di liquido
+        spostato è lo stesso da una parte e dall'altra — è ancora la conservazione della sezione 5! — quindi
+        <span>$A_1 d_1 = A_2 d_2$</span>. Si guadagna in forza <strong>esattamente quanto si perde in
+        spostamento</strong>, e il prodotto forza × spostamento resta invariato. Quel prodotto si chiama
+        <em>lavoro</em>, e l'anno prossimo scoprirete che non si può creare dal nulla: nessuna macchina
+        regala energia, tutte si limitano a scambiare una cosa con un'altra.
+      </div>
+
+      <p>Il torchio idraulico non è un giocattolo da laboratorio: è il <strong>freno della vostra
+        automobile</strong> (il piede spinge un pistoncino, l'olio trasmette la pressione a quattro pistoni
+        grandi che stringono i dischi), è il <strong>cric idraulico</strong> del meccanico, è la
+        <strong>pala meccanica</strong> del cantiere, ed è la pressa che stampa la carrozzeria delle
+        automobili.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 5 — il cric del meccanico</span></div>
+        <p>Un cric idraulico ha il pistone piccolo di diametro <span>$3{,}0$</span> cm e quello grande di
+          <span>$15$</span> cm. <strong>(a)</strong> Qual è il vantaggio meccanico? <strong>(b)</strong> Che
+          forza serve per sollevare un'automobile di <span>$1200$</span> kg? <strong>(c)</strong> Di quanto
+          deve scendere il pistone piccolo per alzare l'auto di <span>$5{,}0$</span> cm?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-f5">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-f5">
+          <p><strong>(a)</strong> Il rapporto delle aree è il quadrato del rapporto dei diametri:</p>
+          <p style="text-align:center;">$$\frac{A_2}{A_1} = \left(\frac{15}{3{,}0}\right)^2 = 5^2 = 25$$</p>
+          <p>Notate che non serve calcolare le due aree: basta il rapporto, e i <span>$\pi$</span> si
+            semplificano.</p>
+          <p><strong>(b)</strong> Il peso dell'automobile è
+            <span>$P = 1200 \cdot 9{,}81 = 11\,772$</span> N, quindi</p>
+          <p style="text-align:center;">$$F_1 = \frac{F_2}{25} = \frac{11\,772}{25} = 471\ \text{N}$$</p>
+          <p>Circa 471 newton, cioè quanto pesa una persona di 48 kg: si fa con una gamba, o con un braccio
+            usando una leva. Ed è esattamente quello che si vede fare in officina.</p>
+          <p><strong>(c)</strong> Il volume spostato è lo stesso, quindi
+            <span>$A_1 d_1 = A_2 d_2$</span>:</p>
+          <p style="text-align:center;">$$d_1 = d_2 \cdot \frac{A_2}{A_1} = 5{,}0 \cdot 25 = 125\ \text{cm}$$</p>
+          <p>Un metro e venticinque di corsa! Ecco perché i cric hanno una leva che si pompa: nessun pistone
+            è lungo un metro, e si arriva ai 125 cm totali facendo tante piccole corse.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">vantaggio $25$ &nbsp;·&nbsp; $F_1 = 471$ N &nbsp;·&nbsp; corsa $125$ cm</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 6 — progettare la pressa</span></div>
+        <p>Si vuole costruire una pressa che, con una forza applicata di <span>$80$</span> N, eserciti una
+          forza di <span>$2880$</span> N. Il pistone piccolo ha diametro <span>$4{,}0$</span> cm.
+          <strong>(a)</strong> Quale deve essere il diametro del pistone grande? <strong>(b)</strong> Quanto
+          vale la pressione nel liquido?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-f6">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-f6">
+          <p><strong>(a)</strong> Il vantaggio meccanico richiesto è</p>
+          <p style="text-align:center;">$$\frac{A_2}{A_1} = \frac{F_2}{F_1} = \frac{2880}{80} = 36$$</p>
+          <p>Ma il rapporto delle aree è il quadrato del rapporto dei diametri, quindi il rapporto dei
+            diametri è la <strong>radice</strong>:</p>
+          <p style="text-align:center;">$$\frac{d_2}{d_1} = \sqrt{36} = 6 \qquad\Longrightarrow\qquad d_2 = 6 \cdot 4{,}0 = 24\ \text{cm}$$</p>
+          <p>È il passaggio in cui si sbaglia più spesso: chi dimentica la radice risponde 144 cm, cioè un
+            pistone largo un metro e mezzo.</p>
+          <p><strong>(b)</strong> La pressione si calcola dove è più comodo, cioè dal pistone piccolo:</p>
+          <p style="text-align:center;">$$A_1 = \pi (0{,}020)^2 = 1{,}257 \times 10^{-3}\ \text{m}^2$$</p>
+          <p style="text-align:center;">$$p = \frac{F_1}{A_1} = \frac{80}{1{,}257 \times 10^{-3}} = 63\,662\ \text{Pa} \approx 0{,}64\ \text{bar}$$</p>
+          <p>Verifica: <span>$A_2 = 36 A_1 = 4{,}524 \times 10^{-2}$</span> m², e
+            <span>$p \cdot A_2 = 63\,662 \cdot 0{,}04524 = 2880$</span> N. ✔</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$d_2 = 24$ cm &nbsp;·&nbsp; $p \approx 64$ kPa</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 — LEGGE DI STEVINO -->
+    <section id="sec10">
+      <h2>10. La legge di Stevino</h2>
+
+      <p>Chiunque si sia immerso in piscina lo sa: più si scende, più le orecchie fanno male. La legge che
+        quantifica questa esperienza porta il nome del fiammingo Simon Stevin e si ricava con un ragionamento
+        di tre righe.</p>
+
+      <p>Prendete una colonna di liquido di altezza <span>$h$</span> e sezione <span>$A$</span>. Il suo volume
+        è <span>$V = Ah$</span>, la sua massa è <span>$m = \rho A h$</span> e il suo peso è
+        <span>$P = \rho A h g$</span>. Quel peso preme sulla base, che ha area <span>$A$</span>: la pressione
+        che ne risulta è</p>
+
+      <div class="rule">
+        <p class="formula-title">Legge di Stevino</p>
+        <p style="text-align:center; font-size:1.25rem;">$$p = p_0 + \rho\,g\,h$$</p>
+        <p class="formula-note">dove <span>$p_0$</span> è la pressione sulla superficie libera (in genere
+          quella atmosferica) e <span>$h$</span> è la <strong>profondità</strong>. Il termine
+          <span>$\rho g h$</span> si chiama pressione <em>idrostatica</em>, o relativa.</p>
+      </div>
+
+      <p>Guardate bene che cosa <strong>non</strong> compare in quella formula: non c'è l'area, non c'è la
+        forma del recipiente, non c'è la quantità totale di liquido. La pressione dipende
+        <strong>soltanto</strong> dalla profondità e dalla densità.</p>
+
+      <div class="curiosita">
+        <strong>Il paradosso idrostatico.</strong> Se ho un tubicino sottile alto due metri e una piscina
+        profonda due metri, sul fondo la pressione è <em>esattamente la stessa</em>: 19 620 Pa. Sembra assurdo
+        — nella piscina c'è mille volte più acqua! — ma la pressione è forza <em>diviso area</em>, e nella
+        piscina anche l'area del fondo è mille volte più grande. Il rapporto non cambia. Il fatto sconcertò
+        parecchio i fisici del Seicento, e Pascal ne fece un esperimento famoso: riuscì a far scoppiare una
+        botte piena versando pochi bicchieri d'acqua in un tubo sottile e lunghissimo infilato nel tappo.
+      </div>
+
+      <h3>10.1 L'acqua che esce da un foro</h3>
+
+      <p>Dalla legge di Stevino discende un fatto che potete verificare a casa con una bottiglia di plastica e
+        un chiodo: più il foro è in basso, più l'acqua esce forte. La velocità di uscita si ricava dalla
+        pressione ed è data dalla <strong>legge di Torricelli</strong> (sì, sempre lui):</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.2rem;">$$v = \sqrt{2gh}$$</p>
+        <p class="formula-note">dove <span>$h$</span> è l'altezza del <em>pelo libero sopra il foro</em>. È la
+          stessa formula della velocità di un sasso che cade da un'altezza <span>$h$</span>: l'acqua esce con
+          la velocità che avrebbe se fosse semplicemente caduta da lì.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="st-h">altezza dell'acqua nel recipiente = <span id="st-hv">1,00</span> m</label>
+          <input type="range" id="st-h" min="0.4" max="1.4" step="0.05" value="1">
+        </div>
+        <svg viewBox="0 0 660 380" id="st-svg" role="img" aria-label="getti d'acqua da fori a diverse altezze"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="st-v1">1,40</div><div class="l">$v$ dal foro alto (m/s)</div></div>
+          <div class="stat"><div class="n" id="st-v2">2,80</div><div class="l">$v$ dal foro centrale (m/s)</div></div>
+          <div class="stat"><div class="n" id="st-v3">3,71</div><div class="l">$v$ dal foro basso (m/s)</div></div>
+          <div class="stat"><div class="n" id="st-x2">1,00</div><div class="l">gittata massima possibile, da un foro a metà altezza (m)</div></div>
+        </div>
+        <p class="cap">Il foro più basso ha la velocità maggiore, ma la <strong>gittata</strong> massima è quella del foro a <em>metà altezza</em>: dal basso l'acqua esce veloce ma ha pochissimo tempo per volare.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>Perché proprio a metà.</strong> Un foro a profondità <span>$h$</span> sotto il pelo libero, che
+        si trova ad altezza <span>$y$</span> da terra, spara acqua a velocità <span>$\sqrt{2gh}$</span> per un
+        tempo di caduta che dipende da <span>$y$</span>. Facendo i conti, la gittata risulta
+        <span>$x = 2\sqrt{h\,y}$</span>: un prodotto in cui, se uno dei due fattori cresce, l'altro cala. Il
+        massimo si ha quando sono <strong>uguali</strong>, cioè esattamente a metà altezza. È lo stesso motivo
+        per cui, fra tutti i rettangoli di perimetro assegnato, quello di area massima è il quadrato.
+      </div>
+
+      <h3>10.2 I vasi comunicanti</h3>
+
+      <p>Se collego fra loro più recipienti di forma qualunque e ci verso dentro un liquido, quello si dispone
+        in modo che il <strong>livello sia lo stesso in tutti</strong> — indipendentemente dalla forma e dalla
+        larghezza.</p>
+
+      <p>Il perché è immediato con Stevino: sul fondo, che è collegato, la pressione deve essere una sola. E
+        poiché <span>$p = p_0 + \rho g h$</span> dipende solo da <span>$h$</span>, allora
+        <span>$h$</span> deve essere uguale dappertutto. Se un ramo fosse più alto, spingerebbe di più, il
+        liquido si sposterebbe — e si fermerebbe soltanto al pareggio.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="vc-h">quantità d'acqua versata = <span id="vc-hv">50</span>%</label>
+          <input type="range" id="vc-h" min="10" max="95" step="1" value="50">
+        </div>
+        <svg viewBox="0 0 660 300" id="vc-svg" role="img" aria-label="vasi comunicanti di forma diversa"></svg>
+        <div class="eq-out" id="vc-out"></div>
+      </div>
+
+      <div class="rule">
+        <p class="formula-title">Dove lo trovate ogni giorno</p>
+        <ul style="margin:0.3rem 0 0;">
+          <li>l'<strong>acquedotto</strong>: il serbatoio sta in alto (una torre, o una collina) e l'acqua sale
+            nelle case fino a quel livello, senza bisogno di pompe. È il motivo per cui i serbatoi si vedono
+            sempre sui punti alti del paese;</li>
+          <li>il <strong>sifone</strong> del lavandino: quella curva a U che resta sempre piena d'acqua e
+            impedisce ai cattivi odori della fogna di risalire;</li>
+          <li>la <strong>livella a bolla</strong> dei muratori, e la sua versione lunga: due tubi trasparenti
+            collegati da una canna d'acqua, con cui si mettono in piano due punti distanti anche decine di
+            metri;</li>
+          <li>le <strong>chiuse</strong> dei canali navigabili, che alzano e abbassano le navi riempiendo e
+            svuotando una vasca.</li>
+        </ul>
+      </div>
+
+      <div class="warnbox">
+        <strong>Il limite dell'acquedotto a gravità.</strong> Se il serbatoio è a 30 metri sopra il vostro
+        rubinetto, la pressione disponibile è <span>$\rho g h = 1000 \cdot 9{,}81 \cdot 30 \approx 294\,000$</span>
+        Pa, cioè circa 3 bar: perfetta per una doccia. Ma un palazzo alto 40 metri, servito dallo stesso
+        serbatoio, avrebbe gli ultimi piani <em>sopra</em> il livello dell'acqua, e da quei rubinetti non
+        uscirebbe niente. È per questo che i palazzi alti hanno autoclavi e pompe di rilancio: i vasi
+        comunicanti non fanno miracoli.
+      </div>
+    </section>
+
+    <!-- 11 — BERNOULLI -->
+    <section id="sec11">
+      <h2>11. L'equazione di Bernoulli</h2>
+
+      <p>Finora abbiamo studiato i fluidi fermi (Stevino, Pascal) e i fluidi in moto guardando solo quanti ne
+        passano (continuità). Manca il pezzo che li mette insieme: che cosa succede alla <strong>pressione</strong>
+        quando un fluido si muove?</p>
+
+      <p>La risposta la diede Daniel Bernoulli nel 1738, ed è una delle equazioni più sorprendenti della
+        fisica classica.</p>
+
+      <div class="rule">
+        <p class="formula-title">Equazione di Bernoulli</p>
+        <p style="text-align:center; font-size:1.25rem;">$$p + \frac{1}{2}\rho v^2 + \rho g h = \text{costante}$$</p>
+        <p class="formula-note">Lungo una linea di flusso, in un fluido incomprimibile in regime laminare e
+          senza attriti, la somma di questi tre termini <strong>non cambia</strong>. Se uno cresce, un altro
+          deve calare.</p>
+      </div>
+
+      <p>Riconoscete la struttura? È di nuovo una <strong>legge di conservazione</strong>: qualcosa si
+        bilancia. E i tre termini si leggono così:</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>$p$ — pressione</h4>
+          <p>quella che misurerebbe un manometro montato sul tubo, la spinta che il fluido esercita sulle
+            pareti.</p>
+        </div>
+        <div class="prop-card">
+          <h4>$\frac{1}{2}\rho v^2$ — termine cinetico</h4>
+          <p>legato alla <strong>velocità</strong>: cresce con il quadrato, quindi raddoppiando la velocità
+            quadruplica. Chi ha già visto l'energia cinetica riconoscerà la formula.</p>
+        </div>
+        <div class="prop-card">
+          <h4>$\rho g h$ — termine di quota</h4>
+          <p>è il termine di Stevino: legato all'<strong>altezza</strong>. Sale se il tubo sale.</p>
+        </div>
+      </div>
+
+      <p>La conseguenza più importante si legge nei primi due termini, in un tubo orizzontale (dove il terzo
+        non cambia):</p>
+
+      <div class="rule">
+        <strong>Dove il fluido va più veloce, la pressione è più bassa.</strong> È il contrario di quello che
+        dice l'intuizione — verrebbe da pensare che «più corre, più spinge» — e invece è proprio l'opposto.
+      </div>
+
+      <p>Mettiamola insieme alla continuità della sezione 5 e otteniamo la catena completa: il tubo si
+        restringe → la velocità aumenta → <strong>la pressione cala</strong>. Nel punto più stretto di un tubo,
+        il fluido preme <em>meno</em> sulle pareti.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="be-v">velocità nel tratto largo = <span id="be-vv">2,0</span> m/s</label>
+          <input type="range" id="be-v" min="0.5" max="4" step="0.1" value="2">
+          <label for="be-r">restringimento = <span id="be-rv">50</span>% della sezione</label>
+          <input type="range" id="be-r" min="25" max="90" step="5" value="50">
+        </div>
+        <svg viewBox="0 0 660 340" id="be-svg" role="img" aria-label="tubo di Venturi con manometri"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="be-v2">4,00</div><div class="l">velocità nel restringimento (m/s)</div></div>
+          <div class="stat"><div class="n" id="be-dp">6000</div><div class="l">calo di pressione (Pa)</div></div>
+          <div class="stat"><div class="n" id="be-dpm">61</div><div class="l">in centimetri d'acqua</div></div>
+        </div>
+        <p class="cap">È il <strong>tubo di Venturi</strong>: misurando il dislivello nei due tubicini si risale alla portata. Si usa negli impianti industriali e nei carburatori.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>Dove lo vedete tutti i giorni.</strong>
+        <ul style="margin:0.4rem 0 0;">
+          <li>La <strong>tenda della doccia</strong> che si appiccica addosso: l'acqua che scende trascina
+            l'aria, l'aria dentro si muove più veloce, la pressione dentro cala e quella esterna spinge dentro
+            la tenda.</li>
+          <li>Il <strong>tetto che vola</strong> durante una tempesta. Attenzione: non viene sollevato dal
+            vento che lo colpisce da sotto — viene <em>aspirato</em> dall'aria che scorre veloce sopra di esso.
+            Con un vento a 108 km/h la depressione vale circa 540 Pa, che su un tetto di 100 m² fanno 54 000 N:
+            cinque tonnellate e mezzo di tiro verso l'alto.</li>
+          <li>Due <strong>navi affiancate</strong> in navigazione tendono a essere spinte l'una contro l'altra:
+            fra gli scafi l'acqua deve passare in uno spazio stretto, quindi accelera e la pressione cala. Nel
+            1912 il transatlantico Olympic fu speronato da un incrociatore proprio per questo effetto.</li>
+          <li>Lo <strong>spruzzino</strong> del profumo, il <strong>carburatore</strong>, l'aspirapolvere ad
+            acqua: tutti sfruttano la depressione creata da un getto veloce per aspirare un altro fluido.</li>
+        </ul>
+      </div>
+
+      <div class="warnbox">
+        <strong>E l'ala dell'aeroplano?</strong> La spiegazione «l'aria sopra fa più strada, quindi va più
+        veloce, quindi la pressione cala» è quella che si trova su tutti i libri divulgativi ed è
+        <strong>sbagliata</strong>, o quantomeno molto incompleta: si basa su un'affermazione — che le due
+        correnti debbano ricongiungersi contemporaneamente — che non è vera. Bernoulli c'entra, ma il conto
+        giusto richiede di calcolare come l'ala <em>devia</em> l'aria verso il basso. Una spiegazione elegante
+        e sbagliata è comunque una spiegazione sbagliata: meglio saperlo.
+      </div>
+
+      <h3>11.1 Un'equazione di bilancio, come tante altre</h3>
+
+      <p>Fermiamoci un attimo sulla forma dell'equazione, perché è più interessante del suo contenuto.
+        Bernoulli dice: ci sono tre «serbatoi» (pressione, velocità, quota), il totale è fisso, e il fluido può
+        travasare da uno all'altro ma non può crearne. È esattamente la struttura del conto in banca di cui
+        parlavamo nella sezione 5.</p>
+
+      <p>Questo tipo di equazione — la si chiama <strong>equazione di bilancio</strong> — è talmente potente
+        che è uscita dalla fisica e ha invaso tutto:</p>
+
+      <table class="tabf">
+        <thead><tr><th>Campo</th><th>Che cosa si bilancia</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">fluidodinamica</td><td class="l">pressione, velocità e quota (Bernoulli)</td></tr>
+          <tr><td class="lab">termodinamica</td><td class="l">calore scambiato, lavoro fatto, energia interna</td></tr>
+          <tr><td class="lab">elettrotecnica</td><td class="l">le correnti che entrano ed escono da un nodo</td></tr>
+          <tr><td class="lab">chimica</td><td class="l">atomi a sinistra e a destra di una reazione</td></tr>
+          <tr><td class="lab">ecologia</td><td class="l">il ciclo del carbonio: quanto ne emettiamo e quanto ne assorbono oceani e foreste</td></tr>
+          <tr><td class="lab">economia</td><td class="l">entrate e uscite, domanda e offerta, bilancia commerciale di uno Stato</td></tr>
+        </tbody>
+      </table>
+
+      <p>Gli economisti scrivono davvero equazioni di questa forma, e le chiamano proprio «equazioni di
+        bilancio». Non è una metafora e non è una coincidenza: quando una grandezza non può essere creata né
+        distrutta ma solo spostata, la matematica che ne esce è sempre la stessa — qualunque cosa quella
+        grandezza rappresenti.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 7 — il tubo che si restringe</span></div>
+        <p>In un tubo orizzontale l'acqua scorre a <span>$2{,}0$</span> m/s in un tratto di sezione
+          <span>$20$</span> cm². Il tubo si restringe a <span>$10$</span> cm². <strong>(a)</strong> Qual è la
+          velocità nel tratto stretto? <strong>(b)</strong> Di quanto cala la pressione? <strong>(c)</strong>
+          A quanti centimetri d'acqua corrisponde quel calo?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-f7">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-f7">
+          <p><strong>(a)</strong> Prima la continuità, che non ha bisogno di Bernoulli:</p>
+          <p style="text-align:center;">$$v_2 = v_1 \frac{A_1}{A_2} = 2{,}0 \cdot \frac{20}{10} = 4{,}0\ \text{m/s}$$</p>
+          <p><strong>(b)</strong> Ora Bernoulli. Il tubo è orizzontale, quindi il termine
+            <span>$\rho g h$</span> è lo stesso da una parte e dall'altra e si semplifica:</p>
+          <p style="text-align:center;">$$p_1 + \frac{1}{2}\rho v_1^2 = p_2 + \frac{1}{2}\rho v_2^2$$</p>
+          <p style="text-align:center;">$$p_1 - p_2 = \frac{1}{2}\rho\left(v_2^2 - v_1^2\right) = \frac{1}{2} \cdot 1000 \cdot (16 - 4) = 6000\ \text{Pa}$$</p>
+          <p><strong>(c)</strong> Un calo di 6000 Pa corrisponde, per Stevino, a una colonna d'acqua di</p>
+          <p style="text-align:center;">$$h = \frac{\Delta p}{\rho g} = \frac{6000}{1000 \cdot 9{,}81} = 0{,}61\ \text{m} = 61\ \text{cm}$$</p>
+          <p>Ed è proprio così che si misura in pratica: due tubicini verticali sui due tratti, e si legge il
+            dislivello con un righello. Sessantun centimetri sono facilissimi da vedere.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$v_2 = 4{,}0$ m/s &nbsp;·&nbsp; $\Delta p = 6000$ Pa &nbsp;·&nbsp; $61$ cm d'acqua</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 8 — l'acqua che sale al piano di sopra</span></div>
+        <p>In una casa l'acqua arriva in cantina a <span>$3{,}0$</span> bar e vi scorre a <span>$1{,}0$</span>
+          m/s. Sale poi fino a un bagno che si trova <span>$8{,}0$</span> m più in alto, dove il tubo ha la
+          stessa sezione. <strong>(a)</strong> Che pressione c'è al bagno? <strong>(b)</strong> Fino a che
+          altezza potrebbe arrivare l'acqua prima di fermarsi del tutto?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-f8">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-f8">
+          <p><strong>(a)</strong> La sezione è la stessa, quindi per la continuità la velocità non cambia e il
+            termine cinetico si semplifica. Resta il bilancio fra pressione e quota:</p>
+          <p style="text-align:center;">$$p_2 = p_1 - \rho g h = 300\,000 - 1000 \cdot 9{,}81 \cdot 8{,}0$$</p>
+          <p style="text-align:center;">$$p_2 = 300\,000 - 78\,480 = 221\,520\ \text{Pa} \approx 2{,}2\ \text{bar}$$</p>
+          <p>Si sono persi circa 0,8 bar solo per essere saliti di otto metri. È il motivo per cui negli
+            ultimi piani la doccia va sempre peggio.</p>
+          <p><strong>(b)</strong> L'acqua si ferma quando la pressione si annulla:</p>
+          <p style="text-align:center;">$$h_{\max} = \frac{p_1}{\rho g} = \frac{300\,000}{1000 \cdot 9{,}81} = 30{,}6\ \text{m}$$</p>
+          <p>Circa dieci piani. Un grattacielo ha bisogno di pompe di rilancio a metà altezza — esattamente
+            quello che dicevamo a proposito dei vasi comunicanti.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$p_2 \approx 2{,}2$ bar &nbsp;·&nbsp; $h_{\max} = 30{,}6$ m</span></div>
+        </div>
+      </div>
+
+      <h3>11.2 Allenamento su Bernoulli</h3>
+
+      <div class="qbox" id="bn-box">
+        <div class="qt" id="bn-testo">—</div>
+        <div class="qrow">
+          <span id="bn-eti">risposta:</span>
+          <input class="inp" id="bn-val" inputmode="decimal" aria-label="risposta">
+          <span id="bn-um">Pa</span>
+          <button class="btn" id="bn-ver">Verifica</button>
+          <button class="btn btn-secondary" id="bn-new">Nuovo esercizio</button>
+        </div>
+        <div class="fb" id="bn-fb"></div>
+      </div>
+    </section>
+
+    <!-- 12 — IL SISTEMA CIRCOLATORIO -->
+    <section id="sec12">
+      <h2>12. Un impianto idraulico straordinario: voi</h2>
+
+      <p>Abbiamo parlato di tubi, pompe, pressioni e portate. Il tempo di chiudere il cerchio con il sistema
+        idraulico più notevole che conosciate: quello che avete addosso.</p>
+
+      <div class="rule">
+        Il <strong>sistema cardiovascolare</strong> è un circuito chiuso in cui una pompa — il
+        <strong>cuore</strong> — spinge circa <span>$5$</span> litri di sangue al minuto attraverso una rete di
+        vasi lunga, se messa in fila, quasi <strong>centomila chilometri</strong>: due volte e mezzo il giro
+        della Terra.
+      </div>
+
+      <table class="tabf">
+        <thead><tr><th>Grandezza</th><th>Valore tipico a riposo</th></tr></thead>
+        <tbody>
+          <tr><td class="l">portata cardiaca</td><td>$\approx 5$ L/min $= 83$ mL/s</td></tr>
+          <tr><td class="l">frequenza</td><td>$60$–$80$ battiti al minuto</td></tr>
+          <tr><td class="l">densità del sangue</td><td>$\approx 1060$ kg/m³ (un po' più dell'acqua)</td></tr>
+          <tr><td class="l">velocità nell'aorta</td><td>$\approx 0{,}3$ m/s</td></tr>
+          <tr><td class="l">velocità nei capillari</td><td>$\approx 0{,}0005$ m/s (mezzo millimetro al secondo)</td></tr>
+          <tr><td class="l">battiti in una vita di 70 anni</td><td>$\approx 2{,}6$ miliardi</td></tr>
+          <tr><td class="l">sangue pompato in una vita</td><td>$\approx 180$ milioni di litri</td></tr>
+        </tbody>
+      </table>
+
+      <div class="curiosita">
+        <strong>Perché il sangue rallenta nei capillari?</strong> Sembra una contraddizione con la
+        continuità — il tubo si restringe, quindi dovrebbe accelerare — e invece è proprio la continuità a
+        spiegarlo. Ogni singolo capillare è strettissimo, ma ce ne sono <em>miliardi</em> in parallelo, e la
+        sezione <strong>complessiva</strong> di tutti i capillari messi insieme è centinaia di volte più grande
+        di quella dell'aorta. Vale <span>$Q = A_{\text{tot}} v$</span> con <span>$A_{\text{tot}}$</span>
+        enorme, quindi <span>$v$</span> piccolissima. Ed è indispensabile: il sangue deve avere il tempo di
+        cedere ossigeno ai tessuti, e a mezzo millimetro al secondo impiega circa un secondo ad attraversare un
+        capillare.
+      </div>
+
+      <h3>12.1 La pressione del sangue e come si misura</h3>
+
+      <p>Quando il medico dice «120 su 80», sta dando due numeri, e ciascuno ha un significato preciso.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Pressione sistolica — «la massima»</h4>
+          <p>La pressione al momento della <strong>contrazione</strong> del ventricolo, quando il cuore spinge.
+            Valore tipico: <strong>120 mmHg</strong>, cioè circa 16 000 Pa.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Pressione diastolica — «la minima»</h4>
+          <p>La pressione fra un battito e l'altro, quando il cuore si riempie. Valore tipico:
+            <strong>80 mmHg</strong>, cioè circa 10 700 Pa. Non scende a zero grazie all'elasticità delle
+            arterie, che si comportano da ammortizzatore.</p>
+        </div>
+      </div>
+
+      <p>Due precisazioni che valgono la lezione intera. La prima: quei valori sono pressioni
+        <strong>relative</strong>, cioè misurate <em>rispetto</em> a quella atmosferica. La pressione assoluta
+        nell'aorta è circa <span>$101\,325 + 16\,000 = 117\,000$</span> Pa. La seconda: si misurano al
+        <strong>braccio</strong>, all'altezza del cuore, e non è un dettaglio — per Stevino, la pressione alla
+        caviglia è più alta di parecchie decine di mmHg, e quella alla testa più bassa. Misurare col braccio
+        penzoloni dà un valore sbagliato.</p>
+
+      <div class="rule">
+        <p class="formula-title">Perché proprio in millimetri di mercurio</p>
+        <p>Perché il primo strumento, lo <strong>sfigmomanometro</strong>, era letteralmente un tubo di
+          mercurio alla Torricelli: si leggeva l'altezza della colonna con un righello. Lo strumento è
+          cambiato — oggi sono quasi tutti elettronici — ma l'unità è rimasta, per continuità con un secolo di
+          dati clinici. È lo stesso motivo per cui i marinai usano ancora i nodi.</p>
+      </div>
+
+      <p><strong>Come funziona la misura.</strong> Si gonfia un bracciale finché la pressione schiaccia
+        l'arteria e ferma completamente il flusso. Poi si sgonfia lentamente ascoltando con lo stetoscopio:</p>
+
+      <ol>
+        <li>quando la pressione del bracciale scende appena sotto la <strong>sistolica</strong>, il sangue
+          ricomincia a passare a fiotti nei picchi del battito, e si sente un ticchettio (i <em>toni di
+          Korotkoff</em>): quello è il primo numero;</li>
+        <li>continuando a sgonfiare, il rumore sparisce: significa che il flusso è tornato continuo e non
+          turbolento. Quello è il secondo numero, la <strong>diastolica</strong>.</li>
+      </ol>
+
+      <p>Notate che cosa si sta ascoltando: la <strong>turbolenza</strong> della sezione 4. Con l'arteria
+        parzialmente schiacciata il sangue passa a velocità alta in una strozzatura e il flusso diventa
+        turbolento, quindi rumoroso. Quando l'arteria è libera il flusso torna laminare e silenzioso. Tutta la
+        misura si basa sulla differenza fra i due regimi.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="sf-p">pressione del bracciale = <span id="sf-pv">150</span> mmHg</label>
+          <input type="range" id="sf-p" min="40" max="180" step="1" value="150">
+        </div>
+        <svg viewBox="0 0 660 300" id="sf-svg" role="img" aria-label="misura della pressione con lo sfigmomanometro"></svg>
+        <div class="eq-out" id="sf-out"></div>
+        <p class="cap">Sgonfiate lentamente il bracciale e osservate quando compare e quando sparisce il rumore.</p>
+      </div>
+
+      <h3>12.2 Perché tenerlo in forma, e come</h3>
+
+      <p>Adesso mettiamo insieme la fisica di questa lezione e la salute, perché il collegamento è più diretto
+        di quanto sembri.</p>
+
+      <p>Il sangue scorre nei vasi come l'acqua nei tubi, e quando un tubo si restringe la portata crolla. Ma
+        crolla in un modo che nessuno si aspetta: per un flusso laminare in un condotto cilindrico vale la
+        <strong>legge di Poiseuille</strong>, secondo cui la portata è proporzionale alla
+        <strong>quarta potenza</strong> del raggio.</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.15rem;">$$Q \propto r^4$$</p>
+        <p class="formula-note">Un'arteria il cui raggio si riduce solo del <strong>20%</strong> lascia
+          passare appena il <span>$0{,}8^4 = 41\%$</span> del sangue di prima. Per mantenere la stessa portata
+          il cuore dovrebbe più che raddoppiare la pressione.</p>
+      </div>
+
+      <p>Ecco spiegata in una riga tutta la faccenda: i depositi di grasso che si formano sulle pareti delle
+        arterie (l'<strong>aterosclerosi</strong>) riducono di poco il raggio, ma di moltissimo la portata. Il
+        cuore compensa spingendo più forte — la pressione sale — e un cuore che lavora contro pressioni alte
+        per anni si ingrossa, si affatica e alla fine cede. E quando una placca si stacca e ostruisce
+        completamente un vaso, il tessuto a valle resta senza ossigeno: è l'<strong>infarto</strong> se
+        succede nel cuore, l'<strong>ictus</strong> se succede nel cervello.</p>
+
+      <div class="rule">
+        <p class="formula-title">Che cosa si può fare, concretamente</p>
+        <ul style="margin:0.3rem 0 0;">
+          <li><strong>Muoversi.</strong> L'attività aerobica regolare (camminare svelto, correre, nuotare,
+            andare in bici) rende il cuore un muscolo più efficiente: pompa più sangue a ogni battito, quindi
+            batte meno volte e a pressioni più basse. Bastano 30 minuti al giorno, e non serve la palestra.</li>
+          <li><strong>Mangiare in modo sensato.</strong> Meno grassi saturi, meno zuccheri, e soprattutto
+            <strong>meno sale</strong>: il sale trattiene acqua, aumenta il volume di sangue e quindi la
+            pressione — è ancora idraulica.</li>
+          <li><strong>Dormire.</strong> Durante il sonno pressione e frequenza calano: è la manutenzione
+            programmata dell'impianto. Dormire poco cronicamente alza la pressione media.</li>
+          <li><strong>Controllarsi.</strong> L'ipertensione non fa male, non si sente, e per questo la
+            chiamano «killer silenzioso». Si scopre solo misurandola.</li>
+        </ul>
+      </div>
+
+      <h3>12.3 Il fumo</h3>
+
+      <p>Va detto in modo diretto, perché è il fattore di rischio evitabile più importante e riguarda proprio
+        l'impianto di cui stiamo parlando.</p>
+
+      <div class="warnbox">
+        <strong>Che cosa fa il fumo all'idraulica del vostro corpo.</strong>
+        <ul style="margin:0.4rem 0 0;">
+          <li>la <strong>nicotina</strong> restringe i vasi sanguigni (vasocostrizione) e accelera il cuore:
+            raggio più piccolo, e ricordate la quarta potenza. Effetto immediato, a ogni sigaretta;</li>
+          <li>il <strong>monossido di carbonio</strong> si lega all'emoglobina al posto dell'ossigeno, con
+            un'affinità oltre duecento volte maggiore: il sangue trasporta meno ossigeno, e il cuore deve
+            pompare di più per compensare;</li>
+          <li>le sostanze del fumo danneggiano l'<strong>endotelio</strong>, cioè la superficie interna dei
+            vasi, favorendo la formazione delle placche e rendendo il sangue più propenso a coagulare dove non
+            dovrebbe.</li>
+        </ul>
+        <p style="margin:0.6rem 0 0;">Risultato: il rischio di infarto in un fumatore è circa il
+          <strong>doppio</strong>, e ai polmoni va anche peggio. La buona notizia è che il corpo ripara: dopo
+          un anno senza fumo il rischio cardiovascolare in eccesso si è già dimezzato.</p>
+      </div>
+
+      <p>E la <strong>sigaretta elettronica</strong>? Viene presentata come l'alternativa innocua, e non lo è.
+        Il vapore contiene <strong>nicotina</strong> — quindi la vasocostrizione e l'aumento della frequenza
+        cardiaca ci sono tutti, identici — insieme ad aldeidi e metalli ultrafini prodotti dal riscaldamento
+        del liquido. Gli studi sul lungo periodo sono ancora pochi, semplicemente perché il prodotto è
+        recente, ma quelli disponibili mostrano già danni all'endotelio e alterazioni della funzione
+        polmonare.</p>
+
+      <div class="rule">
+        <p>Il punto onesto è questo: per un fumatore adulto che non riesce a smettere, passare alla sigaretta
+          elettronica <em>riduce</em> alcuni danni — non c'è combustione, quindi niente catrame e molto meno
+          monossido. Ma per chi <strong>non fuma</strong>, e in particolare per un ragazzo, iniziare a
+          svapare non è «meno peggio»: è <strong>cominciare da zero</strong> con una dipendenza da nicotina che
+          in adolescenza si instaura più in fretta e dura di più, e con un rischio concreto di passare poi
+          alla sigaretta vera.</p>
+        <p style="margin:0.5rem 0 0;">L'aroma alla fragola non cambia la chimica: quello che arriva alle
+          arterie è sempre nicotina.</p>
+      </div>
+
+      <div class="note">
+        <strong>Che cosa portarsi via da questa lezione.</strong> Abbiamo cominciato definendo che cosa sia un
+        fluido e siamo finiti a parlare di sale, di sonno e di sigarette. Non è una divagazione: è
+        <em>esattamente</em> la stessa fisica. La portata che si conserva quando un tubo si divide è quella che
+        distribuisce il sangue ai vostri organi; la pressione che cala in una strozzatura è quella che il medico
+        ascolta con lo stetoscopio; e la quarta potenza del raggio è il motivo per cui una riduzione del 20% di
+        un vaso è una faccenda seria. La fisica non è una materia scolastica che parla di carrelli su rotaie:
+        è il manuale d'uso della macchina in cui abitate.
+      </div>
+    </section>
+
+<!--SENTINEL-->
+
+    <section id="quiz">
+      <h2>13. Quiz finale</h2>
+      <p>Domande su volume e densità, portata e continuità, pressione, Pascal, Stevino, Bernoulli e sistema
+        circolatorio.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 10 — I fluidi · Fisica · Terzo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      /* ---------- utilità comuni ---------- */
+      var G = 9.81, RHO = 1000, ATM = 101325, RHO_HG = 13595;
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+      function num(s) { return parseFloat(String(s).replace(',', '.').replace(/\s/g, '').trim()); }
+
+      function freccia(x1, y1, x2, y2, cls, s) {
+        s = s || 11;
+        var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy) || 1;
+        var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+        if (L < s * 1.2) { s = Math.max(3, L * 0.75); }
+        var bx = x2 - ux * s, by = y2 - uy * s;
+        var pts = x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+                  (bx + px * s * 0.42).toFixed(1) + ',' + (by + py * s * 0.42).toFixed(1) + ' ' +
+                  (bx - px * s * 0.42).toFixed(1) + ',' + (by - py * s * 0.42).toFixed(1);
+        return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) +
+               '" y2="' + by.toFixed(1) + '" class="' + cls + '"/>' +
+               '<polygon points="' + pts + '" class="' + cls + 'p"/>';
+      }
+
+      /* ================= 2.1 — conversioni di volume ================= */
+      (function () {
+        var box = document.getElementById('cv-box');
+        if (!box) { return; }
+        var att = 0, um = 'L', dec = 3;
+        var GAL = 3.785411784, GALUK = 4.54609;
+        function nuovo() {
+          var tipo = Math.floor(Math.random() * 6);
+          var testo;
+          if (tipo === 0) {
+            var m3 = [0.25, 0.5, 1.5, 2, 0.08][Math.floor(Math.random() * 5)];
+            att = m3 * 1000; um = 'L'; dec = 1;
+            testo = 'Quanti litri sono $' + nf(m3, 2).replace(',', '{,}') + '$ metri cubi?';
+            document.getElementById('cv-eti').textContent = 'V =';
+          } else if (tipo === 1) {
+            var L = [250, 500, 1500, 80, 2000][Math.floor(Math.random() * 5)];
+            att = L / 1000; um = 'm³'; dec = 3;
+            testo = 'Quanti metri cubi sono $' + L + '$ litri?';
+            document.getElementById('cv-eti').textContent = 'V =';
+          } else if (tipo === 2) {
+            var cm3 = [250, 500, 1500, 750, 2500][Math.floor(Math.random() * 5)];
+            att = cm3 / 1000; um = 'L'; dec = 3;
+            testo = 'Quanti litri sono $' + cm3 + '$ centimetri cubi?';
+            document.getElementById('cv-eti').textContent = 'V =';
+          } else if (tipo === 3) {
+            var g = [5, 10, 15, 20, 12][Math.floor(Math.random() * 5)];
+            att = g * GAL; um = 'L'; dec = 2;
+            testo = 'A quanti litri corrispondono $' + g + '$ galloni statunitensi? ' +
+                    '($1$ gal $= 3{,}785$ L)';
+            document.getElementById('cv-eti').textContent = 'V =';
+          } else if (tipo === 4) {
+            var Lg = [40, 50, 60, 80, 100][Math.floor(Math.random() * 5)];
+            att = Lg / GAL; um = 'gal US'; dec = 2;
+            testo = 'Un serbatoio da $' + Lg + '$ litri: quanti galloni statunitensi sono? ' +
+                    '($1$ gal $= 3{,}785$ L)';
+            document.getElementById('cv-eti').textContent = 'V =';
+          } else {
+            var Lu = [10, 20, 40, 50][Math.floor(Math.random() * 4)];
+            att = Lu / GALUK; um = 'gal UK'; dec = 2;
+            testo = 'Quanti galloni <strong>imperiali</strong> sono $' + Lu + '$ litri? ' +
+                    '($1$ gal UK $= 4{,}546$ L)';
+            document.getElementById('cv-eti').textContent = 'V =';
+          }
+          document.getElementById('cv-um').textContent = um;
+          var el = document.getElementById('cv-testo');
+          el.innerHTML = testo;
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          document.getElementById('cv-val').value = '';
+          document.getElementById('cv-fb').textContent = '';
+          document.getElementById('cv-fb').className = 'fb';
+        }
+        function verifica() {
+          var v = num(document.getElementById('cv-val').value);
+          var fb = document.getElementById('cv-fb');
+          if (isNaN(v)) { fb.className = 'fb no'; fb.textContent = 'Scrivi un numero.'; return; }
+          if (Math.abs(v - att) < Math.max(Math.pow(10, -dec) * 0.6, Math.abs(att) * 0.004)) {
+            fb.className = 'fb ok';
+            fb.textContent = '✓ Esatto: ' + nf(att, dec) + ' ' + um + '.';
+          } else if (Math.abs(v - att * 1000) < Math.abs(att) * 4 || Math.abs(v - att / 1000) < Math.abs(att) * 0.004) {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ Il numero giusto c\'è, ma è sbagliato di un fattore <strong>1000</strong>: ' +
+                           'ricontrolla il verso del fattore di conversione.';
+          } else {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ No. Scrivi il fattore di conversione nel verso che <em>semplifica</em> ' +
+                           'l\'unità da eliminare, e controlla che resti quella richiesta.';
+          }
+        }
+        document.getElementById('cv-ver').addEventListener('click', verifica);
+        document.getElementById('cv-new').addEventListener('click', nuovo);
+        nuovo();
+      })();
+
+      /* ================= 4 — portata e flusso ================= */
+      (function () {
+        var svg = document.getElementById('po-svg');
+        if (!svg) { return; }
+        var laminare = true, t0 = Date.now();
+        function disegna() {
+          var Q = parseFloat(document.getElementById('po-q').value);      // L/s
+          var d = parseFloat(document.getElementById('po-d').value);      // cm
+          var A = Math.PI * Math.pow(d / 2, 2);                            // cm^2
+          var v = (Q / 1000) / (A / 10000);                                // m/s
+          var YC = 130, H = Math.max(26, d * 9);                           // altezza grafica del tubo
+          var g = '', i, j;
+          g += '<rect x="40" y="' + (YC - H / 2) + '" width="580" height="' + H + '" class="tubo"/>';
+          g += '<rect x="40" y="' + (YC - H / 2 + 2) + '" width="580" height="' + (H - 4) + '" class="acqua"/>';
+          // linee di flusso
+          var n = Math.max(3, Math.round(H / 14));
+          for (i = 0; i < n; i++) {
+            var y = YC - H / 2 + (H / (n + 1)) * (i + 1);
+            if (laminare) {
+              g += '<line x1="50" y1="' + y.toFixed(1) + '" x2="610" y2="' + y.toFixed(1) + '" class="filetto"/>';
+            } else {
+              var d2 = 'M 50 ' + y.toFixed(1);
+              for (j = 1; j <= 14; j++) {
+                var xx = 50 + j * 40;
+                var yy = y + Math.sin(j * 1.7 + i * 2.1) * Math.min(H / 3.5, 14);
+                d2 += ' Q ' + (xx - 20) + ' ' + (y + Math.cos(j * 2.3 + i) * Math.min(H / 3, 16)).toFixed(1) +
+                      ' ' + xx + ' ' + yy.toFixed(1);
+              }
+              g += '<path d="' + d2 + '" class="filetto"/>';
+            }
+          }
+          // le frecce della velocità (in laminare tutte uguali, in turbolento no)
+          for (i = 0; i < 4; i++) {
+            var yf = YC - H / 2 + (H / 5) * (i + 1);
+            if (yf > YC - H / 2 + 6 && yf < YC + H / 2 - 6) {
+              var lung = laminare ? Math.min(70, 18 + v * 26) : (18 + Math.abs(Math.sin(i * 3.1)) * 40);
+              g += freccia(200, yf, 200 + lung, yf, 'w', 9);
+            }
+          }
+          // la sezione evidenziata
+          g += '<line x1="430" y1="' + (YC - H / 2 - 14) + '" x2="430" y2="' + (YC + H / 2 + 14) +
+               '" stroke="var(--magenta)" stroke-width="2.4" stroke-dasharray="5 4"/>';
+          g += '<text x="430" y="' + (YC + H / 2 + 34) + '" text-anchor="middle" class="em">sezione A</text>';
+          g += '<text x="330" y="34" text-anchor="middle" class="lbl">' +
+               (laminare ? 'strati ordinati che non si mescolano' : 'vortici: il moto diventa caotico') + '</text>';
+          g += '<text x="40" y="' + (YC - H / 2 - 12) + '" class="lbl-s">d = ' + nf(d, 1) + ' cm</text>';
+          svg.innerHTML = g;
+          document.getElementById('po-qv').textContent = nf(Q, 1);
+          document.getElementById('po-dv').textContent = nf(d, 1);
+          document.getElementById('po-a').textContent = nf(A, 1);
+          document.getElementById('po-v').textContent = nf(v, 2);
+          document.getElementById('po-t').textContent = nf(10 / Q, 1);
+          document.getElementById('po-lam').classList.toggle('active', laminare);
+          document.getElementById('po-tur').classList.toggle('active', !laminare);
+        }
+        document.getElementById('po-q').addEventListener('input', disegna);
+        document.getElementById('po-d').addEventListener('input', disegna);
+        document.getElementById('po-lam').addEventListener('click', function () { laminare = true; disegna(); });
+        document.getElementById('po-tur').addEventListener('click', function () { laminare = false; disegna(); });
+        disegna();
+      })();
+
+      /* ================= 5 — equazione di continuità ================= */
+      (function () {
+        var svg = document.getElementById('co-svg');
+        if (!svg) { return; }
+        var R1 = 2.0;                       // raggio del tratto largo, in cm
+        function disegna() {
+          var R2 = parseFloat(document.getElementById('co-r').value);
+          var A1 = Math.PI * R1 * R1, A2 = Math.PI * R2 * R2;
+          var v1 = 1.0, v2 = v1 * A1 / A2;
+          var YC = 130, H1 = R1 * 24, H2 = R2 * 24;
+          var g = '';
+          // il tubo: largo, cono, stretto
+          var p = 'M 30 ' + (YC - H1 / 2) + ' L 230 ' + (YC - H1 / 2) +
+                  ' L 330 ' + (YC - H2 / 2) + ' L 630 ' + (YC - H2 / 2) +
+                  ' L 630 ' + (YC + H2 / 2) + ' L 330 ' + (YC + H2 / 2) +
+                  ' L 230 ' + (YC + H1 / 2) + ' L 30 ' + (YC + H1 / 2) + ' Z';
+          g += '<path d="' + p + '" class="tubo"/>';
+          g += '<path d="' + p + '" class="acqua"/>';
+          // linee di flusso che si stringono
+          for (var i = 1; i <= 5; i++) {
+            var f = (i / 6 - 0.5);
+            var ya = YC + f * H1, yb = YC + f * H2;
+            g += '<path d="M 34 ' + ya.toFixed(1) + ' L 230 ' + ya.toFixed(1) + ' L 330 ' + yb.toFixed(1) +
+                 ' L 626 ' + yb.toFixed(1) + '" class="filetto"/>';
+          }
+          // frecce: corte a sinistra, lunghe a destra
+          g += freccia(90, YC, 90 + 22 * v1, YC, 'w', 9);
+          g += freccia(420, YC, 420 + 22 * Math.min(v2, 7), YC, 'w', 11);
+          g += '<text x="130" y="' + (YC - H1 / 2 - 16) + '" text-anchor="middle" class="lbl">v₁ = 1,00 m/s</text>';
+          g += '<text x="480" y="' + (YC - H2 / 2 - 16) + '" text-anchor="middle" class="lbl">v₂ = ' + nf(v2, 2) + ' m/s</text>';
+          g += '<text x="120" y="' + (YC + H1 / 2 + 28) + '" text-anchor="middle" class="lbl-s">r₁ = 2,0 cm</text>';
+          g += '<text x="480" y="' + (YC + H2 / 2 + 28) + '" text-anchor="middle" class="lbl-s">r₂ = ' + nf(R2, 1) + ' cm</text>';
+          g += '<text x="330" y="248" text-anchor="middle" class="em">la portata è la stessa: A₁v₁ = A₂v₂</text>';
+          svg.innerHTML = g;
+          document.getElementById('co-rv').textContent = nf(R2, 1);
+          document.getElementById('co-a1').textContent = nf(A1, 1);
+          document.getElementById('co-a2').textContent = nf(A2, 1);
+          document.getElementById('co-v2').textContent = nf(v2, 2);
+          document.getElementById('co-rap').textContent = nf(A1 / A2, 1) + '×';
+        }
+        document.getElementById('co-r').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 5.2 — il tubo che si divide ================= */
+      (function () {
+        var svg = document.getElementById('di-svg');
+        if (!svg) { return; }
+        var QTOT = 12.0;
+        function disegna() {
+          var q1 = parseFloat(document.getElementById('di-q1').value);
+          var q2 = QTOT - q1;
+          var g = '';
+          var h1 = Math.max(8, q1 * 4), h2 = Math.max(8, q2 * 4), hin = QTOT * 4;
+          // tubo principale
+          g += '<rect x="20" y="' + (140 - hin / 2) + '" width="230" height="' + hin + '" class="tubo"/>';
+          g += '<rect x="20" y="' + (140 - hin / 2) + '" width="230" height="' + hin + '" class="acqua"/>';
+          // ramo 1 (in alto) e ramo 2 (in basso)
+          g += '<path d="M 250 ' + (140 - hin / 2) + ' L 420 ' + (60 - h1 / 2) + ' L 640 ' + (60 - h1 / 2) +
+               ' L 640 ' + (60 + h1 / 2) + ' L 420 ' + (60 + h1 / 2) + ' L 250 140 Z" class="tubo"/>';
+          g += '<path d="M 250 ' + (140 - hin / 2) + ' L 420 ' + (60 - h1 / 2) + ' L 640 ' + (60 - h1 / 2) +
+               ' L 640 ' + (60 + h1 / 2) + ' L 420 ' + (60 + h1 / 2) + ' L 250 140 Z" class="acqua"/>';
+          g += '<path d="M 250 140 L 420 ' + (225 - h2 / 2) + ' L 640 ' + (225 - h2 / 2) +
+               ' L 640 ' + (225 + h2 / 2) + ' L 420 ' + (225 + h2 / 2) + ' L 250 ' + (140 + hin / 2) + ' Z" class="tubo"/>';
+          g += '<path d="M 250 140 L 420 ' + (225 - h2 / 2) + ' L 640 ' + (225 - h2 / 2) +
+               ' L 640 ' + (225 + h2 / 2) + ' L 420 ' + (225 + h2 / 2) + ' L 250 ' + (140 + hin / 2) + ' Z" class="acqua"/>';
+          g += freccia(60, 140, 150, 140, 'w', 12);
+          g += freccia(500, 60, 590, 60, 'w', 11);
+          g += freccia(500, 225, 590, 225, 'w', 11);
+          g += '<text x="105" y="' + (140 - hin / 2 - 12) + '" text-anchor="middle" class="lbl">Q = ' + nf(QTOT, 1) + ' L/s</text>';
+          g += '<text x="545" y="' + (60 - h1 / 2 - 12) + '" text-anchor="middle" class="lbl">Q₁ = ' + nf(q1, 1) + ' L/s</text>';
+          g += '<text x="545" y="' + (225 + h2 / 2 + 24) + '" text-anchor="middle" class="lbl">Q₂ = ' + nf(q2, 1) + ' L/s</text>';
+          g += '<text x="330" y="268" text-anchor="middle" class="em">Q = Q₁ + Q₂ &nbsp; → &nbsp; ' +
+               nf(QTOT, 1) + ' = ' + nf(q1, 1) + ' + ' + nf(q2, 1) + '</text>';
+          svg.innerHTML = g;
+          document.getElementById('di-q1v').textContent = nf(q1, 1);
+          document.getElementById('di-q2').textContent = nf(q2, 1);
+          document.getElementById('di-perc').textContent = Math.round(q1 / QTOT * 100) + '%';
+        }
+        document.getElementById('di-q1').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 5.3 — allenamento sulla continuità ================= */
+      (function () {
+        var box = document.getElementById('ct-box');
+        if (!box) { return; }
+        var att = 0, um = 'm/s', dec = 2;
+        function nuovo() {
+          var tipo = Math.floor(Math.random() * 3);
+          var testo;
+          if (tipo === 0) {
+            var A1 = [2, 4, 5, 8, 10][Math.floor(Math.random() * 5)];
+            var rid = [2, 4, 5][Math.floor(Math.random() * 3)];
+            var v1 = [1, 1.5, 2, 2.5][Math.floor(Math.random() * 4)];
+            att = v1 * rid; um = 'm/s'; dec = 2;
+            testo = 'In un tubo di sezione $' + A1 + '$ cm² l\'acqua scorre a $' +
+                    nf(v1, 1).replace(',', '{,}') + '$ m/s. Il tubo si restringe fino a $' +
+                    nf(A1 / rid, 1).replace(',', '{,}') + '$ cm². Con che velocità scorre nel tratto stretto?';
+            document.getElementById('ct-eti').textContent = 'v₂ =';
+          } else if (tipo === 1) {
+            var Qt = [12, 15, 18, 20, 24][Math.floor(Math.random() * 5)];
+            var nr = [2, 3, 4][Math.floor(Math.random() * 3)];
+            att = Qt / nr; um = 'L/s'; dec = 2;
+            testo = 'Un tubo che porta $' + Qt + '$ L/s si divide in $' + nr +
+                    '$ rami uguali. Quanta acqua scorre in ciascun ramo?';
+            document.getElementById('ct-eti').textContent = 'Q =';
+          } else {
+            var A = [2, 4, 5, 10][Math.floor(Math.random() * 4)];
+            var vv = [1, 2, 3, 4][Math.floor(Math.random() * 4)];
+            att = A * 1e-4 * vv * 1000; um = 'L/s'; dec = 2;
+            testo = 'Un tubo di sezione $' + A + '$ cm² porta acqua a $' + vv +
+                    '$ m/s. Quanto vale la portata, in litri al secondo?';
+            document.getElementById('ct-eti').textContent = 'Q =';
+          }
+          document.getElementById('ct-um').textContent = um;
+          var el = document.getElementById('ct-testo');
+          el.innerHTML = testo;
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          document.getElementById('ct-val').value = '';
+          document.getElementById('ct-fb').textContent = '';
+          document.getElementById('ct-fb').className = 'fb';
+        }
+        function verifica() {
+          var v = num(document.getElementById('ct-val').value);
+          var fb = document.getElementById('ct-fb');
+          if (isNaN(v)) { fb.className = 'fb no'; fb.textContent = 'Scrivi un numero.'; return; }
+          if (Math.abs(v - att) < Math.max(0.005, Math.abs(att) * 0.005)) {
+            fb.className = 'fb ok';
+            fb.textContent = '✓ Esatto: ' + nf(att, dec) + ' ' + um + '.';
+          } else {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ No. Riparti da $Q = A\\,v$ e dal fatto che la portata si conserva: ' +
+                           '$A_1v_1 = A_2v_2$. Attenzione a portare i cm² in m² (dividendo per 10 000).';
+            renderMathIn(fb);
+          }
+        }
+        document.getElementById('ct-ver').addEventListener('click', verifica);
+        document.getElementById('ct-new').addEventListener('click', nuovo);
+        nuovo();
+      })();
+
+      /* ================= 6 — campo vettoriale, flusso e rotore ================= */
+      (function () {
+        var svg = document.getElementById('cf-svg');
+        if (!svg) { return; }
+        var CX = 300, CY = 190, S = 50;         // origine e scala del disegno
+        var RC = 1.6;                            // raggio della curva chiusa (unità fisiche)
+        var PX = 2.6, PY = 1.1;                  // punto in cui si misura il rotore
+        var CAMPI = [
+          { nome: 'Uniforme',
+            f: function (x, y) { return [1.1, 0]; },
+            testo: 'Tutte le particelle vanno nella stessa direzione con la stessa velocità. Quello che entra ' +
+                   'dalla curva esce dall\'altra parte: <strong>flusso nullo</strong>. E la girandola non gira: ' +
+                   '<strong>rotore nullo</strong>.' },
+          { nome: 'Sorgente',
+            f: function (x, y) { var r = Math.sqrt(x * x + y * y) || 1e-6; return [0.95 * x / r, 0.95 * y / r]; },
+            testo: 'Dal centro esce fluido in tutte le direzioni, come da un rubinetto. Il <strong>flusso è ' +
+                   'positivo</strong>: dentro la curva si crea fluido. Il rotore però è nullo, perché il fluido ' +
+                   'non gira, va dritto per dritto.' },
+          { nome: 'Pozzo',
+            f: function (x, y) { var r = Math.sqrt(x * x + y * y) || 1e-6; return [-0.95 * x / r, -0.95 * y / r]; },
+            testo: 'Il contrario: uno scarico che aspira. Il <strong>flusso è negativo</strong>, perché entra ' +
+                   'più fluido di quanto ne esce. Rotore ancora nullo.' },
+          { nome: 'Vortice',
+            f: function (x, y) { return [-0.42 * y, 0.42 * x]; },
+            testo: 'Il fluido ruota in blocco, come una giostra. Il <strong>flusso è nullo</strong> — nessuno ' +
+                   'attraversa il confine, si gira e basta — ma il <strong>rotore non lo è</strong>: la ' +
+                   'girandola gira eccome.' },
+          { nome: 'Corrente a strati',
+            f: function (x, y) { return [0.42 * y, 0]; },
+            testo: 'Qui viene il bello: tutte le traiettorie sono <strong>rette</strong>, nessuno gira in ' +
+                   'tondo, eppure il rotore <strong>non è nullo</strong>. La girandola ha il fluido veloce ' +
+                   'sopra e lento sotto, quindi viene messa in rotazione. Il rotore misura la rotazione ' +
+                   'locale, non la forma delle traiettorie.' }
+        ];
+        var sel = 0;
+
+        function flusso(f) {           // integrale di v·n lungo la circonferenza
+          var s = 0, N = 720, i;
+          for (i = 0; i < N; i++) {
+            var th = 2 * Math.PI * i / N;
+            var x = RC * Math.cos(th), y = RC * Math.sin(th);
+            var v = f(x, y);
+            s += (v[0] * Math.cos(th) + v[1] * Math.sin(th)) * RC * (2 * Math.PI / N);
+          }
+          return s;
+        }
+        function rotore(f, x, y) {     // componente z: dvy/dx - dvx/dy
+          var h = 1e-4;
+          var a = f(x + h, y)[1], b = f(x - h, y)[1];
+          var c = f(x, y + h)[0], d = f(x, y - h)[0];
+          return (a - b) / (2 * h) - (c - d) / (2 * h);
+        }
+
+        function disegna() {
+          var C = CAMPI[sel], g = '', i, j;
+          // griglia di frecce
+          for (i = -4; i <= 5; i++) {
+            for (j = -3; j <= 3; j++) {
+              var x = i * 1.15, y = j * 1.0;
+              var v = C.f(x, y);
+              var m = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+              if (m < 1e-6) {
+                g += '<circle cx="' + (CX + x * S) + '" cy="' + (CY - y * S) + '" r="2.5" fill="var(--muted)"/>';
+                continue;
+              }
+              var L = Math.min(30, 12 + m * 16);
+              var x1 = CX + x * S - v[0] / m * L / 2, y1 = CY - y * S + v[1] / m * L / 2;
+              var x2 = CX + x * S + v[0] / m * L / 2, y2 = CY - y * S - v[1] / m * L / 2;
+              g += freccia(x1, y1, x2, y2, 'v', 8);
+            }
+          }
+          // la curva chiusa su cui si calcola il flusso
+          g += '<circle cx="' + CX + '" cy="' + CY + '" r="' + (RC * S) +
+               '" fill="none" stroke="var(--red)" stroke-width="3"/>';
+          g += '<text x="' + CX + '" y="' + (CY + RC * S + 22) + '" text-anchor="middle" class="lbl" style="fill:var(--red);">curva chiusa: quanto ne esce?</text>';
+          // il punto in cui si misura il rotore, con la girandola
+          var rot = rotore(C.f, PX, PY);
+          var gx = CX + PX * S, gy = CY - PY * S;
+          g += '<circle cx="' + gx + '" cy="' + gy + '" r="22" fill="color-mix(in srgb, var(--green) 18%, transparent)" stroke="var(--green)" stroke-width="2.5"/>';
+          for (i = 0; i < 4; i++) {
+            var a0 = i * Math.PI / 2 + (rot > 0 ? 0.35 : (rot < 0 ? -0.35 : 0));
+            g += '<line x1="' + gx + '" y1="' + gy + '" x2="' + (gx + 19 * Math.cos(a0)).toFixed(1) +
+                 '" y2="' + (gy - 19 * Math.sin(a0)).toFixed(1) + '" stroke="var(--green)" stroke-width="2.6"/>';
+          }
+          g += '<circle cx="' + gx + '" cy="' + gy + '" r="3.5" fill="var(--green)"/>';
+          var verso = (Math.abs(rot) < 1e-6) ? 'ferma' : (rot > 0 ? 'gira antioraria' : 'gira oraria');
+          g += '<text x="' + gx + '" y="' + (gy - 30) + '" text-anchor="middle" class="lbl" style="fill:var(--green);">girandola: ' + verso + '</text>';
+          svg.innerHTML = g;
+
+          var fl = flusso(C.f);
+          document.getElementById('cf-flusso').textContent = nf(Math.abs(fl) < 1e-9 ? 0 : fl, 2);
+          document.getElementById('cf-rot').textContent = nf(Math.abs(rot) < 1e-9 ? 0 : rot, 2);
+          var out = document.getElementById('cf-out');
+          out.innerHTML = '<strong>' + C.nome + '.</strong> ' + C.testo;
+          CAMPI.forEach(function (c, k) {
+            document.getElementById('cf-b' + k).classList.toggle('active', k === sel);
+          });
+        }
+        CAMPI.forEach(function (c, k) {
+          document.getElementById('cf-b' + k).addEventListener('click', function () { sel = k; disegna(); });
+        });
+        disegna();
+      })();
+
+      /* ================= 8 — l'esperimento di Torricelli ================= */
+      (function () {
+        var svg = document.getElementById('to-svg');
+        if (!svg) { return; }
+        var mercurio = true;
+        function disegna() {
+          var pHPa = parseFloat(document.getElementById('to-p').value);
+          var p = pHPa * 100;
+          var rho = mercurio ? RHO_HG : RHO;
+          var h = p / (rho * G);                       // in metri
+          var YB = 330;                                 // livello della bacinella
+          // scala: con il mercurio 760 mm devono venire circa 250 px
+          var SC = mercurio ? 250 / 0.76 : 250 / 11.0;
+          var yTop = YB - h * SC;
+          var g = '';
+          // la bacinella
+          g += '<rect x="150" y="' + YB + '" width="360" height="46" rx="4" class="tubo"/>';
+          g += '<rect x="154" y="' + (YB + 6) + '" width="352" height="36" fill="' +
+               (mercurio ? '#9ca3af' : 'color-mix(in srgb, #3b82f6 45%, transparent)') + '"/>';
+          // il tubo
+          var XT = 330, W = 34;
+          var yTubo = Math.min(yTop - 46, 30);
+          g += '<rect x="' + (XT - W / 2) + '" y="' + yTubo.toFixed(1) + '" width="' + W + '" height="' +
+               (YB + 20 - yTubo).toFixed(1) + '" class="tubo" fill="none"/>';
+          // il liquido nel tubo
+          g += '<rect x="' + (XT - W / 2 + 3) + '" y="' + yTop.toFixed(1) + '" width="' + (W - 6) +
+               '" height="' + (YB + 20 - yTop).toFixed(1) + '" fill="' +
+               (mercurio ? '#9ca3af' : 'color-mix(in srgb, #3b82f6 55%, transparent)') + '"/>';
+          // il vuoto sopra
+          g += '<text x="' + (XT + 30) + '" y="' + (yTubo + 26).toFixed(1) + '" class="em">vuoto</text>';
+          g += '<text x="' + (XT + 30) + '" y="' + (yTubo + 42).toFixed(1) + '" class="lbl-s">(di Torricelli)</text>';
+          // la quota
+          g += '<line x1="' + (XT - 60) + '" y1="' + yTop.toFixed(1) + '" x2="' + (XT - 60) + '" y2="' + YB +
+               '" stroke="var(--gold)" stroke-width="2.4"/>';
+          g += '<line x1="' + (XT - 68) + '" y1="' + yTop.toFixed(1) + '" x2="' + (XT - 52) + '" y2="' + yTop.toFixed(1) + '" stroke="var(--gold)" stroke-width="2.4"/>';
+          g += '<line x1="' + (XT - 68) + '" y1="' + YB + '" x2="' + (XT - 52) + '" y2="' + YB + '" stroke="var(--gold)" stroke-width="2.4"/>';
+          g += '<text x="' + (XT - 74) + '" y="' + ((yTop + YB) / 2).toFixed(1) +
+               '" text-anchor="end" class="lbl" style="fill:var(--gold);">h = ' +
+               (mercurio ? (nf(h * 1000, 0) + ' mm') : (nf(h, 2) + ' m')) + '</text>';
+          // le frecce della pressione atmosferica sulla bacinella
+          for (var i = 0; i < 4; i++) {
+            var x = 180 + i * 40;
+            g += freccia(x, YB - 40, x, YB - 8, 'w', 9);
+            g += freccia(660 - x, YB - 40, 660 - x, YB - 8, 'w', 9);
+          }
+          g += '<text x="205" y="' + (YB - 50) + '" text-anchor="middle" class="em">la pressione atmosferica preme qui</text>';
+          g += '<text x="' + XT + '" y="392" text-anchor="middle" class="lbl">' +
+               (mercurio ? 'mercurio, ρ = 13 595 kg/m³' : 'acqua, ρ = 1000 kg/m³') + '</text>';
+          if (!mercurio) {
+            g += '<text x="540" y="80" text-anchor="middle" class="em">servirebbe</text>';
+            g += '<text x="540" y="98" text-anchor="middle" class="em">un tubo di 11 m!</text>';
+          }
+          svg.innerHTML = g;
+          document.getElementById('to-pv').textContent = pHPa;
+          document.getElementById('to-h').textContent = mercurio ? nf(h * 1000, 0) : nf(h, 2);
+          document.getElementById('to-pa').textContent = nf(p, 0);
+          document.getElementById('to-atm').textContent = nf(p / ATM, 3);
+          document.getElementById('to-hg').classList.toggle('active', mercurio);
+          document.getElementById('to-h2o').classList.toggle('active', !mercurio);
+        }
+        document.getElementById('to-p').addEventListener('input', disegna);
+        document.getElementById('to-hg').addEventListener('click', function () { mercurio = true; disegna(); });
+        document.getElementById('to-h2o').addEventListener('click', function () { mercurio = false; disegna(); });
+        disegna();
+      })();
+
+      /* ================= 9 — il torchio idraulico ================= */
+      (function () {
+        var svg = document.getElementById('tk-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var d1 = parseFloat(document.getElementById('tk-d1').value);
+          var d2 = parseFloat(document.getElementById('tk-d2').value);
+          var F1 = parseFloat(document.getElementById('tk-f1').value);
+          var A1 = Math.PI * Math.pow(d1 / 200, 2), A2 = Math.PI * Math.pow(d2 / 200, 2);
+          var rap = A2 / A1, F2 = F1 * rap, p = F1 / A1;
+          var SC = 7.5;                                   // px per cm di diametro
+          var w1 = Math.max(14, d1 * SC), w2 = Math.max(30, d2 * SC);
+          var X1 = 140, X2 = 460, YB = 250;
+          var h1 = 120, h2 = 90;
+          var g = '';
+          // il liquido: base comune + due cilindri
+          g += '<rect x="' + (X1 - w1 / 2) + '" y="' + (YB - h1) + '" width="' + w1 + '" height="' + h1 + '" class="tubo"/>';
+          g += '<rect x="' + (X2 - w2 / 2) + '" y="' + (YB - h2) + '" width="' + w2 + '" height="' + h2 + '" class="tubo"/>';
+          g += '<rect x="' + (X1 - w1 / 2) + '" y="' + YB + '" width="' + (X2 - X1 + w2 / 2 + w1 / 2) + '" height="34" class="tubo"/>';
+          g += '<rect x="' + (X1 - w1 / 2 + 3) + '" y="' + (YB - h1 + 16) + '" width="' + (w1 - 6) + '" height="' + (h1 - 16) + '" fill="color-mix(in srgb, var(--gold) 40%, transparent)"/>';
+          g += '<rect x="' + (X2 - w2 / 2 + 3) + '" y="' + (YB - h2 + 16) + '" width="' + (w2 - 6) + '" height="' + (h2 - 16) + '" fill="color-mix(in srgb, var(--gold) 40%, transparent)"/>';
+          g += '<rect x="' + (X1 - w1 / 2 + 3) + '" y="' + (YB + 3) + '" width="' + (X2 - X1 + w2 / 2 + w1 / 2 - 6) + '" height="28" fill="color-mix(in srgb, var(--gold) 40%, transparent)"/>';
+          // i pistoni
+          g += '<rect x="' + (X1 - w1 / 2 - 2) + '" y="' + (YB - h1 + 6) + '" width="' + (w1 + 4) + '" height="12" rx="3" fill="var(--muted)" stroke="var(--text)" stroke-width="1.6"/>';
+          g += '<rect x="' + (X2 - w2 / 2 - 2) + '" y="' + (YB - h2 + 6) + '" width="' + (w2 + 4) + '" height="12" rx="3" fill="var(--muted)" stroke="var(--text)" stroke-width="1.6"/>';
+          // le forze
+          g += freccia(X1, YB - h1 - 62, X1, YB - h1 + 2, 'w', 13);
+          g += '<text x="' + (X1 - 10) + '" y="' + (YB - h1 - 70) + '" text-anchor="middle" class="lbl" style="fill:var(--magenta);">F₁ = ' + nf(F1, 0) + ' N</text>';
+          g += freccia(X2, YB - h2 + 2, X2, YB - h2 - 62, 's', 15);
+          g += '<text x="' + X2 + '" y="' + (YB - h2 - 70) + '" text-anchor="middle" class="lbl" style="fill:var(--green);">F₂ = ' + nf(F2, 0) + ' N</text>';
+          // la pressione, uguale dappertutto
+          g += '<text x="330" y="' + (YB + 54) + '" text-anchor="middle" class="lbl" style="fill:var(--gold);">stessa pressione ovunque: p = ' + nf(p, 0) + ' Pa</text>';
+          g += '<text x="' + X1 + '" y="' + (YB + 84) + '" text-anchor="middle" class="lbl-s">d₁ = ' + nf(d1, 1) + ' cm</text>';
+          g += '<text x="' + X2 + '" y="' + (YB + 84) + '" text-anchor="middle" class="lbl-s">d₂ = ' + nf(d2, 0) + ' cm</text>';
+          svg.innerHTML = g;
+          document.getElementById('tk-d1v').textContent = nf(d1, 1);
+          document.getElementById('tk-d2v').textContent = nf(d2, 0);
+          document.getElementById('tk-f1v').textContent = nf(F1, 0);
+          document.getElementById('tk-rap').textContent = nf(rap, rap < 10 ? 1 : 0);
+          document.getElementById('tk-f2').textContent = nf(F2, 0);
+          document.getElementById('tk-kg').textContent = nf(F2 / G, 0);
+          document.getElementById('tk-corsa').textContent = nf(rap, rap < 10 ? 1 : 0);
+        }
+        ['tk-d1', 'tk-d2', 'tk-f1'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        disegna();
+      })();
+
+      /* ================= 10.1 — l'acqua che esce dai fori ================= */
+      (function () {
+        var svg = document.getElementById('st-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var H = parseFloat(document.getElementById('st-h').value);   // altezza acqua, in metri
+          var SC = 180;                                                 // px per metro
+          var XL = 90, XR = 210, YB = 330;                              // recipiente
+          var g = '';
+          var yPelo = YB - H * SC;
+          // il recipiente
+          g += '<rect x="' + XL + '" y="' + (YB - 1.5 * SC) + '" width="' + (XR - XL) + '" height="' + (1.5 * SC) + '" class="tubo" fill="none"/>';
+          g += '<rect x="' + (XL + 2) + '" y="' + yPelo.toFixed(1) + '" width="' + (XR - XL - 4) + '" height="' + (YB - yPelo).toFixed(1) + '" class="acqua"/>';
+          g += '<line x1="' + XL + '" y1="' + YB + '" x2="640" y2="' + YB + '" stroke="var(--muted)" stroke-width="2.5"/>';
+          // tre fori, a 1/4, 1/2 e 3/4 dell'altezza massima del recipiente
+          var vs = [];
+          [0.75, 0.5, 0.25].forEach(function (frac, k) {
+            var yFor = YB - frac * 1.2 * SC;           // altezza del foro da terra
+            var yAlt = (YB - yFor) / SC;               // in metri
+            var hSopra = H - yAlt;                     // colonna d'acqua sopra il foro
+            if (hSopra <= 0) { vs.push(0); return; }
+            var v = Math.sqrt(2 * G * hSopra);
+            vs.push(v);
+            // getto parabolico: x = v t, y = 1/2 g t^2
+            var pts = [], t;
+            for (t = 0; t < 3; t += 0.01) {
+              var x = XR + v * t * SC, y = yFor + 0.5 * G * t * t * SC;
+              if (y > YB) { break; }
+              pts.push(x.toFixed(1) + ',' + y.toFixed(1));
+            }
+            g += '<circle cx="' + XR + '" cy="' + yFor.toFixed(1) + '" r="4" fill="var(--magenta)"/>';
+            if (pts.length > 1) {
+              g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="#3b82f6" stroke-width="3" opacity="0.9"/>';
+            }
+            var gitt = 2 * Math.sqrt(yAlt * hSopra);
+            g += '<text x="' + (XR + gitt * SC).toFixed(1) + '" y="' + (YB + 18) + '" text-anchor="middle" class="lbl-s">' +
+                 nf(gitt, 2) + ' m</text>';
+          });
+          // il pelo libero e le quote
+          g += '<line x1="' + (XL - 40) + '" y1="' + yPelo.toFixed(1) + '" x2="' + XR + '" y2="' + yPelo.toFixed(1) + '" class="dash"/>';
+          g += '<text x="' + (XL - 44) + '" y="' + (yPelo - 6).toFixed(1) + '" text-anchor="end" class="lbl" style="fill:var(--gold);">H = ' + nf(H, 2) + ' m</text>';
+          g += '<text x="330" y="30" text-anchor="middle" class="lbl">v = √(2gh): più acqua sopra il foro, più veloce esce</text>';
+          svg.innerHTML = g;
+          document.getElementById('st-hv').textContent = nf(H, 2);
+          document.getElementById('st-v1').textContent = nf(vs[0], 2);
+          document.getElementById('st-v2').textContent = nf(vs[1], 2);
+          document.getElementById('st-v3').textContent = nf(vs[2], 2);
+          document.getElementById('st-x2').textContent = nf(H, 2);
+        }
+        document.getElementById('st-h').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 10.2 — i vasi comunicanti ================= */
+      (function () {
+        var svg = document.getElementById('vc-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var pct = parseFloat(document.getElementById('vc-h').value);
+          var YB = 250, HMAX = 190;
+          var liv = YB - HMAX * pct / 100;
+          var g = '';
+          // quattro recipienti di forma diversa, collegati da un condotto sul fondo
+          var vasi = [
+            { x: 70, w: 60, forma: 'dritto' },
+            { x: 190, w: 26, forma: 'sottile' },
+            { x: 290, w: 90, forma: 'svasato' },
+            { x: 450, w: 70, forma: 'inclinato' }
+          ];
+          g += '<rect x="60" y="' + YB + '" width="530" height="28" class="tubo"/>';
+          g += '<rect x="63" y="' + (YB + 3) + '" width="524" height="22" class="acqua"/>';
+          vasi.forEach(function (v) {
+            var top = YB - HMAX - 10;
+            if (v.forma === 'svasato') {
+              var p = 'M ' + v.x + ' ' + YB + ' L ' + (v.x - 22) + ' ' + top + ' L ' + (v.x + v.w + 22) + ' ' +
+                      top + ' L ' + (v.x + v.w) + ' ' + YB + ' Z';
+              g += '<path d="' + p + '" class="tubo" fill="none"/>';
+              // l'acqua dentro il vaso svasato: trapezio fino al livello
+              var f = (YB - liv) / (YB - top);
+              var xl = v.x - 22 * f, xr = v.x + v.w + 22 * f;
+              g += '<path d="M ' + v.x + ' ' + YB + ' L ' + xl.toFixed(1) + ' ' + liv.toFixed(1) + ' L ' +
+                   xr.toFixed(1) + ' ' + liv.toFixed(1) + ' L ' + (v.x + v.w) + ' ' + YB + ' Z" class="acqua"/>';
+            } else if (v.forma === 'inclinato') {
+              var p2 = 'M ' + v.x + ' ' + YB + ' L ' + (v.x + 46) + ' ' + top + ' L ' + (v.x + 46 + v.w) + ' ' +
+                       top + ' L ' + (v.x + v.w) + ' ' + YB + ' Z';
+              g += '<path d="' + p2 + '" class="tubo" fill="none"/>';
+              var f2 = (YB - liv) / (YB - top);
+              g += '<path d="M ' + v.x + ' ' + YB + ' L ' + (v.x + 46 * f2).toFixed(1) + ' ' + liv.toFixed(1) +
+                   ' L ' + (v.x + 46 * f2 + v.w).toFixed(1) + ' ' + liv.toFixed(1) + ' L ' + (v.x + v.w) + ' ' +
+                   YB + ' Z" class="acqua"/>';
+            } else {
+              g += '<rect x="' + v.x + '" y="' + top + '" width="' + v.w + '" height="' + (YB - top) + '" class="tubo" fill="none"/>';
+              g += '<rect x="' + (v.x + 2) + '" y="' + liv.toFixed(1) + '" width="' + (v.w - 4) + '" height="' +
+                   (YB - liv).toFixed(1) + '" class="acqua"/>';
+            }
+          });
+          // la linea di livello, che attraversa tutto
+          g += '<line x1="40" y1="' + liv.toFixed(1) + '" x2="620" y2="' + liv.toFixed(1) +
+               '" stroke="var(--magenta)" stroke-width="2.4" stroke-dasharray="8 5"/>';
+          g += '<text x="626" y="' + (liv + 5).toFixed(1) + '" text-anchor="end" class="em"></text>';
+          g += '<text x="330" y="26" text-anchor="middle" class="em">lo stesso livello in tutti i vasi, qualunque sia la forma</text>';
+          svg.innerHTML = g;
+          document.getElementById('vc-hv').textContent = pct;
+          var out = document.getElementById('vc-out');
+          out.innerHTML = 'Il vaso largo contiene molta più acqua di quello sottile, eppure il livello è lo ' +
+                          'stesso: sul fondo la pressione dipende <strong>solo</strong> dall\'altezza, ' +
+                          'e sul fondo — che è collegato — la pressione deve essere una sola.';
+        }
+        document.getElementById('vc-h').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 11 — il tubo di Venturi ================= */
+      (function () {
+        var svg = document.getElementById('be-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var v1 = parseFloat(document.getElementById('be-v').value);
+          var pct = parseFloat(document.getElementById('be-r').value);
+          var v2 = v1 / (pct / 100);
+          var dp = 0.5 * RHO * (v2 * v2 - v1 * v1);
+          var YC = 235, H1 = 62, H2 = H1 * pct / 100;
+          var g = '';
+          // il tubo con la strozzatura
+          var p = 'M 30 ' + (YC - H1 / 2) + ' L 210 ' + (YC - H1 / 2) + ' L 280 ' + (YC - H2 / 2) +
+                  ' L 380 ' + (YC - H2 / 2) + ' L 450 ' + (YC - H1 / 2) + ' L 630 ' + (YC - H1 / 2) +
+                  ' L 630 ' + (YC + H1 / 2) + ' L 450 ' + (YC + H1 / 2) + ' L 380 ' + (YC + H2 / 2) +
+                  ' L 280 ' + (YC + H2 / 2) + ' L 210 ' + (YC + H1 / 2) + ' L 30 ' + (YC + H1 / 2) + ' Z';
+          g += '<path d="' + p + '" class="tubo"/>';
+          g += '<path d="' + p + '" class="acqua"/>';
+          // i due tubicini manometrici
+          var hmax = 150, h1px = hmax, h2px = Math.max(10, hmax - dp / (RHO * G) * 100);
+          [[120, h1px, 'p₁'], [330, h2px, 'p₂']].forEach(function (t) {
+            var x = t[0], hh = t[1];
+            g += '<rect x="' + (x - 9) + '" y="' + (YC - H1 / 2 - hmax - 14) + '" width="18" height="' +
+                 (hmax + 20) + '" class="tubo" fill="none"/>';
+            g += '<rect x="' + (x - 6) + '" y="' + (YC - H1 / 2 - hh).toFixed(1) + '" width="12" height="' +
+                 (hh + 4).toFixed(1) + '" class="acqua"/>';
+            g += '<text x="' + (x + 16) + '" y="' + (YC - H1 / 2 - hh + 4).toFixed(1) + '" class="lbl">' + t[2] + '</text>';
+          });
+          // il dislivello
+          g += '<line x1="120" y1="' + (YC - H1 / 2 - h1px).toFixed(1) + '" x2="330" y2="' +
+               (YC - H1 / 2 - h1px).toFixed(1) + '" class="dash"/>';
+          g += '<line x1="360" y1="' + (YC - H1 / 2 - h1px).toFixed(1) + '" x2="360" y2="' +
+               (YC - H1 / 2 - h2px).toFixed(1) + '" stroke="var(--magenta)" stroke-width="2.6"/>';
+          g += '<text x="368" y="' + (YC - H1 / 2 - (h1px + h2px) / 2).toFixed(1) + '" class="em">Δp = ' +
+               nf(dp, 0) + ' Pa</text>';
+          // le velocità
+          g += freccia(90, YC, 90 + v1 * 16, YC, 'w', 10);
+          g += freccia(310, YC, 310 + Math.min(v2 * 16, 60), YC, 'w', 10);
+          g += '<text x="110" y="' + (YC + H1 / 2 + 26) + '" text-anchor="middle" class="lbl">v₁ = ' + nf(v1, 1) + ' m/s</text>';
+          g += '<text x="330" y="' + (YC + H1 / 2 + 26) + '" text-anchor="middle" class="lbl">v₂ = ' + nf(v2, 2) + ' m/s</text>';
+          g += '<text x="330" y="' + (YC + H1 / 2 + 52) + '" text-anchor="middle" class="em">dove corre di più, preme di meno</text>';
+          svg.innerHTML = g;
+          document.getElementById('be-vv').textContent = nf(v1, 1);
+          document.getElementById('be-rv').textContent = pct;
+          document.getElementById('be-v2').textContent = nf(v2, 2);
+          document.getElementById('be-dp').textContent = nf(dp, 0);
+          document.getElementById('be-dpm').textContent = nf(dp / (RHO * G) * 100, 0);
+        }
+        document.getElementById('be-v').addEventListener('input', disegna);
+        document.getElementById('be-r').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 11.2 — allenamento su Bernoulli ================= */
+      (function () {
+        var box = document.getElementById('bn-box');
+        if (!box) { return; }
+        var att = 0, um = 'Pa', dec = 0;
+        function nuovo() {
+          var tipo = Math.floor(Math.random() * 3);
+          var testo;
+          if (tipo === 0) {
+            var v1 = [1, 1.5, 2, 2.5][Math.floor(Math.random() * 4)];
+            var k = [2, 3, 4][Math.floor(Math.random() * 3)];
+            var v2 = v1 * k;
+            att = 0.5 * RHO * (v2 * v2 - v1 * v1); um = 'Pa'; dec = 0;
+            testo = 'In un tubo orizzontale l\'acqua passa da $' + nf(v1, 1).replace(',', '{,}') +
+                    '$ m/s a $' + nf(v2, 1).replace(',', '{,}') + '$ m/s. Di quanto cala la pressione? ' +
+                    '($\\rho = 1000$ kg/m³)';
+            document.getElementById('bn-eti').textContent = 'Δp =';
+          } else if (tipo === 1) {
+            var h = [2, 4, 5, 8, 10][Math.floor(Math.random() * 5)];
+            att = RHO * G * h; um = 'Pa'; dec = 0;
+            testo = 'In un tubo di sezione costante l\'acqua sale di $' + h +
+                    '$ metri. Di quanto cala la pressione? ($\\rho = 1000$ kg/m³)';
+            document.getElementById('bn-eti').textContent = 'Δp =';
+          } else {
+            var hh = [1, 2, 4, 5][Math.floor(Math.random() * 4)];
+            att = Math.sqrt(2 * G * hh); um = 'm/s'; dec = 2;
+            testo = 'Da un foro sul fondo di un recipiente, con $' + hh +
+                    '$ m d\'acqua sopra, con che velocità esce il liquido? ($v = \\sqrt{2gh}$)';
+            document.getElementById('bn-eti').textContent = 'v =';
+          }
+          document.getElementById('bn-um').textContent = um;
+          var el = document.getElementById('bn-testo');
+          el.innerHTML = testo;
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          document.getElementById('bn-val').value = '';
+          document.getElementById('bn-fb').textContent = '';
+          document.getElementById('bn-fb').className = 'fb';
+        }
+        function verifica() {
+          var v = num(document.getElementById('bn-val').value);
+          var fb = document.getElementById('bn-fb');
+          if (isNaN(v)) { fb.className = 'fb no'; fb.textContent = 'Scrivi un numero.'; return; }
+          if (Math.abs(v - att) < Math.max(0.5, Math.abs(att) * 0.01)) {
+            fb.className = 'fb ok';
+            fb.textContent = '✓ Esatto: ' + nf(att, dec) + ' ' + um + '.';
+          } else {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ No. Riparti da $p + \\frac{1}{2}\\rho v^2 + \\rho g h$ = costante e cancella ' +
+                           'i termini che non cambiano.';
+            renderMathIn(fb);
+          }
+        }
+        document.getElementById('bn-ver').addEventListener('click', verifica);
+        document.getElementById('bn-new').addEventListener('click', nuovo);
+        nuovo();
+      })();
+
+      /* ================= 12 — lo sfigmomanometro ================= */
+      (function () {
+        var svg = document.getElementById('sf-svg');
+        if (!svg) { return; }
+        var SIS = 120, DIA = 80;
+        function disegna() {
+          var p = parseFloat(document.getElementById('sf-p').value);
+          var g = '', i;
+          // il braccio
+          g += '<rect x="60" y="120" width="520" height="60" rx="30" fill="color-mix(in srgb, var(--gold) 22%, transparent)" stroke="var(--muted)" stroke-width="2"/>';
+          // l'arteria: schiacciata se p e' alta
+          var apertura = (p >= SIS) ? 0 : (p <= DIA ? 1 : (SIS - p) / (SIS - DIA));
+          var hA = 4 + apertura * 14;
+          g += '<rect x="60" y="' + (150 - hA / 2).toFixed(1) + '" width="520" height="' + hA.toFixed(1) +
+               '" fill="#dc2626" opacity="0.85"/>';
+          // il bracciale
+          g += '<rect x="230" y="104" width="150" height="92" rx="8" fill="color-mix(in srgb, var(--muted) 45%, transparent)" stroke="var(--text)" stroke-width="2"/>';
+          g += '<text x="305" y="98" text-anchor="middle" class="lbl">bracciale: ' + p + ' mmHg</text>';
+          // il flusso a valle
+          var stato, colore, msg;
+          if (p >= SIS) {
+            stato = 'nessun flusso'; colore = 'var(--red)';
+            msg = 'Il bracciale schiaccia completamente l\'arteria: <strong>il sangue non passa</strong> e ' +
+                  'non si sente nulla. Siamo sopra la pressione massima.';
+          } else if (p > DIA) {
+            stato = 'flusso a fiotti — TURBOLENTO, si sente'; colore = 'var(--magenta)';
+            msg = 'Il sangue riesce a passare solo nei picchi del battito, spremuto in una strozzatura: il ' +
+                  'flusso è <strong>turbolento</strong> e quindi <strong>rumoroso</strong>. Il primo rumore ' +
+                  'si è sentito a <strong>' + SIS + ' mmHg</strong>: quella è la <em>sistolica</em>.';
+          } else {
+            stato = 'flusso continuo e laminare — silenzio'; colore = 'var(--green)';
+            msg = 'L\'arteria è libera: il flusso torna <strong>laminare</strong> e il rumore sparisce. È ' +
+                  'sparito a <strong>' + DIA + ' mmHg</strong>: quella è la <em>diastolica</em>.';
+          }
+          if (p > DIA && p < SIS) {
+            for (i = 0; i < 5; i++) {
+              g += '<path d="M ' + (400 + i * 34) + ' 150 q 12 -14 24 0 q 12 14 24 0" fill="none" stroke="var(--magenta)" stroke-width="2.4"/>';
+            }
+          } else if (p <= DIA) {
+            g += freccia(400, 150, 560, 150, 's', 12);
+          }
+          g += '<text x="330" y="228" text-anchor="middle" class="lbl" style="fill:' + colore + ';">' + stato + '</text>';
+          g += '<text x="130" y="' + 150 + '" text-anchor="middle" class="lbl-s">arteria</text>';
+          // la scala di riferimento
+          g += '<line x1="60" y1="270" x2="580" y2="270" class="axis"/>';
+          for (i = 40; i <= 180; i += 20) {
+            var x = 60 + (i - 40) / 140 * 520;
+            g += '<line x1="' + x.toFixed(1) + '" y1="265" x2="' + x.toFixed(1) + '" y2="275" class="axis"/>';
+            g += '<text x="' + x.toFixed(1) + '" y="292" text-anchor="middle" class="lbl-s">' + i + '</text>';
+          }
+          var xd = 60 + (DIA - 40) / 140 * 520, xs = 60 + (SIS - 40) / 140 * 520;
+          g += '<rect x="' + xd.toFixed(1) + '" y="262" width="' + (xs - xd).toFixed(1) +
+               '" height="16" fill="color-mix(in srgb, var(--magenta) 30%, transparent)"/>';
+          var xp = 60 + (p - 40) / 140 * 520;
+          g += '<polygon points="' + xp.toFixed(1) + ',258 ' + (xp - 7).toFixed(1) + ',244 ' +
+               (xp + 7).toFixed(1) + ',244" fill="var(--accent)"/>';
+          svg.innerHTML = g;
+          document.getElementById('sf-pv').textContent = p;
+          document.getElementById('sf-out').innerHTML = msg;
+        }
+        document.getElementById('sf-p').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      //JSSENTINEL
+
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Che cosa distingue un <strong>fluido</strong> da un solido?',
+        options: ['il fluido non ha forma propria e scorre, cioè si deforma con continuità sotto forze piccolissime', 'il fluido è sempre più leggero', 'il fluido è sempre trasparente', 'il fluido non ha massa', 'il fluido non occupa volume'],
+        correct: 0, explain: 'Spingendo di lato un solido, questo si deforma un po\' e poi si ferma. Spingendo di lato un fluido, quello continua a spostarsi finché continuo a spingere. Sono fluidi sia i liquidi sia i gas.' },
+
+      { type: 'mc', diff: 'medium', text: 'Quanti litri sono $0{,}25$ metri cubi?',
+        options: ['$25$ L', '$2{,}5$ L', '$250$ L', '$2500$ L', '$0{,}00025$ L'],
+        correct: 2, explain: '$1$ m³ $= 1000$ L, quindi $0{,}25 \\cdot 1000 = 250$ L. Ricordate che un litro è un decimetro cubo: il cubo di 10 cm di lato.' },
+
+      { type: 'mc', diff: 'hard', text: 'Quanti centimetri cubi ci sono in un metro cubo?',
+        options: ['$100$', '$1000$', '$10\\,000$', '$10$', '$1\\,000\\,000$'],
+        correct: 4, explain: '$1\\ \\text{m}^3 = (100\\ \\text{cm})^3 = 10^6\\ \\text{cm}^3$. Quando un\'unità con prefisso è elevata al cubo, <strong>anche il fattore di conversione va elevato al cubo</strong>: è la trappola più insidiosa del capitolo.' },
+
+      { type: 'mc', diff: 'medium', text: 'Un cubo di lato $5{,}0$ cm ha massa $337{,}5$ g. Qual è la sua densità?',
+        options: ['$67{,}5$ g/cm³', '$2{,}70$ g/cm³', '$0{,}37$ g/cm³', '$1{,}35$ g/cm³', '$13{,}5$ g/cm³'],
+        correct: 1, explain: 'Il volume è $5{,}0^3 = 125$ cm³, quindi $\\rho = 337{,}5/125 = 2{,}70$ g/cm³, cioè $2700$ kg/m³: è alluminio. Essendo maggiore di $1{,}00$ g/cm³, affonda in acqua.' },
+
+      { type: 'mc', diff: 'easy', text: 'Che cos\'è la <strong>portata</strong> di un condotto?',
+        options: ['la pressione all\'interno', 'la velocità del fluido', 'il diametro del tubo', 'il volume di fluido che attraversa una sezione nell\'unità di tempo', 'la massa totale di fluido contenuta'],
+        correct: 3, explain: '$Q = V/\\Delta t$, e vale anche $Q = A\\,v$. Si misura in m³/s, o più comodamente in litri al secondo: per misurarla bastano un secchio e un cronometro.' },
+
+      { type: 'mc', diff: 'hard', text: 'In un tubo la sezione si dimezza. Se la portata resta la stessa, la velocità del fluido:',
+        options: ['raddoppia', 'si dimezza', 'resta uguale', 'diventa quattro volte più grande', 'si riduce a un quarto'],
+        correct: 0, explain: 'Dalla continuità $A_1v_1 = A_2v_2$: se l\'area si dimezza, la velocità raddoppia. Attenzione però: se a dimezzarsi è il <em>raggio</em>, l\'area diventa un <strong>quarto</strong> e la velocità quadruplica, perché $A = \\pi r^2$.' },
+
+      { type: 'mc', diff: 'medium', text: 'Un tubo che porta $18$ L/s si divide in tre rami uguali. In ciascun ramo scorrono:',
+        options: ['$18$ L/s', '$54$ L/s', '$6$ L/s', '$9$ L/s', 'dipende dalla lunghezza dei rami'],
+        correct: 2, explain: 'Per la conservazione, quello che entra è la somma di quello che esce: $18 = 3Q$, quindi $Q = 6$ L/s. Non dipende dalla lunghezza dei rami — ed è proprio questo che rende utili le leggi di conservazione.' },
+
+      { type: 'mc', diff: 'medium', text: 'Che cosa significa che un flusso è <strong>laminare</strong>?',
+        options: ['che il fluido è molto denso', 'che il fluido si muove molto velocemente', 'che il tubo è di metallo', 'che ci sono vortici ovunque', 'che il fluido scorre in strati ordinati che non si mescolano'],
+        correct: 4, explain: 'Dal latino <em>lamina</em>, strato. È il getto sottile e trasparente di un rubinetto appena aperto. Il contrario è il flusso <strong>turbolento</strong>, pieno di vortici e caotico: è la regola in natura, ma le sue equazioni non si sanno risolvere.' },
+
+      { type: 'mc', diff: 'easy', text: 'In quale unità si misura la <strong>pressione</strong> nel Sistema Internazionale?',
+        options: ['newton (N)', 'pascal (Pa)', 'bar', 'millimetri di mercurio (mmHg)', 'atmosfere (atm)'],
+        correct: 1, explain: '$1$ Pa $= 1$ N/m². Le altre unità elencate esistono e si usano molto (il bar nell\'industria, i mmHg in medicina), ma non appartengono al SI. E ricordate che la pressione è uno <strong>scalare</strong>, non una forza.' },
+
+      { type: 'mc', diff: 'hard', text: 'Perché nell\'esperimento di Torricelli la colonna di mercurio si ferma a circa $760$ mm?',
+        options: ['perché il mercurio è denso', 'perché il tubo è lungo un metro', 'perché il vetro trattiene il mercurio', 'perché il peso della colonna equilibra la pressione dell\'atmosfera sulla bacinella', 'perché sopra c\'è il vuoto che tira verso l\'alto'],
+        correct: 3, explain: 'La colonna è <em>sostenuta</em> dall\'aria che preme sulla superficie libera. Rifacendo il conto con l\'acqua, 13,6 volte meno densa, si ottengono $10{,}33$ m: ecco perché nessuna pompa aspirante riesce a sollevare l\'acqua oltre i dieci metri.' },
+
+      { type: 'mc', diff: 'medium', text: 'In un torchio idraulico il pistone grande ha diametro <strong>cinque volte</strong> quello piccolo. La forza viene moltiplicata per:',
+        options: ['$25$', '$5$', '$10$', '$2{,}5$', '$125$'],
+        correct: 0, explain: 'Il vantaggio meccanico è il rapporto delle <strong>aree</strong>, che è il <em>quadrato</em> del rapporto dei diametri: $5^2 = 25$. Attenzione: non si guadagna energia — il pistone piccolo deve fare una corsa 25 volte più lunga.' },
+
+      { type: 'mc', diff: 'hard', text: 'Un tubicino sottile alto $2$ m e una piscina profonda $2$ m: dove è maggiore la pressione sul fondo?',
+        options: ['nella piscina, perché contiene molta più acqua', 'nel tubicino, perché l\'acqua è più concentrata', 'è la stessa: dipende solo dalla profondità', 'dipende dalla forma del fondo', 'nella piscina, perché la superficie è più grande'],
+        correct: 2, explain: 'È il <strong>paradosso idrostatico</strong>: $p = p_0 + \\rho g h$ non contiene né l\'area né il volume. Nella piscina c\'è mille volte più acqua, ma anche mille volte più area su cui distribuirne il peso. Pascal fece scoppiare una botte versando pochi bicchieri d\'acqua in un tubo lunghissimo.' },
+
+      { type: 'mc', diff: 'medium', text: 'In vasi comunicanti di forma diversa, il livello del liquido:',
+        options: ['è più alto nel vaso più stretto', 'è più alto nel vaso più largo', 'dipende dalla forma di ciascun vaso', 'è più alto nel vaso più pesante', 'è lo stesso in tutti i vasi'],
+        correct: 4, explain: 'Sul fondo, che è collegato, la pressione deve essere una sola; e poiché dipende solo da $h$, l\'altezza deve essere uguale ovunque. È il principio degli acquedotti, del sifone del lavandino e della livella dei muratori.' },
+
+      { type: 'mc', diff: 'hard', text: 'In un tubo orizzontale, dove il fluido scorre <strong>più veloce</strong> la pressione è:',
+        options: ['più alta', 'più bassa', 'uguale', 'nulla', 'dipende dalla densità'],
+        correct: 1, explain: 'È il risultato controintuitivo di Bernoulli: $p + \\frac{1}{2}\\rho v^2 = $ costante, quindi se cresce il termine cinetico deve calare la pressione. Spiega la tenda della doccia che si appiccica, il tetto che vola e il tubo di Venturi.' },
+
+      { type: 'mc', diff: 'medium', text: 'Perché la pressione del sangue si misura in <strong>millimetri di mercurio</strong>?',
+        options: ['perché il sangue contiene mercurio', 'perché è l\'unità del Sistema Internazionale', 'perché il mercurio è tossico', 'perché il primo sfigmomanometro era un tubo di mercurio e si leggeva l\'altezza della colonna con un righello', 'perché il cuore pompa come un barometro'],
+        correct: 3, explain: 'Lo strumento è cambiato — oggi è quasi sempre elettronico — ma l\'unità è rimasta per continuità con un secolo di dati clinici. $120$ mmHg corrispondono a circa $16\\,000$ Pa.' },
+
+      { type: 'mc', diff: 'hard', text: 'Un\'arteria si restringe fino all\'$80\\%$ del raggio iniziale. Poiché la portata va come $r^4$, il sangue che passa scende a circa:',
+        options: ['il $41\\%$', 'l\'$80\\%$', 'il $64\\%$', 'il $20\\%$', 'il $96\\%$'],
+        correct: 0, explain: '$0{,}8^4 = 0{,}41$, cioè il $41\\%$. Una riduzione apparentemente modesta del raggio più che dimezza il flusso: è il motivo per cui l\'aterosclerosi è così pericolosa e per cui il cuore, per compensare, deve alzare la pressione.' },
+
+      { type: 'open', diff: 'hard', text: 'Spiega che cos\'è una <strong>legge di conservazione</strong>, perché è così utile in fisica, e fai almeno due esempi presi da questa lezione.',
+        keywords: ['non cambia', 'entra', 'esce', 'bilancio', 'vincol', 'equazione', 'continuit', 'portata', 'bernoulli', 'volume', 'energia', 'incognita'],
+        requiredMatches: 3,
+        explain: 'Una <strong>legge di conservazione</strong> afferma che una certa grandezza non cambia nel tempo, oppure che <em>quello che entra è uguale a quello che esce</em>. Non descrive come avviene il processo: lo <strong>vincola</strong>.<br><br>È proprio questa la sua forza. Non sapere nulla di come si muovono le singole particelle d\'acqua dentro un restringimento è un problema difficilissimo; eppure, sapendo che la portata si conserva, posso <strong>calcolare</strong> con certezza la velocità in uscita. Da un bilancio si ricava un\'equazione, e da un\'equazione si ricava l\'incognita.<br><br><strong>Primo esempio: l\'equazione di continuità</strong>, $A_1v_1 = A_2v_2$. L\'acqua non si crea né si distrugge dentro il tubo e — essendo incomprimibile — non può accumularsi: quindi la portata è la stessa in ogni sezione. Se il tubo si divide, la portata entrante è la somma di quelle uscenti.<br><br><strong>Secondo esempio: l\'equazione di Bernoulli</strong>, $p + \\frac{1}{2}\\rho v^2 + \\rho g h = $ costante. Qui a bilanciarsi sono tre termini: il fluido può travasare da uno all\'altro, ma il totale non cambia. Se la velocità cresce, la pressione deve calare.<br><br>Si può aggiungere il <strong>torchio idraulico</strong>: si guadagna in forza esattamente quanto si perde in spostamento, perché il volume di liquido spostato è lo stesso da entrambe le parti.<br><br>Le leggi di conservazione sono fra gli enunciati più solidi della fisica: quando un esperimento sembra violarne una, storicamente si è quasi sempre scoperto che mancava qualcosa da vedere — ed è così che è stato previsto il neutrino.' }
+    ];
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 8 — Il movimento</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .figbox .grid { stroke: var(--border); stroke-width: 1; }
+    .figbox .axis { stroke: var(--muted); stroke-width: 2; }
+    .figbox .dash { stroke: var(--muted); stroke-width: 1.6; stroke-dasharray: 6 5; fill: none; }
+    .figbox .v  { stroke: var(--accent); stroke-width: 3.4; fill: none; stroke-linecap: round; }
+    .figbox .vp { fill: var(--accent); }
+    .figbox .w  { stroke: var(--magenta); stroke-width: 3.4; fill: none; stroke-linecap: round; }
+    .figbox .wp { fill: var(--magenta); }
+    .figbox .s  { stroke: var(--green); stroke-width: 3.6; fill: none; stroke-linecap: round; }
+    .figbox .sp { fill: var(--green); }
+    .figbox .c  { stroke: var(--gold); stroke-width: 2.6; fill: none; stroke-linecap: round; }
+    .figbox .cp { fill: var(--gold); }
+    .figbox .curva { fill: none; stroke: var(--accent); stroke-width: 3; }
+    .figbox .curva2 { fill: none; stroke: var(--magenta); stroke-width: 3; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .ctrl input[type=range] { vertical-align: middle; }
+
+    .crono { font-family: Consolas, monospace; font-size: 1.6rem; font-weight: 800; color: var(--accent);
+             background: var(--surface); border: 2px solid var(--border); border-radius: 10px;
+             padding: 0.15rem 0.7rem; letter-spacing: 0.05em; }
+
+    .inp { width: 7rem; font-size: 1rem; font-family: inherit; padding: 0.3rem 0.45rem; border-radius: 8px;
+           border: 2px solid var(--border); background: var(--surface); color: var(--text); text-align: right; }
+    .inp:focus { outline: none; border-color: var(--accent); }
+    .inp.w6 { width: 5rem; }
+    .qbox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.8rem 0; }
+    .qbox .qt { font-weight: 600; margin-bottom: 0.45rem; }
+    .qrow { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .fb { min-height: 1.4em; margin-top: 0.45rem; font-weight: 600; font-size: 0.95rem; }
+    .fb.ok { color: var(--green); }
+    .fb.no { color: var(--red); }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+    .tabf tr.tot td { font-weight: 700; background: color-mix(in srgb, var(--accent) 9%, transparent); }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.7rem; text-align: center; }
+    .stat .n { font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
+    .stat .l { font-size: 0.76rem; color: var(--muted); }
+
+    .prop { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .prop-card { background: var(--surface-2); border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px; padding: 0.8rem 0.95rem; }
+    .prop-card h4 { margin: 0 0 0.3rem; color: var(--accent); font-size: 1.03rem; }
+    .prop-card p { margin: 0.35rem 0; font-size: 0.93rem; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Terzo anno · Lezione 8</div>
+    <h1>Il movimento</h1>
+    <p>Sistemi di riferimento, velocità e accelerazione: come si descrive un corpo che si muove —
+      e, alla fine, che cos'è che lo fa muovere</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Terzo anno</a>
+    <span class="sep">/</span> Il movimento
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove eravamo rimasti.</strong> Nella <a href="7_Grandezze_vettoriali.html">lezione 7</a> abbiamo
+      costruito lo strumento: i vettori, con il loro modulo, la loro direzione e il loro verso. Adesso lo
+      mettiamo al lavoro sul primo fenomeno vero della meccanica — i corpi che si muovono. La parte della
+      fisica che <em>descrive</em> il movimento senza chiedersi che cosa lo provochi si chiama
+      <strong>cinematica</strong>, e sarà il grosso di questa lezione. Solo nelle ultime sezioni ci
+      concederemo la domanda che tutti si fanno subito: <em>ma chi è che li spinge?</em>
+    </div>
+
+    <!-- 1 — IL SISTEMA DI RIFERIMENTO -->
+    <section id="sec1">
+      <h2>1. Prima di tutto: il sistema di riferimento</h2>
+
+      <p>Prima di poter dire una sola parola sensata sul movimento dobbiamo mettere in chiaro una cosa che
+        sembra ovvia e non lo è affatto. Se vi chiedo <em>«ti stai muovendo?»</em>, che cosa rispondete?</p>
+
+      <p>Seduti al banco, direte di no. Ma la Terra vi sta portando in giro attorno al proprio asse a più di
+        1000 km/h, e attorno al Sole a 107 000 km/h. Allora vi state muovendo o no? La risposta onesta è:
+        <strong>dipende rispetto a che cosa</strong>. Il movimento non è una proprietà di un corpo: è una
+        relazione fra un corpo e qualcos'altro che abbiamo scelto come riferimento.</p>
+
+      <div class="rule">
+        Un <strong>sistema di riferimento</strong> è l'insieme di ciò che serve per dire <em>dove</em> e
+        <em>quando</em> si trova un corpo:
+        <ul style="margin:0.4rem 0 0;">
+          <li>un'<strong>origine</strong>, cioè il punto da cui misuriamo;</li>
+          <li>uno o più <strong>assi</strong> orientati, con un'unità di misura;</li>
+          <li>un <strong>orologio</strong>, per dire in quale istante.</li>
+        </ul>
+      </div>
+
+      <p>Senza tutte e tre le cose non si va da nessuna parte. Gli assi da soli dicono «dove» ma non «quando»;
+        l'orologio da solo dice «quando» ma non «dove». È il motivo per cui in ogni laboratorio di fisica, in
+        ogni gara di atletica e in ogni telecronaca c'è sempre un <strong>cronometro</strong>: senza, i numeri
+        sulla posizione non raccontano nulla di interessante.</p>
+
+      <p>Nel simulatore qui sotto c'è tutto quello che serve. Fate partire il cronometro e guardate il carrello
+        muoversi: sotto, la posizione letta sull'asse cambia istante per istante. Poi provate il pulsante che
+        <strong>sposta l'origine</strong>: il carrello non cambia di una virgola quello che sta facendo, ma
+        tutti i numeri della posizione cambiano insieme.</p>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn" id="sr-play">▶ Avvia</button>
+          <button class="btn btn-secondary" id="sr-reset">↺ Azzera</button>
+          <span class="crono" id="sr-t">0,00 s</span>
+          <button class="btn btn-secondary" id="sr-origine">⇄ Sposta l'origine</button>
+        </div>
+        <div class="ctrl">
+          <label for="sr-v">velocità del carrello = <span id="sr-vv">2,0</span> m/s</label>
+          <input type="range" id="sr-v" min="-3" max="3" step="0.5" value="2">
+        </div>
+        <svg viewBox="0 0 660 260" id="sr-svg" role="img" aria-label="carrello che si muove su un asse con cronometro"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="sr-x">0,0</div><div class="l">posizione x (m)</div></div>
+          <div class="stat"><div class="n" id="sr-x0">0,0</div><div class="l">posizione iniziale (m)</div></div>
+          <div class="stat"><div class="n" id="sr-dx">0,0</div><div class="l">spostamento $\Delta x$ (m)</div></div>
+        </div>
+        <p class="cap">Il moto è sempre lo stesso: cambiando l'origine cambiano i numeri, non il fenomeno.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>Perché questo conta davvero.</strong> Se siete su un treno che viaggia a velocità costante e
+        lasciate cadere una moneta, questa vi cade dritta sui piedi, esattamente come a casa. Per voi la moneta
+        scende in verticale; per chi vi guarda dal marciapiede descrive un arco lungo decine di metri. Nessuno
+        dei due si sbaglia: sono due sistemi di riferimento diversi. Da questa osservazione, apparentemente
+        innocua, Galileo tirò fuori il <em>principio di relatività</em> — e da lì, tre secoli dopo, Einstein
+        tirò fuori tutto il resto. Ma non corriamo.
+      </div>
+
+      <p>Per tutta questa lezione faremo una scelta che semplifica moltissimo i conti: studieremo il movimento
+        <strong>lungo una sola direzione</strong>, cioè lungo un solo asse. Un carrello su una rotaia, una
+        macchina su un rettilineo, un sasso che cade. Con un asse solo, i vettori della lezione scorsa si
+        riducono a numeri <strong>con un segno</strong>, ed è una gran comodità.</p>
+    </section>
+
+    <!-- 2 — LA VELOCITÀ -->
+    <section id="sec2">
+      <h2>2. La posizione cambia: nasce la velocità</h2>
+
+      <p>Abbiamo un corpo che in un dato istante si trova in una certa posizione. Aspettiamo un po'. Possono
+        succedere due cose: o è rimasto dov'era, oppure la sua posizione è cambiata. Nel secondo caso diciamo
+        che il corpo ha una <strong>velocità</strong>.</p>
+
+      <p>E possiamo anche dire <em>quanta</em>. Se a parità di tempo si è spostato di più, diremo che è più
+        veloce; se si è spostato di meno, che è meno veloce. Da qui a scrivere una formula il passo è breve,
+        ma prima ci serve un simbolo.</p>
+
+      <div class="rule">
+        <p class="formula-title">Il simbolo $\Delta$</p>
+        <p>In fisica una <strong>variazione</strong> si indica con la lettera greca delta maiuscola. Scrivere
+          <span>$\Delta x$</span> significa</p>
+        <p style="text-align:center; font-size:1.1rem;">$$\Delta x = x_f - x_i$$</p>
+        <p class="formula-note">cioè <em>posizione finale meno posizione iniziale</em>. Sempre in
+          quest'ordine: è una convenzione, ma è quella che fa venire i segni giusti.</p>
+      </div>
+
+      <p>Il <span>$\Delta$</span> non è un numero che moltiplica <span>$x$</span>: è un'abbreviazione per
+        «di quanto è cambiata la...». Lo useremo per tutto: <span>$\Delta t$</span> è l'intervallo di tempo,
+        <span>$\Delta v$</span> la variazione di velocità, <span>$\Delta L$</span> l'allungamento di una molla
+        (e lo incontrerete nella prossima lezione).</p>
+
+      <div class="rule">
+        <p class="formula-title">Definizione di velocità (media)</p>
+        <p style="text-align:center; font-size:1.2rem;">$$v = \frac{\Delta x}{\Delta t} = \frac{x_f - x_i}{t_f - t_i}$$</p>
+        <p class="formula-note">La velocità è la <strong>variazione di posizione nell'unità di tempo</strong>.
+          Si misura in <strong>metri al secondo</strong> (m/s): è una grandezza derivata, il rapporto fra una
+          lunghezza e un tempo.</p>
+      </div>
+
+      <h3>2.1 Il segno della velocità</h3>
+
+      <p>La velocità, l'abbiamo detto nella lezione scorsa, è una grandezza <strong>vettoriale</strong>. Ma
+        avendo scelto di muoverci lungo un solo asse, tutta la sua «vettorialità» si concentra in un segno:</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>$v \gt 0$</h4>
+          <p>il corpo si muove <strong>concorde</strong> all'asse, cioè nel verso in cui l'asse cresce. La
+            posizione finale è maggiore di quella iniziale, quindi <span>$\Delta x \gt 0$</span>.</p>
+        </div>
+        <div class="prop-card">
+          <h4>$v \lt 0$</h4>
+          <p>il corpo si muove <strong>discorde</strong> all'asse, all'indietro. La posizione finale è minore
+            di quella iniziale, quindi <span>$\Delta x \lt 0$</span>.</p>
+        </div>
+        <div class="prop-card">
+          <h4>$v = 0$</h4>
+          <p>il corpo è <strong>fermo</strong>: la posizione non cambia, <span>$\Delta x = 0$</span>. Attenzione:
+            fermo <em>in questo sistema di riferimento</em>.</p>
+        </div>
+      </div>
+
+      <div class="warnbox">
+        <strong>Il segno non dice «quanto», dice «da che parte».</strong> Una velocità di
+        <span>$-30$</span> m/s non è più piccola di una di <span>$+20$</span> m/s: è più grande in
+        <em>modulo</em> (30 contro 20), solo diretta dall'altra parte. Confondere «velocità negativa» con
+        «velocità piccola» è l'errore più comune di tutto il capitolo. Quando volete dire «quanto va forte»
+        senza curarvi della direzione, parlate del <strong>modulo</strong> della velocità.
+      </div>
+
+      <h3>2.2 Le formule inverse</h3>
+
+      <p>Dalla definizione si ricavano subito le due formule inverse, che sono quelle che nei problemi servono
+        più spesso della formula diretta:</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.1rem;">$$v = \frac{\Delta x}{\Delta t} \qquad\Longrightarrow\qquad \Delta x = v\,\Delta t \qquad\Longrightarrow\qquad \Delta t = \frac{\Delta x}{v}$$</p>
+        <p class="formula-note">Sono la stessa relazione scritta in tre modi. Se vi ricordate solo la prima e
+          sapete isolare una lettera, avete anche le altre due.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 1 — la galleria</span></div>
+        <p>Un treno viaggia a velocità costante di <span>$30$</span> m/s e deve attraversare una galleria
+          lunga <span>$1800$</span> m. <strong>(a)</strong> Quanto tempo impiega? <strong>(b)</strong> Quanti
+          metri percorre in <span>$45$</span> secondi? <strong>(c)</strong> Quanto vale la sua velocità in
+          km/h?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-m1">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-m1">
+          <p><strong>(a)</strong> Serve la formula inversa che isola il tempo:</p>
+          <p style="text-align:center;">$$\Delta t = \frac{\Delta x}{v} = \frac{1800\ \text{m}}{30\ \text{m/s}} = 60\ \text{s}$$</p>
+          <p>Un minuto esatto. Notate come si semplificano le unità: metri diviso metri al secondo dà secondi,
+            che è proprio quello che volevamo — il metodo dei fattori della lezione 4, ancora al lavoro.</p>
+          <p><strong>(b)</strong> Qui serve l'altra formula inversa:</p>
+          <p style="text-align:center;">$$\Delta x = v\,\Delta t = 30 \cdot 45 = 1350\ \text{m}$$</p>
+          <p><strong>(c)</strong> Da m/s a km/h si moltiplica per 3,6:
+            <span>$30 \cdot 3{,}6 = 108$</span> km/h.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$60$ s &nbsp;·&nbsp; $1350$ m &nbsp;·&nbsp; $108$ km/h</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2 — avanti e indietro</span></div>
+        <p>Un carrello parte dalla posizione <span>$x_i = 12$</span> m e dopo <span>$4{,}0$</span> s si trova
+          in <span>$x_f = 2{,}0$</span> m. <strong>(a)</strong> Quanto vale lo spostamento? <strong>(b)</strong>
+          Quanto vale la velocità? <strong>(c)</strong> Che cosa dice il segno?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-m2">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-m2">
+          <p><strong>(a)</strong> Finale meno iniziale, sempre in quest'ordine:</p>
+          <p style="text-align:center;">$$\Delta x = x_f - x_i = 2{,}0 - 12 = -10\ \text{m}$$</p>
+          <p><strong>(b)</strong> E quindi</p>
+          <p style="text-align:center;">$$v = \frac{\Delta x}{\Delta t} = \frac{-10\ \text{m}}{4{,}0\ \text{s}} = -2{,}5\ \text{m/s}$$</p>
+          <p><strong>(c)</strong> Il segno meno dice che il carrello si muove <strong>all'indietro</strong>,
+            cioè in verso opposto a quello dell'asse. Il suo modulo è <span>$2{,}5$</span> m/s: se qualcuno vi
+            chiede «quanto va forte?» la risposta è 2,5 m/s, se vi chiede «qual è la sua velocità?» la
+            risposta è <span>$-2{,}5$</span> m/s. Sono due domande diverse.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$\Delta x = -10$ m &nbsp;·&nbsp; $v = -2{,}5$ m/s, verso l'indietro</span></div>
+        </div>
+      </div>
+
+      <h3>2.3 Allenamento sulle formule inverse</h3>
+
+      <div class="qbox" id="fv-box">
+        <div class="qt" id="fv-testo">—</div>
+        <div class="qrow">
+          <span id="fv-eti">risposta:</span>
+          <input class="inp" id="fv-val" inputmode="decimal" aria-label="risposta">
+          <span id="fv-um">m</span>
+          <button class="btn" id="fv-ver">Verifica</button>
+          <button class="btn btn-secondary" id="fv-new">Nuovo esercizio</button>
+        </div>
+        <div class="fb" id="fv-fb"></div>
+      </div>
+    </section>
+
+    <!-- 3 — L'ACCELERAZIONE -->
+    <section id="sec3">
+      <h2>3. La velocità cambia: nasce l'accelerazione</h2>
+
+      <p>Prendiamo adesso un oggetto che si sta già muovendo. La sua velocità può restare sempre la stessa —
+        e allora diremo che il moto è <em>uniforme</em> — oppure può cambiare. Se cambia, diciamo che
+        l'oggetto sta <strong>accelerando</strong>.</p>
+
+      <p>E qui succede una cosa che vale la pena notare, perché è il modo di ragionare tipico della fisica:
+        <strong>ripetiamo esattamente lo stesso ragionamento di prima, un piano più su</strong>. Prima
+        guardavamo come cambiava la posizione nel tempo e abbiamo ottenuto la velocità. Adesso guardiamo come
+        cambia la velocità nel tempo, e otteniamo l'accelerazione.</p>
+
+      <div class="rule">
+        <p class="formula-title">Definizione di accelerazione (media)</p>
+        <p style="text-align:center; font-size:1.2rem;">$$a = \frac{\Delta v}{\Delta t} = \frac{v_f - v_i}{t_f - t_i}$$</p>
+        <p class="formula-note">L'accelerazione è la <strong>variazione di velocità nell'unità di
+          tempo</strong>. Si misura in <strong>metri al secondo, al secondo</strong>: cioè
+          <span>$\dfrac{\text{m/s}}{\text{s}} = \text{m/s}^2$</span>, che si legge «metri al secondo
+          quadrato».</p>
+      </div>
+
+      <p>Quell'unità di misura strampalata merita mezzo minuto. <span>$\text{m/s}^2$</span> non vuol dire che
+        c'è un tempo elevato al quadrato da qualche parte nel mondo: vuol dire «metri al secondo, ogni
+        secondo». Un'accelerazione di <span>$3$</span> m/s² significa che <em>ogni secondo che passa</em> la
+        velocità aumenta di 3 metri al secondo. Dopo un secondo va a 3 m/s, dopo due a 6 m/s, dopo tre a
+        9 m/s.</p>
+
+      <table class="tabf">
+        <thead>
+          <tr><th>Situazione</th><th>Segno di $a$</th><th>Che cosa succede</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="l">$v$ e $a$ hanno lo stesso segno</td><td>—</td><td class="l">il corpo <strong>accelera</strong>: il modulo della velocità cresce</td></tr>
+          <tr><td class="l">$v$ e $a$ hanno segno opposto</td><td>—</td><td class="l">il corpo <strong>rallenta</strong> (frena): il modulo della velocità diminuisce</td></tr>
+          <tr><td class="l">$a = 0$</td><td>$0$</td><td class="l">la velocità resta costante: moto uniforme (o corpo fermo)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="warnbox">
+        <strong>Accelerazione negativa non significa «frenare».</strong> È l'altro grande equivoco del
+        capitolo. Una macchina che va all'indietro sempre più forte ha velocità negativa <em>e</em>
+        accelerazione negativa, eppure sta accelerando eccome. Quello che conta è il <strong>confronto fra i
+        due segni</strong>: concordi, accelera; discordi, frena. Il termine tecnico per «frenare» è
+        <em>decelerare</em>, e non corrisponde a un segno ma a una relazione.
+      </div>
+
+      <p>Anche qui, naturalmente, valgono le formule inverse:</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.1rem;">$$a = \frac{\Delta v}{\Delta t} \qquad\Longrightarrow\qquad \Delta v = a\,\Delta t \qquad\Longrightarrow\qquad \Delta t = \frac{\Delta v}{a}$$</p>
+        <p class="formula-note">E se il corpo parte da fermo, <span>$\Delta v = v_f$</span> e la prima
+          diventa semplicemente <span>$v_f = a\,\Delta t$</span>.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3 — lo scatto</span></div>
+        <p>Un'automobile sportiva passa da ferma a <span>$100$</span> km/h in <span>$4{,}2$</span> secondi.
+          <strong>(a)</strong> Quanto vale la sua accelerazione media? <strong>(b)</strong> Con la stessa
+          accelerazione, che velocità raggiungerebbe in <span>$6{,}0$</span> s?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-m3">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-m3">
+          <p>Prima di tutto le unità: nel Sistema Internazionale le velocità vanno in m/s.</p>
+          <p style="text-align:center;">$$100\ \text{km/h} = \frac{100}{3{,}6} = 27{,}8\ \text{m/s}$$</p>
+          <p><strong>(a)</strong> Partendo da ferma, <span>$\Delta v = 27{,}8 - 0 = 27{,}8$</span> m/s:</p>
+          <p style="text-align:center;">$$a = \frac{\Delta v}{\Delta t} = \frac{27{,}8}{4{,}2} = 6{,}6\ \text{m/s}^2$$</p>
+          <p><strong>(b)</strong> Formula inversa:</p>
+          <p style="text-align:center;">$$\Delta v = a\,\Delta t = 6{,}6 \cdot 6{,}0 = 39{,}7\ \text{m/s} \approx 143\ \text{km/h}$$</p>
+          <p>Un controllo di ragionevolezza che vale sempre la pena: 6,6 m/s² è meno dei 9,81 m/s²
+            dell'accelerazione di gravità. Ha senso — se fosse di più, l'automobile accelererebbe in
+            orizzontale più forte di quanto un sasso cada, e le ruote non riuscirebbero a fare tanta presa
+            sull'asfalto.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$a = 6{,}6$ m/s² &nbsp;·&nbsp; $v = 39{,}7$ m/s ≈ $143$ km/h</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 4 — la frenata</span></div>
+        <p>Un ciclista che viaggia a <span>$30$</span> m/s frena e si ferma in <span>$6{,}0$</span> s.
+          <strong>(a)</strong> Quanto vale l'accelerazione? <strong>(b)</strong> Perché è negativa?
+          <strong>(c)</strong> Se avesse frenato con la stessa accelerazione partendo da <span>$20$</span> m/s,
+          in quanto tempo si sarebbe fermato?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-m4">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-m4">
+          <p><strong>(a)</strong> La velocità finale è zero, quella iniziale 30 m/s:</p>
+          <p style="text-align:center;">$$a = \frac{v_f - v_i}{\Delta t} = \frac{0 - 30}{6{,}0} = -5{,}0\ \text{m/s}^2$$</p>
+          <p><strong>(b)</strong> Il segno meno non dice «poca accelerazione»: dice che l'accelerazione è
+            diretta <em>all'indietro</em>, in verso opposto alla velocità. Ed è proprio questo che la rende
+            una frenata: velocità positiva e accelerazione negativa sono discordi, quindi il modulo della
+            velocità diminuisce.</p>
+          <p><strong>(c)</strong> Formula inversa sul tempo:</p>
+          <p style="text-align:center;">$$\Delta t = \frac{\Delta v}{a} = \frac{0 - 20}{-5{,}0} = 4{,}0\ \text{s}$$</p>
+          <p>Meno velocità, meno tempo per fermarsi: ragionevole. E notate che i due segni meno si sono
+            semplificati dando un tempo positivo — se vi viene un tempo negativo, avete sbagliato un segno da
+            qualche parte.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$a = -5{,}0$ m/s² &nbsp;·&nbsp; $4{,}0$ s da $20$ m/s</span></div>
+        </div>
+      </div>
+
+      <h3>3.1 Allenamento sull'accelerazione</h3>
+
+      <div class="qbox" id="fa-box">
+        <div class="qt" id="fa-testo">—</div>
+        <div class="qrow">
+          <span id="fa-eti">risposta:</span>
+          <input class="inp" id="fa-val" inputmode="decimal" aria-label="risposta">
+          <span id="fa-um">m/s²</span>
+          <button class="btn" id="fa-ver">Verifica</button>
+          <button class="btn btn-secondary" id="fa-new">Nuovo esercizio</button>
+        </div>
+        <div class="fb" id="fa-fb"></div>
+      </div>
+    </section>
+
+    <!-- 4 — VELOCITÀ MEDIA E ISTANTANEA -->
+    <section id="sec4">
+      <h2>4. Un problema: e se dentro l'intervallo la velocità cambia?</h2>
+
+      <p>C'è una crepa nelle definizioni che abbiamo dato, e conviene guardarla in faccia subito.</p>
+
+      <p>Quando scrivo <span>$v = \Delta x / \Delta t$</span> e prendo <span>$\Delta t = 10$</span> secondi,
+        che cosa sto misurando davvero? Sto misurando quanto il corpo si è spostato <em>complessivamente</em>
+        in quei dieci secondi, diviso dieci. Ma dentro quei dieci secondi il corpo può aver fatto di tutto:
+        essere partito piano, aver accelerato, essersi fermato al semaforo, essere ripartito. Il numero che
+        ottengo è una <strong>media</strong>, e come tutte le medie nasconde quello che è successo dentro.</p>
+
+      <div class="curiosita">
+        <strong>L'esempio che tutti conoscono.</strong> Andate da Roma a Milano, 570 km, in 6 ore. Velocità
+        media: 95 km/h. Ma non avete viaggiato a 95 km/h nemmeno per un istante: siete stati a 130 in
+        autostrada, a 0 all'autogrill e a 40 nel traffico dell'ingresso in città. La velocità media è un numero
+        utilissimo e non descrive nessun momento particolare del viaggio.
+      </div>
+
+      <p>Come si fa allora a dire quanto va veloce un corpo <em>proprio adesso</em>, in questo preciso istante?
+        L'idea è semplice e geniale insieme: se il problema è che dentro l'intervallo succedono troppe cose,
+        <strong>prendiamo l'intervallo più piccolo</strong>. E poi ancora più piccolo. E ancora.</p>
+
+      <p>Guardate che cosa succede nel simulatore. Un corpo si muove secondo la legge
+        <span>$x = 2t^2$</span> (è un moto accelerato, fra poco capiremo perché) e noi vogliamo sapere quanto
+        va veloce all'istante <span>$t = 3$</span> s. Stringete l'intervallo e osservate la colonna della
+        velocità media.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="li-dt">intervallo $\Delta t$ = <span id="li-dtv">2</span> s</label>
+          <input type="range" id="li-dt" min="0" max="7" step="1" value="0">
+        </div>
+        <svg viewBox="0 0 660 380" id="li-svg" role="img" aria-label="la velocità media su intervalli sempre più piccoli"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="li-dx">32,00</div><div class="l">$\Delta x$ (m)</div></div>
+          <div class="stat"><div class="n" id="li-dt2">2</div><div class="l">$\Delta t$ (s)</div></div>
+          <div class="stat"><div class="n" id="li-v">16,00</div><div class="l">velocità media (m/s)</div></div>
+          <div class="stat"><div class="n">12,00</div><div class="l">valore «al limite» (m/s)</div></div>
+        </div>
+        <p class="cap">La retta blu è la <em>secante</em>, che unisce i due estremi dell'intervallo. Stringendo, si appoggia sempre di più alla curva.</p>
+      </div>
+
+      <p>Il numero si avvicina sempre di più a <strong>12 m/s</strong>, e non ci arriva mai per un intervallo
+        finito — ma ci si avvicina quanto vogliamo. In matematica questo si dice <strong>«al limite»</strong>:
+        la velocità istantanea è il valore verso cui tende il rapporto <span>$\Delta x / \Delta t$</span>
+        quando <span>$\Delta t$</span> diventa piccolo a piacere.</p>
+
+      <table class="tabf">
+        <thead><tr><th>$\Delta t$ (s)</th><th>$\Delta x$ (m)</th><th>$\Delta x / \Delta t$ (m/s)</th></tr></thead>
+        <tbody>
+          <tr><td>$2$</td><td>$32$</td><td>$16$</td></tr>
+          <tr><td>$1$</td><td>$14$</td><td>$14$</td></tr>
+          <tr><td>$0{,}5$</td><td>$6{,}5$</td><td>$13$</td></tr>
+          <tr><td>$0{,}1$</td><td>$1{,}22$</td><td>$12{,}2$</td></tr>
+          <tr><td>$0{,}01$</td><td>$0{,}1202$</td><td>$12{,}02$</td></tr>
+          <tr><td>$0{,}001$</td><td>$0{,}012002$</td><td>$12{,}002$</td></tr>
+          <tr class="tot"><td>«al limite»</td><td>—</td><td>$12$</td></tr>
+        </tbody>
+      </table>
+
+      <div class="warnbox">
+        <strong>Attenzione: non stiamo dividendo per zero.</strong> È la domanda che fanno tutti, ed è giusto
+        farla. Non stiamo dividendo per zero: stiamo dividendo per un numero <em>molto molto piccolo</em>. E
+        la cosa importante è che <strong>anche il numeratore diventa piccolissimo insieme al
+        denominatore</strong>: guardate la seconda colonna della tabella, <span>$\Delta x$</span> scende a
+        0,012 mentre <span>$\Delta t$</span> scende a 0,001. Il loro rapporto resta un numero perfettamente
+        educato, di quelli con cui siamo abituati a lavorare — anzi, si stabilizza su un valore preciso.
+        Questa idea, il quoziente di due quantità che tendono a zero insieme, è il cuore del
+        <strong>calcolo infinitesimale</strong>: la incontrerete in matematica al quarto e quinto anno, sotto
+        il nome di <em>derivata</em>.
+      </div>
+
+      <div class="rule">
+        <p class="formula-title">Velocità media e velocità istantanea</p>
+        <p>La <strong>velocità media</strong> è <span>$\Delta x / \Delta t$</span> su un intervallo finito:
+          descrive il viaggio nel suo insieme.</p>
+        <p>La <strong>velocità istantanea</strong> è lo stesso rapporto calcolato su un intervallo
+          piccolissimo: descrive l'istante. È quella che segna il tachimetro, ed è quella che si intende
+          quando si dice «velocità» senza altre precisazioni.</p>
+        <p class="formula-note">Tutto ciò che abbiamo detto vale identico per l'accelerazione: esiste
+          un'accelerazione media e un'accelerazione istantanea, definite allo stesso modo.</p>
+      </div>
+
+      <h3>4.1 E si potrebbe andare avanti</h3>
+
+      <p>Una domanda legittima, a questo punto: se dalla posizione siamo passati alla velocità guardando come
+        cambia, e dalla velocità all'accelerazione con lo stesso trucco, chi ci vieta di andare avanti? Che
+        cosa succede se studiamo come cambia l'<em>accelerazione</em>?</p>
+
+      <p>Nessuno ce lo vieta, e infatti quella grandezza esiste e ha un nome. Non la studieremo, ma non è una
+        curiosità inutile: è la grandezza che misura quanto è «brusca» una frenata, e i progettisti di
+        ascensori, montagne russe e treni ad alta velocità la tengono d'occhio con attenzione, perché è quella
+        che decide se un passeggero si sente a disagio. Chi è curioso la cerchi in rete: si chiama
+        <em>jerk</em> (in italiano «strappo»), si misura in m/s³, ed esistono anche i livelli successivi, con
+        nomi che sembrano una presa in giro e invece sono seri.</p>
+    </section>
+
+    <!-- 5 — MOTO RETTILINEO UNIFORME -->
+    <section id="sec5">
+      <h2>5. Il moto rettilineo uniforme</h2>
+
+      <p>Adesso mettiamo tutto in grafico, perché è lì che il moto si capisce davvero. Cominciamo dal caso più
+        semplice possibile.</p>
+
+      <div class="rule">
+        Il <strong>moto rettilineo uniforme</strong> è il moto lungo una retta con <strong>velocità
+        costante</strong>: in intervalli di tempo uguali il corpo percorre spazi uguali. Quindi
+        <span>$a = 0$</span>.
+      </div>
+
+      <p>La sua legge oraria — cioè la formula che dà la posizione a ogni istante — si ricava dalla definizione
+        di velocità. Da <span>$v = (x - x_0)/t$</span> si isola la <span>$x$</span>:</p>
+
+      <div class="rule">
+        <p class="formula-title">Legge oraria del moto rettilineo uniforme</p>
+        <p style="text-align:center; font-size:1.2rem;">$$x = x_0 + v\,t$$</p>
+        <p class="formula-note">dove <span>$x_0$</span> è la posizione all'istante <span>$t = 0$</span>.
+          Confrontatela con <span>$y = q + m x$</span>: è l'equazione di una <strong>retta</strong>, con
+          <span>$x_0$</span> al posto dell'intercetta e <span>$v$</span> al posto del coefficiente
+          angolare.</p>
+      </div>
+
+      <p>Ed ecco la prima cosa importante che il grafico ci regala: nel diagramma <strong>posizione-tempo</strong>
+        il moto uniforme è una retta, e la sua <strong>pendenza è la velocità</strong>. Retta ripida, corpo
+        veloce; retta poco inclinata, corpo lento; retta orizzontale, corpo fermo; retta che scende, velocità
+        negativa.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="mu-x0">$x_0$ = <span id="mu-x0v">2</span> m</label>
+          <input type="range" id="mu-x0" min="-6" max="10" step="1" value="2">
+          <label for="mu-v">$v$ = <span id="mu-vv">2</span> m/s</label>
+          <input type="range" id="mu-v" min="-3" max="3" step="0.5" value="2">
+        </div>
+        <svg viewBox="0 0 660 460" id="mu-svg" role="img" aria-label="grafici posizione-tempo e velocità-tempo del moto uniforme"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="mu-legge">x = 2 + 2·t</div><div class="l">legge oraria</div></div>
+          <div class="stat"><div class="n" id="mu-x10">22,0</div><div class="l">posizione a t = 10 s (m)</div></div>
+          <div class="stat"><div class="n" id="mu-area">20,0</div><div class="l">area sotto v-t in 10 s (m)</div></div>
+        </div>
+        <p class="cap">Sopra il grafico posizione-tempo, sotto quello velocità-tempo. Muovete i cursori e guardate come cambiano insieme.</p>
+      </div>
+
+      <p>E c'è una seconda cosa, che a prima vista sembra un caso e invece è una delle idee più potenti di
+        tutta la fisica. Guardate il grafico <strong>velocità-tempo</strong>: è una retta orizzontale, e sotto
+        di essa c'è un rettangolo di base <span>$t$</span> e altezza <span>$v$</span>. La sua area vale
+        <span>$v \cdot t$</span>… che è esattamente lo spazio percorso.</p>
+
+      <div class="rule">
+        Nel grafico <strong>velocità-tempo</strong>, l'<strong>area</strong> sotto la curva è lo
+        <strong>spazio percorso</strong>. Vale sempre, per qualunque moto — non solo per quello uniforme.
+      </div>
+
+      <p>Nel riquadro del simulatore trovate l'area calcolata: confrontatela con lo spostamento. E provate a
+        mettere una velocità negativa: l'area finisce sotto l'asse e conta come negativa, cioè come uno
+        spostamento all'indietro. Anche qui la matematica si comporta meglio di quanto ci aspetteremmo.</p>
+    </section>
+
+    <!-- 6 — MOTO UNIFORMEMENTE ACCELERATO -->
+    <section id="sec6">
+      <h2>6. Il moto uniformemente accelerato</h2>
+
+      <p>Secondo caso: la velocità non è costante, ma cambia sempre allo stesso ritmo. Cioè
+        l'<strong>accelerazione</strong> è costante.</p>
+
+      <div class="rule">
+        Il <strong>moto uniformemente accelerato</strong> è il moto lungo una retta con
+        <strong>accelerazione costante</strong>: in intervalli di tempo uguali la velocità cambia sempre della
+        stessa quantità.
+      </div>
+
+      <p>È il moto più importante di tutta la meccanica, per un motivo che scopriremo l'anno prossimo: è il
+        moto di <em>qualunque</em> corpo che cade, perché la gravità tira sempre allo stesso modo
+        (<span>$g = 9{,}81$</span> m/s²). Le sue leggi sono due, una per la velocità e una per la posizione:</p>
+
+      <div class="rule">
+        <p class="formula-title">Le due leggi del moto uniformemente accelerato</p>
+        <p style="text-align:center; font-size:1.15rem;">$$v = v_0 + a\,t$$</p>
+        <p style="text-align:center; font-size:1.15rem;">$$x = x_0 + v_0\,t + \frac{1}{2}a\,t^2$$</p>
+        <p class="formula-note">La prima è di nuovo l'equazione di una retta (la velocità cresce
+          linearmente). La seconda contiene <span>$t^2$</span>: è l'equazione di una
+          <strong>parabola</strong>.</p>
+      </div>
+
+      <p>Da dove esce quel <span>$\frac{1}{2}$</span>, che è la cosa che tutti si dimenticano? Dall'area, con
+        un ragionamento che potete fare da soli. Nel grafico velocità-tempo, partendo da fermo, la velocità è
+        una retta che sale da 0 fino a <span>$a t$</span>: l'area sotto non è un rettangolo ma un
+        <strong>triangolo</strong>, di base <span>$t$</span> e altezza <span>$a t$</span>. E l'area del
+        triangolo è base per altezza <em>diviso due</em>:</p>
+
+      <p style="text-align:center;">$$\text{spazio} = \frac{t \cdot (a\,t)}{2} = \frac{1}{2}a\,t^2$$</p>
+
+      <p>Ecco il mezzo. Non è una costante magica da imparare a memoria: è l'area di un triangolo.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="ua-x0">$x_0$ = <span id="ua-x0v">0</span> m</label>
+          <input type="range" id="ua-x0" min="-10" max="10" step="1" value="0">
+          <label for="ua-v0">$v_0$ = <span id="ua-v0v">0</span> m/s</label>
+          <input type="range" id="ua-v0" min="-8" max="8" step="1" value="0">
+          <label for="ua-a">$a$ = <span id="ua-av">2</span> m/s²</label>
+          <input type="range" id="ua-a" min="-3" max="3" step="0.5" value="2">
+        </div>
+        <svg viewBox="0 0 660 560" id="ua-svg" role="img" aria-label="grafici del moto uniformemente accelerato"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="ua-legge">x = 0 + 0·t + 1·t²</div><div class="l">legge oraria</div></div>
+          <div class="stat"><div class="n" id="ua-v6">12,0</div><div class="l">velocità a t = 6 s (m/s)</div></div>
+          <div class="stat"><div class="n" id="ua-x6">36,0</div><div class="l">posizione a t = 6 s (m)</div></div>
+          <div class="stat"><div class="n" id="ua-inv">—</div><div class="l">istante di inversione</div></div>
+        </div>
+        <p class="cap">Tre grafici: posizione (parabola), velocità (retta) e accelerazione (costante). Provate $v_0$ e $a$ di segno opposto: il corpo torna indietro.</p>
+      </div>
+
+      <p>Un caso che merita attenzione è proprio quello: <span>$v_0$</span> e <span>$a$</span> di segno
+        opposto. Il corpo parte in una direzione, rallenta, si ferma per un istante e poi torna indietro
+        accelerando. È esattamente quello che fa un sasso lanciato in aria — e nel grafico posizione-tempo si
+        vede benissimo, perché la parabola ha un vertice.</p>
+
+      <div class="curiosita">
+        <strong>Una formula in più, che fa risparmiare tempo.</strong> Combinando le due leggi ed eliminando
+        il tempo si ottiene <span>$v^2 = v_0^2 + 2a\,\Delta x$</span>, che serve quando del tempo non ci
+        importa nulla. Esempio: un'automobile a 20 m/s frena con <span>$a = -4$</span> m/s²; in quanti metri
+        si ferma? Da <span>$0 = 400 - 8\,\Delta x$</span> viene <span>$\Delta x = 50$</span> m. Provate a
+        rifarlo con le due leggi separate: si arriva allo stesso 50, ma con il doppio dei passaggi.
+      </div>
+    </section>
+
+    <!-- 7 — LEGGERE I GRAFICI -->
+    <section id="sec7">
+      <h2>7. Esercizi: leggere un grafico del moto</h2>
+
+      <p>Saper leggere un grafico vale più che sapere le formule a memoria, perché il grafico racconta tutta la
+        storia in un colpo d'occhio. Ecco un promemoria da tenere sott'occhio:</p>
+
+      <table class="tabf">
+        <thead>
+          <tr><th>Nel grafico…</th><th>la <strong>pendenza</strong> è…</th><th>l'<strong>area</strong> sotto è…</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="lab">posizione-tempo ($x$, $t$)</td><td>la <strong>velocità</strong></td><td>(non ha significato fisico)</td></tr>
+          <tr><td class="lab">velocità-tempo ($v$, $t$)</td><td>l'<strong>accelerazione</strong></td><td>lo <strong>spostamento</strong></td></tr>
+          <tr><td class="lab">accelerazione-tempo ($a$, $t$)</td><td>(il <em>jerk</em>, che non studiamo)</td><td>la <strong>variazione di velocità</strong></td></tr>
+        </tbody>
+      </table>
+
+      <p>Nel simulatore qui sotto compare un grafico a caso e alcune domande. Rispondete guardando la figura,
+        senza fare conti complicati.</p>
+
+      <div class="figbox">
+        <svg viewBox="0 0 660 340" id="lg-svg" role="img" aria-label="grafico del moto da interpretare"></svg>
+        <div class="qbox" style="margin-top:0.2rem;">
+          <div class="qt" id="lg-dom">—</div>
+          <div class="sim-btns" id="lg-opz"></div>
+          <div class="fb" id="lg-fb"></div>
+          <div class="sim-btns">
+            <button class="btn btn-secondary" id="lg-new">Nuovo grafico</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 5 — la storia di un viaggio</span></div>
+        <p>Il grafico posizione-tempo qui sotto descrive un pomeriggio in bicicletta. Racconta che cosa succede
+          in ciascuno dei quattro tratti e calcola la velocità in ognuno.</p>
+        <div class="figbox">
+          <svg viewBox="0 0 660 320" role="img" aria-label="grafico posizione tempo con quattro tratti">
+            <line x1="80" y1="40" x2="80" y2="260" class="axis"/>
+            <line x1="80" y1="260" x2="620" y2="260" class="axis"/>
+            <text x="624" y="266" class="lbl">t (min)</text>
+            <text x="74" y="34" text-anchor="end" class="lbl">x (km)</text>
+            <line x1="170" y1="40" x2="170" y2="260" class="grid"/>
+            <line x1="260" y1="40" x2="260" y2="260" class="grid"/>
+            <line x1="350" y1="40" x2="350" y2="260" class="grid"/>
+            <line x1="440" y1="40" x2="440" y2="260" class="grid"/>
+            <line x1="530" y1="40" x2="530" y2="260" class="grid"/>
+            <line x1="80" y1="205" x2="620" y2="205" class="grid"/>
+            <line x1="80" y1="150" x2="620" y2="150" class="grid"/>
+            <line x1="80" y1="95" x2="620" y2="95" class="grid"/>
+            <text x="170" y="278" text-anchor="middle" class="lbl-s">10</text>
+            <text x="260" y="278" text-anchor="middle" class="lbl-s">20</text>
+            <text x="350" y="278" text-anchor="middle" class="lbl-s">30</text>
+            <text x="440" y="278" text-anchor="middle" class="lbl-s">40</text>
+            <text x="530" y="278" text-anchor="middle" class="lbl-s">50</text>
+            <text x="72" y="209" text-anchor="end" class="lbl-s">2</text>
+            <text x="72" y="154" text-anchor="end" class="lbl-s">4</text>
+            <text x="72" y="99" text-anchor="end" class="lbl-s">6</text>
+            <polyline points="80,260 260,150 350,150 530,40 620,40" class="curva"/>
+            <circle cx="80" cy="260" r="5" fill="var(--accent)"/>
+            <circle cx="260" cy="150" r="5" fill="var(--accent)"/>
+            <circle cx="350" cy="150" r="5" fill="var(--accent)"/>
+            <circle cx="530" cy="40" r="5" fill="var(--accent)"/>
+            <circle cx="620" cy="40" r="5" fill="var(--accent)"/>
+            <text x="165" y="196" class="em">A</text>
+            <text x="300" y="140" class="em">B</text>
+            <text x="430" y="88" class="em">C</text>
+            <text x="570" y="32" class="em">D</text>
+          </svg>
+        </div>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-m5">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-m5">
+          <p><strong>Tratto A</strong> (da 0 a 20 min): la retta sale da 0 a 4 km. Il ciclista pedala in
+            avanti a velocità costante.</p>
+          <p style="text-align:center;">$$v_A = \frac{4\ \text{km}}{20\ \text{min}} = 0{,}2\ \text{km/min} = 12\ \text{km/h}$$</p>
+          <p><strong>Tratto B</strong> (da 20 a 30 min): la retta è <em>orizzontale</em>. La posizione non
+            cambia: il ciclista è <strong>fermo</strong>, <span>$v_B = 0$</span>. Pausa al bar.</p>
+          <p><strong>Tratto C</strong> (da 30 a 50 min): riparte e arriva a 8 km, cioè altri 4 km in altri
+            20 minuti: stessa pendenza del tratto A, quindi
+            <span>$v_C = 12$</span> km/h.</p>
+          <p><strong>Tratto D</strong> (da 50 a 60 min): di nuovo orizzontale, di nuovo fermo.</p>
+          <p>Osservazione finale: la velocità <em>media</em> sull'intera ora è
+            <span>$8\ \text{km} / 1\ \text{h} = 8$</span> km/h, che non è la velocità di nessuno dei quattro
+            tratti. È la media di cui parlavamo nella sezione 4.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">A: $12$ km/h · B: fermo · C: $12$ km/h · D: fermo · media $8$ km/h</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 6 — dall'area allo spostamento</span></div>
+        <p>Un corpo parte da fermo e accelera uniformemente a <span>$3{,}0$</span> m/s² per
+          <span>$4{,}0$</span> s, poi prosegue a velocità costante per altri <span>$6{,}0$</span> s.
+          <strong>(a)</strong> Che velocità raggiunge? <strong>(b)</strong> Quanto spazio percorre in tutto?
+          Usa il grafico velocità-tempo.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-m6">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-m6">
+          <p><strong>(a)</strong> Nella prima fase, partendo da fermo:</p>
+          <p style="text-align:center;">$$v = a\,t = 3{,}0 \cdot 4{,}0 = 12\ \text{m/s}$$</p>
+          <p><strong>(b)</strong> Nel grafico velocità-tempo la figura è composta da due pezzi: un
+            <strong>triangolo</strong> (la fase accelerata) e un <strong>rettangolo</strong> (la fase
+            uniforme). Lo spazio totale è la somma delle due aree:</p>
+          <p style="text-align:center;">$$s_1 = \frac{4{,}0 \cdot 12}{2} = 24\ \text{m} \qquad s_2 = 12 \cdot 6{,}0 = 72\ \text{m}$$</p>
+          <p style="text-align:center;">$$s_{\text{tot}} = 24 + 72 = 96\ \text{m}$$</p>
+          <p>Verifica con le formule: <span>$s_1 = \frac{1}{2} \cdot 3{,}0 \cdot 4{,}0^2 = 24$</span> m. ✔
+            Il metodo delle aree è più veloce e, soprattutto, funziona anche quando la formula non ce l'avete:
+            basta saper calcolare l'area di una figura.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$v = 12$ m/s &nbsp;·&nbsp; $s = 96$ m</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — LA FORZA -->
+    <section id="sec8">
+      <h2>8. Ma chi è che li fa muovere? La forza</h2>
+
+      <p>Fin qui abbiamo <em>descritto</em> il movimento: posizione, velocità, accelerazione, grafici. Non ci
+        siamo mai chiesti da dove venga. Era una scelta deliberata — è quella che separa la cinematica dalla
+        <strong>dinamica</strong> — ma adesso la domanda non si può più rimandare.</p>
+
+      <p>La grandezza fisica che sta all'origine dei cambiamenti di movimento si chiama <strong>forza</strong>.
+        E fa due cose, che sono i due modi in cui ce ne accorgiamo:</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Deforma i corpi</h4>
+          <p>Una molla si allunga, una gomma si piega, un pallone si schiaccia quando lo si calcia. È
+            l'<strong>effetto statico</strong> della forza — e sarà proprio questo, nella prossima lezione, a
+            darci il modo di <em>misurarla</em>.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Cambia il movimento</h4>
+          <p>Mette in moto un corpo fermo, ferma un corpo in moto, gli fa cambiare direzione. È
+            l'<strong>effetto dinamico</strong>, quello di cui ci occupiamo adesso.</p>
+        </div>
+      </div>
+
+      <div class="rule">
+        La <strong>forza</strong> è una grandezza <strong>vettoriale</strong>: ha un modulo, una direzione, un
+        verso e un punto di applicazione. Si misura in <strong>newton</strong> (simbolo N), unità derivata
+        del Sistema Internazionale.
+      </div>
+
+      <p>Che sia vettoriale lo dice l'esperienza quotidiana: se spingo un armadio verso destra, quello va verso
+        destra. La direzione della spinta si ritrova nella direzione del movimento — e un numero da solo non
+        potrebbe mai contenere quell'informazione.</p>
+
+      <p>Quanto è grande un newton? Poco: è all'incirca la forza con cui la Terra attira una mela di un etto.
+        Per sollevare uno zaino da 5 kg servono circa 50 N, per tenere in mano questo foglio meno di mezzo
+        newton.</p>
+
+      <div class="warnbox">
+        <strong>Anticipazione.</strong> Quello che stiamo dicendo qui è il seme dei <em>principi della
+        dinamica</em>, che studierete per esteso l'anno prossimo. Per ora bastano due fatti: una forza è un
+        vettore, e una forza applicata a un corpo lo fa <strong>accelerare</strong> nella direzione della
+        forza. La parola giusta è «accelerare», non «muovere» — e la prossima sezione spiega perché la
+        differenza è tutt'altro che una pignoleria.
+      </div>
+    </section>
+
+    <!-- 9 — LA MISCONCEZIONE STORICA -->
+    <section id="sec9">
+      <h2>9. Un errore lungo duemila anni</h2>
+
+      <p>Qui vale la pena fermarsi, perché stiamo per smontare un'idea sbagliata che vi sembrerà giustissima —
+        e che ha ingannato per venti secoli alcune delle menti migliori che siano mai esistite.</p>
+
+      <p>L'idea è questa: <strong>la forza dà velocità</strong>. Cioè: se spingo, il corpo si muove; se smetto
+        di spingere, il corpo si ferma. Quindi «più forza» vuol dire «più velocità», e senza forza non c'è
+        movimento.</p>
+
+      <p>Provate a contestarla. È in accordo con <em>tutto</em> quello che vediamo. Spingo un armadio: si
+        muove. Smetto: si ferma. Pedalo: la bici va. Smetto di pedalare: la bici si ferma. Trascino una cassa:
+        avanza finché tiro. Non c'è un solo esempio di vita quotidiana che la contraddica, e Aristotele la
+        mise per iscritto in una fisica che rimase in piedi fino al Seicento.</p>
+
+      <div class="curiosita">
+        <strong>Il problema della freccia.</strong> C'era però un caso che non tornava, e gli antichi lo
+        sapevano benissimo. Prendete una freccia scoccata da un arco. Nell'istante in cui lascia la corda,
+        nessuno la sta più spingendo — eppure continua a volare per decine di metri. Se la forza fosse
+        necessaria a mantenere il movimento, la freccia dovrebbe cadere a terra appena lasciata la corda.
+      </div>
+
+      <p>La spiegazione che si diedero è, diciamolo, piuttosto arzigogolata: si chiama
+        <strong>antiperistasi</strong>. L'aria spostata dalla freccia, dicevano, si richiude dietro di essa e
+        la spinge in avanti, prendendo il posto della corda. Un'idea ingegnosa, con un difetto fatale: allora
+        nel vuoto una freccia non volerebbe affatto, e per far volare più lontano un oggetto basterebbe
+        renderlo più tozzo, così da spostare più aria. Vale la pena provare a lanciare un mattone e una
+        freccia e vedere quale arriva più lontano.</p>
+
+      <p>La verità è molto più semplice, e ci arrivarono Galileo e poi Newton:</p>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.15rem;">Una forza non dà velocità: dà <strong>accelerazione</strong>.</p>
+        <p class="formula-note">Se spingo un corpo, quel corpo <em>accelera</em> nella direzione della spinta.
+          Se smetto di spingere, il corpo non si ferma: continua ad andare alla velocità che aveva raggiunto.
+          Per mantenere un movimento a velocità costante non serve nessuna forza.</p>
+      </div>
+
+      <p>«Ma allora perché l'armadio si ferma?» Perché non è vero che quando smetto di spingere non c'è più
+        nessuna forza: ce n'è un'altra, che agisce sempre e che non vediamo, e si chiama
+        <strong>attrito</strong>. L'attrito è una forza diretta in verso opposto al movimento e tende a
+        fermare qualunque cosa si muova. Non è un dettaglio fastidioso: è ciò che rende l'esperienza
+        quotidiana così ingannevole, perché sulla Terra è sempre presente e nasconde la legge vera.</p>
+
+      <p>Togliete l'attrito e la legge vera salta fuori. Un disco da hockey su ghiaccio liscio scivola per
+        decine di metri; una sonda spaziale lanciata negli anni Settanta viaggia ancora oggi, senza motori
+        accesi, senza che nessuno la spinga, alla stessa velocità di quarant'anni fa. Là fuori non c'è aria e
+        non c'è attrito, e si vede finalmente come stanno le cose.</p>
+
+      <div class="curiosita">
+        <strong>Una lezione di metodo, che vale più della fisica.</strong> Perché è servito così tanto tempo?
+        Non perché gli antichi fossero stupidi — non lo erano affatto. Perché la loro idea era
+        <em>in accordo con i dati</em>: spiegava benissimo tutto quello che si poteva osservare. Il problema
+        era che i dati erano tutti «sporcati» dall'attrito, e nessuno poteva accorgersene finché non si è
+        pensato di <strong>immaginare l'esperimento senza attrito</strong>. È esattamente il tipo di
+        ragionamento di cui parlavamo nella lezione 1, quando dicevamo che un modello si abbandona solo quando
+        i dati costringono — e che a volte occorre inventarsi dati che in natura non si trovano.
+      </div>
+    </section>
+
+    <!-- 10 — SOMMA DI FORZE -->
+    <section id="sec10">
+      <h2>10. Le forze si sommano come vettori</h2>
+
+      <p>Torniamo alla forza. Essendo un vettore, quando su un corpo ne agiscono due o più, l'effetto
+        complessivo si trova con la <strong>somma vettoriale</strong> della lezione scorsa. Quella somma si
+        chiama <strong>risultante</strong>, e il corpo si comporta come se ci fosse soltanto lei.</p>
+
+      <p>La situazione classica è quella dei rimorchiatori: due barche che devono trainarne una terza, ferma in
+        mezzo al porto. Ognuna tira con la propria fune, e le due funi formano un angolo. Muovete l'angolo e le
+        due forze nel simulatore e guardate come cambia la risultante.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="bt-f1">F₁ = <span id="bt-f1v">600</span> N</label>
+          <input type="range" id="bt-f1" min="200" max="900" step="50" value="600">
+          <label for="bt-f2">F₂ = <span id="bt-f2v">600</span> N</label>
+          <input type="range" id="bt-f2" min="200" max="900" step="50" value="600">
+          <label for="bt-ang">angolo fra le funi = <span id="bt-angv">60</span>°</label>
+          <input type="range" id="bt-ang" min="0" max="170" step="5" value="60">
+        </div>
+        <svg viewBox="0 0 660 400" id="bt-svg" role="img" aria-label="due rimorchiatori che trainano una terza barca"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="bt-ris">1039</div><div class="l">risultante (N)</div></div>
+          <div class="stat"><div class="n" id="bt-somma">1200</div><div class="l">somma dei moduli (N)</div></div>
+          <div class="stat"><div class="n" id="bt-perc">86,6</div><div class="l">resa: risultante / somma (%)</div></div>
+          <div class="stat"><div class="n" id="bt-dir">0,0°</div><div class="l">direzione della risultante</div></div>
+        </div>
+        <p class="cap">Portate l'angolo a 0° e poi a 170°: nel primo caso le due forze collaborano al massimo, nel secondo quasi si annullano.</p>
+      </div>
+
+      <p>Ci sono due cose da portare a casa da questo simulatore, e sono tutte e due controintuitive.</p>
+
+      <p><strong>La prima</strong>: la risultante è quasi sempre <em>minore</em> della somma dei moduli. Due
+        rimorchiatori da 600 N ciascuno non tirano con 1200 N, a meno che non tirino esattamente nella stessa
+        direzione. A 60° di apertura la risultante vale 1039 N: si sta buttando via il 13% della fatica. È la
+        disuguaglianza triangolare della lezione 7, in versione marinara.</p>
+
+      <p><strong>La seconda</strong>: se le due barche tirano perpendicolarmente l'una all'altra, o peggio, si
+        arriva rapidamente a situazioni in cui il grosso della potenza dei motori serve solo a far sì che le
+        due barche si contrastino a vicenda. Nel caso limite di due forze uguali e opposte (180°) la
+        risultante è <strong>zero</strong>: i motori vanno a tutto gas e la barca sta ferma. È esattamente il
+        tiro alla fune fra due squadre di pari forza.</p>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 7 — il rimorchio simmetrico</span></div>
+        <p>Due rimorchiatori tirano con la stessa forza di <span>$600$</span> N, disposti simmetricamente
+          rispetto alla direzione in cui si vuole muovere la nave, con un angolo di <span>$60°$</span> fra le
+          due funi. <strong>(a)</strong> Quanto vale la risultante? <strong>(b)</strong> Che percentuale della
+          forza totale viene sprecata? <strong>(c)</strong> Che cosa conviene fare al comandante?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-m7">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-m7">
+          <p>Essendo la disposizione simmetrica, ogni fune forma <span>$30°$</span> con la direzione della
+            nave. Scomponiamo ogni forza (sezione 10 della lezione 7):</p>
+          <ul>
+            <li>componente <strong>utile</strong>, lungo la direzione della nave:
+              <span>$600 \cdot \cos 30° = 519{,}6$</span> N ciascuna;</li>
+            <li>componente <strong>trasversale</strong>: <span>$600 \cdot \sin 30° = 300$</span> N ciascuna,
+              ma una verso destra e una verso sinistra.</li>
+          </ul>
+          <p><strong>(a)</strong> Le trasversali si annullano a vicenda (ed è tutto lavoro sprecato), mentre
+            le utili si sommano:</p>
+          <p style="text-align:center;">$$R = 2 \cdot 600 \cdot \cos 30° = 1039\ \text{N}$$</p>
+          <p><strong>(b)</strong> La somma dei moduli sarebbe 1200 N, quindi la resa è
+            <span>$1039/1200 = 86{,}6\%$</span>: si spreca il <strong>13,4%</strong>.</p>
+          <p><strong>(c)</strong> Avvicinare le funi, cioè ridurre l'angolo. A <span>$0°$</span> la resa
+            sarebbe del 100% — ma nella pratica le barche si urterebbero, e per questo un angolo piccolo ma
+            non nullo è il compromesso che si usa davvero nei porti.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$R = 1039$ N &nbsp;·&nbsp; spreco del $13{,}4\%$</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 — COME SI MISURA UNA FORZA -->
+    <section id="sec11">
+      <h2>11. E adesso: come si misura una forza?</h2>
+
+      <p>Abbiamo detto che cos'è una forza, che è un vettore, che si misura in newton e che le forze si
+        sommano. Resta la domanda più concreta di tutte, e anche la più imbarazzante: <strong>come faccio a
+        sapere quanto vale?</strong></p>
+
+      <p>La velocità la misuro con un metro e un cronometro. Ma la forza? Non posso «guardarla»: vedo solo i
+        suoi effetti. E allora l'idea è proprio quella — <em>misuriamola attraverso uno dei suoi due
+        effetti</em>. Ricordate quali erano?</p>
+
+      <ul>
+        <li>l'effetto <strong>dinamico</strong>: accelera i corpi. Si potrebbe misurare l'accelerazione che
+          produce… ma serve conoscere la massa, e per ora non abbiamo gli strumenti;</li>
+        <li>l'effetto <strong>statico</strong>: deforma i corpi. E qui c'è la strada giusta, perché
+          <em>una deformazione si vede e si misura con un righello</em>.</li>
+      </ul>
+
+      <p>Se troviamo un oggetto che si deforma in modo <strong>regolare e prevedibile</strong> — cioè tanto
+        quanto è grande la forza, né più né meno — allora misurando la deformazione avremo misurato la forza.
+        Quell'oggetto esiste, ce l'avete visto mille volte e si chiama <strong>molla</strong>.</p>
+
+      <div class="note">
+        <strong>Nella prossima lezione</strong> ce lo andiamo a costruire davvero. Studieremo la legge che
+        lega la forza applicata a una molla e il suo allungamento — la <strong>legge di Hooke</strong> — la
+        verificheremo con un esperimento, ne misureremo la costante elastica con due metodi diversi, e alla
+        fine avremo in mano un <strong>dinamometro</strong>: il primo strumento della fisica capace di dire
+        quanti newton vale una forza. <a href="9_Legge_di_Hooke.html">Andiamo a vedere →</a>
+      </div>
+    </section>
+
+<!--SENTINEL-->
+
+    <section id="quiz">
+      <h2>12. Quiz finale</h2>
+      <p>Domande su sistemi di riferimento, velocità, accelerazione, grafici del moto e forza.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 8 — Il movimento · Fisica · Terzo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      /* ---------- utilità comuni ---------- */
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+      function num(s) { return parseFloat(String(s).replace(',', '.').replace(/\s/g, '').trim()); }
+
+      function freccia(x1, y1, x2, y2, cls, s) {
+        s = s || 11;
+        var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy) || 1;
+        var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+        if (L < s * 1.2) { s = Math.max(4, L * 0.8); }
+        var bx = x2 - ux * s, by = y2 - uy * s;
+        var pts = x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+                  (bx + px * s * 0.42).toFixed(1) + ',' + (by + py * s * 0.42).toFixed(1) + ' ' +
+                  (bx - px * s * 0.42).toFixed(1) + ',' + (by - py * s * 0.42).toFixed(1);
+        return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) +
+               '" y2="' + by.toFixed(1) + '" class="' + cls + '"/>' +
+               '<polygon points="' + pts + '" class="' + cls + 'p"/>';
+      }
+
+      // assi di un grafico con etichette: restituisce l'SVG e le funzioni di conversione
+      function assi(x0, y0, larg, alt, xmax, ymin, ymax, etx, ety) {
+        var g = '';
+        var sx = larg / xmax, sy = alt / (ymax - ymin);
+        function px(x) { return x0 + x * sx; }
+        function py(y) { return y0 - (y - ymin) * sy; }
+        var i;
+        for (i = 0; i <= xmax; i++) {
+          g += '<line x1="' + px(i) + '" y1="' + py(ymin) + '" x2="' + px(i) + '" y2="' + py(ymax) + '" class="grid"/>';
+        }
+        for (i = Math.ceil(ymin); i <= ymax; i++) {
+          g += '<line x1="' + px(0) + '" y1="' + py(i) + '" x2="' + px(xmax) + '" y2="' + py(i) + '" class="grid"/>';
+        }
+        g += '<line x1="' + px(0) + '" y1="' + py(Math.max(ymin, Math.min(ymax, 0))) + '" x2="' + (px(xmax) + 16) +
+             '" y2="' + py(Math.max(ymin, Math.min(ymax, 0))) + '" class="axis"/>';
+        g += '<line x1="' + px(0) + '" y1="' + py(ymin) + '" x2="' + px(0) + '" y2="' + (py(ymax) - 14) + '" class="axis"/>';
+        g += '<text x="' + (px(xmax) + 20) + '" y="' + (py(Math.max(ymin, Math.min(ymax, 0))) + 5) + '" class="lbl">' + etx + '</text>';
+        g += '<text x="' + (px(0) - 6) + '" y="' + (py(ymax) - 20) + '" text-anchor="middle" class="lbl">' + ety + '</text>';
+        for (i = 0; i <= xmax; i += Math.max(1, Math.round(xmax / 6))) {
+          g += '<text x="' + px(i) + '" y="' + (py(ymin) + 17) + '" text-anchor="middle" class="lbl-s">' + i + '</text>';
+        }
+        var passo = Math.max(1, Math.round((ymax - ymin) / 6));
+        for (i = Math.ceil(ymin / passo) * passo; i <= ymax; i += passo) {
+          if (i !== 0 || ymin >= 0) {
+            g += '<text x="' + (px(0) - 8) + '" y="' + (py(i) + 4) + '" text-anchor="end" class="lbl-s">' + i + '</text>';
+          }
+        }
+        return { g: g, px: px, py: py };
+      }
+
+      /* ================= 1 — sistema di riferimento ================= */
+      (function () {
+        var svg = document.getElementById('sr-svg');
+        if (!svg) { return; }
+        var OX = 90, OY = 175, PX = 46;      // 46 px per metro
+        var t = 0, attivo = false, ultimo = null, origine = 0, x0 = 1;
+        function pos() { return x0 + parseFloat(document.getElementById('sr-v').value) * t; }
+        function disegna() {
+          var x = pos(), v = parseFloat(document.getElementById('sr-v').value);
+          var xr = x - origine;                   // posizione letta nel riferimento scelto
+          var g = '';
+          var OXr = OX + origine * PX;
+          // il binario
+          g += '<line x1="40" y1="' + (OY + 26) + '" x2="640" y2="' + (OY + 26) + '" stroke="var(--muted)" stroke-width="4"/>';
+          // l'asse con le tacche
+          g += '<line x1="40" y1="' + OY + '" x2="646" y2="' + OY + '" class="axis"/>';
+          for (var i = -1; i <= 12; i++) {
+            var sx = OXr + i * PX;
+            if (sx < 42 || sx > 640) { continue; }
+            g += '<line x1="' + sx + '" y1="' + (OY - 6) + '" x2="' + sx + '" y2="' + (OY + 6) + '" class="axis"/>';
+            g += '<text x="' + sx + '" y="' + (OY - 12) + '" text-anchor="middle" class="lbl-s">' + i + '</text>';
+          }
+          g += '<text x="646" y="' + (OY - 14) + '" text-anchor="end" class="lbl">x (m)</text>';
+          // l'origine
+          g += '<line x1="' + OXr + '" y1="' + (OY - 30) + '" x2="' + OXr + '" y2="' + (OY + 42) + '" stroke="var(--magenta)" stroke-width="3"/>';
+          g += '<text x="' + OXr + '" y="' + (OY + 60) + '" text-anchor="middle" class="em">origine O</text>';
+          // il carrello
+          var cx = OX + x * PX;
+          g += '<rect x="' + (cx - 24) + '" y="' + (OY + 2) + '" width="48" height="22" rx="5" fill="color-mix(in srgb, var(--accent) 35%, transparent)" stroke="var(--accent)" stroke-width="2"/>';
+          g += '<circle cx="' + (cx - 13) + '" cy="' + (OY + 26) + '" r="6" fill="var(--accent)"/>';
+          g += '<circle cx="' + (cx + 13) + '" cy="' + (OY + 26) + '" r="6" fill="var(--accent)"/>';
+          // il vettore velocità
+          if (Math.abs(v) > 0.01) {
+            g += freccia(cx, OY - 42, cx + v * 26, OY - 42, 'w', 11);
+            g += '<text x="' + (cx + v * 13) + '" y="' + (OY - 52) + '" text-anchor="middle" class="em">v</text>';
+          } else {
+            g += '<text x="' + cx + '" y="' + (OY - 46) + '" text-anchor="middle" class="em">fermo</text>';
+          }
+          svg.innerHTML = g;
+          document.getElementById('sr-t').textContent = nf(t, 2) + ' s';
+          document.getElementById('sr-x').textContent = nf(xr, 1);
+          document.getElementById('sr-x0').textContent = nf(x0 - origine, 1);
+          document.getElementById('sr-dx').textContent = nf(xr - (x0 - origine), 1);
+          document.getElementById('sr-vv').textContent = nf(v, 1);
+        }
+        function passo(ts) {
+          if (!attivo) { return; }
+          if (ultimo === null) { ultimo = ts; }
+          var dt = (ts - ultimo) / 1000;
+          ultimo = ts;
+          t += dt;
+          var x = pos();
+          if (x < -1.2 || x > 12.2) { attivo = false; document.getElementById('sr-play').textContent = '▶ Avvia'; }
+          disegna();
+          if (attivo) { requestAnimationFrame(passo); }
+        }
+        document.getElementById('sr-play').addEventListener('click', function () {
+          attivo = !attivo;
+          this.textContent = attivo ? '⏸ Pausa' : '▶ Avvia';
+          ultimo = null;
+          if (attivo) { requestAnimationFrame(passo); }
+        });
+        document.getElementById('sr-reset').addEventListener('click', function () {
+          attivo = false; t = 0; ultimo = null;
+          document.getElementById('sr-play').textContent = '▶ Avvia';
+          disegna();
+        });
+        document.getElementById('sr-origine').addEventListener('click', function () {
+          origine = (origine === 0) ? 4 : 0;
+          disegna();
+        });
+        document.getElementById('sr-v').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 2.3 — allenamento sulle formule inverse ================= */
+      (function () {
+        var box = document.getElementById('fv-box');
+        if (!box) { return; }
+        var att = 0, um = 'm';
+        function nuovo() {
+          var tipo = Math.floor(Math.random() * 3);
+          var v = [2, 2.5, 4, 5, 8, 10, 12, 15, 20, 25][Math.floor(Math.random() * 10)];
+          var t = [4, 5, 6, 8, 10, 12, 15, 20, 25, 30][Math.floor(Math.random() * 10)];
+          var testo;
+          if (tipo === 0) {
+            att = v * t; um = 'm';
+            testo = 'Un corpo viaggia a velocità costante di $' + nf(v, 1).replace(',', '{,}') +
+                    '$ m/s per $' + t + '$ s. Quanto spazio percorre?';
+            document.getElementById('fv-eti').textContent = 'Δx =';
+          } else if (tipo === 1) {
+            att = t; um = 's';
+            testo = 'Un corpo percorre $' + (v * t) + '$ m alla velocità costante di $' +
+                    nf(v, 1).replace(',', '{,}') + '$ m/s. Quanto tempo impiega?';
+            document.getElementById('fv-eti').textContent = 'Δt =';
+          } else {
+            att = v; um = 'm/s';
+            testo = 'Un corpo percorre $' + (v * t) + '$ m in $' + t + '$ s. Qual è la sua velocità media?';
+            document.getElementById('fv-eti').textContent = 'v =';
+          }
+          document.getElementById('fv-um').textContent = um;
+          var el = document.getElementById('fv-testo');
+          el.innerHTML = testo;
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          document.getElementById('fv-val').value = '';
+          document.getElementById('fv-fb').textContent = '';
+          document.getElementById('fv-fb').className = 'fb';
+        }
+        function verifica() {
+          var v = num(document.getElementById('fv-val').value);
+          var fb = document.getElementById('fv-fb');
+          if (isNaN(v)) { fb.className = 'fb no'; fb.textContent = 'Scrivi un numero.'; return; }
+          if (Math.abs(v - att) < Math.max(0.005, Math.abs(att) * 0.002)) {
+            fb.className = 'fb ok';
+            fb.textContent = '✓ Esatto: ' + nf(att, 2) + ' ' + um + '.';
+          } else {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ No. Riparti sempre da $v = \\Delta x / \\Delta t$ e isola la lettera che ti serve.';
+            renderMathIn(fb);
+          }
+        }
+        document.getElementById('fv-ver').addEventListener('click', verifica);
+        document.getElementById('fv-new').addEventListener('click', nuovo);
+        nuovo();
+      })();
+
+      /* ================= 3.1 — allenamento sull'accelerazione ================= */
+      (function () {
+        var box = document.getElementById('fa-box');
+        if (!box) { return; }
+        var att = 0, um = 'm/s²';
+        function nuovo() {
+          var tipo = Math.floor(Math.random() * 3);
+          var a = [1.5, 2, 2.5, 3, 4, 5][Math.floor(Math.random() * 6)];
+          var t = [2, 3, 4, 5, 6, 8, 10][Math.floor(Math.random() * 7)];
+          var testo;
+          if (tipo === 0) {
+            att = a * t; um = 'm/s';
+            testo = 'Un corpo parte da fermo con accelerazione costante di $' + nf(a, 1).replace(',', '{,}') +
+                    '$ m/s². Che velocità raggiunge dopo $' + t + '$ s?';
+            document.getElementById('fa-eti').textContent = 'v =';
+          } else if (tipo === 1) {
+            att = a; um = 'm/s²';
+            testo = 'Un corpo passa da fermo a $' + nf(a * t, 1).replace(',', '{,}') + '$ m/s in $' + t +
+                    '$ s. Quanto vale la sua accelerazione media?';
+            document.getElementById('fa-eti').textContent = 'a =';
+          } else {
+            att = -a; um = 'm/s²';
+            testo = 'Un corpo che viaggia a $' + nf(a * t, 1).replace(',', '{,}') + '$ m/s frena fino a ' +
+                    'fermarsi in $' + t + '$ s. Quanto vale la sua accelerazione (con il segno)?';
+            document.getElementById('fa-eti').textContent = 'a =';
+          }
+          document.getElementById('fa-um').textContent = um;
+          var el = document.getElementById('fa-testo');
+          el.innerHTML = testo;
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          document.getElementById('fa-val').value = '';
+          document.getElementById('fa-fb').textContent = '';
+          document.getElementById('fa-fb').className = 'fb';
+        }
+        function verifica() {
+          var v = num(document.getElementById('fa-val').value);
+          var fb = document.getElementById('fa-fb');
+          if (isNaN(v)) { fb.className = 'fb no'; fb.textContent = 'Scrivi un numero.'; return; }
+          if (Math.abs(v - att) < Math.max(0.005, Math.abs(att) * 0.002)) {
+            fb.className = 'fb ok';
+            fb.textContent = '✓ Esatto: ' + nf(att, 2) + ' ' + um + '.';
+          } else if (att < 0 && Math.abs(v + att) < 0.005) {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ Il valore assoluto è giusto, ma manca il <strong>segno</strong>: sta frenando, ' +
+                           'quindi l\'accelerazione è opposta alla velocità.';
+          } else {
+            fb.className = 'fb no';
+            fb.innerHTML = '✗ No. Riparti da $a = \\Delta v / \\Delta t$, ricordando che $\\Delta v = v_f - v_i$.';
+            renderMathIn(fb);
+          }
+        }
+        document.getElementById('fa-ver').addEventListener('click', verifica);
+        document.getElementById('fa-new').addEventListener('click', nuovo);
+        nuovo();
+      })();
+
+      /* ================= 4 — intervalli sempre più stretti ================= */
+      (function () {
+        var svg = document.getElementById('li-svg');
+        if (!svg) { return; }
+        var DT = [2, 1, 0.5, 0.2, 0.1, 0.01, 0.001, 0];
+        function f(t) { return 2 * t * t; }
+        function disegna() {
+          var i = parseInt(document.getElementById('li-dt').value, 10);
+          var dt = DT[i];
+          var A = assi(80, 320, 500, 250, 5, 0, 55, 't (s)', 'x (m)');
+          var g = A.g, t;
+          // la curva x = 2 t^2
+          var pts = [];
+          for (t = 0; t <= 5.001; t += 0.05) { pts.push(A.px(t).toFixed(1) + ',' + A.py(f(t)).toFixed(1)); }
+          g += '<polyline points="' + pts.join(' ') + '" class="curva"/>';
+          var t0 = 3, t1 = t0 + (dt > 0 ? dt : 0.0001);
+          // la secante, prolungata perché si veda anche quando dt è minuscolo
+          var m = (f(t1) - f(t0)) / (t1 - t0);
+          var xa = 1.2, xb = 4.8;
+          g += '<line x1="' + A.px(xa) + '" y1="' + A.py(f(t0) + m * (xa - t0)) +
+               '" x2="' + A.px(xb) + '" y2="' + A.py(f(t0) + m * (xb - t0)) +
+               '" stroke="var(--magenta)" stroke-width="2.6"/>';
+          // i due punti e il triangolino dell'incremento
+          if (dt > 0.05) {
+            g += '<line x1="' + A.px(t0) + '" y1="' + A.py(f(t0)) + '" x2="' + A.px(t1) + '" y2="' + A.py(f(t0)) + '" class="dash"/>';
+            g += '<line x1="' + A.px(t1) + '" y1="' + A.py(f(t0)) + '" x2="' + A.px(t1) + '" y2="' + A.py(f(t1)) + '" class="dash"/>';
+            g += '<text x="' + ((A.px(t0) + A.px(t1)) / 2) + '" y="' + (A.py(f(t0)) + 18) + '" text-anchor="middle" class="lbl-s" style="fill:var(--gold);">Δt</text>';
+            g += '<text x="' + (A.px(t1) + 8) + '" y="' + ((A.py(f(t0)) + A.py(f(t1))) / 2) + '" class="lbl-s" style="fill:var(--gold);">Δx</text>';
+          }
+          g += '<circle cx="' + A.px(t0) + '" cy="' + A.py(f(t0)) + '" r="6" fill="var(--accent)"/>';
+          g += '<circle cx="' + A.px(t1) + '" cy="' + A.py(f(t1)) + '" r="5" fill="var(--magenta)"/>';
+          g += '<text x="' + (A.px(t0) - 46) + '" y="' + (A.py(f(t0)) + 4) + '" class="lbl">t = 3 s</text>';
+          g += '<text x="330" y="60" class="em">' + (dt === 0 ? 'la secante è diventata la tangente' : 'secante') + '</text>';
+          svg.innerHTML = g;
+          var dx = f(t1) - f(t0), v = dx / (t1 - t0);
+          document.getElementById('li-dtv').textContent = (dt === 0) ? '«al limite»' : nf(dt, 3);
+          document.getElementById('li-dt2').textContent = (dt === 0) ? '→ 0' : nf(dt, 3);
+          document.getElementById('li-dx').textContent = (dt === 0) ? '→ 0' : nf(dx, 4);
+          document.getElementById('li-v').textContent = nf(v, 3);
+        }
+        document.getElementById('li-dt').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 5 — moto rettilineo uniforme ================= */
+      (function () {
+        var svg = document.getElementById('mu-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var x0 = parseFloat(document.getElementById('mu-x0').value);
+          var v = parseFloat(document.getElementById('mu-v').value);
+          var T = 10;
+          var xmin = Math.min(-2, x0 - 2, x0 + v * T - 2), xmax = Math.max(2, x0 + 2, x0 + v * T + 2);
+          var A = assi(80, 200, 480, 160, T, Math.round(xmin), Math.round(xmax), 't (s)', 'x (m)');
+          var g = A.g;
+          g += '<line x1="' + A.px(0) + '" y1="' + A.py(x0) + '" x2="' + A.px(T) + '" y2="' + A.py(x0 + v * T) + '" class="curva"/>';
+          g += '<circle cx="' + A.px(0) + '" cy="' + A.py(x0) + '" r="5" fill="var(--accent)"/>';
+          g += '<text x="' + (A.px(0) + 10) + '" y="' + (A.py(x0) - 10) + '" class="lbl" style="fill:var(--accent);">x₀</text>';
+          // secondo grafico: velocità-tempo
+          var B = assi(80, 430, 480, 130, T, -4, 4, 't (s)', 'v (m/s)');
+          g += B.g;
+          if (Math.abs(v) > 0.01) {
+            g += '<rect x="' + B.px(0) + '" y="' + Math.min(B.py(0), B.py(v)) + '" width="' + (B.px(T) - B.px(0)) +
+                 '" height="' + Math.abs(B.py(v) - B.py(0)) + '" fill="color-mix(in srgb, var(--gold) 30%, transparent)"/>';
+          }
+          g += '<line x1="' + B.px(0) + '" y1="' + B.py(v) + '" x2="' + B.px(T) + '" y2="' + B.py(v) + '" class="curva2"/>';
+          g += '<text x="' + (B.px(T / 2)) + '" y="' + (B.py(v / 2) + (v >= 0 ? 6 : -2)) +
+               '" text-anchor="middle" class="lbl" style="fill:var(--gold);">area = spostamento</text>';
+          svg.innerHTML = g;
+          document.getElementById('mu-x0v').textContent = x0;
+          document.getElementById('mu-vv').textContent = nf(v, 1);
+          document.getElementById('mu-legge').textContent =
+            'x = ' + x0 + (v >= 0 ? ' + ' : ' − ') + nf(Math.abs(v), 1) + '·t';
+          document.getElementById('mu-x10').textContent = nf(x0 + v * T, 1);
+          document.getElementById('mu-area').textContent = nf(v * T, 1);
+        }
+        document.getElementById('mu-x0').addEventListener('input', disegna);
+        document.getElementById('mu-v').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 6 — moto uniformemente accelerato ================= */
+      (function () {
+        var svg = document.getElementById('ua-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var x0 = parseFloat(document.getElementById('ua-x0').value);
+          var v0 = parseFloat(document.getElementById('ua-v0').value);
+          var a = parseFloat(document.getElementById('ua-a').value);
+          var T = 6, t;
+          function x(t) { return x0 + v0 * t + 0.5 * a * t * t; }
+          var vals = [];
+          for (t = 0; t <= T; t += 0.25) { vals.push(x(t)); }
+          var xmin = Math.floor(Math.min.apply(null, vals) - 2), xmax = Math.ceil(Math.max.apply(null, vals) + 2);
+          var A = assi(80, 190, 480, 150, T, xmin, xmax, 't (s)', 'x (m)');
+          var g = A.g, pts = [];
+          for (t = 0; t <= T + 0.001; t += 0.1) { pts.push(A.px(t).toFixed(1) + ',' + A.py(x(t)).toFixed(1)); }
+          g += '<polyline points="' + pts.join(' ') + '" class="curva"/>';
+          // il vertice, se cade dentro l'intervallo
+          var tv = (Math.abs(a) > 1e-9) ? -v0 / a : -1;
+          if (tv > 0 && tv < T) {
+            g += '<circle cx="' + A.px(tv) + '" cy="' + A.py(x(tv)) + '" r="5" fill="var(--magenta)"/>';
+            g += '<line x1="' + A.px(tv) + '" y1="' + A.py(x(tv)) + '" x2="' + A.px(tv) + '" y2="' + A.py(xmin) + '" class="dash"/>';
+            g += '<text x="' + (A.px(tv) + 8) + '" y="' + (A.py(xmin) - 8) + '" class="em">inverte</text>';
+          }
+          // velocità-tempo
+          var vmin = Math.floor(Math.min(0, v0, v0 + a * T) - 1), vmax = Math.ceil(Math.max(0, v0, v0 + a * T) + 1);
+          var B = assi(80, 390, 480, 130, T, vmin, vmax, 't (s)', 'v (m/s)');
+          g += B.g;
+          g += '<line x1="' + B.px(0) + '" y1="' + B.py(v0) + '" x2="' + B.px(T) + '" y2="' + B.py(v0 + a * T) + '" class="curva2"/>';
+          // accelerazione-tempo
+          var C = assi(80, 530, 480, 90, T, -4, 4, 't (s)', 'a (m/s²)');
+          g += C.g;
+          g += '<line x1="' + C.px(0) + '" y1="' + C.py(a) + '" x2="' + C.px(T) + '" y2="' + C.py(a) + '" stroke="var(--green)" stroke-width="3"/>';
+          svg.innerHTML = g;
+          document.getElementById('ua-x0v').textContent = x0;
+          document.getElementById('ua-v0v').textContent = v0;
+          document.getElementById('ua-av').textContent = nf(a, 1);
+          document.getElementById('ua-legge').textContent =
+            'x = ' + x0 + ' + ' + v0 + '·t + ' + nf(a / 2, 2) + '·t²';
+          document.getElementById('ua-v6').textContent = nf(v0 + a * T, 1);
+          document.getElementById('ua-x6').textContent = nf(x(T), 1);
+          document.getElementById('ua-inv').textContent =
+            (tv > 0 && tv < T) ? ('t = ' + nf(tv, 2) + ' s') : '—';
+        }
+        ['ua-x0', 'ua-v0', 'ua-a'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        disegna();
+      })();
+
+      /* ================= 7 — leggere un grafico ================= */
+      (function () {
+        var svg = document.getElementById('lg-svg');
+        if (!svg) { return; }
+        var caso = null;
+        function nuovo() {
+          var tipo = Math.floor(Math.random() * 4);
+          var A = assi(80, 270, 480, 200, 6, -4, 8, 't (s)', '');
+          var g = A.g, dom, opz, giusta, t, pts = [];
+          if (tipo === 0) {                       // x-t retta crescente
+            var v = [1, 2, 3][Math.floor(Math.random() * 3)], x0 = [0, 1, 2][Math.floor(Math.random() * 3)];
+            for (t = 0; t <= 6; t += 0.5) { pts.push(A.px(t) + ',' + A.py(x0 + v * t)); }
+            g += '<polyline points="' + pts.join(' ') + '" class="curva"/>';
+            g += '<text x="' + (A.px(0) - 6) + '" y="' + (A.py(8) - 20) + '" text-anchor="middle" class="lbl">x (m)</text>';
+            dom = 'Il grafico è posizione-tempo. Quanto vale la velocità?';
+            opz = [v + ' m/s', (v * 2) + ' m/s', (x0 || 1) + ' m/s', '0 m/s'];
+            giusta = 0;
+          } else if (tipo === 1) {                // x-t con tratto orizzontale
+            for (t = 0; t <= 2; t += 0.5) { pts.push(A.px(t) + ',' + A.py(2 * t)); }
+            for (t = 2; t <= 4; t += 0.5) { pts.push(A.px(t) + ',' + A.py(4)); }
+            for (t = 4; t <= 6; t += 0.5) { pts.push(A.px(t) + ',' + A.py(4 - 2 * (t - 4))); }
+            g += '<polyline points="' + pts.join(' ') + '" class="curva"/>';
+            g += '<text x="' + (A.px(0) - 6) + '" y="' + (A.py(8) - 20) + '" text-anchor="middle" class="lbl">x (m)</text>';
+            dom = 'Il grafico è posizione-tempo. Che cosa fa il corpo fra $t = 2$ s e $t = 4$ s?';
+            opz = ['è fermo', 'va avanti a velocità costante', 'torna indietro', 'accelera'];
+            giusta = 0;
+          } else if (tipo === 2) {                // v-t costante: area
+            var vc = [2, 3, 4][Math.floor(Math.random() * 3)];
+            g += '<rect x="' + A.px(0) + '" y="' + A.py(vc) + '" width="' + (A.px(6) - A.px(0)) +
+                 '" height="' + (A.py(0) - A.py(vc)) + '" fill="color-mix(in srgb, var(--gold) 26%, transparent)"/>';
+            g += '<line x1="' + A.px(0) + '" y1="' + A.py(vc) + '" x2="' + A.px(6) + '" y2="' + A.py(vc) + '" class="curva2"/>';
+            g += '<text x="' + (A.px(0) - 6) + '" y="' + (A.py(8) - 20) + '" text-anchor="middle" class="lbl">v (m/s)</text>';
+            dom = 'Il grafico è velocità-tempo. Quanto spazio percorre il corpo in 6 secondi?';
+            opz = [(vc * 6) + ' m', vc + ' m', (vc + 6) + ' m', '0 m'];
+            giusta = 0;
+          } else {                                 // v-t crescente: accelerazione
+            var a = [1, 2][Math.floor(Math.random() * 2)];
+            for (t = 0; t <= 6; t += 0.5) { pts.push(A.px(t) + ',' + A.py(a * t)); }
+            g += '<polyline points="' + pts.join(' ') + '" class="curva2"/>';
+            g += '<text x="' + (A.px(0) - 6) + '" y="' + (A.py(8) - 20) + '" text-anchor="middle" class="lbl">v (m/s)</text>';
+            dom = 'Il grafico è velocità-tempo. Quanto vale l\'accelerazione?';
+            opz = [a + ' m/s²', (a * 6) + ' m/s²', '0 m/s²', (a / 2) + ' m/s²'];
+            giusta = 0;
+          }
+          // mescolo le alternative tenendo traccia di quella giusta
+          var idx = opz.map(function (o, k) { return k; });
+          for (var j = idx.length - 1; j > 0; j--) {
+            var r = Math.floor(Math.random() * (j + 1)), tmp = idx[j]; idx[j] = idx[r]; idx[r] = tmp;
+          }
+          var testi = idx.map(function (k) { return opz[k]; });
+          caso = { giusta: idx.indexOf(giusta) };
+          svg.innerHTML = g;
+          var el = document.getElementById('lg-dom');
+          el.innerHTML = dom;
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          var cont = document.getElementById('lg-opz');
+          cont.innerHTML = '';
+          testi.forEach(function (t, k) {
+            var b = document.createElement('button');
+            b.className = 'btn';
+            b.textContent = t;
+            b.addEventListener('click', function () {
+              var fb = document.getElementById('lg-fb');
+              if (k === caso.giusta) {
+                fb.className = 'fb ok';
+                fb.textContent = '✓ Esatto.';
+              } else {
+                fb.className = 'fb no';
+                fb.textContent = '✗ No: guarda bene di che grafico si tratta, e se ti serve la pendenza o l\'area.';
+              }
+            });
+            cont.appendChild(b);
+          });
+          document.getElementById('lg-fb').textContent = '';
+          document.getElementById('lg-fb').className = 'fb';
+        }
+        document.getElementById('lg-new').addEventListener('click', nuovo);
+        nuovo();
+      })();
+
+      /* ================= 10 — i due rimorchiatori ================= */
+      (function () {
+        var svg = document.getElementById('bt-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var F1 = parseFloat(document.getElementById('bt-f1').value);
+          var F2 = parseFloat(document.getElementById('bt-f2').value);
+          var ang = parseFloat(document.getElementById('bt-ang').value);
+          var semi = ang / 2 * Math.PI / 180;
+          // asse del traino verso destra; una barca a +semi, l'altra a -semi
+          var rx = F1 * Math.cos(semi) + F2 * Math.cos(-semi);
+          var ry = F1 * Math.sin(semi) + F2 * Math.sin(-semi);
+          var R = Math.sqrt(rx * rx + ry * ry);
+          var SC = 0.14;                                  // pixel per newton
+          var NX = 250, NY = 200;                         // posizione della nave
+          var g = '';
+          // il mare
+          g += '<rect x="0" y="0" width="660" height="400" fill="color-mix(in srgb, var(--accent) 6%, transparent)"/>';
+          for (var i = 0; i < 5; i++) {
+            g += '<path d="M 20 ' + (60 + i * 75) + ' q 20 -8 40 0 q 20 8 40 0" fill="none" stroke="var(--border)" stroke-width="2"/>';
+          }
+          // la nave da trainare
+          g += '<path d="M ' + (NX - 46) + ' ' + (NY - 16) + ' L ' + (NX + 46) + ' ' + (NY - 16) +
+               ' L ' + (NX + 30) + ' ' + (NY + 16) + ' L ' + (NX - 30) + ' ' + (NY + 16) + ' Z" ' +
+               'fill="color-mix(in srgb, var(--muted) 35%, transparent)" stroke="var(--text)" stroke-width="2"/>';
+          g += '<text x="' + NX + '" y="' + (NY + 40) + '" text-anchor="middle" class="lbl">nave</text>';
+          // le due funi e i due rimorchiatori
+          [[F1, semi, 'v'], [F2, -semi, 'w']].forEach(function (b, k) {
+            var F = b[0], t = b[1], cls = b[2];
+            var bx = NX + Math.cos(t) * 190, by = NY - Math.sin(t) * 190;
+            g += '<line x1="' + (NX + 40) + '" y1="' + NY + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) +
+                 '" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/>';
+            g += '<path d="M ' + (bx - 26) + ' ' + (by - 11) + ' L ' + (bx + 26) + ' ' + (by - 11) +
+                 ' L ' + (bx + 16) + ' ' + (by + 11) + ' L ' + (bx - 16) + ' ' + (by + 11) + ' Z" ' +
+                 'fill="color-mix(in srgb, var(--' + (k === 0 ? 'accent' : 'magenta') + ') 30%, transparent)" ' +
+                 'stroke="var(--' + (k === 0 ? 'accent' : 'magenta') + ')" stroke-width="2"/>';
+            // il vettore forza applicato alla nave
+            g += freccia(NX + 40, NY, NX + 40 + Math.cos(t) * F * SC, NY - Math.sin(t) * F * SC, cls, 12);
+            g += '<text x="' + (NX + 46 + Math.cos(t) * F * SC).toFixed(1) + '" y="' +
+                 (NY - Math.sin(t) * F * SC + (k === 0 ? -8 : 18)).toFixed(1) + '" class="lbl" style="fill:var(--' +
+                 (k === 0 ? 'accent' : 'magenta') + ');">F' + (k + 1) + ' = ' + F + ' N</text>';
+          });
+          // la risultante
+          if (R > 1) {
+            g += freccia(NX + 40, NY, NX + 40 + rx * SC, NY - ry * SC, 's', 15);
+            g += '<text x="' + (NX + 40 + rx * SC / 2).toFixed(1) + '" y="' + (NY - ry * SC / 2 + 26).toFixed(1) +
+                 '" text-anchor="middle" class="lbl" style="fill:var(--green);">risultante ' + Math.round(R) + ' N</text>';
+          } else {
+            g += '<text x="' + (NX + 90) + '" y="' + (NY + 4) + '" class="em">risultante nulla: la nave non si muove</text>';
+          }
+          svg.innerHTML = g;
+          document.getElementById('bt-f1v').textContent = F1;
+          document.getElementById('bt-f2v').textContent = F2;
+          document.getElementById('bt-angv').textContent = ang;
+          document.getElementById('bt-ris').textContent = Math.round(R);
+          document.getElementById('bt-somma').textContent = F1 + F2;
+          document.getElementById('bt-perc').textContent = nf(R / (F1 + F2) * 100, 1);
+          var dir = Math.atan2(ry, rx) * 180 / Math.PI;
+          document.getElementById('bt-dir').textContent = (R > 1) ? nf(dir, 1) + '°' : '—';
+        }
+        ['bt-f1', 'bt-f2', 'bt-ang'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        disegna();
+      })();
+
+      //JSSENTINEL
+
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Che cosa serve, come minimo, per costituire un <strong>sistema di riferimento</strong>?',
+        options: ['un\'origine, uno o più assi orientati e un orologio', 'soltanto un metro', 'soltanto un orologio', 'un corpo fermo e uno in moto', 'una velocità e un\'accelerazione'],
+        correct: 0, explain: 'Senza origine e assi non si può dire <em>dove</em>; senza orologio non si può dire <em>quando</em>. Il movimento non è una proprietà assoluta di un corpo: è sempre relativo al sistema di riferimento scelto.' },
+
+      { type: 'mc', diff: 'easy', text: 'Che cosa significa il simbolo $\\Delta x$?',
+        options: ['il prodotto di $\\Delta$ per $x$', 'la posizione media', 'la variazione di posizione, $x_f - x_i$', 'la distanza dall\'origine', 'la derivata della posizione'],
+        correct: 2, explain: 'La lettera greca delta è un\'abbreviazione per «di quanto è cambiata la…», e si calcola <strong>sempre</strong> come finale meno iniziale. Non è un fattore che moltiplica.' },
+
+      { type: 'mc', diff: 'medium', text: 'Un corpo si sposta da $x_i = 12$ m a $x_f = 2$ m in $4{,}0$ s. Quanto vale la sua velocità?',
+        options: ['$+2{,}5$ m/s', '$+3{,}5$ m/s', '$-10$ m/s', '$+10$ m/s', '$-2{,}5$ m/s'],
+        correct: 4, explain: '$\\Delta x = 2 - 12 = -10$ m, quindi $v = -10/4{,}0 = -2{,}5$ m/s. Il segno meno dice che si muove <strong>all\'indietro</strong> rispetto al verso dell\'asse, non che va «poco forte»: il suo modulo è $2{,}5$ m/s.' },
+
+      { type: 'mc', diff: 'medium', text: 'In quale caso un corpo sta <strong>frenando</strong>?',
+        options: ['quando $a \\lt 0$', 'quando $v$ e $a$ hanno segno opposto', 'quando $v \\lt 0$', 'quando $a = 0$', 'quando $v$ e $a$ hanno lo stesso segno'],
+        correct: 1, explain: 'Non conta il segno dell\'accelerazione da solo: conta il <strong>confronto</strong> con quello della velocità. Una macchina che va all\'indietro sempre più forte ha $v \\lt 0$ e $a \\lt 0$, eppure sta accelerando.' },
+
+      { type: 'mc', diff: 'hard', text: 'Un\'automobile passa da ferma a $27{,}8$ m/s in $4{,}2$ s. La sua accelerazione media vale circa:',
+        options: ['$27{,}8$ m/s²', '$117$ m/s²', '$0{,}15$ m/s²', '$6{,}6$ m/s²', '$4{,}2$ m/s²'],
+        correct: 3, explain: '$a = \\Delta v / \\Delta t = 27{,}8 / 4{,}2 = 6{,}6$ m/s². Controllo di ragionevolezza: è meno dei $9{,}81$ m/s² della gravità, ed è giusto che sia così — con più di così le ruote slitterebbero.' },
+
+      { type: 'mc', diff: 'medium', text: 'Perché, prendendo intervalli di tempo sempre più piccoli, il rapporto $\\Delta x / \\Delta t$ non «esplode»?',
+        options: ['perché anche $\\Delta x$ diventa piccolissimo insieme a $\\Delta t$', 'perché a un certo punto si divide per zero', 'perché la velocità è sempre costante', 'perché si arrotonda il risultato', 'perché $\\Delta t$ non può scendere sotto un secondo'],
+        correct: 0, explain: 'Numeratore e denominatore tendono a zero <strong>insieme</strong>, e il loro rapporto si stabilizza su un valore preciso: la velocità istantanea. Non si divide mai per zero — si divide per un numero piccolo a piacere. È l\'idea di <em>limite</em>, e in matematica diventerà la <em>derivata</em>.' },
+
+      { type: 'mc', diff: 'medium', text: 'Nel grafico <strong>posizione-tempo</strong>, un tratto orizzontale significa che il corpo:',
+        options: ['si muove a velocità costante', 'accelera uniformemente', 'è fermo', 'torna indietro', 'ha accelerazione costante e non nulla'],
+        correct: 2, explain: 'Nel grafico $x$-$t$ la <strong>pendenza</strong> è la velocità: pendenza nulla significa velocità nulla, cioè posizione che non cambia. Attenzione a non confondere con il grafico $v$-$t$, dove un tratto orizzontale significa invece velocità costante.' },
+
+      { type: 'mc', diff: 'hard', text: 'Nel grafico <strong>velocità-tempo</strong>, l\'area compresa fra la curva e l\'asse dei tempi rappresenta:',
+        options: ['l\'accelerazione', 'la velocità media', 'la posizione iniziale', 'il tempo impiegato', 'lo spostamento'],
+        correct: 4, explain: 'Vale per qualunque moto, non solo per quello uniforme. Ed è il modo più rapido di risolvere molti problemi: se la figura è un rettangolo o un triangolo, basta l\'area di una figura geometrica al posto delle formule.' },
+
+      { type: 'mc', diff: 'medium', text: 'Nel moto uniformemente accelerato, il grafico <strong>posizione-tempo</strong> è:',
+        options: ['una retta', 'una parabola', 'una retta orizzontale', 'una circonferenza', 'una curva a gradini'],
+        correct: 1, explain: 'La legge oraria $x = x_0 + v_0 t + \\frac{1}{2}a t^2$ contiene $t^2$, quindi è una parabola. È il grafico <strong>velocità-tempo</strong> a essere una retta, perché $v = v_0 + a\\,t$.' },
+
+      { type: 'mc', diff: 'hard', text: 'Da dove viene il fattore $\\frac{1}{2}$ nella formula $x = \\frac{1}{2}a t^2$?',
+        options: ['è una costante sperimentale', 'dal fatto che si prende la metà del tempo', 'dalla media fra posizione iniziale e finale', 'dall\'area del <strong>triangolo</strong> sotto il grafico velocità-tempo', 'da un\'approssimazione'],
+        correct: 3, explain: 'Partendo da fermo, nel grafico $v$-$t$ la velocità è una retta che sale fino a $a\\,t$: l\'area sotto è un triangolo di base $t$ e altezza $a\\,t$, cioè $\\frac{1}{2}a t^2$. Non è una costante da imparare a memoria: è «base per altezza diviso due».' },
+
+      { type: 'mc', diff: 'easy', text: 'Quali sono i due effetti che una forza può produrre su un corpo?',
+        options: ['deformarlo e cambiarne il movimento', 'scaldarlo e raffreddarlo', 'illuminarlo e caricarlo elettricamente', 'aumentarne la massa e il volume', 'soltanto metterlo in movimento'],
+        correct: 0, explain: 'L\'effetto <strong>statico</strong> (la deformazione) e quello <strong>dinamico</strong> (il cambiamento di moto). Il primo sembra il meno interessante, e invece è quello che permette di <em>misurare</em> le forze con un dinamometro.' },
+
+      { type: 'mc', diff: 'hard', text: 'Perché gli antichi credevano che senza una forza un corpo si fermasse?',
+        options: ['perché non sapevano fare i conti', 'perché non avevano il concetto di velocità', 'perché nell\'esperienza quotidiana l\'attrito è sempre presente e nasconde la legge vera', 'perché credevano che la Terra fosse ferma', 'perché non esistevano ancora gli orologi'],
+        correct: 2, explain: 'La loro idea era <em>in accordo con i dati</em>: sulla Terra qualunque cosa si fermi, prima o poi. Il salto è stato immaginare un esperimento <strong>senza attrito</strong>, e scoprire che una forza non dà velocità ma <strong>accelerazione</strong>. Il caso che non tornava, e che loro spiegavano con l\'aria che spinge, era la freccia scoccata.' },
+
+      { type: 'mc', diff: 'medium', text: 'Due rimorchiatori tirano una nave con $600$ N ciascuno, con un angolo di $60°$ fra le funi. La risultante vale:',
+        options: ['$1200$ N', '$600$ N', '$300$ N', '$0$ N', '$1039$ N'],
+        correct: 4, explain: 'Le componenti trasversali si annullano, quelle utili si sommano: $R = 2 \\cdot 600 \\cdot \\cos 30° = 1039$ N. Si «spreca» il 13,4% dello sforzo, ed è la disuguaglianza triangolare vista dal porto: il modulo della somma è minore della somma dei moduli.' },
+
+      { type: 'mc', diff: 'medium', text: 'Come si misura una forza, in pratica?',
+        options: ['con un cronometro', 'sfruttando la deformazione regolare di una molla', 'con una bilancia a due piatti', 'misurando la velocità che produce', 'contando i newton direttamente'],
+        correct: 1, explain: 'Una forza non si «vede»: se ne vedono gli effetti. Poiché una deformazione si misura con un semplice righello, si usa un corpo che si deforma in modo <strong>prevedibile</strong> — una molla — e si costruisce il <strong>dinamometro</strong>. È l\'argomento della prossima lezione.' },
+
+      { type: 'open', diff: 'hard', text: 'Spiega perché la frase «se smetto di spingere un oggetto, questo si ferma» è <strong>vera nell\'esperienza</strong> ma <strong>falsa come legge fisica</strong>. Usa l\'esempio della freccia scoccata.',
+        keywords: ['attrito', 'forza', 'acceler', 'velocit', 'costante', 'freccia', 'aria', 'ghiaccio', 'spazio', 'vuoto', 'galileo', 'newton', 'aristotele'],
+        requiredMatches: 3,
+        explain: 'La frase descrive bene <em>quello che si vede</em>, perché sulla Terra c\'è sempre l\'<strong>attrito</strong>: una forza diretta in verso opposto al moto, che agisce anche quando noi abbiamo smesso di spingere. Quando lascio l\'armadio, non è vero che su di esso non agisce più nessuna forza: agisce l\'attrito, e sarà quello a fermarlo.<br><br>La legge vera è un\'altra: <strong>una forza non dà velocità, dà accelerazione</strong>. Per mantenere un corpo a velocità costante non serve alcuna forza; ne serve una solo per <em>cambiare</em> la velocità.<br><br>La <strong>freccia scoccata</strong> è il caso che smaschera l\'errore, e gli antichi lo conoscevano: appena lascia la corda nessuno la spinge più, eppure vola per decine di metri. Per salvare la loro teoria immaginarono l\'<em>antiperistasi</em>, cioè l\'aria che si richiude dietro la freccia e la spinge — una spiegazione ingegnosa ma sbagliata, che prevederebbe fra l\'altro che nel vuoto una freccia non voli e che un mattone voli più lontano di una freccia.<br><br>La conferma moderna si vede dove l\'attrito è quasi assente: un disco da hockey sul ghiaccio, o una sonda spaziale che dopo cinquant\'anni viaggia ancora alla stessa velocità con i motori spenti.' }
+    ];
+  </script>
+
+</body>
+
+</html>
