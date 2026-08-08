@@ -1709,8 +1709,8 @@
       <div class="ckt">
         <svg viewBox="0 0 660 260" id="cs-svg" role="img" aria-label="modi del campo permessi fra due piastre e fuori"></svg>
         <p style="font-size:0.87rem; color:var(--muted); text-align:center; margin:0.35rem 0 0;">
-          Fra le piastre entrano solo alcune lunghezze d'onda; fuori ci stanno tutte. Meno modi dentro
-          significa meno energia dentro.</p>
+          Schema di principio (non in scala). Fra le piastre entrano solo alcune lunghezze d'onda; fuori ci
+          stanno tutte. Meno modi dentro significa meno energia dentro.</p>
       </div>
 
       <div class="vuotobox">
@@ -1725,16 +1725,23 @@
           si avvicinano.</p>
       </div>
 
+      <p>Il simulatore qui sotto disegna la stessa scena <strong>in scala vera</strong>: le onde che si vedono
+        fuori hanno sempre la stessa lunghezza d'onda — <span>$100$</span> nm — perché fuori ci sono tutte,
+        mentre il vano fra le piastre si stringe e si allarga davvero al variare di <span>$d$</span>. Guardate
+        quante di quelle onde riescono ancora a entrarci: sotto i <span>$50$</span> nm, praticamente
+        nessuna.</p>
+
       <div class="ckt">
         <div style="display:flex; flex-wrap:wrap; gap:0.5rem 1.1rem; align-items:center; margin:0.4rem 0;">
           <label for="cs-d" style="font-size:0.9rem; color:var(--muted); font-weight:600;">distanza fra le piastre = <span id="cs-dv">100</span> nm</label>
           <input type="range" id="cs-d" min="5" max="500" step="1" value="100">
         </div>
+        <svg viewBox="0 0 660 250" id="cs-svg2" role="img" aria-label="le piastre in scala reale al variare della distanza"></svg>
         <div class="cs-grid">
+          <div class="cs-num"><b id="cs-lam">200</b><span>λ più lunga che ci sta dentro (nm)</span></div>
           <div class="cs-num"><b id="cs-p">13,0</b><span>pressione di Casimir (Pa)</span></div>
           <div class="cs-num"><b id="cs-atm">1,3·10⁻⁴</b><span>in atmosfere</span></div>
-          <div class="cs-num"><b id="cs-f">1,3·10⁻³</b><span>forza su 1 cm² (N)</span></div>
-          <div class="cs-num"><b id="cs-g">0,13</b><span>come appoggiarci sopra (grammi)</span></div>
+          <div class="cs-num"><b id="cs-g">0,13</b><span>peso equivalente su 1 cm² (grammi)</span></div>
         </div>
         <p class="eq-out" id="cs-msg" style="font-size:0.95rem;"></p>
       </div>
@@ -2522,12 +2529,75 @@
       // pressione di Casimir fra due piastre conduttrici parallele
       function pressione(d) { return Math.PI * Math.PI * HBAR * CLUCE / (240 * Math.pow(d, 4)); }
 
+      /* --- secondo disegno: le piastre IN SCALA, che è quello che cambia col cursore --- */
+      var svg2 = document.getElementById('cs-svg2');
+      var SCALA = 0.68;        // pixel per nanometro: a 500 nm il vano è largo 340 px
+      var LAM_RIF = 100;       // lunghezza d'onda di riferimento delle onde esterne, in nm
+
+      function disegnaScala(nm) {
+        if (!svg2) { return; }
+        var CX = 330, Y = 96, SP = 16;                 // centro, asse, spessore delle piastre
+        var vano = Math.max(2, nm * SCALA);            // larghezza del vano, in pixel
+        var xa = CX - vano / 2, xb = CX + vano / 2;
+        var lamPx = LAM_RIF * SCALA;                   // le onde esterne, alla stessa scala
+        var g = '', i, j, pts;
+
+        // le onde di fuori: sempre le stesse, perché fuori ci sono tutte le lunghezze d'onda
+        for (i = 0; i < 3; i++) {
+          var amp = 20 - i * 4;
+          pts = [];
+          for (j = 0; j <= 160; j++) {
+            var x = 16 + j / 160 * Math.max(4, xa - 16 - SP);
+            pts.push(x.toFixed(1) + ',' + (Y - amp * Math.sin(2 * Math.PI * x / lamPx + i)).toFixed(1));
+          }
+          g += '<polyline points="' + pts.join(' ') + '" class="modo" opacity="0.55"/>';
+          pts = [];
+          for (j = 0; j <= 160; j++) {
+            var x2 = xb + SP + j / 160 * Math.max(4, 644 - xb - SP);
+            pts.push(x2.toFixed(1) + ',' + (Y - amp * Math.sin(2 * Math.PI * x2 / lamPx + i)).toFixed(1));
+          }
+          g += '<polyline points="' + pts.join(' ') + '" class="modo" opacity="0.55"/>';
+        }
+
+        // le piastre, disegnate alla distanza vera
+        g += '<rect x="' + (xa - SP).toFixed(1) + '" y="' + (Y - 52) + '" width="' + SP + '" height="104" class="piastra"/>';
+        g += '<rect x="' + xb.toFixed(1) + '" y="' + (Y - 52) + '" width="' + SP + '" height="104" class="piastra"/>';
+
+        // dentro: solo se ci sta qualcosa di visibile
+        if (vano > 26) {
+          for (i = 1; i <= 2; i++) {
+            pts = [];
+            for (j = 0; j <= 90; j++) {
+              var u = j / 90;
+              pts.push((xa + u * vano).toFixed(1) + ',' + (Y - 22 * Math.sin(i * Math.PI * u)).toFixed(1));
+            }
+            g += '<polyline points="' + pts.join(' ') + '" class="modo"/>';
+          }
+        } else {
+          g += '<text x="' + CX + '" y="' + (Y - 62) + '" text-anchor="middle" class="em">qui dentro non ci sta quasi più niente</text>';
+        }
+
+        // la quota e la barra di scala
+        g += '<line x1="' + xa.toFixed(1) + '" y1="' + (Y + 66) + '" x2="' + xb.toFixed(1) + '" y2="' + (Y + 66) + '" stroke="var(--magenta)" stroke-width="2"/>';
+        g += '<text x="' + CX + '" y="' + (Y + 84) + '" text-anchor="middle" class="em">d = ' + nm + ' nm</text>';
+        g += '<line x1="40" y1="' + (Y + 110) + '" x2="' + (40 + lamPx).toFixed(1) + '" y2="' + (Y + 110) + '" stroke="var(--muted)" stroke-width="3"/>';
+        g += '<text x="' + (44 + lamPx).toFixed(1) + '" y="' + (Y + 114) + '" class="lbl-s">' + LAM_RIF + ' nm — la lunghezza d\'onda disegnata fuori</text>';
+        g += '<text x="16" y="24" class="lbl">tutto in scala: al variare di d cambia davvero quanto ci sta dentro</text>';
+
+        // quante lunghezze d'onda di riferimento entrano nel vano
+        var quante = nm / LAM_RIF;
+        g += '<text x="16" y="' + (Y + 140) + '" class="lbl-s">nel vano ci stanno ' +
+             (quante >= 1 ? nf(quante, 2) + ' lunghezze d\'onda da ' + LAM_RIF + ' nm'
+                          : 'meno di una lunghezza d\'onda da ' + LAM_RIF + ' nm: quel modo è escluso') + '</text>';
+        svg2.innerHTML = g;
+      }
+
       function disegna() {
         var nm = parseFloat(document.getElementById('cs-d').value);
         var d = nm * 1e-9;
         var P = pressione(d);
         var g = '', i, j, pts;
-        var XA = 210, XB = 430, Y = 130, H = 78;      // le due piastre e la semiampiezza
+        var XA = 210, XB = 430, Y = 130, H = 78;      // schema di principio, non in scala
 
         // le piastre
         g += '<rect x="' + (XA - 12) + '" y="' + (Y - H - 22) + '" width="12" height="' + (2 * H + 44) + '" class="piastra"/>';
@@ -2586,10 +2656,11 @@
              '" fill="none" stroke="var(--magenta)" stroke-width="2.6"/>';
         svg.innerHTML = g;
 
+        disegnaScala(nm);
         document.getElementById('cs-dv').textContent = nm;
+        document.getElementById('cs-lam').textContent = nf(2 * nm, 0);
         document.getElementById('cs-p').textContent = fmt(P);
         document.getElementById('cs-atm').textContent = sci(P / ATM);
-        document.getElementById('cs-f').textContent = sci(P * 1e-4);
         document.getElementById('cs-g').textContent = fmt(P * 1e-4 / 9.81 * 1000);
         var msg;
         if (nm <= 11) {
