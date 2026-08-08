@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 11 — Le onde</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox svg.stretta { max-width: 460px; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .figbox .grid { stroke: var(--border); stroke-width: 1; }
+    .figbox .axis { stroke: var(--muted); stroke-width: 2; }
+    .figbox .dash { stroke: var(--muted); stroke-width: 1.6; stroke-dasharray: 6 5; fill: none; }
+    .figbox .v  { stroke: var(--accent); stroke-width: 3.2; fill: none; stroke-linecap: round; }
+    .figbox .vp { fill: var(--accent); }
+    .figbox .w  { stroke: var(--magenta); stroke-width: 3.2; fill: none; stroke-linecap: round; }
+    .figbox .wp { fill: var(--magenta); }
+    .figbox .s  { stroke: var(--green); stroke-width: 3.4; fill: none; stroke-linecap: round; }
+    .figbox .sp { fill: var(--green); }
+    .figbox .corda { fill: none; stroke: var(--accent); stroke-width: 3.2; stroke-linejoin: round; }
+    .figbox .corda2 { fill: none; stroke: var(--magenta); stroke-width: 2.6; stroke-linejoin: round; }
+    .figbox .corda3 { fill: none; stroke: var(--green); stroke-width: 2.6; stroke-linejoin: round; }
+    .figbox .curva { fill: none; stroke: var(--accent); stroke-width: 3; }
+    .figbox .acqua { fill: color-mix(in srgb, #3b82f6 42%, transparent); }
+    .figbox .roccia { fill: color-mix(in srgb, var(--muted) 26%, transparent); }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+
+    .inp { width: 7rem; font-size: 1rem; font-family: inherit; padding: 0.3rem 0.45rem; border-radius: 8px;
+           border: 2px solid var(--border); background: var(--surface); color: var(--text); text-align: right; }
+    .inp:focus { outline: none; border-color: var(--accent); }
+    .qbox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.8rem 0; }
+    .qbox .qt { font-weight: 600; margin-bottom: 0.45rem; }
+    .qrow { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .fb { min-height: 1.4em; margin-top: 0.45rem; font-weight: 600; font-size: 0.95rem; }
+    .fb.ok { color: var(--green); }
+    .fb.no { color: var(--red); }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.42rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+    .tabf tr.tot td { font-weight: 700; background: color-mix(in srgb, var(--accent) 9%, transparent); }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.7rem; text-align: center; }
+    .stat .n { font-size: 1.15rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
+    .stat .l { font-size: 0.76rem; color: var(--muted); }
+
+    .prop { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .prop-card { background: var(--surface-2); border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px; padding: 0.8rem 0.95rem; }
+    .prop-card h4 { margin: 0 0 0.3rem; color: var(--accent); font-size: 1.03rem; }
+    .prop-card p { margin: 0.35rem 0; font-size: 0.93rem; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Terzo anno · Lezione 11</div>
+    <h1>Le onde</h1>
+    <p>Qualcosa che viaggia trasportando energia senza portarsi dietro la materia: dalla corda di
+      una chitarra al terremoto</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Terzo anno</a>
+    <span class="sep">/</span> Le onde
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove eravamo rimasti.</strong> Alla fine della
+      <a href="8_Movimento.html#sec9">lezione 8</a> avevamo scoperto una cosa apparentemente innocua: un
+      punto che gira in tondo, guardato di profilo, <em>oscilla</em> — e la funzione che descrive quella
+      oscillazione è il seno. Poi, nella <a href="10_Fluidi.html">lezione 10</a>, abbiamo studiato i fluidi
+      come materia che si muove e si conserva. Adesso mettiamo insieme le due cose e otteniamo il concetto
+      più trasversale di tutta la fisica: l'<strong>onda</strong>. Con questa lezione e la prossima avrete in
+      mano lo strumento per descrivere il suono, la luce, i terremoti, la radio, il wi-fi — e, al quinto
+      anno, perfino gli elettroni.
+    </div>
+
+    <!-- 1 — FREQUENZA E PERIODO -->
+    <section id="sec1">
+      <h2>1. Una grandezza un po' particolare: la frequenza</h2>
+
+      <p>Prima di parlare di onde ci serve una grandezza che finora abbiamo solo sfiorato. L'abbiamo
+        incontrata nella lezione 8 parlando di moto circolare, e adesso diventa protagonista.</p>
+
+      <p>Partiamo da un <strong>fenomeno periodico</strong>, cioè da qualcosa che si ripete sempre uguale a
+        sé stesso: un pendolo che oscilla, un cuore che batte, una molla che va su e giù, un punto che gira.
+        Di un fenomeno del genere possiamo chiederci una cosa molto naturale: <em>quante volte accade
+        nell'unità di tempo?</em></p>
+
+      <p>Fermiamoci un attimo su che tipo di numero stiamo costruendo, perché è istruttivo. «Quante volte
+        accade una cosa» è un <strong>numero puro</strong>: si contano gli eventi, e i conteggi non hanno
+        unità di misura. Tre battiti sono tre, punto. Se però vogliamo sapere quanti ne accadono
+        <em>in un secondo</em>, dobbiamo dividere quel numero puro per un tempo. E dividere qualcosa che non
+        ha unità per un tempo dà…</p>
+
+      <div class="rule">
+        <p class="formula-title">La frequenza</p>
+        <p>La <strong>frequenza</strong> <span>$f$</span> è il numero di volte in cui un fenomeno periodico
+          si ripete nell'unità di tempo. È l'<strong>inverso di un tempo</strong>:</p>
+        <p style="text-align:center; font-size:1.2rem;">$$[f] = \frac{1}{\text{s}} = \text{s}^{-1} = \text{Hz}$$</p>
+        <p class="formula-note">L'unità ha un nome proprio, l'<strong>hertz</strong>, in onore di Heinrich
+          Hertz, il primo a produrre e rilevare onde radio in laboratorio. Un hertz è
+          <em>una volta al secondo</em>.</p>
+      </div>
+
+      <p>E il tempo che serve per <strong>una singola</strong> ripetizione? Quello ha anch'esso un nome, e lo
+        conoscete già dal moto circolare:</p>
+
+      <div class="rule">
+        <p class="formula-title">Il periodo</p>
+        <p>Il <strong>periodo</strong> <span>$T$</span> è il tempo impiegato da una singola oscillazione
+          completa. Si misura in secondi.</p>
+        <p style="text-align:center; font-size:1.2rem;">$$T = \frac{1}{f} \qquad\qquad f = \frac{1}{T}$$</p>
+        <p class="formula-note">Il nome dice tutto: è il <em>periodo di tempo</em> che occorre per compiere
+          un'oscillazione. Frequenza e periodo sono due modi di dire la stessa cosa, uno l'inverso
+          dell'altro.</p>
+      </div>
+
+      <p>Vale la pena farsi un'idea degli ordini di grandezza, perché la frequenza copre un intervallo
+        enorme — molto più di qualunque altra grandezza abbiate incontrato finora.</p>
+
+      <table class="tabf">
+        <thead>
+          <tr><th>Fenomeno</th><th>Frequenza</th><th>Periodo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="lab">Le maree</td><td>$2{,}2 \times 10^{-5}$ Hz</td><td>circa 12 ore</td></tr>
+          <tr><td class="lab">Un cuore a riposo</td><td>$\approx 1{,}2$ Hz</td><td>$0{,}8$ s</td></tr>
+          <tr><td class="lab">La corrente elettrica di casa</td><td>$50$ Hz</td><td>$0{,}02$ s</td></tr>
+          <tr><td class="lab">Il la del diapason</td><td>$440$ Hz</td><td>$2{,}3$ ms</td></tr>
+          <tr><td class="lab">Il limite dell'udito umano</td><td>$20\,000$ Hz</td><td>$50\ \mu$s</td></tr>
+          <tr><td class="lab">Un telefono in 4G</td><td>$1{,}8 \times 10^9$ Hz</td><td>$0{,}56$ ns</td></tr>
+          <tr><td class="lab">La luce verde</td><td>$5{,}5 \times 10^{14}$ Hz</td><td>$1{,}8$ fs</td></tr>
+        </tbody>
+      </table>
+
+      <div class="curiosita">
+        <strong>Perché proprio i giri al minuto in officina e i battiti al minuto in ospedale?</strong>
+        Perché in quei mestieri i numeri in hertz sarebbero scomodi: un cuore a 72 battiti al minuto ha una
+        frequenza di <span>$1{,}2$</span> Hz, e «1,2» dice molto meno di «72» a chi deve accorgersi in fretta
+        se il paziente sta bene. Le unità pratiche sopravvivono quando i numeri che producono stanno comodi
+        nella testa di chi le usa. Ma sono la stessa grandezza: basta dividere per 60.
+      </div>
+    </section>
+
+    <!-- 2 — CHE COS'È UN'ONDA -->
+    <section id="sec2">
+      <h2>2. Che cos'è un'onda</h2>
+
+      <p>Adesso la domanda vera. Prendete una corda tesa e date un colpetto secco a un'estremità. Si forma
+        una gobba, e la gobba <strong>corre</strong> lungo la corda fino all'altro capo. Che cosa è arrivato
+        dall'altra parte?</p>
+
+      <p>Non la corda: la corda è ancora lì, ogni suo pezzo è tornato al suo posto. Eppure qualcosa è
+        arrivato, tanto che se all'altro capo c'è un campanellino, suona. È arrivata
+        <strong>energia</strong>. E ci è arrivata senza che nessun pezzo di materia facesse il viaggio.</p>
+
+      <div class="rule">
+        <p class="formula-title">Definizione</p>
+        <p>Un'<strong>onda</strong> è una <strong>perturbazione</strong> che si propaga in un mezzo
+          trasportando <strong>energia</strong> ma <strong>non materia</strong>.</p>
+        <p class="formula-note">Ogni punto del mezzo oscilla attorno alla propria posizione di riposo e ci
+          resta. A viaggiare non è la materia: è la <em>forma</em> della perturbazione, cioè
+          l'informazione su chi deve muoversi e quando.</p>
+      </div>
+
+      <p>Nel simulatore qui sotto mandate un impulso lungo la corda e tenete d'occhio il <strong>pallino
+        rosso</strong>: è un punto della corda che abbiamo colorato per poterlo seguire. Guardate bene che
+        cosa fa quando l'onda gli passa addosso.</p>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn" id="im-go">➤ Manda un impulso</button>
+          <button class="btn btn-secondary" id="im-play">▶ Avvia</button>
+          <button class="btn btn-secondary" id="im-reset">↺ Azzera</button>
+          <label class="toggle-row"><input type="checkbox" id="im-tracce" checked> 🎯 mostra i punti della corda</label>
+        </div>
+        <div class="ctrl">
+          <label for="im-v">velocità dell'onda = <span id="im-vv">2,0</span> m/s</label>
+          <input type="range" id="im-v" min="0.5" max="4" step="0.1" value="2">
+        </div>
+        <svg viewBox="0 0 660 300" id="im-svg" role="img" aria-label="impulso che viaggia lungo una corda mentre un punto oscilla sul posto"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="im-x">0,0</div><div class="l">dov'è la gobba (m)</div></div>
+          <div class="stat"><div class="n" id="im-y">0,00</div><div class="l">altezza del pallino (m)</div></div>
+          <div class="stat"><div class="n" id="im-dx">0,00</div><div class="l">spostamento <em>orizzontale</em> del pallino (m)</div></div>
+        </div>
+        <p class="cap">Figura 1 — La gobba avanza; il pallino sale, scende e torna esattamente dov'era. Lo spostamento orizzontale resta zero.</p>
+      </div>
+
+      <p>Il pallino sale, scende e torna al suo posto. <strong>Il suo spostamento orizzontale è sempre
+        zero</strong>: non ha viaggiato di un millimetro nella direzione in cui viaggia l'onda. È questa la
+        frase da portarsi a casa, ed è anche quella che più spesso viene fraintesa.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Onda trasversale</h4>
+          <p>Il mezzo oscilla <strong>perpendicolarmente</strong> alla direzione in cui l'onda viaggia. È il
+            caso della corda: l'onda va a destra, i punti vanno su e giù.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Onda longitudinale</h4>
+          <p>Il mezzo oscilla <strong>nella stessa direzione</strong> in cui l'onda viaggia: si formano zone
+            più fitte e zone più rade. È il caso di una molla compressa e rilasciata — e, come vedremo nella
+            prossima lezione, del <strong>suono</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — LE BOE E IL CAVALLONE -->
+    <section id="sec3">
+      <h2>3. Ma allora le boe in mare?</h2>
+
+      <p>A questo punto, in classe, arriva sempre la stessa obiezione, ed è una buona obiezione: <em>se le
+        onde non trasportano materia, com'è che il mare porta a riva la boa, la tavola da surf, la bottiglia
+        di plastica?</em></p>
+
+      <p>La risposta è che quelle cose non le porta l'onda. <strong>Le portano le correnti.</strong> Sono due
+        fenomeni completamente diversi che convivono nello stesso mare:</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>L'onda</h4>
+          <p>È una perturbazione che <em>attraversa</em> l'acqua. Ogni goccia compie un'orbita quasi chiusa —
+            avanti sulla cresta, indietro nel cavo — e torna quasi al punto di partenza. Trasporta energia,
+            e viaggia veloce.</p>
+        </div>
+        <div class="prop-card">
+          <h4>La corrente</h4>
+          <p>È acqua che <em>si sposta davvero</em>, da un posto a un altro. È il moto di un fluido di cui
+            abbiamo parlato nella <a href="10_Fluidi.html#sec5">lezione 10</a>: ha una portata, trasporta
+            materia, e in genere è molto più lenta.</p>
+        </div>
+      </div>
+
+      <p>Una boa ancorata al largo, quando passa un'onda, sale e scende e disegna un piccolo cerchio. Se la
+        stessa boa dopo un mese la ritrovate cento chilometri più in là, non è stata l'onda: è stata la
+        corrente. Le due cose si vedono benissimo dal molo — l'onda arriva a riva in pochi secondi, la
+        bottiglia ci mette ore.</p>
+
+      <div class="warnbox">
+        <strong>A riva però le cose cambiano davvero.</strong> Finché l'acqua è profonda, l'onda passa e
+        basta. Ma avvicinandosi alla spiaggia il fondale sale e le orbite delle particelle non hanno più lo
+        spazio per chiudersi: la parte bassa dell'onda viene frenata dall'attrito con il fondo, mentre la
+        cresta continua alla sua velocità. La cresta <strong>supera</strong> il piede dell'onda, si sporge in
+        avanti e infine crolla: è il <strong>frangente</strong>, il «cavallone».<br><br>
+        A quel punto non siamo più davanti a un'onda in senso stretto: siamo davanti a una massa d'acqua che
+        si rovescia in avanti, e quella <em>sì</em> che trasporta materia — e vi trascina con sé, come sa
+        chiunque abbia preso un'onda in faccia. La definizione di prima non era sbagliata: era valida
+        <em>finché l'onda resta un'onda</em>. Ogni legge fisica ha il suo campo di validità, e riconoscere
+        dove finisce vale quanto conoscerla.
+      </div>
+
+      <div class="curiosita">
+        <strong>E gli tsunami?</strong> In mare aperto uno tsunami è un'onda quasi invisibile: alta mezzo
+        metro, ma con una lunghezza d'onda di <em>duecento chilometri</em>. Una nave ci passa sopra senza
+        accorgersene. Il guaio è che tutta quell'energia, arrivando in acque basse, si comprime: l'onda
+        rallenta, si accorcia e cresce in altezza fino a diventare un muro d'acqua. E poiché la sua lunghezza
+        d'onda è enorme, non è un frangente che passa in tre secondi — è un innalzamento del mare che dura
+        minuti e continua ad avanzare verso l'interno.
+      </div>
+    </section>
+
+    <!-- 4 — AMPIEZZA E LUNGHEZZA D'ONDA -->
+    <section id="sec4">
+      <h2>4. Guardare l'onda tutta insieme: ampiezza e lunghezza d'onda</h2>
+
+      <p>Un impulso solo è utile per capire il concetto, ma le onde interessanti sono quelle che si ripetono:
+        una mano che scuote la corda su e giù senza fermarsi, una corda di chitarra pizzicata, un altoparlante
+        che vibra. Ne esce una figura che si ripete identica nello spazio, e che ha due misure fondamentali.</p>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn" id="on-play">▶ Avvia</button>
+          <button class="btn btn-secondary" id="on-reset">↺ Azzera</button>
+        </div>
+        <div class="ctrl">
+          <label for="on-A">ampiezza $A$ = <span id="on-Av">0,40</span> m</label>
+          <input type="range" id="on-A" min="0.1" max="0.8" step="0.05" value="0.4">
+          <label for="on-L">lunghezza d'onda $\lambda$ = <span id="on-Lv">2,0</span> m</label>
+          <input type="range" id="on-L" min="0.8" max="4" step="0.1" value="2">
+        </div>
+        <svg viewBox="0 0 660 300" id="on-svg" role="img" aria-label="onda sinusoidale con ampiezza e lunghezza d'onda evidenziate"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="on-A2">0,40</div><div class="l">ampiezza $A$ (m)</div></div>
+          <div class="stat"><div class="n" id="on-L2">2,0</div><div class="l">lunghezza d'onda $\lambda$ (m)</div></div>
+          <div class="stat"><div class="n" id="on-cc">0,80</div><div class="l">da cresta a cavo (m)</div></div>
+          <div class="stat"><div class="n" id="on-n">5,0</div><div class="l">onde nei 10 m visibili</div></div>
+        </div>
+        <p class="cap">Figura 2 — L'ampiezza si misura dalla linea di riposo alla cresta, non da cresta a cavo.</p>
+      </div>
+
+      <div class="rule">
+        <p class="formula-title">Le due misure spaziali di un'onda</p>
+        <ul style="margin:0.4rem 0 0;">
+          <li>L'<strong>ampiezza</strong> <span>$A$</span> è lo spostamento <em>massimo</em> di un punto del
+            mezzo rispetto alla sua posizione di riposo. Si misura in metri (o in qualunque unità serva a
+            misurare «quanto si sposta» il mezzo).</li>
+          <li>La <strong>lunghezza d'onda</strong> <span>$\lambda$</span> (lambda) è la distanza dopo la
+            quale l'onda si ripete identica: da una cresta alla cresta successiva, o da un cavo al cavo
+            successivo. Si misura in metri.</li>
+        </ul>
+      </div>
+
+      <div class="warnbox">
+        <strong>L'ampiezza non è l'altezza totale dell'onda.</strong> È l'errore più frequente. Da cresta a
+        cavo ci sono <span>$2A$</span>, non <span>$A$</span>: l'ampiezza si conta a partire dalla linea di
+        riposo, cioè da dove la corda starebbe se non la toccasse nessuno. Se una boa oscilla fra
+        <span>$+30$</span> cm e <span>$-30$</span> cm, l'ampiezza è <span>$30$</span> cm e non 60.
+      </div>
+    </section>
+
+    <!-- 5 — UN PUNTO SOLO, NEL TEMPO -->
+    <section id="sec5">
+      <h2>5. Un punto solo, nel tempo: ecco la frequenza</h2>
+
+      <p>Adesso cambiamo completamente punto di vista, e questo è il passaggio più importante di tutta la
+        lezione. Fino a un attimo fa stavamo guardando <strong>tutta la corda in un istante</strong>, come
+        una fotografia. Adesso guardiamo <strong>un solo punto della corda per un certo tempo</strong>, come
+        un filmato puntato su di lui.</p>
+
+      <p>Quel punto non fa niente di complicato: sale e scende. E ci mette sempre lo stesso tempo a compiere
+        un'oscillazione completa — è un fenomeno periodico, e quindi ha un periodo e una frequenza.</p>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn" id="pt-play">▶ Avvia</button>
+          <button class="btn btn-secondary" id="pt-reset">↺ Azzera</button>
+        </div>
+        <div class="ctrl">
+          <label for="pt-f">frequenza $f$ = <span id="pt-fv">0,50</span> Hz</label>
+          <input type="range" id="pt-f" min="0.2" max="1.5" step="0.05" value="0.5">
+          <label for="pt-x">quale punto guardiamo: $x$ = <span id="pt-xv">3,0</span> m</label>
+          <input type="range" id="pt-x" min="0.5" max="9" step="0.1" value="3">
+        </div>
+        <svg viewBox="0 0 660 320" id="pt-svg" role="img" aria-label="a sinistra la corda nello spazio, a destra il moto di un singolo punto nel tempo"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="pt-T">2,00</div><div class="l">periodo $T$ (s)</div></div>
+          <div class="stat"><div class="n" id="pt-f2">0,50</div><div class="l">frequenza $f$ (Hz)</div></div>
+          <div class="stat"><div class="n" id="pt-osc">0</div><div class="l">oscillazioni compiute</div></div>
+        </div>
+        <p class="cap">Figura 3 — A sinistra lo spazio (una fotografia), a destra il tempo (un filmato). Le due curve si somigliano ma non sono la stessa cosa.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>Due grafici che sembrano uguali e non lo sono.</strong> Sono tutti e due sinusoidi, e questo
+        confonde. Ma guardate che cosa c'è sull'asse orizzontale:
+        <ul style="margin:0.4rem 0 0;">
+          <li>nel grafico <strong>spaziale</strong> c'è la posizione <span>$x$</span> in <em>metri</em>, e la
+            distanza fra due creste è la <strong>lunghezza d'onda</strong> <span>$\lambda$</span>;</li>
+          <li>nel grafico <strong>temporale</strong> c'è il tempo <span>$t$</span> in <em>secondi</em>, e la
+            distanza fra due creste è il <strong>periodo</strong> <span>$T$</span>.</li>
+        </ul>
+        Confonderli è l'errore classico delle verifiche. Domandatevi sempre: sto guardando tutta la corda in
+        un istante, o un punto solo per un po' di tempo?
+      </div>
+
+      <p>Ed ecco finalmente il quadro completo. Un'onda ha <strong>due periodicità</strong>: una nello spazio
+        e una nel tempo. Si ripete ogni <span>$\lambda$</span> metri e ogni <span>$T$</span> secondi. Sono
+        due facce dello stesso fenomeno, e fra poco scopriremo che a legarle è la velocità con cui l'onda
+        viaggia.</p>
+
+      <table class="tabf">
+        <thead>
+          <tr><th>Guardo…</th><th>Il grafico ha in ascissa…</th><th>La periodicità si chiama…</th><th>Si misura in…</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="lab">tutta la corda, in un istante</td><td>la posizione $x$</td><td>lunghezza d'onda $\lambda$</td><td>metri</td></tr>
+          <tr><td class="lab">un punto solo, nel tempo</td><td>il tempo $t$</td><td>periodo $T$ (o frequenza $f$)</td><td>secondi (o hertz)</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 6 — SENO E COSENO -->
+    <section id="sec6">
+      <h2>6. Ci serve una formula: tornano le nostre amiche</h2>
+
+      <p>Abbiamo descritto le onde a parole e con i disegni. Adesso ci serve una <strong>formula</strong>,
+        perché senza formula non si fanno previsioni e non si fanno conti. Ma quale funzione può descrivere
+        una cosa che sale, scende, torna su e non finisce mai?</p>
+
+      <p>Ce l'abbiamo già, e l'abbiamo costruita nella <a href="8_Movimento.html#sec9">lezione 8</a> facendo
+        girare un punto su una circonferenza. Riprendiamo la tabella del seno e portiamola sul piano
+        cartesiano:</p>
+
+      <table class="tabf">
+        <thead>
+          <tr><th>$\theta$</th><th>$0$</th><th>$\frac{\pi}{6}$</th><th>$\frac{\pi}{3}$</th><th>$\frac{\pi}{2}$</th><th>$\frac{2\pi}{3}$</th><th>$\pi$</th><th>$\frac{3\pi}{2}$</th><th>$2\pi$</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="lab">in gradi</td><td>0°</td><td>30°</td><td>60°</td><td>90°</td><td>120°</td><td>180°</td><td>270°</td><td>360°</td></tr>
+          <tr><td class="lab">$\sin\theta$</td><td>0</td><td>0,50</td><td>0,87</td><td>1,00</td><td>0,87</td><td>0</td><td>−1,00</td><td>0</td></tr>
+        </tbody>
+      </table>
+
+      <p>Sale da 0 a 1, torna a 0, scende a −1, risale. E poi ricomincia, identica, all'infinito.
+        <strong>È la forma delle onde.</strong> Non ci siamo dovuti inventare niente: la funzione giusta
+        esisteva già, e l'avevamo incontrata come rapporto fra i lati di un triangolo.</p>
+
+      <p>Adesso però dobbiamo adattarla, perché così com'è descrive una sola onda su infinite possibili. Ci
+        servono tre manopole.</p>
+
+      <h3>6.1 Prima manopola: l'ampiezza</h3>
+
+      <p>Il seno oscilla fra <span>$-1$</span> e <span>$+1$</span>, e non può fare altrimenti: è il rapporto
+        fra un cateto e l'ipotenusa, e un cateto non può essere più lungo dell'ipotenusa. Ma un'onda del
+        mare alta trenta centimetri e una alta tre metri esistono tutte e due. Come si fa?</p>
+
+      <p>Si <strong>moltiplica la funzione</strong> per il numero che vogliamo. Se il seno vale al massimo 1,
+        allora <span>$A\sin\theta$</span> vale al massimo <span>$A$</span>: e quel numero è esattamente
+        l'<strong>ampiezza</strong> di cui parlavamo alla sezione 4, cioè l'altezza massima raggiunta
+        partendo dalla posizione di riposo.</p>
+
+      <div class="rule">
+        <p class="formula-title">L'ampiezza e l'energia</p>
+        <p>Un'onda non trasporta materia, ma trasporta <strong>energia</strong>. E l'energia dipende
+          dall'ampiezza in un modo molto preciso: per un'onda sinusoidale su una corda, la potenza
+          trasmessa vale</p>
+        <p style="text-align:center; font-size:1.15rem;">$$P = \frac{1}{2}\,\mu\,\omega^2 A^2\, v$$</p>
+        <p class="formula-note">Non serve impararla a memoria — la incontrerete per bene al quinto anno. Qui
+          serve notare una cosa sola: <span>$A$</span> compare <strong>al quadrato</strong>. Raddoppiare
+          l'ampiezza non raddoppia l'energia: la <em>quadruplica</em>. Un'onda alta il doppio non fa il
+          doppio dei danni, ne fa quattro volte tanti.</p>
+      </div>
+
+      <p>Pensateci quando guardate il mare: fra un'onda da mezzo metro e una da due metri non c'è un fattore
+        quattro di energia, ce n'è uno di sedici. È lo stesso motivo per cui il vento a 100 km/h non fa il
+        doppio dei danni di quello a 50.</p>
+
+      <h3>6.2 Seconda manopola: quanto in fretta</h3>
+
+      <p>Il seno compie un'oscillazione completa quando il suo argomento passa da <span>$0$</span> a
+        <span>$2\pi$</span>: sono i <strong>radianti</strong> della
+        <a href="4_Unita_di_misura.html">lezione 4</a>, e <span>$2\pi$</span> è il giro completo. Dopo un
+        giro il punto è tornato dov'era e tutto ricomincia.</p>
+
+      <p>Se voglio che l'oscillazione sia più rapida devo far crescere l'argomento più in fretta, cioè
+        <strong>moltiplicare l'argomento</strong> per un numero. Scriviamo allora
+        <span>$\sin(\omega t)$</span>: il giro completo si compie quando <span>$\omega t = 2\pi$</span>,
+        cioè dopo un tempo</p>
+
+      <p style="text-align:center;">$$T = \frac{2\pi}{\omega} \qquad\Longrightarrow\qquad \omega = 2\pi f$$</p>
+
+      <p>La grandezza <span>$\omega$</span> si chiama <strong>pulsazione</strong> (o velocità angolare, ed è
+        la stessa del moto circolare). È la frequenza travestita: dice le stesse cose in radianti al secondo
+        invece che in giri al secondo, e serve perché è quella che va messa dentro il seno.</p>
+
+      <h3>6.3 Terza manopola: da dove comincia</h3>
+
+      <p>Resta un'ultima libertà. Un'onda deve pur cominciare da qualche parte: al tempo zero il nostro punto
+        può trovarsi in basso, in alto, a metà strada in salita o a metà in discesa. Per dirlo si aggiunge un
+        numero <strong>dentro</strong> il seno, sommato all'argomento:</p>
+
+      <div class="rule">
+        <p class="formula-title">L'oscillazione, per esteso</p>
+        <p style="text-align:center; font-size:1.3rem;">$$y(t) = A\,\sin(\omega t + \varphi)$$</p>
+        <p class="formula-note"><span>$A$</span> è l'<strong>ampiezza</strong> (quanto è alta),
+          <span>$\omega = 2\pi f$</span> la <strong>pulsazione</strong> (quanto è rapida),
+          <span>$\varphi$</span> la <strong>fase iniziale</strong> (da dove parte). Con tre numeri si
+          descrive qualunque oscillazione sinusoidale dell'universo. La stessa identica formula, con
+          <span>$x$</span> al posto di <span>$t$</span>, descrive l'onda vista <em>nello spazio</em>.</p>
+      </div>
+
+      <p>Muovete i tre cursori uno alla volta e guardate che cosa cambia. Tenete attivo «blocca la scala»:
+        se gli assi si adattassero da soli, un'onda alta il doppio sembrerebbe identica a prima e non
+        capireste niente.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="fs-A">$A$ = <span id="fs-Av">1,0</span> m</label>
+          <input type="range" id="fs-A" min="0.2" max="2.5" step="0.1" value="1">
+          <label for="fs-w">$\omega$ = <span id="fs-wv">1,0</span> rad/s</label>
+          <input type="range" id="fs-w" min="0.4" max="3" step="0.1" value="1">
+          <label for="fs-p">$\varphi$ = <span id="fs-pv">0</span>°</label>
+          <input type="range" id="fs-p" min="-180" max="180" step="15" value="0">
+          <label class="toggle-row"><input type="checkbox" id="fs-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg viewBox="0 0 660 290" id="fs-svg" role="img" aria-label="grafico di A sin(omega t + fi) con tre cursori"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="fs-T">6,28</div><div class="l">periodo $T$ (s)</div></div>
+          <div class="stat"><div class="n" id="fs-f">0,159</div><div class="l">frequenza $f$ (Hz)</div></div>
+          <div class="stat"><div class="n" id="fs-y0">0,00</div><div class="l">valore a $t = 0$ (m)</div></div>
+          <div class="stat"><div class="n" id="fs-E">1,00</div><div class="l">energia relativa ($\propto A^2$)</div></div>
+        </div>
+        <p class="cap">Figura 4 — In magenta l'onda con i vostri parametri, in grigio quella di riferimento $\sin t$.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>La fase da sola non significa niente.</strong> Un'onda con <span>$\varphi = 90°$</span> non è
+        «migliore» o «più avanti» di una con <span>$\varphi = 0$</span>: dipende solo da quando abbiamo fatto
+        partire il cronometro, ed è la stessa storia dei sistemi di riferimento della lezione 8. La fase
+        diventa importantissima quando le onde sono <strong>due</strong>: allora la <em>differenza</em> di
+        fase fra loro è una quantità fisica vera, e alla sezione 10 vedremo che decide se le due onde si
+        rafforzano o si cancellano.
+      </div>
+    </section>
+
+    <!-- 7 — ONDE CHE SI PROPAGANO -->
+    <section id="sec7">
+      <h2>7. La corda vera: onde che partono, corrono e tornano indietro</h2>
+
+      <p>Fin qui abbiamo disegnato onde che stanno lì. Ma un'onda vera nasce da qualche parte, corre, arriva
+        in fondo e — se trova un ostacolo — <strong>torna indietro</strong>. Il simulatore qui sotto non
+        disegna una formula: risolve passo dopo passo la fisica di una corda tesa, punto per punto, come
+        farebbe la corda vera.</p>
+
+      <p>Ci sono due modi di eccitarla, e sono i due modi con cui si suona uno strumento.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Muovere un estremo</h4>
+          <p>Come fa l'archetto di un violino o l'altoparlante: si tiene un capo fisso e si scuote l'altro.
+            Le onde partono da sinistra, corrono, rimbalzano sul capo fisso e tornano.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Pizzicare al centro</h4>
+          <p>Come fa il dito sulla chitarra: si tengono fermi tutti e due i capi, si tira su la corda nel
+            mezzo e si lascia andare. La deformazione si divide in due onde che partono in direzioni
+            opposte.</p>
+        </div>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn" id="cd-mod-a">Muovi l'estremo sinistro</button>
+          <button class="btn btn-secondary" id="cd-mod-b">Pizzica al centro</button>
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="cd-play">▶ Avvia</button>
+          <button class="btn btn-secondary" id="cd-pizzica">✋ Pizzica adesso</button>
+          <button class="btn btn-secondary" id="cd-reset">↺ Azzera</button>
+          <label class="toggle-row"><input type="checkbox" id="cd-smorza" checked> 💧 attrito</label>
+        </div>
+        <div class="ctrl" id="cd-riga-f">
+          <label for="cd-f">frequenza con cui scuoto = <span id="cd-fv">1,20</span> Hz</label>
+          <input type="range" id="cd-f" min="0.3" max="3" step="0.05" value="1.2">
+        </div>
+        <div class="ctrl" id="cd-riga-p" style="display:none;">
+          <label for="cd-p">dove pizzico = <span id="cd-pv">50</span> % della corda</label>
+          <input type="range" id="cd-p" min="10" max="90" step="1" value="50">
+        </div>
+        <svg viewBox="0 0 660 260" id="cd-svg" role="img" aria-label="simulazione di una corda tesa che oscilla"></svg>
+        <p class="cap">Figura 5 — Non è un disegno: è la corda calcolata istante per istante. Provate a spegnere l'attrito.</p>
+      </div>
+
+      <p>Provate una cosa: nella modalità «muovi l'estremo», cercate con il cursore una frequenza per cui la
+        corda entra in una figura stabile, con dei punti che restano <strong>fermi</strong> mentre gli altri
+        oscillano forte. Sono le <strong>onde stazionarie</strong>: l'onda che va e quella che torna si
+        sovrappongono e in certi punti si cancellano sempre. È così che funziona ogni strumento a corda, ed è
+        il motivo per cui una corda pizzicata dà una nota e non un rumore. Alla sezione 10 capiremo
+        perché.</p>
+
+      <div class="curiosita">
+        <strong>Le corde di chitarra non fanno onde tonde.</strong> Se pizzicate una corda con il dito, per
+        un istante la corda ha la forma di un <strong>triangolo</strong>: due segmenti dritti che si
+        incontrano dove sta il dito. Non c'è nessuna sinusoide, all'inizio. È quello che fa anche il nostro
+        simulatore nella modalità «pizzica», ed è il motivo per cui il suono di una corda pizzicata è così
+        ricco e diverso da un fischio puro.<br><br>
+        Noi però continueremo a disegnare sinusoidi, e non è pigrizia: è un <strong>modello</strong>. Nella
+        <a href="12_Suono_Luce.html">prossima lezione</a> scopriremo che quel triangolo <em>è</em> una somma
+        di sinusoidi — di infinite sinusoidi, per l'esattezza — e che quindi studiare la sinusoide non è
+        studiare un caso particolare: è studiare il mattone con cui tutto il resto è costruito.
+      </div>
+    </section>
+
+    <!-- 8 — L'ONDA PROGRESSIVA -->
+    <section id="sec8">
+      <h2>8. L'equazione di un'onda che viaggia</h2>
+
+      <p>Ci manca ancora una cosa: una formula che descriva non un'oscillazione ferma, ma un'onda che
+        <strong>si sposta</strong>. E qui c'è un'idea semplicissima e molto potente.</p>
+
+      <p>Supponiamo che all'istante <span>$t = 0$</span> la corda abbia una certa forma, descritta da una
+        funzione qualsiasi <span>$f(x)$</span>: una gobba, una sinusoide, un dente di sega, quello che vi
+        pare. Se un istante dopo quella forma si è spostata verso destra di un tratto <span>$vt$</span>
+        <em>senza cambiare</em>, allora quello che prima stava in <span>$x$</span> adesso sta in
+        <span>$x + vt$</span>. Basta quindi scrivere:</p>
+
+      <div class="rule">
+        <p class="formula-title">L'onda progressiva</p>
+        <p style="text-align:center; font-size:1.3rem;">$$y(x,\,t) = f(x - v\,t)$$</p>
+        <p class="formula-note">Qualunque funzione della combinazione <span>$x - vt$</span> descrive una
+          forma che viaggia verso destra alla velocità <span>$v$</span> senza deformarsi. Con
+          <span>$x + vt$</span> viaggia verso sinistra. La forma <span>$f$</span> resta libera: è
+          l'<em>onda</em> che decidiamo di mandare.</p>
+      </div>
+
+      <p>Il trucco sta nel <strong>meno</strong>. Man mano che il tempo passa, per ritrovare lo stesso valore
+        della funzione bisogna spostarsi in avanti quanto basta a compensare il <span>$vt$</span> che si è
+        sottratto — e «quanto basta» è esattamente <span>$vt$</span>. La cresta, insomma, viaggia a velocità
+        <span>$v$</span> perché la formula la obbliga a farlo.</p>
+
+      <p>Se la forma che scegliamo è proprio una sinusoide, mettendo insieme tutto quello che sappiamo si
+        ottiene la formula completa dell'onda armonica:</p>
+
+      <p style="text-align:center;">$$y(x,t) = A\,\sin\!\left[\frac{2\pi}{\lambda}(x - v\,t) + \varphi\right]$$</p>
+
+      <p>Nel simulatore potete scegliere la forma <span>$f$</span> e vedere che il ragionamento non dipende
+        affatto da quale sia: sinusoide, triangolo o onda quadra viaggiano tutte allo stesso modo.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="pr-forma">
+          <button class="btn" data-f="sin">sinusoidale</button>
+          <button class="btn btn-secondary" data-f="tri">triangolare</button>
+          <button class="btn btn-secondary" data-f="qua">quadra</button>
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="pr-play">▶ Avvia</button>
+          <button class="btn btn-secondary" id="pr-reset">↺ Azzera</button>
+          <button class="btn btn-secondary" id="pr-verso">⇄ Inverti il verso</button>
+        </div>
+        <div class="ctrl">
+          <label for="pr-v">velocità $v$ = <span id="pr-vv">1,5</span> m/s</label>
+          <input type="range" id="pr-v" min="0.3" max="4" step="0.1" value="1.5">
+          <label for="pr-A">ampiezza $A$ = <span id="pr-Av">0,50</span> m</label>
+          <input type="range" id="pr-A" min="0.1" max="0.9" step="0.05" value="0.5">
+          <label for="pr-L">$\lambda$ = <span id="pr-Lv">2,5</span> m</label>
+          <input type="range" id="pr-L" min="1" max="5" step="0.1" value="2.5">
+        </div>
+        <svg viewBox="0 0 660 280" id="pr-svg" role="img" aria-label="onda progressiva con forma selezionabile"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="pr-t">0,0</div><div class="l">tempo (s)</div></div>
+          <div class="stat"><div class="n" id="pr-cr">0,0</div><div class="l">dov'è la cresta marcata (m)</div></div>
+          <div class="stat"><div class="n" id="pr-T">1,67</div><div class="l">periodo $T = \lambda/v$ (s)</div></div>
+          <div class="stat"><div class="n" id="pr-f">0,60</div><div class="l">frequenza $f = v/\lambda$ (Hz)</div></div>
+        </div>
+        <p class="cap">Figura 6 — La cresta segnata in rosso avanza di $v$ metri ogni secondo, qualunque sia la forma dell'onda.</p>
+      </div>
+    </section>
+
+    <!-- 9 — LA VELOCITÀ DELL'ONDA -->
+    <section id="sec9">
+      <h2>9. La velocità dell'onda</h2>
+
+      <p>Concentriamoci su un dettaglio che è appena passato sotto gli occhi: la posizione della cresta
+        <strong>cambia nel tempo</strong>. Ma come abbiamo chiamato, nella lezione 8, una posizione che cambia
+        nel tempo? Un <strong>movimento</strong>. E la rapidità con cui cambia?</p>
+
+      <p>Una <strong>velocità</strong> — e questa è la velocità dell'onda. Ricorderete anche la definizione:
+        spazio percorso diviso tempo impiegato. Prendiamo allora l'intervallo di tempo più naturale, cioè un
+        periodo <span>$T$</span>. In un periodo l'onda avanza esattamente di una lunghezza d'onda
+        <span>$\lambda$</span>: dopo un periodo la figura è di nuovo identica a prima, spostata di una
+        gobba.</p>
+
+      <div class="rule">
+        <p class="formula-title">La relazione fondamentale delle onde</p>
+        <p style="text-align:center; font-size:1.3rem;">$$v = \frac{\lambda}{T} = \lambda\, f$$</p>
+        <p class="formula-note">È la formula più usata di tutta la fisica delle onde, e vale per
+          <em>qualunque</em> onda: corde, suono, acqua, terremoti, luce, radio. Lega le tre grandezze che
+          abbiamo costruito — quella spaziale, quella temporale e quella del movimento.</p>
+      </div>
+
+      <p>Da qui discende una conseguenza che vale la pena scolpirsi in mente. In un mezzo dato, la velocità
+        <span>$v$</span> è <strong>fissata dal mezzo</strong>: non la decidiamo noi. Quindi
+        <span>$\lambda$</span> e <span>$f$</span> non sono indipendenti — se una cresce, l'altra
+        <em>deve</em> calare:</p>
+
+      <p style="text-align:center;">$$\lambda = \frac{v}{f}$$</p>
+
+      <p>Suoni acuti e suoni gravi viaggiano nell'aria alla stessa velocità (circa <span>$343$</span> m/s);
+        quello che cambia è la lunghezza d'onda. Un la a <span>$440$</span> Hz ha
+        <span>$\lambda = 343/440 = 0{,}78$</span> m, mentre un suono al limite dell'udito, a
+        <span>$20$</span> kHz, ha una lunghezza d'onda di appena <span>$1{,}7$</span> cm.</p>
+
+      <h3>9.1 Da che cosa dipende la velocità? La corda tesa</h3>
+
+      <p>Se la velocità la decide il mezzo, la domanda diventa: quali proprietà del mezzo? Per una corda tesa
+        la risposta è semplice e si capisce con l'intuito.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>La tensione $T$</h4>
+          <p>Più la corda è tirata, più forte è il richiamo che riporta ogni punto al suo posto, e più in
+            fretta si trasmette il movimento al vicino. Tendere la corda <strong>accelera</strong> l'onda.</p>
+        </div>
+        <div class="prop-card">
+          <h4>La densità lineare $\mu$</h4>
+          <p>È la massa per unità di lunghezza, in kg/m. Una corda pesante ha più inerzia: fa più fatica a
+            mettersi in moto. Appesantire la corda <strong>rallenta</strong> l'onda.</p>
+        </div>
+      </div>
+
+      <div class="rule">
+        <p style="text-align:center; font-size:1.25rem;">$$v = \sqrt{\frac{T}{\mu}}$$</p>
+        <p class="formula-note">Attenzione al simbolo: qui <span>$T$</span> è la <strong>tensione</strong> in
+          newton, non il periodo. È una collisione di notazione fastidiosa ma universale — ci si orienta dal
+          contesto e dalle unità di misura.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>C'è una radice quadrata, e cambia tutto.</strong> Per raddoppiare la velocità dell'onda su
+        una corda non basta raddoppiare la tensione: bisogna <strong>quadruplicarla</strong>. È il motivo per
+        cui accordare una chitarra richiede giri di chiave piccolissimi vicino alla nota giusta, e per cui le
+        note gravi si ottengono con corde più <em>grosse</em> anziché con corde molto più lente da tendere:
+        agire su <span>$\mu$</span> costa molto meno fatica che agire su <span>$T$</span>.
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 1 — la corda del laboratorio</span></div>
+        <p>Una corda di densità lineare <span>$\mu = 5{,}0$</span> g/m è tesa con una forza di
+          <span>$50$</span> N. <strong>(a)</strong> Con che velocità viaggiano le onde su questa corda?
+          <strong>(b)</strong> Se la scuotiamo a <span>$50$</span> Hz, qual è la lunghezza d'onda?
+          <strong>(c)</strong> Che tensione servirebbe per raddoppiare la velocità?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-o1">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-o1">
+          <p><strong>(a)</strong> Prima le unità, sempre: <span>$5{,}0$</span> g/m
+            <span>$= 0{,}0050$</span> kg/m.</p>
+          <p style="text-align:center;">$$v = \sqrt{\frac{T}{\mu}} = \sqrt{\frac{50}{0{,}0050}} = \sqrt{10\,000} = 100\ \text{m/s}$$</p>
+          <p><strong>(b)</strong> Con la relazione fondamentale:</p>
+          <p style="text-align:center;">$$\lambda = \frac{v}{f} = \frac{100}{50} = 2{,}0\ \text{m}$$</p>
+          <p><strong>(c)</strong> Per avere <span>$v = 200$</span> m/s serve
+            <span>$T = \mu v^2 = 0{,}0050 \cdot 200^2 = 200$</span> N: <strong>quattro volte</strong> la
+            tensione di prima, non due. La radice quadrata si vendica sempre.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$100$ m/s &nbsp;·&nbsp; $2{,}0$ m &nbsp;·&nbsp; $200$ N</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2 — quanto tira la corda di una chitarra</span></div>
+        <p>Il <em>cantino</em> di una chitarra (la corda del mi acuto) è lungo <span>$0{,}65$</span> m fra il
+          capotasto e il ponte, e suona a <span>$329{,}6$</span> Hz. La sua densità lineare è
+          <span>$0{,}40$</span> g/m. Sapendo che la lunghezza d'onda della nota fondamentale è il
+          <strong>doppio</strong> della lunghezza della corda: <strong>(a)</strong> quanto vale la velocità
+          delle onde sulla corda? <strong>(b)</strong> Con che forza è tesa? <strong>(c)</strong> A quanti
+          chilogrammi appesi corrisponde?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-o2">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-o2">
+          <p><strong>(a)</strong> La lunghezza d'onda è <span>$\lambda = 2 \cdot 0{,}65 = 1{,}30$</span> m,
+            quindi</p>
+          <p style="text-align:center;">$$v = \lambda f = 1{,}30 \cdot 329{,}6 = 428{,}5\ \text{m/s}$$</p>
+          <p><strong>(b)</strong> Invertendo la formula della corda tesa (si eleva al quadrato e si
+            moltiplica):</p>
+          <p style="text-align:center;">$$T = \mu\,v^2 = 0{,}00040 \cdot 428{,}5^2 = 73{,}5\ \text{N}$$</p>
+          <p><strong>(c)</strong> <span>$73{,}5 / 9{,}81 = 7{,}5$</span> kg. Ogni corda di una chitarra tira
+            come un secchio d'acqua appeso, e le sei insieme fanno più di 50 kg: è il motivo per cui il manico
+            ha dentro una barra d'acciaio, e per cui una chitarra lasciata al sole si scorda.</p>
+          <p>Notate anche la trappola dei grammi: <span>$0{,}40$</span> g/m sono
+            <span>$0{,}00040$</span> kg/m. Chi dimentica la conversione trova una tensione mille volte più
+            grande — 73 500 N, cioè sette tonnellate e mezzo appese a una corda di nylon. Il controllo di
+            ragionevolezza salva il compito.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$428{,}5$ m/s &nbsp;·&nbsp; $73{,}5$ N &nbsp;·&nbsp; circa $7{,}5$ kg</span></div>
+        </div>
+      </div>
+
+      <h3>9.2 Allenamento sulla relazione $v = \lambda f$</h3>
+
+      <div class="qbox" id="vl-box">
+        <div class="qt" id="vl-testo">—</div>
+        <div class="qrow">
+          <span id="vl-eti">risposta:</span>
+          <input class="inp" id="vl-val" inputmode="decimal" aria-label="risposta">
+          <span id="vl-um">m</span>
+          <button class="btn" id="vl-ver">Verifica</button>
+          <button class="btn btn-secondary" id="vl-new">Nuovo esercizio</button>
+        </div>
+        <div class="fb" id="vl-fb"></div>
+      </div>
+    </section>
+
+    <!-- 10 — SOVRAPPOSIZIONE E INTERFERENZA -->
+    <section id="sec10">
+      <h2>10. Che cosa succede se due onde si incontrano?</h2>
+
+      <p>Due biglie che si scontrano rimbalzano. Due automobili che si scontrano si fermano. Due onde che si
+        incontrano fanno una cosa che non fa nessun oggetto materiale: <strong>si attraversano</strong>, e
+        dopo l'incontro proseguono come se niente fosse.</p>
+
+      <p>Mentre si sovrappongono, però, succede qualcosa di interessante.</p>
+
+      <div class="rule">
+        <p class="formula-title">Principio di sovrapposizione</p>
+        <p>Quando due onde occupano contemporaneamente lo stesso punto, lo spostamento risultante del mezzo è
+          la <strong>somma</strong> degli spostamenti che ciascuna onda produrrebbe da sola.</p>
+        <p style="text-align:center; font-size:1.15rem;">$$y_{\text{tot}}(x,t) = y_1(x,t) + y_2(x,t)$$</p>
+        <p class="formula-note">Somma <em>con il segno</em>: se una tira su di 3 cm e l'altra tira giù di
+          3 cm, il punto resta fermo. È una somma, non un accumulo.</p>
+      </div>
+
+      <p>E poiché è una somma con il segno, tutto dipende da come le due onde sono messe l'una rispetto
+        all'altra — cioè dalla loro <strong>differenza di fase</strong>, quella <span>$\varphi$</span> che
+        alla sezione 6 sembrava non contare niente.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Interferenza costruttiva</h4>
+          <p>Le due onde sono <strong>in fase</strong> (<span>$\Delta\varphi = 0$</span>): cresta su cresta,
+            cavo su cavo. Le ampiezze si sommano e l'onda risultante è più alta di entrambe.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Interferenza distruttiva</h4>
+          <p>Le due onde sono <strong>in opposizione di fase</strong>
+            (<span>$\Delta\varphi = 180°$</span>): cresta su cavo. Si sottraggono, e se hanno la stessa
+            ampiezza <strong>si cancellano del tutto</strong>.</p>
+        </div>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns">
+          <button class="btn" id="sv-play">▶ Avvia</button>
+          <button class="btn btn-secondary" id="sv-reset">↺ Azzera</button>
+          <button class="btn btn-secondary" id="sv-fase0">In fase</button>
+          <button class="btn btn-secondary" id="sv-fase180">In opposizione</button>
+        </div>
+        <div class="ctrl">
+          <label for="sv-d">sfasamento $\Delta\varphi$ = <span id="sv-dv">0</span>°</label>
+          <input type="range" id="sv-d" min="0" max="360" step="5" value="0">
+          <label for="sv-A2">ampiezza della seconda onda = <span id="sv-A2v">1,00</span></label>
+          <input type="range" id="sv-A2" min="0" max="1" step="0.05" value="1">
+        </div>
+        <svg viewBox="0 0 660 330" id="sv-svg" role="img" aria-label="due onde che si sovrappongono e la loro somma"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="sv-amp">2,00</div><div class="l">ampiezza risultante (relativa)</div></div>
+          <div class="stat"><div class="n" id="sv-tipo">costruttiva</div><div class="l">tipo di interferenza</div></div>
+          <div class="stat"><div class="n" id="sv-en">4,00</div><div class="l">energia relativa ($\propto A^2$)</div></div>
+        </div>
+        <p class="cap">Figura 7 — In alto le due onde, in basso la loro somma. Portate lo sfasamento a 180° con la stessa ampiezza: sparisce tutto.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>E l'energia? Sparisce anche quella?</strong> È la domanda giusta, e la risposta è no —
+        l'energia si conserva sempre. In un punto in cui l'interferenza è distruttiva l'energia non viene
+        annullata: viene <strong>spostata altrove</strong>. Se costruite un esperimento con due sorgenti,
+        troverete zone di buio alternate a zone doppiamente luminose, e facendo il conto su tutto lo spazio
+        l'energia torna. Quando invece si cancellano davvero <em>ovunque</em> — come nelle cuffie qui sotto —
+        l'energia non è scomparsa: non è mai stata emessa come suono, perché l'altoparlante che genera l'onda
+        in opposizione compie un lavoro contro quella che arriva.
+      </div>
+
+      <div class="curiosita">
+        <strong>Le cuffie a cancellazione attiva del rumore.</strong> È interferenza distruttiva applicata,
+        e funziona così: un microfono sulla parte esterna della cuffia ascolta il rumore ambientale;
+        l'elettronica lo analizza e in una frazione di millisecondo genera un'onda sonora <em>identica ma in
+        opposizione di fase</em>; l'altoparlante la emette, le due onde si sommano dentro il padiglione e il
+        risultato è silenzio.<br><br>
+        Funziona benissimo con i suoni <strong>gravi e regolari</strong> — il ronzio dei motori di un aereo,
+        il rombo del treno — perché sono periodici e prevedibili, e l'elettronica fa in tempo a costruire
+        l'onda opposta. Funziona molto peggio con le voci e con i rumori improvvisi, che cambiano troppo in
+        fretta perché la previsione stia al passo. È il motivo per cui in aereo si sente il silenzio e in
+        ufficio si sentono ancora i colleghi.
+      </div>
+
+      <p>E le <strong>onde stazionarie</strong> del simulatore della sezione 7? Adesso si spiegano da sole:
+        sono l'interferenza fra l'onda che va e quella che torna indietro dopo aver rimbalzato. Nei punti in
+        cui le due arrivano sempre in opposizione di fase la corda non si muove mai — si chiamano
+        <strong>nodi</strong>; nei punti in cui arrivano sempre in fase la corda oscilla al massimo, e sono i
+        <strong>ventri</strong>. Ogni strumento musicale è una macchina per costruire onde stazionarie.</p>
+    </section>
+
+    <!-- 11 — LE ONDE SISMICHE -->
+    <section id="sec11">
+      <h2>11. Onde in tre dimensioni: i terremoti</h2>
+
+      <p>Tutto quello che abbiamo fatto finora era su una corda: un mondo a <strong>una dimensione</strong>,
+        dove l'onda può andare solo avanti o indietro e il mezzo può oscillare solo su e giù. Il mondo vero
+        però ha tre dimensioni, e quando il mezzo è un blocco di roccia le possibilità si moltiplicano.</p>
+
+      <p>Il modo più drammatico per vederlo è un <strong>terremoto</strong>. Quando due masse rocciose in
+        attrito si sbloccano di colpo — la faglia «scatta» — l'energia accumulata per anni parte in tutte le
+        direzioni sotto forma di onde elastiche. E non ne parte una sola: ne partono di tipi diversi, che
+        viaggiano a velocità diverse e fanno danni diversi.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="si-modo">
+          <button class="btn" data-m="P">onde P (longitudinali)</button>
+          <button class="btn btn-secondary" data-m="S">onde S (trasversali)</button>
+          <button class="btn btn-secondary" data-m="SV">solo componente SV</button>
+          <button class="btn btn-secondary" data-m="SH">solo componente SH</button>
+          <button class="btn btn-secondary" data-m="R">onde superficiali</button>
+          <button class="btn btn-secondary" data-m="ALL">tutte insieme</button>
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="si-play">▶ Avvia</button>
+          <button class="btn btn-secondary" id="si-reset">↺ Azzera</button>
+        </div>
+        <div class="ctrl">
+          <label for="si-A">ampiezza = <span id="si-Av">1,0</span></label>
+          <input type="range" id="si-A" min="0.2" max="2" step="0.1" value="1">
+        </div>
+        <svg viewBox="0 0 660 400" id="si-svg" role="img" aria-label="simulazione dei diversi tipi di onde sismiche"></svg>
+        <p class="eq-out" id="si-msg"></p>
+        <p class="cap">Figura 8 — Sopra una sezione verticale del terreno, sotto la stessa zona vista dall'alto. L'onda viaggia sempre verso destra.</p>
+      </div>
+
+      <h3>11.1 Le onde di volume</h3>
+
+      <p>Le prime due viaggiano <em>dentro</em> la roccia, in profondità, e per questo si chiamano
+        <strong>onde di volume</strong>.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Onde P — «prime»</h4>
+          <p><strong>Longitudinali:</strong> la roccia si comprime e si dilata <em>nella stessa direzione</em>
+            in cui l'onda avanza, come una molla. Sono le più veloci di tutte
+            (<span>$\approx 6$</span> km/s nella crosta) e quindi le prime ad arrivare: da qui il nome.</p>
+          <p>Attraversano tutto, solidi e liquidi, perché per comprimere basta esserci.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Onde S — «seconde»</h4>
+          <p><strong>Trasversali:</strong> la roccia scorre <em>perpendicolarmente</em> alla direzione di
+            propagazione, come sulla nostra corda. Viaggiano a circa <span>$3{,}5$</span> km/s, quindi
+            arrivano dopo.</p>
+          <p>Nei liquidi <strong>non si propagano affatto</strong>: un fluido non oppone resistenza allo
+            scorrimento laterale, quindi non ha nulla con cui trasmettere la spinta al vicino.</p>
+        </div>
+      </div>
+
+      <div class="curiosita">
+        <strong>È così che sappiamo com'è fatta la Terra dentro.</strong> Nessuno ha mai scavato più di 12
+        km, eppure conosciamo la struttura interna del pianeta fino al centro. Il merito è di questa
+        differenza: le onde S <em>non</em> passano nei liquidi. Registrando i terremoti in tutto il mondo ci
+        si accorse che esiste una vasta «zona d'ombra» in cui le onde S non arrivano mai — e l'unica
+        spiegazione possibile è che a metà strada, a 2900 km di profondità, ci sia uno strato
+        <strong>liquido</strong>: il nucleo esterno. La Terra è stata radiografata con i suoi stessi
+        terremoti.
+      </div>
+
+      <h3>11.2 SV, SH e il concetto di polarizzazione</h3>
+
+      <p>Qui arriva il punto più sottile, e vale la pena rallentare. Un'onda longitudinale non ha scelta: la
+        direzione in cui il mezzo oscilla <em>è</em> la direzione in cui l'onda viaggia, e basta. Ma
+        un'onda <strong>trasversale</strong> deve oscillare perpendicolarmente alla propagazione — e in tre
+        dimensioni «perpendicolare» non individua una direzione sola: ne individua un <strong>piano
+        intero</strong>.</p>
+
+      <p>Se l'onda viaggia in orizzontale verso est, il mezzo può oscillare su e giù, oppure a destra e a
+        sinistra, oppure in qualunque via di mezzo. La scelta di questa direzione si chiama
+        <strong>polarizzazione</strong>, ed è una proprietà che <em>solo</em> le onde trasversali possiedono.</p>
+
+      <div class="rule">
+        <p class="formula-title">Le due componenti di un'onda S</p>
+        <ul style="margin:0.4rem 0 0;">
+          <li><strong>SV</strong> (<em>shear vertical</em>): la roccia oscilla nel <strong>piano
+            verticale</strong>, cioè su e giù. Si vede nella sezione verticale del simulatore.</li>
+          <li><strong>SH</strong> (<em>shear horizontal</em>): la roccia oscilla in <strong>orizzontale</strong>,
+            di traverso rispetto al cammino dell'onda. Si vede solo nella vista dall'alto.</li>
+        </ul>
+        <p class="formula-note">Un'onda S qualsiasi è sempre una <strong>somma</strong> di una componente SV
+          e una SH — esattamente come, nella lezione 7, un vettore qualsiasi era la somma delle sue due
+          componenti. Scomporre serve perché le due componenti si comportano in modo diverso quando incontrano
+          la superficie o uno strato di terreno differente.</p>
+      </div>
+
+      <div class="note">
+        <strong>Segnatevi questa parola.</strong> La polarizzazione tornerà nella
+        <a href="12_Suono_Luce.html">prossima lezione</a>, e non per i terremoti: per la <strong>luce</strong>.
+        Il fatto che la luce si possa polarizzare è la prova sperimentale che è un'onda
+        <em>trasversale</em> — e questa sola informazione ha deciso una controversia che durava da due secoli.
+        Il suono, che è longitudinale, non si può polarizzare in nessun modo: non c'è niente da orientare.
+      </div>
+
+      <h3>11.3 Le onde superficiali, cioè quelle che fanno i danni</h3>
+
+      <p>C'è un terzo tipo, e nasce quando le onde di volume raggiungono la <strong>superficie</strong>. Lì il
+        terreno non ha più roccia sopra di sé, e può muoversi molto più liberamente: si formano onde che
+        viaggiano <em>lungo</em> la superficie, un po' come quelle del mare.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Onde di Rayleigh</h4>
+          <p>Il terreno descrive <strong>ellissi verticali</strong>: sale, avanza, scende, torna indietro. È
+            l'onda che si vede letteralmente passare come un'ondulazione del suolo.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Onde di Love</h4>
+          <p>Il terreno scorre <strong>orizzontalmente</strong>, di traverso. Sono le più insidiose per gli
+            edifici, che resistono bene ai carichi verticali — devono già reggere il proprio peso — e molto
+            male alle scosse laterali.</p>
+        </div>
+      </div>
+
+      <p>Sono le <strong>più lente</strong> di tutte (attorno a <span>$3$</span> km/s), quindi arrivano per
+        ultime. Ma sono anche quelle che portano <strong>più energia</strong>, per due motivi: restano
+        confinate vicino alla superficie invece di disperdersi in tutto il volume, e si smorzano molto più
+        lentamente con la distanza. Il risultato è che nella maggior parte dei terremoti i danni gravi
+        arrivano <em>dopo</em> la prima scossa avvertita.</p>
+
+      <table class="tabf">
+        <thead>
+          <tr><th>Tipo</th><th>Come oscilla la roccia</th><th>Velocità tipica</th><th>Arrivo</th><th>Pericolosità</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="lab">P — longitudinali</td><td class="l">avanti e indietro, lungo il cammino</td><td>$\approx 6$ km/s</td><td>per prime</td><td>bassa</td></tr>
+          <tr><td class="lab">S — trasversali</td><td class="l">di traverso (SV e SH)</td><td>$\approx 3{,}5$ km/s</td><td>per seconde</td><td>media</td></tr>
+          <tr><td class="lab">superficiali</td><td class="l">ellissi verticali o scorrimenti laterali</td><td>$\approx 3$ km/s</td><td>per ultime</td><td><strong>alta</strong></td></tr>
+        </tbody>
+      </table>
+
+      <div class="curiosita">
+        <strong>Perché il ritardo salva delle vite.</strong> Le onde P sono più veloci e quasi innocue: fanno
+        quel colpo secco, quel «tonfo» che spesso precede la scossa vera. Le reti sismiche moderne le
+        sfruttano: un sensore vicino all'epicentro riconosce le P, calcola in un istante l'entità del sisma e
+        lancia l'allarme via radio — che viaggia alla velocità della luce e quindi <strong>arriva prima delle
+        onde S</strong>. In Giappone questo sistema ferma i treni ad alta velocità, chiude le valvole del gas
+        e apre le porte degli ascensori con un anticipo che va da pochi secondi a un minuto. Non sembra molto:
+        è abbastanza per fermare uno Shinkansen a 300 km/h.
+      </div>
+
+      <p>Lo stesso ritardo serve anche a un'altra cosa: a capire <strong>quanto è lontano</strong> il
+        terremoto. Poiché le P e le S partono nello stesso istante ma viaggiano a velocità diverse, il tempo
+        che passa fra i due arrivi cresce con la distanza — e da quel tempo si risale ai chilometri.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="sg-d">distanza dall'epicentro = <span id="sg-dv">100</span> km</label>
+          <input type="range" id="sg-d" min="20" max="250" step="5" value="100">
+        </div>
+        <svg viewBox="0 0 660 260" id="sg-svg" role="img" aria-label="sismogramma con gli arrivi delle onde P, S e superficiali"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="sg-tp">16,7</div><div class="l">arrivo delle P (s)</div></div>
+          <div class="stat"><div class="n" id="sg-ts">28,6</div><div class="l">arrivo delle S (s)</div></div>
+          <div class="stat"><div class="n" id="sg-tr">31,3</div><div class="l">arrivo delle superficiali (s)</div></div>
+          <div class="stat"><div class="n" id="sg-dt">11,9</div><div class="l">ritardo S − P (s)</div></div>
+        </div>
+        <p class="cap">Figura 9 — Un sismogramma semplificato. Il ritardo fra i due arrivi cresce in proporzione alla distanza.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3 — dov'è l'epicentro?</span></div>
+        <p>Una stazione sismica registra l'arrivo delle onde P alle <span>$10{:}32{:}15$</span> e quello
+          delle onde S alle <span>$10{:}32{:}27$</span>. Assumendo
+          <span>$v_P = 6{,}0$</span> km/s e <span>$v_S = 3{,}5$</span> km/s: <strong>(a)</strong> a che
+          distanza è avvenuto il terremoto? <strong>(b)</strong> A che ora, esattamente, è cominciato?
+          <strong>(c)</strong> Perché con una sola stazione non si può dire <em>dove</em> sia l'epicentro?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution" data-target="#sol-o3">💡 Mostra soluzione</button></div>
+        <div class="solution" id="sol-o3">
+          <p><strong>(a)</strong> Il ritardo è <span>$\Delta t = 12$</span> s. Le due onde hanno percorso la
+            stessa distanza <span>$d$</span> impiegando tempi diversi:</p>
+          <p style="text-align:center;">$$\Delta t = \frac{d}{v_S} - \frac{d}{v_P} = d\left(\frac{1}{3{,}5} - \frac{1}{6{,}0}\right) = d \cdot 0{,}1190$$</p>
+          <p style="text-align:center;">$$d = \frac{12}{0{,}1190} = 101\ \text{km}$$</p>
+          <p>Il fattore <span>$1/0{,}1190 = 8{,}4$</span> km/s è comodissimo e i sismologi lo usano a mente:
+            <em>ogni secondo di ritardo vale circa 8 chilometri</em>.</p>
+          <p><strong>(b)</strong> Le P hanno impiegato <span>$101 / 6{,}0 = 16{,}8$</span> s, quindi la
+            scossa è partita alle <span>$10{:}31{:}58$</span> circa. Controprova con le S:
+            <span>$101 / 3{,}5 = 28{,}9$</span> s prima delle 10:32:27, che dà lo stesso istante. ✔</p>
+          <p><strong>(c)</strong> Perché <span>$d$</span> è una <strong>distanza</strong>, non una posizione:
+            dice che l'epicentro sta da qualche parte su una <strong>circonferenza</strong> di raggio 101 km
+            attorno alla stazione, ma non dice in quale punto. Con due stazioni le due circonferenze si
+            intersecano in due punti; con <strong>tre</strong> stazioni resta un punto solo. È il motivo per
+            cui le reti sismiche hanno sempre molti sensori sparsi, ed è la stessa matematica con cui il
+            navigatore satellitare vi trova incrociando le distanze da più satelliti.</p>
+          <div class="result-box"><span class="result-label">Risultati</span>
+            <span class="result-value">$d \approx 101$ km &nbsp;·&nbsp; inizio alle $10{:}31{:}58$ &nbsp;·&nbsp; servono tre stazioni</span></div>
+        </div>
+      </div>
+
+      <h3>11.4 Quanto è stato forte? Le scale dei terremoti</h3>
+
+      <p>Dopo ogni scossa, in televisione, arrivano due numeri diversi e quasi nessuno spiega perché siano
+        due. La ragione è che rispondono a <strong>due domande diverse</strong>, e confonderle è l'errore
+        più comune quando si parla di terremoti.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Intensità — «quanto l'abbiamo sentito <em>qui</em>?»</h4>
+          <p>Misura gli <strong>effetti</strong> in un luogo preciso: che cosa hanno avvertito le persone,
+            che cosa è caduto, quali edifici sono lesionati. Non serve nessuno strumento: serve andare a
+            vedere.</p>
+          <p>Uno stesso terremoto ha <strong>tante intensità quanti sono i paesi colpiti</strong>: alta
+            vicino all'epicentro, bassa lontano.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Magnitudo — «quanta energia ha liberato?»</h4>
+          <p>Misura ciò che è successo <strong>alla sorgente</strong>, sotto terra: quanta roccia si è
+            spostata e di quanto. Si ricava dai sismografi con un calcolo.</p>
+          <p>Un terremoto ha <strong>una sola magnitudo</strong>, indipendente da dove lo si misura. È il
+            numero che permette di confrontare eventi avvenuti in continenti diversi.</p>
+        </div>
+      </div>
+
+      <p>Un'immagine per fissarla: la magnitudo è la <em>potenza della lampadina</em>, l'intensità è
+        <em>quanta luce arriva sul vostro tavolo</em>. La lampadina è una sola; la luce sul tavolo dipende
+        da quanto siete lontani, da che cosa c'è in mezzo e da com'è fatta la stanza.</p>
+
+      <h4 style="color:var(--accent); margin-top:1.2rem;">Le scale di intensità: Mercalli e le sue eredi</h4>
+
+      <p>La più nota in Italia è la scala <strong>Mercalli–Cancani–Sieberg</strong> (MCS), oggi affiancata
+        dalla scala europea <strong>EMS-98</strong>, che ne è una versione più rigorosa. Sono scale
+        <strong>descrittive</strong>: a ogni grado corrisponde un elenco di effetti osservabili, e si
+        assegna il grado che meglio descrive quello che si vede. Vanno da I a XII, in numeri romani proprio
+        per non confonderle con la magnitudo.</p>
+
+      <table class="tabf">
+        <thead>
+          <tr><th>Grado</th><th>Nome</th><th>Che cosa si osserva</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="lab">I–III</td><td class="l">impercettibile / leggero</td><td class="l">avvertito solo da strumenti o da poche persone ferme ai piani alti; lampadari che oscillano appena</td></tr>
+          <tr><td class="lab">IV–V</td><td class="l">moderato / abbastanza forte</td><td class="l">avvertito da molti, tintinnio di stoviglie, quadri storti, qualche persona si sveglia</td></tr>
+          <tr><td class="lab">VI–VII</td><td class="l">forte / molto forte</td><td class="l">tutti escono di casa; crepe negli intonaci, caduta di comignoli e tegole, danni agli edifici deboli</td></tr>
+          <tr><td class="lab">VIII–IX</td><td class="l">rovinoso / distruttivo</td><td class="l">crolli parziali diffusi, edifici in muratura gravemente lesionati, fenditure nel terreno</td></tr>
+          <tr><td class="lab">X–XII</td><td class="l">disastroso / catastrofico</td><td class="l">crollo della maggior parte degli edifici, deformazioni permanenti del suolo, modifiche del paesaggio</td></tr>
+        </tbody>
+      </table>
+
+      <p>Sembra un metodo poco scientifico, e invece è indispensabile per almeno tre motivi. È l'<strong>unico
+        modo</strong> di studiare i terremoti avvenuti prima dell'invenzione del sismografo: leggendo le
+        cronache di un evento del Seicento si assegnano i gradi paese per paese e si ricostruisce la mappa.
+        È quello che serve alla <strong>protezione civile</strong>, che non deve sapere quanti joule sono
+        stati liberati ma dove sono crollate le case. Ed è la base delle <strong>norme antisismiche</strong>,
+        che sono scritte in termini di scuotimento atteso in un luogo, non di energia alla sorgente.</p>
+
+      <div class="curiosita">
+        <strong>Perché due paesi vicini possono avere intensità molto diverse.</strong> A parità di
+        distanza dall'epicentro contano il tipo di terreno — la roccia trasmette e basta, i terreni
+        alluvionali sabbiosi <em>amplificano</em> lo scuotimento e possono perfino liquefarsi come nel
+        secchio della prossima sezione — la profondità dell'ipocentro e, soprattutto, com'erano costruite
+        le case. Non è un difetto della scala: è proprio l'informazione che si vuole misurare.
+      </div>
+
+      <h4 style="color:var(--accent); margin-top:1.2rem;">Le scale di magnitudo: Richter e il momento sismico</h4>
+
+      <p>Nel 1935 Charles Richter ebbe un'idea molto pratica: prendere l'<strong>ampiezza massima</strong>
+        registrata dal sismografo, correggerla per la distanza e farne il <strong>logaritmo</strong>. Perché
+        il logaritmo? Perché le ampiezze in gioco vanno dal micrometro al metro — un rapporto di un milione —
+        e su una scala normale i terremoti piccoli sarebbero tutti schiacciati sullo zero. Il logaritmo
+        comprime quell'enormità in numeri che stanno fra 1 e 10.</p>
+
+      <div class="rule">
+        <p class="formula-title">Che cosa significa «un grado in più»</p>
+        <ul style="margin:0.4rem 0 0;">
+          <li>L'<strong>ampiezza</strong> registrata diventa <strong>10 volte</strong> più grande.</li>
+          <li>L'<strong>energia</strong> liberata diventa circa <strong>32 volte</strong> più grande
+            (per la precisione <span>$10^{1{,}5} = 31{,}6$</span>).</li>
+        </ul>
+        <p class="formula-note">Quindi due gradi in più valgono <span>$10^3 = 1000$</span> volte l'energia.
+          Un terremoto di magnitudo 7 non è «poco più forte» di uno di magnitudo 5: ne libera
+          <strong>mille volte</strong> tanta. È il motivo per cui la scala inganna chi la legge come se
+          fosse una scala normale.</p>
+      </div>
+
+      <p>La formula che lega magnitudo ed energia liberata è, in joule,</p>
+
+      <p style="text-align:center;">$$\log_{10} E = 1{,}5\,M + 4{,}8$$</p>
+
+      <p>e non serve saperla usare adesso — i logaritmi li incontrerete in matematica più avanti. Serve però
+        il confronto qui sotto, perché rende concreto che cosa vuol dire «un grado».</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="mg-a">primo terremoto: magnitudo <span id="mg-av">6,0</span></label>
+          <input type="range" id="mg-a" min="3" max="9.5" step="0.1" value="6">
+          <label for="mg-b">secondo terremoto: magnitudo <span id="mg-bv">7,0</span></label>
+          <input type="range" id="mg-b" min="3" max="9.5" step="0.1" value="7">
+        </div>
+        <svg viewBox="0 0 660 240" id="mg-svg" role="img" aria-label="confronto fra le energie di due terremoti"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="mg-ea">6,3·10¹³</div><div class="l">energia del primo (J)</div></div>
+          <div class="stat"><div class="n" id="mg-eb">2,0·10¹⁵</div><div class="l">energia del secondo (J)</div></div>
+          <div class="stat"><div class="n" id="mg-rap">31,6</div><div class="l">quante volte più grande</div></div>
+          <div class="stat"><div class="n" id="mg-hiro">1,0</div><div class="l">il primo, in bombe di Hiroshima</div></div>
+        </div>
+        <p class="cap">Figura 10 — Le barre sono in scala logaritmica: se fossero in scala normale, quella del terremoto piccolo sarebbe invisibile.</p>
+      </div>
+
+      <p>La scala Richter però ha un difetto scoperto col tempo: sopra magnitudo 7 circa <strong>satura</strong>.
+        Gli strumenti registrano ampiezze quasi uguali per terremoti molto diversi, perché le onde su cui si
+        basa non riescono più a «raccontare» una rottura lunga centinaia di chilometri. Per questo oggi si
+        usa quasi sempre la <strong>magnitudo momento</strong> <span>$M_w$</span>, che non parte dal
+        sismogramma ma da una grandezza fisica della faglia: il <em>momento sismico</em>, cioè quanto è
+        estesa la superficie che si è rotta moltiplicata per quanto è scivolata e per la rigidità della
+        roccia. È la grandezza che davvero misura l'evento, e non satura mai.</p>
+
+      <div class="warnbox">
+        <strong>Quando sentite «magnitudo Richter», quasi sempre non lo è.</strong> I numeri diffusi oggi
+        dagli istituti sismologici sono magnitudo momento <span>$M_w$</span>: sotto il 7 le due scale danno
+        valori quasi uguali — per questo la confusione non fa danni — ma sopra divergono parecchio. Il
+        terremoto del Cile del 1960, il più forte mai registrato, è <span>$M_w\ 9{,}5$</span>: sulla scala
+        Richter originale sarebbe stato «solo» 8,5 circa, e nessuno avrebbe capito che era in una categoria
+        a parte.
+      </div>
+
+      <table class="tabf">
+        <thead>
+          <tr><th>Terremoto</th><th>Magnitudo $M_w$</th><th>Energia (J)</th><th>Intensità massima osservata</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="lab">Cile, 1960</td><td>$9{,}5$</td><td>$1{,}1 \times 10^{19}$</td><td>XI–XII</td></tr>
+          <tr><td class="lab">Tōhoku (Giappone), 2011</td><td>$9{,}1$</td><td>$2{,}8 \times 10^{18}$</td><td>IX–XI</td></tr>
+          <tr><td class="lab">Messina, 1908</td><td>$7{,}1$</td><td>$2{,}8 \times 10^{15}$</td><td>XI</td></tr>
+          <tr><td class="lab">Irpinia, 1980</td><td>$6{,}9$</td><td>$1{,}4 \times 10^{15}$</td><td>X</td></tr>
+          <tr><td class="lab">L'Aquila, 2009</td><td>$6{,}3$</td><td>$1{,}8 \times 10^{14}$</td><td>IX</td></tr>
+          <tr><td class="lab">Amatrice, 2016</td><td>$6{,}0$</td><td>$6{,}3 \times 10^{13}$</td><td>XI</td></tr>
+        </tbody>
+      </table>
+
+      <p>Guardate le ultime due righe, perché insegnano più di tutto il resto: Amatrice ha avuto una
+        magnitudo <em>più bassa</em> dell'Aquila e un'intensità massima <em>più alta</em>. Non è una
+        contraddizione ed è esattamente il motivo per cui servono due scale. L'ipocentro era molto
+        superficiale, i borghi erano proprio sopra, e l'edilizia storica in pietra non era stata
+        consolidata. La magnitudo dice quanta energia è partita; l'intensità dice quanta ne è arrivata
+        addosso alle case — e quella dipende anche da noi.</p>
+    </section>
+
+    <!-- 12 — L'ESPERIMENTO DEL SECCHIO -->
+    <section id="sec12">
+      <h2>12. Un esperimento da fare in giardino</h2>
+
+      <p>Chiudiamo con qualcosa da fare con le mani, che costa zero e che spiega una delle ragioni per cui i
+        terremoti fanno crollare le case. Serve un secchio, dell'acqua e della sabbia.</p>
+
+      <div class="rule">
+        <p class="formula-title">Che cosa fare</p>
+        <ol style="margin:0.4rem 0 0;">
+          <li>Mettete nel secchio due o tre dita d'<strong>acqua</strong>.</li>
+          <li>Versateci sopra la <strong>sabbia</strong> — meglio quella fine, da spiaggia — fino a riempire
+            il secchio quasi del tutto. Lasciate riposare qualche minuto: in superficie la sabbia deve
+            apparire compatta e asciutta, tanto da poterci camminare sopra con le dita.</li>
+          <li>Appoggiate sopra un <strong>oggetto pesante e piccolo</strong>: una moneta grossa, una vite, un
+            sasso. Deve stare lì senza affondare.</li>
+          <li>Adesso <strong>battete sui bordi</strong> del secchio con la mano, ritmicamente, per qualche
+            secondo.</li>
+        </ol>
+      </div>
+
+      <p>Quello che vedete è sorprendente: la sabbia, che un attimo prima era un solido su cui si poteva
+        appoggiare un peso, <strong>si comporta come un liquido</strong>. L'oggetto sprofonda, e se avete
+        sepolto in fondo qualcosa di leggero — un tappo di sughero, una pallina di plastica — quello
+        <em>risale</em>, esattamente come farebbe in acqua per la spinta di Archimede della
+        <a href="10_Fluidi.html#sec4">lezione 10</a>.</p>
+
+      <p>Il fenomeno si chiama <strong>liquefazione</strong>, ed è tutt'altro che un gioco.</p>
+
+      <div class="rule">
+        <p class="formula-title">Perché succede</p>
+        <p>Una sabbia satura d'acqua sta in piedi grazie al <strong>contatto fra i granelli</strong>: sono i
+          punti in cui si toccano a sostenere il peso, mentre l'acqua sta ferma negli spazi vuoti. Le
+          vibrazioni scuotono i granelli e li fanno riassestare; nel farlo l'acqua intrappolata viene
+          compressa, la sua pressione sale e comincia a <em>sostenere</em> lei il carico, separando i
+          granelli.</p>
+        <p class="formula-note">A quel punto i contatti si perdono e i granelli galleggiano in un impasto:
+          il terreno non è più un solido, è una sospensione densa. Cessate le vibrazioni, l'acqua rifiltra
+          via, i granelli si ricompattano — e il terreno ritorna solido, ma con l'edificio storto dentro.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>Succede davvero, e su larga scala.</strong> A Niigata, in Giappone, nel 1964 interi palazzi
+        di appartamenti si <em>coricarono su un fianco</em> senza rompersi: la struttura aveva retto
+        benissimo alla scossa, ma il terreno sotto si era liquefatto e il palazzo era affondato come la
+        moneta nel secchio. A Christchurch, in Nuova Zelanda, nel 2011 la liquefazione riversò in superficie
+        centinaia di migliaia di tonnellate di fango. Il terreno più a rischio è proprio quello che sembra
+        più comodo su cui costruire: pianure alluvionali sabbiose, con la falda vicina alla superficie —
+        cioè le zone dove sorgono quasi tutte le città.
+      </div>
+
+      <p>Ed è per questo che prima di costruire qualcosa non basta l'ingegnere che calcola la struttura:
+        serve il <strong>geologo</strong> che dica com'è fatto il terreno sotto. In Italia lo studio
+        geologico è obbligatorio per legge prima di qualunque intervento edilizio serio, e non è un
+        adempimento burocratico: è la differenza fra un edificio che resiste a un terremoto e un edificio
+        perfetto che sprofonda per conto suo. La miglior casa antisismica del mondo, costruita sul terreno
+        sbagliato, si corica lo stesso.</p>
+
+      <div class="note">
+        <strong>Nella prossima lezione</strong> prendiamo tutto quello che abbiamo costruito qui — frequenza,
+        ampiezza, lunghezza d'onda, velocità, interferenza, polarizzazione — e lo applichiamo a due onde che
+        conoscete benissimo senza sapere che lo sono: il <strong>suono</strong> e la <strong>luce</strong>.
+        Con una novità: le onde, finalmente, le potrete anche <em>sentire</em>.
+        <a href="12_Suono_Luce.html">Andiamo →</a>
+      </div>
+    </section>
+
+<!--SENTINEL-->
+
+    <section id="quiz">
+      <h2>13. Quiz finale</h2>
+      <p>Domande su frequenza e periodo, ampiezza e lunghezza d'onda, la formula delle onde, la velocità di
+        propagazione, l'interferenza e le onde sismiche.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 11 — Le onde · Fisica · Terzo anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      /* ---------- utilità comuni ---------- */
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+      function num(s) { return parseFloat(String(s).replace(',', '.').replace(/\s/g, '').trim()); }
+
+      function freccia(x1, y1, x2, y2, cls, s) {
+        s = s || 11;
+        var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy) || 1;
+        var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+        if (L < s * 1.2) { s = Math.max(4, L * 0.8); }
+        var bx = x2 - ux * s, by = y2 - uy * s;
+        var pts = x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+                  (bx + px * s * 0.42).toFixed(1) + ',' + (by + py * s * 0.42).toFixed(1) + ' ' +
+                  (bx - px * s * 0.42).toFixed(1) + ',' + (by - py * s * 0.42).toFixed(1);
+        return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) +
+               '" y2="' + by.toFixed(1) + '" class="' + cls + '"/>' +
+               '<polygon points="' + pts + '" class="' + cls + 'p"/>';
+      }
+
+      // freccia a due punte, per quotare una distanza
+      function quota(x1, y1, x2, y2, cls) {
+        return freccia(x1, y1, x2, y2, cls, 9) + freccia(x2, y2, x1, y1, cls, 9);
+      }
+
+      // gestisce un gruppo di pulsanti a scelta singola
+      function gruppo(sel, attr, callback) {
+        var bs = document.querySelectorAll(sel + ' button');
+        Array.prototype.forEach.call(bs, function (b) {
+          b.addEventListener('click', function () {
+            Array.prototype.forEach.call(bs, function (x) {
+              x.className = (x === b) ? 'btn' : 'btn btn-secondary';
+            });
+            callback(b.getAttribute(attr));
+          });
+        });
+      }
+
+      // motore di animazione: chiama passo(dt) finché è attivo
+      function motore(idPlay, passo) {
+        var attivo = false, ultimo = null;
+        function ciclo(ts) {
+          if (!attivo) { return; }
+          if (ultimo === null) { ultimo = ts; }
+          var dt = Math.min((ts - ultimo) / 1000, 0.05);
+          ultimo = ts;
+          passo(dt);
+          if (attivo) { requestAnimationFrame(ciclo); }
+        }
+        var btn = document.getElementById(idPlay);
+        btn.addEventListener('click', function () {
+          attivo = !attivo;
+          this.textContent = attivo ? '⏸ Pausa' : '▶ Avvia';
+          ultimo = null;
+          if (attivo) { requestAnimationFrame(ciclo); }
+        });
+        return {
+          stop: function () { attivo = false; ultimo = null; btn.textContent = '▶ Avvia'; },
+          avvia: function () { if (!attivo) { attivo = true; ultimo = null; btn.textContent = '⏸ Pausa'; requestAnimationFrame(ciclo); } }
+        };
+      }
+
+      /* ================= 2 — l'impulso che viaggia ================= */
+      (function () {
+        var svg = document.getElementById('im-svg');
+        if (!svg) { return; }
+        var t = 0, XM = 10, XP = 60, XW = 580, Y0 = 160, SC = 68;
+        var XMARK = 6.0, A = 0.8, W = 0.55;
+        function px(x) { return XP + x / XM * XW; }
+        function py(y) { return Y0 - y * SC; }
+        function forma(x, x0) { var u = (x - x0) / W; return A * Math.exp(-u * u); }
+        function disegna() {
+          var v = parseFloat(document.getElementById('im-v').value);
+          var x0 = -1.2 + v * t;
+          var g = '', i, pts = [];
+          for (i = 0; i <= 300; i++) {
+            var x = XM * i / 300;
+            pts.push(px(x).toFixed(1) + ',' + py(forma(x, x0)).toFixed(1));
+          }
+          g += '<line x1="' + XP + '" y1="' + Y0 + '" x2="' + (XP + XW) + '" y2="' + Y0 + '" class="dash"/>';
+          g += '<polyline points="' + pts.join(' ') + '" class="corda"/>';
+          if (document.getElementById('im-tracce').checked) {
+            for (i = 0; i <= 25; i++) {
+              var xp = XM * i / 25;
+              g += '<circle cx="' + px(xp).toFixed(1) + '" cy="' + py(forma(xp, x0)).toFixed(1) +
+                   '" r="3" fill="var(--muted)"/>';
+            }
+          }
+          var ym = forma(XMARK, x0);
+          g += '<line x1="' + px(XMARK).toFixed(1) + '" y1="' + (Y0 + 34) + '" x2="' + px(XMARK).toFixed(1) +
+               '" y2="' + py(ym).toFixed(1) + '" class="dash"/>';
+          g += '<circle cx="' + px(XMARK).toFixed(1) + '" cy="' + py(ym).toFixed(1) + '" r="8" fill="var(--red)"/>';
+          g += '<text x="' + px(XMARK).toFixed(1) + '" y="' + (Y0 + 52) + '" text-anchor="middle" class="lbl-s">il punto che seguiamo</text>';
+          g += freccia(px(XMARK) + 34, py(ym), px(XMARK) + 34, py(ym) - 40 * (ym > 0.05 ? 1 : 0.001), 'w', 10);
+          g += '<text x="' + (XP + XW) + '" y="' + (Y0 + 74) + '" text-anchor="end" class="lbl">x (m)</text>';
+          for (i = 0; i <= XM; i += 2) {
+            g += '<line x1="' + px(i).toFixed(1) + '" y1="' + (Y0 + 30) + '" x2="' + px(i).toFixed(1) + '" y2="' + (Y0 + 38) + '" class="axis"/>';
+            g += '<text x="' + px(i).toFixed(1) + '" y="' + (Y0 + 54) + '" text-anchor="middle" class="lbl-s">' + i + '</text>';
+          }
+          svg.innerHTML = g;
+          document.getElementById('im-vv').textContent = nf(v, 1);
+          document.getElementById('im-x').textContent = nf(Math.max(0, Math.min(XM, x0)), 1);
+          document.getElementById('im-y').textContent = nf(ym, 2);
+          document.getElementById('im-dx').textContent = '0,00';
+        }
+        var m = motore('im-play', function (dt) {
+          t += dt;
+          if (-1.2 + parseFloat(document.getElementById('im-v').value) * t > XM + 1.5) { t = 0; }
+          disegna();
+        });
+        document.getElementById('im-go').addEventListener('click', function () { t = 0; m.avvia(); });
+        document.getElementById('im-reset').addEventListener('click', function () { m.stop(); t = 0; disegna(); });
+        document.getElementById('im-v').addEventListener('input', disegna);
+        document.getElementById('im-tracce').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ================= 4 — ampiezza e lunghezza d'onda ================= */
+      (function () {
+        var svg = document.getElementById('on-svg');
+        if (!svg) { return; }
+        var t = 0, XM = 10, XP = 60, XW = 580, Y0 = 150, SC = 100;
+        function px(x) { return XP + x / XM * XW; }
+        function py(y) { return Y0 - y * SC; }
+        function disegna() {
+          var A = parseFloat(document.getElementById('on-A').value);
+          var L = parseFloat(document.getElementById('on-L').value);
+          var f = 0.35;
+          function y(x) { return A * Math.sin(2 * Math.PI * (x / L - f * t)); }
+          var g = '', i, pts = [];
+          for (i = 0; i <= 400; i++) { var x = XM * i / 400; pts.push(px(x).toFixed(1) + ',' + py(y(x)).toFixed(1)); }
+          g += '<line x1="' + XP + '" y1="' + Y0 + '" x2="' + (XP + XW) + '" y2="' + Y0 + '" class="dash"/>';
+          g += '<polyline points="' + pts.join(' ') + '" class="corda"/>';
+          // la prima cresta: quota dell'ampiezza
+          var xc = L * (0.25 + f * t);
+          while (xc > L) { xc -= L; }
+          while (xc < 0.6) { xc += L; }
+          g += quota(px(xc), Y0, px(xc), py(A), 'w');
+          g += '<text x="' + (px(xc) + 12).toFixed(1) + '" y="' + (Y0 - A * SC / 2 + 5).toFixed(1) + '" class="em">A</text>';
+          // fra due creste: la lunghezza d'onda
+          if (xc + L <= XM) {
+            g += quota(px(xc), py(A) - 26, px(xc + L), py(A) - 26, 's');
+            g += '<text x="' + px(xc + L / 2).toFixed(1) + '" y="' + (py(A) - 32).toFixed(1) +
+                 '" text-anchor="middle" class="lbl">λ</text>';
+            g += '<line x1="' + px(xc).toFixed(1) + '" y1="' + py(A).toFixed(1) + '" x2="' + px(xc).toFixed(1) + '" y2="' + (py(A) - 24).toFixed(1) + '" class="dash"/>';
+            g += '<line x1="' + px(xc + L).toFixed(1) + '" y1="' + py(A).toFixed(1) + '" x2="' + px(xc + L).toFixed(1) + '" y2="' + (py(A) - 24).toFixed(1) + '" class="dash"/>';
+          }
+          g += '<text x="' + (XP + XW) + '" y="' + (Y0 + 118) + '" text-anchor="end" class="lbl">x (m)</text>';
+          for (i = 0; i <= XM; i += 2) {
+            g += '<text x="' + px(i).toFixed(1) + '" y="' + (Y0 + 118) + '" text-anchor="middle" class="lbl-s">' + i + '</text>';
+          }
+          svg.innerHTML = g;
+          document.getElementById('on-Av').textContent = nf(A, 2);
+          document.getElementById('on-Lv').textContent = nf(L, 1);
+          document.getElementById('on-A2').textContent = nf(A, 2);
+          document.getElementById('on-L2').textContent = nf(L, 1);
+          document.getElementById('on-cc').textContent = nf(2 * A, 2);
+          document.getElementById('on-n').textContent = nf(XM / L, 1);
+        }
+        var m = motore('on-play', function (dt) { t += dt; disegna(); });
+        document.getElementById('on-reset').addEventListener('click', function () { m.stop(); t = 0; disegna(); });
+        ['on-A', 'on-L'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        disegna();
+      })();
+
+      /* ================= 5 — lo spazio e il tempo ================= */
+      (function () {
+        var svg = document.getElementById('pt-svg');
+        if (!svg) { return; }
+        var t = 0, V = 2.0, A = 0.6, TM = 10;
+        var AX = 45, AW = 265, AY = 120, SC = 62;      // pannello spaziale
+        var BX = 375, BW = 250, BY = 120;              // pannello temporale
+        function disegna() {
+          var f = parseFloat(document.getElementById('pt-f').value);
+          var xs = parseFloat(document.getElementById('pt-x').value);
+          var L = V / f;
+          function px(x) { return AX + x / 10 * AW; }
+          function py(y) { return AY - y * SC; }
+          function qx(u) { return BX + u / TM * BW; }
+          function qy(y) { return AY - y * SC; }
+          function onda(x, tt) { return A * Math.sin(2 * Math.PI * (x / L - f * tt)); }
+          var g = '', i, pts = [];
+          // --- pannello spaziale ---
+          g += '<text x="' + (AX + AW / 2) + '" y="26" text-anchor="middle" class="lbl">tutta la corda, adesso</text>';
+          g += '<line x1="' + AX + '" y1="' + AY + '" x2="' + (AX + AW) + '" y2="' + AY + '" class="dash"/>';
+          for (i = 0; i <= 300; i++) { var x = 10 * i / 300; pts.push(px(x).toFixed(1) + ',' + py(onda(x, t)).toFixed(1)); }
+          g += '<polyline points="' + pts.join(' ') + '" class="corda"/>';
+          g += '<circle cx="' + px(xs).toFixed(1) + '" cy="' + py(onda(xs, t)).toFixed(1) + '" r="7" fill="var(--red)"/>';
+          g += '<line x1="' + px(xs).toFixed(1) + '" y1="' + (AY + 66) + '" x2="' + px(xs).toFixed(1) + '" y2="' + py(onda(xs, t)).toFixed(1) + '" class="dash"/>';
+          g += '<text x="' + (AX + AW) + '" y="' + (AY + 86) + '" text-anchor="end" class="lbl">x (m)</text>';
+          g += quota(px(0.0), AY + 96, px(L), AY + 96, 's');
+          g += '<text x="' + px(L / 2).toFixed(1) + '" y="' + (AY + 114) + '" text-anchor="middle" class="lbl">λ = ' + nf(L, 2) + ' m</text>';
+          // --- pannello temporale ---
+          g += '<text x="' + (BX + BW / 2) + '" y="26" text-anchor="middle" class="lbl">solo il punto rosso, nel tempo</text>';
+          g += '<line x1="' + BX + '" y1="' + AY + '" x2="' + (BX + BW) + '" y2="' + AY + '" class="dash"/>';
+          var tmax = Math.min(t, TM);
+          pts = [];
+          for (i = 0; i <= 400; i++) {
+            var u = tmax * i / 400;
+            pts.push(qx(u).toFixed(1) + ',' + qy(onda(xs, u)).toFixed(1));
+          }
+          if (tmax > 0.01) { g += '<polyline points="' + pts.join(' ') + '" class="corda2"/>'; }
+          g += '<circle cx="' + qx(tmax).toFixed(1) + '" cy="' + qy(onda(xs, tmax)).toFixed(1) + '" r="7" fill="var(--red)"/>';
+          g += '<text x="' + (BX + BW) + '" y="' + (AY + 86) + '" text-anchor="end" class="lbl">t (s)</text>';
+          var T = 1 / f;
+          if (T <= TM) {
+            g += quota(qx(0), AY + 96, qx(T), AY + 96, 's');
+            g += '<text x="' + qx(T / 2).toFixed(1) + '" y="' + (AY + 114) + '" text-anchor="middle" class="lbl">T = ' + nf(T, 2) + ' s</text>';
+          }
+          g += '<line x1="345" y1="20" x2="345" y2="250" class="grid"/>';
+          svg.innerHTML = g;
+          document.getElementById('pt-fv').textContent = nf(f, 2);
+          document.getElementById('pt-xv').textContent = nf(xs, 1);
+          document.getElementById('pt-T').textContent = nf(1 / f, 2);
+          document.getElementById('pt-f2').textContent = nf(f, 2);
+          document.getElementById('pt-osc').textContent = Math.floor(t * f);
+        }
+        var m = motore('pt-play', function (dt) { t += dt; if (t > TM) { t = 0; } disegna(); });
+        document.getElementById('pt-reset').addEventListener('click', function () { m.stop(); t = 0; disegna(); });
+        ['pt-f', 'pt-x'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', function () { t = 0; disegna(); });
+        });
+        disegna();
+      })();
+
+      /* ================= 6 — A sin(omega t + fi) ================= */
+      (function () {
+        var svg = document.getElementById('fs-svg');
+        if (!svg) { return; }
+        var XP = 62, XW = 556, Y0 = 145, TM = 16;
+        function disegna() {
+          var A = parseFloat(document.getElementById('fs-A').value);
+          var w = parseFloat(document.getElementById('fs-w').value);
+          var ph = parseFloat(document.getElementById('fs-p').value) * Math.PI / 180;
+          var lock = document.getElementById('fs-lock').checked;
+          var YM = lock ? 2.5 : Math.max(0.5, Math.ceil(A * 2) / 2);
+          var SC = 110 / YM;
+          function px(t) { return XP + t / TM * XW; }
+          function py(y) { return Y0 - y * SC; }
+          var g = '', i, pts = [];
+          for (i = 0; i <= TM; i += 2) {
+            g += '<line x1="' + px(i).toFixed(1) + '" y1="' + py(-YM).toFixed(1) + '" x2="' + px(i).toFixed(1) + '" y2="' + py(YM).toFixed(1) + '" class="grid"/>';
+            g += '<text x="' + px(i).toFixed(1) + '" y="' + (py(-YM) + 18).toFixed(1) + '" text-anchor="middle" class="lbl-s">' + i + '</text>';
+          }
+          for (i = -2; i <= 2; i++) {
+            var yv = YM * i / 2;
+            g += '<line x1="' + XP + '" y1="' + py(yv).toFixed(1) + '" x2="' + (XP + XW) + '" y2="' + py(yv).toFixed(1) + '" class="grid"/>';
+            g += '<text x="' + (XP - 8) + '" y="' + (py(yv) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(yv, 1) + '</text>';
+          }
+          g += '<line x1="' + XP + '" y1="' + Y0 + '" x2="' + (XP + XW + 14) + '" y2="' + Y0 + '" class="axis"/>';
+          g += '<line x1="' + XP + '" y1="' + py(-YM).toFixed(1) + '" x2="' + XP + '" y2="' + (py(YM) - 12).toFixed(1) + '" class="axis"/>';
+          g += '<text x="' + (XP + XW + 18) + '" y="' + (Y0 + 5) + '" class="lbl">t (s)</text>';
+          // riferimento
+          pts = [];
+          for (i = 0; i <= 600; i++) { var t0 = TM * i / 600; pts.push(px(t0).toFixed(1) + ',' + py(Math.sin(t0)).toFixed(1)); }
+          g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--muted)" stroke-width="1.8" opacity="0.55"/>';
+          // la curva
+          pts = [];
+          for (i = 0; i <= 900; i++) {
+            var tt = TM * i / 900, yv2 = A * Math.sin(w * tt + ph);
+            if (yv2 > YM || yv2 < -YM) { continue; }
+            pts.push(px(tt).toFixed(1) + ',' + py(yv2).toFixed(1));
+          }
+          g += '<polyline points="' + pts.join(' ') + '" class="corda2"/>';
+          g += '<circle cx="' + px(0).toFixed(1) + '" cy="' + py(Math.max(-YM, Math.min(YM, A * Math.sin(ph)))).toFixed(1) + '" r="6" fill="var(--red)"/>';
+          var T = 2 * Math.PI / w;
+          if (T <= TM) {
+            g += quota(px(0), py(YM) + 12, px(T), py(YM) + 12, 's');
+            g += '<text x="' + px(T / 2).toFixed(1) + '" y="' + (py(YM) + 6).toFixed(1) + '" text-anchor="middle" class="lbl">T</text>';
+          }
+          svg.innerHTML = g;
+          document.getElementById('fs-Av').textContent = nf(A, 1);
+          document.getElementById('fs-wv').textContent = nf(w, 1);
+          document.getElementById('fs-pv').textContent = Math.round(ph * 180 / Math.PI);
+          document.getElementById('fs-T').textContent = nf(2 * Math.PI / w, 2);
+          document.getElementById('fs-f').textContent = nf(w / (2 * Math.PI), 3);
+          document.getElementById('fs-y0').textContent = nf(A * Math.sin(ph), 2);
+          document.getElementById('fs-E').textContent = nf(A * A, 2);
+        }
+        ['fs-A', 'fs-w', 'fs-p'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('fs-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ================= 7 — la corda, calcolata davvero ================= */
+      (function () {
+        var svg = document.getElementById('cd-svg');
+        if (!svg) { return; }
+        var N = 201, LU = 10.0, C_ONDA = 4.0;
+        var dx = LU / (N - 1), CFL = 0.5, dt = CFL * dx / C_ONDA;
+        var y = new Array(N), yp = new Array(N), yn = new Array(N);
+        var t = 0, modo = 'a';
+        var XP = 40, XW = 600, Y0 = 130, SC = 78;
+
+        function azzera() {
+          for (var i = 0; i < N; i++) { y[i] = 0; yp[i] = 0; yn[i] = 0; }
+          t = 0;
+        }
+        function pizzica() {
+          var p = parseFloat(document.getElementById('cd-p').value) / 100;
+          var ip = Math.round(p * (N - 1));
+          for (var i = 0; i < N; i++) {
+            y[i] = (i <= ip) ? (0.55 * i / Math.max(1, ip)) : (0.55 * (N - 1 - i) / Math.max(1, N - 1 - ip));
+            yp[i] = y[i];
+          }
+          y[0] = 0; yp[0] = 0; y[N - 1] = 0; yp[N - 1] = 0;
+        }
+        function passoFisico() {
+          var b = document.getElementById('cd-smorza').checked ? 0.0016 : 0;
+          for (var i = 1; i < N - 1; i++) {
+            yn[i] = 2 * y[i] - yp[i] + CFL * CFL * (y[i + 1] - 2 * y[i] + y[i - 1]) - b * (y[i] - yp[i]);
+          }
+          t += dt;
+          if (modo === 'a') {
+            var f = parseFloat(document.getElementById('cd-f').value);
+            yn[0] = 0.45 * Math.sin(2 * Math.PI * f * t);
+          } else {
+            yn[0] = 0;
+          }
+          yn[N - 1] = 0;
+          var tmp = yp; yp = y; y = yn; yn = tmp;
+        }
+        function disegna() {
+          var g = '', i, pts = [];
+          for (i = 0; i < N; i++) {
+            pts.push((XP + i / (N - 1) * XW).toFixed(1) + ',' + (Y0 - y[i] * SC).toFixed(1));
+          }
+          g += '<line x1="' + XP + '" y1="' + Y0 + '" x2="' + (XP + XW) + '" y2="' + Y0 + '" class="dash"/>';
+          g += '<polyline points="' + pts.join(' ') + '" class="corda"/>';
+          g += '<line x1="' + XP + '" y1="' + (Y0 - 90) + '" x2="' + XP + '" y2="' + (Y0 + 90) + '" stroke="var(--muted)" stroke-width="5"/>';
+          g += '<line x1="' + (XP + XW) + '" y1="' + (Y0 - 90) + '" x2="' + (XP + XW) + '" y2="' + (Y0 + 90) + '" stroke="var(--muted)" stroke-width="5"/>';
+          g += '<text x="' + (XP + XW) + '" y="' + (Y0 + 112) + '" text-anchor="end" class="lbl-s">capo fisso</text>';
+          g += '<text x="' + XP + '" y="' + (Y0 + 112) + '" class="lbl-s">' +
+               (modo === 'a' ? 'lo scuotiamo qui' : 'capo fisso') + '</text>';
+          g += '<text x="330" y="230" text-anchor="middle" class="lbl-s">t = ' + nf(t, 2) + ' s</text>';
+          svg.innerHTML = g;
+        }
+        var m = motore('cd-play', function () {
+          for (var k = 0; k < 6; k++) { passoFisico(); }
+          disegna();
+        });
+        function setModo(x) {
+          modo = x;
+          document.getElementById('cd-mod-a').className = (x === 'a') ? 'btn' : 'btn btn-secondary';
+          document.getElementById('cd-mod-b').className = (x === 'b') ? 'btn' : 'btn btn-secondary';
+          document.getElementById('cd-riga-f').style.display = (x === 'a') ? '' : 'none';
+          document.getElementById('cd-riga-p').style.display = (x === 'b') ? '' : 'none';
+          azzera();
+          if (x === 'b') { pizzica(); }
+          disegna();
+        }
+        document.getElementById('cd-mod-a').addEventListener('click', function () { setModo('a'); });
+        document.getElementById('cd-mod-b').addEventListener('click', function () { setModo('b'); });
+        document.getElementById('cd-pizzica').addEventListener('click', function () {
+          if (modo !== 'b') { setModo('b'); }
+          azzera(); pizzica(); disegna(); m.avvia();
+        });
+        document.getElementById('cd-reset').addEventListener('click', function () {
+          m.stop(); azzera(); if (modo === 'b') { pizzica(); } disegna();
+        });
+        document.getElementById('cd-p').addEventListener('input', function () {
+          document.getElementById('cd-pv').textContent = this.value;
+        });
+        document.getElementById('cd-f').addEventListener('input', function () {
+          document.getElementById('cd-fv').textContent = nf(parseFloat(this.value), 2);
+        });
+        setModo('a');
+      })();
+
+      /* ================= 8 — l'onda progressiva ================= */
+      (function () {
+        var svg = document.getElementById('pr-svg');
+        if (!svg) { return; }
+        var t = 0, forma = 'sin', verso = 1, XM = 10, XP = 55, XW = 570, Y0 = 130, SC = 110;
+        function f(u) {          // u = frazione di lunghezza d'onda
+          var s = u - Math.floor(u);
+          if (forma === 'sin') { return Math.sin(2 * Math.PI * s); }
+          if (forma === 'tri') { return s < 0.25 ? 4 * s : (s < 0.75 ? 2 - 4 * s : 4 * s - 4); }
+          return s < 0.5 ? 1 : -1;
+        }
+        function disegna() {
+          var v = parseFloat(document.getElementById('pr-v').value);
+          var A = parseFloat(document.getElementById('pr-A').value);
+          var L = parseFloat(document.getElementById('pr-L').value);
+          function px(x) { return XP + x / XM * XW; }
+          function py(y) { return Y0 - y * SC; }
+          var g = '', i, pts = [];
+          g += '<line x1="' + XP + '" y1="' + Y0 + '" x2="' + (XP + XW) + '" y2="' + Y0 + '" class="dash"/>';
+          for (i = 0; i <= 1200; i++) {
+            var x = XM * i / 1200;
+            pts.push(px(x).toFixed(1) + ',' + py(A * f((x - verso * v * t) / L)).toFixed(1));
+          }
+          g += '<polyline points="' + pts.join(' ') + '" class="corda"/>';
+          // la cresta marcata
+          var xc = 0.25 * L + verso * v * t;
+          while (xc > XM) { xc -= XM; }
+          while (xc < 0) { xc += XM; }
+          g += '<circle cx="' + px(xc).toFixed(1) + '" cy="' + py(A * f((xc - verso * v * t) / L)).toFixed(1) + '" r="7" fill="var(--red)"/>';
+          g += freccia(px(xc), Y0 + 62, px(xc) + verso * 46, Y0 + 62, 'v', 11);
+          g += '<text x="' + (px(xc) + verso * 23).toFixed(1) + '" y="' + (Y0 + 82) + '" text-anchor="middle" class="lbl-s">v</text>';
+          g += '<text x="' + (XP + XW) + '" y="' + (Y0 + 112) + '" text-anchor="end" class="lbl">x (m)</text>';
+          for (i = 0; i <= XM; i += 2) {
+            g += '<text x="' + px(i).toFixed(1) + '" y="' + (Y0 + 112) + '" text-anchor="middle" class="lbl-s">' + i + '</text>';
+          }
+          svg.innerHTML = g;
+          document.getElementById('pr-vv').textContent = nf(v, 1);
+          document.getElementById('pr-Av').textContent = nf(A, 2);
+          document.getElementById('pr-Lv').textContent = nf(L, 1);
+          document.getElementById('pr-t').textContent = nf(t, 1);
+          document.getElementById('pr-cr').textContent = nf(xc, 1);
+          document.getElementById('pr-T').textContent = nf(L / v, 2);
+          document.getElementById('pr-f').textContent = nf(v / L, 2);
+        }
+        var m = motore('pr-play', function (dt) { t += dt; disegna(); });
+        gruppo('#pr-forma', 'data-f', function (x) { forma = x; disegna(); });
+        document.getElementById('pr-reset').addEventListener('click', function () { m.stop(); t = 0; disegna(); });
+        document.getElementById('pr-verso').addEventListener('click', function () { verso = -verso; disegna(); });
+        ['pr-v', 'pr-A', 'pr-L'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        disegna();
+      })();
+
+      /* ================= 9.2 — allenamento su v = lambda f ================= */
+      (function () {
+        var box = document.getElementById('vl-box');
+        if (!box) { return; }
+        var att = 0, um = 'm/s';
+        function nuovo() {
+          var tipo = Math.floor(Math.random() * 3);
+          var L = [0.5, 0.8, 1.2, 2.0, 2.5, 4.0, 5.0][Math.floor(Math.random() * 7)];
+          var f = [2, 4, 5, 8, 10, 20, 25, 50][Math.floor(Math.random() * 8)];
+          var v = L * f, testo;
+          if (tipo === 0) {
+            att = v; um = 'm/s';
+            testo = 'Un\'onda ha lunghezza d\'onda $' + nf(L, 1).replace(',', '{,}') + '$ m e frequenza $' +
+                    f + '$ Hz. Con che velocità si propaga?';
+            document.getElementById('vl-eti').textContent = 'v =';
+          } else if (tipo === 1) {
+            att = L; um = 'm';
+            testo = 'Un\'onda viaggia a $' + nf(v, 1).replace(',', '{,}') + '$ m/s con frequenza $' + f +
+                    '$ Hz. Qual è la sua lunghezza d\'onda?';
+            document.getElementById('vl-eti').textContent = 'λ =';
+          } else {
+            att = f; um = 'Hz';
+            testo = 'Un\'onda viaggia a $' + nf(v, 1).replace(',', '{,}') + '$ m/s con lunghezza d\'onda $' +
+                    nf(L, 1).replace(',', '{,}') + '$ m. Qual è la sua frequenza?';
+            document.getElementById('vl-eti').textContent = 'f =';
+          }
+          document.getElementById('vl-um').textContent = um;
+          var el = document.getElementById('vl-testo');
+          el.innerHTML = testo;
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          document.getElementById('vl-val').value = '';
+          document.getElementById('vl-fb').textContent = '';
+          document.getElementById('vl-fb').className = 'fb';
+        }
+        function verifica() {
+          var v = num(document.getElementById('vl-val').value);
+          var fb = document.getElementById('vl-fb');
+          if (isNaN(v)) { fb.className = 'fb no'; fb.textContent = 'Scrivi un numero.'; return; }
+          if (Math.abs(v - att) <= Math.abs(att) * 0.01 + 1e-6) {
+            fb.className = 'fb ok';
+            fb.textContent = '✓ Esatto: ' + nf(att, 2) + ' ' + um + '.';
+          } else {
+            fb.className = 'fb no';
+            fb.textContent = '✗ No, viene ' + nf(att, 2) + ' ' + um +
+                             '. Parti sempre da v = λ·f e isola la lettera che ti serve.';
+          }
+        }
+        document.getElementById('vl-ver').addEventListener('click', verifica);
+        document.getElementById('vl-new').addEventListener('click', nuovo);
+        nuovo();
+      })();
+
+      /* ================= 10 — sovrapposizione ================= */
+      (function () {
+        var svg = document.getElementById('sv-svg');
+        if (!svg) { return; }
+        var t = 0, XM = 10, XP = 55, XW = 570, L = 3.0, F = 0.3;
+        var YA = 90, YB = 235, SC = 34;
+        function disegna() {
+          var d = parseFloat(document.getElementById('sv-d').value) * Math.PI / 180;
+          var A2 = parseFloat(document.getElementById('sv-A2').value);
+          function px(x) { return XP + x / XM * XW; }
+          function fase(x) { return 2 * Math.PI * (x / L - F * t); }
+          var g = '', i, p1 = [], p2 = [], ps = [];
+          for (i = 0; i <= 600; i++) {
+            var x = XM * i / 600;
+            var y1 = Math.sin(fase(x)), y2 = A2 * Math.sin(fase(x) + d);
+            p1.push(px(x).toFixed(1) + ',' + (YA - y1 * SC).toFixed(1));
+            p2.push(px(x).toFixed(1) + ',' + (YA - y2 * SC).toFixed(1));
+            ps.push(px(x).toFixed(1) + ',' + (YB - (y1 + y2) * SC).toFixed(1));
+          }
+          g += '<line x1="' + XP + '" y1="' + YA + '" x2="' + (XP + XW) + '" y2="' + YA + '" class="dash"/>';
+          g += '<polyline points="' + p1.join(' ') + '" class="corda2"/>';
+          g += '<polyline points="' + p2.join(' ') + '" class="corda3"/>';
+          g += '<text x="' + XP + '" y="30" class="lbl">le due onde, separate</text>';
+          g += '<line x1="' + XP + '" y1="' + YB + '" x2="' + (XP + XW) + '" y2="' + YB + '" class="dash"/>';
+          g += '<polyline points="' + ps.join(' ') + '" class="corda"/>';
+          g += '<text x="' + XP + '" y="' + (YB - 78) + '" class="lbl">la loro somma</text>';
+          g += '<line x1="' + XP + '" y1="' + (YA + 62) + '" x2="' + (XP + XW) + '" y2="' + (YA + 62) + '" class="grid"/>';
+          svg.innerHTML = g;
+          var amp = Math.sqrt(1 + A2 * A2 + 2 * A2 * Math.cos(d));
+          document.getElementById('sv-dv').textContent = Math.round(d * 180 / Math.PI);
+          document.getElementById('sv-A2v').textContent = nf(A2, 2);
+          document.getElementById('sv-amp').textContent = nf(amp, 2);
+          document.getElementById('sv-en').textContent = nf(amp * amp, 2);
+          var tipo;
+          if (amp < 0.08) { tipo = 'si cancellano'; }
+          else if (Math.cos(d) > 0.85) { tipo = 'costruttiva'; }
+          else if (Math.cos(d) < -0.85) { tipo = 'distruttiva'; }
+          else { tipo = 'intermedia'; }
+          document.getElementById('sv-tipo').textContent = tipo;
+        }
+        var m = motore('sv-play', function (dt) { t += dt; disegna(); });
+        document.getElementById('sv-reset').addEventListener('click', function () { m.stop(); t = 0; disegna(); });
+        document.getElementById('sv-fase0').addEventListener('click', function () {
+          document.getElementById('sv-d').value = 0; disegna();
+        });
+        document.getElementById('sv-fase180').addEventListener('click', function () {
+          document.getElementById('sv-d').value = 180; document.getElementById('sv-A2').value = 1; disegna();
+        });
+        ['sv-d', 'sv-A2'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        disegna();
+      })();
+
+      /* ================= 11 — le onde sismiche ================= */
+      (function () {
+        var svg = document.getElementById('si-svg');
+        if (!svg) { return; }
+        var t = 0, modo = 'P', LAM = 4.0, FR = 0.45, XM = 12;
+        var NX = 24, NZ = 5, NY = 5;
+        var XP = 60, XW = 560;
+        var TESTI = {
+          P: 'Onde <strong>P</strong>, longitudinali: la roccia si comprime e si dilata <em>lungo</em> la direzione di propagazione. Guardate come i punti si addensano e si diradano. Si vedono in tutte e due le viste, perché il movimento è orizzontale e diretto come l\'onda.',
+          S: 'Onde <strong>S</strong>, trasversali: la roccia scorre <em>di traverso</em>. Qui ci sono tutte e due le componenti insieme, e infatti si muove sia la sezione (SV) sia la vista dall\'alto (SH).',
+          SV: 'Componente <strong>SV</strong>: l\'oscillazione avviene nel piano verticale, cioè su e giù. Nella vista dall\'alto non si vede muovere niente — è la stessa onda, ma <em>polarizzata</em> in verticale.',
+          SH: 'Componente <strong>SH</strong>: l\'oscillazione è orizzontale e perpendicolare al cammino. Adesso è la sezione verticale a restare immobile e la vista dall\'alto a muoversi. Le due componenti sono la stessa onda con due polarizzazioni diverse.',
+          R: 'Onde <strong>superficiali</strong> (di Rayleigh): ogni punto descrive un\'<em>ellisse</em> nel piano verticale, e l\'ampiezza si smorza rapidamente con la profondità. Sono le più lente e le più distruttive.',
+          ALL: 'Un terremoto vero: tutte le componenti insieme. Il moto del suolo diventa complicato e irregolare — ed è esattamente quello che registra un sismografo.'
+        };
+        function disegna() {
+          var A0 = parseFloat(document.getElementById('si-A').value) * 9;
+          var g = '', i, j;
+          var YS0 = 62, DZ = 26, YT0 = 268, DY = 26;
+          function fase(x) { return 2 * Math.PI * (x / LAM - FR * t); }
+          function spost(x, prof) {
+            var s = Math.sin(fase(x)), c = Math.cos(fase(x));
+            var dec = Math.exp(-prof / 2.6);
+            var ux = 0, uy = 0, uz = 0;
+            if (modo === 'P') { ux = s; }
+            else if (modo === 'SV') { uz = s; }
+            else if (modo === 'SH') { uy = s; }
+            else if (modo === 'S') { uz = s; uy = s; }
+            else if (modo === 'R') { ux = s * dec; uz = -0.75 * c * dec; }
+            else { ux = 0.5 * s + 0.5 * s * dec; uy = 0.5 * s; uz = 0.5 * s - 0.4 * c * dec; }
+            return [ux, uy, uz];
+          }
+          // riquadri
+          g += '<rect x="40" y="42" width="600" height="' + (NZ * DZ + 24) + '" rx="8" class="roccia"/>';
+          g += '<text x="46" y="34" class="lbl">sezione verticale — l\'onda viaggia verso destra →</text>';
+          g += '<rect x="40" y="248" width="600" height="' + (NY * DY + 24) + '" rx="8" class="roccia"/>';
+          g += '<text x="46" y="240" class="lbl">la stessa zona vista dall\'alto</text>';
+          g += '<line x1="40" y1="' + (YS0 - 14) + '" x2="640" y2="' + (YS0 - 14) + '" stroke="var(--green)" stroke-width="3"/>';
+          g += '<text x="636" y="' + (YS0 - 20) + '" text-anchor="end" class="lbl-s">superficie</text>';
+          for (i = 0; i < NX; i++) {
+            var x = XM * i / (NX - 1);
+            var bx = XP + x / XM * XW;
+            for (j = 0; j < NZ; j++) {
+              var u = spost(x, j);
+              g += '<circle cx="' + (bx + u[0] * A0).toFixed(1) + '" cy="' + (YS0 + j * DZ - u[2] * A0).toFixed(1) +
+                   '" r="4.2" fill="var(--accent)"/>';
+            }
+            for (j = 0; j < NY; j++) {
+              var u2 = spost(x, 0);
+              g += '<circle cx="' + (bx + u2[0] * A0).toFixed(1) + '" cy="' + (YT0 + j * DY + u2[1] * A0).toFixed(1) +
+                   '" r="4.2" fill="var(--magenta)"/>';
+            }
+          }
+          svg.innerHTML = g;
+          document.getElementById('si-Av').textContent = nf(parseFloat(document.getElementById('si-A').value), 1);
+          document.getElementById('si-msg').innerHTML = TESTI[modo];
+        }
+        var m = motore('si-play', function (dt) { t += dt; disegna(); });
+        gruppo('#si-modo', 'data-m', function (x) { modo = x; disegna(); });
+        document.getElementById('si-reset').addEventListener('click', function () { m.stop(); t = 0; disegna(); });
+        document.getElementById('si-A').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 11.3 — il sismogramma ================= */
+      (function () {
+        var svg = document.getElementById('sg-svg');
+        if (!svg) { return; }
+        var VP = 6.0, VS = 3.5, VR = 3.2, TM = 90;
+        var XP = 55, XW = 570, Y0 = 130;
+        function disegna() {
+          var d = parseFloat(document.getElementById('sg-d').value);
+          var tP = d / VP, tS = d / VS, tR = d / VR;
+          function px(u) { return XP + u / TM * XW; }
+          function traccia(u) {
+            var y = 0;
+            if (u > tP) { y += 10 * Math.exp(-(u - tP) / 6) * Math.sin(2 * Math.PI * 1.6 * (u - tP)); }
+            if (u > tS) { y += 24 * Math.exp(-(u - tS) / 8) * Math.sin(2 * Math.PI * 1.1 * (u - tS)); }
+            if (u > tR) { y += 40 * Math.exp(-(u - tR) / 14) * Math.sin(2 * Math.PI * 0.45 * (u - tR)); }
+            return y;
+          }
+          var g = '', i, pts = [];
+          for (i = 0; i <= 1400; i++) { var u = TM * i / 1400; pts.push(px(u).toFixed(1) + ',' + (Y0 - traccia(u)).toFixed(1)); }
+          g += '<line x1="' + XP + '" y1="' + Y0 + '" x2="' + (XP + XW) + '" y2="' + Y0 + '" class="dash"/>';
+          var etich = [[tP, 'P', 'var(--accent)'], [tS, 'S', 'var(--magenta)'], [tR, 'superficiali', 'var(--red)']];
+          for (i = 0; i < 3; i++) {
+            if (etich[i][0] > TM) { continue; }
+            g += '<line x1="' + px(etich[i][0]).toFixed(1) + '" y1="30" x2="' + px(etich[i][0]).toFixed(1) +
+                 '" y2="' + (Y0 + 62) + '" stroke="' + etich[i][2] + '" stroke-width="2" stroke-dasharray="5 4"/>';
+            g += '<text x="' + (px(etich[i][0]) + 5).toFixed(1) + '" y="' + (26 + i * 0) + '" class="lbl">' + etich[i][1] + '</text>';
+          }
+          g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--text)" stroke-width="1.6"/>';
+          for (i = 0; i <= TM; i += 10) {
+            g += '<line x1="' + px(i).toFixed(1) + '" y1="' + (Y0 + 62) + '" x2="' + px(i).toFixed(1) + '" y2="' + (Y0 + 70) + '" class="axis"/>';
+            g += '<text x="' + px(i).toFixed(1) + '" y="' + (Y0 + 86) + '" text-anchor="middle" class="lbl-s">' + i + '</text>';
+          }
+          g += '<line x1="' + XP + '" y1="' + (Y0 + 62) + '" x2="' + (XP + XW) + '" y2="' + (Y0 + 62) + '" class="axis"/>';
+          g += '<text x="' + (XP + XW) + '" y="' + (Y0 + 104) + '" text-anchor="end" class="lbl">tempo dalla scossa (s)</text>';
+          g += quota(px(tP), Y0 + 44, px(tS), Y0 + 44, 's');
+          g += '<text x="' + px((tP + tS) / 2).toFixed(1) + '" y="' + (Y0 + 38) + '" text-anchor="middle" class="lbl">S − P</text>';
+          svg.innerHTML = g;
+          document.getElementById('sg-dv').textContent = Math.round(d);
+          document.getElementById('sg-tp').textContent = nf(tP, 1);
+          document.getElementById('sg-ts').textContent = nf(tS, 1);
+          document.getElementById('sg-tr').textContent = nf(tR, 1);
+          document.getElementById('sg-dt').textContent = nf(tS - tP, 1);
+        }
+        document.getElementById('sg-d').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 11.4 — magnitudo ed energia ================= */
+      (function () {
+        var svg = document.getElementById('mg-svg');
+        if (!svg) { return; }
+        var HIRO = 6.276e13;                       // joule liberati a Hiroshima
+        var SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+        function energia(M) { return Math.pow(10, 1.5 * M + 4.8); }
+        function sci(E) {
+          var e = Math.floor(Math.log(E) / Math.LN10);
+          var m = E / Math.pow(10, e);
+          var ap = String(e).split('').map(function (ch) {
+            return (ch === '-') ? '⁻' : SUP[parseInt(ch, 10)];
+          }).join('');
+          return nf(m, 1) + '·10' + ap;
+        }
+        function disegna() {
+          var Ma = parseFloat(document.getElementById('mg-a').value);
+          var Mb = parseFloat(document.getElementById('mg-b').value);
+          var Ea = energia(Ma), Eb = energia(Mb);
+          var LMIN = 1.5 * 3 + 4.8, LMAX = 1.5 * 9.5 + 4.8;
+          var XP = 90, XW = 500;
+          function larg(M) { return Math.max(6, (1.5 * M + 4.8 - LMIN) / (LMAX - LMIN) * XW); }
+          var g = '';
+          g += '<text x="' + XP + '" y="30" class="lbl">lunghezza della barra ∝ logaritmo dell\'energia</text>';
+          g += '<rect x="' + XP + '" y="60" width="' + larg(Ma).toFixed(1) + '" height="46" rx="6" fill="color-mix(in srgb, var(--accent) 55%, transparent)" stroke="var(--accent)" stroke-width="2.4"/>';
+          g += '<text x="' + (XP - 10) + '" y="90" text-anchor="end" class="lbl">M ' + nf(Ma, 1) + '</text>';
+          g += '<rect x="' + XP + '" y="130" width="' + larg(Mb).toFixed(1) + '" height="46" rx="6" fill="color-mix(in srgb, var(--magenta) 55%, transparent)" stroke="var(--magenta)" stroke-width="2.4"/>';
+          g += '<text x="' + (XP - 10) + '" y="160" text-anchor="end" class="lbl">M ' + nf(Mb, 1) + '</text>';
+          for (var M = 3; M <= 9.5; M += 1) {
+            g += '<line x1="' + (XP + larg(M)).toFixed(1) + '" y1="52" x2="' + (XP + larg(M)).toFixed(1) +
+                 '" y2="192" class="grid"/>';
+            g += '<text x="' + (XP + larg(M)).toFixed(1) + '" y="208" text-anchor="middle" class="lbl-s">' + M + '</text>';
+          }
+          g += '<text x="' + (XP + XW / 2) + '" y="228" text-anchor="middle" class="lbl-s">magnitudo</text>';
+          svg.innerHTML = g;
+          document.getElementById('mg-av').textContent = nf(Ma, 1);
+          document.getElementById('mg-bv').textContent = nf(Mb, 1);
+          document.getElementById('mg-ea').textContent = sci(Ea);
+          document.getElementById('mg-eb').textContent = sci(Eb);
+          var r = Eb / Ea;
+          document.getElementById('mg-rap').textContent = (r >= 1000 || r <= 0.001) ? sci(r) : nf(r, 1);
+          document.getElementById('mg-hiro').textContent = (Ea / HIRO >= 1000) ? sci(Ea / HIRO) : nf(Ea / HIRO, 2);
+        }
+        ['mg-a', 'mg-b'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        disegna();
+      })();
+
+      //JSSENTINEL
+
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Che cos\'è la <strong>frequenza</strong> di un fenomeno periodico?',
+        options: ['il numero di ripetizioni nell\'unità di tempo, in hertz', 'il tempo di una singola ripetizione', 'la velocità con cui il fenomeno si sposta', 'l\'altezza massima dell\'oscillazione', 'la distanza fra due creste'],
+        correct: 0, explain: 'Contare le ripetizioni dà un numero puro; dividerlo per un tempo dà $\\text{s}^{-1}$, cioè l\'<strong>hertz</strong>. Il tempo di una singola ripetizione è invece il <em>periodo</em>, che è l\'inverso: $T = 1/f$.' },
+
+      { type: 'mc', diff: 'easy', text: 'Che cosa trasporta un\'onda?',
+        options: ['materia, ma non energia', 'materia ed energia in parti uguali', 'energia, ma non materia', 'né l\'una né l\'altra', 'soltanto informazione, che non è una grandezza fisica'],
+        correct: 2, explain: 'Ogni punto del mezzo oscilla attorno alla propria posizione di riposo e ci resta: il suo spostamento netto è zero. A viaggiare è la <strong>perturbazione</strong>, e con essa l\'energia. È il motivo per cui una corda scossa a un capo fa suonare un campanello all\'altro capo senza che un solo pezzo di corda abbia fatto il viaggio.' },
+
+      { type: 'mc', diff: 'medium', text: 'Una boa oscilla fra $+30$ cm e $-30$ cm rispetto al livello di riposo. Qual è l\'<strong>ampiezza</strong> dell\'onda?',
+        options: ['$60$ cm', '$15$ cm', '$0$ cm', '$120$ cm', '$30$ cm'],
+        correct: 4, explain: 'L\'ampiezza si conta dalla <strong>linea di riposo</strong> alla cresta, non da cresta a cavo. Fra il punto più alto e il più basso ci sono $2A$, cioè 60 cm — ed è l\'errore più frequente del capitolo.' },
+
+      { type: 'mc', diff: 'medium', text: 'Se le onde non trasportano materia, perché la corrente marina porta via una bottiglia?',
+        options: ['perché in acqua le onde funzionano diversamente', 'perché la corrente è acqua che si sposta davvero: è un fenomeno diverso dall\'onda', 'perché la bottiglia galleggia', 'perché le onde del mare sono longitudinali', 'perché la bottiglia è più leggera dell\'acqua'],
+        correct: 1, explain: 'Nello stesso mare convivono due fenomeni distinti: l\'<strong>onda</strong>, che attraversa l\'acqua facendole compiere orbite quasi chiuse, e la <strong>corrente</strong>, che è vero e proprio trasporto di materia — con una portata, come nella lezione sui fluidi. L\'onda arriva a riva in pochi secondi, la bottiglia ci mette ore.' },
+
+      { type: 'mc', diff: 'hard', text: 'In un grafico che rappresenta lo spostamento di <strong>un solo punto</strong> della corda in funzione del <strong>tempo</strong>, la distanza fra due creste è:',
+        options: ['la lunghezza d\'onda', 'l\'ampiezza', 'la velocità dell\'onda', 'il periodo', 'la fase'],
+        correct: 3, explain: 'Attenzione all\'asse orizzontale: se ci sono i <em>secondi</em>, la periodicità è il <strong>periodo</strong> $T$; se ci sono i <em>metri</em>, è la <strong>lunghezza d\'onda</strong> $\\lambda$. I due grafici sono tutti e due sinusoidi e si somigliano moltissimo, ma raccontano cose diverse: una fotografia di tutta la corda contro il filmato di un punto solo.' },
+
+      { type: 'mc', diff: 'medium', text: 'Un\'onda ha lunghezza d\'onda $2{,}0$ m e frequenza $50$ Hz. Con che velocità si propaga?',
+        options: ['$100$ m/s', '$25$ m/s', '$0{,}04$ m/s', '$52$ m/s', '$2500$ m/s'],
+        correct: 0, explain: '$v = \\lambda f = 2{,}0 \\cdot 50 = 100$ m/s. È la relazione fondamentale delle onde e vale per tutte: corde, suono, terremoti, luce. In un mezzo dato $v$ è fissata, quindi $\\lambda$ e $f$ sono legate — se una cresce l\'altra deve calare.' },
+
+      { type: 'mc', diff: 'hard', text: 'Che cosa succede all\'energia trasportata da un\'onda se ne <strong>raddoppiamo l\'ampiezza</strong>?',
+        options: ['resta la stessa', 'raddoppia', 'diventa quattro volte più grande', 'si dimezza', 'dipende dalla frequenza, non dall\'ampiezza'],
+        correct: 2, explain: 'Nella potenza trasportata, $P = \\frac{1}{2}\\mu\\omega^2A^2v$, l\'ampiezza compare <strong>al quadrato</strong>. Fra un\'onda da mezzo metro e una da due metri non c\'è un fattore quattro di energia: ce n\'è uno di sedici.' },
+
+      { type: 'mc', diff: 'hard', text: 'Che cosa descrive una funzione della forma $y = f(x - v\\,t)$?',
+        options: ['un\'onda ferma', 'un\'oscillazione che si smorza', 'un corpo che cade', 'una corda tesa in equilibrio', 'una forma qualsiasi che viaggia verso destra alla velocità $v$ senza deformarsi'],
+        correct: 4, explain: 'Il segreto è il <strong>meno</strong>: man mano che il tempo passa, per ritrovare lo stesso valore bisogna spostarsi in avanti di $vt$. La forma $f$ resta libera — sinusoide, triangolo, onda quadra — e viaggia comunque. Con $x + vt$ l\'onda va verso sinistra.' },
+
+      { type: 'mc', diff: 'hard', text: 'Su una corda tesa vale $v = \\sqrt{T/\\mu}$. Per <strong>raddoppiare</strong> la velocità delle onde bisogna:',
+        options: ['dimezzare la tensione', 'quadruplicare la tensione', 'raddoppiare la tensione', 'raddoppiare la densità della corda', 'dimezzare la lunghezza della corda'],
+        correct: 1, explain: 'C\'è una radice quadrata: la velocità va come $\\sqrt{T}$, quindi per raddoppiarla la tensione deve diventare <strong>quattro volte</strong>. È il motivo per cui le note gravi si ottengono con corde più <em>grosse</em> (agendo su $\\mu$) invece che allentando moltissimo.' },
+
+      { type: 'mc', diff: 'medium', text: 'Due onde identiche si incontrano <strong>in opposizione di fase</strong>. Che cosa succede?',
+        options: ['si sommano e l\'ampiezza raddoppia', 'rimbalzano una sull\'altra', 'proseguono senza interagire in alcun modo', 'si cancellano: il mezzo resta fermo', 'l\'energia scompare per sempre'],
+        correct: 3, explain: 'Il principio di sovrapposizione dice che gli spostamenti si <strong>sommano con il segno</strong>: cresta su cavo dà zero. L\'energia però non scompare — o viene spostata in altre zone, o non viene mai emessa, come nelle cuffie a cancellazione di rumore. E dopo essersi attraversate le due onde proseguono intatte.' },
+
+      { type: 'mc', diff: 'medium', text: 'Perché le cuffie a cancellazione attiva funzionano bene con il rombo di un aereo e male con le voci?',
+        options: ['perché il rombo è periodico e prevedibile, mentre le voci cambiano troppo in fretta', 'perché il rombo è più forte', 'perché le voci sono onde longitudinali e il rombo no', 'perché le voci hanno lunghezza d\'onda maggiore', 'perché il microfono non sente le voci'],
+        correct: 0, explain: 'La cuffia deve <em>costruire</em> in tempo reale un\'onda identica a quella in arrivo ma sfasata di $180°$. Con un suono grave e regolare l\'elettronica riesce a prevedere l\'istante successivo; con una voce, che cambia in continuazione, la previsione arriva in ritardo e l\'interferenza non è più distruttiva.' },
+
+      { type: 'mc', diff: 'easy', text: 'In un terremoto, quali onde arrivano <strong>per prime</strong>?',
+        options: ['le onde superficiali', 'le onde S', 'le onde P, che sono longitudinali e le più veloci', 'arrivano tutte insieme', 'dipende dalla magnitudo'],
+        correct: 2, explain: 'Le P (da «prime») viaggiano a circa $6$ km/s, le S a $3{,}5$, le superficiali a circa $3$. Il ritardo fra P e S serve a due cose: misurare la distanza dall\'epicentro (circa $8{,}4$ km per ogni secondo di ritardo) e far scattare gli allarmi sismici, perché la radio viaggia più veloce delle onde S.' },
+
+      { type: 'mc', diff: 'hard', text: 'Perché le onde S <strong>non attraversano</strong> il nucleo esterno della Terra?',
+        options: ['perché è troppo caldo', 'perché è troppo denso', 'perché sono troppo lente', 'perché il campo magnetico le devia', 'perché è liquido, e un fluido non oppone resistenza allo scorrimento laterale'],
+        correct: 4, explain: 'Le S sono <strong>trasversali</strong>: si trasmettono solo se il mezzo resiste allo scorrimento, cosa che un liquido non fa. Dalla «zona d\'ombra» in cui le S non arrivano mai si è dedotto che a 2900 km di profondità c\'è uno strato liquido. La Terra è stata radiografata con i suoi stessi terremoti.' },
+
+      { type: 'mc', diff: 'hard', text: 'Che cos\'è la <strong>polarizzazione</strong> di un\'onda, e quali onde possono averla?',
+        options: ['la sua intensità; ce l\'hanno tutte le onde', 'la direzione in cui oscilla il mezzo fra le infinite perpendicolari al cammino; solo le onde trasversali', 'la direzione in cui l\'onda viaggia; tutte le onde', 'la sua frequenza; solo le onde sonore', 'il verso di rotazione; solo le onde superficiali'],
+        correct: 1, explain: 'Un\'onda longitudinale non ha scelta: oscilla lungo il cammino, e basta. Una trasversale invece deve oscillare perpendicolarmente, e in tre dimensioni «perpendicolare» è un piano intero: da qui le componenti <strong>SV</strong> e <strong>SH</strong> delle onde sismiche. Il fatto che la luce si polarizzi è la prova che è un\'onda trasversale.' },
+
+      { type: 'mc', diff: 'medium', text: 'Che differenza c\'è fra <strong>magnitudo</strong> e <strong>intensità</strong> di un terremoto?',
+        options: ['la magnitudo misura l\'energia liberata alla sorgente ed è una sola; l\'intensità misura gli effetti in un luogo e cambia da paese a paese', 'sono due nomi della stessa grandezza', 'la magnitudo si misura in Italia, l\'intensità all\'estero', 'l\'intensità si misura con i sismografi, la magnitudo osservando i danni', 'la magnitudo riguarda le onde P, l\'intensità le onde S'],
+        correct: 0, explain: 'La magnitudo è la <em>potenza della lampadina</em>, l\'intensità è <em>quanta luce arriva sul vostro tavolo</em>: dipende dalla distanza, dalla profondità, dal tipo di terreno e da come sono costruite le case. Amatrice 2016 ebbe magnitudo <strong>minore</strong> dell\'Aquila 2009 e intensità massima <strong>maggiore</strong> — e non è una contraddizione, è proprio il motivo per cui servono due scale.' },
+
+      { type: 'mc', diff: 'hard', text: 'Un terremoto di magnitudo $7$ rispetto a uno di magnitudo $5$ libera un\'energia circa:',
+        options: ['doppia', '10 volte più grande', '1000 volte più grande', '32 volte più grande', 'uguale, cambia solo l\'ampiezza registrata'],
+        correct: 2, explain: 'La scala è <strong>logaritmica</strong>: ogni grado in più vale $\\times 10$ in ampiezza e $\\times 10^{1{,}5} \\approx 32$ in energia. Due gradi valgono quindi $10^3 = 1000$ volte. È il motivo per cui la scala inganna chi la legge come se fosse una scala normale: fra un 5 e un 7 non c\'è «un po\' di differenza».' },
+
+      { type: 'mc', diff: 'medium', text: 'Che cos\'è la <strong>liquefazione</strong> del terreno?',
+        options: ['lo scioglimento delle rocce per il calore del sisma', 'l\'allagamento causato dalla rottura delle condutture', 'la fusione dell\'asfalto durante una scossa', 'una sabbia satura d\'acqua che, scossa, perde i contatti fra i granelli e si comporta come un fluido', 'la formazione di crepe nel terreno asciutto'],
+        correct: 3, explain: 'Le vibrazioni fanno riassestare i granelli, la pressione dell\'acqua intrappolata sale e comincia a sostenere lei il carico separandoli: il terreno smette di essere un solido. A Niigata nel 1964 interi palazzi si coricarono su un fianco <em>senza rompersi</em>. Si riproduce in un secchio con acqua e sabbia — ed è il motivo per cui prima di costruire serve il geologo, non solo l\'ingegnere.' },
+
+      { type: 'open', diff: 'medium', text: 'Spiega perché si dice che un\'onda <strong>trasporta energia ma non materia</strong>, e perché invece a riva l\'onda del mare ci trascina.',
+        keywords: ['energia', 'materia', 'oscilla', 'riposo', 'perturbaz', 'corrente', 'fondale', 'frangente', 'cavallone', 'rompe', 'boa'],
+        requiredMatches: 3,
+        explain: 'Quando un\'onda passa, ogni punto del mezzo <strong>oscilla attorno alla propria posizione di riposo e ci torna</strong>: il suo spostamento netto è nullo. Nessun pezzo di materia compie il viaggio dalla sorgente al ricevitore. A viaggiare è la <em>perturbazione</em> — cioè la forma, l\'informazione su chi deve muoversi e quando — e con essa l\'<strong>energia</strong>, che infatti si può raccogliere all\'altro capo.<br><br>Le boe e le bottiglie in mare non le sposta l\'onda: le spostano le <strong>correnti</strong>, che sono un fenomeno diverso — acqua che si trasferisce davvero da un posto a un altro, con una portata, come nella lezione sui fluidi. L\'onda arriva a riva in pochi secondi, la bottiglia ci mette ore.<br><br>A riva però cambia tutto: il <strong>fondale</strong> sale, la parte bassa dell\'onda viene frenata dall\'attrito mentre la cresta prosegue alla sua velocità, la supera e crolla in avanti. È il <strong>frangente</strong>. A quel punto non abbiamo più un\'onda in senso stretto ma una massa d\'acqua che si rovescia, e quella trasporta materia eccome. La definizione non era sbagliata: valeva finché l\'onda restava un\'onda, ed è normale che una legge fisica abbia un campo di validità.' },
+
+      { type: 'open', diff: 'hard', text: 'Un compagno ti mostra due grafici sinusoidali identici e ti dice: «sono la stessa cosa». Spiega perché possono non esserlo, e come si fa a capire quale grandezza è la periodicità di ciascuno.',
+        keywords: ['ascissa', 'asse', 'orizzontale', 'metri', 'second', 'lunghezza d\'onda', 'periodo', 'lambda', 'spazio', 'tempo', 'fotografia'],
+        requiredMatches: 3,
+        explain: 'Un\'onda ha <strong>due periodicità</strong>, una nello spazio e una nel tempo, e i loro grafici hanno la stessa forma. Per distinguerli si guarda l\'<strong>asse orizzontale</strong>, cioè le unità di misura in ascissa:<br><br>• se in ascissa ci sono i <strong>metri</strong>, stiamo guardando <em>tutta la corda in un istante</em> — una fotografia — e la distanza fra due creste è la <strong>lunghezza d\'onda</strong> $\\lambda$;<br>• se in ascissa ci sono i <strong>secondi</strong>, stiamo guardando <em>un solo punto per un certo tempo</em> — un filmato — e la distanza fra due creste è il <strong>periodo</strong> $T$ (o, equivalentemente, la frequenza $f = 1/T$).<br><br>Le due periodicità non sono indipendenti: sono legate dalla velocità con cui l\'onda si propaga, secondo $v = \\lambda / T = \\lambda f$. In un mezzo dato la velocità è fissata, quindi conoscendo una delle due si ricava l\'altra. Domandarsi sempre «sto guardando lo spazio o il tempo?» è il modo più rapido di non sbagliare.' }
+    ];
+  </script>
+
+</body>
+
+</html>
