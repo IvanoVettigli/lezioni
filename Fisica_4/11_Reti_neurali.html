@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 11 — Le reti neurali</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    pre.codice { background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+                 border-radius: 8px; padding: 0.8rem 1rem; overflow-x: auto; font-size: 0.86rem; line-height: 1.5;
+                 margin: 0.9rem 0; }
+    pre.codice .cm { color: var(--muted); font-style: italic; }
+    pre.codice .kw { color: var(--magenta); font-weight: 600; }
+
+    .addestra { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .addestra > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                      padding: 0.8rem 0.9rem; background: var(--surface); }
+    .addestra h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quarto anno · Lezione 11</div>
+    <h1>Le reti neurali</h1>
+    <p>Che cosa succede quando si prende un pezzo di cervello,
+      lo si semplifica fino all'osso e lo si scrive in formule</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quarto anno</a>
+    <span class="sep">/</span> Le reti neurali
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Perché in un corso di fisica.</strong> Perché la matematica è la stessa. Una rete neurale è un
+      sistema di moltissime unità semplici che interagiscono, in cui si definisce un'<em>energia</em> e si
+      cerca il suo minimo: esattamente l'oggetto della lezione precedente. Il modello che vedremo fra poco fu
+      proposto nel 1982 da <strong>John Hopfield</strong>, un fisico della materia condensata, e nasce
+      direttamente dai modelli di magnetismo — quelli in cui gli spin si allineano coi vicini. Hopfield ha
+      preso il Nobel per la <em>fisica</em> nel 2024, insieme a Geoffrey Hinton, proprio per questo.
+    </div>
+
+    <!-- 1 — IL CERVELLO -->
+    <section id="sec1">
+      <h2>1. Il cervello, da fisici</h2>
+
+      <p>Prima di semplificare, guardiamo che cosa stiamo semplificando. Il cervello umano contiene circa
+        <strong>86 miliardi di neuroni</strong> — il numero preciso lo ha misurato nel 2009 Suzana
+        Herculano-Houzel, sciogliendo cervelli in una soluzione e contando i nuclei, dopo che per decenni si
+        era ripetuto «cento miliardi» senza che nessuno l'avesse mai verificato.</p>
+
+      <div class="definition">
+        <div class="formula-title">Il neurone</div>
+        <p>Una cellula con tre parti: i <strong>dendriti</strong>, ramificazioni che ricevono segnali da altri
+          neuroni; il <strong>corpo cellulare</strong>, che li somma; l'<strong>assone</strong>, un unico cavo
+          in uscita che porta il segnale ad altre cellule. Il punto di contatto fra un assone e un dendrite si
+          chiama <strong>sinapsi</strong>.</p>
+        <p class="formula-note">Ogni neurone ha in media $7000$ sinapsi, il che porta il totale a circa
+          $10^{14}$ — centomila miliardi di collegamenti. È lì che sta l'informazione: non nei neuroni, ma
+          <em>nelle connessioni</em>.</p>
+      </div>
+
+      <p>Il funzionamento è, dal punto di vista fisico, elettrochimico. La membrana del neurone mantiene una
+        differenza di potenziale di circa $-70$ mV fra dentro e fuori, prodotta da pompe che spostano ioni
+        sodio e potassio contro il loro gradiente — un lavoro che costa energia, ed è uno dei motivi per cui il
+        cervello consuma il $20\%$ delle calorie di tutto il corpo pur pesandone il $2\%$.</p>
+
+      <p>Quando i segnali in arrivo dai dendriti fanno salire quel potenziale oltre una <strong>soglia</strong>
+        di circa $-55$ mV, il neurone «spara»: si apre una cascata di canali ionici e lungo l'assone corre un
+        impulso di tensione, il <em>potenziale d'azione</em>, che viaggia a velocità fra $1$ e $100$ m/s. È un
+        fenomeno <strong>tutto-o-niente</strong>: l'impulso ha sempre la stessa ampiezza, e l'informazione sta
+        nella <em>frequenza</em> degli impulsi, non nella loro intensità.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>grandezza</th><th>valore tipico</th><th>per confronto</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">neuroni</td><td>$86\times10^9$</td><td class="l">stelle della Via Lattea:
+              $\sim 10^{11}$</td></tr>
+            <tr><td class="lab">sinapsi</td><td>$\sim 10^{14}$</td><td class="l">parametri di un grande modello
+              linguistico: $10^{11}$-$10^{12}$</td></tr>
+            <tr><td class="lab">frequenza di scarica</td><td>$1$-$100$ Hz</td><td class="l">frequenza di un
+              processore: $10^9$ Hz</td></tr>
+            <tr><td class="lab">potenza consumata</td><td>$\sim 20$ W</td><td class="l">una scheda grafica da
+              addestramento: $700$ W</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Guardate l'ultima riga, perché è quella che stupisce di più: il cervello fa quello che fa con la
+        potenza di una lampadina. Un modello linguistico moderno, per essere addestrato, consuma l'energia di
+        centinaia di famiglie per mesi. Sul piano dell'<em>efficienza energetica</em> la biologia è avanti di
+        parecchi ordini di grandezza, e non è chiaro perché.</p>
+    </section>
+
+    <!-- 2 — DAL NEURONE AL MODELLO -->
+    <section id="sec2">
+      <h2>2. Quanto bisogna semplificare</h2>
+
+      <p>Un neurone vero è una cellula complicatissima: canali ionici di decine di tipi, geometria dendritica
+        che fa calcoli da sola, neurotrasmettitori diversi, plasticità su scale di tempo che vanno dai
+        millisecondi agli anni. Modellarlo per bene richiede sistemi di equazioni differenziali — il modello
+        di Hodgkin e Huxley, Nobel 1963, ne usa quattro accoppiate <em>per un solo neurone</em>.</p>
+
+      <p>La scelta che ha reso possibile tutto il resto è stata <strong>buttare via quasi tutto</strong>.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il neurone artificiale (McCulloch e Pitts, 1943)</div>
+        $$y = \varphi\!\left(\sum_i w_i x_i + b\right)$$
+        <p class="formula-note">Gli ingressi $x_i$ vengono moltiplicati per dei <strong>pesi</strong> $w_i$ —
+          che rappresentano la forza delle sinapsi — sommati, aggiunti a una soglia $b$, e passati attraverso
+          una <strong>funzione di attivazione</strong> $\varphi$. Tutto qui: una somma pesata e una soglia.</p>
+      </div>
+
+      <p>Che cosa si è perso? Praticamente tutto: la dinamica temporale, la geometria, la chimica, il rumore.
+        Che cosa si è tenuto? Due cose sole: che il neurone <strong>somma</strong> gli ingressi pesandoli, e
+        che risponde in modo <strong>non lineare</strong>. Sono bastate.</p>
+
+      <div class="warnbox"><strong>La non linearità non è un dettaglio.</strong> Se $\varphi$ fosse
+        l'identità, una rete a molti strati collasserebbe in una sola moltiplicazione di matrici, cioè in una
+        singola trasformazione lineare: mille strati non saprebbero fare più di uno. È la funzione di
+        attivazione a rendere possibile la profondità, ed è per questo che le reti moderne usano funzioni
+        semplicissime ma <em>storte</em>, come la ReLU $\varphi(z) = \max(0, z)$.</div>
+
+      <p>Un singolo neurone artificiale, con la soglia a gradino, si chiama <strong>percettrone</strong>: lo
+        avete già incontrato — e fatto imparare — nella lezione 12 di Matematica del secondo anno. Sa
+        risolvere solo problemi <em>linearmente separabili</em>, e questa limitazione, denunciata da Minsky e
+        Papert nel 1969, fermò la ricerca per quindici anni. La via d'uscita è mettere più neuroni, su più
+        strati.</p>
+    </section>
+
+    <!-- 3 — HOPFIELD -->
+    <section id="sec3">
+      <h2>3. Il modello di Hopfield: una memoria fatta di minimi</h2>
+
+      <p>Ecco il modello in cui la fisica entra in modo esplicito. Prendiamo $N$ neuroni, ciascuno con due soli
+        stati possibili, $s_i = +1$ (acceso) o $s_i = -1$ (spento). Ogni coppia è collegata da un peso
+        simmetrico $w_{ij} = w_{ji}$. E definiamo un'energia.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Energia di una rete di Hopfield</div>
+        $$E = -\frac12 \sum_{i \ne j} w_{ij}\,s_i\,s_j$$
+        <p class="formula-note">È <em>esattamente</em> l'energia di un modello di spin: se $w_{ij} \gt 0$ i due
+          neuroni «vogliono» essere concordi, se $w_{ij} \lt 0$ discordi. La dinamica è semplicissima: si
+          sceglie un neurone a caso e lo si mette nello stato che <strong>abbassa l'energia</strong>, cioè
+          $s_i = \text{segno}\left(\sum_j w_{ij}s_j\right)$.</p>
+      </div>
+
+      <div class="method">
+        <p><strong>Il risultato notevole di Hopfield.</strong></p>
+        <p><span class="step-num">1</span>Con pesi simmetrici, quella dinamica <strong>non può mai far salire
+          l'energia</strong>. Ogni aggiornamento la abbassa o la lascia uguale.</p>
+        <p><span class="step-num">2</span>L'energia è limitata inferiormente (le configurazioni sono finite),
+          quindi la dinamica <strong>si ferma</strong> — sempre, in un numero finito di passi.</p>
+        <p><span class="step-num">3</span>Si ferma in un <strong>minimo locale</strong>: una «insenatura» del
+          paesaggio energetico.</p>
+        <p><span class="step-num">4</span>Se si scelgono i pesi in modo che certe configurazioni siano minimi,
+          quelle configurazioni diventano <strong>ricordi</strong>: partendo da una versione rovinata di una di
+          esse, la rete ci scivola dentro da sola. <strong>È una memoria associativa.</strong></p>
+      </div>
+
+      <p>La regola per costruire i pesi è quella di <strong>Hebb</strong>, formulata nel 1949 su basi
+        puramente biologiche — <em>neurons that fire together, wire together</em>:</p>
+
+      $$w_{ij} = \frac{1}{N}\sum_{\mu=1}^{P} \xi_i^\mu\,\xi_j^\mu \qquad (i \ne j)$$
+
+      <p>dove $\xi^\mu$ sono i $P$ schemi da memorizzare. Provatelo: qui sotto la rete ha $64$ neuroni disposti
+        in una griglia $8\times8$, e ha imparato tre lettere. Rovinatene una e guardatela ricostruirsi.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="hp-pat"></div>
+        <div class="ctrl">
+          <label>rumore introdotto: <span class="val-badge" id="hp-rv">25</span> % dei pixel</label>
+          <input type="range" id="hp-r" min="0" max="60" step="5" value="25">
+          <label>schemi memorizzati: <span class="val-badge" id="hp-mv">3</span></label>
+          <input type="range" id="hp-m" min="1" max="3" step="1" value="3">
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="hp-rovina" type="button">🎲 rovina l'immagine</button>
+          <button class="btn" id="hp-passo" type="button">▶ un passo</button>
+          <button class="btn" id="hp-fine" type="button">⏩ fino alla fine</button>
+        </div>
+        <svg id="hp-svg" viewBox="0 0 680 330" role="img"
+             aria-label="Rete di Hopfield 8x8: immagine rovinata, ricostruzione e discesa dell'energia"></svg>
+        <p class="cap">A sinistra lo stato attuale della rete, al centro lo schema memorizzato più vicino, a
+          destra l'energia che scende a ogni aggiornamento.</p>
+        <div class="sp-cols">
+          <div>energia attuale: <span class="val-badge" id="hp-en">—</span></div>
+          <div>pixel sbagliati: <span class="val-badge" id="hp-err">—</span></div>
+          <div>aggiornamenti fatti: <span class="val-badge" id="hp-pas">—</span></div>
+          <div>capacità teorica della rete: <span class="val-badge" id="hp-cap">—</span></div>
+        </div>
+        <div class="eq-out" id="hp-out"></div>
+      </div>
+
+      <p>Il codice che costruisce e fa girare questa rete è più corto della spiegazione. Eccolo, in Python:</p>
+
+      <pre class="codice"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># schemi da memorizzare: matrici 8x8 di +1 e -1, appiattite in vettori</span>
+schemi = np.array([lettera_A, lettera_B, lettera_C])   <span class="cm"># forma (3, 64)</span>
+
+<span class="cm"># regola di Hebb: i pesi sono la somma dei prodotti esterni</span>
+W = schemi.T @ schemi / len(schemi[0])
+np.fill_diagonal(W, 0)                                 <span class="cm"># nessun neurone parla con se stesso</span>
+
+<span class="kw">def</span> energia(s):
+    <span class="kw">return</span> -0.5 * s @ W @ s
+
+<span class="kw">def</span> aggiorna(s, i):
+    s[i] = 1 <span class="kw">if</span> W[i] @ s &gt;= 0 <span class="kw">else</span> -1
+    <span class="kw">return</span> s
+
+<span class="cm"># si parte da un'immagine rovinata e si aggiorna finche' non cambia piu' nulla</span>
+s = immagine_rovinata.copy()
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="kw">range</span>(200):
+    i = np.random.randint(64)
+    s = aggiorna(s, i)
+<span class="kw">print</span>(energia(s))</pre>
+
+      <p>Sette righe di sostanza. E notate quanto è <em>fisico</em> il tutto: la matrice dei pesi è costruita
+        una volta sola e non cambia mai; non c'è nessun addestramento iterativo, nessuna correzione
+        dell'errore. La memoria sta nel <strong>paesaggio energetico</strong>, e ricordare significa
+        semplicemente rotolare in fondo alla valle più vicina.</p>
+
+      <div class="warnbox"><strong>I limiti, che sono istruttivi.</strong> Una rete di Hopfield con $N$
+        neuroni può memorizzare circa $0{,}138\,N$ schemi: con $64$ neuroni, <strong>nove</strong>.
+        Sovraccaricandola, i minimi si fondono fra loro e compaiono <em>minimi spuri</em> — configurazioni che
+        la rete «ricorda» pur non avendole mai viste, spesso miscugli dei ricordi veri. È un fenomeno con un
+        nome preciso in fisica, la <em>frustrazione</em>, e chi ha provato a ricordare due volti simili e ne ha
+        ottenuto un terzo inesistente sa di che cosa si parla.</div>
+
+      <div class="curiosita"><strong>Da dove viene davvero questo modello.</strong> Dai <strong>vetri di
+        spin</strong>: leghe magnetiche disordinate in cui alcuni atomi vogliono allinearsi e altri
+        anti-allinearsi, e non esiste una configurazione che accontenti tutti. Il loro paesaggio energetico è
+        pieno di minimi locali, e per capirli Giorgio Parisi sviluppò negli anni Settanta una teoria che gli è
+        valsa il Nobel per la fisica nel 2021. Hopfield si accorse che quel paesaggio, invece di essere un
+        fastidio, poteva essere <em>usato</em>: se i minimi sono ricordi, il disordine diventa memoria. Tre
+        Nobel per la fisica — Parisi 2021, Hopfield e Hinton 2024 — sulla stessa matematica.</div>
+    </section>
+
+    <!-- 4 — LE RETI PROFONDE -->
+    <section id="sec4">
+      <h2>4. Le reti profonde: che cosa sono gli strati</h2>
+
+      <p>La rete di Hopfield è tutta collegata con tutti e non ha una direzione. Le reti che oggi fanno
+        funzionare i traduttori, il riconoscimento delle immagini e i modelli linguistici hanno invece una
+        struttura <strong>a strati</strong>: i neuroni sono organizzati in file, ciascuna riceve solo dalla
+        precedente e manda solo alla successiva.</p>
+
+      <div class="definition">
+        <div class="formula-title">Rete a strati</div>
+        <p>Uno <strong>strato di ingresso</strong> riceve i dati (i pixel di un'immagine, le parole di una
+          frase); uno o più <strong>strati nascosti</strong> li rielaborano; uno <strong>strato di
+          uscita</strong> produce la risposta. Ogni strato calcola
+          $\vec y = \varphi(W\vec x + \vec b)$: una moltiplicazione per una matrice di pesi, un'aggiunta e una
+          funzione non lineare.</p>
+        <p class="formula-note">«Profonda» significa semplicemente <em>con molti strati nascosti</em>. Il
+          termine <em>deep learning</em> non indica una tecnica particolare: indica il fatto che, dal 2012 in
+          poi, si è riusciti ad addestrare reti con decine o centinaia di strati, cosa che prima non
+          funzionava.</p>
+      </div>
+
+      <p>Perché la profondità aiuta? Perché ogni strato costruisce rappresentazioni <em>a partire</em> da
+        quelle del precedente. In una rete che riconosce immagini, i primi strati imparano da soli a
+        riconoscere bordi e macchie di colore; quelli intermedi combinano i bordi in occhi, ruote, texture;
+        quelli finali combinano gli occhi in volti. <strong>Nessuno gliel'ha detto</strong>: è la struttura a
+        strati a rendere naturale questa gerarchia.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="dp-prob"></div>
+        <div class="ctrl">
+          <label>neuroni per strato: <span class="val-badge" id="dp-nv">6</span></label>
+          <input type="range" id="dp-n" min="1" max="16" step="1" value="6">
+          <label>strati nascosti: <span class="val-badge" id="dp-sv">2</span></label>
+          <input type="range" id="dp-s" min="0" max="4" step="1" value="2">
+        </div>
+        <div class="ctrl">
+          <label>passi di addestramento: <span class="val-badge" id="dp-tv">400</span></label>
+          <input type="range" id="dp-t" min="0" max="1200" step="50" value="400">
+          <span class="toggle-row"><input type="checkbox" id="dp-lock" checked>
+            <label for="dp-lock">🔒 blocca la scala</label></span>
+        </div>
+        <svg id="dp-svg" viewBox="0 0 680 340" role="img"
+             aria-label="Rete a strati che separa due classi di punti sul piano"></svg>
+        <p class="cap">A sinistra la struttura della rete, a destra la frontiera che ha imparato a tracciare
+          fra i punti rossi e quelli blu.</p>
+        <div class="sp-cols">
+          <div>parametri da imparare: <span class="val-badge" id="dp-par">—</span></div>
+          <div>punti classificati bene: <span class="val-badge" id="dp-acc">—</span></div>
+          <div>errore residuo: <span class="val-badge" id="dp-err">—</span></div>
+          <div>tipo di frontiera: <span class="val-badge" id="dp-tip">—</span></div>
+        </div>
+        <div class="eq-out" id="dp-out"></div>
+      </div>
+
+      <p>Provate a portare gli strati nascosti a zero: la rete si riduce a un percettrone e sa tracciare solo
+        una <strong>retta</strong>. Sul problema «due macchie separate» funziona; sul problema «un anello
+        dentro l'altro» fallisce sempre, per quanto la si addestri. Aggiungete uno strato e la frontiera si
+        piega; aggiungetene un altro e diventa qualunque cosa serva.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Quanti sono i parametri</div>
+        $$\#\text{parametri} = \sum_{\ell} \left(n_{\ell-1}\,n_\ell + n_\ell\right)$$
+        <p class="formula-note">Per ogni strato: una matrice $n_{\ell-1}\times n_\ell$ di pesi più $n_\ell$
+          soglie. Il conto cresce in fretta — e nei modelli linguistici moderni arriva a centinaia di
+          miliardi. Non è un'esagerazione retorica: è letteralmente il numero di numeri che vengono aggiustati
+          durante l'addestramento.</p>
+      </div>
+
+      <div class="curiosita"><strong>Il teorema che dice che basta uno strato.</strong> Esiste un risultato,
+        il <em>teorema di approssimazione universale</em> (Cybenko 1989, Hornik 1991), che dimostra che una
+        rete con <strong>un solo strato nascosto</strong>, purché abbastanza largo, può approssimare qualunque
+        funzione continua con la precisione che si vuole. Sembrerebbe rendere inutile la profondità — e
+        invece no, per un motivo pratico decisivo: quel teorema dice che la rete <em>esiste</em>, non che si
+        riesca a trovarla, e non dice quanto debba essere larga. Nella pratica una rete profonda e stretta
+        impara con molti meno parametri di una piatta e larghissima. Lo avete già visto all'opera
+        nell'approssimatore universale della lezione 12 di Matematica del secondo anno.</div>
+    </section>
+
+    <!-- 5 — L'ADDESTRAMENTO -->
+    <section id="sec5">
+      <h2>5. Come si addestra una rete</h2>
+
+      <p>Una rete appena creata ha pesi casuali e non sa fare niente. <strong>Addestrarla</strong> significa
+        aggiustare quei numeri finché non fa quello che vogliamo. Le strategie sono quattro, e differiscono
+        per una sola cosa: <em>che tipo di informazione riceve la rete su quanto sta sbagliando</em>.</p>
+
+      <div class="addestra">
+        <div>
+          <h4>Supervisionato</h4>
+          <p>Si danno alla rete esempi <strong>già etichettati</strong>: mille foto di gatti con scritto
+            «gatto». La rete prevede, si confronta con la risposta giusta, calcola l'errore e corregge i pesi
+            nella direzione che lo riduce (è la <em>discesa del gradiente</em>, con la
+            <strong>retropropagazione</strong> a calcolare le derivate).</p>
+          <p class="formula-note">Funziona benissimo e costa carissimo: qualcuno deve aver etichettato tutto a
+            mano. Il grande archivio ImageNet contiene $14$ milioni di immagini etichettate da esseri umani.</p>
+        </div>
+        <div>
+          <h4>Non supervisionato</h4>
+          <p>Nessuna etichetta: si danno i dati e basta, e si chiede alla rete di trovarci <strong>struttura</strong>.
+            Raggruppare clienti simili, comprimere immagini, scoprire che in un archivio di volti ci sono due
+            gruppi ben distinti.</p>
+          <p class="formula-note">Il criterio non è «hai indovinato?» ma «hai trovato una descrizione più
+            corta?». Ed è qui che rientra l'entropia di Shannon della lezione precedente: comprimere bene
+            significa aver capito.</p>
+        </div>
+        <div>
+          <h4>Semi-supervisionato</h4>
+          <p>Poche etichette, tantissimi dati grezzi. Si usano i pochi esempi etichettati per orientarsi e la
+            struttura dei dati non etichettati per rifinire.</p>
+          <p class="formula-note">È il regime realistico quasi sempre, ed è anche il modo in cui impara un
+            bambino: qualcuno gli dice «questo è un cane» tre volte, e poi lui vede diecimila cani da solo.</p>
+        </div>
+        <div>
+          <h4>Per rinforzo</h4>
+          <p>Nessuno dice qual era la risposta giusta: si riceve solo un <strong>premio</strong> o una
+            <strong>punizione</strong>, spesso molto dopo l'azione. È come imparare a giocare a scacchi
+            sapendo solo, alla fine, se si è vinto.</p>
+          <p class="formula-note">È il metodo con cui sono stati costruiti i programmi che battono i campioni
+            di Go e che imparano a camminare. Il problema difficile si chiama <em>assegnazione del
+            credito</em>: quale delle centoventi mosse è stata quella buona?</p>
+        </div>
+      </div>
+
+      <h3>5.1 — Il rinforzo e la statistica bayesiana</h3>
+
+      <p>Nell'apprendimento per rinforzo compare un problema che non ha una soluzione ovvia, ed è il motivo
+        per cui entra in scena il teorema di Bayes visto nella lezione 7 di Matematica del secondo anno.</p>
+
+      <div class="definition">
+        <div class="formula-title">Il dilemma esplorazione-sfruttamento</div>
+        <p>Avete tre macchinette che pagano con probabilità diverse e sconosciute. Ogni gettone speso su una è
+          un gettone non speso sulle altre. Conviene <strong>sfruttare</strong> quella che finora sembra
+          migliore, o <strong>esplorare</strong> le altre nel caso si stesse sbagliando?</p>
+        <p class="formula-note">La risposta bayesiana è elegante: si tiene per ogni macchinetta una
+          <em>distribuzione di probabilità</em> su quanto è buona, la si aggiorna a ogni tentativo con la
+          regola di Bayes, e a ogni giro si <strong>estrae un valore a caso da ciascuna distribuzione</strong>,
+          giocando su quella che esce meglio. Si chiama <em>campionamento di Thompson</em>, ed è del 1933.</p>
+      </div>
+
+      <p>Il meccanismo è astuto: una macchinetta poco provata ha una distribuzione larga, quindi ogni tanto
+        estrae un valore alto e viene provata; una molto provata ha una distribuzione stretta e viene giocata
+        solo se è davvero buona. L'esplorazione non è imposta da fuori — <strong>emerge
+        dall'incertezza</strong>.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>tentativi effettuati: <span class="val-badge" id="rl-tv">40</span></label>
+          <input type="range" id="rl-t" min="0" max="400" step="5" value="40">
+          <span class="toggle-row"><input type="checkbox" id="rl-lock" checked>
+            <label for="rl-lock">🔒 blocca la scala</label></span>
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="rl-go" type="button">▶ gioca</button>
+          <button class="btn btn-secondary" id="rl-stop" type="button">⏸ ferma</button>
+          <button class="btn btn-secondary" id="rl-reset" type="button">↺ ricomincia</button>
+        </div>
+        <svg id="rl-svg" viewBox="0 0 680 330" role="img"
+             aria-label="Tre distribuzioni beta che si aggiornano con i tentativi"></svg>
+        <p class="cap">Le tre curve sono la convinzione della macchina su quanto paga ciascuna macchinetta. Le
+          probabilità vere, che la macchina non conosce, sono $0{,}30$, $0{,}55$ e $0{,}45$.</p>
+        <div class="sp-cols">
+          <div>giocate per macchinetta: <span class="val-badge" id="rl-gio">—</span></div>
+          <div>vincite ottenute: <span class="val-badge" id="rl-vin">—</span></div>
+          <div>migliore secondo la macchina: <span class="val-badge" id="rl-best">—</span></div>
+          <div>rimpianto rispetto all'ottimo: <span class="val-badge" id="rl-reg">—</span></div>
+        </div>
+        <div class="eq-out" id="rl-out"></div>
+      </div>
+
+      <div class="curiosita"><strong>Ci sono anche reti che non si addestrano.</strong> La rete di Hopfield
+        della sezione precedente è l'esempio più chiaro: i pesi si calcolano una volta sola con la regola di
+        Hebb e non si toccano più. Esistono poi i <em>reservoir computing</em>, in cui una rete ricorrente coi
+        pesi lasciati a caso serve da «vasca» che rimescola il segnale, e si addestra soltanto l'ultimo strato
+        — un centesimo dei parametri, risultati spesso ottimi su serie temporali. E le
+        <em>reti convoluzionali</em> hanno una parte di struttura decisa a priori dal progettista, non
+        imparata: sapere in anticipo che in un'immagine la posizione di un oggetto non ne cambia l'identità
+        vale milioni di esempi di addestramento.</div>
+    </section>
+
+    <!-- 6 — I BIG DATA -->
+    <section id="sec6">
+      <h2>6. I dati: da dove vengono, e come si raccolgono</h2>
+
+      <p>Un modello linguistico moderno è addestrato su qualcosa come mille miliardi di parole. Nessuno le ha
+        digitate: sono state <strong>raccolte automaticamente</strong>. Vale la pena capire come, perché è più
+        semplice di quanto sembri ed è una cosa che potete fare anche voi.</p>
+
+      <div class="method">
+        <p><strong>Un esperimento da fare adesso, con un browser.</strong></p>
+        <p><span class="step-num">1</span>Aprite un sito con un catalogo — una libreria online, un museo, un
+          archivio di articoli — e guardate la <strong>barra degli indirizzi</strong> mentre sfogliate le
+          pagine.</p>
+        <p><span class="step-num">2</span>Noterete che l'indirizzo cambia in modo <em>regolare</em>: qualcosa
+          come <code>.../catalogo?pagina=1</code>, poi <code>pagina=2</code>, poi <code>pagina=3</code>.
+          Oppure <code>/prodotto/1042</code>, <code>/prodotto/1043</code>.</p>
+        <p><span class="step-num">3</span>Quegli indirizzi <strong>non sono scritti a mano</strong>: sono
+          generati da una regola. E una regola che genera indirizzi è una regola che un programma può
+          <em>imitare</em>.</p>
+        <p><span class="step-num">4</span>Un programma di poche righe può quindi chiedere una pagina dopo
+          l'altra, estrarre dal codice HTML i pezzi che interessano — titolo, prezzo, data — e scriverli in una
+          tabella. Si chiama <strong>scraping</strong>, «raschiare».</p>
+      </div>
+
+      <pre class="codice"><span class="kw">import</span> requests, csv
+<span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+
+righe = []
+<span class="kw">for</span> pagina <span class="kw">in</span> <span class="kw">range</span>(1, 51):          <span class="cm"># cinquanta pagine di catalogo</span>
+    url = f<span class="cm">"https://esempio.it/catalogo?pagina={pagina}"</span>
+    zuppa = BeautifulSoup(requests.get(url).text, <span class="cm">"html.parser"</span>)
+    <span class="kw">for</span> scheda <span class="kw">in</span> zuppa.select(<span class="cm">".prodotto"</span>):
+        righe.append([scheda.select_one(<span class="cm">".titolo"</span>).text,
+                      scheda.select_one(<span class="cm">".prezzo"</span>).text])
+
+<span class="kw">with</span> <span class="kw">open</span>(<span class="cm">"dati.csv"</span>, <span class="cm">"w"</span>, newline=<span class="cm">""</span>) <span class="kw">as</span> f:
+    csv.writer(f).writerows(righe)</pre>
+
+      <p>In una manciata di minuti si ottengono migliaia di righe di dati. Moltiplicate per milioni di siti e
+        avete l'ingrediente principale dell'intelligenza artificiale contemporanea. Il progetto
+        <em>Common Crawl</em>, che è pubblico, contiene decine di miliardi di pagine raccolte esattamente
+        così, ed è la base di partenza di quasi tutti i modelli linguistici esistenti.</p>
+
+      <div class="warnbox"><strong>Che non sia facile non vuol dire che sia lecito.</strong> Lo scraping tocca
+        almeno tre questioni serie. Il <strong>diritto d'autore</strong>: i testi e le immagini raccolte hanno
+        un autore, e non è affatto pacifico che addestrarci un modello sia un uso consentito — ci sono cause in
+        corso in mezzo mondo. La <strong>privacy</strong>: dati personali pubblicati per uno scopo finiscono
+        usati per un altro, il che in Europa è espressamente regolato dal GDPR. E il <strong>carico sui
+        server</strong>: un programma può chiedere mille pagine al secondo e mettere in ginocchio un sito
+        piccolo, ed è per questo che quasi tutti i siti pubblicano un file <code>robots.txt</code> in cui
+        dichiarano che cosa è permesso raccogliere. Rispettarlo è il minimo sindacale.</div>
+
+      <div class="curiosita"><strong>La cosa più preziosa non sono i dati: sono i dati puliti.</strong> Il
+        materiale grezzo raccolto dal web è per la maggior parte spazzatura — pagine duplicate, testo generato
+        automaticamente, elenchi di parole chiave, errori di codifica. La parte costosa e delicata del lavoro
+        non è raccogliere ma <strong>filtrare</strong>, ed è largamente artigianale: chi lo fa bene ottiene
+        modelli migliori a parità di tutto il resto. Una regola vecchia dell'informatica lo dice meglio:
+        <em>garbage in, garbage out</em>.</div>
+    </section>
+
+    <!-- 7 — I MODELLI LINGUISTICI -->
+    <section id="sec7">
+      <h2>7. I modelli linguistici, dalle catene di Markov a oggi</h2>
+
+      <p>Il punto di partenza lo conoscete già: nella lezione 8 di Matematica del secondo anno avete costruito
+        <strong>catene di Markov</strong> su Dante, Collodi e Manzoni, e visto che generavano testo quasi
+        italiano leggendo solo le probabilità di transizione fra parole vicine.</p>
+
+      <p>L'idea di fondo dei modelli linguistici moderni è <em>esattamente la stessa</em>: dato un pezzo di
+        testo, prevedere quale sarà la parola successiva. Quello che è cambiato è quanta storia si guarda e
+        quanto è flessibile il modo di guardarla.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>modello</th><th>che cosa guarda</th><th>parametri</th><th>limite</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">catena di Markov (bigrammi)</td><td>la parola precedente</td>
+              <td>$\sim 10^6$</td><td class="l">dimentica tutto dopo una parola</td></tr>
+            <tr><td class="lab">n-grammi</td><td>le $n-1$ parole precedenti</td><td>cresce come $V^n$</td>
+              <td class="l">esplode: con $V = 50\,000$ e $n = 4$ non ci sono abbastanza testi al mondo</td></tr>
+            <tr><td class="lab">reti ricorrenti</td><td>tutta la storia, riassunta in uno stato</td>
+              <td>$\sim 10^8$</td><td class="l">lo stato dimentica il passato lontano</td></tr>
+            <tr><td class="lab">trasformatori</td><td>tutto il testo, con pesi imparati</td>
+              <td>$10^{11}$-$10^{12}$</td><td class="l">costo di calcolo e di energia</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>La svolta del 2017 è il meccanismo di <strong>attenzione</strong>: invece di riassumere il passato in
+        uno stato che si consuma, il modello <em>impara a quali parole precedenti guardare</em>, e lo fa in
+        modo diverso per ogni parola da prevedere. Leggendo «la chiave era nella borsa, ma Anna non
+        <strong>la</strong> trovava», il modello deve capire che «la» si riferisce alla chiave e non alla
+        borsa: l'attenzione è il meccanismo che glielo permette.</p>
+
+      <div class="warnbox"><strong>Un modello linguistico non «sa» le cose: prevede parole.</strong> Questo va
+        tenuto ben fermo, perché spiega insieme i successi e i disastri. Quando risponde correttamente a una
+        domanda di storia è perché quella risposta è la continuazione statisticamente plausibile del testo;
+        quando <em>inventa</em> una citazione inesistente con tanto di pagina e anno — è il fenomeno chiamato
+        <em>allucinazione</em> — sta facendo esattamente la stessa cosa, e con la stessa sicurezza. Il modello
+        non ha un modo interno di distinguere «vero» da «plausibile», perché è stato costruito per ottimizzare
+        la seconda.</div>
+
+      <div class="curiosita"><strong>Una nota personale, e un nome che torna.</strong> Per scrivere questo sito
+        sto usando moltissimo <strong>Claude</strong>, un modello linguistico. Il suo nome viene da
+        <strong>Claude Shannon</strong> — quello dell'entropia dell'informazione, incontrato nella lezione
+        precedente — e la scelta è più che simbolica: fu Shannon, nel 1948, a fare per primo l'esperimento di
+        generare testo inglese estraendo parole con le probabilità osservate, e a mostrare che già con pochi
+        termini di contesto il risultato somiglia a una lingua. Settantacinque anni dopo, con parametri in più
+        di undici ordini di grandezza, il principio è lo stesso.
+        <br><br>
+        Vale la pena dire anche come lo uso, perché è il punto che conta: scrivo io che cosa deve contenere una
+        lezione, discuto con la macchina la struttura, le faccio scrivere codice e controllarlo, e poi
+        <strong>verifico</strong> — ogni numero di questo sito è ricalcolato da un programma indipendente
+        prima di essere pubblicato. Uno strumento potentissimo per fare le cose noiose in fretta, che non
+        toglie a nessuno la responsabilità di sapere se quello che esce è giusto.</div>
+    </section>
+
+    <!-- 8 — CERVELLO E MODELLI -->
+    <section id="sec8">
+      <h2>8. Perché una rete neurale non è un cervello</h2>
+
+      <p>Il nome inganna, e conviene disinnescarlo. «Rete neurale» descrive un'ispirazione, non
+        un'equivalenza. Le differenze sono profonde e vale la pena elencarle, perché ognuna dice qualcosa di
+        interessante.</p>
+
+      <div class="method">
+        <p><span class="step-num">1</span><strong>Non siamo solo cervello.</strong> Il sistema nervoso è
+          immerso in un corpo che lo condiziona di continuo: ormoni, glicemia, sistema immunitario, dolore,
+          fame, sonno. Uno stato d'ansia cambia il modo in cui si ragiona, e non passa dai «pesi delle
+          sinapsi»: passa dal cortisolo. Un modello linguistico non ha nulla di tutto questo.</p>
+        <p><span class="step-num">2</span><strong>Simulare tutto non basta.</strong> Il verme
+          <em>Caenorhabditis elegans</em> ha esattamente $302$ neuroni, mappati uno per uno con tutte le loro
+          connessioni fin dal 1986: il primo <em>connettoma</em> completo della storia. Il progetto OpenWorm
+          lo simula da anni al calcolatore. Non ne è uscito un verme: ne è uscito un modello che riproduce
+          alcuni comportamenti e non altri. Con trecento neuroni, tutti noti. Trarne conclusioni sugli
+          ottantasei miliardi è, diciamo, prematuro.</p>
+        <p><span class="step-num">3</span><strong>Il cervello impara molto meglio.</strong> Un bambino impara
+          che cos'è una giraffa dopo <em>due</em> esempi; una rete ne richiede migliaia. Un bambino impara la
+          grammatica della sua lingua da poche milioni di parole ascoltate, un modello ne richiede mille
+          miliardi. La differenza non è nella potenza di calcolo — è nel <em>punto di partenza</em>.</p>
+      </div>
+
+      <h3>8.1 — Non siamo tabula rasa</h3>
+
+      <p>L'ultimo punto merita di essere sviluppato, perché è quello concettualmente più ricco. Il cervello
+        umano non arriva vuoto: arriva con una <strong>struttura innata</strong>, il prodotto di qualche
+        centinaio di milioni di anni di evoluzione, che rende certe cose facilissime da imparare e altre quasi
+        impossibili. E arriva con delle <strong>strategie</strong> di apprendimento che assomigliano molto a
+        quelle di uno scienziato.</p>
+
+      <div class="definition">
+        <div class="formula-title">Il bambino come piccolo scienziato bayesiano</div>
+        <p>Alcune euristiche che i bambini usano spontaneamente, documentate dalla psicologia dello sviluppo:</p>
+        <ul>
+          <li><strong>Una parola nuova indica probabilmente una cosa nuova.</strong> Se il bambino conosce
+            «tazza» e sente «caraffa» indicando un tavolo con una tazza e un oggetto sconosciuto, assume che
+            «caraffa» sia l'oggetto sconosciuto. È un <em>a priori</em> bayesiano bell'e buono.</li>
+          <li><strong>Le parole indicano oggetti interi</strong>, non parti o proprietà, se non c'è motivo di
+            pensare il contrario.</li>
+          <li><strong>Una spiegazione che copre più fenomeni vale più di tante spiegazioni separate.</strong>
+            È il rasoio di Occam, e i bambini lo applicano prima di poterlo enunciare.</li>
+          <li><strong>Si sperimenta.</strong> Il gioco è, letteralmente, un programma di esperimenti: lasciar
+            cadere ripetutamente un cucchiaio è un modo di raccogliere dati sulla gravità.</li>
+        </ul>
+        <p class="formula-note">Il quadro complessivo — pochi dati, forti aspettative a priori, aggiornamento
+          continuo — è quello di un <strong>ragionatore bayesiano</strong> e insieme di un
+          <strong>riduzionista</strong>: si cercano poche regole generali che spieghino molte osservazioni.
+          Esattamente il metodo di questo corso.</p>
+      </div>
+
+      <p>Le reti artificiali, in questo, stanno andando nella stessa direzione: le architetture di maggior
+        successo sono quelle in cui il progettista <em>inserisce a priori</em> una struttura giusta — la
+        convoluzione per le immagini, l'attenzione per il linguaggio — invece di lasciare che la rete impari
+        tutto da zero. La struttura innata, sia biologica sia progettata, vale enormi quantità di dati.</p>
+    </section>
+
+    <!-- 9 — CHIUSURA -->
+    <section id="sec9">
+      <h2>9. Che cosa stiamo facendo, in fondo</h2>
+
+      <p>Chiudiamo con qualche riga fuori dal programma, perché è il posto giusto per farlo.</p>
+
+      <p>Tutta questa impresa poggia su un'assunzione che nessuno sa dimostrare: che esista una
+        <strong>realtà oggettiva</strong>, la stessa per tutti, che si comporta secondo regole. Non sappiamo se
+        sia vero; sappiamo che <em>ci serve</em> assumerlo, perché senza quell'assunzione l'idea stessa di
+        esperimento riproducibile non ha senso. È il presupposto di ogni pagina di questo sito.</p>
+
+      <p>Su quella realtà si affaccia un essere che la osserva e la traduce in un <strong>linguaggio
+        astratto</strong>. Costruisce modelli di porzioni limitate del mondo — una carrucola, un gas, una
+        stella — e poi cerca di unificarli, di trovare principi che ne coprano di più con meno. E lo fa con un
+        ciclo che si ripete: <em>prevedere, confrontare, correggere</em>. Prevedere con la logica, confrontare
+        con la misura, correggere con la statistica. È il metodo sperimentale della prima lezione del terzo
+        anno, ed è anche — non a caso — la descrizione di come impara una rete.</p>
+
+      <div class="warnbox"><strong>Sulla parola «intelligenza», e su quella peggiore.</strong> Definire
+        l'intelligenza è già difficile: la maggior parte delle definizioni proposte finisce per descrivere
+        <em>ciò che gli esseri umani fanno bene</em>, il che è un po' comodo. Definire la
+        <strong>coscienza</strong> è talmente più difficile che qui non ci provo nemmeno. Ne segue che la
+        domanda «una macchina può essere cosciente?» non è, propriamente, una domanda a cui rispondere: non
+        sappiamo che cosa significhi. Per usare l'espressione con cui Wolfgang Pauli liquidava certi lavori,
+        <em>non è nemmeno sbagliata</em>. Quello che si può dire è più modesto e più verificabile: le macchine
+        stanno diventando brave in un numero crescente di compiti, come i telai dell'era industriale prima di
+        loro, e ogni volta la lista di ciò che «solo un umano può fare» si accorcia di una voce.</div>
+
+      <p>Resta una domanda che non è tecnica e che non ha una risposta nel programma di fisica:
+        <strong>chi trarrà beneficio da queste macchine?</strong> Le rivoluzioni tecnologiche precedenti hanno
+        prodotto enormi ricchezze e le hanno distribuite molto male, almeno all'inizio, e non c'è nessuna legge
+        di natura che garantisca che questa volta andrà diversamente. È una domanda politica, e come tale
+        riguarda tutti — anche chi la fisica la fa e basta.</p>
+
+      <p>Per parte mia, dichiaro l'unica competenza che ho: mi limito a <em>godere da bravo nerd delle
+        meraviglie della scienza e della tecnologia</em>, e a raccontarvele con il massimo di onestà di cui
+        sono capace. Il resto sta a voi.</p>
+
+      <div class="note">
+        <strong>Dove ci lascia questa lezione.</strong> Siamo partiti dalla stessa matematica della lezione
+        precedente — molte unità semplici, un'energia, un minimo da cercare — e siamo arrivati alla memoria,
+        all'apprendimento e al linguaggio. Nella prossima, l'ultima dell'anno, la stessa costante di Boltzmann
+        che ci ha accompagnato dal gas perfetto in poi ci servirà a capire come funziona una stella.
+      </div>
+    </section>
+
+    <!-- 10 — QUIZ -->
+    <section id="quiz">
+      <h2>10. Quiz finale</h2>
+      <p>Dodici domande a risposta multipla e due aperte, dai neuroni ai modelli linguistici.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 11 — Le reti neurali · Fisica · Quarto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nc(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      function prng(s0) {
+        var s = s0;
+        return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+      }
+
+      /* ============ 3 — LA RETE DI HOPFIELD ============ */
+      (function () {
+        var svg = document.getElementById('hp-svg');
+        if (!svg) { return; }
+        var LETT = [
+          ['A', ['..####..', '.##..##.', '##....##', '##....##', '########', '##....##', '##....##', '##....##']],
+          ['B', ['######..', '##...##.', '##...##.', '######..', '##...##.', '##....##', '##...##.', '######..']],
+          ['C', ['..#####.', '.##...##', '##......', '##......', '##......', '##......', '.##...##', '..#####.']]
+        ];
+        var NP = 64;
+        var sel = 0, W = [], stato = [], passi = 0, storia = [];
+        var rnd = prng(20260821);
+
+        function vettore(righe) {
+          var v = [], r, c;
+          for (r = 0; r < 8; r++) {
+            for (c = 0; c < 8; c++) { v.push(righe[r].charAt(c) === '#' ? 1 : -1); }
+          }
+          return v;
+        }
+
+        function pesi() {
+          var M = parseInt(document.getElementById('hp-m').value, 10);
+          var i, j, k;
+          W = [];
+          for (i = 0; i < NP; i++) { W.push(new Array(NP).fill(0)); }
+          for (k = 0; k < M; k++) {
+            var p = vettore(LETT[k][1]);
+            for (i = 0; i < NP; i++) {
+              for (j = 0; j < NP; j++) {
+                if (i !== j) { W[i][j] += p[i] * p[j] / NP; }
+              }
+            }
+          }
+        }
+
+        function campo(i) {
+          var s = 0;
+          for (var j = 0; j < NP; j++) { s += W[i][j] * stato[j]; }
+          return s;
+        }
+
+        function energia() {
+          var e = 0, i, j;
+          for (i = 0; i < NP; i++) {
+            for (j = 0; j < NP; j++) { e += W[i][j] * stato[i] * stato[j]; }
+          }
+          return -0.5 * e;
+        }
+
+        function rovina() {
+          var r = parseFloat(document.getElementById('hp-r').value) / 100;
+          stato = vettore(LETT[sel][1]).slice();
+          for (var i = 0; i < NP; i++) { if (rnd() < r) { stato[i] = -stato[i]; } }
+          passi = 0;
+          storia = [energia()];
+        }
+
+        function unPasso() {
+          var i = Math.min(NP - 1, Math.floor(rnd() * NP));
+          stato[i] = campo(i) >= 0 ? 1 : -1;
+          passi++;
+          storia.push(energia());
+          if (storia.length > 400) { storia.shift(); }
+        }
+
+        function finoAllaFine() {
+          var cambiato = true, giri = 0;
+          while (cambiato && giri < 60) {
+            cambiato = false;
+            for (var i = 0; i < NP; i++) {
+              var nuovo = campo(i) >= 0 ? 1 : -1;
+              if (nuovo !== stato[i]) { stato[i] = nuovo; cambiato = true; }
+              passi++;
+            }
+            storia.push(energia());
+            giri++;
+          }
+          if (storia.length > 400) { storia = storia.slice(storia.length - 400); }
+        }
+
+        function griglia(v, X, Y, lato, col) {
+          var s = '', r, c;
+          var cell = lato / 8;
+          s += '<rect x="' + X + '" y="' + Y + '" width="' + lato + '" height="' + lato +
+            '" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="1.8"/>';
+          for (r = 0; r < 8; r++) {
+            for (c = 0; c < 8; c++) {
+              if (v[r * 8 + c] > 0) {
+                s += '<rect x="' + (X + c * cell).toFixed(1) + '" y="' + (Y + r * cell).toFixed(1) + '" width="' +
+                  cell.toFixed(1) + '" height="' + cell.toFixed(1) + '" fill="' + col + '"/>';
+              }
+            }
+          }
+          return s;
+        }
+
+        function disegna() {
+          var M = parseInt(document.getElementById('hp-m').value, 10);
+          var orig = vettore(LETT[sel][1]);
+          var err = 0, i;
+          for (i = 0; i < NP; i++) { if (stato[i] !== orig[i]) { err++; } }
+          var E = energia();
+          var s = '';
+          s += griglia(stato, 30, 60, 150, 'var(--accent)');
+          s += '<text x="105" y="50" text-anchor="middle" class="lbl">stato della rete</text>';
+          s += griglia(orig, 220, 60, 150, 'var(--muted)');
+          s += '<text x="295" y="50" text-anchor="middle" class="lbl">schema memorizzato</text>';
+          s += '<text x="105" y="232" text-anchor="middle" class="lbl-s">' + err + ' pixel diversi</text>';
+          s += '<text x="295" y="232" text-anchor="middle" class="lbl-s">lettera ' + LETT[sel][0] + '</text>';
+          // la discesa dell'energia
+          var GX0 = 420, GX1 = 650, GY0 = 280, GY1 = 60;
+          var emin = -40, emax = 10;
+          var gx = function (k) { return GX0 + (GX1 - GX0) * k / Math.max(1, storia.length - 1); };
+          var gy = function (e) { return GY0 - (GY0 - GY1) * (e - emin) / (emax - emin); };
+          var pts = [];
+          for (i = 0; i < storia.length; i++) { pts.push(gx(i).toFixed(1) + ',' + gy(storia[i]).toFixed(1)); }
+          if (pts.length > 1) {
+            s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--magenta)" stroke-width="2.2"/>';
+          }
+          s += '<line x1="' + GX0 + '" y1="' + gy(-34.5).toFixed(1) + '" x2="' + GX1 + '" y2="' + gy(-34.5).toFixed(1) +
+            '" stroke="var(--gold)" stroke-width="1.6" stroke-dasharray="5 4"/>';
+          s += '<text x="' + (GX1 - 4) + '" y="' + (gy(-34.5) - 6).toFixed(1) +
+            '" text-anchor="end" style="fill:var(--gold); font-size:11.5px;">fondo della valle</text>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX1 + '" y2="' + GY0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX0 + '" y2="' + GY1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + GX1 + '" y="' + (GY0 + 22) + '" text-anchor="end" class="lbl-s">aggiornamenti</text>';
+          s += '<text x="' + (GX0 - 4) + '" y="' + (GY1 - 16) + '" class="lbl-s">energia</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('hp-rv').textContent = Math.round(parseFloat(document.getElementById('hp-r').value));
+          document.getElementById('hp-mv').textContent = M;
+          document.getElementById('hp-en').textContent = nc(E, 2);
+          document.getElementById('hp-err').textContent = err + ' su 64';
+          document.getElementById('hp-pas').textContent = passi;
+          document.getElementById('hp-cap').textContent = nc(0.138 * NP, 1) + ' schemi';
+          var el = document.getElementById('hp-out');
+          el.innerHTML = 'L\'energia vale ora $E = ' + nc(E, 2).replace(',', '{,}') +
+            '$; il fondo della valle, cioè lo schema perfetto, sta a $-34{,}5$. ' +
+            (err === 0
+              ? '<strong>La rete ha ricostruito la lettera esattamente.</strong> Nessuno le ha detto quale ' +
+                'fosse: è semplicemente rotolata nel minimo più vicino, aggiornando un neurone alla volta e ' +
+                'abbassando l\'energia a ogni passo.'
+              : (passi === 0
+                ? 'Premete «un passo» o «fino alla fine» e guardate l\'energia scendere. Ogni aggiornamento la ' +
+                  'abbassa o la lascia uguale: non può <em>mai</em> farla salire, ed è per questo che la ' +
+                  'dinamica si ferma sempre.'
+                : 'Mancano ancora ' + err + ' pixel. ' +
+                  (err > 20
+                    ? 'Con questo livello di rumore la rete può finire in un <strong>minimo spurio</strong>, ' +
+                      'cioè in un ricordo che non le è mai stato insegnato: succede più spesso quando gli ' +
+                      'schemi memorizzati sono tanti o si somigliano.'
+                    : 'Continuate ad aggiornare: siamo quasi in fondo alla valle.'))) +
+            ' La capacità teorica di questa rete è $0{,}138\\,N = 8{,}8$ schemi: con tre lettere siamo ' +
+            'tranquilli, ma caricandola troppo i minimi si fondono fra loro.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        var host = document.getElementById('hp-pat');
+        LETT.forEach(function (L, i) {
+          var b = document.createElement('button');
+          b.className = 'btn' + (i === 0 ? ' active' : '');
+          b.type = 'button';
+          b.textContent = 'lettera ' + L[0];
+          b.addEventListener('click', function () {
+            sel = i;
+            Array.prototype.forEach.call(host.children, function (o, j) {
+              if (j === i) { o.classList.add('active'); } else { o.classList.remove('active'); }
+            });
+            if (sel >= parseInt(document.getElementById('hp-m').value, 10)) {
+              document.getElementById('hp-m').value = sel + 1;
+              pesi();
+            }
+            rovina(); disegna();
+          });
+          host.appendChild(b);
+        });
+        ['hp-r', 'hp-m'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', function () {
+            if (sel >= parseInt(document.getElementById('hp-m').value, 10)) { sel = 0; }
+            pesi(); rovina(); disegna();
+          });
+        });
+        document.getElementById('hp-rovina').addEventListener('click', function () { rovina(); disegna(); });
+        document.getElementById('hp-passo').addEventListener('click', function () { unPasso(); disegna(); });
+        document.getElementById('hp-fine').addEventListener('click', function () { finoAllaFine(); disegna(); });
+        pesi(); rovina(); disegna();
+      })();
+
+      /* ============ 4 — LA RETE A STRATI ============ */
+      (function () {
+        var svg = document.getElementById('dp-svg');
+        if (!svg) { return; }
+        var PROB = ['due macchie', 'un anello dentro l\'altro'];
+        var sel = 1;
+
+        function dati(quale) {
+          var rnd = prng(20260822), P = [], i;
+          for (i = 0; i < 60; i++) {
+            var x, y, cl;
+            if (quale === 0) {
+              cl = i % 2;
+              x = (cl ? 0.9 : -0.9) + (rnd() - 0.5) * 1.1;
+              y = (cl ? 0.7 : -0.7) + (rnd() - 0.5) * 1.1;
+            } else {
+              cl = i % 2;
+              var r = cl ? 1.5 + rnd() * 0.5 : rnd() * 0.7;
+              var th = rnd() * 2 * Math.PI;
+              x = r * Math.cos(th); y = r * Math.sin(th);
+            }
+            P.push([x, y, cl]);
+          }
+          return P;
+        }
+
+        function crea(nn, ns) {
+          var rnd = prng(20260823), rete = [], dim = [2], i, k;
+          for (i = 0; i < ns; i++) { dim.push(nn); }
+          dim.push(1);
+          for (k = 1; k < dim.length; k++) {
+            var Wl = [], bl = [];
+            for (i = 0; i < dim[k]; i++) {
+              var riga = [];
+              for (var j = 0; j < dim[k - 1]; j++) { riga.push((rnd() - 0.5) * 2.4); }
+              Wl.push(riga);
+              bl.push((rnd() - 0.5) * 0.6);
+            }
+            rete.push({ W: Wl, b: bl });
+          }
+          return rete;
+        }
+
+        function avanti(rete, x) {
+          var att = [x.slice()], k, i, j;
+          for (k = 0; k < rete.length; k++) {
+            var v = [];
+            for (i = 0; i < rete[k].b.length; i++) {
+              var z = rete[k].b[i];
+              for (j = 0; j < att[k].length; j++) { z += rete[k].W[i][j] * att[k][j]; }
+              v.push(k === rete.length - 1 ? 1 / (1 + Math.exp(-z)) : Math.tanh(z));
+            }
+            att.push(v);
+          }
+          return att;
+        }
+
+        function addestra(rete, P, passi, eta) {
+          var k, i, j, t, n;
+          for (t = 0; t < passi; t++) {
+            var gW = [], gb = [];
+            for (k = 0; k < rete.length; k++) {
+              gW.push(rete[k].W.map(function (r) { return r.map(function () { return 0; }); }));
+              gb.push(rete[k].b.map(function () { return 0; }));
+            }
+            for (n = 0; n < P.length; n++) {
+              var att = avanti(rete, [P[n][0], P[n][1]]);
+              var delta = [att[att.length - 1][0] - P[n][2]];
+              for (k = rete.length - 1; k >= 0; k--) {
+                for (i = 0; i < rete[k].b.length; i++) {
+                  gb[k][i] += delta[i];
+                  for (j = 0; j < att[k].length; j++) { gW[k][i][j] += delta[i] * att[k][j]; }
+                }
+                if (k > 0) {
+                  var nd = [];
+                  for (j = 0; j < att[k].length; j++) {
+                    var s = 0;
+                    for (i = 0; i < rete[k].b.length; i++) { s += rete[k].W[i][j] * delta[i]; }
+                    nd.push(s * (1 - att[k][j] * att[k][j]));
+                  }
+                  delta = nd;
+                }
+              }
+            }
+            for (k = 0; k < rete.length; k++) {
+              for (i = 0; i < rete[k].b.length; i++) {
+                rete[k].b[i] -= eta * gb[k][i] / P.length;
+                for (j = 0; j < rete[k].W[i].length; j++) {
+                  rete[k].W[i][j] -= eta * gW[k][i][j] / P.length;
+                }
+              }
+            }
+          }
+        }
+
+        function disegna() {
+          var nn = parseInt(document.getElementById('dp-n').value, 10);
+          var ns = parseInt(document.getElementById('dp-s').value, 10);
+          var T = parseInt(document.getElementById('dp-t').value, 10);
+          var P = dati(sel);
+          var rete = crea(nn, ns);
+          addestra(rete, P, T, 1.2);
+          var giusti = 0, errore = 0, i, j;
+          for (i = 0; i < P.length; i++) {
+            var o = avanti(rete, [P[i][0], P[i][1]]);
+            var y = o[o.length - 1][0];
+            if ((y >= 0.5 ? 1 : 0) === P[i][2]) { giusti++; }
+            errore += (y - P[i][2]) * (y - P[i][2]);
+          }
+          errore /= P.length;
+          var dim = [2], par = 0;
+          for (i = 0; i < ns; i++) { dim.push(nn); }
+          dim.push(1);
+          for (i = 1; i < dim.length; i++) { par += dim[i - 1] * dim[i] + dim[i]; }
+          var s = '';
+          // struttura della rete
+          var SX0 = 40, SX1 = 300, SY = 190;
+          for (i = 0; i < dim.length; i++) {
+            var x = SX0 + (SX1 - SX0) * i / (dim.length - 1);
+            for (j = 0; j < dim[i]; j++) {
+              var y2 = SY - (dim[i] - 1) * 13 + j * 26;
+              if (i > 0) {
+                for (var q = 0; q < dim[i - 1]; q++) {
+                  var xp = SX0 + (SX1 - SX0) * (i - 1) / (dim.length - 1);
+                  var yp = SY - (dim[i - 1] - 1) * 13 + q * 26;
+                  s += '<line x1="' + xp.toFixed(1) + '" y1="' + yp.toFixed(1) + '" x2="' + x.toFixed(1) +
+                    '" y2="' + y2.toFixed(1) + '" stroke="var(--border)" stroke-width="0.5"/>';
+                }
+              }
+              s += '<circle cx="' + x.toFixed(1) + '" cy="' + y2.toFixed(1) + '" r="6" fill="' +
+                (i === 0 ? 'var(--gold)' : (i === dim.length - 1 ? 'var(--magenta)' : 'var(--accent)')) + '"/>';
+            }
+          }
+          s += '<text x="' + ((SX0 + SX1) / 2) + '" y="40" text-anchor="middle" class="lbl">' +
+            dim.join(' → ') + '</text>';
+          s += '<text x="' + ((SX0 + SX1) / 2) + '" y="320" text-anchor="middle" class="lbl-s">' +
+            par + ' parametri</text>';
+          // la frontiera
+          var BX = 350, BY = 44, BS = 280, RM = 2.4;
+          var px = function (v) { return BX + BS / 2 + BS / 2 * v / RM; };
+          var py = function (v) { return BY + BS / 2 - BS / 2 * v / RM; };
+          var G = 26, cell = BS / G;
+          for (i = 0; i < G; i++) {
+            for (j = 0; j < G; j++) {
+              var xx = -RM + 2 * RM * (i + 0.5) / G, yy = -RM + 2 * RM * (j + 0.5) / G;
+              var oo = avanti(rete, [xx, yy]);
+              var vv = oo[oo.length - 1][0];
+              s += '<rect x="' + (BX + i * cell).toFixed(1) + '" y="' + (BY + BS - (j + 1) * cell).toFixed(1) +
+                '" width="' + (cell + 0.6).toFixed(1) + '" height="' + (cell + 0.6).toFixed(1) + '" fill="' +
+                (vv >= 0.5 ? '#3b82f6' : '#ef4444') + '" opacity="' + (0.10 + 0.30 * Math.abs(vv - 0.5) * 2).toFixed(2) + '"/>';
+            }
+          }
+          for (i = 0; i < P.length; i++) {
+            s += '<circle cx="' + px(P[i][0]).toFixed(1) + '" cy="' + py(P[i][1]).toFixed(1) + '" r="4" fill="' +
+              (P[i][2] ? '#3b82f6' : '#ef4444') + '" stroke="var(--surface)" stroke-width="1"/>';
+          }
+          s += '<rect x="' + BX + '" y="' + BY + '" width="' + BS + '" height="' + BS +
+            '" fill="none" stroke="var(--text-soft)" stroke-width="1.8"/>';
+          s += '<text x="' + (BX + BS / 2) + '" y="' + (BY + BS + 20) + '" text-anchor="middle" class="lbl-s">' +
+            'la frontiera imparata dalla rete</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('dp-nv').textContent = nn;
+          document.getElementById('dp-sv').textContent = ns;
+          document.getElementById('dp-tv').textContent = T;
+          document.getElementById('dp-par').textContent = par;
+          document.getElementById('dp-acc').textContent = giusti + ' su ' + P.length +
+            ' (' + nc(giusti / P.length * 100, 0) + '%)';
+          document.getElementById('dp-err').textContent = nc(errore, 4);
+          document.getElementById('dp-tip').textContent = ns === 0 ? 'una retta' :
+            (ns === 1 ? 'una curva' : 'qualunque forma');
+          var el = document.getElementById('dp-out');
+          el.innerHTML = 'Rete $' + dim.join(' \\to ') + '$, cioè <strong>' + par +
+            ' parametri</strong> da imparare, addestrata per ' + T + ' passi di discesa del gradiente. ' +
+            (ns === 0
+              ? 'Con <strong>zero strati nascosti</strong> la rete è un percettrone e può tracciare soltanto ' +
+                'una <strong>retta</strong>: ' +
+                (sel === 1
+                  ? 'sul problema dell\'anello è condannata a sbagliare circa metà dei punti, per quanto la si ' +
+                    'addestri. Nessuna retta separa un cerchio interno da una corona esterna.'
+                  : 'e qui basta, perché le due macchie sono linearmente separabili.')
+              : 'Con ' + ns + (ns === 1 ? ' strato nascosto' : ' strati nascosti') + ' la frontiera può ' +
+                'piegarsi: ne classifica bene ' + giusti + ' su ' + P.length + '. ' +
+                (T < 200
+                  ? 'Ma l\'addestramento è appena cominciato: alzate il cursore dei passi e guardate la ' +
+                    'frontiera prendere forma.'
+                  : 'Notate che i parametri non sono «istruzioni»: nessuno ha scritto «disegna un cerchio». ' +
+                    'La forma è emersa dal solo fatto di ridurre l\'errore, un pochino alla volta.'));
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        var host = document.getElementById('dp-prob');
+        PROB.forEach(function (n, i) {
+          var b = document.createElement('button');
+          b.className = 'btn' + (i === sel ? ' active' : '');
+          b.type = 'button';
+          b.textContent = n;
+          b.addEventListener('click', function () {
+            sel = i;
+            Array.prototype.forEach.call(host.children, function (o, j) {
+              if (j === i) { o.classList.add('active'); } else { o.classList.remove('active'); }
+            });
+            disegna();
+          });
+          host.appendChild(b);
+        });
+        ['dp-n', 'dp-s', 'dp-t'].forEach(function (id) {
+          document.getElementById(id).addEventListener('change', disegna);
+        });
+        document.getElementById('dp-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nc(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      /* ============ 5.1 — IL CAMPIONAMENTO DI THOMPSON ============ */
+      (function () {
+        var svg = document.getElementById('rl-svg');
+        if (!svg) { return; }
+        var VERE = [0.30, 0.55, 0.45];
+        var NOMI = ['macchinetta 1', 'macchinetta 2', 'macchinetta 3'];
+        var COL = ['var(--accent)', 'var(--magenta)', 'var(--gold)'];
+        var succ = [0, 0, 0], fall = [0, 0, 0], giocate = 0, raf = null;
+        var seme = 20260824;
+
+        function rnd() { seme = (seme * 16807) % 2147483647; return (seme - 1) / 2147483646; }
+        function gauss() {
+          var u = Math.max(1e-12, rnd()), v = rnd();
+          return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+        }
+
+        function estraiBeta(a, b) {
+          // per a e b interi piccoli: a-esima statistica d'ordine di a+b-1 uniformi;
+          // per valori grandi si usa l'approssimazione normale
+          if (a + b - 1 <= 60) {
+            var u = [], i;
+            for (i = 0; i < a + b - 1; i++) { u.push(rnd()); }
+            u.sort(function (x, y) { return x - y; });
+            return u[a - 1];
+          }
+          var mu = a / (a + b);
+          var sd = Math.sqrt(a * b / ((a + b) * (a + b) * (a + b + 1)));
+          return Math.max(1e-6, Math.min(1 - 1e-6, mu + sd * gauss()));
+        }
+
+        function unGiro() {
+          var best = -1, bv = -1, i;
+          for (i = 0; i < 3; i++) {
+            var x = estraiBeta(succ[i] + 1, fall[i] + 1);
+            if (x > bv) { bv = x; best = i; }
+          }
+          if (rnd() < VERE[best]) { succ[best]++; } else { fall[best]++; }
+          giocate++;
+          document.getElementById('rl-t').value = Math.min(400, giocate);
+        }
+
+        function reset() {
+          succ = [0, 0, 0]; fall = [0, 0, 0]; giocate = 0; seme = 20260824;
+          document.getElementById('rl-t').value = 0;
+        }
+
+        function lbeta(a, b) {
+          return lgamma(a) + lgamma(b) - lgamma(a + b);
+        }
+        function lgamma(z) {
+          var g = [676.5203681218851, -1259.1392167224028, 771.32342877765313,
+                   -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+                   9.9843695780195716e-6, 1.5056327351493116e-7];
+          if (z < 0.5) { return Math.log(Math.PI / Math.sin(Math.PI * z)) - lgamma(1 - z); }
+          z -= 1;
+          var x = 0.99999999999980993, i;
+          for (i = 0; i < 8; i++) { x += g[i] / (z + i + 1); }
+          var t = z + 7.5;
+          return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+        }
+        function densBeta(x, a, b) {
+          if (x <= 0 || x >= 1) { return 0; }
+          return Math.exp((a - 1) * Math.log(x) + (b - 1) * Math.log(1 - x) - lbeta(a, b));
+        }
+
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+
+        function tick() {
+          if (giocate < 400) { unGiro(); }
+          disegna();
+          if (raf && giocate < 400) { raf = requestAnimationFrame(tick); } else { ferma(); }
+        }
+
+        function disegna() {
+          var lock = document.getElementById('rl-lock').checked;
+          var X0 = 60, X1 = 646, Y0 = 268, Y1 = 46;
+          var YM = lock ? 14 : 14;
+          var px = function (p) { return X0 + (X1 - X0) * p; };
+          var py = function (d) { return Y0 - (Y0 - Y1) * Math.min(1.02, d / YM); };
+          var s = '', i, j;
+          for (i = 0; i < 3; i++) {
+            var a = succ[i] + 1, b = fall[i] + 1, pts = [];
+            for (j = 0; j <= 300; j++) {
+              var x = j / 300;
+              pts.push(px(x).toFixed(1) + ',' + py(densBeta(x, a, b)).toFixed(1));
+            }
+            s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + COL[i] + '" stroke-width="2.6"/>';
+            s += '<line x1="' + px(VERE[i]).toFixed(1) + '" y1="' + (Y0 - 6) + '" x2="' + px(VERE[i]).toFixed(1) +
+              '" y2="' + (Y0 + 6) + '" stroke="' + COL[i] + '" stroke-width="3"/>';
+            s += '<text x="' + px(VERE[i]).toFixed(1) + '" y="' + (Y0 + 22) + '" text-anchor="middle" style="fill:' +
+              COL[i] + '; font-size:11px;">' + nc(VERE[i], 2) + '</text>';
+            s += '<text x="' + (X1 - 6) + '" y="' + (Y1 + 6 + i * 17) + '" text-anchor="end" style="fill:' + COL[i] +
+              '; font-size:11.5px;">' + NOMI[i] + ': ' + succ[i] + ' vinte su ' + (succ[i] + fall[i]) + '</text>';
+          }
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + X1 + '" y="' + (Y0 + 40) + '" text-anchor="end" class="lbl-s">probabilità di vincita</text>';
+          s += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 16) + '" class="lbl-s">quanto la macchina ci crede</text>';
+          s += '<text x="' + X0 + '" y="' + (Y0 + 62) + '" class="lbl-s">i trattini sull\'asse sono le ' +
+            'probabilità vere, che la macchina non conosce</text>';
+          svg.innerHTML = s;
+
+          var tot = succ[0] + succ[1] + succ[2];
+          var best = 0;
+          for (i = 1; i < 3; i++) {
+            if ((succ[i] + 1) / (succ[i] + fall[i] + 2) > (succ[best] + 1) / (succ[best] + fall[best] + 2)) { best = i; }
+          }
+          var ottimo = Math.max.apply(null, VERE) * giocate;
+          var atteso = 0;
+          for (i = 0; i < 3; i++) { atteso += VERE[i] * (succ[i] + fall[i]); }
+          document.getElementById('rl-tv').textContent = giocate;
+          document.getElementById('rl-gio').textContent = (succ[0] + fall[0]) + ' · ' + (succ[1] + fall[1]) +
+            ' · ' + (succ[2] + fall[2]);
+          document.getElementById('rl-vin').textContent = tot + ' su ' + giocate;
+          document.getElementById('rl-best').textContent = NOMI[best];
+          document.getElementById('rl-reg').textContent = nc(ottimo - atteso, 1) + ' vincite perse';
+          var el = document.getElementById('rl-out');
+          el.innerHTML = giocate === 0
+            ? 'All\'inizio le tre curve sono <strong>piatte</strong>: la macchina non sa nulla, e per lei ogni ' +
+              'probabilità di vincita è ugualmente plausibile. È la distribuzione <em>a priori</em> del ' +
+              'teorema di Bayes. Premete «gioca».'
+            : 'Dopo ' + giocate + ' tentativi le curve si sono <strong>strette</strong> attorno ai valori veri: ' +
+              'ogni esito aggiorna la convinzione con la regola di Bayes. Notate quante volte è stata giocata ' +
+              'ciascuna macchinetta (' + (succ[0] + fall[0]) + ', ' + (succ[1] + fall[1]) + ', ' +
+              (succ[2] + fall[2]) + '): ' +
+              (giocate > 60
+                ? 'la migliore riceve la grande maggioranza delle giocate, ma le altre continuano a essere ' +
+                  'provate ogni tanto. <strong>L\'esplorazione non è imposta da fuori: emerge ' +
+                  'dall\'incertezza</strong>, perché una curva larga ogni tanto estrae un valore alto.'
+                : 'per ora sono ancora piuttosto simili, perché la macchina non ha elementi per preferirne una.') +
+              ' Il <em>rimpianto</em> — quante vincite si sono perse rispetto a chi avesse saputo in anticipo ' +
+              'qual era la migliore — vale ' + nc(ottimo - atteso, 1) + ', e cresce sempre più lentamente.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        document.getElementById('rl-t').addEventListener('input', function () {
+          ferma();
+          var voluti = parseInt(document.getElementById('rl-t').value, 10);
+          if (voluti < giocate) { reset(); }
+          while (giocate < voluti) { unGiro(); }
+          disegna();
+        });
+        document.getElementById('rl-lock').addEventListener('change', disegna);
+        document.getElementById('rl-go').addEventListener('click', function () {
+          if (!raf && giocate < 400) { raf = requestAnimationFrame(tick); }
+        });
+        document.getElementById('rl-stop').addEventListener('click', ferma);
+        document.getElementById('rl-reset').addEventListener('click', function () { ferma(); reset(); disegna(); });
+        while (giocate < 40) { unGiro(); }
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Dove sta, in un cervello, l\'informazione appresa?',
+        options: [
+          'nelle connessioni fra i neuroni, cioè nelle sinapsi e nella loro forza',
+          'nel numero di neuroni',
+          'nel DNA delle cellule nervose',
+          'nella frequenza degli impulsi'
+        ],
+        correct: 0,
+        explain: 'I neuroni sono $86$ miliardi, ma le sinapsi sono circa $10^{14}$: centomila miliardi di collegamenti, ciascuno con una sua forza. Imparare significa modificare quelle forze, ed è esattamente ciò che nei modelli artificiali si chiama «aggiustare i pesi». La frequenza degli impulsi è invece il modo in cui l\'informazione viene <em>trasmessa</em>, non memorizzata.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Il neurone artificiale di McCulloch e Pitts calcola:',
+        options: [
+          'la media dei suoi ingressi',
+          'una somma pesata degli ingressi, passata attraverso una funzione non lineare',
+          'la soluzione di un sistema di equazioni differenziali',
+          'il prodotto degli ingressi'
+        ],
+        correct: 1,
+        explain: '$y = \\varphi(\\sum_i w_ix_i + b)$, e basta. Del neurone biologico si è tenuto solo che <em>somma pesando</em> e che risponde in modo <em>non lineare</em>; tutto il resto — dinamica, geometria, chimica — è stato buttato via. Il modello serio di un singolo neurone, quello di Hodgkin e Huxley, richiede quattro equazioni differenziali accoppiate.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Perché in una rete a strati serve una funzione di attivazione <strong>non lineare</strong>?',
+        options: [
+          'per rendere i conti più veloci',
+          'per evitare che i pesi diventino troppo grandi',
+          'perché senza di essa una rete a mille strati saprebbe fare esattamente quanto una a uno solo',
+          'perché il cervello è non lineare'
+        ],
+        correct: 2,
+        explain: 'La composizione di trasformazioni lineari è una trasformazione lineare: senza $\\varphi$ tutti gli strati collasserebbero in un\'unica moltiplicazione di matrici. È la non linearità a rendere utile la profondità, ed è per questo che le reti moderne usano funzioni semplicissime ma <em>storte</em>, come la ReLU $\\max(0,z)$.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Nella rete di Hopfield, che cosa garantisce che la dinamica si fermi sempre?',
+        options: [
+          'un limite imposto sul numero di aggiornamenti',
+          'il fatto che i pesi siano piccoli',
+          'la simmetria dei pesi da sola',
+          'che ogni aggiornamento non può far salire l\'energia, e l\'energia è limitata inferiormente'
+        ],
+        correct: 3,
+        explain: 'Con pesi simmetrici la regola $s_i = \\text{segno}(\\sum_j w_{ij}s_j)$ abbassa l\'energia o la lascia uguale, mai la alza; e siccome le configurazioni sono finite, l\'energia ha un minimo. Da queste due cose insieme segue che la dinamica converge in un numero finito di passi, in un <strong>minimo locale</strong>. La simmetria da sola non basta: serve anche la limitatezza.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'In una rete di Hopfield, che cos\'è un «ricordo»?',
+        options: [
+          'un minimo locale del paesaggio energetico, in cui la rete scivola partendo da uno stato simile',
+          'un valore memorizzato in una cella di memoria',
+          'la media di tutti gli schemi appresi',
+          'un peso particolarmente grande'
+        ],
+        correct: 0,
+        explain: 'Scegliendo i pesi con la regola di Hebb, gli schemi che si vogliono memorizzare diventano minimi dell\'energia. Ricordare significa allora <strong>rotolare in fondo alla valle più vicina</strong>: si parte da una versione rovinata e la dinamica ricostruisce l\'originale. È una <em>memoria associativa</em>, indirizzata dal contenuto e non dalla posizione.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Una rete a strati con <strong>zero</strong> strati nascosti può separare:',
+        options: [
+          'qualunque insieme di punti, se addestrata abbastanza',
+          'solo insiemi separabili da una retta (o da un iperpiano)',
+          'solo insiemi con lo stesso numero di punti per classe',
+          'nulla: serve sempre almeno uno strato nascosto'
+        ],
+        correct: 1,
+        explain: 'Senza strati nascosti la rete è un percettrone, e la sua frontiera è $\\sum w_ix_i + b = 0$, cioè una retta. Sul problema «due macchie» funziona; su «un anello dentro l\'altro» è condannata a sbagliare, per quanto la si addestri — nessuna retta separa un disco da una corona che lo circonda. È il limite denunciato da Minsky e Papert nel 1969, che fermò la ricerca per quindici anni.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Nell\'apprendimento <strong>per rinforzo</strong>, che cosa riceve la rete?',
+        options: [
+          'la risposta corretta per ogni esempio',
+          'nessuna informazione: impara da sola',
+          'un premio o una punizione, spesso molto dopo l\'azione',
+          'un insieme di dati già raggruppati'
+        ],
+        correct: 2,
+        explain: 'È come imparare a giocare a scacchi sapendo solo, alla fine della partita, se si è vinto. Il problema difficile si chiama <em>assegnazione del credito</em>: quale delle centoventi mosse è stata quella buona? Ed è qui che entra la statistica bayesiana, con il dilemma esplorazione-sfruttamento.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Nel campionamento di Thompson, perché le opzioni poco provate continuano a essere tentate?',
+        options: [
+          'perché una regola impone di provarle ogni tanto',
+          'perché il programma sceglie a caso con probabilità fissa',
+          'per evitare che i dati si sbilancino',
+          'perché la loro distribuzione è larga, e ogni tanto estrae un valore alto'
+        ],
+        correct: 3,
+        explain: 'È il punto elegante del metodo: <strong>l\'esplorazione emerge dall\'incertezza</strong>, non è imposta da fuori. Un\'opzione provata poche volte ha una distribuzione ampia, quindi ogni tanto il valore estratto è alto e viene giocata; man mano che la si prova la distribuzione si stringe, e da lì in poi viene scelta solo se è davvero buona. Il metodo è del 1933.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Un modello linguistico che inventa una citazione inesistente, completa di pagina e anno, sta:',
+        options: [
+          'facendo esattamente quello per cui è costruito, cioè producendo la continuazione statisticamente plausibile',
+          'funzionando male per un errore di programmazione',
+          'mentendo deliberatamente',
+          'esaurendo la memoria'
+        ],
+        correct: 0,
+        explain: 'Il modello prevede parole, non verifica fatti: quando risponde correttamente e quando <em>allucina</em> sta facendo la stessa identica operazione, con la stessa sicurezza. Non ha un meccanismo interno che distingua «vero» da «plausibile», perché è stato ottimizzato sulla seconda. Da qui la regola pratica: uno strumento potentissimo per fare in fretta, che non toglie a nessuno la responsabilità di verificare.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Perché il progetto che simula i $302$ neuroni del verme <em>C. elegans</em> è istruttivo?',
+        options: [
+          'perché ha prodotto il primo verme artificiale cosciente',
+          'perché mostra che anche con un connettoma completo e piccolissimo la simulazione riproduce solo una parte dei comportamenti',
+          'perché dimostra che i neuroni non sono importanti',
+          'perché il verme ha più neuroni di quanto si pensasse'
+        ],
+        correct: 1,
+        explain: 'Il connettoma del <em>C. elegans</em> è mappato per intero dal 1986: ogni neurone e ogni connessione. Nonostante questo, simularlo non ha prodotto un verme — ha prodotto un modello che riproduce alcuni comportamenti e non altri. Con trecento neuroni, tutti noti. È un ottimo antidoto contro le previsioni disinvolte su che cosa si otterrebbe simulando ottantasei miliardi.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Un bambino impara che cos\'è una giraffa dopo due esempi, una rete ne richiede migliaia. La differenza principale sta:',
+        options: [
+          'nella velocità di calcolo del cervello',
+          'nel numero di neuroni',
+          'nel punto di partenza: il cervello arriva con una struttura innata e con forti aspettative a priori',
+          'nel fatto che il bambino può fare domande'
+        ],
+        correct: 2,
+        explain: 'Il cervello non è una tabula rasa: arriva con una struttura selezionata da centinaia di milioni di anni di evoluzione e con euristiche precise — una parola nuova indica probabilmente una cosa nuova, le parole indicano oggetti interi, una spiegazione che copre più fenomeni vale più di tante separate. È il profilo di un <strong>ragionatore bayesiano</strong>. E le reti artificiali vanno nella stessa direzione: le architetture migliori sono quelle in cui il progettista <em>inserisce</em> la struttura giusta invece di farla imparare da zero.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Perché il modello di Hopfield è considerato fisica, tanto da valere un Nobel per la fisica?',
+        options: [
+          'perché usa l\'elettricità',
+          'perché descrive il potenziale di membrana dei neuroni',
+          'perché fu proposto in un dipartimento di fisica',
+          'perché la sua energia è quella dei modelli di spin, e i suoi minimi sono quelli dei vetri di spin'
+        ],
+        correct: 3,
+        explain: '$E = -\\frac12\\sum w_{ij}s_is_j$ è letteralmente l\'energia di un sistema di spin: se $w_{ij} \\gt 0$ i due «vogliono» essere concordi. Il paesaggio pieno di minimi locali è quello dei <strong>vetri di spin</strong>, studiati da Giorgio Parisi (Nobel 2021). L\'intuizione di Hopfield fu che quei minimi, invece di essere un fastidio, potevano essere <em>usati</em> come ricordi: il disordine diventa memoria.'
+      },
+      {
+        type: 'open',
+        text: 'Spiega in che senso la rete di Hopfield è un sistema fisico: che cos\'è la sua energia, perché la dinamica converge sempre, e in che senso un «ricordo» è un minimo. Poi di\' qual è il suo limite di capacità e che cosa succede superandolo.',
+        keywords: ['spin', 'energia', 'minimo', 'abbassa', 'hebb', 'converge', 'capacit', 'spuri'],
+        requiredMatches: 4,
+        explain: 'L\'energia è $E = -\\frac12\\sum_{i\\neq j} w_{ij}s_is_j$, con $s_i = \\pm1$: è esattamente l\'energia di un sistema di <strong>spin</strong> accoppiati, in cui pesi positivi favoriscono la concordanza e pesi negativi la discordanza. La dinamica è locale: si sceglie un neurone e lo si mette nello stato che l\'energia preferisce, $s_i = \\text{segno}(\\sum_j w_{ij}s_j)$. Con pesi <strong>simmetrici</strong> questa regola non può mai far salire l\'energia — al più la lascia uguale — e siccome le configurazioni possibili sono finite l\'energia è limitata inferiormente: dalle due cose insieme segue che la dinamica <strong>converge sempre</strong>, in un numero finito di passi, in un minimo locale. Costruendo i pesi con la <strong>regola di Hebb</strong>, $w_{ij} = \\frac1N\\sum_\\mu \\xi_i^\\mu\\xi_j^\\mu$, gli schemi $\\xi^\\mu$ diventano minimi: partendo da una loro versione rovinata il sistema ci rotola dentro da solo, e questo è <em>ricordare</em>. È una memoria <strong>associativa</strong>, indirizzata dal contenuto e non da un indirizzo. Il limite è la <strong>capacità</strong>: circa $0{,}138\\,N$ schemi, cioè nove su una rete di $64$ neuroni. Superandola i minimi si avvicinano e si fondono, e compaiono <strong>minimi spuri</strong>: configurazioni che la rete «ricorda» pur non avendole mai viste, tipicamente miscugli di ricordi veri. Il fenomeno ha un nome preciso in fisica — la <em>frustrazione</em> — e un analogo introspettivo abbastanza familiare.'
+      },
+      {
+        type: 'open',
+        text: 'Elenca le quattro strategie di addestramento di una rete, spiegando per ciascuna che tipo di informazione riceve. Poi spiega perché un bambino impara con molti meno esempi di una rete, e che cosa questo suggerisce a chi progetta reti.',
+        keywords: ['etichett', 'supervision', 'struttura', 'premio', 'rinforzo', 'innat', 'priori', 'bayesian'],
+        requiredMatches: 4,
+        explain: 'Le quattro strategie differiscono per <em>che tipo di segnale</em> ricevono. <strong>Supervisionato</strong>: esempi già etichettati, la rete prevede, si confronta con la risposta giusta e corregge i pesi nella direzione che riduce l\'errore (discesa del gradiente con retropropagazione); funziona benissimo e costa carissimo, perché qualcuno deve aver etichettato tutto. <strong>Non supervisionato</strong>: nessuna etichetta, solo dati, e il compito è trovarci struttura — raggruppare, comprimere; il criterio non è «hai indovinato?» ma «hai trovato una descrizione più corta?», e qui rientra l\'entropia di Shannon. <strong>Semi-supervisionato</strong>: poche etichette e moltissimi dati grezzi, il regime realistico quasi sempre. <strong>Per rinforzo</strong>: nessuna risposta corretta, solo un premio o una punizione, spesso molto dopo l\'azione — con il problema dell\'<em>assegnazione del credito</em> e il dilemma esplorazione-sfruttamento, che si affronta con metodi bayesiani come il campionamento di Thompson. Sul bambino: la differenza non è la potenza di calcolo ma il <strong>punto di partenza</strong>. Il cervello non è una tabula rasa — arriva con una struttura innata prodotta dall\'evoluzione e con forti <strong>aspettative a priori</strong>: una parola nuova indica probabilmente una cosa nuova; le parole indicano oggetti interi e non parti; una spiegazione che copre più fenomeni vale più di tante separate. È il profilo di un ragionatore bayesiano e riduzionista, che con pochi dati e buone ipotesi a priori arriva lontano. Il suggerimento per chi progetta reti è diretto, ed è quello che la pratica ha confermato: <strong>inserire a priori la struttura giusta</strong> — la convoluzione per le immagini, l\'attenzione per il linguaggio — vale enormi quantità di dati di addestramento.'
+      }
+    ];
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,2888 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 1 — I principi della dinamica</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .inline-code { font-family: Consolas, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); border-radius: 4px; padding: 0.05rem 0.32rem; font-size: 0.9em; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .figbox .grid { stroke: var(--border); stroke-width: 1; }
+    .figbox .axis { stroke: var(--muted); stroke-width: 2; }
+    .figbox .dash { stroke: var(--muted); stroke-width: 1.6; stroke-dasharray: 6 5; fill: none; }
+    .figbox .curva { fill: none; stroke: var(--accent); stroke-width: 3; }
+    .figbox .curva2 { fill: none; stroke: var(--magenta); stroke-width: 3; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .inp { width: 7rem; font-size: 1rem; font-family: inherit; padding: 0.3rem 0.45rem; border-radius: 8px;
+           border: 2px solid var(--border); background: var(--surface); color: var(--text); text-align: right; }
+    .inp:focus { outline: none; border-color: var(--accent); }
+    .inp.w6 { width: 5rem; }
+    .qbox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.8rem 0; }
+    .qbox .qt { font-weight: 600; margin-bottom: 0.45rem; }
+    .qrow { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .fb { min-height: 1.4em; margin-top: 0.45rem; font-weight: 600; font-size: 0.95rem; }
+    .fb.ok { color: var(--green); }
+    .fb.no { color: var(--red); }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    /* ---- CSS dedicato alla sezione facoltativa 9: il moto parabolico in formule ---- */
+    #sec9 .parabox { border: 2px solid var(--gold); border-radius: 14px; padding: 0.9rem 1.2rem; margin: 1.2rem 0;
+                     background: color-mix(in srgb, var(--gold) 7%, var(--surface)); }
+    #sec9 .parabox h4 { margin: 0 0 0.45rem; color: var(--gold); font-size: 1.02rem; }
+    #sec9 .parabox > *:last-child { margin-bottom: 0; }
+    #sec9 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.7rem; margin: 0.9rem 0; }
+    #sec9 .form-card { border: 1px solid var(--border); border-top: 3px solid var(--gold); border-radius: 10px;
+                       background: var(--surface); padding: 0.7rem 0.8rem; }
+    #sec9 .form-card .nome { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 0.25rem; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quarto anno · Lezione 1</div>
+    <h1>I principi della dinamica</h1>
+    <p>Le tre leggi con cui Newton ha spiegato la mela, la Luna e tutto quello che sta in mezzo —
+      e l'attrito, che per duemila anni le ha tenute nascoste</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quarto anno</a>
+    <span class="sep">/</span> I principi della dinamica
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove eravamo rimasti.</strong> Il terzo anno si è chiuso con la <em>cinematica</em>: sappiamo
+      descrivere un movimento con posizione, velocità e accelerazione, e sappiamo maneggiare i vettori. Restava
+      però in sospeso la domanda che ogni studente fa per prima e che ogni libro rimanda: <em>ma chi è che li
+      fa muovere?</em> Quest'anno si comincia proprio da lì. La parte della fisica che collega il movimento
+      alle sue cause si chiama <strong>dinamica</strong>, e le sue fondamenta stanno in tre frasi scritte da
+      un signore inglese nel 1687.
+    </div>
+
+    <!-- 1 — MODELLI E APPROSSIMAZIONI -->
+    <section id="sec1">
+      <h2>1. Galline sferiche nel vuoto</h2>
+
+      <p>Comincio con la barzelletta più famosa della fisica, perché non è una barzelletta: è un metodo.</p>
+
+      <div class="curiosita">Un allevatore ha un problema: le sue galline non fanno abbastanza uova. Chiama un
+        veterinario, che non risolve nulla; chiama uno zootecnico, idem. Alla fine, disperato, chiama un fisico.
+        Il fisico si chiude in laboratorio per tre settimane, riempie lavagne di calcoli, poi torna con
+        l'aria soddisfatta di chi ha capito tutto: <em>«Ho trovato la soluzione! Funziona però solo per galline
+        sferiche nel vuoto.»</em></div>
+
+      <p>Si ride, e si dovrebbe anche riflettere. Perché quella è esattamente la mossa che ha reso possibile la
+        fisica. Il mondo reale è troppo complicato per essere descritto tutto insieme: una gallina vera ha
+        piume, becco, temperatura, umore. Il fisico allora non studia <em>la gallina</em>: studia un
+        <strong>modello</strong> della gallina, cioè una versione semplificata che conserva solo le proprietà
+        rilevanti <em>per quella domanda</em> e butta via tutto il resto.</p>
+
+      <div class="definition">
+        <strong>Modello.</strong> Una descrizione volutamente incompleta della realtà, costruita per rispondere
+        a una domanda precisa. Un modello non è né vero né falso: è <strong>adeguato</strong> oppure
+        <strong>inadeguato</strong> allo scopo. La bravura del fisico non sta nel non approssimare — è
+        impossibile — ma nel sapere <em>che cosa</em> può buttare via e <em>quando</em> non può più farlo.
+      </div>
+
+      <p>Nella meccanica useremo tutto l'anno due modelli, e vale la pena metterli a fuoco subito.</p>
+
+      <div class="sp-cols">
+        <div class="definition">
+          <strong>Punto materiale</strong>
+          <p>Un corpo di cui si trascurano <em>completamente</em> le dimensioni: tutta la massa è concentrata in
+            un punto geometrico. Si può fare quando le dimensioni del corpo sono piccole rispetto agli spazi in
+            gioco, <em>oppure</em> quando il corpo si muove senza ruotare né deformarsi.</p>
+          <p class="formula-note">La Terra è un punto materiale se studio la sua orbita attorno al Sole (il suo
+            diametro è un decimillesimo dell'orbita). Non lo è più se voglio spiegare le maree.</p>
+        </div>
+        <div class="definition">
+          <strong>Corpo rigido</strong>
+          <p>Un corpo di cui contano le dimensioni e la forma, ma che <em>non si deforma</em>: la distanza fra
+            due suoi punti qualsiasi resta sempre la stessa. Serve quando il corpo può <strong>ruotare</strong>,
+            e quindi quando conta <em>dove</em> applico una forza e non solo quanto vale.</p>
+          <p class="formula-note">Una porta è un corpo rigido: la spingo lontano dai cardini e si apre, la
+            spingo vicino e faccio molta più fatica. Un punto materiale non ha cardini.</p>
+        </div>
+      </div>
+
+      <p>Nessuno dei due esiste in natura. Il punto materiale non ha dimensioni, e un corpo di volume nullo con
+        massa finita avrebbe densità infinita; il corpo rigido richiederebbe che una spinta su un'estremità
+        arrivasse <em>istantaneamente</em> all'altra, cosa che la relatività vieta. Sono comodi
+        <em>proprio</em> perché sono impossibili: sono così semplici che i conti si riescono a fare.</p>
+
+      <div class="note"><strong>Il criterio pratico.</strong> Prima di risolvere un problema, chiedetevi sempre:
+        <em>questo corpo, qui, che cosa deve fare?</em> Se deve solo spostarsi, è un punto. Se deve girare, è un
+        corpo rigido. Se deve piegarsi o allungarsi, servirà qualcosa di più (e infatti la legge di Hooke
+        l'abbiamo incontrata l'anno scorso proprio per questo). Sbagliare modello costa più che sbagliare i
+        conti: i conti si ricontrollano, il modello sbagliato dà una risposta pulita, elegante e completamente
+        priva di significato.</div>
+
+      <div class="curiosita"><strong>Le approssimazioni hanno un valore, e si può calcolare.</strong> Quando in
+        un problema di caduta trascuriamo l'attrito dell'aria non stiamo «facendo finta»: stiamo dicendo che il
+        suo effetto è più piccolo dell'errore con cui misuriamo. Per un sasso che cade da due metri è vero
+        (l'aria toglie meno dell'uno per mille); per un foglio di carta è falsissimo. Il terzo anno ci ha
+        insegnato a misurare gli errori: proprio quello serve a decidere quali approssimazioni sono
+        legittime.</div>
+    </section>
+
+    <!-- 2 — NEWTON E I PRINCIPIA -->
+    <section id="sec2">
+      <h2>2. Newton e i <em>Principia</em></h2>
+
+      <p>Nell'estate del 1665 l'università di Cambridge chiude per la peste. Uno studente di ventidue anni,
+        <strong>Isaac Newton</strong>, torna alla fattoria di famiglia a Woolsthorpe e ci resta quasi due anni.
+        In quei due anni inventa il calcolo differenziale, scompone la luce bianca col prisma e comincia a
+        pensare che la forza che fa cadere una mela e quella che tiene la Luna in orbita possano essere
+        <em>la stessa</em>. Li chiamerà, più tardi, i suoi <em>anni mirabili</em>.</p>
+
+      <p>Poi però non pubblica niente. Per vent'anni. Newton era un uomo diffidente, ossessivo e permaloso, e
+        detestava le polemiche più di quanto amasse la gloria. Se ne stette zitto finché, nel 1684, l'astronomo
+        <strong>Edmond Halley</strong> — quello della cometa — non andò a Cambridge a chiedergli una cosa
+        precisa: che orbita descriverebbe un pianeta attirato da una forza che va come l'inverso del quadrato
+        della distanza? Newton rispose subito: «un'ellisse». E come lo sa? «L'ho calcolato.» Halley chiese di
+        vedere il calcolo, Newton non lo trovò, promise di rifarlo — e ne uscì, tre anni dopo, il libro più
+        importante della storia della scienza.</p>
+
+      <div class="definition">
+        <strong><em>Philosophiae Naturalis Principia Mathematica</em></strong> (1687), «I principi matematici
+        della filosofia naturale». Tre libri in latino, scritti in forma di teoremi e dimostrazioni geometriche
+        alla maniera di Euclide. Contengono le <strong>tre leggi del moto</strong>, la
+        <strong>gravitazione universale</strong> e la dimostrazione che da esse discendono le tre leggi di
+        Keplero, le maree, la precessione degli equinozi e la forma schiacciata della Terra. Halley pagò la
+        stampa di tasca propria.
+      </div>
+
+      <p>Il salto concettuale è difficile da sopravvalutare. Prima dei <em>Principia</em> il cielo e la Terra
+        erano due mondi con due fisiche diverse: quaggiù le cose cadono e si fermano, lassù girano per sempre in
+        cerchi perfetti. Newton scrive un pugno di regole che valgono <strong>in tutti e due</strong>, e da
+        quel momento la parola «universo» smette di essere una figura retorica.</p>
+
+      <div class="curiosita"><strong>Sulle spalle dei giganti.</strong> La frase più citata di Newton — «se ho
+        visto più lontano, è perché stavo sulle spalle di giganti» — sta in una lettera a Robert Hooke, con cui
+        era in guerra aperta su chi avesse capito per primo la legge dell'inverso del quadrato. Hooke era
+        piccolo di statura e leggermente gobbo. Molti storici sospettano che quella frase, così nobile in
+        antologia, in originale fosse una cattiveria.</div>
+
+      <div class="note"><strong>Che cosa vuol dire «principio».</strong> Le tre leggi si chiamano
+        <em>principi</em> perché non si dimostrano: si assumono. Non discendono da qualcosa di più profondo —
+        si accettano perché tutto quello che se ne deduce, per tre secoli, ha continuato a trovare conferma
+        negli esperimenti. Se un giorno un esperimento le smentisse, cadrebbero: è già successo, in effetti,
+        alle velocità vicine a quella della luce e alle scale atomiche, dove servono la relatività e la
+        meccanica quantistica. Nel mondo di mezzo — quello dei sassi, delle automobili e dei pianeti — reggono
+        ancora perfettamente.</div>
+    </section>
+
+    <!-- 3 — LA RELATIVITÀ GALILEIANA -->
+    <section id="sec3">
+      <h2>3. Il principio di relatività: la stiva di Galileo</h2>
+
+      <p>Prima di enunciare le leggi bisogna sistemare una faccenda preliminare: <strong>rispetto a chi</strong>
+        le scriviamo. Un'accelerazione, l'abbiamo visto l'anno scorso, non è un fatto assoluto: dipende dal
+        sistema di riferimento. E allora la domanda diventa urgente, perché $\vec F = m \vec a$ non può valere
+        in tutti i riferimenti se $\vec a$ cambia da uno all'altro.</p>
+
+      <p>La risposta più bella la diede Galileo nel <em>Dialogo sopra i due massimi sistemi del mondo</em>
+        (1632), in un passo che vale la pena leggere quasi per intero.</p>
+
+      <div class="definition" style="font-style: italic;">
+        «Riserratevi con qualche amico nella maggiore stanza che sia sotto coverta di alcun gran navilio, e
+        quivi fate d'aver mosche, farfalle e simili animaletti volanti; siavi anco un gran vaso d'acqua, e
+        dentrovi de' pescetti; sospendasi anco in alto qualche secchiello, che a goccia a goccia vada versando
+        dell'acqua in un altro vaso di angusta bocca […]. Osservate diligentemente tutte queste cose […] fate
+        muover la nave con quanta si voglia velocità; ché (pur che il moto sia uniforme e non fluttuante in qua
+        e in là) voi non riconoscerete una minima mutazione in tutti li nominati effetti, né da alcuno di quelli
+        potrete comprender se la nave cammina o pure sta ferma.»
+      </div>
+
+      <p>Le gocce cadono nello stesso punto, i pesci nuotano con la stessa fatica in tutte le direzioni, le
+        mosche non si ammucchiano a poppa. <strong>Nessun esperimento meccanico fatto dentro la stiva può dire
+        se la nave si muove.</strong> E se nessun esperimento può dirlo, allora la domanda «la nave si muove
+        davvero?» non ha risposta fisica: si muove rispetto alla riva, sta ferma rispetto a sé stessa, e le due
+        descrizioni sono entrambe legittime.</p>
+
+      <div class="definition">
+        <strong>Principio di relatività galileiana.</strong> Le leggi della meccanica hanno la <em>stessa
+        forma</em> in tutti i sistemi di riferimento che si muovono l'uno rispetto all'altro di moto rettilineo
+        uniforme. Tali sistemi si dicono <strong>inerziali</strong>, e nessun esperimento meccanico permette di
+        stabilire quale di essi sia «fermo».
+      </div>
+
+      <h3>3.1 — Il marinaio che lascia cadere la palla</h3>
+
+      <p>L'esperimento decisivo è quello della palla lasciata cadere dalla cima dell'albero. Gli aristotelici
+        dicevano: se la Terra si muovesse, la palla cadrebbe <em>dietro</em>, perché mentre scende la nave le
+        scappa avanti. Galileo rispose che no, cade esattamente ai piedi dell'albero — e che chi sostiene il
+        contrario «non l'ha mai provato». Guardate lo stesso lancio dai due punti di vista.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="nv-v">velocità della nave: <span class="val-badge" id="nv-vv">6</span> m/s</label>
+          <input type="range" id="nv-v" min="0" max="12" step="0.5" value="6">
+          <span class="sim-btns" id="nv-vista">
+            <button class="btn active" type="button" data-w="nave">visto dalla nave</button>
+            <button class="btn btn-secondary" type="button" data-w="riva">visto dalla riva</button>
+          </span>
+          <button class="btn" id="nv-lancia" type="button">▶ Lascia cadere</button>
+        </div>
+        <svg id="nv-svg" viewBox="0 0 660 320" aria-label="La palla lasciata cadere dall'albero di una nave, vista dalla nave e dalla riva"></svg>
+        <p class="cap" id="nv-cap">La palla cade sempre ai piedi dell'albero. Cambia la traiettoria, non il punto d'arrivo.</p>
+      </div>
+
+      <p>Le due traiettorie sono diversissime — un segmento verticale e un arco di parabola — eppure descrivono
+        <em>lo stesso identico fatto</em>. La differenza non sta nella palla: sta in noi. Dalla riva vediamo
+        anche il moto orizzontale che la palla si porta dietro dalla nave; dalla nave quel moto ce l'abbiamo
+        anche noi, e quindi non lo vediamo.</p>
+
+      <h3>3.2 — Che cosa cambia e che cosa no</h3>
+
+      <p>Passare da un riferimento all'altro è facile: se il riferimento primato si muove con velocità $v$
+        lungo $x$ rispetto a quello non primato, allora</p>
+
+      $$x' = x - v\,t, \qquad y' = y, \qquad t' = t$$
+
+      <p>Sono le <strong>trasformazioni di Galileo</strong>. Derivando una volta si ottiene la composizione
+        delle velocità, $u' = u - v$; derivando ancora si ottiene il fatto decisivo:</p>
+
+      $$a' = a$$
+
+      <p>L'accelerazione è la <strong>stessa</strong> nei due riferimenti. E siccome la massa non cambia, se
+        vale $F = ma$ in uno vale identica nell'altro. È questo, tecnicamente, il contenuto del principio di
+        relatività: la seconda legge è <em>invariante</em> per trasformazioni di Galileo.</p>
+
+      <table class="tabf">
+        <thead><tr><th>Grandezza</th><th>Cambia cambiando riferimento inerziale?</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Posizione</td><td class="l">sì — e infatti «dove sono» è una domanda mal posta senza dire rispetto a che cosa</td></tr>
+          <tr><td class="lab">Velocità</td><td class="l">sì — si somma o si sottrae quella del riferimento</td></tr>
+          <tr><td class="lab">Energia cinetica, quantità di moto</td><td class="l">sì — dipendono dalla velocità</td></tr>
+          <tr><td class="lab">Accelerazione</td><td class="l"><strong>no</strong></td></tr>
+          <tr><td class="lab">Massa</td><td class="l"><strong>no</strong></td></tr>
+          <tr><td class="lab">Forza</td><td class="l"><strong>no</strong></td></tr>
+          <tr><td class="lab">Intervalli di tempo e distanze</td><td class="l"><strong>no</strong> — in meccanica classica. Sarà proprio qui che la relatività di Einstein romperà tutto</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note"><strong>Un'osservazione che vi tornerà utile per anni.</strong> In fisica le grandezze
+        che <em>non</em> cambiano al cambiare del punto di vista sono le più preziose: sono quelle che
+        descrivono il fenomeno e non l'osservatore. Cercare gli invarianti è, in un certo senso, tutto il
+        mestiere. Einstein farà esattamente questo: si accorgerà che la velocità della luce è un invariante e
+        preferirà buttare via l'invarianza del tempo piuttosto che rinunciare a lei.</div>
+
+      <div class="curiosita"><strong>Lo spaziotempo fatto a triangoli.</strong> Nella relatività generale lo
+        spazio non è più un fondale fisso: si incurva, e i conti diventano feroci. Nel 1961 il fisico
+        piemontese <strong>Tullio Regge</strong> ebbe un'idea da geometra: invece di descrivere una superficie
+        curva con le formule, approssimiamola incollando tanti <em>pezzi piatti</em> — triangoli, tetraedri —
+        e concentriamo tutta la curvatura sugli spigoli dove si incontrano, come nel cartone di una scatola
+        piegata. È il <strong>calcolo di Regge</strong>, e da allora è diventato uno degli strumenti con cui i
+        computer simulano i buchi neri che si fondono e con cui si prova a costruire una gravità quantistica.
+        È lo stesso spirito delle galline sferiche della sezione 1: sostituire l'oggetto vero con un modello
+        abbastanza rozzo da poterci fare i conti — e abbastanza fine da dare la risposta giusta.</div>
+      <h3>3.3 — La traiettoria (e perché non è una proprietà del corpo)</h3>
+
+      <p>La palla della simulazione precedente ha disegnato due curve diversissime — un segmento e un arco di
+        parabola — pur essendo <em>una sola palla</em> che fa <em>una sola cosa</em>. Vale la pena dare un nome
+        preciso a quella curva, perché è uno degli oggetti che useremo di più.</p>
+
+      <div class="definition">
+        <strong>Traiettoria.</strong> L'insieme di tutte le posizioni occupate da un punto materiale durante il
+        suo moto: la «scia» che lascerebbe se potesse disegnare. In formule, è il luogo dei punti descritto dal
+        vettore posizione $\vec r(t)$ al variare del tempo.
+        <p class="formula-note">Attenzione a non confonderla con la <strong>legge oraria</strong>. La traiettoria
+          dice <em>dove</em> passa il corpo, e basta: è una curva nello spazio, e il tempo non compare. La legge
+          oraria dice <em>quando</em> ci passa. Due automobili che percorrono la stessa strada, una piano e una
+          forte, hanno la <em>stessa traiettoria</em> e leggi orarie diverse.</p>
+      </div>
+
+      <div class="warnbox"><strong>La traiettoria dipende dal riferimento.</strong> Questo è il punto della
+        sezione, e conviene dirlo in modo brutale: <em>non ha senso chiedersi qual è la «vera» traiettoria di un
+        corpo</em>. Chiedersi se la palla scende dritta o descrive una parabola è come chiedersi se la nave si
+        muove: dipende da chi guarda, e nessuno dei due ha più ragione dell'altro. La traiettoria non è una
+        proprietà del corpo: è una proprietà della <strong>coppia</strong> corpo-osservatore.</div>
+
+      <p>L'esempio più bello è una ruota che rotola. Guardate che cosa disegna la valvola di una bicicletta —
+        prima stando fermi sul marciapiede, poi seduti sul portapacchi.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>Punto osservato</label>
+          <span class="sim-btns" id="tr-punto">
+            <button class="btn active" type="button" data-p="1">sul bordo (la valvola)</button>
+            <button class="btn btn-secondary" type="button" data-p="0.5">a metà raggio</button>
+            <button class="btn btn-secondary" type="button" data-p="0">al centro (il mozzo)</button>
+          </span>
+        </div>
+        <div class="ctrl">
+          <label>Riferimento</label>
+          <span class="sim-btns" id="tr-rif">
+            <button class="btn active" type="button" data-r="terra">da terra</button>
+            <button class="btn btn-secondary" type="button" data-r="carro">dalla bicicletta</button>
+          </span>
+          <button class="btn" id="tr-via" type="button">▶ Avvia / ferma</button>
+          <button class="btn btn-secondary" id="tr-pulisci" type="button">🧹 Cancella la scia</button>
+        </div>
+        <svg id="tr-svg" viewBox="0 0 660 300" aria-label="Traiettoria di un punto di una ruota che rotola, vista da terra e dalla bicicletta"></svg>
+        <p class="cap" id="tr-cap"></p>
+      </div>
+      <p class="eq-out" id="tr-out"></p>
+
+      <div class="curiosita"><strong>La cicloide, «l'Elena dei geometri».</strong> La curva che la valvola
+        disegna vista da terra si chiama <strong>cicloide</strong>, e nel Seicento fece litigare mezza Europa:
+        Galileo, Torricelli, Pascal, Huygens, i fratelli Bernoulli e Newton ci lavorarono tutti, spesso
+        accusandosi a vicenda di plagio — tanto che qualcuno la ribattezzò «l'Elena dei geometri», la bella
+        contesa che scatena le guerre. Ha due proprietà stupefacenti: è la <em>brachistocrona</em>, cioè la
+        curva lungo la quale un corpo scivola da un punto a un altro nel <strong>minor tempo possibile</strong>
+        (e non è la retta!), ed è anche la <em>tautocrona</em>, cioè la curva lungo la quale un corpo lasciato
+        cadere impiega lo <strong>stesso tempo</strong> qualunque sia il punto di partenza. Huygens provò a usare
+        proprio questa seconda proprietà per costruire un orologio a pendolo perfettamente isocrono.</div>
+
+      <div class="note"><strong>Un dettaglio che sorprende sempre.</strong> Nella cicloide c'è un istante, a ogni
+        giro, in cui la valvola è <strong>ferma</strong> rispetto a terra: quello in cui tocca il suolo. E c'è un
+        istante in cui va al <strong>doppio</strong> della velocità della bicicletta: quello in cui è in cima. Il
+        punto più basso di una ruota che rotola senza strisciare ha velocità nulla — è esattamente questo che
+        significa «non strisciare» — e per questo le foto di una bici in corsa hanno i raggi in alto sfocati e
+        quelli in basso nitidi.</div>
+    </section>
+
+    <!-- 4 — PRIMO PRINCIPIO -->
+    <section id="sec4">
+      <h2>4. Il primo principio: l'inerzia</h2>
+
+      <p>Adesso che sappiamo <em>dove</em> stiamo scrivendo le leggi, possiamo scriverle. La prima è quella che
+        sembra ovvia dopo averla capita e che invece ha richiesto duemila anni.</p>
+
+      <div class="definition">
+        <strong>Primo principio della dinamica (o principio d'inerzia).</strong> Un corpo non soggetto a forze,
+        o soggetto a forze la cui risultante è nulla, <strong>persevera nel suo stato di quiete o di moto
+        rettilineo uniforme</strong>.
+        $$\sum \vec F = \vec 0 \iff \vec v = \text{costante}$$
+      </div>
+
+      <p>Attenzione a quel «o»: quiete e moto rettilineo uniforme sono messi sullo stesso piano, come due casi
+        della stessa cosa. Ed è giusto che sia così, perché — l'abbiamo appena visto con la stiva di Galileo —
+        sono <em>letteralmente</em> la stessa cosa vista da due riferimenti diversi. Un corpo fermo per me è un
+        corpo in moto uniforme per chi passa in bicicletta, e nessuno dei due ha ragione più dell'altro.</p>
+
+      <h3>4.1 — Perché ci abbiamo messo duemila anni</h3>
+
+      <p>Aristotele sosteneva che per mantenere un corpo in movimento serve una forza. Non era stupido: era un
+        eccellente osservatore, e <em>l'esperienza gli dava ragione</em>. Provate a spingere un armadio: appena
+        smettete, si ferma. Un carro trainato da un bue: appena il bue si ferma, si ferma anche il carro. La
+        teoria funzionava benissimo su tutto quello che si poteva vedere.</p>
+
+      <p>Il caso che non tornava lo conoscevano anche loro: la <strong>freccia scoccata</strong>. Appena lascia
+        la corda nessuno la spinge più, eppure vola per cento metri. Per salvare la teoria immaginarono
+        l'<em>antiperistasi</em>: l'aria che si richiude dietro la freccia e la spinge avanti. Una toppa
+        ingegnosa, che però prevede due cose false — che nel vuoto la freccia non voli affatto, e che un
+        oggetto tozzo, che «raccoglie» più aria dietro, voli più lontano di una freccia.</p>
+
+      <div class="warnbox"><strong>L'errore vero non era osservare male: era non accorgersi di una forza.</strong>
+        Quando lascio l'armadio non è vero che su di esso non agisce più nulla. Agisce l'<strong>attrito</strong>,
+        una forza che nessuno vede perché non c'è nessuno che spinge, ma che c'è. Togliete l'attrito e Aristotele
+        crolla: un disco da hockey sul ghiaccio percorre decine di metri senza rallentare quasi, e le sonde
+        <em>Voyager</em>, coi motori spenti da cinquant'anni, viaggiano ancora a quindici chilometri al secondo.
+        Aristotele non aveva né il ghiaccio liscio né lo spazio vuoto: aveva solo strade sterrate.</div>
+
+      <div class="note"><strong>Il primo principio è anche una definizione.</strong> Letto con attenzione, dice
+        una cosa un po' circolare: «senza forze il moto è uniforme» — ma come faccio a sapere che non ci sono
+        forze, se non guardando che il moto è uniforme? La lettura moderna scioglie il nodo così: il primo
+        principio <strong>definisce</strong> quali sono i sistemi di riferimento inerziali. Sono quelli in cui
+        un corpo isolato va di moto rettilineo uniforme. Negli altri — un'automobile che frena, una giostra che
+        gira — il principio non vale, e compaiono le cosiddette <em>forze apparenti</em>, che non hanno nessuno
+        che le esercita.</div>
+
+      <div class="curiosita"><strong>Quanto è inerziale un'aula?</strong> Nessun riferimento è davvero
+        inerziale: l'aula ruota con la Terra, la Terra gira attorno al Sole, il Sole attorno al centro della
+        Galassia. Ma le accelerazioni che ne derivano sono minuscole — quella dovuta alla rotazione terrestre
+        vale circa $0{,}034$ m/s², cioè tre millesimi di $g$ — e per quasi tutti i problemi si possono
+        trascurare tranquillamente. Quando <em>non</em> si possono si vede benissimo: il pendolo di Foucault
+        che ruota lentamente per tutto il giorno è la prova, in diretta, che l'aula non è un riferimento
+        inerziale.</div>
+    </section>
+
+    <!-- 5 — SECONDO PRINCIPIO -->
+    <section id="sec5">
+      <h2>5. Il secondo principio: $\vec F = m\vec a$</h2>
+
+      <p>Il primo principio dice che cosa succede <em>senza</em> forze. Il secondo dice che cosa succede
+        <em>con</em> le forze, ed è il vero motore di tutta la meccanica.</p>
+
+      <div class="definition">
+        <strong>Secondo principio della dinamica.</strong> La risultante delle forze applicate a un corpo è
+        uguale al prodotto della sua massa per l'accelerazione che ne consegue:
+        $$\sum \vec F = m\,\vec a$$
+        È un'uguaglianza <strong>vettoriale</strong>: l'accelerazione ha sempre la stessa direzione e lo stesso
+        verso della forza risultante, e vale zero quando la risultante è zero — cioè il primo principio è il
+        caso particolare $\vec F = \vec 0$.
+      </div>
+
+      <p>Ci sono tre cose da capire in questa formula, e nessuna delle tre è ovvia.</p>
+
+      <div class="sp-cols">
+        <div class="definition">
+          <strong>① La forza dà accelerazione, non velocità</strong>
+          <p>È l'errore più duro da estirpare. Se spingo un carrello con forza costante, il carrello non va a
+            velocità costante: <em>accelera</em>. Se voglio che vada a velocità costante devo spingere con una
+            forza che compensi esattamente l'attrito, cioè la risultante deve essere nulla.</p>
+        </div>
+        <div class="definition">
+          <strong>② La massa misura la pigrizia</strong>
+          <p>A parità di forza, l'accelerazione è tanto minore quanto maggiore è $m$. La massa che compare qui
+            si chiama <strong>massa inerziale</strong>: è la resistenza che un corpo oppone a <em>cambiare</em>
+            il proprio stato di moto. Non ha niente a che vedere, in linea di principio, con il peso.</p>
+        </div>
+        <div class="definition">
+          <strong>③ Conta solo la risultante</strong>
+          <p>Su un corpo agiscono quasi sempre più forze. La formula non parla di ciascuna: parla della loro
+            <strong>somma vettoriale</strong>. Il libro sul tavolo è tirato in giù dal peso e spinto in su dal
+            tavolo: due forze grandi, risultante nulla, accelerazione nulla.</p>
+        </div>
+      </div>
+
+      <div class="unit-box" style="border:2px solid var(--green); border-radius:12px; background:color-mix(in srgb, var(--green) 8%, var(--surface)); padding:0.8rem 1.1rem; margin:1rem 0;">
+        <p style="margin:0;"><strong>L'unità di misura.</strong> Il <strong>newton</strong> è la forza che
+          imprime a una massa di $1$ kg l'accelerazione di $1$ m/s²:
+          $$1\ \text{N} = 1\ \frac{\text{kg}\cdot\text{m}}{\text{s}^2}$$
+          Per farsi un'idea: un newton è all'incirca il peso di una mela di un etto. La coincidenza è così
+          bella che sembra fatta apposta.</p>
+      </div>
+
+      <h3>5.1 — Massa e peso non sono la stessa cosa</h3>
+
+      <p>Nel linguaggio comune si confondono continuamente, e in fisica sono grandezze <em>diverse</em>: una è
+        uno scalare misurato in chilogrammi, l'altra è un vettore misurato in newton.</p>
+
+      <div class="definition">
+        <strong>Forza peso.</strong> Vicino alla superficie terrestre ogni corpo di massa $m$ è attirato verso
+        il basso con una forza
+        $$\vec P = m\,\vec g, \qquad g \approx 9{,}81\ \text{m/s}^2$$
+        La massa è una proprietà del corpo e non cambia mai; il peso dipende da <em>dove</em> si trova. Sulla
+        Luna $g$ vale $1{,}62$ m/s², e la stessa persona pesa sei volte meno pur avendo esattamente la stessa
+        massa — e la stessa difficoltà a essere spinta di lato.
+      </div>
+
+      <h3>5.2 — Perché tutti i corpi cadono insieme</h3>
+
+      <p>Mettiamo insieme le due formule appena scritte. Su un corpo che cade (trascurando l'aria) agisce solo
+        il peso, quindi</p>
+
+      $$m\,a = m\,g \quad\Longrightarrow\quad a = g$$
+
+      <p>La massa si semplifica. <strong>Sparisce.</strong> L'accelerazione di caduta è la stessa per un sasso
+        e per una piuma, per una nave e per un chicco di riso. È un risultato tanto famoso quanto
+        controintuitivo, e Galileo lo dimostrò con un ragionamento puro, senza esperimenti: se i corpi pesanti
+        cadessero più in fretta, legando un corpo pesante a uno leggero il leggero dovrebbe frenare il pesante
+        (e allora l'insieme cadrebbe più piano del pesante da solo) ma l'insieme è più pesante di entrambi
+        (e allora dovrebbe cadere più in fretta). Contraddizione: l'unica via d'uscita è che cadano tutti
+        uguale.</p>
+
+      <div class="curiosita"><strong>Il martello e la piuma sulla Luna.</strong> Il 2 agosto 1971 l'astronauta
+        <strong>David Scott</strong>, comandante dell'Apollo 15, si mise davanti alla telecamera con un martello
+        geologico in una mano e una piuma di falco nell'altra e li lasciò andare insieme. Toccarono il suolo nello
+        stesso istante. «Questo dimostra», commentò, «che il signor Galileo aveva ragione.» Era il primo
+        esperimento di fisica trasmesso in diretta da un altro corpo celeste.</div>
+
+      <h3>5.3 — Due esercizi svolti sulla caduta</h3>
+
+      <div class="definition">
+        <strong>Esercizio 1.</strong> Un sasso viene lasciato cadere da un ponte alto $20$ m. Quanto tempo
+        impiega a toccare l'acqua? Con che velocità arriva?
+        <p><span class="step-num">1</span>Scelgo l'asse verticale rivolto verso il basso, con origine sul ponte:
+          il moto è uniformemente accelerato con $a = g$, $v_0 = 0$, $s_0 = 0$.</p>
+        <p><span class="step-num">2</span>Dalla legge oraria $s = \tfrac{1}{2} g t^2$ ricavo il tempo:
+          $t = \sqrt{2s/g} = \sqrt{2 \cdot 20 / 9{,}81} = \sqrt{4{,}077} = 2{,}02$ s.</p>
+        <p><span class="step-num">3</span>La velocità finale: $v = g\,t = 9{,}81 \cdot 2{,}02 = 19{,}8$ m/s,
+          cioè circa $71$ km/h.</p>
+        <p><span class="step-num">4</span><strong>Controllo di sensatezza.</strong> Settanta all'ora dopo venti
+          metri: ecco perché un tuffo da un ponte è pericoloso, e perché la caduta è la prima causa di infortunio
+          sul lavoro. Notate che la massa del sasso non è mai comparsa nel conto — non serviva.</p>
+      </div>
+
+      <div class="definition">
+        <strong>Esercizio 2.</strong> Un ascensore parte dal piano terra e accelera verso l'alto a
+        $1{,}2$ m/s². Una persona di $60$ kg sta sopra una bilancia. Che cosa segna la bilancia?
+        <p><span class="step-num">1</span>La bilancia non misura la massa: misura la forza con cui i piedi la
+          premono, cioè — per il terzo principio — la reazione normale $N$ che essa esercita sulla persona.</p>
+        <p><span class="step-num">2</span>Sulla persona agiscono due forze verticali: il peso $mg$ verso il
+          basso e $N$ verso l'alto. Prendendo l'alto come positivo:
+          $N - mg = m\,a \;\Rightarrow\; N = m(g + a)$.</p>
+        <p><span class="step-num">3</span>$N = 60 \cdot (9{,}81 + 1{,}2) = 60 \cdot 11{,}01 = 660{,}6$ N,
+          contro i $588{,}6$ N di quando l'ascensore è fermo. La bilancia, tarata in chilogrammi, segnerebbe
+          $67{,}3$ kg.</p>
+        <p><span class="step-num">4</span><strong>E se l'ascensore scende accelerando?</strong> Basta cambiare
+          segno ad $a$: si «pesa» di meno. Nel caso limite di caduta libera, $a = -g$, si ottiene $N = 0$: è
+          l'assenza di peso degli astronauti, che non sono affatto lontani dalla gravità — stanno
+          <em>cadendo</em>, insieme alla loro navicella.</p>
+      </div>
+
+      <div class="curiosita"><strong>Le quattro forze fondamentali.</strong> Di forze, in natura, ce ne sono
+        soltanto quattro. Tutte le altre — attrito, spinta, tensione di una fune, resistenza dell'aria — sono
+        travestimenti.
+        <table class="tabf" style="margin-top:0.6rem;">
+          <thead><tr><th>Interazione</th><th>Intensità relativa</th><th>Raggio d'azione</th><th>Che cosa tiene insieme</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">Nucleare forte</td><td>$1$</td><td>$10^{-15}$ m</td><td class="l">i quark dentro i protoni, i protoni dentro il nucleo</td></tr>
+            <tr><td class="lab">Elettromagnetica</td><td>$10^{-2}$</td><td class="l">infinito</td><td class="l">gli atomi, le molecole, la chimica, <em>noi</em></td></tr>
+            <tr><td class="lab">Nucleare debole</td><td>$10^{-6}$</td><td>$10^{-18}$ m</td><td class="l">non tiene insieme nulla: fa <em>decadere</em>. Accende il Sole</td></tr>
+            <tr><td class="lab">Gravitazionale</td><td>$10^{-38}$</td><td class="l">infinito</td><td class="l">i pianeti, le stelle, le galassie</td></tr>
+          </tbody>
+        </table>
+        Due cose saltano all'occhio. La prima: la gravità è ridicolmente debole — un magnete da frigo di due
+        grammi solleva una graffetta vincendo l'attrazione dell'intero pianeta. La seconda: eppure è lei che
+        governa l'universo su grande scala, perché è l'unica che non si cancella mai (le cariche positive e
+        negative si compensano, le masse no) e perché ha raggio infinito.</div>
+
+      <div class="note"><strong>Quando toccate un tavolo, non lo toccate.</strong> La forza che il tavolo
+        esercita sul libro è di natura elettromagnetica: sono le nuvole di elettroni degli atomi della superficie
+        che respingono quelle del libro. Fra il libro e il tavolo resta sempre uno spazio, dell'ordine di
+        $10^{-10}$ metri, che nessuna pressione ordinaria riesce a chiudere. Il «contatto», in fisica, non
+        esiste: esiste solo la repulsione elettrica a brevissima distanza.</div>
+    </section>
+
+    <!-- 6 — L'ATTRITO -->
+    <section id="sec6">
+      <h2>6. L'attrito: il colpevole che ha ingannato tutti</h2>
+
+      <p>Abbiamo detto che Aristotele sbagliava perché non si accorgeva di una forza. Adesso guardiamola bene,
+        perché è la forza più presente nella vita di tutti i giorni e la più trascurata nei libri.</p>
+
+      <div class="definition">
+        <strong>Attrito.</strong> L'insieme delle forze che si oppongono al moto relativo fra due superfici a
+        contatto (o fra un corpo e il fluido in cui si muove). Si distinguono tre famiglie:
+        <ul>
+          <li><strong>attrito radente</strong> — fra due superfici che strisciano l'una sull'altra; a sua volta
+            <em>statico</em> (finché non c'è scivolamento) e <em>dinamico</em> (quando lo scivolamento c'è);</li>
+          <li><strong>attrito volvente</strong> — quando un corpo rotola invece di strisciare; è di gran lunga
+            il più piccolo dei tre;</li>
+          <li><strong>attrito viscoso</strong> — quello dei fluidi: aria, acqua, olio. A differenza degli altri
+            due, dipende fortemente dalla <em>velocità</em>.</li>
+        </ul>
+      </div>
+
+      <h3>6.1 — Le leggi dell'attrito radente</h3>
+
+      <div class="definition">
+        <strong>Attrito statico.</strong> Finché il corpo non si muove, l'attrito vale <em>esattamente quanto
+        serve</em> per tenerlo fermo, fino a un massimo:
+        $$F_s \le \mu_s\,N$$
+        <strong>Attrito dinamico.</strong> Una volta che il corpo scivola, la forza è costante e diretta in
+        verso opposto al moto:
+        $$F_d = \mu_d\,N$$
+        dove $N$ è la reazione normale (quanto le superfici sono premute l'una contro l'altra) e $\mu$ è il
+        <strong>coefficiente di attrito</strong>, un numero puro che dipende dalla coppia di materiali. Vale
+        sempre $\mu_d \lt \mu_s$.
+      </div>
+
+      <p>Quella disuguaglianza nella prima formula è la cosa più interessante: l'attrito statico non ha un
+        valore proprio, si <em>adatta</em>. Se spingo l'armadio con $50$ N e non si muove, l'attrito vale
+        esattamente $50$ N; se spingo con $80$ N e ancora non si muove, vale $80$. Continua a pareggiare finché
+        può, e a un certo punto molla di colpo. Provate.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="at-m">massa: <span class="val-badge" id="at-mv">10</span> kg</label>
+          <input type="range" id="at-m" min="1" max="40" step="1" value="10">
+          <label for="at-ms">$\mu_s$: <span class="val-badge" id="at-msv">0,60</span></label>
+          <input type="range" id="at-ms" min="0.05" max="1" step="0.01" value="0.6">
+          <label for="at-md">$\mu_d$: <span class="val-badge" id="at-mdv">0,40</span></label>
+          <input type="range" id="at-md" min="0.02" max="1" step="0.01" value="0.4">
+        </div>
+        <div class="ctrl">
+          <label for="at-f">forza applicata: <span class="val-badge" id="at-fv">30</span> N</label>
+          <input type="range" id="at-f" min="0" max="300" step="1" value="30">
+          <label class="toggle-row"><input type="checkbox" id="at-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg id="at-svg" viewBox="0 0 660 300" aria-label="La forza di attrito in funzione della forza applicata"></svg>
+        <p class="cap" id="at-cap"></p>
+      </div>
+      <div class="sp-cols">
+        <div>Reazione normale $N$: <span class="val-badge" id="at-N">—</span></div>
+        <div>Forza d'attrito: <span class="val-badge" id="at-Fa">—</span></div>
+        <div>Accelerazione: <span class="val-badge" id="at-a">—</span></div>
+      </div>
+      <p class="eq-out" id="at-out"></p>
+
+      <div class="warnbox"><strong>Il gradino è reale, e si sente.</strong> Nell'istante in cui il corpo parte,
+        l'attrito <em>cala di colpo</em> da $\mu_s N$ a $\mu_d N$: la risultante balza da zero a un valore
+        finito e il corpo scatta in avanti. È il motivo per cui l'armadio, appena si stacca, «scappa»; è il
+        motivo per cui in frenata di emergenza le ruote bloccate frenano <em>peggio</em> di quelle che stanno
+        per bloccarsi — e da lì nasce l'ABS, che ha esattamente il compito di tenere il pneumatico sul bordo
+        dell'attrito statico senza mai superarlo.</div>
+
+      <h3>6.2 — Due sorprese e la spiegazione microscopica</h3>
+
+      <p>Le formule qui sopra hanno due conseguenze che quasi nessuno si aspetta.</p>
+
+      <div class="sp-cols">
+        <div class="definition">
+          <strong>L'attrito non dipende dall'area di contatto</strong>
+          <p>Un mattone trascinato di piatto o di taglio richiede la stessa forza. Sembra assurdo: di piatto
+            «tocca di più». Ma se l'area è doppia, la pressione è la metà, e i due effetti si compensano
+            esattamente.</p>
+        </div>
+        <div class="definition">
+          <strong>L'attrito dinamico non dipende dalla velocità</strong>
+          <p>Trascinare una cassa piano o veloce costa (quasi) uguale. Anche questo stupisce, ed è proprio la
+            differenza fondamentale con l'attrito dell'aria, che invece cresce col quadrato della velocità.</p>
+        </div>
+      </div>
+
+      <p>La spiegazione sta sotto il microscopio. Due superfici che sembrano lisce, ingrandite, sono catene
+        montuose: si toccano soltanto sulle punte, e l'<strong>area di contatto reale</strong> è mille volte più
+        piccola di quella apparente. Su quelle punte la pressione è enorme, il materiale cede e le asperità si
+        <em>saldano a freddo</em>. Per far scivolare il corpo bisogna rompere queste microsaldature, e il numero
+        di microsaldature dipende da quanto le superfici sono premute — cioè da $N$ — e non da quanto sono
+        larghe.</p>
+
+      <table class="tabf">
+        <thead><tr><th>Materiali a contatto</th><th>$\mu_s$</th><th>$\mu_d$</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Gomma su asfalto asciutto</td><td>$0{,}9$</td><td>$0{,}7$</td></tr>
+          <tr><td class="lab">Gomma su asfalto bagnato</td><td>$0{,}6$</td><td>$0{,}4$</td></tr>
+          <tr><td class="lab">Acciaio su acciaio</td><td>$0{,}7$</td><td>$0{,}6$</td></tr>
+          <tr><td class="lab">Legno su legno</td><td>$0{,}5$</td><td>$0{,}3$</td></tr>
+          <tr><td class="lab">Acciaio su acciaio lubrificato</td><td>$0{,}1$</td><td>$0{,}05$</td></tr>
+          <tr><td class="lab">Teflon su teflon</td><td>$0{,}04$</td><td>$0{,}04$</td></tr>
+          <tr><td class="lab">Ghiaccio su ghiaccio</td><td>$0{,}1$</td><td>$0{,}03$</td></tr>
+          <tr><td class="lab">Articolazione umana (con liquido sinoviale)</td><td colspan="2">$0{,}003$ — meglio di qualunque cuscinetto industriale</td></tr>
+        </tbody>
+      </table>
+
+      <div class="curiosita"><strong>Perché si scivola sul ghiaccio (e non è per il motivo che vi hanno
+        detto).</strong> Per un secolo si è insegnato che il pattino scivola perché la sua pressione fonde il
+        ghiaccio creando un velo d'acqua. Il conto però non torna: la pressione di un pattino abbassa il punto
+        di fusione di appena qualche centesimo di grado, e sul ghiaccio a $-20$ °C si scivola benissimo lo
+        stesso. La spiegazione moderna è un'altra: la superficie del ghiaccio è ricoperta da uno strato di
+        molecole <em>già</em> disordinate — un liquido di superficie che esiste anche a temperature ben sotto
+        lo zero, perché quelle molecole non hanno vicini sopra di loro a cui legarsi. Lo sci aggiunge poi un
+        secondo effetto, questo sì di attrito: lo sfregamento scalda e scioglie un velo sottilissimo, e infatti
+        gli sci si scaldano davvero durante una discesa.</div>
+
+      <div class="curiosita"><strong>Senza attrito non si cammina.</strong> Ci lamentiamo dell'attrito perché
+        consuma energia, ma è quello che ci tiene in piedi. Camminare significa spingere il piede
+        <em>all'indietro</em> contro il pavimento, e l'attrito statico è la forza che il pavimento restituisce
+        in avanti. Su una superficie perfettamente liscia sarebbe fisicamente impossibile avviarsi: si potrebbe
+        solo lanciare qualcosa in una direzione per rinculare nell'altra, come gli astronauti. Ed è ancora
+        l'attrito statico — <em>statico</em>, perché la ruota che non slitta non striscia — a far accelerare
+        e frenare qualunque automobile.</div>
+    </section>
+
+    <!-- 7 — IL PIANO INCLINATO -->
+    <section id="sec7">
+      <h2>7. Il piano inclinato: la gravità annacquata</h2>
+
+      <p>Torniamo al 1604. Galileo vuole studiare la caduta dei gravi, ma ha un problema pratico che noi non
+        abbiamo: <strong>non ha un cronometro</strong>. Un sasso lasciato cadere da due metri impiega sei decimi
+        di secondo, e con gli strumenti dell'epoca — il polso, un pendolo, un orologio ad acqua — sei decimi di
+        secondo non si misurano.</p>
+
+      <p>La sua idea è di una semplicità geniale: se non posso rallentare il tempo, <strong>rallento la
+        caduta</strong>. Faccio scendere una palla lungo un piano inclinato di pochi gradi: il moto è dello
+        stesso tipo — uniformemente accelerato — ma con un'accelerazione molto più piccola, che posso scegliere
+        io inclinando più o meno il piano. È il primo esempio nella storia della fisica di un fenomeno
+        <em>diluito</em> apposta per poterlo misurare.</p>
+
+      <h3>7.1 — Scomporre il peso: seno e coseno entrano in scena</h3>
+
+      <p>Su una palla ferma su un piano inclinato di un angolo $\theta$ agiscono due forze: il peso $m\vec g$,
+        verticale verso il basso, e la <strong>reazione normale</strong> $\vec N$ del piano, perpendicolare al
+        piano stesso. Conviene scegliere gli assi <em>ruotati</em>, uno lungo il piano e uno perpendicolare ad
+        esso, e scomporre il peso su di essi.</p>
+
+      <div class="figbox">
+        <svg viewBox="0 0 660 300" aria-label="Scomposizione della forza peso su un piano inclinato">
+          <polygon points="70,250 590,250 590,90" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2.5"/>
+          <path d="M110,250 A40,40 0 0 0 110,250" fill="none"/>
+          <path d="M150,250 A80,80 0 0 0 214,201" fill="none" stroke="var(--magenta)" stroke-width="2"/>
+          <text x="160" y="238" class="em">θ</text>
+          <rect x="330" y="140" width="52" height="34" rx="4" fill="var(--accent)" opacity="0.55"
+                stroke="var(--accent)" stroke-width="2" transform="rotate(-17 356 157)"/>
+          <line x1="356" y1="157" x2="356" y2="266" stroke="var(--magenta)" stroke-width="3.4"/>
+          <polygon points="356,274 350,258 362,258" fill="var(--magenta)"/>
+          <text x="364" y="250" class="em">m g</text>
+          <line x1="356" y1="157" x2="288" y2="178" stroke="var(--green)" stroke-width="3.4"/>
+          <polygon points="281,180 296,170 299,182" fill="var(--green)"/>
+          <text x="256" y="200" style="fill:var(--green); font-size:13px; font-weight:700;">mg sen θ</text>
+          <line x1="356" y1="157" x2="424" y2="245" stroke="var(--gold)" stroke-width="3.4"/>
+          <polygon points="429,251 414,242 424,234" fill="var(--gold)"/>
+          <text x="432" y="235" style="fill:var(--gold); font-size:13px; font-weight:700;">mg cos θ</text>
+          <line x1="356" y1="157" x2="288" y2="69" stroke="var(--accent)" stroke-width="3.4"/>
+          <polygon points="283,63 298,72 288,80" fill="var(--accent)"/>
+          <text x="248" y="60" style="fill:var(--accent); font-size:13px; font-weight:700;">N</text>
+          <path d="M356,266 L356,220 L400,220" fill="none" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="4 4"/>
+          <text x="80" y="40" class="lbl">Il peso si spezza in due: una parte fa scendere, l'altra preme sul piano</text>
+        </svg>
+        <p class="cap">La componente lungo il piano è $mg \sin\theta$, quella perpendicolare $mg \cos\theta$.
+          La reazione normale pareggia solo la seconda: $N = mg\cos\theta$.</p>
+      </div>
+
+      <div class="definition">
+        <strong>Piano inclinato liscio.</strong> Perpendicolarmente al piano non c'è moto, quindi
+        $N = mg\cos\theta$. Lungo il piano resta scoperta la componente $mg\sin\theta$, e il secondo principio dà
+        $$a = g\,\sin\theta$$
+        Di nuovo la massa sparisce. Per $\theta = 90°$ si ritrova la caduta libera ($a = g$), per
+        $\theta = 0°$ il corpo sta fermo. Con $\theta = 3°$ l'accelerazione scende a $0{,}51$ m/s²: venti volte
+        più lenta della caduta, e finalmente misurabile con un orologio ad acqua.
+      </div>
+
+      <div class="definition">
+        <strong>Piano inclinato con attrito.</strong> L'attrito dinamico vale $\mu_d N = \mu_d\,mg\cos\theta$ e
+        si oppone al moto, quindi
+        $$a = g\,(\sin\theta - \mu_d\cos\theta)$$
+        Il corpo comincia a scivolare solo se la componente motrice supera l'attrito statico massimo, cioè se
+        $$\tan\theta \gt \mu_s$$
+        Notate che la condizione non contiene la massa: l'<strong>angolo di distacco</strong> dipende soltanto
+        dai materiali. È il modo più semplice che esista per misurare $\mu_s$: si inclina lentamente un piano
+        finché l'oggetto parte, si misura l'angolo e si fa la tangente.
+      </div>
+
+      <h3>7.2 — I campanelli di Galileo</h3>
+
+      <p>Resta il problema di misurare il tempo. Qui entra in gioco un dettaglio biografico che sembra un
+        aneddoto e invece è la chiave: il padre di Galileo, <strong>Vincenzo Galilei</strong>, era un
+        musicista teorico di primo piano, e Galileo stesso suonava il liuto molto bene. Un orecchio allenato
+        <em>non sa dire</em> quanto dura un intervallo, ma sa dire benissimo se una serie di battiti è
+        <strong>regolare</strong>: un musicista riconosce uno scarto di pochi centesimi di secondo in un ritmo.</p>
+
+      <p>Secondo la ricostruzione dello storico <strong>Stillman Drake</strong>, Galileo legò attraverso il
+        piano inclinato dei sottili budelli, come i tasti di un liuto: la palla, passandoci sopra, produceva un
+        piccolo scatto udibile. Poi spostò i budelli finché gli scatti non risultarono <em>perfettamente a
+        tempo</em>. A quel punto bastava misurare col righello dove erano finiti — e la risposta era lì.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="pi-th">inclinazione: <span class="val-badge" id="pi-thv">6</span>°</label>
+          <input type="range" id="pi-th" min="2" max="20" step="0.5" value="6">
+          <span class="sim-btns" id="pi-modo">
+            <button class="btn active" type="button" data-m="uguali">campanelli a distanze uguali</button>
+            <button class="btn btn-secondary" type="button" data-m="quadrati">campanelli sui quadrati</button>
+          </span>
+          <button class="btn" id="pi-via" type="button">▶ Lascia andare la palla</button>
+          <label class="toggle-row"><input type="checkbox" id="pi-audio" checked> 🔊 audio</label>
+        </div>
+        <svg id="pi-svg" viewBox="0 0 660 300" aria-label="Il piano inclinato di Galileo con i campanelli"></svg>
+        <p class="cap" id="pi-cap">Con i campanelli a distanze uguali il ritmo accelera. Spostateli sui quadrati:
+          il ritmo diventa regolare, e quello è il cronometro.</p>
+      </div>
+      <div class="sp-cols">
+        <div>Accelerazione lungo il piano: <span class="val-badge" id="pi-a">—</span></div>
+        <div>Intervalli fra gli scatti: <span class="val-badge" id="pi-int">—</span></div>
+      </div>
+      <p class="eq-out" id="pi-out"></p>
+
+      <div class="definition">
+        <strong>Che cosa scoprì.</strong> Le posizioni dei campanelli che danno un ritmo regolare stanno fra
+        loro come $1, 4, 9, 16, 25, \dots$, cioè come i <strong>quadrati</strong> dei numeri naturali. Le
+        distanze fra un campanello e il successivo stanno quindi come $1, 3, 5, 7, 9, \dots$: i
+        <strong>numeri dispari</strong>. È la <em>legge degli spazi</em> del moto uniformemente accelerato,
+        $$s = \tfrac{1}{2}\,a\,t^2$$
+        ottenuta per la prima volta non con una formula ma con l'orecchio.
+      </div>
+
+      <div class="curiosita"><strong>Una precisazione onesta.</strong> La palla di Galileo non scivolava:
+        <em>rotolava</em>. Una parte dell'energia va allora nella rotazione, e per una sfera piena
+        l'accelerazione è $a = \tfrac{5}{7}\,g\sin\theta$, cioè il $71\%$ di quella di un corpo che striscia.
+        Questo non tocca minimamente la legge degli spazi — i quadrati restano quadrati — ma sposta il valore
+        numerico di $g$ ricavato dall'esperimento. Galileo non poteva saperlo, perché il momento d'inerzia lo
+        studieremo (e lo studierà il mondo) parecchio più tardi.</div>
+
+      <div class="curiosita"><strong>Unire il cielo e la terra.</strong> Ecco il punto che rende quell'esperimento
+        una rivoluzione e non una misura. Se la caduta di un sasso e la discesa di una palla su un piano sono lo
+        <em>stesso</em> moto con $g$ diverso, allora un moto può essere «più o meno caduta»: non c'è un cielo
+        dove le cose girano e una terra dove le cose cadono. C'è un unico modo di muoversi, e la Luna
+        semplicemente cade <em>per sempre</em> senza mai arrivare. Newton, ottant'anni dopo, non farà che
+        prendere sul serio questa frase.</div>
+
+      <h3>7.3 — Quattro esercizi guidati</h3>
+
+      <p>Provate a rispondere prima di aprire la soluzione. I dati stanno tutti nelle formule di questa sezione,
+        e $g = 9{,}81$ m/s².</p>
+
+      <div class="qbox">
+        <div class="qt">① Una cassa di $25$ kg sta su un piano inclinato di $20°$, liscio. Con che accelerazione
+          scende?</div>
+        <button class="btn btn-toggle" data-target="#sol-p1">Mostra la soluzione</button>
+        <div id="sol-p1" class="hidden">
+          <p>$a = g\sin\theta = 9{,}81 \cdot \sin 20° = 9{,}81 \cdot 0{,}342 = 3{,}36$ m/s².</p>
+          <p>La massa non serve: sarebbe la stessa per una cassa di un quintale. Se la domanda fosse stata
+            «con che forza scende», allora sì: $F = ma = 25 \cdot 3{,}36 = 84$ N.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">② Lo stesso piano, ma con $\mu_d = 0{,}25$. Quanto vale ora l'accelerazione?</div>
+        <button class="btn btn-toggle" data-target="#sol-p2">Mostra la soluzione</button>
+        <div id="sol-p2" class="hidden">
+          <p>$a = g(\sin\theta - \mu_d\cos\theta) = 9{,}81\,(0{,}342 - 0{,}25 \cdot 0{,}940) = 9{,}81 \cdot (0{,}342 - 0{,}235) = 9{,}81 \cdot 0{,}107 = 1{,}05$ m/s².</p>
+          <p>L'attrito si è mangiato due terzi dell'accelerazione. Notate che <em>anche qui</em> la massa
+            sparisce: attrito e componente motrice sono entrambi proporzionali a $m$.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">③ Appoggio una moneta su un libro e alzo lentamente il libro. La moneta comincia a
+          scivolare quando il libro forma $27°$ con l'orizzontale. Quanto vale $\mu_s$?</div>
+        <button class="btn btn-toggle" data-target="#sol-p3">Mostra la soluzione</button>
+        <div id="sol-p3" class="hidden">
+          <p>La condizione di distacco è $\tan\theta = \mu_s$, quindi
+            $\mu_s = \tan 27° = 0{,}51$.</p>
+          <p>È un esperimento che si può fare adesso, con un libro e un goniometro (o con l'inclinometro del
+            telefono). Provate con una moneta, una gomma da cancellare e un pezzo di scotch: tre materiali,
+            tre angoli diversi, tre coefficienti.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">④ Su un piano inclinato di $15°$ una cassa scende a velocità <em>costante</em>. Che cosa
+          si può dire di $\mu_d$?</div>
+        <button class="btn btn-toggle" data-target="#sol-p4">Mostra la soluzione</button>
+        <div id="sol-p4" class="hidden">
+          <p>Velocità costante significa accelerazione nulla, quindi $\sin\theta - \mu_d\cos\theta = 0$, da cui
+            $$\mu_d = \tan\theta = \tan 15° = 0{,}27$$</p>
+          <p>È il caso limite in cui l'attrito pareggia esattamente la spinta della gravità. È anche il modo in
+            cui si misura $\mu_d$: si cerca l'inclinazione a cui il corpo, una volta avviato con una spintarella,
+            prosegue senza né accelerare né rallentare.</p>
+        </div>
+      </div>
+
+      <div class="note"><strong>La reazione vincolare non è un'invenzione.</strong> Il piano che «regge» la
+        cassa esercita una forza vera, la <strong>reazione normale</strong>, di natura elettromagnetica come
+        abbiamo detto nella sezione 5. Ha però una caratteristica speciale: non ha un valore proprio, si adatta
+        a quello che serve. Un tavolo regge un libro con $10$ N e un'incudine con $2000$ N — finché ce la fa.
+        Quando non ce la fa più, il vincolo si rompe, ed è esattamente quello che calcola un ingegnere quando
+        dimensiona una trave.</div>
+    </section>
+
+    <!-- 8 — SOVRAPPOSIZIONE E PROIETTILE -->
+    <section id="sec8">
+      <h2>8. Il principio di sovrapposizione e il moto del proiettile</h2>
+
+      <p>Ancora Galileo, ancora una domanda apparentemente innocua: se sparo una palla in orizzontale e nello
+        stesso istante ne lascio cadere un'altra dalla stessa altezza, quale tocca terra per prima?</p>
+
+      <p>La risposta è: <strong>insieme</strong>. Sempre. Che la prima esca dalla canna a dieci metri al secondo
+        o a mille, tocca terra nello stesso istante di quella lasciata cadere. Il motivo è un principio che
+        useremo da qui in avanti senza più nominarlo.</p>
+
+      <div class="definition">
+        <strong>Principio di sovrapposizione (o di indipendenza dei moti).</strong> Un moto qualsiasi può essere
+        scomposto lungo due direzioni perpendicolari, e le due componenti <strong>si svolgono come se l'altra
+        non ci fosse</strong>. Le forze lungo $x$ determinano solo il moto lungo $x$; quelle lungo $y$ solo il
+        moto lungo $y$.
+      </div>
+
+      <p>Nel moto di un proiettile (sempre trascurando l'aria) le forze sono una sola, il peso, ed è verticale.
+        Quindi:</p>
+
+      <div class="sp-cols">
+        <div class="definition">
+          <strong>Lungo $x$: nessuna forza</strong>
+          <p>Moto rettilineo <strong>uniforme</strong>. La componente orizzontale della velocità non cambia mai,
+            dal primo istante all'impatto.</p>
+          $$x(t) = v_0 \cos\alpha \cdot t$$
+        </div>
+        <div class="definition">
+          <strong>Lungo $y$: la forza peso</strong>
+          <p>Moto uniformemente <strong>accelerato</strong>, esattamente come una caduta libera — con la sola
+            differenza di partire con una velocità iniziale.</p>
+          $$y(t) = h + v_0 \sin\alpha \cdot t - \tfrac{1}{2}g\,t^2$$
+        </div>
+      </div>
+
+      <p>Il moto complessivo — quella traiettoria curva che tutti riconoscono — non è un moto nuovo: è la somma
+        di due moti che conosciamo già. È la stessa idea con cui l'anno scorso abbiamo sommato i vettori, usata
+        stavolta sul tempo.</p>
+
+      <h3>8.1 — Il cannone e la nave</h3>
+
+      <p>Adesso siete voi l'artigliere. Scegliete alzo e carica e provate a colpire il bersaglio. Attenzione: la
+        traiettoria non punta dove punta la canna, e più il bersaglio è lontano più la differenza conta.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="cn-a">alzo: <span class="val-badge" id="cn-av">35</span>°</label>
+          <input type="range" id="cn-a" min="5" max="85" step="1" value="35">
+          <label for="cn-v">velocità iniziale: <span class="val-badge" id="cn-vv">55</span> m/s</label>
+          <input type="range" id="cn-v" min="20" max="75" step="1" value="55">
+          <button class="btn" id="cn-fuoco" type="button">💥 Fuoco</button>
+          <button class="btn btn-secondary" id="cn-nuovo" type="button">⚓ Nuova nave</button>
+        </div>
+        <div class="ctrl">
+          <label class="toggle-row"><input type="checkbox" id="cn-comp"> mostra le componenti della velocità</label>
+          <label class="toggle-row"><input type="checkbox" id="cn-scia" checked> conserva i tiri precedenti</label>
+        </div>
+        <svg id="cn-svg" viewBox="0 0 660 320" aria-label="Simulatore di tiro: cannone contro una nave"></svg>
+        <p class="cap" id="cn-cap">La componente orizzontale della velocità resta costante per tutto il volo;
+          quella verticale si annulla nel punto più alto e poi cambia verso.</p>
+      </div>
+      <div class="sp-cols">
+        <div>Distanza della nave: <span class="val-badge" id="cn-d">—</span></div>
+        <div>Gittata del tiro: <span class="val-badge" id="cn-g">—</span></div>
+        <div>Tempo di volo: <span class="val-badge" id="cn-t">—</span></div>
+        <div>Altezza massima: <span class="val-badge" id="cn-h">—</span></div>
+      </div>
+      <p class="eq-out" id="cn-out"></p>
+
+      <div class="note"><strong>Due alzi per lo stesso bersaglio.</strong> Se avete giocato un po' ve ne sarete
+        accorti: quasi ogni bersaglio si può colpire in <em>due</em> modi, con un tiro teso e con un tiro
+        arcuato. Gli angoli che funzionano sono sempre complementari — $30°$ e $60°$, $20°$ e $70°$ — e la
+        ragione la vediamo nella prossima sezione. L'artiglieria di ogni epoca ha preferito il tiro teso, che
+        arriva prima e sbaglia meno; i mortai usano il tiro arcuato apposta, per scavalcare un muro.</div>
+
+      <div class="curiosita"><strong>Perché i cannoni sbagliano, comunque.</strong> Il modello che abbiamo
+        scritto trascura l'aria, e per un proiettile vero l'aria è tutto: un colpo da $155$ mm che senza
+        atmosfera arriverebbe a $60$ km ne fa in realtà una trentina. Non solo: conta la rotazione impressa dalla
+        rigatura (che stabilizza il proiettile ma lo fa anche derivare di lato), conta il vento, conta la
+        temperatura dell'aria, conta perfino la rotazione della Terra. Le tavole di tiro dell'artiglieria erano
+        volumi di centinaia di pagine, e sono state uno dei primi problemi affidati ai calcolatori
+        elettronici — l'ENIAC, nel 1945, nasce esattamente per questo.</div>
+    </section>
+
+    <!-- 9 — LA PARABOLA IN FORMULE -->
+    <section id="sec9">
+      <h2>9. La parabola, la gittata e l'angolo migliore</h2>
+
+      <p>Nella sezione precedente abbiamo simulato. Qui ricaviamo le formule, perché sono corte, eleganti e
+        rispondono a domande che vengono naturali: quanto lontano arriva? quanto sta in aria? qual è l'alzo
+        migliore?</p>
+
+      <h3>9.1 — L'equazione della traiettoria</h3>
+
+      <p>Le due leggi orarie della sezione 8 (poniamo $h = 0$ per semplicità) sono
+        $x = v_0\cos\alpha \, t$ e $y = v_0\sin\alpha\, t - \tfrac12 g t^2$. Dalla prima ricavo
+        $t = x/(v_0\cos\alpha)$ e lo sostituisco nella seconda:</p>
+
+      <div class="parabox">
+        $$y(x) = x\,\tan\alpha \;-\; \frac{g}{2\,v_0^2\cos^2\alpha}\;x^2$$
+        <p>È un polinomio di secondo grado in $x$ con il coefficiente del termine quadratico negativo: la
+          traiettoria è una <strong>parabola con la concavità verso il basso</strong>. Non è una scelta né
+          un'approssimazione: è una conseguenza inevitabile di «forza costante verso il basso, nessuna forza
+          in orizzontale». Fu Galileo il primo a dimostrarlo, ed è uno dei rari casi in cui la natura si
+          degna di usare una curva che gli antichi avevano già studiato.</p>
+      </div>
+
+      <h3>9.2 — Le quattro formule che servono</h3>
+
+      <p>Con $h = 0$ (partenza e arrivo alla stessa quota) tutto si ricava in due righe. Il tempo di volo si
+        trova imponendo $y = 0$: oltre alla soluzione banale $t = 0$ resta</p>
+
+      <div class="form-grid">
+        <div class="form-card"><span class="nome">Tempo di volo</span>$$T = \frac{2\,v_0\sin\alpha}{g}$$</div>
+        <div class="form-card"><span class="nome">Gittata</span>$$R = \frac{v_0^2\,\sin 2\alpha}{g}$$</div>
+        <div class="form-card"><span class="nome">Altezza massima</span>$$H = \frac{v_0^2\sin^2\alpha}{2g}$$</div>
+        <div class="form-card"><span class="nome">Istante del vertice</span>$$t_H = \frac{v_0\sin\alpha}{g} = \frac{T}{2}$$</div>
+      </div>
+
+      <p>La gittata si ottiene sostituendo $T$ dentro $x(t)$ e usando la formula di duplicazione
+        $2\sin\alpha\cos\alpha = \sin 2\alpha$. Da lì discendono subito due fatti.</p>
+
+      <div class="parabox">
+        <h4>L'alzo di gittata massima è $45°$</h4>
+        <p>$R$ è massima quando $\sin 2\alpha = 1$, cioè quando $2\alpha = 90°$: <strong>$\alpha = 45°$</strong>.
+          E siccome $\sin 2\alpha = \sin(180° - 2\alpha)$, gli angoli $\alpha$ e $90° - \alpha$ danno
+          <strong>la stessa gittata</strong>: è la spiegazione dei due alzi che avete trovato giocando col
+          cannone. Il tiro teso e quello arcuato arrivano nello stesso punto, ma il secondo ci mette molto
+          più tempo e sale molto più in alto.</p>
+      </div>
+
+      <h3>9.3 — E se c'è l'aria?</h3>
+
+      <p>Tutto quanto sopra vale nel vuoto. Nell'aria compare una terza forza, la <strong>resistenza</strong>,
+        che punta sempre <em>contro</em> la velocità e cresce con essa. Per un corpo di dimensioni ordinarie a
+        velocità non piccolissime vale con buona approssimazione</p>
+
+      $$\vec F_{\text{aria}} = -\,\tfrac{1}{2}\,\rho\,C_d\,A\,|\vec v|\;\vec v$$
+
+      <p>cioè il modulo va come $v^2$. Adesso il moto orizzontale e quello verticale <strong>non sono più
+        indipendenti</strong> — la resistenza verticale dipende anche da quanto si va veloci in orizzontale — e
+        le formule chiuse non esistono più: bisogna integrare numericamente. È esattamente quello che fa il
+        simulatore qui sotto, che per ogni alzo calcola la gittata vera e disegna la curva.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="gt-v">velocità iniziale: <span class="val-badge" id="gt-vv">50</span> m/s</label>
+          <input type="range" id="gt-v" min="15" max="120" step="1" value="50">
+          <label for="gt-k">resistenza dell'aria: <span class="val-badge" id="gt-kv">0,0</span> (in millesimi al metro)</label>
+          <input type="range" id="gt-k" min="0" max="0.006" step="0.0002" value="0">
+          <label class="toggle-row"><input type="checkbox" id="gt-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg id="gt-svg" viewBox="0 0 660 300" aria-label="Gittata in funzione dell'alzo, con e senza resistenza dell'aria"></svg>
+        <p class="cap">In blu la gittata nel vuoto, in magenta quella calcolata integrando passo passo con la
+          resistenza dell'aria. Il pallino segna il massimo.</p>
+      </div>
+      <div class="sp-cols">
+        <div>Alzo migliore: <span class="val-badge" id="gt-best">—</span></div>
+        <div>Gittata massima: <span class="val-badge" id="gt-rmax">—</span></div>
+        <div>Perdita rispetto al vuoto: <span class="val-badge" id="gt-perd">—</span></div>
+      </div>
+      <p class="eq-out" id="gt-out"></p>
+
+      <div class="parabox">
+        <h4>Il risultato controintuitivo</h4>
+        <p>Con l'aria l'alzo migliore <strong>non è più $45°$</strong>: scende, e tanto più quanto più la
+          resistenza conta. Il motivo è che un tiro molto arcuato resta in volo a lungo, e più tempo passa in
+          aria più l'aria gli ruba velocità. Conviene allora abbassare l'alzo, sacrificare un po' di tempo di
+          volo e conservare più velocità orizzontale. Per una palla da baseball l'ottimo sta attorno ai
+          $35°$; per un proiettile d'artiglieria lento e pesante si resta vicini a $45°$; per una pallina da
+          ping-pong, leggerissima, si scende sotto i $30°$.</p>
+        <p>E la simmetria si rompe: la parabola diventa <strong>asimmetrica</strong>, con la discesa più ripida
+          della salita. Guardate la curva del simulatore quando alzate la resistenza — il vertice si sposta
+          oltre la metà.</p>
+      </div>
+
+      <h3>9.4 — Tre esercizi guidati</h3>
+
+      <p>I dati stanno tutti nelle quattro formule qui sopra, e $g = 9{,}81$ m/s². Provate prima di aprire la
+        soluzione: il valore vero di questi esercizi è nel <em>metodo</em>, non nel numero.</p>
+
+      <div class="qbox">
+        <div class="qt">① Un pallone viene calciato dal suolo a $18$ m/s con un'inclinazione di $30°$. Quanto
+          resta in aria, quanto lontano ricade e che altezza massima raggiunge?</div>
+        <button class="btn btn-toggle" data-target="#sol-g1">Mostra la soluzione</button>
+        <div id="sol-g1" class="hidden">
+          <p><span class="step-num">1</span>Le due componenti della velocità iniziale:
+            $v_{0x} = 18\cos 30° = 15{,}59$ m/s e $v_{0y} = 18\sin 30° = 9{,}00$ m/s.</p>
+          <p><span class="step-num">2</span>Tempo di volo: $T = \dfrac{2 v_0 \sin\alpha}{g} = \dfrac{2\cdot 9{,}00}{9{,}81} = 1{,}83$ s.</p>
+          <p><span class="step-num">3</span>Gittata: $R = \dfrac{v_0^2 \sin 2\alpha}{g} = \dfrac{324 \cdot 0{,}8660}{9{,}81} = 28{,}6$ m.
+            <em>Controllo</em>: $v_{0x}\cdot T = 15{,}59 \cdot 1{,}83 = 28{,}6$ m. Torna.</p>
+          <p><span class="step-num">4</span>Altezza massima: $H = \dfrac{v_0^2\sin^2\alpha}{2g} = \dfrac{324\cdot 0{,}25}{19{,}62} = 4{,}13$ m.</p>
+          <p><span class="step-num">5</span><strong>Ragionevolezza.</strong> Un pallone che vola $29$ metri e sale
+            a poco più di quattro: è un tiro da metà campo, e i numeri sono credibili. Se fosse venuto
+            $H = 40$ m avreste sbagliato qualcosa — probabilmente dimenticando il $2$ al denominatore.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">② Un sasso viene lanciato <strong>in orizzontale</strong> a $12$ m/s dal parapetto di un
+          ponte alto $1{,}80$ m. A che distanza dal ponte tocca l'acqua? Con che velocità arriva?</div>
+        <button class="btn btn-toggle" data-target="#sol-g2">Mostra la soluzione</button>
+        <div id="sol-g2" class="hidden">
+          <p><span class="step-num">1</span>Qui $\alpha = 0$, quindi la componente verticale iniziale è
+            <strong>nulla</strong>: verticalmente è una caduta libera pura, e le formule di gittata e tempo di
+            volo della sezione 9.2 <em>non si applicano</em> perché quelle valgono per partenza e arrivo alla
+            stessa quota.</p>
+          <p><span class="step-num">2</span>Il tempo lo detta la caduta: $h = \frac12 g t^2 \Rightarrow t = \sqrt{\dfrac{2h}{g}} = \sqrt{\dfrac{3{,}60}{9{,}81}} = 0{,}606$ s.</p>
+          <p><span class="step-num">3</span>Nel frattempo, orizzontalmente, il moto è uniforme:
+            $x = v_0 t = 12 \cdot 0{,}606 = 7{,}27$ m.</p>
+          <p><span class="step-num">4</span>La velocità d'arrivo ha due componenti: $v_x = 12$ m/s (invariata) e
+            $v_y = g t = 5{,}94$ m/s. Il modulo: $v = \sqrt{12^2 + 5{,}94^2} = 13{,}4$ m/s.</p>
+          <p><span class="step-num">5</span><strong>Il punto della domanda.</strong> Il tempo di caduta è
+            <em>lo stesso</em> di un sasso lasciato cadere fermo dal parapetto: $0{,}606$ s. Il moto orizzontale
+            non ha alcuna voce in capitolo su <em>quando</em> si arriva a terra — decide solo <em>dove</em>. È il
+            principio di sovrapposizione visto in azione.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">③ Con che alzo bisogna sparare, a $22$ m/s, per colpire un bersaglio a $40$ m sullo stesso
+          piano? (Attenzione: le risposte sono due.)</div>
+        <button class="btn btn-toggle" data-target="#sol-g3">Mostra la soluzione</button>
+        <div id="sol-g3" class="hidden">
+          <p><span class="step-num">1</span>Si parte dalla formula della gittata e si ricava il seno:
+            $R = \dfrac{v_0^2\sin 2\alpha}{g} \Rightarrow \sin 2\alpha = \dfrac{R\,g}{v_0^2} = \dfrac{40 \cdot 9{,}81}{484} = 0{,}8107$.</p>
+          <p><span class="step-num">2</span><strong>Prima di andare avanti, un controllo.</strong> Il seno deve
+            venire minore di 1, altrimenti il bersaglio è irraggiungibile. Qui viene $0{,}81$: siamo dentro. La
+            gittata massima con questa carica è $v_0^2/g = 49{,}3$ m.</p>
+          <p><span class="step-num">3</span>Un'equazione col seno ha <em>due</em> soluzioni nell'intervallo utile:
+            $2\alpha = 54{,}2°$ oppure $2\alpha = 180° - 54{,}2° = 125{,}8°$.</p>
+          <p><span class="step-num">4</span>Quindi $\alpha = 27{,}1°$ (tiro teso) oppure $\alpha = 62{,}9°$ (tiro
+            arcuato). Come previsto, i due angoli sono <strong>complementari</strong>: $27{,}1 + 62{,}9 = 90$.</p>
+          <p><span class="step-num">5</span>Le due traiettorie sono molto diverse: il tiro teso resta in aria
+            $2{,}04$ s e sale a $5{,}1$ m, quello arcuato resta in aria $3{,}99$ s e sale a $19{,}6$ m. Stesso
+            bersaglio, doppio del tempo.</p>
+        </div>
+      </div>
+
+      <div class="curiosita"><strong>Il lancio del peso non si fa a 45°.</strong> Gli atleti lanciano intorno ai
+        $37$–$38$ gradi, e non per l'aria (una sfera d'acciaio da $7{,}26$ kg se ne infischia della resistenza).
+        Il motivo è un altro, e le nostre formule lo spiegano: il peso parte da un'altezza di circa due metri e
+        arriva a terra, quindi $h \ne 0$ e la formula della gittata cambia. Con partenza più alta dell'arrivo
+        l'angolo ottimale scende sempre sotto i $45°$. C'è poi un terzo motivo, biomeccanico: il corpo umano
+        riesce a imprimere una velocità maggiore ai lanci più tesi, e siccome la gittata va col
+        <em>quadrato</em> della velocità, conviene barattare angolo con velocità.</div>
+    </section>
+
+    <!-- 10 — MOTO CIRCOLARE -->
+    <section id="sec10">
+      <h2>10. Il moto circolare uniforme: girare è accelerare</h2>
+
+      <p>Un'automobile percorre una rotonda a velocità costante, indicata dal tachimetro, di $30$ km/h. Sta
+        accelerando?</p>
+
+      <p>Sì. E il fatto che la risposta sembri assurda dipende solo dal linguaggio comune, in cui «accelerare»
+        vuol dire «andare più forte». In fisica accelerare significa <strong>cambiare il vettore
+        velocità</strong>, e un vettore si può cambiare anche solo di direzione. L'auto in rotonda cambia
+        direzione in continuazione: quindi accelera in continuazione, e quindi — secondo principio — c'è per
+        forza una forza che la spinge.</p>
+
+      <div class="definition">
+        <strong>Accelerazione centripeta.</strong> Un corpo che percorre una circonferenza di raggio $r$ con
+        velocità di modulo $v$ costante possiede un'accelerazione diretta <strong>verso il centro</strong>, di
+        modulo
+        $$a_c = \frac{v^2}{r} = \omega^2 r$$
+        dove $\omega = v/r$ è la velocità angolare. La forza corrispondente,
+        $$F_c = m\,\frac{v^2}{r}$$
+        si chiama <strong>forza centripeta</strong>.
+      </div>
+
+      <div class="warnbox"><strong>La forza centripeta non è una forza nuova.</strong> È un <em>ruolo</em>, non
+        un tipo. Chi lo interpreta cambia da caso a caso: per la Luna è la gravità, per un sasso fatto ruotare
+        con lo spago è la tensione della corda, per l'auto in curva è l'attrito fra pneumatici e asfalto, per
+        l'elettrone nell'atomo di Bohr è l'attrazione elettrica. Scrivere «$F_c$» fra le forze in un diagramma
+        è un errore classico: le forze si elencano per quello che sono (peso, tensione, attrito) e
+        <em>poi</em> si scrive che la loro risultante vale $mv^2/r$.</div>
+
+      <h3>10.1 — E la forza centrifuga?</h3>
+
+      <p>Quando l'auto curva a sinistra, il passeggero si sente schiacciato contro la portiera destra. La
+        sensazione è reale; la forza non c'è.</p>
+
+      <p>Quello che accade davvero è l'opposto di quello che si sente: il corpo del passeggero, per inerzia,
+        vorrebbe proseguire <strong>dritto</strong>, ed è la portiera a spingerlo verso il centro obbligandolo a
+        curvare insieme all'auto. La spinta è centripeta, non centrifuga. La «forza centrifuga» compare solo se
+        si sceglie come sistema di riferimento l'automobile stessa — che sta curvando, e quindi
+        <em>non è inerziale</em>: in quel riferimento il primo principio non vale, e per far tornare i conti
+        bisogna inventare una forza che non ha nessuno che la eserciti. Si chiama <strong>forza
+        apparente</strong>, ed è una scrittura comoda, non un pezzo di mondo.</p>
+
+      <div class="curiosita"><strong>La centrifuga della lavatrice non butta fuori l'acqua.</strong> Il cestello
+        spinge i panni verso il centro, obbligandoli a girare. L'acqua, finché è dentro il tessuto, gira con
+        loro. Ma quando una goccia arriva davanti a un buco, nessuno la spinge più: e allora fa quello che il
+        primo principio comanda, cioè prosegue <strong>per la tangente</strong>, in linea retta, e finisce
+        fuori. La centrifuga non aggiunge una forza: <em>smette di trattenere</em>.</div>
+
+      <h3>10.2 — Quattro esercizi guidati</h3>
+
+      <div class="qbox">
+        <div class="qt">① Un'auto affronta a $72$ km/h una curva di raggio $50$ m. Quale coefficiente d'attrito
+          serve, come minimo, perché non sbandi?</div>
+        <button class="btn btn-toggle" data-target="#sol-c1">Mostra la soluzione</button>
+        <div id="sol-c1" class="hidden">
+          <p>$v = 72/3{,}6 = 20$ m/s, quindi $a_c = v^2/r = 400/50 = 8$ m/s².</p>
+          <p>L'unica forza orizzontale disponibile è l'attrito, che al massimo vale $\mu_s\,mg$. Deve bastare a
+            fornire $m\,a_c$:
+            $$\mu_s\,m g \ge m\,a_c \;\Rightarrow\; \mu_s \ge \frac{a_c}{g} = \frac{8}{9{,}81} = 0{,}82$$</p>
+          <p>Sull'asfalto asciutto ($\mu_s \approx 0{,}9$) ce la si fa, ma con pochissimo margine; sul bagnato
+            ($\mu_s \approx 0{,}6$) si esce di strada. Notate ancora una volta che la massa si semplifica: un
+            camion e una utilitaria sbandano alla stessa velocità.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">② La Luna dista $384\,400$ km e compie un giro in $27{,}32$ giorni. Quanto vale la sua
+          accelerazione centripeta? Confrontatela con $g$.</div>
+        <button class="btn btn-toggle" data-target="#sol-c2">Mostra la soluzione</button>
+        <div id="sol-c2" class="hidden">
+          <p>Il periodo in secondi: $T = 27{,}32 \cdot 86\,400 = 2{,}360\times10^6$ s. La velocità:
+            $v = 2\pi r/T = 2\pi \cdot 3{,}844\times10^8 / 2{,}360\times10^6 = 1023$ m/s.</p>
+          <p>$a_c = v^2/r = (1023)^2 / 3{,}844\times10^8 = 2{,}72\times10^{-3}$ m/s².</p>
+          <p><strong>Il confronto che cambiò la storia.</strong> La Luna dista circa $60$ raggi terrestri.
+            Se la gravità si diluisse come l'inverso del quadrato della distanza, lassù dovrebbe valere
+            $$\frac{g}{60^2} = \frac{9{,}81}{3600} = 2{,}72\times10^{-3}\ \text{m/s}^2$$
+            cioè <em>esattamente</em> l'accelerazione che abbiamo appena calcolato dal moto della Luna. Questo
+            conto lo fece Newton, e da qui capì che la mela e la Luna obbediscono alla stessa legge. Lo
+            riprenderemo per esteso nella prossima lezione.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">③ Una giostra ha raggio $4{,}0$ m e compie un giro completo in $6{,}0$ s. Quanto vale la
+          velocità di un bambino seduto sul bordo? E la sua accelerazione centripeta? Se il bambino ha massa
+          $30$ kg, con che forza dev'essere trattenuto?</div>
+        <button class="btn btn-toggle" data-target="#sol-c3">Mostra la soluzione</button>
+        <div id="sol-c3" class="hidden">
+          <p><span class="step-num">1</span>In un giro percorre l'intera circonferenza, quindi
+            $v = \dfrac{2\pi r}{T} = \dfrac{2\pi \cdot 4{,}0}{6{,}0} = 4{,}19$ m/s (poco più di $15$ km/h).</p>
+          <p><span class="step-num">2</span>$a_c = \dfrac{v^2}{r} = \dfrac{17{,}55}{4{,}0} = 4{,}39$ m/s².
+            <em>Controllo con l'altra formula</em>: $\omega = 2\pi/T = 1{,}047$ rad/s e
+            $a_c = \omega^2 r = 1{,}097 \cdot 4{,}0 = 4{,}39$ m/s². Torna.</p>
+          <p><span class="step-num">3</span>$F_c = m\,a_c = 30 \cdot 4{,}39 = 132$ N, diretta <strong>verso il
+            centro</strong>. La fornisce il sedile, o la sbarra a cui il bambino si tiene.</p>
+          <p><span class="step-num">4</span><strong>Osservazione.</strong> $132$ N sono circa $13$ kg-forza: quasi
+            metà del peso del bambino, orizzontale. Ecco perché sulle giostre veloci ci si deve aggrappare — e
+            perché al bambino sembra di essere «buttato fuori», mentre in realtà è la sbarra che lo tira dentro.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">④ Il «giro della morte»: un carrello percorre un anello verticale di raggio $5{,}0$ m.
+          Qual è la velocità minima che deve avere <strong>nel punto più alto</strong> per non staccarsi dalla
+          guida? (Trascura l'attrito.)</div>
+        <button class="btn btn-toggle" data-target="#sol-c4">Mostra la soluzione</button>
+        <div id="sol-c4" class="hidden">
+          <p><span class="step-num">1</span>Nel punto più alto sono <em>entrambe</em> rivolte verso il centro (che
+            sta sotto) le due forze in gioco: il peso $mg$ e la reazione della guida $N$. La loro somma fa da
+            centripeta:
+            $$mg + N = m\frac{v^2}{r}$$</p>
+          <p><span class="step-num">2</span>La condizione limite è quella in cui la guida non spinge più affatto,
+            cioè $N = 0$: da lì in giù il carrello si stacca. Ponendo $N = 0$:
+            $$mg = m\frac{v^2}{r} \;\Longrightarrow\; v_{\min} = \sqrt{g\,r}$$</p>
+          <p><span class="step-num">3</span>$v_{\min} = \sqrt{9{,}81 \cdot 5{,}0} = \sqrt{49{,}05} = 7{,}00$ m/s,
+            cioè circa $25$ km/h.</p>
+          <p><span class="step-num">4</span><strong>Due cose da notare.</strong> La prima: la massa
+            <em>si semplifica</em> — un carrello vuoto e uno pieno hanno la stessa velocità minima. La seconda: il
+            risultato $v = \sqrt{gr}$ è formalmente identico a quello della velocità orbitale rasente,
+            $\sqrt{gR}$, e non è un caso: in entrambi i casi la gravità sta facendo, da sola, tutto il lavoro di
+            forza centripeta.</p>
+          <p><span class="step-num">5</span>A quella velocità, in cima, il passeggero è in
+            <strong>caduta libera</strong>: la reazione del sedile è nulla e lui «non pesa». È esattamente la
+            situazione dell'astronauta in orbita, e dura mezzo secondo.</p>
+        </div>
+      </div>
+
+      <h3>10.3 — Il cannone di Newton: quando il proiettile non ricade più</h3>
+
+      <p>Nei <em>Principia</em> c'è un disegno famosissimo: una montagna altissima con un cannone in cima, che
+        spara orizzontalmente. Con poca polvere il proiettile fa la sua parabola e cade poco lontano. Con più
+        polvere cade più lontano. E siccome la Terra <em>è curva</em>, a un certo punto succede qualcosa di
+        straordinario: il proiettile cade sempre, ma la Terra gli si incurva sotto alla stessa velocità con cui
+        lui scende, e allora <strong>non arriva mai</strong>.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="or-v">velocità di lancio: <span class="val-badge" id="or-vv">6,0</span> km/s</label>
+          <input type="range" id="or-v" min="2" max="13" step="0.1" value="6">
+          <button class="btn" id="or-spara" type="button">💥 Spara</button>
+          <button class="btn btn-secondary" id="or-pulisci" type="button">🧹 Pulisci</button>
+        </div>
+        <svg id="or-svg" viewBox="0 0 660 340" aria-label="Il cannone di Newton: traiettorie a velocità crescente"></svg>
+        <p class="cap" id="or-cap"></p>
+      </div>
+      <div class="sp-cols">
+        <div>Esito: <span class="val-badge" id="or-esito">—</span></div>
+        <div>Minima per non ricadere: <span class="val-badge" id="or-orb">—</span></div>
+        <div>Di fuga, dalla montagna: <span class="val-badge" id="or-fuga">—</span></div>
+      </div>
+      <p class="eq-out" id="or-out"></p>
+
+      <div class="definition">
+        <strong>Velocità orbitale rasente.</strong> Perché un corpo giri attorno alla Terra sfiorandone la
+        superficie, la gravità deve fornire esattamente la centripeta:
+        $$m g = m\frac{v^2}{R} \;\Longrightarrow\; v = \sqrt{g\,R} = \sqrt{9{,}81 \cdot 6{,}371\times10^6}
+          = 7{,}91\ \text{km/s}$$
+        cioè circa $28\,500$ km/h. Con una velocità $\sqrt{2}$ volte maggiore, $11{,}2$ km/s, il corpo non torna
+        più: è la <strong>velocità di fuga</strong>, e la ricaveremo nella lezione sull'energia.
+        <p class="formula-note">Nel simulatore il cannone sta su una montagna alta $320$ km — come nel disegno
+          dei <em>Principia</em>, volutamente esagerato — perché sparando esattamente dal livello del suolo ogni
+          tiro non orbitale finirebbe sottoterra al primo istante. Da lassù la gravità è un po' più debole e le
+          due soglie scendono a $7{,}62$ e $10{,}91$ km/s: le trovate nei riquadri qui sopra. La prima non è
+          la velocità di un'orbita circolare ($7{,}72$ km/s da quella quota) ma quella minima perché il punto
+          più basso dell'ellisse resti fuori dalla Terra — un'orbita non deve essere un cerchio per essere
+          un'orbita.</p>
+      </div>
+
+      <div class="note"><strong>Essere in orbita significa cadere.</strong> Gli astronauti della Stazione
+        Spaziale non fluttuano perché lassù «non c'è gravità»: a $400$ km di quota la gravità vale ancora circa
+        l'$89\%$ di quella al suolo. Fluttuano perché stanno <strong>cadendo</strong>, loro e la stazione
+        insieme, esattamente come la persona nell'ascensore in caduta libera dell'esercizio 2 della sezione 5.
+        La differenza è che, andando abbastanza veloci in orizzontale, mancano sempre il bersaglio.</div>
+    </section>
+
+    <!-- 11 — IL MOMENTO DI UNA FORZA -->
+    <section id="sec11">
+      <h2>11. Il momento di una forza: quando il punto non basta più</h2>
+
+      <p>Finora abbiamo trattato tutto come punto materiale, e ci è bastato. Ma provate a spingere una porta a
+        dieci centimetri dai cardini: la stessa forza che, applicata alla maniglia, la spalanca, lì non la muove
+        quasi. Per un punto materiale questa frase non ha senso — un punto non ha un «dove» — e infatti il
+        modello va cambiato: passiamo al <strong>corpo rigido</strong>.</p>
+
+      <div class="definition">
+        <strong>Momento di una forza.</strong> Rispetto a un punto $O$ (il fulcro, il perno, i cardini), il
+        momento di una forza $\vec F$ misura la sua capacità di far <em>ruotare</em> il corpo:
+        $$M = F\,b$$
+        dove $b$ è il <strong>braccio</strong>, cioè la distanza fra $O$ e la retta d'azione della forza. Se
+        $\vec r$ è il vettore che va da $O$ al punto di applicazione e $\theta$ l'angolo fra $\vec r$ e
+        $\vec F$, si ha $b = r\sin\theta$ e quindi
+        $$M = r\,F\,\sin\theta$$
+        Si misura in newton per metro (N·m) e ha un segno, che si sceglie positivo per le rotazioni antiorarie.
+      </div>
+
+      <p>Tre conseguenze immediate, tutte verificabili in dieci secondi con una porta:</p>
+
+      <ul>
+        <li>se $\theta = 0$, cioè se spingo <em>verso</em> i cardini, il momento è nullo e la porta non si muove
+          di un millimetro, per quanto forte io spinga;</li>
+        <li>a parità di forza, il momento cresce col braccio — ecco perché la maniglia sta il più lontano
+          possibile dai cardini, e perché un cacciavite col manico grosso svita meglio;</li>
+        <li>si può ottenere lo stesso momento con una forza piccola e un braccio lungo: è tutto il segreto delle
+          <strong>leve</strong>, dal cavatappi al remo, dalla carriola al nostro avambraccio.</li>
+      </ul>
+
+      <div class="definition">
+        <strong>Equilibrio di un corpo rigido.</strong> Non basta più che la risultante delle forze sia nulla:
+        servono <em>due</em> condizioni.
+        $$\sum \vec F = \vec 0 \qquad\text{e}\qquad \sum M = 0$$
+        La prima impedisce le traslazioni, la seconda le rotazioni. Un corpo con risultante nulla ma momento
+        non nullo non va da nessuna parte — e intanto gira.
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="mo-m1">massa a sinistra: <span class="val-badge" id="mo-m1v">4</span> kg</label>
+          <input type="range" id="mo-m1" min="1" max="20" step="1" value="4">
+          <label for="mo-d1">a distanza: <span class="val-badge" id="mo-d1v">1,5</span> m</label>
+          <input type="range" id="mo-d1" min="0.2" max="2.4" step="0.1" value="1.5">
+        </div>
+        <div class="ctrl">
+          <label for="mo-m2">massa a destra: <span class="val-badge" id="mo-m2v">6</span> kg</label>
+          <input type="range" id="mo-m2" min="1" max="20" step="1" value="6">
+          <label for="mo-d2">a distanza: <span class="val-badge" id="mo-d2v">1,0</span> m</label>
+          <input type="range" id="mo-d2" min="0.2" max="2.4" step="0.1" value="1">
+        </div>
+        <svg id="mo-svg" viewBox="0 0 660 300" aria-label="Leva con due masse: confronto fra i momenti"></svg>
+        <p class="cap" id="mo-cap"></p>
+      </div>
+      <div class="sp-cols">
+        <div>Momento a sinistra: <span class="val-badge" id="mo-Ms">—</span></div>
+        <div>Momento a destra: <span class="val-badge" id="mo-Md">—</span></div>
+        <div>Momento risultante: <span class="val-badge" id="mo-Mtot">—</span></div>
+      </div>
+      <p class="eq-out" id="mo-out"></p>
+
+      <div class="curiosita"><strong>«Datemi un punto d'appoggio e solleverò il mondo.»</strong> La frase è
+        attribuita ad <strong>Archimede</strong> da Pappo di Alessandria, e non è una vanteria: è una
+        conseguenza esatta della formula. Con un braccio abbastanza lungo, una forza qualunque produce un
+        momento qualunque. Il conto, però, è impietoso: per sollevare la Terra di un centimetro con la forza di
+        un uomo servirebbe una leva lunga qualche anno luce, e bisognerebbe abbassarne l'altro capo per una
+        distanza che la luce percorrerebbe in millenni. La fisica non vieta nulla; la pazienza sì.</div>
+
+      <div class="note"><strong>Il corpo umano è pieno di leve svantaggiose.</strong> Il bicipite si attacca
+        all'avambraccio a pochi centimetri dal gomito, mentre la mano è a trenta: per sollevare un chilo il
+        muscolo deve tirare con una forza di sette-otto chili. Sembra una pessima progettazione, e invece è un
+        baratto: si perde in forza e si guadagna in <em>velocità</em> e in escursione. Una piccola contrazione
+        del muscolo produce un grande, rapido movimento della mano — che per un animale che deve afferrare e
+        lanciare vale molto più della forza bruta.</div>
+    </section>
+
+    <!-- 12 — TERZO PRINCIPIO -->
+    <section id="sec12">
+      <h2>12. Il terzo principio: non si può spingere senza essere spinti</h2>
+
+      <div class="definition">
+        <strong>Terzo principio della dinamica (di azione e reazione).</strong> Se un corpo $A$ esercita una
+        forza su un corpo $B$, allora $B$ esercita su $A$ una forza di <strong>uguale modulo, stessa direzione
+        e verso opposto</strong>:
+        $$\vec F_{A \to B} = -\,\vec F_{B \to A}$$
+        Le forze in natura non esistono mai da sole: esistono sempre a <strong>coppie</strong>.
+      </div>
+
+      <div class="warnbox"><strong>L'obiezione che viene a tutti (e la risposta).</strong> «Se le due forze sono
+        uguali e opposte, allora si annullano e non succede mai niente!» No: le due forze della coppia agiscono
+        <strong>su corpi diversi</strong>. Per calcolare il moto di $A$ si sommano le forze che agiscono su
+        $A$ — e la reazione su $B$ non è fra queste. Due forze si annullano solo se sono applicate allo stesso
+        corpo, e la coppia azione-reazione non lo è mai, per definizione.</div>
+
+      <p>Una volta capito, lo si vede ovunque:</p>
+
+      <div class="sp-cols">
+        <div class="definition">
+          <strong>Camminare</strong>
+          <p>Il piede spinge il pavimento <em>indietro</em>; il pavimento spinge il piede <em>avanti</em>. È la
+            seconda forza a farci avanzare, ed è per questo che sul ghiaccio, dove la coppia non si può
+            instaurare, si resta fermi a scalciare.</p>
+        </div>
+        <div class="definition">
+          <strong>Il razzo</strong>
+          <p>Il motore spinge i gas verso il basso, i gas spingono il razzo verso l'alto. Non serve nessuna aria
+            su cui «appoggiarsi»: un razzo funziona <em>meglio</em> nel vuoto. Il <em>New York Times</em> nel
+            1920 derise Goddard per questo, e si scusò nel 1969, il giorno dell'allunaggio.</p>
+        </div>
+        <div class="definition">
+          <strong>Il cavallo e il carro</strong>
+          <p>«Se il carro tira il cavallo con la stessa forza con cui il cavallo tira il carro, come fa a
+            partire?» Perché sul <em>carro</em> agiscono la trazione del cavallo e l'attrito del terreno: se la
+            prima vince, il carro accelera. La reazione è sul cavallo, e riguarda il moto del cavallo.</p>
+        </div>
+      </div>
+
+      <h3>12.1 — L'irrigatore di Feynman</h3>
+
+      <p>Chiudiamo con un problema che sembra elementare e che ha fatto litigare i fisici per mezzo secolo.</p>
+
+      <p>Un irrigatore da giardino a S ha due bracci con gli ugelli piegati; quando l'acqua esce, l'irrigatore
+        gira <em>all'indietro</em> rispetto ai getti, per il terzo principio. Fin qui nessun problema. Ora la
+        domanda, che il giovane <strong>Richard Feynman</strong> pose ai colleghi di Princeton negli anni
+        Quaranta: se invece di <em>spruzzare</em> l'acqua l'irrigatore la <strong>aspira</strong>, da che parte
+        gira?</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <span class="sim-btns" id="fs-modo">
+            <button class="btn active" type="button" data-m="normale">irrigatore normale (spruzza)</button>
+            <button class="btn btn-secondary" type="button" data-m="inverso">irrigatore inverso (aspira)</button>
+          </span>
+          <button class="btn" id="fs-via" type="button">▶ Avvia / ferma</button>
+        </div>
+        <svg id="fs-svg" viewBox="0 0 660 300" aria-label="L'irrigatore di Feynman, nella versione normale e in quella invertita"></svg>
+        <p class="cap" id="fs-cap"></p>
+        <div class="ctrl" id="fs-quiz">
+          <span style="font-weight:600;">La vostra ipotesi, prima di leggere:</span>
+          <button class="btn btn-secondary" type="button" data-r="stesso">gira nello stesso verso</button>
+          <button class="btn btn-secondary" type="button" data-r="opposto">gira al contrario</button>
+          <button class="btn btn-secondary" type="button" data-r="fermo">non gira affatto</button>
+        </div>
+        <p class="eq-out" id="fs-out">Scegliete una risposta: poi si vede chi aveva ragione (e perché avevano
+          ragione un po' tutti).</p>
+      </div>
+
+      <div class="definition">
+        <strong>Perché è difficile.</strong> I tre ragionamenti sembrano tutti buoni.
+        <ul>
+          <li><em>«Al contrario»</em>: se sputare acqua di là spinge di qua, aspirarla di là deve spingere di
+            là. Simmetria.</li>
+          <li><em>«Nello stesso verso»</em>: l'acqua che entra nell'ugello arriva da tutte le direzioni e non
+            porta quantità di moto ordinata, mentre dentro il tubo curvo deve essere deviata — e deviare
+            costa una forza.</li>
+          <li><em>«Non gira»</em>: a regime, in un fluido ideale, il momento angolare totale che entra è nullo
+            e quello che esce dal centro è nullo, quindi non c'è coppia netta. Questo è il ragionamento
+            corretto <strong>nel caso ideale</strong>, ed è quello che il conto conferma.</li>
+        </ul>
+      </div>
+
+      <p>Il caso ideale, però, non esiste. Nel <strong>2024</strong> un gruppo del Courant Institute di New York
+        ha costruito un irrigatore inverso quasi privo di attrito, immerso in acqua, e l'ha filmato: gira
+        <strong>lentamente nel verso opposto</strong> a quello dell'irrigatore normale, circa cinquanta volte
+        più piano. La ragione non sta nel bilancio complessivo, ma <em>dentro</em> il tubo: il getto che entra
+        non riempie il condotto in modo simmetrico, si attacca a una parete e produce una piccola coppia
+        residua. Un effetto che nessuno dei tre ragionamenti «di principio» poteva prevedere.</p>
+
+      <div class="curiosita"><strong>E l'esperimento di Feynman finì male.</strong> Feynman racconta in
+        <em>Sta scherzando, Mr. Feynman!</em> di aver provato a risolvere la questione in laboratorio: mise un
+        irrigatore dentro una damigiana di vetro piena d'acqua, collegò l'aria compressa del ciclotrone per
+        creare l'aspirazione e aprì la valvola. Un po' troppo. La damigiana esplose, l'acqua e i vetri
+        finirono ovunque, e a lui fu vietato l'uso del laboratorio. Non riuscì mai a dare la risposta
+        sperimentale: ci sono voluti altri ottant'anni.</div>
+
+      <div class="note"><strong>Che cosa insegna, questa storia.</strong> Che un problema può essere elementare
+        nell'enunciato e feroce nella soluzione; che i ragionamenti «per simmetria» sono potenti ma tradiscono
+        quando il sistema ha dettagli che la simmetria non vede; e che alla fine, quando le teorie litigano,
+        decide l'esperimento. Sono le stesse tre lezioni del metodo sperimentale che avete incontrato all'inizio
+        del terzo anno — solo che qui non riguardano Galileo, ma un laboratorio del 2024.</div>
+    </section>
+
+    <!-- 13 — LA TENSIONE -->
+    <section id="sec13">
+      <h2>13. La tensione: quando a tirare è una fune</h2>
+
+      <p>Nel terzo principio abbiamo appena visto che le forze vanno sempre a coppie. C'è un caso in cui questo
+        si vede benissimo e serve tutti i giorni: quando due corpi sono collegati da una <strong>fune</strong>,
+        da un filo, da una catena o da un cavo. La forza che la fune trasmette si chiama <strong>tensione</strong>.</p>
+
+      <div class="definition">
+        <strong>Tensione.</strong> In una fune tesa ogni tratto tira i due tratti vicini, in verso opposto, con
+        la stessa intensità $T$: quella intensità è la <em>tensione</em> della fune. Si misura in newton, come
+        tutte le forze.
+        <p class="formula-note">Non è una forza «della fune» presa da sola: è la coppia azione-reazione che
+          agisce fra due parti della fune, o fra la fune e ciò che le sta attaccato. Se tagliaste la fune in un
+          punto qualsiasi e voleste tenere insieme i due monconi, dovreste tirare ciascuno con una forza $T$.</p>
+      </div>
+
+      <div class="definition">
+        <strong>La fune ideale</strong> è il modello che useremo quasi sempre, e ha due sole proprietà:
+        <ul>
+          <li>è <strong>inestensibile</strong>: i due corpi che collega hanno in ogni istante la stessa
+            <em>intensità</em> di velocità e di accelerazione;</li>
+          <li>ha <strong>massa trascurabile</strong>: e da qui segue il fatto più utile di tutti, cioè che
+            <strong>la tensione è la stessa in tutti i punti della fune</strong>.</li>
+        </ul>
+        <p class="formula-note">Perché la seconda cosa segue dalla prima? Applicate $\vec F = m\vec a$ a un
+          pezzetto di fune: la risultante vale $T_2 - T_1$ e la massa è zero, quindi $T_2 = T_1$ qualunque sia
+          l'accelerazione. Se la fune avesse massa — una catena d'ancora, un cavo d'acciaio lungo cento metri —
+          non sarebbe più vero: la tensione in cima dovrebbe reggere anche il peso di tutto ciò che sta sotto.</p>
+      </div>
+
+      <div class="warnbox"><strong>Una fune può solo tirare.</strong> È l'osservazione più importante di questa
+        sezione, e la fonte di metà degli errori nei problemi. Se il conto vi restituisce una tensione
+        <em>negativa</em>, non significa che la fune spinge: significa che <strong>la fune si è
+        allentata</strong> e il modello va rifatto da capo, perché in quel momento la fune non esercita
+        nessuna forza. Provate a spingere un carrello con una corda: non funziona.</div>
+
+      <h3>13.1 — La tensione non è (quasi mai) il peso</h3>
+
+      <p>Il caso più semplice: un corpo appeso e fermo. Allora la fune deve reggerne il peso e $T = mg$. Ma
+        basta che il sistema <em>acceleri</em> perché il numero cambi, e a volte di parecchio. Il simulatore
+        qui sotto è un ascensore con una bilancia appesa al soffitto.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="ts-m">massa appesa: <span class="val-badge" id="ts-mv">8,0</span> kg</label>
+          <input type="range" id="ts-m" min="1" max="20" step="0.5" value="8">
+          <label for="ts-a">accelerazione dell'ascensore: <span class="val-badge" id="ts-av">0,00</span> · g</label>
+          <input type="range" id="ts-a" min="-1" max="0.8" step="0.05" value="0">
+          <button class="btn btn-secondary" id="ts-cad" type="button">↓ Cavo tranciato (caduta libera)</button>
+          <button class="btn btn-secondary" id="ts-fermo" type="button">↺ Ascensore fermo</button>
+        </div>
+        <svg id="ts-svg" viewBox="0 0 660 320" aria-label="Massa appesa dentro un ascensore che accelera: la tensione della fune"></svg>
+        <div class="sp-cols">
+          <div>Peso del corpo: <span class="val-badge" id="ts-p">—</span></div>
+          <div>Tensione della fune: <span class="val-badge" id="ts-t">—</span></div>
+          <div>Quanto segna la bilancia: <span class="val-badge" id="ts-bil">—</span></div>
+          <div>Stato: <span class="val-badge" id="ts-stato">—</span></div>
+        </div>
+        <p class="eq-out" id="ts-out"></p>
+      </div>
+
+      <div class="curiosita"><strong>Il peso apparente, e perché gli astronauti «galleggiano».</strong> Quello
+        che la bilancia segna non è il peso: è la <em>tensione</em>, cioè la forza con cui il vincolo sostiene il
+        corpo. Portate l'accelerazione a $-1\,g$ — è il caso del cavo tranciato — e la tensione va esattamente a
+        <strong>zero</strong>: la massa e la bilancia cadono insieme, e nessuno dei due tira più l'altro. È
+        quello che succede sulla Stazione Spaziale, dove la gravità vale ancora l'$88\%$ di quella al suolo ma
+        tutto cade insieme: non c'è assenza di gravità, c'è assenza di <strong>vincoli</strong>.</div>
+
+      <h3>13.2 — Trazione e compressione</h3>
+
+      <p>La tensione è un caso particolare di una distinzione che attraversa tutta l'ingegneria e tutta la
+        biologia: un elemento strutturale può essere <strong>tirato</strong> o <strong>schiacciato</strong>, e
+        le due cose non sono affatto simmetriche.</p>
+
+      <div class="sp-cols">
+        <div class="definition">
+          <strong>Trazione</strong> (o <em>tiro</em>)
+          <p>Le forze alle due estremità puntano <strong>verso l'esterno</strong> e tendono ad allungare
+            l'elemento, che reagisce tirando all'indietro.</p>
+          <p>La reggono: funi, cavi, catene, fili, tiranti, tendini, l'acciaio.</p>
+          <p>Un elemento in trazione non può «piegarsi di lato»: sotto carico si mette in tensione da solo, ed è
+            per questo che una fune tesa è sempre dritta.</p>
+        </div>
+        <div class="definition">
+          <strong>Compressione</strong>
+          <p>Le forze alle due estremità puntano <strong>verso l'interno</strong> e tendono ad accorciare
+            l'elemento, che reagisce spingendo all'infuori.</p>
+          <p>La reggono: colonne, pilastri, puntoni, archi, ossa, il calcestruzzo, la pietra.</p>
+          <p>Un elemento lungo e sottile in compressione può <strong>inflettersi di colpo</strong> — è
+            l'instabilità euleriana, il motivo per cui una cannuccia si piega e una corda no.</p>
+        </div>
+      </div>
+
+      <div class="curiosita"><strong>Perché il cemento armato è armato.</strong> Il calcestruzzo regge
+        benissimo la compressione (decine di megapascal) e malissimo la trazione: si spacca a un decimo di
+        quel carico. L'acciaio fa l'opposto ed è carissimo. La soluzione, brevettata da Joseph Monier
+        — un <em>giardiniere</em>, che voleva vasi da fiori che non si rompessero — è metterli insieme:
+        il calcestruzzo dove il pezzo è compresso, i tondini d'acciaio dove è teso. In una trave appoggiata
+        i ferri stanno <em>in basso</em>, perché è lì che la trave si allunga; in una mensola stanno in alto.
+        Guardando dove sono i ferri si legge dove il progettista ha previsto la trazione.
+        <p style="margin:0.6rem 0 0;">La stessa divisione dei ruoli è nel vostro corpo: le <strong>ossa</strong>
+          lavorano a compressione, i <strong>tendini</strong> e i <strong>legamenti</strong> solo a trazione. Un
+          tendine spinge tanto quanto una corda: cioè per niente, ed è per questo che i muscoli sono sempre in
+          coppie antagoniste.</p>
+      </div>
+
+      <div class="curiosita"><strong>Ponti: due modi opposti di risolvere lo stesso problema.</strong> In un
+        <strong>ponte sospeso</strong> (il Golden Gate, l'Akashi Kaikyō) l'elemento principale è un cavo in pura
+        <em>trazione</em>, che scende in una catenaria e regge l'impalcato con i pendini; le torri sono in
+        compressione. In un <strong>ponte ad arco</strong> (i ponti romani, che stanno in piedi da duemila anni)
+        l'elemento principale è un arco in pura <em>compressione</em>, e infatti si può costruire in pietra
+        senza una goccia di malta. Un arco è, in un senso preciso, la <em>forma di una fune rovesciata</em>: se
+        appendete una catenella e poi capovolgete la figura, ottenete la curva che sta in piedi in sola
+        compressione. È il metodo con cui Antoni Gaudí progettò la Sagrada Família, usando modelli fatti di
+        spaghi e sacchetti di pallini, appesi al soffitto e fotografati a testa in giù.</div>
+
+      <h3>13.3 — Cinque esercizi guidati</h3>
+
+      <div class="qbox">
+        <div class="qt">① Una lampada di $8{,}0$ kg pende dal soffitto di un ascensore. Quanto vale la tensione
+          del cavo <strong>(a)</strong> quando l'ascensore è fermo, <strong>(b)</strong> quando sale
+          accelerando a $2{,}0$ m/s², <strong>(c)</strong> quando scende accelerando verso il basso a
+          $2{,}0$ m/s², <strong>(d)</strong> se il cavo dell'ascensore si tranciasse?</div>
+        <button class="btn btn-toggle" data-target="#sol-t1">Mostra la soluzione</button>
+        <div id="sol-t1" class="hidden">
+          <p><span class="step-num">1</span><strong>Sempre lo stesso schema.</strong> Isolate la lampada,
+            elencate le forze su di essa — sono solo due, il peso $mg$ verso il basso e la tensione $T$ verso
+            l'alto — e scrivete il secondo principio prendendo positivo il verso <em>verso l'alto</em>:
+            $$T - mg = ma \;\Longrightarrow\; T = m\,(g + a)$$</p>
+          <p><span class="step-num">2</span>(a) Fermo (o in moto uniforme): $a = 0$ e
+            $T = mg = 8{,}0 \cdot 9{,}81 = 78{,}5$ N.</p>
+          <p><span class="step-num">3</span>(b) Sale accelerando: $a = +2{,}0$ e
+            $T = 8{,}0 \cdot 11{,}81 = 94{,}5$ N. La fune deve fare <em>più</em> del peso, perché oltre a
+            sostenere deve anche accelerare.</p>
+          <p><span class="step-num">4</span>(c) Accelera verso il basso: $a = -2{,}0$ e
+            $T = 8{,}0 \cdot 7{,}81 = 62{,}5$ N.</p>
+          <p><span class="step-num">5</span>(d) Cavo tranciato: tutto cade con $a = -g$, quindi
+            $T = 8{,}0 \cdot 0 = 0$. La lampada «fluttua» dentro la cabina, e non perché la gravità sia sparita.</p>
+          <p><span class="step-num">6</span><strong>Attenzione al segno di $a$, non al verso del moto.</strong>
+            Un ascensore che <em>sale</em> rallentando ha $a$ rivolta verso il basso, e la tensione è quella del
+            caso (c). Quello che conta è l'accelerazione, non la velocità.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">② Due casse sono appese una sotto l'altra: la superiore da $3{,}0$ kg è attaccata al
+          soffitto, l'inferiore da $5{,}0$ kg pende dalla prima. Quanto valgono le due tensioni, se tutto è
+          fermo?</div>
+        <button class="btn btn-toggle" data-target="#sol-t2">Mostra la soluzione</button>
+        <div id="sol-t2" class="hidden">
+          <p><span class="step-num">1</span><strong>Si parte sempre dal basso</strong>, perché sulla cassa
+            inferiore agisce una fune sola.</p>
+          <p><span class="step-num">2</span>Cassa inferiore: $T_2 - m_2 g = 0$, quindi
+            $T_2 = 5{,}0 \cdot 9{,}81 = 49{,}1$ N.</p>
+          <p><span class="step-num">3</span>Cassa superiore: su di lei agiscono il proprio peso, la tensione
+            $T_1$ della fune di sopra e — per il <strong>terzo principio</strong> — la fune di sotto che la tira
+            verso il basso con la stessa $T_2$. Quindi
+            $$T_1 - m_1 g - T_2 = 0 \;\Longrightarrow\; T_1 = 3{,}0 \cdot 9{,}81 + 49{,}1 = 78{,}5\ \text{N}$$</p>
+          <p><span class="step-num">4</span><strong>Controllo elegante.</strong> Prendendo le due casse come
+            un unico corpo di $8{,}0$ kg, la fune di sopra deve reggere $78{,}5$ N: identico. È sempre una
+            buona idea rifare il conto «a scatola chiusa» per verificare.</p>
+          <p><span class="step-num">5</span>Le due tensioni sono <em>diverse</em>: la tensione è la stessa in
+            tutti i punti di <em>una</em> fune, non fra funi diverse.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">③ <strong>La macchina di Atwood.</strong> Due masse, $m_1 = 6{,}0$ kg e
+          $m_2 = 4{,}0$ kg, pendono dai due capi di una fune che passa su una carrucola ideale (senza massa né
+          attrito). Trova l'accelerazione e la tensione.</div>
+        <button class="btn btn-toggle" data-target="#sol-t3">Mostra la soluzione</button>
+        <div id="sol-t3" class="hidden">
+          <p><span class="step-num">1</span><strong>Il vincolo.</strong> La fune è inestensibile, quindi le due
+            masse hanno accelerazione uguale in modulo: se $m_1$ scende di un metro, $m_2$ sale di un metro.
+            Prendiamo positivo il verso in cui $m_1$ scende.</p>
+          <p><span class="step-num">2</span>Carrucola ideale, quindi la tensione è la <strong>stessa</strong> ai
+            due capi. Le due equazioni:
+            $$m_1 g - T = m_1 a, \qquad T - m_2 g = m_2 a$$</p>
+          <p><span class="step-num">3</span>Sommando membro a membro la $T$ sparisce:
+            $$a = \frac{m_1 - m_2}{m_1 + m_2}\,g = \frac{2{,}0}{10{,}0}\cdot 9{,}81 = 1{,}96\ \text{m/s}^2$$</p>
+          <p><span class="step-num">4</span>Sostituendo in una delle due:
+            $$T = m_1(g - a) = 6{,}0 \cdot 7{,}85 = 47{,}1\ \text{N}$$
+            (oppure, in forma chiusa, $T = \dfrac{2m_1m_2}{m_1+m_2}g$, che dà lo stesso numero).</p>
+          <p><span class="step-num">5</span><strong>Due controlli che valgono più della formula.</strong> Con
+            masse uguali si ottiene $a = 0$ e $T = mg$: giusto. Con $m_2 = 0$ si ottiene $a = g$ e $T = 0$:
+            caduta libera, giusto. E notate che $47{,}1$ N è <em>minore</em> del peso di $m_1$ ($58{,}9$ N) e
+            <em>maggiore</em> del peso di $m_2$ ($39{,}2$ N): deve essere così, altrimenti nessuna delle due si
+            muoverebbe nel verso giusto.</p>
+          <p><span class="step-num">6</span>Fu proprio questa macchina, inventata da George Atwood nel 1784, a
+            permettere le prime verifiche precise del secondo principio: rallentando la caduta con masse quasi
+            uguali si ottengono accelerazioni misurabili con i cronometri dell'epoca.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">④ Un blocco di $2{,}0$ kg poggia su un tavolo <strong>liscio</strong>; una fune orizzontale
+          lo collega, passando su una carrucola sul bordo, a una massa appesa di $3{,}0$ kg. Trova
+          l'accelerazione e la tensione.</div>
+        <button class="btn btn-toggle" data-target="#sol-t4">Mostra la soluzione</button>
+        <div id="sol-t4" class="hidden">
+          <p><span class="step-num">1</span>Blocco sul tavolo (moto orizzontale): $T = m_1 a$. La normale e il
+            peso si elidono e non entrano.</p>
+          <p><span class="step-num">2</span>Massa appesa (moto verticale, positivo verso il basso):
+            $m_2 g - T = m_2 a$.</p>
+          <p><span class="step-num">3</span>Sommando:
+            $$a = \frac{m_2}{m_1+m_2}\,g = \frac{3{,}0}{5{,}0}\cdot 9{,}81 = 5{,}89\ \text{m/s}^2$$
+            e quindi $T = m_1 a = 2{,}0 \cdot 5{,}89 = 11{,}8$ N.</p>
+          <p><span class="step-num">4</span><strong>Controllo.</strong> Dall'altra equazione,
+            $T = m_2(g-a) = 3{,}0 \cdot 3{,}92 = 11{,}8$ N. ✓ E $11{,}8$ N è molto <em>meno</em> del peso della
+            massa appesa ($29{,}4$ N): la fune non deve sostenerla, deve solo trascinare il blocco.</p>
+          <p><span class="step-num">5</span><strong>L'errore classico</strong> è porre $T = m_2 g$, cioè trattare
+            la massa appesa come se fosse ferma. Sarebbe vero solo se il blocco fosse inchiodato al tavolo.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">⑤ Un lampadario di $12$ kg è sospeso a due cavi uguali, che formano ciascuno un angolo di
+          $20°$ con il <strong>soffitto orizzontale</strong>. Quanto vale la tensione di ogni cavo? E se
+          l'angolo scendesse a $5°$?</div>
+        <button class="btn btn-toggle" data-target="#sol-t5">Mostra la soluzione</button>
+        <div id="sol-t5" class="hidden">
+          <p><span class="step-num">1</span><strong>Scomporre.</strong> Ogni cavo tira con una forza $T$
+            inclinata di $\theta$ sull'orizzontale: componente verticale $T\sin\theta$, componente orizzontale
+            $T\cos\theta$. Le due orizzontali sono opposte e si elidono.</p>
+          <p><span class="step-num">2</span>Equilibrio verticale:
+            $$2\,T\sin\theta = mg \;\Longrightarrow\; T = \frac{mg}{2\sin\theta}$$</p>
+          <p><span class="step-num">3</span>A $20°$: $T = \dfrac{12 \cdot 9{,}81}{2 \cdot 0{,}342} = \dfrac{117{,}7}{0{,}684} = 172$ N.</p>
+          <p><span class="step-num">4</span>A $5°$: $\sin 5° = 0{,}0872$ e
+            $T = \dfrac{117{,}7}{0{,}174} = 675$ N.</p>
+          <p><span class="step-num">5</span><strong>Il risultato sorprendente.</strong> Già a $20°$ ciascun
+            cavo tira con $172$ N, cioè <em>più</em> dell'intero peso del lampadario ($118$ N). Tendendo i cavi
+            fino a quasi orizzontali la tensione <strong>diverge</strong>: per $\theta \to 0$ il seno va a zero
+            e $T$ va all'infinito. Nessuna fune reale può essere perfettamente orizzontale sotto carico — ed è
+            per questo che i fili dell'alta tensione, i cavi dei ponti sospesi e le corde da bucato hanno
+            sempre una pancia. Chi tira troppo un cavo lo rompe non per il peso, ma per la geometria.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 — QUIZ -->
+    <section id="quiz">
+      <h2>14. Quiz finale</h2>
+      <p>Sedici domande a risposta multipla e due aperte, sulle idee di tutta la lezione.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 1 — I principi della dinamica · Fisica · Quarto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var G = 9.81;
+
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      // freccia: segmento + punta (niente <marker>: darebbe id duplicati)
+      function frec(x1, y1, x2, y2, col, sp) {
+        var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy);
+        if (L < 0.8) { return ''; }
+        var s = Math.min(L * 0.38, 9);
+        var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+        var bx = x2 - ux * s, by = y2 - uy * s;
+        return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) +
+          '" stroke="' + col + '" stroke-width="' + sp + '" stroke-linecap="round"/>' +
+          '<polygon points="' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+          (bx + px * s * 0.5).toFixed(1) + ',' + (by + py * s * 0.5).toFixed(1) + ' ' +
+          (bx - px * s * 0.5).toFixed(1) + ',' + (by - py * s * 0.5).toFixed(1) + '" fill="' + col + '"/>';
+      }
+
+      function tabs(cont, attr, azione) {
+        var bs = cont.querySelectorAll('button');
+        Array.prototype.forEach.call(bs, function (b) {
+          b.addEventListener('click', function () {
+            Array.prototype.forEach.call(bs, function (x) {
+              x.className = (x === b) ? 'btn active' : 'btn btn-secondary';
+            });
+            azione(b.getAttribute(attr));
+          });
+        });
+      }
+
+      // audio condiviso: si crea solo dopo un gesto dell'utente
+      var AC = null;
+      function suono(freqs, vol, dur) {
+        if (!AC) { return; }
+        var t0 = AC.currentTime, i;
+        for (i = 0; i < freqs.length; i++) {
+          var o = AC.createOscillator(), g = AC.createGain();
+          o.type = 'sine';
+          o.frequency.value = freqs[i];
+          g.gain.setValueAtTime(0.0001, t0);
+          g.gain.exponentialRampToValueAtTime(vol, t0 + 0.004);
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+          o.connect(g); g.connect(AC.destination);
+          o.start(t0); o.stop(t0 + dur + 0.02);
+        }
+      }
+      function accendiAudio() {
+        if (!AC) {
+          var Ctx = window.AudioContext || window.webkitAudioContext;
+          if (Ctx) { AC = new Ctx(); }
+        }
+        if (AC && AC.state === 'suspended') { AC.resume(); }
+      }
+      var VIVI = [];       // animazioni da fermare quando la pagina passa in secondo piano
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { VIVI.forEach(function (f) { f(); }); }
+      });
+      window.addEventListener('pagehide', function () { VIVI.forEach(function (f) { f(); }); });
+
+      /* ==================== 3.1 — LA NAVE DI GALILEO ==================== */
+      (function () {
+        var svg = document.getElementById('nv-svg');
+        if (!svg) { return; }
+        var HM = 12;                       // altezza dell'albero, in metri
+        var SCALA = 10;                    // pixel per metro
+        var TCAD = Math.sqrt(2 * HM / G);  // tempo di caduta
+        var vista = 'nave', t = 0, raf = null, tprec = 0;
+
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } tprec = 0; }
+        VIVI.push(ferma);
+
+        function disegna() {
+          var v = parseFloat(document.getElementById('nv-v').value);
+          var g = '', k;
+          var YMARE = 250, XN = (vista === 'nave') ? 250 : 120 + v * t * SCALA;
+          var ycim = YMARE - 30 - HM * SCALA;      // cima dell'albero
+
+          // il mare e la riva
+          g += '<rect x="0" y="' + YMARE + '" width="660" height="' + (300 - YMARE) + '" fill="var(--accent)" opacity="0.18"/>';
+          g += '<line x1="0" y1="' + YMARE + '" x2="660" y2="' + YMARE + '" stroke="var(--accent)" stroke-width="2"/>';
+          // un faro sulla riva: nella vista dalla nave e' lui a scorrere
+          var xf = (vista === 'nave') ? (560 - v * t * SCALA) : 560;
+          g += '<rect x="' + (xf - 9) + '" y="' + (YMARE - 66) + '" width="18" height="66" fill="var(--muted)" opacity="0.55"/>';
+          g += '<polygon points="' + (xf - 14) + ',' + (YMARE - 66) + ' ' + (xf + 14) + ',' + (YMARE - 66) + ' ' + xf + ',' + (YMARE - 88) + '" fill="var(--gold)" opacity="0.75"/>';
+          g += '<text x="' + xf + '" y="' + (YMARE + 18) + '" text-anchor="middle" class="lbl-s">faro (fermo sulla riva)</text>';
+
+          // lo scafo e l'albero
+          g += '<polygon points="' + (XN - 70) + ',' + (YMARE - 30) + ' ' + (XN + 70) + ',' + (YMARE - 30) + ' ' +
+            (XN + 50) + ',' + YMARE + ' ' + (XN - 50) + ',' + YMARE + '" fill="var(--text-soft)" opacity="0.75"/>';
+          g += '<line x1="' + XN + '" y1="' + (YMARE - 30) + '" x2="' + XN + '" y2="' + ycim + '" stroke="var(--text-soft)" stroke-width="5"/>';
+          g += '<polygon points="' + XN + ',' + (ycim + 8) + ' ' + XN + ',' + (ycim + 74) + ' ' + (XN + 54) + ',' + (ycim + 46) + '" fill="var(--gold)" opacity="0.5"/>';
+
+          // la palla
+          var y = ycim + 0.5 * G * t * t * SCALA;
+          var x = (vista === 'nave') ? XN : (120 + v * t * SCALA);
+          if (y > YMARE - 30) { y = YMARE - 30; }
+          // la traccia lasciata
+          var pts = [], NP = 40;
+          for (k = 0; k <= NP; k++) {
+            var tk = TCAD * k / NP;
+            if (tk > t) { break; }
+            var yk = ycim + 0.5 * G * tk * tk * SCALA;
+            var xk = (vista === 'nave') ? XN : (120 + v * tk * SCALA);
+            pts.push(xk.toFixed(1) + ',' + yk.toFixed(1));
+          }
+          if (pts.length > 1) {
+            g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--magenta)" stroke-width="2.2" stroke-dasharray="5 4"/>';
+          }
+          g += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="7" fill="var(--magenta)"/>';
+
+          g += '<text x="20" y="30" class="lbl">' + (vista === 'nave'
+            ? 'Riferimento della nave: la palla scende in verticale'
+            : 'Riferimento della riva: la palla descrive una parabola') + '</text>';
+          g += '<text x="20" y="50" class="lbl-s">albero alto ' + HM + ' m · tempo di caduta ' + nf(TCAD, 2) +
+            ' s · velocità della nave ' + nf(v, 1) + ' m/s</text>';
+          svg.innerHTML = g;
+          document.getElementById('nv-vv').textContent = nf(v, 1);
+        }
+
+        function passo(ts) {
+          if (!tprec) { tprec = ts; }
+          t += (ts - tprec) / 1000;
+          tprec = ts;
+          if (t >= TCAD) { t = TCAD; disegna(); ferma(); return; }
+          disegna();
+          raf = requestAnimationFrame(passo);
+        }
+
+        document.getElementById('nv-lancia').addEventListener('click', function () {
+          ferma(); t = 0; tprec = 0;
+          raf = requestAnimationFrame(passo);
+        });
+        tabs(document.getElementById('nv-vista'), 'data-w', function (w) { vista = w; disegna(); });
+        document.getElementById('nv-v').addEventListener('input', function () { ferma(); t = 0; disegna(); });
+        disegna();
+      })();
+
+      /* ==================== 3.3 — LA TRAIETTORIA: LA RUOTA CHE ROTOLA ==================== */
+      (function () {
+        var svg = document.getElementById('tr-svg');
+        if (!svg) { return; }
+        var RR = 42, YSUOLO = 235, X0 = 55, XC = 330;   // pixel
+        var GIRI = 2, OMEGA = 1.5;                      // giri mostrati e velocita' angolare (rad/s)
+        var frazione = 1, rif = 'terra';
+        var fi = 0, scia = [], raf = null, tprec = 0, gira = false;
+
+        function ferma() { gira = false; if (raf) { cancelAnimationFrame(raf); raf = null; } tprec = 0; }
+        VIVI.push(ferma);
+
+        // posizione del punto: cicloide (accorciata se la frazione e' minore di 1)
+        function posizione(f) {
+          var d = frazione * RR;
+          var xc = (rif === 'terra') ? (X0 + RR * f) : XC;
+          return {
+            xc: xc, yc: YSUOLO - RR,
+            x: xc - d * Math.sin(f),
+            y: YSUOLO - RR + d * Math.cos(f)
+          };
+        }
+
+        function disegna() {
+          var p = posizione(fi), g = '', k;
+          g += '<line x1="0" y1="' + YSUOLO + '" x2="660" y2="' + YSUOLO + '" stroke="var(--text-soft)" stroke-width="2.5"/>';
+          for (k = 0; k < 22; k++) {
+            g += '<line x1="' + (k * 32) + '" y1="' + (YSUOLO + 2) + '" x2="' + (k * 32 + 14) + '" y2="' + (YSUOLO + 12) +
+              '" stroke="var(--border)" stroke-width="1.6"/>';
+          }
+          // la scia, cioe' la traiettoria
+          if (scia.length > 1) {
+            var pts = [];
+            for (k = 0; k < scia.length; k++) { pts.push(scia[k][0].toFixed(1) + ',' + scia[k][1].toFixed(1)); }
+            g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--magenta)" stroke-width="2.6"/>';
+          }
+          // la ruota
+          g += '<circle cx="' + p.xc.toFixed(1) + '" cy="' + p.yc + '" r="' + RR +
+            '" fill="none" stroke="var(--text-soft)" stroke-width="3"/>';
+          for (k = 0; k < 8; k++) {
+            var a = fi + k * Math.PI / 4;
+            g += '<line x1="' + p.xc.toFixed(1) + '" y1="' + p.yc + '" x2="' + (p.xc - RR * Math.sin(a)).toFixed(1) +
+              '" y2="' + (p.yc + RR * Math.cos(a)).toFixed(1) + '" stroke="var(--border)" stroke-width="1.4"/>';
+          }
+          g += '<circle cx="' + p.xc.toFixed(1) + '" cy="' + p.yc + '" r="5" fill="var(--text-soft)"/>';
+          // il raggio fino al punto osservato, e il punto
+          g += '<line x1="' + p.xc.toFixed(1) + '" y1="' + p.yc + '" x2="' + p.x.toFixed(1) + '" y2="' + p.y.toFixed(1) +
+            '" stroke="var(--accent)" stroke-width="2.6"/>';
+          g += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="7" fill="var(--accent)"/>';
+          g += '<text x="24" y="30" class="lbl">' + (rif === 'terra'
+            ? 'Riferimento del marciapiede: la ruota avanza'
+            : 'Riferimento della bicicletta: la ruota gira sul posto') + '</text>';
+          g += '<text x="24" y="50" class="lbl-s">' +
+            (frazione === 1 ? 'punto sul bordo' : (frazione === 0 ? 'punto al centro' : 'punto a metà raggio')) +
+            ' · traiettoria in magenta</text>';
+          svg.innerHTML = g;
+        }
+
+        function passo(ts) {
+          if (!tprec) { tprec = ts; }
+          fi += OMEGA * (ts - tprec) / 1000;
+          tprec = ts;
+          if (fi > GIRI * 2 * Math.PI) { fi = 0; scia = []; }
+          var p = posizione(fi);
+          scia.push([p.x, p.y]);
+          if (scia.length > 4000) { scia.shift(); }
+          disegna();
+          raf = requestAnimationFrame(passo);
+        }
+
+        function testo() {
+          var el = document.getElementById('tr-out');
+          var nome = (frazione === 1) ? 'cicloide' : (frazione === 0 ? 'retta' : 'cicloide accorciata');
+          el.innerHTML = (rif === 'terra')
+            ? 'Da terra il punto descrive una <strong>' + nome + '</strong>' +
+              (frazione === 0 ? ': il mozzo è l\'unico punto della ruota che si muove di moto rettilineo uniforme.'
+                              : ', una curva che nessuno si aspetterebbe da qualcosa di così quotidiano.')
+            : 'Dalla bicicletta lo stesso punto descrive una <strong>' +
+              (frazione === 0 ? 'traiettoria che si riduce a un punto: sta fermo' : 'circonferenza') +
+              '</strong>. Stesso punto, stesso moto, stesso istante: cambia solo chi guarda.';
+          document.getElementById('tr-cap').textContent =
+            'Premete «Avvia» e lasciate che la ruota faccia un paio di giri, poi cambiate riferimento.';
+        }
+
+        document.getElementById('tr-via').addEventListener('click', function () {
+          if (gira) { ferma(); return; }
+          gira = true; tprec = 0;
+          raf = requestAnimationFrame(passo);
+        });
+        document.getElementById('tr-pulisci').addEventListener('click', function () { scia = []; disegna(); });
+        tabs(document.getElementById('tr-punto'), 'data-p', function (v) {
+          frazione = parseFloat(v); scia = []; disegna(); testo();
+        });
+        tabs(document.getElementById('tr-rif'), 'data-r', function (v) {
+          rif = v; scia = []; disegna(); testo();
+        });
+        disegna();
+        testo();
+      })();
+
+      /* ==================== 6.1 — L'ATTRITO ==================== */
+      (function () {
+        var svg = document.getElementById('at-svg');
+        if (!svg) { return; }
+        var FMAX = 300;
+
+        function leggi() {
+          var m = parseFloat(document.getElementById('at-m').value);
+          var ms = parseFloat(document.getElementById('at-ms').value);
+          var md = parseFloat(document.getElementById('at-md').value);
+          if (md > ms) { md = ms; document.getElementById('at-md').value = md; }
+          return { m: m, ms: ms, md: md, F: parseFloat(document.getElementById('at-f').value) };
+        }
+        function attrito(p, F) {
+          var N = p.m * G, Fsm = p.ms * N, Fd = p.md * N;
+          if (F <= Fsm) { return { N: N, Fa: F, a: 0, fermo: true, Fsm: Fsm, Fd: Fd }; }
+          return { N: N, Fa: Fd, a: (F - Fd) / p.m, fermo: false, Fsm: Fsm, Fd: Fd };
+        }
+
+        function disegna() {
+          var p = leggi(), r = attrito(p, p.F);
+          var lock = document.getElementById('at-lock').checked;
+          var YM = lock ? FMAX : Math.max(r.Fsm * 1.2, 10);
+          var X0 = 74, X1 = 610, Y0 = 250, Y1 = 34;
+          var px = function (f) { return X0 + (X1 - X0) * Math.min(1, f / FMAX); };
+          var py = function (f) { return Y0 - (Y0 - Y1) * Math.min(1, f / YM); };
+          var g = '', k;
+
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (k = 0; k <= 6; k++) {
+            var f = FMAX * k / 6;
+            g += '<text x="' + px(f).toFixed(1) + '" y="' + (Y0 + 19) + '" text-anchor="middle" class="lbl-s">' + Math.round(f) + '</text>';
+          }
+          for (k = 0; k <= 4; k++) {
+            var f2 = YM * k / 4;
+            g += '<line x1="' + X0 + '" y1="' + py(f2).toFixed(1) + '" x2="' + X1 + '" y2="' + py(f2).toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + (X0 - 8) + '" y="' + (py(f2) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + Math.round(f2) + '</text>';
+          }
+          g += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">forza applicata (N)</text>';
+          g += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 8) + '" class="lbl-s">forza di attrito (N)</text>';
+
+          // il tratto statico, il salto e il tratto dinamico
+          g += '<line x1="' + px(0) + '" y1="' + py(0) + '" x2="' + px(r.Fsm).toFixed(1) + '" y2="' + py(r.Fsm).toFixed(1) +
+            '" stroke="var(--accent)" stroke-width="3.2"/>';
+          g += '<line x1="' + px(r.Fsm).toFixed(1) + '" y1="' + py(r.Fsm).toFixed(1) + '" x2="' + px(r.Fsm).toFixed(1) +
+            '" y2="' + py(r.Fd).toFixed(1) + '" stroke="var(--magenta)" stroke-width="2.4" stroke-dasharray="5 4"/>';
+          g += '<line x1="' + px(r.Fsm).toFixed(1) + '" y1="' + py(r.Fd).toFixed(1) + '" x2="' + px(FMAX) +
+            '" y2="' + py(r.Fd).toFixed(1) + '" stroke="var(--magenta)" stroke-width="3.2"/>';
+          g += '<text x="' + (px(r.Fsm) + 8).toFixed(1) + '" y="' + (py(r.Fsm) - 8).toFixed(1) + '" class="em">distacco: ' + nf(r.Fsm, 0) + ' N</text>';
+          g += '<circle cx="' + px(p.F).toFixed(1) + '" cy="' + py(r.Fa).toFixed(1) + '" r="6.5" fill="var(--gold)" stroke="var(--text)" stroke-width="1.4"/>';
+
+          // il corpo, con le frecce delle forze
+          var xc = 90, yc = 288;
+          g += '<rect x="' + xc + '" y="' + (yc - 22) + '" width="46" height="22" rx="3" fill="var(--accent)" opacity="0.5" stroke="var(--accent)" stroke-width="1.6"/>';
+          g += frec(xc + 46, yc - 11, xc + 46 + Math.min(120, p.F * 0.4), yc - 11, 'var(--gold)', 2.6);
+          g += frec(xc, yc - 11, xc - Math.min(120, r.Fa * 0.4), yc - 11, 'var(--magenta)', 2.6);
+          svg.innerHTML = g;
+
+          document.getElementById('at-mv').textContent = Math.round(p.m);
+          document.getElementById('at-msv').textContent = nf(p.ms, 2);
+          document.getElementById('at-mdv').textContent = nf(p.md, 2);
+          document.getElementById('at-fv').textContent = Math.round(p.F);
+          document.getElementById('at-N').textContent = nf(r.N, 1) + ' N';
+          document.getElementById('at-Fa').textContent = nf(r.Fa, 1) + ' N';
+          document.getElementById('at-a').textContent = nf(r.a, 2) + ' m/s²';
+          var el = document.getElementById('at-out');
+          el.innerHTML = r.fermo
+            ? 'Il corpo <strong>non si muove</strong>: l\'attrito statico si è messo esattamente a ' + nf(r.Fa, 1) +
+              ' N, cioè quanto serve. Può arrivare fino a $\\mu_s N = ' + nf(r.Fsm, 1) + '$ N, poi molla.'
+            : 'Il corpo <strong>scivola</strong>. L\'attrito è sceso di colpo a $\\mu_d N = ' + nf(r.Fd, 1) +
+              '$ N e non cambia più, per quanto si spinga: la risultante è ' + nf(p.F - r.Fd, 1) +
+              ' N e produce un\'accelerazione di ' + nf(r.a, 2) + ' m/s².';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          document.getElementById('at-cap').textContent = 'Fino al distacco la forza di attrito copia la forza applicata (retta a 45°); dopo resta costante.';
+        }
+        ['at-m', 'at-ms', 'at-md', 'at-f'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('at-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ==================== 7.2 — IL PIANO INCLINATO DI GALILEO ==================== */
+      (function () {
+        var svg = document.getElementById('pi-svg');
+        if (!svg) { return; }
+        var LPIANO = 4, NC = 6, LDIS = 520;      // metri, numero di campanelli, pixel
+        var modo = 'uguali', t = 0, raf = null, tprec = 0, suonati = 0;
+
+        function acc() { return G * Math.sin(parseFloat(document.getElementById('pi-th').value) * Math.PI / 180); }
+        function posizioni() {
+          var d = [], k;
+          for (k = 1; k <= NC; k++) {
+            d.push(modo === 'uguali' ? LPIANO * k / NC : LPIANO * k * k / (NC * NC));
+          }
+          return d;
+        }
+        function tempi() {
+          var a = acc();
+          return posizioni().map(function (s) { return Math.sqrt(2 * s / a); });
+        }
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } tprec = 0; }
+        VIVI.push(ferma);
+
+        function disegna() {
+          var th = parseFloat(document.getElementById('pi-th').value);
+          var a = acc(), d = posizioni(), tt = tempi();
+          var rad = th * Math.PI / 180;
+          var XB = 610, YB = 250;
+          var XA = XB - LDIS * Math.cos(rad), YA = YB - LDIS * Math.sin(rad);
+          var g = '', k;
+
+          g += '<line x1="' + (XA - 20) + '" y1="' + (YB + 8) + '" x2="' + (XB + 20) + '" y2="' + (YB + 8) + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<polygon points="' + XA.toFixed(1) + ',' + YA.toFixed(1) + ' ' + XB + ',' + YB + ' ' + XA.toFixed(1) + ',' + YB +
+            '" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2.4"/>';
+          g += '<text x="' + (XB - 60) + '" y="' + (YB - 8) + '" class="em">' + nf(th, 1) + '°</text>';
+
+          // i campanelli
+          for (k = 0; k < NC; k++) {
+            var f = d[k] / LPIANO;
+            var xk = XA + (XB - XA) * f, yk = YA + (YB - YA) * f;
+            var nx = Math.sin(rad) * 13, ny = -Math.cos(rad) * 13;
+            var acceso = (tprec !== 0 || t > 0) && t >= tt[k];
+            g += '<line x1="' + (xk - nx).toFixed(1) + '" y1="' + (yk - ny).toFixed(1) + '" x2="' + (xk + nx).toFixed(1) +
+              '" y2="' + (yk + ny).toFixed(1) + '" stroke="' + (acceso ? 'var(--gold)' : 'var(--muted)') + '" stroke-width="' + (acceso ? 4 : 2.4) + '"/>';
+            g += '<text x="' + (xk + nx * 1.9).toFixed(1) + '" y="' + (yk + ny * 1.9 - 4).toFixed(1) +
+              '" text-anchor="middle" class="lbl-s">' + (k + 1) + '</text>';
+          }
+          // la palla
+          var s = Math.min(LPIANO, 0.5 * a * t * t);
+          var fb = s / LPIANO;
+          var xb = XA + (XB - XA) * fb, yb = YA + (YB - YA) * fb;
+          g += '<circle cx="' + xb.toFixed(1) + '" cy="' + (yb - 9).toFixed(1) + '" r="9" fill="var(--magenta)"/>';
+          g += '<text x="24" y="30" class="lbl">' + (modo === 'uguali'
+            ? 'Campanelli a distanze uguali: il ritmo accelera'
+            : 'Campanelli sui quadrati 1, 4, 9, 16, 25, 36: il ritmo è regolare') + '</text>';
+          g += '<text x="24" y="50" class="lbl-s">piano lungo ' + LPIANO + ' m · accelerazione ' + nf(a, 3) + ' m/s²</text>';
+          svg.innerHTML = g;
+
+          document.getElementById('pi-thv').textContent = nf(th, 1);
+          document.getElementById('pi-a').textContent = nf(a, 3) + ' m/s²';
+          var dt = [], i;
+          for (i = 0; i < NC; i++) { dt.push(nf(tt[i] - (i ? tt[i - 1] : 0), 2)); }
+          document.getElementById('pi-int').textContent = dt.join(' · ') + ' s';
+          var el = document.getElementById('pi-out');
+          el.innerHTML = (modo === 'uguali')
+            ? 'Gli intervalli si accorciano: la palla accelera, e per percorrere tratti uguali ci mette ogni volta meno. Un orecchio se ne accorge subito — e infatti non serve nessun cronometro per dire che <em>non</em> è a tempo.'
+            : 'Gli intervalli sono <strong>tutti uguali</strong>, e lo restano cambiando inclinazione: cambia il tempo dell\'unità, non il ritmo. È la prova che $s \\propto t^2$, ottenuta con l\'orecchio invece che con l\'orologio.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        function passo(ts) {
+          if (!tprec) { tprec = ts; }
+          t += (ts - tprec) / 1000;
+          tprec = ts;
+          var tt = tempi();
+          while (suonati < NC && t >= tt[suonati]) {
+            if (document.getElementById('pi-audio').checked) { suono([1800, 2700], 0.05, 0.09); }
+            suonati++;
+          }
+          if (t >= tt[NC - 1] + 0.6) { ferma(); disegna(); return; }
+          disegna();
+          raf = requestAnimationFrame(passo);
+        }
+
+        document.getElementById('pi-via').addEventListener('click', function () {
+          accendiAudio();
+          ferma(); t = 0; suonati = 0; tprec = 0;
+          raf = requestAnimationFrame(passo);
+        });
+        tabs(document.getElementById('pi-modo'), 'data-m', function (m) { modo = m; ferma(); t = 0; suonati = 0; disegna(); });
+        document.getElementById('pi-th').addEventListener('input', function () { ferma(); t = 0; suonati = 0; disegna(); });
+        disegna();
+      })();
+
+      /* ==================== 8.1 — IL CANNONE E LA NAVE ==================== */
+      (function () {
+        var svg = document.getElementById('cn-svg');
+        if (!svg) { return; }
+        var MONDO = 700;                    // metri rappresentati in orizzontale
+        var X0 = 40, X1 = 640, YSUOLO = 262;
+        var px = function (x) { return X0 + (X1 - X0) * x / MONDO; };
+        var py = function (y) { return YSUOLO - (X1 - X0) * y / MONDO; };
+        var D = 300, t = 0, raf = null, tprec = 0, volo = false, scie = [], seme = 7;
+
+        function rnd() { seme = (seme * 16807) % 2147483647; return seme / 2147483647; }
+        function nuovaNave() { D = 130 + Math.round(rnd() * 380); }
+        nuovaNave();
+
+        function dati() {
+          var a = parseFloat(document.getElementById('cn-a').value) * Math.PI / 180;
+          var v = parseFloat(document.getElementById('cn-v').value);
+          return { a: a, v: v, T: 2 * v * Math.sin(a) / G, R: v * v * Math.sin(2 * a) / G, H: v * v * Math.pow(Math.sin(a), 2) / (2 * G) };
+        }
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } tprec = 0; volo = false; }
+        VIVI.push(ferma);
+
+        function disegna() {
+          var d = dati(), g = '', k;
+          g += '<rect x="0" y="' + YSUOLO + '" width="660" height="' + (320 - YSUOLO) + '" fill="var(--accent)" opacity="0.16"/>';
+          g += '<line x1="0" y1="' + YSUOLO + '" x2="660" y2="' + YSUOLO + '" stroke="var(--accent)" stroke-width="2"/>';
+          // il cannone
+          g += '<rect x="' + (px(0) - 14) + '" y="' + (YSUOLO - 16) + '" width="34" height="16" rx="3" fill="var(--text-soft)"/>';
+          g += '<line x1="' + px(0) + '" y1="' + (YSUOLO - 14) + '" x2="' + (px(0) + 34 * Math.cos(d.a)).toFixed(1) +
+            '" y2="' + (YSUOLO - 14 - 34 * Math.sin(d.a)).toFixed(1) + '" stroke="var(--text-soft)" stroke-width="7" stroke-linecap="round"/>';
+          // la nave
+          var xn = px(D);
+          g += '<polygon points="' + (xn - 34) + ',' + (YSUOLO - 16) + ' ' + (xn + 34) + ',' + (YSUOLO - 16) + ' ' +
+            (xn + 24) + ',' + YSUOLO + ' ' + (xn - 24) + ',' + YSUOLO + '" fill="var(--magenta)" opacity="0.7"/>';
+          g += '<line x1="' + xn + '" y1="' + (YSUOLO - 16) + '" x2="' + xn + '" y2="' + (YSUOLO - 54) + '" stroke="var(--magenta)" stroke-width="3"/>';
+          g += '<text x="' + xn + '" y="' + (YSUOLO + 18) + '" text-anchor="middle" class="lbl-s">' + D + ' m</text>';
+
+          // i tiri precedenti
+          if (document.getElementById('cn-scia').checked) {
+            for (k = 0; k < scie.length; k++) {
+              g += '<polyline points="' + scie[k] + '" fill="none" stroke="var(--muted)" stroke-width="1.4" opacity="0.45"/>';
+            }
+          }
+          // la traiettoria in corso
+          var pts = [], NP = 90, tmax = volo ? Math.min(t, d.T) : d.T;
+          for (k = 0; k <= NP; k++) {
+            var tk = tmax * k / NP;
+            pts.push(px(d.v * Math.cos(d.a) * tk).toFixed(1) + ',' + py(d.v * Math.sin(d.a) * tk - 0.5 * G * tk * tk).toFixed(1));
+          }
+          g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--gold)" stroke-width="2.6" stroke-dasharray="' +
+            (volo ? 'none' : '6 5') + '"/>';
+          // la palla
+          var xb = d.v * Math.cos(d.a) * tmax, yb = d.v * Math.sin(d.a) * tmax - 0.5 * G * tmax * tmax;
+          g += '<circle cx="' + px(xb).toFixed(1) + '" cy="' + py(Math.max(0, yb)).toFixed(1) + '" r="6" fill="var(--gold)"/>';
+          if (document.getElementById('cn-comp').checked) {
+            var vx = d.v * Math.cos(d.a), vy = d.v * Math.sin(d.a) - G * tmax;
+            g += frec(px(xb), py(Math.max(0, yb)), px(xb) + vx * 1.1, py(Math.max(0, yb)), 'var(--accent)', 2.4);
+            g += frec(px(xb), py(Math.max(0, yb)), px(xb), py(Math.max(0, yb)) - vy * 1.1, 'var(--green)', 2.4);
+          }
+          g += '<text x="20" y="26" class="lbl">alzo ' + Math.round(d.a * 180 / Math.PI) + '° · carica ' +
+            Math.round(d.v) + ' m/s · gittata prevista ' + nf(d.R, 0) + ' m</text>';
+          svg.innerHTML = g;
+
+          document.getElementById('cn-av').textContent = Math.round(d.a * 180 / Math.PI);
+          document.getElementById('cn-vv').textContent = Math.round(d.v);
+          document.getElementById('cn-d').textContent = D + ' m';
+          document.getElementById('cn-g').textContent = nf(d.R, 1) + ' m';
+          document.getElementById('cn-t').textContent = nf(d.T, 2) + ' s';
+          document.getElementById('cn-h').textContent = nf(d.H, 1) + ' m';
+        }
+
+        function esito() {
+          var d = dati(), err = d.R - D;
+          var el = document.getElementById('cn-out');
+          if (Math.abs(err) <= 15) {
+            el.innerHTML = '🎯 <strong>Colpita!</strong> La gittata è ' + nf(d.R, 1) + ' m contro i ' + D +
+              ' m del bersaglio: uno scarto di ' + nf(Math.abs(err), 1) + ' m. Provate ora l\'alzo complementare (' +
+              Math.round(90 - d.a * 180 / Math.PI) + '°): colpirà anche quello.';
+          } else if (err < 0) {
+            el.innerHTML = '💦 <strong>Corto di ' + nf(-err, 1) + ' m.</strong> Alzate la carica, oppure avvicinatevi ai 45°: ' +
+              'la gittata massima con questa velocità è ' + nf(d.v * d.v / G, 1) + ' m.';
+          } else {
+            el.innerHTML = '💦 <strong>Lungo di ' + nf(err, 1) + ' m.</strong> Riducete la carica, oppure allontanatevi dai 45°: ' +
+              'sia alzando sia abbassando l\'alzo la gittata cala.';
+          }
+        }
+
+        function passo(ts) {
+          var d = dati();
+          if (!tprec) { tprec = ts; }
+          t += (ts - tprec) / 1000 * 1.4;
+          tprec = ts;
+          if (t >= d.T) {
+            t = d.T; volo = false; disegna(); esito();
+            var pts = [], k;
+            for (k = 0; k <= 60; k++) {
+              var tk = d.T * k / 60;
+              pts.push(px(d.v * Math.cos(d.a) * tk).toFixed(1) + ',' + py(d.v * Math.sin(d.a) * tk - 0.5 * G * tk * tk).toFixed(1));
+            }
+            scie.push(pts.join(' '));
+            if (scie.length > 6) { scie.shift(); }
+            if (raf) { cancelAnimationFrame(raf); raf = null; }
+            tprec = 0;
+            return;
+          }
+          disegna();
+          raf = requestAnimationFrame(passo);
+        }
+
+        document.getElementById('cn-fuoco').addEventListener('click', function () {
+          ferma(); t = 0; tprec = 0; volo = true;
+          raf = requestAnimationFrame(passo);
+        });
+        document.getElementById('cn-nuovo').addEventListener('click', function () {
+          ferma(); nuovaNave(); scie = []; t = 0; disegna();
+          document.getElementById('cn-out').textContent = 'Nuovo bersaglio a ' + D + ' m. Buona mira.';
+        });
+        ['cn-a', 'cn-v', 'cn-comp', 'cn-scia'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', function () { ferma(); t = 0; disegna(); });
+        });
+        disegna();
+        document.getElementById('cn-out').textContent = 'Bersaglio a ' + D + ' m. Scegliete alzo e carica, poi fate fuoco.';
+      })();
+
+      /* ==================== 9.3 — GITTATA CON E SENZA ARIA ==================== */
+      (function () {
+        var svg = document.getElementById('gt-svg');
+        if (!svg) { return; }
+        var DT = 0.004;
+
+        // integrazione passo passo con resistenza proporzionale al quadrato della velocita'
+        function gittata(v0, alfa, k) {
+          if (k <= 0) { return v0 * v0 * Math.sin(2 * alfa) / G; }
+          var x = 0, y = 0, vx = v0 * Math.cos(alfa), vy = v0 * Math.sin(alfa);
+          var xp = 0, yp = 0, n = 0;
+          while (n < 60000) {
+            xp = x; yp = y;
+            var v = Math.sqrt(vx * vx + vy * vy);
+            var ax = -k * v * vx, ay = -G - k * v * vy;
+            vx += ax * DT; vy += ay * DT;
+            x += vx * DT; y += vy * DT;
+            n++;
+            if (y < 0) {
+              return xp + (x - xp) * yp / (yp - y);      // interpolazione lineare sull'impatto
+            }
+          }
+          return x;
+        }
+
+        function disegna() {
+          var v0 = parseFloat(document.getElementById('gt-v').value);
+          var k = parseFloat(document.getElementById('gt-k').value);
+          var lock = document.getElementById('gt-lock').checked;
+          var X0 = 70, X1 = 610, Y0 = 246, Y1 = 34;
+          var Rvac = v0 * v0 / G;
+          var i, g = '';
+
+          var angoli = [], Rk = [], Rv = [], best = 0, Rbest = -1;
+          for (i = 1; i <= 89; i++) {
+            var al = i * Math.PI / 180;
+            angoli.push(i);
+            Rv.push(v0 * v0 * Math.sin(2 * al) / G);
+            var r = gittata(v0, al, k);
+            Rk.push(r);
+            if (r > Rbest) { Rbest = r; best = i; }
+          }
+          var YM = lock ? Rvac * 1.06 : Math.max(Rbest * 1.12, 1);
+          var px = function (a) { return X0 + (X1 - X0) * (a - 1) / 88; };
+          var py = function (r) { return Y0 - (Y0 - Y1) * Math.min(1, r / YM); };
+
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 8; i++) {
+            var a2 = 1 + 88 * i / 8;
+            g += '<text x="' + px(a2).toFixed(1) + '" y="' + (Y0 + 19) + '" text-anchor="middle" class="lbl-s">' + Math.round(a2) + '°</text>';
+          }
+          for (i = 0; i <= 4; i++) {
+            var r2 = YM * i / 4;
+            g += '<line x1="' + X0 + '" y1="' + py(r2).toFixed(1) + '" x2="' + X1 + '" y2="' + py(r2).toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + (X0 - 8) + '" y="' + (py(r2) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + Math.round(r2) + '</text>';
+          }
+          g += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">alzo</text>';
+          g += '<text x="' + (X0 - 6) + '" y="' + (Y1 - 8) + '" class="lbl-s">gittata (m)</text>';
+
+          var p1 = [], p2 = [];
+          for (i = 0; i < angoli.length; i++) {
+            p1.push(px(angoli[i]).toFixed(1) + ',' + py(Rv[i]).toFixed(1));
+            p2.push(px(angoli[i]).toFixed(1) + ',' + py(Rk[i]).toFixed(1));
+          }
+          g += '<polyline points="' + p1.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2.6" opacity="0.85"/>';
+          g += '<polyline points="' + p2.join(' ') + '" fill="none" stroke="var(--magenta)" stroke-width="3.2"/>';
+          g += '<circle cx="' + px(best).toFixed(1) + '" cy="' + py(Rbest).toFixed(1) + '" r="6.5" fill="var(--magenta)"/>';
+          g += '<line x1="' + px(45).toFixed(1) + '" y1="' + Y0 + '" x2="' + px(45).toFixed(1) + '" y2="' + Y1 +
+            '" stroke="var(--accent)" stroke-width="1.4" stroke-dasharray="4 5" opacity="0.7"/>';
+          g += '<text x="' + (px(45) + 6).toFixed(1) + '" y="' + (Y1 + 14) + '" class="lbl-s">45°</text>';
+          svg.innerHTML = g;
+
+          document.getElementById('gt-vv').textContent = Math.round(v0);
+          document.getElementById('gt-kv').textContent = nf(k * 1000, 1);
+          document.getElementById('gt-best').textContent = best + '°';
+          document.getElementById('gt-rmax').textContent = nf(Rbest, 1) + ' m';
+          document.getElementById('gt-perd').textContent = nf(100 * (1 - Rbest / Rvac), 1) + '%';
+          var el = document.getElementById('gt-out');
+          el.innerHTML = (k <= 0)
+            ? 'Senza aria le due curve coincidono: la gittata è $R = v_0^2\\sin 2\\alpha / g$, simmetrica attorno ai <strong>45°</strong>, e gli alzi complementari danno lo stesso risultato.'
+            : 'Con l\'aria l\'alzo migliore scende a <strong>' + best + '°</strong> e la gittata cala del ' +
+              nf(100 * (1 - Rbest / Rvac), 1) + '%. La curva perde anche la simmetria: da un lato scende più ripida dell\'altro, ' +
+              'perché i tiri arcuati restano in volo più a lungo e l\'aria ha più tempo per frenarli.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['gt-v', 'gt-k'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('gt-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ==================== 10.3 — IL CANNONE DI NEWTON ==================== */
+      (function () {
+        var svg = document.getElementById('or-svg');
+        if (!svg) { return; }
+        var RT = 6.371e6, GM = G * RT * RT;
+        var MONTE = 0.05 * RT, R0 = RT + MONTE;     // la montagna dei Principia: circa 320 km
+        var CX = 330, CY = 178, RPX = 92, SC = RPX / RT;
+        // velocita' minima perche' il perigeo resti fuori dalla Terra, e velocita' di fuga
+        var VORB = Math.sqrt(2 * GM * RT / (R0 * (R0 + RT))), VFUGA = Math.sqrt(2 * GM / R0);
+        var tracce = [], raf = null;
+
+        // Il verdetto si decide con le leggi di conservazione, non con il disegno:
+        // il lancio e' orizzontale, quindi il punto di partenza e' un apside e
+        // l'orbita e' completamente determinata da energia e momento angolare.
+        function esitoTeorico(v0) {
+          var E = 0.5 * v0 * v0 - GM / R0;
+          if (E >= 0) { return 'fugge'; }
+          var a = -GM / (2 * E);
+          var L = v0 * R0;
+          var ecc = Math.sqrt(Math.max(0, 1 + 2 * E * L * L / (GM * GM)));
+          return (a * (1 - ecc) >= RT) ? 'orbita' : 'ricade';
+        }
+
+        // Per il disegno serve invece la traiettoria: velocity-Verlet, che a
+        // differenza di Eulero non fa collassare le orbite circolari.
+        function simula(v0) {
+          var x = 0, y = R0, vx = v0, vy = 0, n = 0;
+          var dt = 3, pts = [[0, R0]], dist = 0;
+          var esito = esitoTeorico(v0);
+          var r = R0, ax = -GM * x / (r * r * r), ay = -GM * y / (r * r * r);
+          var giro = 0, ang0 = Math.atan2(x, y);
+          while (n < 12000) {
+            x += vx * dt + 0.5 * ax * dt * dt;
+            y += vy * dt + 0.5 * ay * dt * dt;
+            r = Math.sqrt(x * x + y * y);
+            var axn = -GM * x / (r * r * r), ayn = -GM * y / (r * r * r);
+            vx += 0.5 * (ax + axn) * dt; vy += 0.5 * (ay + ayn) * dt;
+            ax = axn; ay = ayn;
+            n++;
+            if (n % 3 === 0) { pts.push([x, y]); }
+            // angolo percorso attorno alla Terra, sommato passo per passo
+            var ang1 = Math.atan2(x, y), da = ang1 - ang0;
+            while (da > Math.PI) { da -= 2 * Math.PI; }
+            while (da < -Math.PI) { da += 2 * Math.PI; }
+            giro += da; ang0 = ang1;
+            if (r < RT) { dist = Math.abs(Math.atan2(x, y)) * RT; break; }
+            if (r > 9 * RT) { break; }
+            if (Math.abs(giro) > 2 * Math.PI) { break; }
+          }
+          return { pts: pts, esito: esito, dist: dist, n: n };
+        }
+
+        function disegna() {
+          var g = '', k, i;
+          g += '<circle cx="' + CX + '" cy="' + CY + '" r="' + RPX + '" fill="var(--accent)" opacity="0.28" stroke="var(--accent)" stroke-width="2"/>';
+          g += '<text x="' + CX + '" y="' + (CY + 6) + '" text-anchor="middle" class="lbl">Terra</text>';
+          // la montagna col cannone, in cima
+          var hM = RPX * MONTE / RT;
+          g += '<polygon points="' + (CX - 15) + ',' + (CY - RPX + 3).toFixed(1) + ' ' + (CX + 15) + ',' + (CY - RPX + 3).toFixed(1) + ' ' +
+            CX + ',' + (CY - RPX - hM).toFixed(1) + '" fill="var(--text-soft)"/>';
+          g += '<circle cx="' + CX + '" cy="' + (CY - RPX - hM).toFixed(1) + '" r="3.2" fill="var(--gold)"/>';
+          for (k = 0; k < tracce.length; k++) {
+            var pts = [], quanti = Math.min(tracce[k].n, tracce[k].pts.length);
+            for (i = 0; i < quanti; i++) {
+              pts.push((CX + tracce[k].pts[i][0] * SC).toFixed(1) + ',' + (CY - tracce[k].pts[i][1] * SC).toFixed(1));
+            }
+            var col = tracce[k].esito === 'ricade' ? 'var(--muted)' : (tracce[k].esito === 'orbita' ? 'var(--green)' : 'var(--magenta)');
+            if (pts.length > 1) {
+              g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + col + '" stroke-width="2.2" opacity="0.9"/>';
+            }
+            // il proiettile in volo, sull'ultimo tiro
+            if (quanti > 0 && quanti < tracce[k].pts.length) {
+              var ux = CX + tracce[k].pts[quanti - 1][0] * SC, uy = CY - tracce[k].pts[quanti - 1][1] * SC;
+              g += '<circle cx="' + ux.toFixed(1) + '" cy="' + uy.toFixed(1) + '" r="5" fill="var(--gold)" stroke="var(--text)" stroke-width="1.2"/>';
+            }
+          }
+          g += '<text x="20" y="28" class="lbl-s">grigio: ricade · verde: entra in orbita · magenta: sfugge alla Terra</text>';
+          svg.innerHTML = g;
+          document.getElementById('or-vv').textContent = nf(parseFloat(document.getElementById('or-v').value), 1);
+        }
+
+        // la traiettoria non compare tutta insieme: si disegna mentre il proiettile vola
+        function anima() {
+          if (raf) { cancelAnimationFrame(raf); raf = null; }
+          var t = tracce[tracce.length - 1];
+          var passo = Math.max(1, Math.round(t.pts.length / 150));
+          function avanti() {
+            t.n = Math.min(t.pts.length, t.n + passo);
+            disegna();
+            if (t.n < t.pts.length) { raf = requestAnimationFrame(avanti); } else { raf = null; }
+          }
+          raf = requestAnimationFrame(avanti);
+        }
+        VIVI.push(function () { if (raf) { cancelAnimationFrame(raf); raf = null; } });
+
+        document.getElementById('or-spara').addEventListener('click', function () {
+          var v = parseFloat(document.getElementById('or-v').value) * 1000;
+          var r = simula(v);
+          r.n = 0;
+          var q;
+          for (q = 0; q < tracce.length; q++) { tracce[q].n = tracce[q].pts.length; }
+          tracce.push(r);
+          if (tracce.length > 8) { tracce.shift(); }
+          anima();
+          var el = document.getElementById('or-out');
+          document.getElementById('or-esito').textContent =
+            r.esito === 'ricade' ? 'ricade a ' + nf(r.dist / 1000, 0) + ' km' :
+            (r.esito === 'orbita' ? 'in orbita' : 'sfugge alla Terra');
+          if (r.esito === 'ricade') {
+            el.innerHTML = 'Con ' + nf(v / 1000, 1) + ' km/s la palla ricade dopo ' + nf(r.dist / 1000, 0) +
+              ' km di superficie. Dalla cima della montagna bastano <strong>' + nf(VORB / 1000, 2) +
+              ' km/s</strong> perché la Terra si incurvi sotto alla stessa velocità con cui la palla scende.';
+          } else if (r.esito === 'orbita') {
+            el.innerHTML = 'Ci siamo: la palla <strong>cade per sempre</strong> senza mai arrivare. Non è successo niente di nuovo — ' +
+              'è ancora la stessa parabola della sezione 8, solo che adesso il suolo scappa via mentre lei scende.';
+          } else {
+            el.innerHTML = 'Oltre <strong>' + nf(VFUGA / 1000, 2) + ' km/s</strong> la Terra non riesce più a richiamarla: ' +
+              'è la <em>velocità di fuga</em>, quella che serve alle sonde interplanetarie.';
+          }
+        });
+        document.getElementById('or-pulisci').addEventListener('click', function () {
+          if (raf) { cancelAnimationFrame(raf); raf = null; }
+          tracce = []; disegna();
+        });
+        document.getElementById('or-v').addEventListener('input', disegna);
+        document.getElementById('or-orb').textContent = nf(VORB / 1000, 2) + ' km/s';
+        document.getElementById('or-fuga').textContent = nf(VFUGA / 1000, 2) + ' km/s';
+        document.getElementById('or-cap').textContent =
+          'Il cannone sta sulla montagna dei Principia, alta ' + nf(MONTE / 1000, 0) +
+          ' km, e spara sempre in orizzontale: aumentate la carica un po\' alla volta.';
+        disegna();
+      })();
+
+      /* ==================== 11 — LA LEVA ==================== */
+      (function () {
+        var svg = document.getElementById('mo-svg');
+        if (!svg) { return; }
+        var CX = 330, CY = 150, PXM = 88;      // pixel per metro
+
+        function disegna() {
+          var m1 = parseFloat(document.getElementById('mo-m1').value);
+          var d1 = parseFloat(document.getElementById('mo-d1').value);
+          var m2 = parseFloat(document.getElementById('mo-m2').value);
+          var d2 = parseFloat(document.getElementById('mo-d2').value);
+          var Ms = m1 * G * d1, Md = m2 * G * d2, Mt = Md - Ms;
+          var ang = Math.max(-0.26, Math.min(0.26, Mt / 110));
+          var ca = Math.cos(ang), sa = Math.sin(ang);
+          var g = '';
+
+          // il fulcro
+          g += '<polygon points="' + (CX - 22) + ',' + (CY + 46) + ' ' + (CX + 22) + ',' + (CY + 46) + ' ' +
+            CX + ',' + (CY + 6) + '" fill="var(--text-soft)"/>';
+          // l'asta
+          var L = 2.6 * PXM;
+          var ax = CX - L * ca, ay = CY + L * sa, bx = CX + L * ca, by = CY - L * sa;
+          g += '<line x1="' + ax.toFixed(1) + '" y1="' + ay.toFixed(1) + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) +
+            '" stroke="var(--text-soft)" stroke-width="8" stroke-linecap="round"/>';
+          // le due masse
+          function peso(d, m, segno, col) {
+            var x = CX - segno * d * PXM * ca, y = CY + segno * d * PXM * sa;
+            var lato = 16 + 1.5 * m;
+            var s = '<rect x="' + (x - lato / 2).toFixed(1) + '" y="' + (y - lato - 5).toFixed(1) + '" width="' + lato.toFixed(1) +
+              '" height="' + lato.toFixed(1) + '" rx="3" fill="' + col + '" opacity="0.55" stroke="' + col + '" stroke-width="2"/>';
+            s += '<text x="' + x.toFixed(1) + '" y="' + (y - lato / 2 - 1).toFixed(1) + '" text-anchor="middle" class="lbl">' + m + '</text>';
+            s += frec(x, y + 6, x, y + 6 + Math.min(50, m * 2.4), col, 2.4);
+            s += '<text x="' + x.toFixed(1) + '" y="' + (y + 22 + Math.min(50, m * 2.4)).toFixed(1) + '" text-anchor="middle" class="lbl-s">' +
+              nf(m * G, 0) + ' N · braccio ' + nf(d, 1) + ' m</text>';
+            return s;
+          }
+          g += peso(d1, m1, 1, 'var(--accent)');
+          g += peso(d2, m2, -1, 'var(--magenta)');
+          g += '<text x="20" y="28" class="lbl">' + (Math.abs(Mt) < 0.5 ? 'La leva è in equilibrio' :
+            (Mt > 0 ? 'La leva ruota verso destra' : 'La leva ruota verso sinistra')) + '</text>';
+          svg.innerHTML = g;
+
+          document.getElementById('mo-m1v').textContent = Math.round(m1);
+          document.getElementById('mo-d1v').textContent = nf(d1, 1);
+          document.getElementById('mo-m2v').textContent = Math.round(m2);
+          document.getElementById('mo-d2v').textContent = nf(d2, 1);
+          document.getElementById('mo-Ms').textContent = nf(Ms, 1) + ' N·m';
+          document.getElementById('mo-Md').textContent = nf(Md, 1) + ' N·m';
+          document.getElementById('mo-Mtot').textContent = nf(Math.abs(Mt), 1) + ' N·m ' + (Math.abs(Mt) < 0.5 ? '' : (Mt > 0 ? '(orario)' : '(antiorario)'));
+          document.getElementById('mo-cap').textContent =
+            'Il momento è forza per braccio: una massa piccola lontana può vincere una massa grande vicina.';
+          var el = document.getElementById('mo-out');
+          el.innerHTML = (Math.abs(Mt) < 0.5)
+            ? '<strong>Equilibrio.</strong> I due momenti si pareggiano: $m_1 g d_1 = m_2 g d_2$, cioè ' +
+              nf(m1, 0) + ' · ' + nf(d1, 1) + ' = ' + nf(m2, 0) + ' · ' + nf(d2, 1) +
+              '. Notate che $g$ si semplifica: l\'equilibrio di una leva è lo stesso sulla Luna.'
+            : 'Prevale il momento ' + (Mt > 0 ? 'di destra' : 'di sinistra') + ' di ' + nf(Math.abs(Mt), 1) +
+              ' N·m. Per riportare l\'equilibrio si può cambiare la massa <em>oppure</em> il braccio: ' +
+              'basta che il prodotto torni uguale.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['mo-m1', 'mo-d1', 'mo-m2', 'mo-d2'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        disegna();
+      })();
+
+      /* ==================== 12.1 — L'IRRIGATORE DI FEYNMAN ==================== */
+      (function () {
+        var svg = document.getElementById('fs-svg');
+        if (!svg) { return; }
+        var modo = 'normale', gira = false, ang = 0, raf = null, tprec = 0;
+        var CX = 240, CY = 150, R = 78;
+
+        function omega() { return modo === 'normale' ? -2.2 : 0.16; }   // il caso inverso gira pianissimo
+        function ferma() { gira = false; if (raf) { cancelAnimationFrame(raf); raf = null; } tprec = 0; }
+        VIVI.push(ferma);
+
+        function disegna() {
+          var g = '', k, i;
+          g += '<circle cx="' + CX + '" cy="' + CY + '" r="' + (R + 26) + '" fill="var(--accent)" opacity="0.10"/>';
+          for (i = 0; i < 2; i++) {
+            var a = ang + i * Math.PI;
+            var xb = CX + R * Math.cos(a), yb = CY - R * Math.sin(a);
+            g += '<line x1="' + CX + '" y1="' + CY + '" x2="' + xb.toFixed(1) + '" y2="' + yb.toFixed(1) +
+              '" stroke="var(--text-soft)" stroke-width="7" stroke-linecap="round"/>';
+            // l'ugello, piegato di 90 gradi
+            var au = a + Math.PI / 2;
+            var xu = xb + 26 * Math.cos(au), yu = yb - 26 * Math.sin(au);
+            g += '<line x1="' + xb.toFixed(1) + '" y1="' + yb.toFixed(1) + '" x2="' + xu.toFixed(1) + '" y2="' + yu.toFixed(1) +
+              '" stroke="var(--text-soft)" stroke-width="7" stroke-linecap="round"/>';
+            // il getto: esce (normale) oppure entra (inverso)
+            for (k = 1; k <= 4; k++) {
+              var d = 12 + k * 15;
+              var xg = xu + d * Math.cos(au), yg = yu - d * Math.sin(au);
+              g += '<circle cx="' + xg.toFixed(1) + '" cy="' + yg.toFixed(1) + '" r="' + (4.4 - k * 0.5).toFixed(1) +
+                '" fill="var(--accent)" opacity="' + (modo === 'normale' ? (0.85 - k * 0.13) : (0.35 + k * 0.13)).toFixed(2) + '"/>';
+            }
+            var p1 = 16, p2 = 66;
+            if (modo === 'normale') {
+              g += frec(xu + p1 * Math.cos(au), yu - p1 * Math.sin(au), xu + p2 * Math.cos(au), yu - p2 * Math.sin(au), 'var(--accent)', 2.6);
+            } else {
+              g += frec(xu + p2 * Math.cos(au), yu - p2 * Math.sin(au), xu + p1 * Math.cos(au), yu - p1 * Math.sin(au), 'var(--accent)', 2.6);
+            }
+          }
+          g += '<circle cx="' + CX + '" cy="' + CY + '" r="15" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="3"/>';
+          // il verso di rotazione
+          var w = omega();
+          var arcR = R + 40;
+          g += '<path d="M' + (CX + arcR) + ',' + CY + ' A' + arcR + ',' + arcR + ' 0 0 ' + (w > 0 ? '0' : '1') + ' ' +
+            CX + ',' + (CY - (w > 0 ? arcR : -arcR)) + '" fill="none" stroke="var(--magenta)" stroke-width="2.4" opacity="0.85"/>';
+          g += '<text x="380" y="60" class="lbl">' + (modo === 'normale' ? 'Irrigatore normale' : 'Irrigatore inverso') + '</text>';
+          g += '<text x="380" y="86" class="lbl-s">' + (modo === 'normale'
+            ? "l'acqua esce: l'irrigatore rincula"
+            : "l'acqua entra: il verso è la domanda") + '</text>';
+          g += '<text x="380" y="112" class="lbl-s">' + (modo === 'normale'
+            ? 'rotazione veloce, verso opposto ai getti'
+            : 'rotazione lentissima (circa 50 volte meno)') + '</text>';
+          svg.innerHTML = g;
+        }
+
+        function passo(ts) {
+          if (!tprec) { tprec = ts; }
+          ang += omega() * (ts - tprec) / 1000;
+          tprec = ts;
+          disegna();
+          raf = requestAnimationFrame(passo);
+        }
+
+        document.getElementById('fs-via').addEventListener('click', function () {
+          if (gira) { ferma(); return; }
+          gira = true; tprec = 0;
+          raf = requestAnimationFrame(passo);
+        });
+        tabs(document.getElementById('fs-modo'), 'data-m', function (m) { modo = m; disegna(); });
+        var brs = document.querySelectorAll('#fs-quiz button');
+        Array.prototype.forEach.call(brs, function (b) {
+          b.addEventListener('click', function () {
+            var r = b.getAttribute('data-r');
+            var el = document.getElementById('fs-out');
+            var testa = (r === 'fermo')
+              ? '<strong>È la risposta della teoria ideale — e ci siete andati vicinissimi.</strong> '
+              : (r === 'opposto'
+                ? '<strong>È la risposta dell\'esperimento del 2024 — e quindi, alla fine, quella giusta.</strong> '
+                : '<strong>È la risposta più intuitiva, ed è quella sbagliata.</strong> ');
+            el.innerHTML = testa + 'In un fluido perfetto, a regime, non c\'è nessuna coppia netta: l\'irrigatore inverso ' +
+              'dovrebbe restare fermo. Nell\'acqua vera, però, il getto che entra non riempie il tubo in modo simmetrico, ' +
+              'si attacca a una parete e produce una coppia residua che lo fa girare <em>al contrario</em> rispetto ' +
+              'all\'irrigatore normale, circa cinquanta volte più piano. Provate il pulsante «Avvia» nelle due modalità ' +
+              'e guardate la differenza di velocità.';
+          });
+        });
+        document.getElementById('fs-cap').textContent =
+          'Le pallottole azzurre sono l\'acqua; la freccia magenta esterna indica il verso di rotazione.';
+        disegna();
+      })();
+
+      /* ============ 13 — LA TENSIONE NELL'ASCENSORE ============ */
+      (function () {
+        var svg = document.getElementById('ts-svg');
+        if (!svg) { return; }
+        var GG = 9.81;
+
+        function nf2(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+        function fre(x1, y1, x2, y2, col, sp) {
+          var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy);
+          if (L < 0.8) { return ''; }
+          var s = Math.min(L * 0.36, 11);
+          var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+          var bx = x2 - ux * s, by = y2 - uy * s;
+          return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) +
+            '" stroke="' + col + '" stroke-width="' + sp + '" stroke-linecap="round"/>' +
+            '<polygon points="' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+            (bx + px * s * 0.5).toFixed(1) + ',' + (by + py * s * 0.5).toFixed(1) + ' ' +
+            (bx - px * s * 0.5).toFixed(1) + ',' + (by - py * s * 0.5).toFixed(1) + '" fill="' + col + '"/>';
+        }
+
+        function disegna() {
+          var m = parseFloat(document.getElementById('ts-m').value);
+          var fr = parseFloat(document.getElementById('ts-a').value);
+          var a = fr * GG;
+          var P = m * GG;
+          var T = m * (GG + a);
+          var s = '';
+          // la cabina
+          var CX = 190, CY = 40, CW = 220, CH = 232;
+          s += '<rect x="' + CX + '" y="' + CY + '" width="' + CW + '" height="' + CH +
+            '" rx="8" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="3"/>';
+          s += '<line x1="' + (CX + 12) + '" y1="' + (CY + 14) + '" x2="' + (CX + CW - 12) + '" y2="' + (CY + 14) +
+            '" stroke="var(--text-soft)" stroke-width="4"/>';
+          // il cavo di sospensione della cabina
+          s += '<line x1="' + (CX + CW / 2) + '" y1="12" x2="' + (CX + CW / 2) + '" y2="' + CY +
+            '" stroke="var(--text-soft)" stroke-width="2.5" stroke-dasharray="' + (fr <= -0.999 ? '6 6' : '0') + '"/>';
+          if (fr <= -0.999) {
+            s += '<text x="' + (CX + CW / 2 + 10) + '" y="26" class="em">cavo tranciato</text>';
+          }
+          // la fune interna e la massa
+          var FX = CX + CW / 2, FY = CY + 14, LF = 96;
+          s += '<line x1="' + FX + '" y1="' + FY + '" x2="' + FX + '" y2="' + (FY + LF) +
+            '" stroke="var(--gold)" stroke-width="3.5"/>';
+          var lato = 26 + m * 1.7;
+          s += '<rect x="' + (FX - lato / 2).toFixed(1) + '" y="' + (FY + LF) + '" width="' + lato.toFixed(1) +
+            '" height="' + (lato * 0.72).toFixed(1) + '" rx="4" fill="var(--accent)" opacity="0.45" stroke="var(--accent)" stroke-width="2"/>';
+          s += '<text x="' + FX + '" y="' + (FY + LF + lato * 0.72 + 18) + '" text-anchor="middle" class="lbl-s">' +
+            nf2(m, 1) + ' kg</text>';
+          // le due forze sulla massa
+          var yc = FY + LF + lato * 0.36;
+          s += fre(FX - lato / 2 - 14, yc, FX - lato / 2 - 14, yc - Math.min(80, 12 + T * 0.45), 'var(--gold)', 3.2);
+          s += '<text x="' + (FX - lato / 2 - 20) + '" y="' + (yc - Math.min(80, 12 + T * 0.45) - 6) +
+            '" text-anchor="end" style="fill:var(--gold); font-size:12.5px; font-weight:700;">T = ' + nf2(T, 1) + ' N</text>';
+          s += fre(FX + lato / 2 + 14, yc, FX + lato / 2 + 14, yc + Math.min(80, 12 + P * 0.45), 'var(--magenta)', 3.2);
+          s += '<text x="' + (FX + lato / 2 + 20) + '" y="' + (yc + Math.min(80, 12 + P * 0.45) + 14) +
+            '" class="em">mg = ' + nf2(P, 1) + ' N</text>';
+          // l'accelerazione della cabina
+          if (Math.abs(fr) > 1e-9) {
+            var La = Math.min(90, 20 + Math.abs(a) * 7);
+            s += fre(CX - 46, CY + CH / 2, CX - 46, CY + CH / 2 - Math.sign(a) * La, 'var(--green)', 4);
+            s += '<text x="' + (CX - 52) + '" y="' + (CY + CH / 2 - Math.sign(a) * La - 10) +
+              '" text-anchor="end" style="fill:var(--green); font-size:12.5px; font-weight:700;">a = ' + nf2(a, 2) + ' m/s²</text>';
+          } else {
+            s += '<text x="' + (CX - 20) + '" y="' + (CY + CH / 2) + '" text-anchor="end" class="lbl-s">a = 0</text>';
+          }
+          // la barra della bilancia
+          var BX = 470, BY = 70, BH = 190, BW = 46;
+          var TM = 20 * GG * 1.8;
+          s += '<text x="' + (BX + BW / 2) + '" y="' + (BY - 30) + '" text-anchor="middle" class="lbl">la bilancia</text>';
+          s += '<text x="' + (BX + BW / 2) + '" y="' + (BY - 12) + '" text-anchor="middle" class="lbl-s">segna la tensione</text>';
+          s += '<rect x="' + BX + '" y="' + BY + '" width="' + BW + '" height="' + BH +
+            '" rx="6" fill="none" stroke="var(--border)" stroke-width="1.8"/>';
+          var hT = BH * Math.min(1, T / TM);
+          s += '<rect x="' + (BX + 2) + '" y="' + (BY + BH - hT).toFixed(1) + '" width="' + (BW - 4) +
+            '" height="' + hT.toFixed(1) + '" fill="var(--gold)" opacity="0.7"/>';
+          var hP = BH * Math.min(1, P / TM);
+          s += '<line x1="' + (BX - 8) + '" y1="' + (BY + BH - hP).toFixed(1) + '" x2="' + (BX + BW + 8) +
+            '" y2="' + (BY + BH - hP).toFixed(1) + '" stroke="var(--magenta)" stroke-width="2" stroke-dasharray="5 4"/>';
+          s += '<text x="' + (BX + BW + 12) + '" y="' + (BY + BH - hP + 4).toFixed(1) + '" class="lbl-s">peso reale</text>';
+          s += '<text x="' + (BX + BW / 2) + '" y="' + (BY + BH + 22) + '" text-anchor="middle" class="lbl">' +
+            nf2(T / GG, 1) + ' kg apparenti</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('ts-mv').textContent = nf2(m, 1);
+          document.getElementById('ts-av').textContent = nf2(fr, 2);
+          document.getElementById('ts-p').textContent = nf2(P, 1) + ' N';
+          document.getElementById('ts-t').textContent = nf2(T, 1) + ' N';
+          document.getElementById('ts-bil').textContent = nf2(T / GG, 2) + ' kg';
+          document.getElementById('ts-stato').textContent = (Math.abs(fr) < 1e-9)
+            ? 'fermo o a velocità costante'
+            : (fr <= -0.999 ? 'caduta libera: T = 0'
+              : (fr > 0 ? 'accelera verso l\'alto' : 'accelera verso il basso'));
+          var el = document.getElementById('ts-out');
+          el.innerHTML = '$T = m(g+a) = ' + nf2(m, 1).replace(',', '{,}') + ' \\cdot (9{,}81 ' +
+            (a >= 0 ? '+ ' : '- ') + nf2(Math.abs(a), 2).replace(',', '{,}') + ') = ' +
+            nf2(T, 1).replace(',', '{,}') + '$ N. ' +
+            (Math.abs(fr) < 1e-9
+              ? 'Con accelerazione nulla la tensione coincide con il peso — ed è l\'unico caso in cui questo accade.'
+              : (fr <= -0.999
+                ? 'In caduta libera la tensione è <strong>esattamente zero</strong>: la fune non tira più nulla, e la massa «fluttua» dentro la cabina. Non è sparita la gravità: sono spariti i vincoli.'
+                : (fr > 0
+                  ? 'Accelerando verso l\'alto la fune deve fare <strong>più</strong> del peso: sostenere e in più accelerare. È la sensazione di pesantezza alla partenza dell\'ascensore.'
+                  : 'Accelerando verso il basso la fune fa <strong>meno</strong> del peso, e la bilancia segna ' +
+                    nf2(T / GG, 1) + ' kg invece di ' + nf2(m, 1) + '. È lo stomaco che sale.')));
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        ['ts-m', 'ts-a'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('ts-cad').addEventListener('click', function () {
+          document.getElementById('ts-a').value = -1;
+          disegna();
+        });
+        document.getElementById('ts-fermo').addEventListener('click', function () {
+          document.getElementById('ts-a').value = 0;
+          disegna();
+        });
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'In fisica, un <strong>modello</strong> è:',
+        options: ['una descrizione completa e fedele della realtà', 'un disegno in scala dell\'oggetto', 'una descrizione volutamente incompleta, costruita per rispondere a una domanda precisa', 'una teoria non ancora verificata'],
+        correct: 2, explain: 'Un modello non è né vero né falso: è adeguato o inadeguato allo scopo. La bravura sta nel sapere che cosa si può buttare via — e quando non si può più.' },
+
+      { type: 'mc', diff: 'easy', text: 'Quando si può trattare un corpo come <strong>punto materiale</strong>?',
+        options: ['quando le sue dimensioni sono trascurabili rispetto agli spazi in gioco, o quando non ruota né si deforma', 'sempre, purché sia piccolo', 'solo se è sferico', 'solo se la sua massa è minore di un chilogrammo'],
+        correct: 0, explain: 'Non conta la dimensione assoluta: la Terra è un punto materiale quando se ne studia l\'orbita, e non lo è più quando si spiegano le maree. Conta il confronto con il fenomeno.' },
+
+      { type: 'mc', diff: 'easy', text: 'Nella stiva della nave di Galileo, un esperimento meccanico permette di stabilire se la nave si muove di moto rettilineo uniforme?',
+        options: ['sì, osservando le gocce che cadono', 'sì, ma solo a velocità alte', 'sì, pesando un oggetto', 'no: nessun esperimento meccanico può distinguere quiete e moto uniforme'],
+        correct: 3, explain: 'È il principio di relatività galileiana. Le leggi della meccanica hanno la stessa forma in tutti i riferimenti inerziali, e nessuno di essi è «quello fermo».' },
+
+      { type: 'mc', diff: 'easy', text: 'Il primo principio della dinamica afferma che un corpo con risultante delle forze nulla:',
+        options: ['si ferma sempre', 'mantiene velocità costante — che può anche essere zero', 'rallenta gradualmente', 'accelera uniformemente'],
+        correct: 1, explain: 'Quiete e moto rettilineo uniforme sono lo stesso stato visto da due riferimenti diversi: è per questo che il principio li mette sullo stesso piano.' },
+
+      { type: 'mc', diff: 'medium', text: 'Spingo una cassa su un piano <em>senza attrito</em> con una forza costante. La cassa:',
+        options: ['accelera in modo uniforme finché continuo a spingere', 'si muove a velocità costante', 'accelera all\'inizio e poi va a velocità costante', 'non si muove finché la forza non supera un valore minimo'],
+        correct: 0, explain: 'La forza dà accelerazione, non velocità. Con $F$ costante e $m$ costante l\'accelerazione è costante, quindi la velocità cresce senza limite (finché regge il modello).' },
+
+      { type: 'mc', diff: 'medium', text: 'Massa e peso:',
+        options: ['sono la stessa grandezza con due nomi', 'differiscono solo per il valore numerico', 'sono grandezze diverse: la massa è uno scalare in kg, il peso è un vettore in newton che dipende da dove ci si trova', 'il peso è la massa moltiplicata per la velocità'],
+        correct: 2, explain: 'Sulla Luna la stessa persona pesa sei volte meno ma ha esattamente la stessa massa — e la stessa difficoltà a essere spinta di lato, perché la massa inerziale non cambia.' },
+
+      { type: 'mc', diff: 'medium', text: 'Perché tutti i corpi cadono con la stessa accelerazione (in assenza d\'aria)?',
+        options: ['perché la gravità è uguale per tutti', 'perché l\'aria compensa le differenze', 'perché la massa è trascurabile', 'perché nella relazione $mg = ma$ la massa si semplifica'],
+        correct: 3, explain: 'La stessa $m$ compare due volte: nella forza peso e nell\'inerzia. Un corpo più pesante è attirato di più ma è anche più difficile da accelerare, e i due effetti si compensano esattamente.' },
+
+      { type: 'mc', diff: 'medium', text: 'La forza di <strong>attrito statico</strong>:',
+        options: ['vale sempre $\\mu_s N$', 'vale quanto serve per tenere fermo il corpo, fino a un massimo di $\\mu_s N$', 'è sempre maggiore dell\'attrito dinamico, a parità di scivolamento', 'non dipende dalla reazione normale'],
+        correct: 1, explain: 'È l\'unica forza «su richiesta» che incontrerete: si adatta a pareggiare quello che si applica, e a un certo punto molla di colpo. Da lì il gradino che fa scattare in avanti l\'armadio.' },
+
+      { type: 'mc', diff: 'medium', text: 'L\'attrito radente dinamico, con buona approssimazione, <strong>non</strong> dipende:',
+        options: ['dalla reazione normale', 'dai materiali a contatto', 'né dall\'area di contatto apparente né dalla velocità', 'dal peso del corpo'],
+        correct: 2, explain: 'Se raddoppio l\'area, la pressione si dimezza e il numero di microsaldature resta lo stesso. È proprio qui la differenza con l\'attrito viscoso dell\'aria, che invece cresce col quadrato della velocità.' },
+
+      { type: 'mc', diff: 'medium', text: 'Su un piano inclinato liscio di angolo $\\theta$, l\'accelerazione di discesa vale:',
+        options: ['$a = g\\sin\\theta$', '$a = g\\cos\\theta$', '$a = g\\tan\\theta$', '$a = g$ sempre'],
+        correct: 0, explain: 'Il peso si scompone in $mg\\sin\\theta$ lungo il piano e $mg\\cos\\theta$ perpendicolare, quest\'ultima pareggiata dalla reazione normale. Per $\\theta = 90°$ si ritrova la caduta libera.' },
+
+      { type: 'mc', diff: 'hard', text: 'Un blocco comincia a scivolare su un piano quando $\\tan\\theta \\gt \\mu_s$. Che cosa implica questa condizione?',
+        options: ['che i corpi pesanti scivolano prima', 'che serve conoscere l\'area di appoggio', 'che l\'angolo dipende dalla velocità iniziale', 'che l\'angolo di distacco dipende solo dai materiali, non dalla massa'],
+        correct: 3, explain: 'La massa si semplifica in entrambi i membri. Per questo inclinare lentamente un piano finché l\'oggetto parte è il modo più semplice al mondo per misurare $\\mu_s$: basta un goniometro.' },
+
+      { type: 'mc', diff: 'hard', text: 'Nel moto di un proiettile (senza aria), la componente <strong>orizzontale</strong> della velocità:',
+        options: ['diminuisce fino ad annullarsi nel punto più alto', 'resta costante per tutto il volo', 'cresce durante la discesa', 'dipende dall\'accelerazione di gravità'],
+        correct: 1, explain: 'Lungo $x$ non agisce nessuna forza, quindi vale il primo principio: moto rettilineo uniforme. A cambiare è solo la componente verticale, che si annulla nel vertice.' },
+
+      { type: 'mc', diff: 'hard', text: 'La cosiddetta <strong>forza centrifuga</strong>:',
+        options: ['è la reazione della forza centripeta secondo il terzo principio', 'è la forza che fa uscire l\'acqua dalla lavatrice', 'è una forza apparente, che compare solo scegliendo un riferimento rotante', 'agisce su tutti i corpi in movimento'],
+        correct: 2, explain: 'Nel riferimento inerziale non c\'è: c\'è solo la portiera che spinge il passeggero verso il centro. La goccia d\'acqua esce dal buco della lavatrice perché nessuno la trattiene più e prosegue per la tangente.' },
+
+      { type: 'mc', diff: 'hard', text: 'Nel terzo principio, azione e reazione non si annullano a vicenda perché:',
+        options: ['agiscono su corpi diversi', 'hanno intensità leggermente diverse', 'agiscono in istanti diversi', 'una è vera e l\'altra apparente'],
+        correct: 0, explain: 'Due forze si annullano solo se sono applicate allo <em>stesso</em> corpo, e la coppia azione-reazione non lo è mai per definizione. Il piede spinge il pavimento indietro, il pavimento spinge il piede avanti: è la seconda a farci camminare.' },
+
+      { type: 'mc', diff: 'medium', text: 'Una lampada pende dal soffitto di un ascensore che sta <strong>salendo, ma rallentando</strong>. La tensione del cavo è:',
+        options: ['maggiore del peso della lampada', 'minore del peso della lampada', 'esattamente uguale al peso della lampada', 'nulla, perché l\'ascensore sta rallentando'],
+        correct: 1, explain: 'Vale $T = m(g+a)$, e quello che conta è il segno dell\'<em>accelerazione</em>, non il verso del moto: un ascensore che sale rallentando ha $a$ rivolta verso il basso, quindi $T \\lt mg$. È lo stesso caso di un ascensore che scende accelerando — e la stessa sensazione allo stomaco.' },
+
+      { type: 'mc', diff: 'easy', text: 'Che cosa una fune <strong>non</strong> può fare?',
+        options: ['tirare il corpo a cui è attaccata', 'trasmettere una forza da un capo all\'altro', 'cambiare la direzione di una forza, passando su una carrucola', 'spingere il corpo a cui è attaccata'],
+        correct: 3, explain: 'Una fune lavora solo a <strong>trazione</strong>. Se un conto restituisce una tensione negativa non significa che la fune spinge: significa che si è allentata e il modello va rifatto. Per spingere serve un elemento rigido — un puntone, un\'asta, una colonna.' },
+
+      { type: 'open', diff: 'hard', text: 'Spiega perché l\'esperienza quotidiana sembra dare ragione ad Aristotele («per mantenere un corpo in moto serve una forza») e dove sta esattamente l\'errore. Usa l\'esempio della freccia scoccata.',
+        keywords: ['attrito', 'forza', 'acceler', 'velocit', 'freccia', 'aria', 'ghiaccio', 'vuoto', 'inerzia', 'risultante', 'antiperistasi'],
+        requiredMatches: 3,
+        explain: 'L\'osservazione è corretta: sulla Terra qualunque cosa, prima o poi, si ferma. L\'errore non è nell\'osservazione ma nell\'inventario delle forze: quando smetto di spingere non è vero che sul corpo non agisce più nulla — agisce l\'<strong>attrito</strong>, una forza che nessuno esercita visibilmente ma che c\'è, ed è lei a fermarlo.<br><br>La legge vera è che una forza non dà velocità ma <strong>accelerazione</strong>: per mantenere una velocità costante la risultante deve essere nulla, non la forza applicata.<br><br>La <strong>freccia scoccata</strong> è il caso che smaschera la teoria antica: appena lascia la corda nessuno la spinge più, eppure vola. Per salvare la teoria si immaginò l\'<em>antiperistasi</em> — l\'aria che si richiude dietro e spinge — ma quella spiegazione prevede due cose false: che nel vuoto una freccia non voli, e che un oggetto tozzo voli più lontano di una freccia. La conferma moderna sta dove l\'attrito quasi non c\'è: un disco sul ghiaccio, o le sonde Voyager che viaggiano da cinquant\'anni coi motori spenti.' },
+
+      { type: 'open', diff: 'hard', text: 'Spiega in che senso un astronauta in orbita «sta cadendo», e perché allora non arriva mai a terra. Collega la risposta al cannone di Newton e al moto del proiettile.',
+        keywords: ['cad', 'orbita', 'curv', 'tangente', 'velocit', 'parabola', 'proiettile', 'centripet', 'gravit', 'newton', 'terra'],
+        requiredMatches: 3,
+        explain: 'A $400$ km di quota la gravità vale ancora circa l\'$89\\%$ di quella al suolo: non è affatto «assente». L\'astronauta fluttua perché lui e la stazione stanno <strong>cadendo insieme</strong>, esattamente come la persona sulla bilancia in un ascensore in caduta libera, dove la reazione normale diventa zero.<br><br>Il motivo per cui non arriva mai è il <strong>cannone di Newton</strong>: un proiettile sparato in orizzontale descrive una parabola e cade sempre più lontano man mano che si aumenta la carica. Ma la Terra è curva, e a una velocità sufficiente ($v = \\sqrt{gR} \\approx 7{,}9$ km/s a livello del suolo) la superficie si incurva sotto al proiettile <em>alla stessa velocità</em> con cui lui scende.<br><br>Non c\'è nessun fenomeno nuovo rispetto alla sezione 8: è lo stesso moto di caduta, con la sola differenza che il bersaglio scappa via. La gravità, in questo caso, fa esattamente il mestiere della forza centripeta: $mg = mv^2/r$.' }
+    ];
+  </script>
+
+</body>
+
+</html>

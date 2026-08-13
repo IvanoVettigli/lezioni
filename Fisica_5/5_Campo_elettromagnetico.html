@@ -44,6 +44,16 @@
     .maxwell-box { border: 2px solid var(--accent); border-radius: 14px; background: color-mix(in srgb, var(--accent) 8%, var(--surface)); padding: 1rem 1.2rem; margin: 1.2rem 0; }
     .maxwell-box h4 { margin: 0 0 0.5rem; color: var(--accent); }
     .poem { text-align: center; font-size: 1.6rem; margin: 1.4rem 0; }
+
+    /* --- applicazioni dell'elettromagnetismo (sez. 8) --- */
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .passi { margin: 0.8rem 0 1rem 1.2rem; }
+    .passi li { margin: 0.35rem 0; }
+    .app-card { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 0.9rem 1.1rem; }
+    .app-card h4 { margin: 0 0 0.4rem; color: var(--accent); }
+    .app-card p { margin: 0; }
   </style>
 </head>
 
@@ -420,14 +430,292 @@
         valida ovunque: circuiti, nubi temporalesche, plasmi stellari, il tuo neurone preferito.</div>
     </section>
 
-    <!-- 8 — FACOLTATIVA: OPERATORI E FORMA LOCALE -->
-    <section id="sec8" class="optional">
-      <h2>8. L'algebra degli operatori: Maxwell in forma locale</h2>
+    <!-- 8 — LE APPLICAZIONI DELL'ELETTROMAGNETISMO -->
+    <section id="sec8">
+      <h2>8. Le applicazioni: dall'equazione all'oggetto</h2>
+
+      <p>Fin qui abbiamo scritto leggi. Ma la vera rivoluzione di Faraday, Ørsted e Ampère non è stata scriverle:
+        è stato accorgersi che con quelle leggi si potevano <em>costruire cose</em>. Nel giro di un secolo il
+        mondo si è riempito di oggetti che, sotto il guscio di plastica, non fanno altro che applicare le
+        equazioni di questa lezione: campanelli, motori, relè, altoparlanti, dischi rigidi, treni a
+        levitazione. In questa sezione ne smontiamo quattro, dal più semplice al più sottile.</p>
+
+      <h3>8.1 — L'elettromagnete: una calamita con l'interruttore</h3>
+
+      <p>Partiamo dalla legge di Ampère. Un filo percorso da corrente genera un campo magnetico; se il filo lo
+        avvolgiamo a spirale, i campi delle singole spire si sommano tutti nella stessa direzione e dentro
+        l'avvolgimento nasce un campo uniforme. Per un <strong>solenoide</strong> lungo $\ell$ con $N$ spire:</p>
+
+      <div class="definition">
+        <strong>Campo dentro un solenoide.</strong>
+        $$B = \mu_0 \, n \, I \qquad \text{con} \qquad n = \frac{N}{\ell}$$
+        Dipende solo da quante spire ci sono <em>per ogni metro</em> e da quanta corrente vi scorre. Il prodotto
+        $N I$ si chiama <strong>amperspire</strong> ed è la vera "manopola del volume" dell'elettromagnete: mille
+        spire con 1 A fanno lo stesso campo di cento spire con 10 A.
+      </div>
+
+      <p>Con la sola aria, però, il risultato è deludente: servono correnti enormi per ottenere campi decenti. La
+        mossa vincente — di <strong>William Sturgeon</strong>, 1825 — è infilare dentro l'avvolgimento un
+        <strong>nucleo di ferro dolce</strong>. Il ferro è ferromagnetico: i suoi domini si allineano al campo
+        della bobina e ci aggiungono il <em>loro</em>, moltiplicando il risultato per centinaia o migliaia di
+        volte. Il campo diventa</p>
+
+      <div class="definition">
+        $$B = \mu_r \, \mu_0 \, n \, I$$
+        dove $\mu_r$ è la <strong>permeabilità relativa</strong> del materiale: vale $1$ per l'aria, qualche
+        centinaio o migliaio per il ferro dolce. Attenzione però: il ferro non può dare più di quello che ha.
+        Quando tutti i domini sono allineati il materiale è in <strong>saturazione</strong> e aumentare la
+        corrente non serve quasi più a nulla.
+      </div>
+
+      <p>La forza con cui l'elettromagnete "tira" un pezzo di ferro appoggiato al polo, di superficie $A$, vale</p>
+      $$F = \frac{B^2 A}{2\mu_0}$$
+      <p>e cresce col <em>quadrato</em> del campo: raddoppiare $B$ quadruplica la presa. Provate voi: la stessa
+        bobina, con e senza nucleo.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Corrente $I$: <span class="val" id="el-iv">1,5</span> A</label>
+          <input type="range" id="el-i" min="0" max="3" step="0.1" value="1.5"></div>
+        <div class="control-group"><label>Numero di spire $N$: <span class="val" id="el-nv">150</span></label>
+          <input type="range" id="el-n" min="20" max="300" step="10" value="150"></div>
+        <div class="control-group"><label>Nucleo</label>
+          <div class="frame-tabs" id="el-core">
+            <button class="btn btn-secondary" type="button" data-c="aria">aria</button>
+            <button class="btn active" type="button" data-c="ferro">ferro dolce</button>
+          </div>
+        </div>
+        <label class="toggle-row"><input type="checkbox" id="el-lock" checked> 🔒 blocca la scala</label>
+      </div>
+      <div class="ckt"><svg id="el-svg" viewBox="0 0 640 300" aria-label="Elettromagnete: solenoide con nucleo che solleva un peso"></svg></div>
+      <div class="ckt"><svg id="el-graf" viewBox="0 0 640 260" aria-label="Grafico del campo B in funzione della corrente"></svg></div>
+      <div class="sp-cols">
+        <div>Amperspire $NI$: <span class="val-badge" id="el-ns">225</span></div>
+        <div>Campo $B$: <span class="val-badge" id="el-b">—</span></div>
+        <div>Forza di presa: <span class="val-badge" id="el-f">—</span></div>
+        <div>Massa sollevata: <span class="val-badge" id="el-m">—</span></div>
+      </div>
+      <p class="eq-out" id="el-out"></p>
+
+      <div class="note"><strong>Il dettaglio che cambia tutto.</strong> Perché <em>dolce</em>? Il ferro dolce (cioè
+        molto puro, povero di carbonio) si magnetizza facilmente <strong>e si smagnetizza altrettanto
+        facilmente</strong>: appena togli la corrente, molla la presa. Se usassi acciaio temprato la calamita
+        resterebbe attaccata anche a interruttore aperto — perfetto per un magnete permanente, disastroso per una
+        gru da sfasciacarrozze. La differenza fra i due si chiama <em>isteresi</em>, e la incontreremo nella
+        §8.4.</div>
+
+      <h3>8.2 — La campanella elettrica: un circuito che si spegne da solo</h3>
+
+      <p>La campanella dell'ingresso (e il vecchio "ronzatore" delle biciclette, e il campanello a martelletto
+        delle sveglie) nasconde un'idea davvero elegante: <strong>un circuito che interrompe se stesso</strong>.
+        Nessun temporizzatore, nessuna elettronica, nessun programma: solo un elettromagnete che, attirando
+        l'ancora, stacca il proprio alimentatore — e poi, non essendo più alimentato, la lascia tornare
+        indietro. Il risultato è un'oscillazione meccanica che si mantiene da sola finché tieni premuto il
+        pulsante.</p>
+
+      <ol class="passi">
+        <li><strong>Il circuito è chiuso.</strong> La corrente passa dalla pila alla bobina attraverso la vite di
+          contatto e l'ancora, che fanno da interruttore.</li>
+        <li><strong>L'elettromagnete attira l'ancora</strong> e il martelletto, che è solidale con essa, colpisce
+          il gong.</li>
+        <li><strong>Proprio muovendosi, l'ancora si stacca dalla vite:</strong> il circuito si apre e il campo
+          magnetico svanisce.</li>
+        <li><strong>La molla riporta indietro l'ancora,</strong> il contatto si richiude… e si ricomincia, decine
+          di volte al secondo.</li>
+      </ol>
+
+      <div class="controls">
+        <button class="btn" id="cp-avvia" type="button">🔔 Suona</button>
+        <div class="control-group"><label>Tensione della pila: <span class="val" id="cp-vv">6,0</span> V</label>
+          <input type="range" id="cp-v" min="3" max="12" step="0.5" value="6"></div>
+        <label class="toggle-row"><input type="checkbox" id="cp-lento"> 🐢 rallentatore</label>
+        <label class="toggle-row"><input type="checkbox" id="cp-audio" checked> 🔊 audio</label>
+      </div>
+      <div class="ckt"><svg id="cp-svg" viewBox="0 0 560 330" aria-label="Simulazione della campanella elettrica: elettromagnete, ancora, martelletto e vite di contatto"></svg></div>
+      <div class="sp-cols">
+        <div>Colpi al secondo: <span class="val-badge" id="cp-f">—</span></div>
+        <div>Stato del circuito: <span class="val-badge" id="cp-fase">fermo</span></div>
+        <div>Colpi dati: <span class="val-badge" id="cp-colpi">0</span></div>
+      </div>
+      <p class="eq-out" id="cp-out">Premi <strong>Suona</strong> e osserva il ciclo. Con il rallentatore si vede
+        bene l'istante in cui il contatto si stacca: è lo stesso istante in cui il martelletto tocca il gong.</p>
+
+      <div class="note"><strong>La scintilla al contatto.</strong> Ogni volta che l'ancora si stacca, la corrente
+        nella bobina viene interrotta di colpo. Ma la bobina è un'induttanza: per la legge di Lenz si oppone alla
+        variazione e produce una <strong>extracorrente di apertura</strong> con una tensione molto più alta di
+        quella della pila — abbastanza da far scoccare una scintilla fra la vite e l'ancora. È il motivo per cui
+        i contatti dei vecchi campanelli si anneriscono e si consumano, ed è anche il motivo per cui accanto a
+        ogni relè moderno si mette un <em>diodo di ricircolo</em> o un condensatore: per dare a quella corrente
+        una strada meno distruttiva.</div>
+
+      <div class="curiosita"><strong>Dallo stesso schema è nato molto altro.</strong> Il contatto che si apre e si
+        chiude da solo è il cuore del <strong>rocchetto di Ruhmkorff</strong>, che produceva le altissime
+        tensioni con cui Röntgen scoprì i raggi X; è il <em>ronzatore</em> del telegrafo; è la pompa della
+        benzina di certe auto d'epoca; ed è il nonno del <strong>relè</strong>, cioè di un interruttore comandato
+        elettricamente — l'oggetto con cui, prima dei transistor, si costruivano i primi calcolatori. Un
+        campanello e un computer, in fondo, sono parenti stretti.</div>
+
+      <h3>8.3 — Il motore omopolare: il motore più semplice del mondo</h3>
+
+      <p>Serve una pila stilo, una vite, un magnete al neodimio e un pezzo di filo di rame. Si appoggia il
+        magnete al polo negativo della pila, si tiene la pila in piedi, si piega il filo a formare un archetto
+        che tocca il polo positivo in alto e sfiora il bordo del magnete in basso. Il filo si mette a girare, e
+        non smette finché la pila non è scarica. È il <strong>motore omopolare</strong> — e non ha spazzole, né
+        collettore, né avvolgimenti: è il discendente diretto della "rotazione elettromagnetica" con cui
+        <strong>Faraday</strong>, nel 1821, costruì il primo motore elettrico della storia.</p>
+
+      <div class="definition">
+        <strong>Perché gira.</strong> Nel tratto di filo che va dall'asse verso il bordo del magnete la corrente
+        scorre in direzione <em>radiale</em>; il campo del magnete, lì, è <em>assiale</em> (esce dalla faccia
+        piatta). La forza di Lorentz su un tratto di filo, $\vec F = I\,\vec\ell \times \vec B$, è perpendicolare
+        a entrambi: quindi è <strong>tangenziale</strong>. Una forza tangenziale su un braccio è un
+        <strong>momento</strong>, e un momento fa girare. Sommando i contributi di tutto il raggio $R$:
+        $$\tau = \int_0^R I B\, r \, \mathrm{d}r = \frac{I B R^2}{2}$$
+      </div>
+
+      <p>Si chiama <em>omopolare</em> perché il campo che vede la corrente non cambia mai verso: non serve
+        invertire nulla a metà giro, e quindi non serve il collettore che invece è indispensabile nei motori a
+        corrente continua ordinari. Il prezzo da pagare è che di giri ne fa tanti ma di coppia ne fa
+        pochissima.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Corrente $I$: <span class="val" id="om-iv">2,0</span> A</label>
+          <input type="range" id="om-i" min="0.2" max="4" step="0.1" value="2"></div>
+        <div class="control-group"><label>Polo del magnete rivolto in alto</label>
+          <div class="frame-tabs" id="om-pol">
+            <button class="btn active" type="button" data-p="N">N</button>
+            <button class="btn btn-secondary" type="button" data-p="S">S</button>
+          </div>
+        </div>
+        <div class="control-group"><label>Verso della corrente</label>
+          <div class="frame-tabs" id="om-verso">
+            <button class="btn active" type="button" data-v="1">dall'alto verso il bordo</button>
+            <button class="btn btn-secondary" type="button" data-v="-1">dal bordo verso l'alto</button>
+          </div>
+        </div>
+        <button class="btn" id="om-play" type="button">▶ Avvia</button>
+      </div>
+      <div class="ckt"><svg id="om-svg" viewBox="0 0 640 320" aria-label="Motore omopolare: vista laterale e vista dall'alto con la forza tangenziale"></svg></div>
+      <div class="sp-cols">
+        <div>Momento $\tau$: <span class="val-badge" id="om-tau">—</span></div>
+        <div>Velocità a regime: <span class="val-badge" id="om-rpm">—</span></div>
+        <div>Senso di rotazione: <span class="val-badge" id="om-senso">—</span></div>
+      </div>
+      <p class="eq-out" id="om-out"></p>
+
+      <div class="note"><strong>Provate a invertire.</strong> Girate il magnete: il senso di rotazione si inverte.
+        Girate la pila: si inverte di nuovo. Girate <em>tutti e due</em>: torna come prima. È la regola della mano
+        destra applicata due volte, e meno due meno fa più.</div>
+
+      <div class="curiosita"><strong>Il fratello grande.</strong> Lo stesso principio, letto al contrario, dà il
+        <strong>generatore omopolare</strong> (o "disco di Faraday"): un disco metallico che ruota in un campo
+        assiale produce fra centro e bordo una differenza di potenziale continua. Tensioni bassissime, ma
+        correnti spaventose: macchine di questo tipo, grosse come una stanza, servono nei laboratori per
+        erogare impulsi da <em>milioni</em> di ampere.</div>
+
+      <h3>8.4 — L'isteresi: quando il ferro si ricorda</h3>
+
+      <p>Torniamo al nucleo dell'elettromagnete e facciamo un esperimento più paziente. Partiamo da un pezzo di
+        ferro smagnetizzato, alziamo il campo $H$ prodotto dalla bobina fino alla saturazione, poi
+        <em>riportiamolo a zero</em>. Ci aspetteremmo che il materiale ritorni sui suoi passi. Non lo fa.</p>
+
+      <div class="definition">
+        <strong>Isteresi</strong> (dal greco <em>hystéresis</em>, "ritardo"). La magnetizzazione di un materiale
+        ferromagnetico non dipende solo dal campo applicato in questo istante, ma anche da <strong>tutta la
+        storia</strong> che il materiale ha attraversato. Il grafico $B$–$H$ non è una curva: è un
+        <strong>ciclo</strong>.
+        <ul>
+          <li><strong>Magnetizzazione residua $B_r$</strong>: quello che resta quando si riporta $H$ a zero.
+            È il motivo per cui esistono i magneti permanenti.</li>
+          <li><strong>Campo coercitivo $H_c$</strong>: il campo <em>contrario</em> che bisogna applicare per
+            azzerare la magnetizzazione. È la misura di quanto il materiale è "testardo".</li>
+          <li><strong>Area del ciclo</strong>: l'energia dissipata in calore a ogni giro, per ogni metro cubo di
+            materiale.</li>
+        </ul>
+      </div>
+
+      <p>La causa microscopica la conosciamo già dalla lezione scorsa: le <strong>pareti dei domini</strong> non
+        scorrono libere, si impigliano nei difetti del reticolo, nelle impurezze, nei bordi dei grani. Per
+        staccarle serve energia — e quell'energia non torna indietro: diventa calore.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Campo applicato $H$: <span class="val" id="is-hv">0,00</span></label>
+          <input type="range" id="is-h" min="-1" max="1" step="0.02" value="0"></div>
+        <div class="control-group"><label>Materiale del nucleo</label>
+          <div class="frame-tabs" id="is-mat">
+            <button class="btn active" type="button" data-m="dolce">dolce (ferro-silicio)</button>
+            <button class="btn btn-secondary" type="button" data-m="duro">duro (magnete permanente)</button>
+          </div>
+        </div>
+        <button class="btn" id="is-ciclo" type="button">▶ Percorri un ciclo</button>
+        <button class="btn" id="is-smag" type="button">↺ Smagnetizza</button>
+        <label class="toggle-row"><input type="checkbox" id="is-lock" checked> 🔒 blocca la scala</label>
+      </div>
+      <div class="ckt"><svg id="is-svg" viewBox="0 0 640 360" aria-label="Ciclo di isteresi: campo B in funzione del campo applicato H"></svg></div>
+      <div class="sp-cols">
+        <div>$B$ attuale: <span class="val-badge" id="is-bv">—</span></div>
+        <div>Residua $B_r$: <span class="val-badge" id="is-br">—</span></div>
+        <div>Coercitivo $H_c$: <span class="val-badge" id="is-hc">—</span></div>
+        <div>Area del ciclo: <span class="val-badge" id="is-area">—</span></div>
+      </div>
+      <p class="eq-out" id="is-out"></p>
+
+      <p>Muovete il cursore avanti e indietro senza mai arrivare agli estremi: vedrete comparire dei
+        <strong>cicli minori</strong>, più piccoli, tutti diversi. È la firma inconfondibile di un sistema con
+        memoria — e infatti su questo si sono costruite, per mezzo secolo, tutte le memorie dei calcolatori.</p>
+
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Materiale</th><th>$H_c$ (A/m)</th><th>$B_r$ (T)</th><th>A che serve</th></tr></thead>
+          <tbody>
+            <tr><td>Ferro dolce ricotto</td><td>$\approx 4$</td><td>$\approx 1{,}3$</td><td>nuclei di elettromagneti e relè</td></tr>
+            <tr><td>Lamierino ferro-silicio</td><td>$\approx 40$</td><td>$\approx 1{,}0$</td><td>trasformatori, motori, alternatori</td></tr>
+            <tr><td>Ferrite dolce (Mn-Zn)</td><td>$\approx 20$</td><td>$\approx 0{,}2$</td><td>alimentatori, antenne, filtri</td></tr>
+            <tr><td>Ferrite dura (Sr)</td><td>$\approx 2{,}5\times 10^{5}$</td><td>$\approx 0{,}4$</td><td>calamite da frigo, altoparlanti</td></tr>
+            <tr><td>Neodimio (Nd-Fe-B)</td><td>$\approx 9\times 10^{5}$</td><td>$\approx 1{,}3$</td><td>motori, hard disk, auricolari</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sp-cols">
+        <div class="app-card">
+          <h4>Ciclo stretto = materiali dolci</h4>
+          <p>Un trasformatore percorre il suo ciclo <strong>50 volte al secondo</strong>: se l'area fosse grande,
+            tutta quell'energia se ne andrebbe in calore. Per questo i nuclei si fanno di lamierini di
+            ferro-silicio, sottili e isolati fra loro (anche per tagliare le correnti parassite di Foucault). Meno
+            area, meno bolletta.</p>
+        </div>
+        <div class="app-card">
+          <h4>Ciclo largo = materiali duri</h4>
+          <p>Se invece vuoi che il materiale <em>ricordi</em>, l'isteresi è una risorsa. Un magnete permanente è
+            semplicemente un materiale con $H_c$ enorme: nessun campo che incontrerà nella sua vita riuscirà più a
+            smagnetizzarlo. E se scrivi minuscole regioni magnetizzate su un disco, hai una
+            <strong>memoria</strong>.</p>
+        </div>
+      </div>
+
+      <div class="curiosita"><strong>Come si smagnetizza davvero qualcosa.</strong> Non basta togliere il campo:
+        resta $B_r$. Bisogna far percorrere al materiale cicli sempre più stretti, invertendo il campo tante
+        volte e riducendolo gradualmente a zero — una spirale che collassa verso l'origine del grafico. È
+        esattamente ciò che fa il <em>degausser</em> con cui si cancellano i nastri e i vecchi tubi catodici, ed è
+        anche il motivo per cui i televisori a tubo, all'accensione, facevano quel caratteristico
+        <em>"blong"</em>: era la bobina di smagnetizzazione che entrava in funzione.</div>
+
+      <div class="curiosita"><strong>Non è roba solo da magneti.</strong> L'isteresi compare ovunque un sistema
+        risponda in ritardo e conservi memoria del passato: nella deformazione della gomma, nell'elastico che non
+        torna esattamente com'era, nell'attrito statico che è maggiore di quello dinamico, nel termostato che
+        accende a 19 °C e spegne a 21 °C per non "ballare" attorno alla soglia. Ogni volta che una risposta
+        dipende <em>da dove vieni</em> e non solo <em>da dove sei</em>, c'è un ciclo di isteresi nascosto da
+        qualche parte.</div>
+    </section>
+
+    <!-- 9 — FACOLTATIVA: OPERATORI E FORMA LOCALE -->
+    <section id="sec9" class="optional">
+      <h2>9. L'algebra degli operatori: Maxwell in forma locale</h2>
       <p>Approfondimento per i curiosi: le equazioni che abbiamo scritto con flussi e circuitazioni si possono
         riscrivere <em>punto per punto</em>, nella forma in cui le usano fisici e ingegneri. Serve un piccolo
         vocabolario nuovo — e alla fine, una sorpresa poetica.</p>
 
-      <h3>8.1 — La derivata parziale</h3>
+      <h3>9.1 — La derivata parziale</h3>
       <p>I campi dipendono da più variabili: $\vec E(x, y, z, t)$. La <strong>derivata parziale</strong> $\dfrac{\partial f}{\partial x}$
         è la derivata che già conosci, fatta però rispetto a <strong>una sola</strong> variabile, tenendo ferme tutte le
         altre come se fossero costanti. Tutto qui: il simbolo $\partial$ (una "d arrotondata") avverte solo che le
@@ -444,14 +732,14 @@
         </div>
       </div>
 
-      <h3>8.2 — Nabla: un vettore fatto di derivate</h3>
+      <h3>9.2 — Nabla: un vettore fatto di derivate</h3>
       <p>Ora impacchettiamo le tre derivate parziali spaziali in un unico simbolo, l'operatore <strong>nabla</strong>:</p>
       <div class="formula-box">$$\nabla = \left( \frac{\partial}{\partial x},\; \frac{\partial}{\partial y},\; \frac{\partial}{\partial z} \right)$$</div>
       <p>Nabla è un "vettore di istruzioni": da solo non vale niente, ma applicato a un campo produce oggetti
         preziosissimi. I due modi di applicarlo a un campo vettoriale ricalcano i due prodotti tra vettori che
         conosciamo: il prodotto scalare e il prodotto vettoriale.</p>
 
-      <h3>8.3 — La divergenza: quanto un punto "sorgente"</h3>
+      <h3>9.3 — La divergenza: quanto un punto "sorgente"</h3>
       <div class="definition">
         La <strong>divergenza</strong> è il prodotto scalare di nabla con il campo:
         $$\nabla \cdot \vec E = \frac{\partial E_x}{\partial x} + \frac{\partial E_y}{\partial y} + \frac{\partial E_z}{\partial z}$$
@@ -460,7 +748,7 @@
         È la versione "locale" del flusso: il flusso per unità di volume di una scatolina infinitesima attorno al punto.
       </div>
 
-      <h3>8.4 — Il rotore: quanto un punto "vortica"</h3>
+      <h3>9.4 — Il rotore: quanto un punto "vortica"</h3>
       <div class="definition">
         Il <strong>rotore</strong> $\nabla \times \vec E$ è il prodotto vettoriale di nabla con il campo. È un vettore
         (per ogni punto) che misura quanto il campo <strong>gira</strong> attorno a quel punto: immergi un mulinello
@@ -483,7 +771,7 @@
         </div>
       </div>
 
-      <h3>8.5 — Le equazioni di Maxwell in forma locale</h3>
+      <h3>9.5 — Le equazioni di Maxwell in forma locale</h3>
       <p>Con questo vocabolario, flusso → divergenza e circuitazione → rotore. Le nostre cinque leggi diventano:</p>
 
       <div class="maxwell-box">
@@ -506,7 +794,7 @@
         l'elettromagnetismo: i circuiti delle lezioni scorse, i motori, le antenne, la luce, il Wi-Fi, il colore del
         cielo. Nessuna eccezione nota, dal 1865 a oggi.</p>
 
-      <h3>8.6 — Chiusura: una poesia ermetica</h3>
+      <h3>9.6 — Chiusura: una poesia ermetica</h3>
       <p>C'è un ultimo passo, il più elegante. Combinando le equazioni (con la scelta di "coordinate" giusta, il
         cosiddetto gauge di Lorenz) i campi si raccolgono in un unico oggetto $A$ — il <strong>potenziale
         elettromagnetico</strong> — e le sorgenti (cariche e correnti) in un unico oggetto $J$. Definendo il
@@ -522,15 +810,15 @@
         imparato a leggerle</em>. Voi, da oggi, avete iniziato.</p>
     </section>
 
-    <!-- 9 — FACOLTATIVA: AHARONOV-BOHM -->
-    <section id="sec9" class="optional">
-      <h2>9. L'effetto Aharonov-Bohm: quando il potenziale diventa reale</h2>
+    <!-- 10 — FACOLTATIVA: AHARONOV-BOHM -->
+    <section id="sec10" class="optional">
+      <h2>10. L'effetto Aharonov-Bohm: quando il potenziale diventa reale</h2>
 
       <p>Nella sezione precedente abbiamo scritto Maxwell in forma locale. C'è però un modo ancora più
         compatto di scriverla, che finora abbiamo tenuto nascosto perché sembra soltanto una comodità di
         calcolo — e che invece nasconde una delle sorprese più profonde della fisica del Novecento.</p>
 
-      <h3>9.1 I potenziali: comode impalcature?</h3>
+      <h3>10.1 I potenziali: comode impalcature?</h3>
 
       <p>Poiché il campo magnetico non ha sorgenti (<span>$\nabla \cdot \vec{B} = 0$</span>), si dimostra che
         esiste sempre un campo vettoriale <span>$\vec{A}$</span>, detto <strong>potenziale vettore</strong>,
@@ -554,7 +842,7 @@
         un'impalcatura matematica utile per fare i conti; le cose vere, quelle che si misurano, sono
         <span>$\vec{E}$</span> e <span>$\vec{B}$</span>. Per un secolo nessuno ha avuto motivo di dubitarne.</p>
 
-      <h3>9.2 Il solenoide che imbroglia</h3>
+      <h3>10.2 Il solenoide che imbroglia</h3>
 
       <p>Consideriamo un <strong>solenoide molto lungo e sottile</strong>. Dentro c'è un campo magnetico
         uniforme; fuori, se il solenoide è ideale, il campo è <strong>esattamente zero</strong>.</p>
@@ -576,7 +864,7 @@
         di un piano tornando allo stesso punto della pianta.
       </div>
 
-      <h3>9.3 L'esperimento pensato da Aharonov e Bohm</h3>
+      <h3>10.3 L'esperimento pensato da Aharonov e Bohm</h3>
 
       <p>Nel 1959 <strong>Yakir Aharonov</strong> e <strong>David Bohm</strong> proposero questo. Si prende un
         esperimento a doppia fenditura con <strong>elettroni</strong> — quello della meccanica quantistica,
@@ -627,7 +915,7 @@
         sono <em>scambiati di posto</em>: dove prima c'era una frangia chiara adesso c'è il buio. Il tutto
         senza che una sola forza abbia agito su un solo elettrone.</p>
 
-      <h3>9.4 Che cosa ci ha insegnato</h3>
+      <h3>10.4 Che cosa ci ha insegnato</h3>
 
       <div class="sp-cols">
         <div class="maxwell-box">
@@ -680,9 +968,9 @@
       </div>
     </section>
 
-    <!-- 10 — QUIZ -->
+    <!-- 11 — QUIZ -->
     <section id="quiz">
-      <h2>10. Quiz finale</h2>
+      <h2>11. Quiz finale</h2>
       <p>Dieci domande su induzione, Ampère, Maxwell e continuità. Difficoltà crescente.</p>
       <div id="quiz-app"></div>
     </section>
@@ -717,8 +1005,8 @@
         options: ['un errore storico mai corretto', 'la conservazione dell\'energia: la corrente indotta si oppone alla variazione', 'il verso convenzionale della corrente', 'che il flusso è sempre negativo'],
         correct: 1, explain: 'Lenz: la corrente indotta contrasta la variazione che la genera. Se la favorisse, avremmo energia gratis dal nulla.' },
       { type: 'mc', diff: 'medium', text: 'Nell\'esperimento di Ørsted, l\'ago della bussola si sposta perché:',
-        options: ['il filo caldo crea correnti d\'aria', 'la corrente nel filo genera un campo magnetico', 'la pila attira il ferro dell\'ago', 'il filo scherma il campo terrestre'],
-        correct: 1, explain: 'Una corrente genera un campo magnetico che si avvolge in cerchi attorno al filo: l\'ago si allinea al campo risultante.' },
+        options: ['il filo caldo crea correnti d\'aria', 'la pila attira il ferro dell\'ago', 'il filo scherma il campo terrestre', 'la corrente nel filo genera un campo magnetico'],
+        correct: 3, explain: 'Una corrente genera un campo magnetico che si avvolge in cerchi attorno al filo: l\'ago si allinea al campo risultante.' },
       { type: 'mc', diff: 'medium', text: 'Il flusso $\\Phi_B = B\\,A\\cos\\theta$ attraverso una spira può variare perché:',
         options: ['solo se cambia il campo B', 'solo se la spira ruota', 'se cambia B, oppure l\'angolo θ, oppure l\'area A', 'solo se la spira si muove'],
         correct: 2, explain: 'Tre strade: varia il campo (magnete che trasla), varia l\'orientazione (rotazione: è l\'alternatore!), varia l\'area della spira.' },
@@ -731,6 +1019,21 @@
       { type: 'mc', diff: 'hard', text: 'Combinando le sue equazioni, Maxwell scoprì che i campi elettromagnetici si propagano come onde con velocità $1/\\sqrt{\\mu_0\\varepsilon_0}$, che risulta essere:',
         options: ['la velocità del suono', 'la velocità della luce: la luce È un\'onda elettromagnetica', 'infinita', 'la velocità degli elettroni nel filo'],
         correct: 1, explain: 'Il calcolo dà circa 3×10⁸ m/s: la velocità della luce. Fu la prova che la luce è un\'onda elettromagnetica.' },
+      { type: 'mc', diff: 'easy', text: 'Perché il nucleo di un elettromagnete si fa di ferro <em>dolce</em> e non di acciaio temprato?',
+        options: ['perché il ferro dolce costa molto meno', 'perché l\'acciaio temprato non conduce la corrente', 'perché il ferro dolce ha una permeabilità più bassa', 'perché il ferro dolce si smagnetizza appena si toglie la corrente'],
+        correct: 3, explain: 'Serve una calamita che si spenga: il ferro dolce ha un ciclo di isteresi strettissimo e molla la presa subito. L\'acciaio temprato resterebbe magnetizzato — perfetto per un magnete permanente, pessimo per una gru.' },
+      { type: 'mc', diff: 'medium', text: 'Nella campanella elettrica il circuito si interrompe perché:',
+        options: ['un temporizzatore lo apre a intervalli regolari', 'la pila si scarica e si ricarica di continuo', 'l\'ancora, attratta dall\'elettromagnete, si stacca dalla vite di contatto', 'il gong fa da interruttore quando viene colpito'],
+        correct: 2, explain: 'È un circuito che interrompe se stesso: il movimento dell\'ancora apre il contatto che alimenta l\'elettromagnete. Nessuna elettronica, solo meccanica e legge di Ampère.' },
+      { type: 'mc', diff: 'medium', text: 'La forza di presa di un elettromagnete vale $F = B^2A/(2\\mu_0)$. Se il campo raddoppia, la forza:',
+        options: ['diventa quattro volte più grande', 'raddoppia', 'resta la stessa', 'si dimezza'],
+        correct: 0, explain: 'La forza va col QUADRATO del campo: raddoppiare B significa moltiplicare per quattro la presa. È il motivo per cui il nucleo di ferro cambia tutto.' },
+      { type: 'mc', diff: 'hard', text: 'In un motore omopolare capovolgiamo il magnete <em>e</em> invertiamo la pila. Il senso di rotazione:',
+        options: ['si inverte una volta sola', 'il motore si ferma', 'diventa imprevedibile', 'resta quello di prima: le due inversioni si compensano'],
+        correct: 3, explain: 'La forza è $\\vec F = I\\,\\vec\\ell\\times\\vec B$: cambiando segno sia a $I$ sia a $\\vec B$ il prodotto non cambia. Meno per meno fa più.' },
+      { type: 'mc', diff: 'hard', text: 'L\'area racchiusa dal ciclo di isteresi di un materiale rappresenta:',
+        options: ['la magnetizzazione residua', 'il campo coercitivo', 'l\'energia dissipata in calore a ogni ciclo, per unità di volume', 'la permeabilità relativa'],
+        correct: 2, explain: 'È $\\oint H\\,\\mathrm{d}B$: energia per metro cubo persa a ogni giro. Per questo i nuclei dei trasformatori, che compiono 50 cicli al secondo, si fanno con materiali dal ciclo strettissimo.' },
       { type: 'open', diff: 'hard', text: 'Spiega con le tue parole perché il segno meno della legge di Lenz è necessario per la conservazione dell\'energia.',
         keywords: ['oppo', 'energia', 'variazione', 'gratis', 'perpetuo', 'lavoro', 'fatica', 'contrast'], requiredMatches: 2,
         explain: 'Se la corrente indotta favorisse la variazione che la crea (segno più), il magnete verrebbe attirato/accelerato da solo, aumentando l\'induzione all\'infinito: energia dal nulla, moto perpetuo. Col segno meno la corrente si oppone: bisogna compiere lavoro contro di essa, ed è quel lavoro a trasformarsi in energia elettrica.' }
@@ -1133,6 +1436,697 @@
       disegna();
     });
   </script>
+  <!-- Sezione 8: le applicazioni dell'elettromagnetismo -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var MU0 = 4 * Math.PI * 1e-7;
+
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      // freccia: segmento + punta triangolare (niente <marker>, che darebbe id duplicati)
+      function frec(x1, y1, x2, y2, col, sp, testa) {
+        var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy);
+        if (L < 0.6) { return ''; }
+        var s = testa || Math.min(L * 0.4, 9);
+        var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+        var bx = x2 - ux * s, by = y2 - uy * s;
+        return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) +
+          '" stroke="' + col + '" stroke-width="' + sp + '" stroke-linecap="round"/>' +
+          '<polygon points="' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+          (bx + px * s * 0.5).toFixed(1) + ',' + (by + py * s * 0.5).toFixed(1) + ' ' +
+          (bx - px * s * 0.5).toFixed(1) + ',' + (by - py * s * 0.5).toFixed(1) + '" fill="' + col + '"/>';
+      }
+
+      function tabs(cont, attr, azione) {
+        var bs = cont.querySelectorAll('button');
+        Array.prototype.forEach.call(bs, function (b) {
+          b.addEventListener('click', function () {
+            Array.prototype.forEach.call(bs, function (x) {
+              x.className = (x === b) ? 'btn active' : 'btn btn-secondary';
+            });
+            azione(b.getAttribute(attr));
+          });
+        });
+      }
+
+      /* ==================== 8.1 — L'ELETTROMAGNETE ==================== */
+      (function () {
+        var svg = document.getElementById('el-svg');
+        if (!svg) { return; }
+        var graf = document.getElementById('el-graf');
+
+        var LSOL = 0.15;       // lunghezza del solenoide, in metri
+        var MUR = 500;         // permeabilita' relativa del ferro dolce
+        var BSAT = 1.6;        // campo di saturazione, in tesla
+        var AREA = 6e-4;       // superficie di un polo, in metri quadrati
+        var GACC = 9.81;
+        var IMAX = 3;
+        var nucleo = 'ferro';
+
+        function campo(I, N, core) {
+          var mur = (core === 'ferro') ? MUR : 1;
+          var x = mur * MU0 * (N / LSOL) * I;      // campo che si avrebbe senza saturazione
+          return BSAT * Math.tanh(x / BSAT);        // ... temperato dalla saturazione del ferro
+        }
+        function forza(B) { return B * B * AREA / (2 * MU0); }
+
+        function massaTesto(kg) {
+          if (kg < 0.001) { return nf(kg * 1e6, 0) + ' mg'; }
+          if (kg < 1) { return nf(kg * 1000, kg < 0.01 ? 1 : 0) + ' g'; }
+          return nf(kg, 1) + ' kg';
+        }
+        function campoTesto(B) {
+          if (B < 0.01) { return nf(B * 1000, 2) + ' mT'; }
+          return nf(B, 3) + ' T';
+        }
+
+        function disegna() {
+          var I = parseFloat(document.getElementById('el-i').value);
+          var N = parseFloat(document.getElementById('el-n').value);
+          var B = campo(I, N, nucleo);
+          var F = forza(B), kg = F / GACC;
+          var attacca = (kg >= 0.05);
+          var g = '';
+
+          // nucleo a U, poli rivolti in basso
+          var col = (nucleo === 'ferro') ? 'var(--text-soft)' : 'none';
+          var dash = (nucleo === 'ferro') ? '' : ' stroke-dasharray="7 6"';
+          g += '<path d="M230,190 L230,110 Q230,74 268,74 L372,74 Q410,74 410,110 L410,190" fill="none" stroke="' +
+            ((nucleo === 'ferro') ? 'var(--text-soft)' : 'var(--muted)') + '" stroke-width="26" stroke-linecap="butt" opacity="' +
+            ((nucleo === 'ferro') ? '1' : '0.25') + '"' + dash + '/>';
+          g += '<text x="320" y="60" text-anchor="middle" class="lbl-s">' +
+            ((nucleo === 'ferro') ? 'nucleo di ferro dolce' : 'nessun nucleo: solo aria') + '</text>';
+
+          // avvolgimento sulle due gambe (il numero di spire disegnate segue N)
+          var nsp = Math.max(3, Math.min(14, Math.round(N / 22)));
+          var yA = 104, yB = 184, k;
+          for (k = 0; k < nsp; k++) {
+            var yy = yA + (yB - yA) * (k + 0.5) / nsp;
+            g += '<rect x="212" y="' + (yy - 2.5).toFixed(1) + '" width="36" height="5" rx="2.5" fill="var(--accent)" opacity="0.85"/>';
+            g += '<rect x="392" y="' + (yy - 2.5).toFixed(1) + '" width="36" height="5" rx="2.5" fill="var(--accent)" opacity="0.85"/>';
+          }
+          g += '<text x="150" y="150" text-anchor="middle" class="lbl-s">avvolgimento</text>';
+          g += '<text x="150" y="166" text-anchor="middle" class="lbl-s">' + Math.round(N) + ' spire</text>';
+          g += '<text x="500" y="150" text-anchor="middle" class="lbl-s">corrente</text>';
+          g += '<text x="500" y="166" text-anchor="middle" class="lbl-s">' + nf(I, 1) + ' A</text>';
+
+          // poli
+          g += '<text x="230" y="208" text-anchor="middle" class="em">N</text>';
+          g += '<text x="410" y="208" text-anchor="middle" class="em">S</text>';
+
+          // linee di campo fra i poli: quante e quanto marcate dipende da B
+          var quante = Math.round(1 + 5 * Math.min(1, B / BSAT));
+          if (B > 1e-4) {
+            for (k = 0; k < quante; k++) {
+              var q = 30 + k * 16;
+              g += '<path d="M230,196 Q320,' + (196 + q) + ' 410,196" fill="none" stroke="var(--accent)" stroke-width="1.7" opacity="' +
+                (0.25 + 0.6 * Math.min(1, B / BSAT)).toFixed(2) + '"/>';
+            }
+          }
+
+          // ancora e peso appeso (se il campo non basta, cade)
+          var yAnc = attacca ? 190 : 232;
+          g += '<rect x="206" y="' + yAnc + '" width="228" height="16" rx="3" fill="var(--muted)" opacity="0.75"/>';
+          g += '<text x="452" y="' + (yAnc + 12) + '" class="lbl-s">ancora</text>';
+          if (attacca) {
+            g += '<line x1="320" y1="206" x2="320" y2="228" stroke="var(--text-soft)" stroke-width="2.5"/>';
+            var lat = Math.max(30, Math.min(78, 26 * Math.pow(kg, 1 / 3) + 16));
+            g += '<rect x="' + (320 - lat / 2).toFixed(1) + '" y="228" width="' + lat.toFixed(1) + '" height="' +
+              (lat * 0.7).toFixed(1) + '" rx="5" fill="var(--gold)" opacity="0.55" stroke="var(--gold)" stroke-width="2"/>';
+            g += '<text x="320" y="' + (228 + lat * 0.7 / 2 + 5).toFixed(1) + '" text-anchor="middle" class="lbl">' + massaTesto(kg) + '</text>';
+          } else {
+            g += '<text x="320" y="272" text-anchor="middle" class="em">la presa e\' troppo debole: l\'ancora cade</text>';
+          }
+          svg.innerHTML = g;
+
+          // ---- grafico B(I) ----
+          var lock = document.getElementById('el-lock').checked;
+          var Bmax = lock ? 1.8 : Math.max(campo(IMAX, N, nucleo) * 1.15, 1e-9);
+          var GX0 = 76, GX1 = 610, GY0 = 218, GY1 = 30;
+          var px = function (i) { return GX0 + (GX1 - GX0) * i / IMAX; };
+          var py = function (b) { return GY0 + (GY1 - GY0) * Math.min(1, b / Bmax); };
+          var h = '';
+          h += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX1 + '" y2="' + GY0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          h += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX0 + '" y2="' + GY1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (k = 0; k <= 6; k++) {
+            var xi = GX0 + (GX1 - GX0) * k / 6;
+            h += '<line x1="' + xi.toFixed(1) + '" y1="' + GY0 + '" x2="' + xi.toFixed(1) + '" y2="' + (GY0 + 5) + '" stroke="var(--text-soft)" stroke-width="1.5"/>';
+            h += '<text x="' + xi.toFixed(1) + '" y="' + (GY0 + 20) + '" text-anchor="middle" class="lbl-s">' + nf(IMAX * k / 6, 1) + '</text>';
+          }
+          for (k = 0; k <= 4; k++) {
+            var yi = GY0 + (GY1 - GY0) * k / 4;
+            h += '<line x1="' + (GX0 - 5) + '" y1="' + yi.toFixed(1) + '" x2="' + GX0 + '" y2="' + yi.toFixed(1) + '" stroke="var(--text-soft)" stroke-width="1.5"/>';
+            h += '<text x="' + (GX0 - 9) + '" y="' + (yi + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(Bmax * k / 4, 2) + '</text>';
+          }
+          h += '<text x="' + GX1 + '" y="' + (GY0 + 34) + '" text-anchor="end" class="lbl-s">corrente I (A)</text>';
+          h += '<text x="' + (GX0 - 60) + '" y="' + (GY1 + 2) + '" class="lbl-s">B (T)</text>';
+          var pts = [], np = 120;
+          for (k = 0; k <= np; k++) {
+            var ii = IMAX * k / np;
+            pts.push(px(ii).toFixed(1) + ',' + py(campo(ii, N, nucleo)).toFixed(1));
+          }
+          h += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2.6"/>';
+          h += '<circle cx="' + px(I).toFixed(1) + '" cy="' + py(B).toFixed(1) + '" r="6" fill="var(--magenta)"/>';
+          if (lock && Bmax > BSAT) {
+            h += '<line x1="' + GX0 + '" y1="' + py(BSAT).toFixed(1) + '" x2="' + GX1 + '" y2="' + py(BSAT).toFixed(1) +
+              '" stroke="var(--magenta)" stroke-width="1.6" stroke-dasharray="6 5" opacity="0.8"/>';
+            h += '<text x="' + (GX1 - 6) + '" y="' + (py(BSAT) - 8).toFixed(1) + '" text-anchor="end" class="em">saturazione, 1,6 T</text>';
+          }
+          graf.innerHTML = h;
+
+          // ---- numeri e commento ----
+          document.getElementById('el-iv').textContent = nf(I, 1);
+          document.getElementById('el-nv').textContent = Math.round(N);
+          document.getElementById('el-ns').textContent = nf(N * I, 0);
+          document.getElementById('el-b').textContent = campoTesto(B);
+          document.getElementById('el-f').textContent = (F < 1 ? nf(F * 1000, 1) + ' mN' : nf(F, 0) + ' N');
+          document.getElementById('el-m').textContent = massaTesto(kg);
+          var Bf = campo(I, N, 'ferro'), Ba = campo(I, N, 'aria');
+          var msg;
+          if (I < 0.05) {
+            msg = 'Corrente nulla, campo nullo: senza corrente l\'elettromagnete è un pezzo di ferro qualunque. È tutto il suo vantaggio sulla calamita.';
+          } else if (nucleo === 'aria') {
+            msg = 'Senza nucleo servono $B = \\mu_0 n I$ e basta: il campo è di pochi millitesla e la presa non regge nemmeno una graffetta. ' +
+              'Con lo stesso avvolgimento, il ferro darebbe ' + campoTesto(Bf) + ' — ' + nf(Bf / Math.max(Ba, 1e-12), 0) + ' volte tanto.';
+          } else if (Bf > 0.85 * BSAT) {
+            msg = 'Siamo vicini alla <strong>saturazione</strong>: la curva si appiattisce e aumentare ancora la corrente serve a poco. ' +
+              'Guardate il grafico: il ferro ha dato tutto quello che aveva.';
+          } else {
+            msg = 'Il nucleo moltiplica il campo per circa ' + nf(Bf / Math.max(Ba, 1e-12), 0) + ' volte. La forza cresce col quadrato del campo, ' +
+              'perciò raddoppiare la corrente quadruplica (quasi) la presa.';
+          }
+          var el = document.getElementById('el-out');
+          el.innerHTML = msg;
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        tabs(document.getElementById('el-core'), 'data-c', function (v) { nucleo = v; disegna(); });
+        ['el-i', 'el-n'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('el-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ==================== 8.2 — LA CAMPANELLA ELETTRICA ==================== */
+      (function () {
+        var svg = document.getElementById('cp-svg');
+        if (!svg) { return; }
+
+        var DMAX = 24;          // corsa dell'ancora, in pixel
+        var VOL = 0.06;         // ampiezza di ogni parziale (il totale resta sotto 0,16)
+        var acceso = false, fase = 0, tprec = 0, colpi = 0, raf = null, AC = null;
+
+        function freq() { return 1.2 + 0.9 * (parseFloat(document.getElementById('cp-v').value) - 3); }
+
+        function ding() {
+          if (!AC || !document.getElementById('cp-audio').checked) { return; }
+          var t0 = AC.currentTime;
+          var PART = [[1046, 1], [2510, 0.55], [4393, 0.3]];
+          for (var i = 0; i < PART.length; i++) {
+            var o = AC.createOscillator(), gn = AC.createGain();
+            o.type = 'sine';
+            o.frequency.value = PART[i][0];
+            gn.gain.setValueAtTime(0.0001, t0);
+            gn.gain.exponentialRampToValueAtTime(VOL * PART[i][1], t0 + 0.006);
+            gn.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.42);
+            o.connect(gn); gn.connect(AC.destination);
+            o.start(t0); o.stop(t0 + 0.45);
+          }
+        }
+
+        // stato meccanico in funzione della fase del ciclo
+        function stato(f) {
+          var attratta = (f < 0.5);
+          var u = attratta ? (f / 0.5) : (1 - (f - 0.5) / 0.5);
+          return { d: -DMAX * u, chiuso: attratta, passo: attratta ? (f < 0.35 ? 1 : 2) : (f < 0.6 ? 3 : 4) };
+        }
+
+        function disegna() {
+          var st = stato(fase), d = st.d, g = '';
+          var acc = 'var(--accent)', spento = 'var(--muted)';
+          var wc = st.chiuso && acceso ? acc : spento;
+          var sw = st.chiuso && acceso ? 3.4 : 2.2;
+
+          // il gong
+          g += '<path d="M116,80 A44,44 0 0 1 204,80 Z" fill="var(--gold)" opacity="0.35" stroke="var(--gold)" stroke-width="2.5"/>';
+          g += '<rect x="112" y="80" width="96" height="10" rx="3" fill="var(--gold)" opacity="0.6" stroke="var(--gold)" stroke-width="2"/>';
+          g += '<text x="160" y="28" text-anchor="middle" class="lbl">gong</text>';
+
+          // l'elettromagnete
+          g += '<rect x="140" y="128" width="66" height="74" rx="4" fill="var(--text-soft)" opacity="' + (st.chiuso && acceso ? '0.85' : '0.5') + '"/>';
+          for (var k = 0; k < 5; k++) {
+            g += '<rect x="132" y="' + (136 + k * 14) + '" width="82" height="7" rx="3.5" fill="' + (st.chiuso && acceso ? acc : spento) + '" opacity="0.9"/>';
+          }
+          g += '<text x="128" y="220" text-anchor="middle" class="lbl-s">elettromagnete</text>';
+
+          // l'ancora e il martelletto
+          g += '<rect x="' + (240 + d) + '" y="112" width="12" height="94" rx="2" fill="var(--text-soft)"/>';
+          g += '<line x1="' + (246 + d) + '" y1="116" x2="' + (242 + d) + '" y2="92" stroke="var(--text-soft)" stroke-width="4"/>';
+          g += '<circle cx="' + (242 + d) + '" cy="85" r="10" fill="var(--text-soft)"/>';
+          g += '<text x="' + (268 + d) + '" y="118" class="lbl-s">martelletto</text>';
+          g += '<text x="' + (258 + d) + '" y="' + 216 + '" class="lbl-s">ancora</text>';
+
+          // la molla di richiamo
+          var mx = 252 + d, pass = (312 - mx) / 6, zig = 'M' + mx + ',132';
+          for (k = 0; k < 6; k++) {
+            zig += ' L' + (mx + pass * (k + 0.5)).toFixed(1) + ',' + (k % 2 ? 142 : 122) + ' L' + (mx + pass * (k + 1)).toFixed(1) + ',132';
+          }
+          g += '<path d="' + zig + '" fill="none" stroke="var(--magenta)" stroke-width="2.4"/>';
+          g += '<text x="330" y="128" class="lbl-s">molla</text>';
+
+          // la vite di contatto e il montante
+          g += '<rect x="312" y="118" width="10" height="118" fill="var(--text-soft)" opacity="0.8"/>';
+          g += '<rect x="252" y="188" width="62" height="9" rx="2" fill="var(--text-soft)"/>';
+          g += '<text x="330" y="198" class="lbl-s">vite di contatto</text>';
+          if (!st.chiuso && acceso) {
+            g += '<text x="' + (256 + d) + '" y="180" class="em">⚡</text>';
+            g += '<text x="' + (232 + d) + '" y="240" class="em">contatto aperto</text>';
+          }
+
+          // il circuito
+          var w = function (a, b, c, e) {
+            return '<line x1="' + a + '" y1="' + b + '" x2="' + c + '" y2="' + e + '" stroke="' + wc + '" stroke-width="' + sw + '" stroke-linecap="round"/>';
+          };
+          g += w(210, 288, 330, 288) + w(330, 288, 330, 192) + w(330, 192, 322, 192);
+          g += w(246 + d, 200, 246 + d, 258) + w(246 + d, 258, 173, 258) + w(173, 258, 173, 204);
+          g += w(173, 126, 173, 108) + w(173, 108, 60, 108) + w(60, 108, 60, 288) + w(60, 288, 150, 288);
+          // la pila
+          g += '<rect x="150" y="272" width="60" height="32" rx="4" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<text x="180" y="293" text-anchor="middle" class="lbl">pila</text>';
+          g += '<text x="214" y="282" class="lbl-s">+</text><text x="140" y="282" class="lbl-s">−</text>';
+
+          // la legenda dei quattro passi
+          var PASSI = ['① circuito chiuso: passa corrente', '② l\'ancora è attratta: colpo!',
+                       '③ il contatto si stacca', '④ la molla richiama l\'ancora'];
+          for (k = 0; k < 4; k++) {
+            var att = acceso && (st.passo === k + 1);
+            g += '<text x="366" y="' + (58 + k * 26) + '" class="' + (att ? 'em' : 'lbl-s') + '">' + PASSI[k] + '</text>';
+          }
+          svg.innerHTML = g;
+
+          document.getElementById('cp-vv').textContent = nf(parseFloat(document.getElementById('cp-v').value), 1);
+          document.getElementById('cp-f').textContent = nf(freq(), 1) + ' Hz';
+          document.getElementById('cp-fase').textContent = !acceso ? 'fermo' : (st.chiuso ? 'chiuso: corrente' : 'aperto: niente corrente');
+          document.getElementById('cp-colpi').textContent = colpi;
+        }
+
+        function passo(t) {
+          if (!acceso) { return; }
+          if (!tprec) { tprec = t; }
+          var dt = Math.min(0.05, (t - tprec) / 1000);
+          tprec = t;
+          var v = freq() * (document.getElementById('cp-lento').checked ? 0.22 : 1);
+          var prima = fase;
+          fase += dt * v;
+          if (prima < 0.5 && fase >= 0.5) { colpi++; ding(); }
+          while (fase >= 1) { fase -= 1; }
+          disegna();
+          raf = requestAnimationFrame(passo);
+        }
+
+        function ferma() {
+          acceso = false;
+          if (raf) { cancelAnimationFrame(raf); raf = null; }
+          tprec = 0;
+          document.getElementById('cp-avvia').textContent = '🔔 Suona';
+          disegna();
+        }
+
+        document.getElementById('cp-avvia').addEventListener('click', function () {
+          if (acceso) { ferma(); return; }
+          if (!AC) {
+            var Ctx = window.AudioContext || window.webkitAudioContext;
+            if (Ctx) { AC = new Ctx(); }
+          }
+          if (AC && AC.state === 'suspended') { AC.resume(); }
+          acceso = true;
+          tprec = 0;
+          this.textContent = '⏹ Ferma';
+          raf = requestAnimationFrame(passo);
+        });
+        ['cp-v', 'cp-lento', 'cp-audio'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        document.addEventListener('visibilitychange', function () { if (document.hidden && acceso) { ferma(); } });
+        window.addEventListener('pagehide', ferma);
+        disegna();
+      })();
+
+      /* ==================== 8.3 — IL MOTORE OMOPOLARE ==================== */
+      (function () {
+        var svg = document.getElementById('om-svg');
+        if (!svg) { return; }
+
+        var BMAG = 0.35;     // campo del magnete al neodimio, in tesla
+        var RMAG = 0.012;    // raggio del magnete, in metri
+        var KAPPA = 1.0e-6;  // attrito viscoso, in N*m*s
+        var pol = 1, verso = 1, gira = false, ang = 0, tprec = 0, raf = null;
+
+        function coppia(I) { return I * BMAG * RMAG * RMAG / 2; }
+        function omega(I) { return coppia(I) / KAPPA; }
+
+        function disegna() {
+          var I = parseFloat(document.getElementById('om-i').value);
+          var sgn = -(verso * pol);            // +1 = antiorario sullo schermo
+          var g = '';
+
+          g += '<text x="170" y="26" text-anchor="middle" class="lbl">vista laterale</text>';
+          g += '<text x="480" y="26" text-anchor="middle" class="lbl">vista dall\'alto</text>';
+          g += '<line x1="326" y1="40" x2="326" y2="300" stroke="var(--border)" stroke-width="1.5"/>';
+
+          /* ---- vista laterale ---- */
+          // il magnete
+          g += '<ellipse cx="170" cy="252" rx="74" ry="17" fill="var(--primary)" opacity="0.35" stroke="var(--primary)" stroke-width="2"/>';
+          g += '<rect x="96" y="252" width="148" height="20" fill="var(--primary)" opacity="0.22"/>';
+          g += '<ellipse cx="170" cy="272" rx="74" ry="17" fill="var(--primary)" opacity="0.35" stroke="var(--primary)" stroke-width="2"/>';
+          g += '<text x="170" y="257" text-anchor="middle" class="em">' + (pol === 1 ? 'N' : 'S') + '</text>';
+          g += '<text x="170" y="305" text-anchor="middle" class="lbl-s">magnete al neodimio</text>';
+          // la pila
+          g += '<rect x="148" y="126" width="44" height="126" rx="6" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<rect x="162" y="118" width="16" height="10" rx="3" fill="var(--text-soft)"/>';
+          g += '<text x="170" y="196" text-anchor="middle" class="lbl">pila</text>';
+          g += '<text x="200" y="132" class="lbl-s">' + (verso === 1 ? '+' : '−') + '</text>';
+          g += '<text x="200" y="266" class="lbl-s">' + (verso === 1 ? '−' : '+') + '</text>';
+          // il filo, due archi dal polo alto fino al bordo del magnete
+          g += '<path d="M170,120 C256,118 268,196 246,250" fill="none" stroke="var(--gold)" stroke-width="3.4"/>';
+          g += '<path d="M170,120 C84,118 72,196 94,250" fill="none" stroke="var(--gold)" stroke-width="3.4"/>';
+          // il verso della corrente sul filo di destra
+          if (verso === 1) {
+            g += frec(250, 150, 258, 188, 'var(--magenta)', 2.6);
+          } else {
+            g += frec(258, 188, 250, 150, 'var(--magenta)', 2.6);
+          }
+          g += '<text x="276" y="176" class="em">I</text>';
+          g += '<text x="60" y="112" class="lbl-s">filo di rame</text>';
+
+          /* ---- vista dall'alto ---- */
+          var CX = 480, CY = 176, R = 92, r0 = 24;
+          g += '<circle cx="' + CX + '" cy="' + CY + '" r="' + R + '" fill="var(--primary)" opacity="0.16" stroke="var(--primary)" stroke-width="2"/>';
+          // il campo: uscente (N in alto) o entrante
+          var k, i2;
+          for (k = 0; k < 8; k++) {
+            var aa = k * Math.PI / 4, rr = 62;
+            var xx = CX + rr * Math.cos(aa), yy = CY - rr * Math.sin(aa);
+            if (pol === 1) {
+              g += '<circle cx="' + xx.toFixed(1) + '" cy="' + yy.toFixed(1) + '" r="6" fill="none" stroke="var(--primary)" stroke-width="1.8"/>';
+              g += '<circle cx="' + xx.toFixed(1) + '" cy="' + yy.toFixed(1) + '" r="2" fill="var(--primary)"/>';
+            } else {
+              g += '<circle cx="' + xx.toFixed(1) + '" cy="' + yy.toFixed(1) + '" r="6" fill="none" stroke="var(--primary)" stroke-width="1.8"/>';
+              g += '<line x1="' + (xx - 4.2).toFixed(1) + '" y1="' + (yy - 4.2).toFixed(1) + '" x2="' + (xx + 4.2).toFixed(1) + '" y2="' + (yy + 4.2).toFixed(1) + '" stroke="var(--primary)" stroke-width="1.6"/>';
+              g += '<line x1="' + (xx - 4.2).toFixed(1) + '" y1="' + (yy + 4.2).toFixed(1) + '" x2="' + (xx + 4.2).toFixed(1) + '" y2="' + (yy - 4.2).toFixed(1) + '" stroke="var(--primary)" stroke-width="1.6"/>';
+            }
+          }
+          g += '<text x="' + CX + '" y="' + (CY + R + 26) + '" text-anchor="middle" class="lbl-s">' +
+            (pol === 1 ? 'B esce dal foglio ⊙' : 'B entra nel foglio ⊗') + '</text>';
+          // i due bracci di filo
+          for (i2 = 0; i2 < 2; i2++) {
+            var a2 = ang + i2 * Math.PI;
+            var xA = CX + r0 * Math.cos(a2), yA = CY - r0 * Math.sin(a2);
+            var xB = CX + R * Math.cos(a2), yB = CY - R * Math.sin(a2);
+            g += '<line x1="' + xA.toFixed(1) + '" y1="' + yA.toFixed(1) + '" x2="' + xB.toFixed(1) + '" y2="' + yB.toFixed(1) +
+              '" stroke="var(--gold)" stroke-width="4"/>';
+            // la forza tangenziale
+            var at = a2 + sgn * Math.PI / 2;
+            var Lf = 16 + 26 * (I / 4);
+            g += frec(xB, yB, xB + Lf * Math.cos(at), yB - Lf * Math.sin(at), 'var(--magenta)', 3);
+          }
+          g += '<circle cx="' + CX + '" cy="' + CY + '" r="' + r0 + '" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<text x="' + CX + '" y="' + (CY + 5) + '" text-anchor="middle" class="lbl-s">pila</text>';
+          // il verso della rotazione
+          var arc = sgn > 0
+            ? 'M' + (CX + 116) + ',' + CY + ' A116,116 0 0 0 ' + CX + ',' + (CY - 116)
+            : 'M' + CX + ',' + (CY - 116) + ' A116,116 0 0 1 ' + (CX + 116) + ',' + CY;
+          g += '<path d="' + arc + '" fill="none" stroke="var(--magenta)" stroke-width="2.4" opacity="0.8"/>';
+
+          svg.innerHTML = g;
+
+          var tau = coppia(I), w = omega(I);
+          document.getElementById('om-iv').textContent = nf(I, 1);
+          document.getElementById('om-tau').textContent = nf(tau * 1e6, 1) + ' µN·m';
+          document.getElementById('om-rpm').textContent = nf(w * 60 / (2 * Math.PI), 0) + ' giri/min';
+          document.getElementById('om-senso').textContent = (sgn > 0 ? 'antiorario' : 'orario') + ' (visto dall\'alto)';
+          var el = document.getElementById('om-out');
+          el.innerHTML = 'Con $I = ' + nf(I, 1) + '$ A, $B = 0{,}35$ T e $R = 12$ mm il momento vale ' +
+            '$\\tau = IBR^2/2 = ' + nf(tau * 1e6, 1) + '$ µN·m: pochissimo, ma il filo pesa quasi nulla e l\'attrito è minimo, ' +
+            'perciò arriva comunque a ' + nf(w * 60 / (2 * Math.PI), 0) + ' giri al minuto. ' +
+            '<em>Nel disegno la rotazione è rallentata, altrimenti si vedrebbe solo una macchia.</em>';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        function passo(t) {
+          if (!gira) { return; }
+          if (!tprec) { tprec = t; }
+          var dt = Math.min(0.05, (t - tprec) / 1000);
+          tprec = t;
+          var I = parseFloat(document.getElementById('om-i').value);
+          var sgn = -(verso * pol);
+          ang += sgn * Math.min(omega(I) / 14, 7) * dt;
+          disegna();
+          raf = requestAnimationFrame(passo);
+        }
+        function ferma() {
+          gira = false;
+          if (raf) { cancelAnimationFrame(raf); raf = null; }
+          tprec = 0;
+          document.getElementById('om-play').textContent = '▶ Avvia';
+        }
+        document.getElementById('om-play').addEventListener('click', function () {
+          if (gira) { ferma(); disegna(); return; }
+          gira = true; tprec = 0;
+          this.textContent = '⏹ Ferma';
+          raf = requestAnimationFrame(passo);
+        });
+        tabs(document.getElementById('om-pol'), 'data-p', function (v) { pol = (v === 'N') ? 1 : -1; disegna(); });
+        tabs(document.getElementById('om-verso'), 'data-v', function (v) { verso = parseInt(v, 10); disegna(); });
+        document.getElementById('om-i').addEventListener('input', disegna);
+        document.addEventListener('visibilitychange', function () { if (document.hidden && gira) { ferma(); } });
+        window.addEventListener('pagehide', ferma);
+        disegna();
+      })();
+
+      /* ==================== 8.4 — L'ISTERESI ==================== */
+      (function () {
+        var svg = document.getElementById('is-svg');
+        if (!svg) { return; }
+
+        // Modello di Prandtl-Ishlinskii: NH "giochi" (play operator) con soglie diverse.
+        // Ogni gioco ha una sua memoria; sommandoli si ottiene un ciclo con gli angoli
+        // arrotondati, i cicli minori e la curva di prima magnetizzazione, senza bisogno
+        // di integrare nulla: il modello e' esatto e non dipende da quanto in fretta si
+        // muove il cursore.
+        var NH = 5;
+        var MAT = {
+          dolce: { Bs: 1.5, Hc: 0.10, a: 0.16, nome: 'ferro-silicio' },
+          duro: { Bs: 1.2, Hc: 0.50, a: 0.22, nome: 'magnete permanente' }
+        };
+        var mat = 'dolce', xi = [], storia = [{ h: 0, b: 0 }];
+        var anim = null;
+
+        function soglie(m) {
+          var v = [], j;
+          for (j = 1; j <= NH; j++) { v.push(m.Hc * (2 * j - 1) / NH); }
+          return v;
+        }
+        function azzera() { xi = []; for (var j = 0; j < NH; j++) { xi.push(0); } }
+        function aggiorna(m, stato, H) {
+          var s = soglie(m), j;
+          for (j = 0; j < NH; j++) {
+            stato[j] = Math.max(Math.min(stato[j], H + s[j]), H - s[j]);
+          }
+          return stato;
+        }
+        function campoB(m, stato) {
+          var s = 0, j;
+          for (j = 0; j < NH; j++) { s += Math.tanh(stato[j] / m.a); }
+          return m.Bs * s / NH;
+        }
+
+        // ciclo maggiore: da smagnetizzato si sale a +1, poi si scende a -1 e si risale
+        function cicloMaggiore(nome) {
+          var m = MAT[nome], st = [], i, h, NP = 600;
+          for (i = 0; i < NH; i++) { st.push(0); }
+          for (i = 1; i <= NP; i++) { aggiorna(m, st, i / NP); }
+          var giu = [], su = [];
+          for (i = 0; i <= 2 * NP; i++) {
+            h = 1 - 2 * i / (2 * NP);
+            aggiorna(m, st, h);
+            giu.push({ h: h, b: campoB(m, st) });
+          }
+          for (i = 0; i <= 2 * NP; i++) {
+            h = -1 + 2 * i / (2 * NP);
+            aggiorna(m, st, h);
+            su.push({ h: h, b: campoB(m, st) });
+          }
+          return { giu: giu, su: su };
+        }
+        function interpola(arr, chiave, valore, altra) {
+          var i;
+          for (i = 1; i < arr.length; i++) {
+            var p = arr[i - 1], q = arr[i];
+            if ((p[chiave] - valore) * (q[chiave] - valore) <= 0 && p[chiave] !== q[chiave]) {
+              return p[altra] + (q[altra] - p[altra]) * (valore - p[chiave]) / (q[chiave] - p[chiave]);
+            }
+          }
+          return 0;
+        }
+        // energia dissipata a ogni ciclo, per ogni metro cubo: l'integrale di H dB sul giro
+        function areaCiclo(c) {
+          var tutto = c.giu.concat(c.su), s = 0, i;
+          for (i = 1; i < tutto.length; i++) {
+            s += 0.5 * (tutto[i].h + tutto[i - 1].h) * (tutto[i].b - tutto[i - 1].b);
+          }
+          return Math.abs(s);
+        }
+
+        var CACHE = {};
+        function dati(nome) {
+          if (!CACHE[nome]) {
+            var c = cicloMaggiore(nome);
+            CACHE[nome] = { c: c, Br: interpola(c.giu, 'h', 0, 'b'), Hc: Math.abs(interpola(c.giu, 'b', 0, 'h')), area: areaCiclo(c) };
+          }
+          return CACHE[nome];
+        }
+
+        function disegna() {
+          var m = MAT[mat], D = dati(mat);
+          var lock = document.getElementById('is-lock').checked;
+          var Bmax = lock ? 1.6 : m.Bs * 1.12;
+          var GX0 = 78, GX1 = 606, GY0 = 328, GY1 = 34;
+          var cx = (GX0 + GX1) / 2, cy = (GY0 + GY1) / 2;
+          var px = function (h) { return cx + (GX1 - GX0) / 2 * (h / 1.06); };
+          var py = function (b) { return cy - (GY0 - GY1) / 2 * (Math.max(-1, Math.min(1, b / Bmax))); };
+          var H = parseFloat(document.getElementById('is-h').value);
+          var B = campoB(m, xi);
+          var g = '', k;
+
+          // griglia e assi
+          for (k = -1; k <= 1.001; k += 0.5) {
+            g += '<line x1="' + px(k).toFixed(1) + '" y1="' + GY1 + '" x2="' + px(k).toFixed(1) + '" y2="' + GY0 +
+              '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + px(k).toFixed(1) + '" y="' + (GY0 + 18) + '" text-anchor="middle" class="lbl-s">' + nf(k, 1) + '</text>';
+            g += '<line x1="' + GX0 + '" y1="' + py(k * Bmax).toFixed(1) + '" x2="' + GX1 + '" y2="' + py(k * Bmax).toFixed(1) +
+              '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + (GX0 - 8) + '" y="' + (py(k * Bmax) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(k * Bmax, 2) + '</text>';
+          }
+          g += '<line x1="' + GX0 + '" y1="' + py(0).toFixed(1) + '" x2="' + GX1 + '" y2="' + py(0).toFixed(1) + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<line x1="' + px(0).toFixed(1) + '" y1="' + GY1 + '" x2="' + px(0).toFixed(1) + '" y2="' + GY0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<text x="' + (GX1 - 4) + '" y="' + (py(0) - 10).toFixed(1) + '" text-anchor="end" class="lbl">H (unità arbitrarie)</text>';
+          g += '<text x="' + (px(0) + 10).toFixed(1) + '" y="' + (GY1 + 14) + '" class="lbl">B (T)</text>';
+
+          function poly(arr, col, sp, op) {
+            var p = [], i;
+            for (i = 0; i < arr.length; i++) { p.push(px(arr[i].h).toFixed(1) + ',' + py(arr[i].b).toFixed(1)); }
+            return '<polyline points="' + p.join(' ') + '" fill="none" stroke="' + col + '" stroke-width="' + sp + '" opacity="' + op + '"/>';
+          }
+          // il ciclo maggiore, in trasparenza, come riferimento
+          g += poly(D.c.giu, 'var(--muted)', 2, 0.45);
+          g += poly(D.c.su, 'var(--muted)', 2, 0.45);
+
+          // magnetizzazione residua e campo coercitivo
+          g += '<line x1="' + px(0).toFixed(1) + '" y1="' + py(D.Br).toFixed(1) + '" x2="' + (px(0) + 30).toFixed(1) + '" y2="' + py(D.Br).toFixed(1) +
+            '" stroke="var(--gold)" stroke-width="2" stroke-dasharray="5 4"/>';
+          g += '<text x="' + (px(0) + 36).toFixed(1) + '" y="' + (py(D.Br) - 5).toFixed(1) + '" class="lbl-s">Br</text>';
+          g += '<line x1="' + px(-D.Hc).toFixed(1) + '" y1="' + py(0).toFixed(1) + '" x2="' + px(-D.Hc).toFixed(1) + '" y2="' + (py(0) - 26).toFixed(1) +
+            '" stroke="var(--gold)" stroke-width="2" stroke-dasharray="5 4"/>';
+          g += '<text x="' + (px(-D.Hc) - 6).toFixed(1) + '" y="' + (py(0) + 18).toFixed(1) + '" text-anchor="end" class="lbl-s">−Hc</text>';
+
+          // il percorso davvero seguito dall'utente
+          g += poly(storia, 'var(--accent)', 3, 1);
+          g += '<circle cx="' + px(H).toFixed(1) + '" cy="' + py(B).toFixed(1) + '" r="6.5" fill="var(--magenta)"/>';
+          svg.innerHTML = g;
+
+          document.getElementById('is-hv').textContent = nf(H, 2);
+          document.getElementById('is-bv').textContent = nf(B, 3) + ' T';
+          document.getElementById('is-br').textContent = nf(D.Br, 3) + ' T';
+          document.getElementById('is-hc').textContent = nf(D.Hc, 3) + ' u.a.';
+          document.getElementById('is-area').textContent = nf(D.area, 3) + ' u.a.';
+          var rap = dati('duro').area / dati('dolce').area;
+          var el = document.getElementById('is-out');
+          el.innerHTML = (mat === 'dolce'
+            ? 'Il <strong>' + m.nome + '</strong> ha un ciclo stretto: pochissima energia persa a ogni giro, ma anche poca memoria. È il materiale dei trasformatori.'
+            : 'Il <strong>' + m.nome + '</strong> ha un ciclo largo e quasi rettangolare: serve un campo contrario enorme per smagnetizzarlo, ed è esattamente quello che vogliamo da una calamita.') +
+            ' Sulla stessa scala il ciclo duro racchiude un\'area <strong>' + nf(rap, 1) + ' volte</strong> quella del ciclo dolce: ' +
+            'dentro un trasformatore quella differenza diventerebbe tutta calore, cinquanta volte al secondo.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        function vaiA(H1) {
+          aggiorna(MAT[mat], xi, H1);
+          storia.push({ h: H1, b: campoB(MAT[mat], xi) });
+          if (storia.length > 5000) { storia.splice(0, storia.length - 5000); }
+        }
+        function stopAnim() { if (anim) { cancelAnimationFrame(anim); anim = null; } }
+
+        document.getElementById('is-h').addEventListener('input', function () {
+          stopAnim();
+          vaiA(parseFloat(this.value));
+          disegna();
+        });
+        tabs(document.getElementById('is-mat'), 'data-m', function (v) {
+          stopAnim();
+          mat = v; azzera(); storia = [{ h: 0, b: 0 }];
+          document.getElementById('is-h').value = 0;
+          disegna();
+        });
+        document.getElementById('is-lock').addEventListener('change', disegna);
+
+        // percorre un ciclo completo: dal punto attuale a +1, poi a -1, poi di nuovo a +1
+        document.getElementById('is-ciclo').addEventListener('click', function () {
+          stopAnim();
+          var sl = document.getElementById('is-h');
+          var tappe = [1, -1, 1], idx = 0, dur = 1500;
+          var da = parseFloat(sl.value), t0 = 0;
+          function step(t) {
+            if (!t0) { t0 = t; }
+            var u = Math.min(1, (t - t0) / dur);
+            var h = da + (tappe[idx] - da) * u;
+            sl.value = h;
+            vaiA(h);
+            disegna();
+            if (u >= 1) {
+              idx++;
+              if (idx >= tappe.length) { anim = null; return; }
+              da = h; t0 = 0;
+            }
+            anim = requestAnimationFrame(step);
+          }
+          anim = requestAnimationFrame(step);
+        });
+
+        // smagnetizzazione vera: cicli sempre piu' stretti, come fa un degausser
+        document.getElementById('is-smag').addEventListener('click', function () {
+          stopAnim();
+          var sl = document.getElementById('is-h');
+          storia = [];
+          var t0 = 0, DUR = 3000, NOSC = 9;
+          function step(t) {
+            if (!t0) { t0 = t; }
+            var u = Math.min(1, (t - t0) / DUR);
+            var h = (1 - u) * Math.cos(2 * Math.PI * NOSC * u);
+            sl.value = h;
+            vaiA(h);
+            disegna();
+            if (u >= 1) {
+              anim = null;
+              sl.value = 0;
+              azzera();
+              storia = [{ h: 0, b: 0 }];
+              disegna();
+              return;
+            }
+            anim = requestAnimationFrame(step);
+          }
+          anim = requestAnimationFrame(step);
+        });
+
+        document.addEventListener('visibilitychange', function () { if (document.hidden) { stopAnim(); } });
+        window.addEventListener('pagehide', stopAnim);
+        azzera();
+        disegna();
+      })();
+    });
+  </script>
+
 </body>
 
 </html>

@@ -1,0 +1,2336 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 8 — I principi della termodinamica</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .qbox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.8rem 0; }
+    .qbox .qt { font-weight: 600; margin-bottom: 0.45rem; }
+    .qbox.tosto { border-left-color: var(--gold); }
+    .qbox.tosto .qt::before { content: "★ "; color: var(--gold); }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .principi { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .principi > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                      padding: 0.8rem 0.9rem; background: var(--surface); }
+    .principi h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+    .principi .num { font-size: 0.8rem; color: var(--muted); font-weight: 700; letter-spacing: 0.06em; }
+
+    .segni { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 0.8rem; margin: 1rem 0; }
+    .segni > div { border: 1px solid var(--border); border-radius: 10px; padding: 0.7rem 0.85rem; background: var(--surface); }
+    .segni .piu { border-left: 4px solid #22c55e; }
+    .segni .meno { border-left: 4px solid #ef4444; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quarto anno · Lezione 8</div>
+    <h1>I principi della termodinamica</h1>
+    <p>Quattro principi, un divieto che nessuno ha mai violato
+      e l'unica legge della fisica che sa distinguere il passato dal futuro</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quarto anno</a>
+    <span class="sep">/</span> I principi della termodinamica
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Da dove veniamo.</strong> Nella lezione precedente abbiamo separato temperatura e calore, e visto
+      con Joule che il calore è energia. Ora facciamo il passo successivo: mettere quell'energia dentro un
+      bilancio, e scoprire che il bilancio da solo non basta. Esistono processi che rispettano perfettamente la
+      conservazione dell'energia e <em>non avvengono mai</em>: una tazza di caffè non si riscalda da sola
+      raffreddando la stanza, anche se l'energia tornerebbe. Capire perché ci porterà alla grandezza più strana
+      della fisica — l'<strong>entropia</strong> — e all'unica legge che distingue un film dal suo contrario.
+    </div>
+
+    <div class="principi">
+      <div>
+        <div class="num">PRINCIPIO ZERO</div>
+        <h4>Si può misurare</h4>
+        <p>L'equilibrio termico è transitivo: esiste la temperatura, e ha senso costruire un termometro.</p>
+      </div>
+      <div>
+        <div class="num">PRIMO PRINCIPIO</div>
+        <h4>Non si può vincere</h4>
+        <p>L'energia si conserva: non se ne crea. Al massimo si pareggia.</p>
+      </div>
+      <div>
+        <div class="num">SECONDO PRINCIPIO</div>
+        <h4>Non si può pareggiare</h4>
+        <p>Nemmeno il pareggio è concesso: qualcosa si degrada sempre. L'entropia non diminuisce.</p>
+      </div>
+      <div>
+        <div class="num">TERZO PRINCIPIO</div>
+        <h4>Non si può uscire dal gioco</h4>
+        <p>Allo zero assoluto non si arriva: ci si avvicina soltanto, con sforzo crescente.</p>
+      </div>
+    </div>
+
+    <p>Questa formulazione scherzosa — «non si può vincere, non si può pareggiare, non si può uscire dal gioco»
+      — è attribuita al chimico britannico <strong>Charles Snow</strong>, e ha il pregio di essere ricordabile.
+      Vediamoli uno per uno, nell'ordine strano in cui la storia li ha numerati: il principio zero è stato
+      formulato per ultimo, quando ci si è accorti che i primi due poggiavano su un'assunzione mai scritta.</p>
+
+    <!-- 1 — IL PRINCIPIO ZERO -->
+    <section id="sec1">
+      <h2>1. Il principio zero: perché esiste la temperatura</h2>
+
+      <p>Sembra la cosa più ovvia del mondo, ed è esattamente per questo che per un secolo nessuno l'ha scritta.
+        Poi qualcuno si è accorto che tutta la termometria ci poggia sopra, e siccome i principi erano già
+        numerati da uno a tre, gli hanno dato il numero <strong>zero</strong>.</p>
+
+      <div class="definition">
+        <div class="formula-title">Principio zero della termodinamica</div>
+        <p>Se un corpo $A$ è in equilibrio termico con un corpo $C$, e anche $B$ è in equilibrio termico con
+          $C$, allora $A$ e $B$ sono in equilibrio termico fra loro.</p>
+        <p class="formula-note">In termini matematici: l'equilibrio termico è una <strong>relazione di
+          equivalenza</strong> (riflessiva, simmetrica, transitiva). E come ogni relazione di equivalenza,
+          divide il mondo in classi: tutti i corpi che stanno in equilibrio fra loro formano una classe, e a
+          ogni classe possiamo appiccicare un'etichetta numerica. Quell'etichetta è la
+          <strong>temperatura</strong>.</p>
+      </div>
+
+      <p>Fermiamoci un secondo, perché il passaggio è più profondo di quanto sembri. Il principio zero non dice
+        «i corpi hanno una temperatura»: dice che <strong>ha senso</strong> dire che ce l'hanno. Se
+        l'equilibrio termico non fosse transitivo, si potrebbe avere $A$ in equilibrio con $C$, $B$ in
+        equilibrio con $C$, e poi vedere del calore passare da $A$ a $B$ appena li si mette a contatto. In un
+        universo così un termometro sarebbe inutile: leggerebbe lo stesso numero su due corpi che poi si
+        scambiano energia. Il principio zero è la garanzia che il termometro funzioni.</p>
+
+      <div class="curiosita"><strong>Un principio nato in ritardo.</strong> La formulazione esplicita si deve a
+        <strong>Ralph Fowler</strong>, negli anni Trenta del Novecento, più di un secolo dopo Carnot e ottant'anni
+        dopo Clausius. Fowler stava rivedendo un manuale di termodinamica e si accorse che il primo e il secondo
+        principio davano per scontata la transitività senza mai dichiararla. Il nome «principio zero» pare sia
+        stato coniato proprio in quell'occasione, mezzo per scherzo, e sia rimasto.</div>
+
+      <h3>1.1 — Il termometro come rivelatore di equilibrio</h3>
+
+      <p>Nella lezione precedente abbiamo visto che <em>un termometro perturba ciò che misura</em>: per segnare
+        una temperatura deve andare in equilibrio con il campione, e per farlo scambia calore con esso. Il
+        risultato è una lettura sistematicamente spostata verso la temperatura da cui il termometro parte.</p>
+
+      <p>Qui viene il bello. Anche un termometro <strong>sbagliato</strong> — con una capacità termica non
+        trascurabile, che quindi legge sempre un po' storto — continua a rispondere correttamente alla domanda
+        «questi due corpi sono in equilibrio?». Il motivo è che l'errore è lo stesso per tutti i corpi con la
+        stessa temperatura: la lettura è una funzione <em>iniettiva</em> della temperatura vera, e quindi due
+        letture uguali significano due temperature uguali. Provatelo qui sotto.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>temperatura vera di A: <span class="val-badge" id="pz-tav">80</span> °C</label>
+          <input type="range" id="pz-ta" min="-20" max="120" step="1" value="80">
+        </div>
+        <div class="ctrl">
+          <label>temperatura vera di B: <span class="val-badge" id="pz-tbv">80</span> °C</label>
+          <input type="range" id="pz-tb" min="-20" max="120" step="1" value="80">
+        </div>
+        <div class="ctrl">
+          <label>capacità termica del termometro: <span class="val-badge" id="pz-cv">5</span> % di quella dei
+            corpi</label>
+          <input type="range" id="pz-c" min="1" max="40" step="1" value="5">
+        </div>
+        <svg id="pz-svg" viewBox="0 0 680 320" role="img"
+             aria-label="Due corpi A e B misurati dallo stesso termometro, che parte sempre dalla temperatura ambiente"></svg>
+        <p class="cap">Il termometro parte ogni volta da $20\ °$C, tocca il corpo, va in equilibrio con esso e
+          legge. Poi torna a temperatura ambiente e ripete sull'altro corpo.</p>
+        <div class="sp-cols">
+          <div>lettura su A: <span class="val-badge" id="pz-la">—</span></div>
+          <div>lettura su B: <span class="val-badge" id="pz-lb">—</span></div>
+          <div>errore sistematico su A: <span class="val-badge" id="pz-err">—</span></div>
+          <div>calore che passerebbe da B ad A: <span class="val-badge" id="pz-q">—</span></div>
+        </div>
+        <div class="eq-out" id="pz-out"></div>
+      </div>
+
+      <p>Portate i due cursori sullo stesso valore: le due letture coincidono, e il calore scambiato fra $A$ e
+        $B$ è esattamente zero — <em>qualunque</em> sia la capacità termica del termometro, anche la più
+        assurda. Poi spostatene uno di un solo grado: le letture si separano, e il calore compare. È il
+        principio zero al lavoro.</p>
+
+      <div class="curiosita"><strong>La stessa idea, in un altro mestiere.</strong> Una bilancia mal tarata che
+        aggiunge sempre trecento grammi è inutile per sapere quanto pesa una cosa, ma è perfetta per sapere se
+        due cose pesano uguale. Gli strumenti di <em>confronto</em> sopportano errori sistematici che
+        renderebbero inservibili gli strumenti di <em>misura</em>: è per questo che le misure più precise della
+        fisica sono quasi sempre misure di differenze, di zeri, di battimenti. Ce lo dirà ancora l'interferometro
+        di LIGO, che non misura la lunghezza di un braccio ma la differenza fra due bracci.</div>
+    </section>
+
+    <!-- 2 — SISTEMI, STATI E TRASFORMAZIONI -->
+    <section id="sec2">
+      <h2>2. Sistemi, stati e trasformazioni</h2>
+
+      <p>Prima di enunciare i principi grossi serve un po' di vocabolario, e conviene prenderlo sul serio perché
+        gli errori in termodinamica nascono quasi tutti da un vocabolario impreciso.</p>
+
+      <div class="definition">
+        <div class="formula-title">Sistema e ambiente</div>
+        <p>Il <strong>sistema</strong> è la porzione di universo che decidiamo di studiare; tutto il resto è
+          l'<strong>ambiente</strong>. La superficie che li separa è il <strong>contorno</strong>, e la scelta di
+          dove metterlo è nostra — ma una volta fatta va tenuta ferma.</p>
+        <p class="formula-note">Un sistema si dice <strong>aperto</strong> se scambia con l'ambiente materia ed
+          energia (una pentola scoperta), <strong>chiuso</strong> se scambia solo energia (una pentola con il
+          coperchio saldato), <strong>isolato</strong> se non scambia nulla (un thermos ideale). L'universo, per
+          definizione, è isolato: non ha un fuori.</p>
+      </div>
+
+      <p>Lo <strong>stato</strong> di un sistema all'equilibrio è descritto da poche grandezze macroscopiche —
+        pressione, volume, temperatura, quantità di sostanza — chiamate <strong>variabili di stato</strong>. La
+        cosa notevole è quante <em>poche</em> ne bastano: un litro di gas contiene un numero di molecole con
+        ventidue zeri, ognuna con la sua posizione e la sua velocità, eppure per dire tutto quello che serve
+        sapere all'equilibrio bastano tre numeri. È lo stesso miracolo di riduzione che abbiamo incontrato con
+        la temperatura: una proprietà emergente che riassume una moltitudine.</p>
+
+      <div class="definition">
+        <div class="formula-title">Funzioni di stato e grandezze di percorso</div>
+        <p>Una <strong>funzione di stato</strong> dipende solo da dove si è, non da come ci si è arrivati:
+          l'energia interna $U$, la temperatura, il volume, l'entropia. Una <strong>grandezza di percorso</strong>
+          dipende dalla strada: il calore $Q$ e il lavoro $L$.</p>
+        <p class="formula-note">L'analogia che funziona sempre: l'<em>altitudine</em> di un rifugio è una
+          funzione di stato, la <em>strada percorsa</em> per arrivarci no. Due escursionisti che partono e
+          arrivano negli stessi punti hanno lo stesso dislivello, ma possono aver camminato l'uno il doppio
+          dell'altro. Per questo si scrive $\Delta U$ ma <strong>mai</strong> $\Delta Q$: il calore non è una
+          proprietà del sistema, è qualcosa che <em>attraversa</em> il contorno.</p>
+      </div>
+
+      <h3>2.1 — Trasformazioni reversibili e irreversibili</h3>
+
+      <p>Una trasformazione si dice <strong>reversibile</strong> se può essere percorsa all'indietro riportando
+        <em>sia il sistema sia l'ambiente</em> esattamente allo stato di partenza. È una condizione durissima, e
+        infatti nessuna trasformazione reale è reversibile: la reversibilità è un limite ideale, come il punto
+        materiale o la superficie senza attrito.</p>
+
+      <p>Perché sia reversibile una trasformazione deve essere <strong>quasi-statica</strong> (così lenta che il
+        sistema sia in equilibrio in ogni istante) e <strong>senza dissipazione</strong> (niente attrito, niente
+        scambi di calore attraverso differenze finite di temperatura). Quanto lenta? Abbastanza da poterla
+        disegnare come una <em>curva</em> sul piano pressione-volume: se il sistema non è in equilibrio, la
+        pressione non è nemmeno definita — è diversa da punto a punto — e non c'è nessuna curva da disegnare.</p>
+
+      <p>Il simulatore qui sotto fa espandere un gas alla stessa temperatura, dallo stesso stato iniziale allo
+        stesso stato finale, ma <strong>in modi diversi</strong>. Il gas segue la legge di Boyle — a temperatura
+        costante la pressione è inversamente proporzionale al volume, $pV = $ costante, lo ricaveremo nella
+        prossima lezione. La differenza sta in come si toglie il peso che tiene giù il pistone: tutto in una
+        volta, oppure a fettine.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>volume finale: <span class="val-badge" id="tr-v2v">3,0</span> L</label>
+          <input type="range" id="tr-v2" min="0.3" max="5" step="0.1" value="3">
+        </div>
+        <div class="ctrl">
+          <label>numero di passi: <span class="val-badge" id="tr-nv">1</span></label>
+          <input type="range" id="tr-n" min="1" max="40" step="1" value="1">
+          <span class="toggle-row"><input type="checkbox" id="tr-lock" checked>
+            <label for="tr-lock">🔒 blocca la scala</label></span>
+        </div>
+        <svg id="tr-svg" viewBox="0 0 680 320" role="img"
+             aria-label="Espansione di un gas sul piano pressione-volume, a gradini e reversibile"></svg>
+        <p class="cap">Stato iniziale fisso: $V_1 = 1{,}0$ L a $p_1 = 100$ kPa. La curva liscia è la
+          trasformazione reversibile, i gradini sono quella reale.</p>
+        <div class="sp-cols">
+          <div>lavoro compiuto: <span class="val-badge" id="tr-l">—</span></div>
+          <div>lavoro reversibile: <span class="val-badge" id="tr-lr">—</span></div>
+          <div>frazione ottenuta: <span class="val-badge" id="tr-fr">—</span></div>
+          <div>lavoro perso: <span class="val-badge" id="tr-lp">—</span></div>
+        </div>
+        <div class="eq-out" id="tr-out"></div>
+      </div>
+
+      <p>Il risultato merita di essere guardato bene. Con <strong>un solo passo</strong> — si toglie tutto il
+        peso di colpo e il gas si espande contro la pressione finale, bassa — il lavoro ottenuto è molto meno di
+        quello reversibile. Aumentando il numero di passi il gas «si accorge» via via della resistenza e spinge
+        più forte, e il lavoro cresce. Al limite di infiniti passi infinitesimi si arriva al valore reversibile,
+        che è il <strong>massimo possibile</strong>. La lentezza, in termodinamica, paga.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il lavoro come area sotto la curva</div>
+        $$L = \int_{V_1}^{V_2} p\,\mathrm{d}V \qquad\text{che per } pV = \text{cost. diventa}\qquad
+        L = p_1V_1\ln\frac{V_2}{V_1}$$
+        <p class="formula-note">Il segno dell'integrale racconta già tutto: se il volume cresce il gas
+          <em>compie</em> lavoro (positivo), se il volume diminuisce il lavoro è fatto <em>sul</em> gas
+          (negativo). E se il volume non cambia — una trasformazione <strong>isocora</strong> — il lavoro è
+          zero, per quanta pressione ci sia.</p>
+      </div>
+
+      <p>Provate ora a portare il volume finale <em>sotto</em> un litro: si passa da un'espansione a una
+        compressione, e la disuguaglianza si rovescia. Comprimere di colpo <strong>costa più</strong> lavoro
+        che comprimere piano. In entrambi i versi, insomma, la fretta si paga: è la prima faccia del secondo
+        principio, e non l'abbiamo ancora nemmeno enunciato.</p>
+
+      <div class="curiosita"><strong>E allora perché le studiamo?</strong> Se nessuna trasformazione reale è
+        reversibile, a che serve una teoria delle trasformazioni reversibili? Serve perché le funzioni di stato
+        <em>non sanno</em> come ci siete arrivati. Se dovete calcolare la variazione di energia interna o di
+        entropia fra due stati, potete inventarvi il cammino che vi pare — anche uno completamente immaginario,
+        purché reversibile — e il risultato sarà giusto. È lo stesso trucco del campo gravitazionale: per
+        calcolare il lavoro della forza peso si sceglie la strada più comoda, perché tanto il risultato non
+        dipende dalla strada.</div>
+    </section>
+
+    <!-- 3 — IL PRIMO PRINCIPIO -->
+    <section id="sec3">
+      <h2>3. Il primo principio: il bilancio dell'energia</h2>
+
+      <p>Joule ha dimostrato che calore e lavoro sono due modi di trasferire la stessa cosa. Il primo principio
+        prende atto della scoperta e la scrive come un bilancio contabile: tutto quello che entra meno tutto
+        quello che esce è quello che resta dentro.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Primo principio della termodinamica</div>
+        $$\Delta U = Q - L$$
+        <p class="formula-note">$\Delta U$ è la variazione di <strong>energia interna</strong> del sistema, $Q$
+          il calore <em>assorbito</em>, $L$ il lavoro <em>compiuto</em> dal sistema. È la conservazione
+          dell'energia estesa ai fenomeni termici: l'energia non si crea e non si distrugge, cambia solo forma e
+          proprietario.</p>
+      </div>
+
+      <div class="warnbox"><strong>Attenzione ai segni: è qui che si sbaglia.</strong> La convenzione tradizionale
+        è «egoista dal punto di vista del sistema»: è positivo ciò che il sistema <em>riceve</em> come calore e
+        ciò che il sistema <em>dà</em> come lavoro. Un modo per non confondersi è pensare a una macchina a
+        vapore: la si nutre di calore (che entra, $Q \gt 0$) e ne si raccoglie lavoro (che esce, $L \gt 0$).</div>
+
+      <div class="segni">
+        <div class="piu"><strong>$Q \gt 0$</strong> — il sistema <em>assorbe</em> calore dall'ambiente.<br>
+          <strong>$L \gt 0$</strong> — il sistema <em>compie</em> lavoro sull'ambiente (si espande).</div>
+        <div class="meno"><strong>$Q \lt 0$</strong> — il sistema <em>cede</em> calore all'ambiente.<br>
+          <strong>$L \lt 0$</strong> — l'ambiente compie lavoro <em>sul</em> sistema (lo comprime).</div>
+      </div>
+
+      <p>L'<strong>energia interna</strong> $U$ è la somma di tutte le energie microscopiche del sistema:
+        cinetiche di traslazione, rotazione e vibrazione, e potenziali dei legami. È una funzione di stato — e
+        questa è l'affermazione forte del principio, non il bilancio in sé. Dire che $U$ è una funzione di stato
+        significa che <strong>su un ciclo chiuso $\Delta U = 0$</strong>, e quindi</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Su un ciclo</div>
+        $$\Delta U = 0 \qquad\Longrightarrow\qquad Q_{\text{tot}} = L_{\text{tot}}$$
+        <p class="formula-note">Una macchina che lavora ciclicamente può produrre lavoro solo consumando una
+          quantità <em>esattamente uguale</em> di calore netto. Non un joule di più. È il divieto del
+          <strong>moto perpetuo di prima specie</strong>.</p>
+      </div>
+
+      <h3>3.1 — Un ciclo, quattro tappe, un bilancio</h3>
+
+      <p>Il modo migliore per vedere il primo principio all'opera è percorrere un ciclo e tenere i conti di ogni
+        tappa. Prendiamo il ciclo più semplice che esista: due <strong>isocore</strong> (volume costante) e due
+        <strong>isobare</strong> (pressione costante), cioè un rettangolo sul piano di Clapeyron.</p>
+
+      <p>Per calcolare l'energia interna useremo il fatto che per un gas perfetto monoatomico vale
+        $U = \frac32 pV$ — un risultato che ricaveremo dalla teoria cinetica, e che per ora accettiamo come
+        regola di calcolo. Notate che dipende solo da $p$ e $V$: è una funzione di stato, come promesso.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>pressione bassa $p_1$: <span class="val-badge" id="pp-p1v">100</span> kPa</label>
+          <input type="range" id="pp-p1" min="50" max="150" step="10" value="100">
+          <label>salto di pressione: <span class="val-badge" id="pp-dpv">100</span> kPa</label>
+          <input type="range" id="pp-dp" min="20" max="250" step="10" value="100">
+        </div>
+        <div class="ctrl">
+          <label>volume piccolo $V_1$: <span class="val-badge" id="pp-v1v">1,0</span> L</label>
+          <input type="range" id="pp-v1" min="1" max="3" step="0.5" value="1">
+          <label>allargamento: <span class="val-badge" id="pp-dvv">3,0</span> L</label>
+          <input type="range" id="pp-dv" min="1" max="6" step="0.5" value="3">
+          <span class="toggle-row"><input type="checkbox" id="pp-lock" checked>
+            <label for="pp-lock">🔒 blocca la scala</label></span>
+        </div>
+        <svg id="pp-svg" viewBox="0 0 680 330" role="img"
+             aria-label="Ciclo rettangolare sul piano pressione-volume con il bilancio energetico di ogni tappa"></svg>
+        <p class="cap">Il ciclo si percorre in senso orario: $A \to B$ isocora, $B \to C$ isobara,
+          $C \to D$ isocora, $D \to A$ isobara.</p>
+        <div id="pp-tab"></div>
+        <div class="eq-out" id="pp-out"></div>
+      </div>
+
+      <p>Tre cose da notare, e sono le tre che tornano in ogni problema di termodinamica:</p>
+
+      <ul>
+        <li>la colonna $\Delta U$ ha somma <strong>esattamente zero</strong>, e non è una coincidenza: è la
+          definizione di funzione di stato;</li>
+        <li>il lavoro totale è l'<strong>area del rettangolo</strong>, $(p_2 - p_1)(V_2 - V_1)$, e coincide con
+          il calore netto scambiato;</li>
+        <li>la macchina assorbe calore in due tappe e ne cede in altre due: il <strong>rendimento</strong>
+          $\eta = L/Q_{\text{assorbito}}$ è sempre ben sotto il $100\%$, e non c'è verso di alzarlo muovendo i
+          cursori. Il perché è il secondo principio, e arriva fra poco.</li>
+      </ul>
+
+      <div class="curiosita"><strong>Perché «senso orario».</strong> Un ciclo percorso in senso orario racchiude
+        un'area positiva e produce lavoro: è un <strong>motore</strong>. Percorso in senso antiorario, la stessa
+        area diventa lavoro <em>assorbito</em>: è un <strong>frigorifero</strong>. Lo stesso disegno, letto nei
+        due versi, descrive i due mestieri della termodinamica applicata. Ci torneremo per bene nella prossima
+        lezione.</div>
+
+      <div class="example">
+        <p><strong>① Esercizio.</strong> Un gas assorbe $500$ J di calore e nel frattempo si espande compiendo
+          $200$ J di lavoro. Poi viene compresso: gli si fanno $150$ J di lavoro sopra e cede $350$ J di calore.
+          Qual è la variazione totale di energia interna? E se la seconda trasformazione lo riportasse allo
+          stato di partenza, che cosa se ne deduce?</p>
+        <button class="btn btn-toggle" data-target="#sol-td1">Mostra la soluzione</button>
+        <div class="solution" id="sol-td1" hidden>
+          <p><span class="step-num">1</span><strong>Prima trasformazione.</strong> $Q_1 = +500$ J (assorbito),
+            $L_1 = +200$ J (compiuto dal gas): $$\Delta U_1 = Q_1 - L_1 = 500 - 200 = +300\ \text{J}$$</p>
+          <p><span class="step-num">2</span><strong>Seconda trasformazione.</strong> Il lavoro è fatto
+            <em>sul</em> gas, quindi $L_2 = -150$ J; il calore è ceduto, quindi $Q_2 = -350$ J:
+            $$\Delta U_2 = -350 - (-150) = -350 + 150 = -200\ \text{J}$$</p>
+          <p><span class="step-num">3</span><strong>Totale.</strong>
+            $\Delta U = +300 - 200 = +100$ J: il gas finisce con più energia interna di quanta ne avesse.</p>
+          <p><span class="step-num">4</span><strong>La domanda vera.</strong> Se la seconda trasformazione lo
+            riportasse davvero allo stato di partenza, dovrebbe essere $\Delta U = 0$, perché $U$ è una funzione
+            di stato. Siccome viene $+100$ J, <strong>lo stato finale non è quello iniziale</strong>: i dati sono
+            incompatibili con un ciclo chiuso. Questo è un controllo che conviene fare sempre — il primo
+            principio non serve solo a calcolare, serve anche a smascherare i dati sbagliati.</p>
+          <p><span class="step-num">5</span>Nota di metodo: i $100$ J in più devono essersi manifestati in
+            qualche modo osservabile, per esempio come temperatura più alta. L'energia interna non è una
+            grandezza astratta: è quella che il termometro, indirettamente, misura.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — IL SECONDO PRINCIPIO -->
+    <section id="sec4">
+      <h2>4. Il secondo principio: quello che l'energia non basta a spiegare</h2>
+
+      <p>Immaginate un film: una tazza di caffè fumante posata sul tavolo. La stanza è a venti gradi, il caffè a
+        ottanta. Nel film il caffè si scalda fino a novanta gradi e la stanza si raffredda impercettibilmente.
+        L'energia si conserva perfettamente — il calore uscito dalla stanza è entrato nel caffè, il primo
+        principio è soddisfatto al joule. Eppure sappiamo tutti che quel film è girato al contrario.</p>
+
+      <p>Questa è la questione. Ci sono processi che <strong>non violano nessuna legge di conservazione</strong>
+        e che non accadono mai. Serve un principio nuovo, che non parli di quantità ma di
+        <strong>direzione</strong>.</p>
+
+      <div class="definition">
+        <div class="formula-title">Secondo principio, enunciato di Clausius</div>
+        <p>È impossibile realizzare una trasformazione il cui <em>unico</em> risultato sia il passaggio di
+          calore da un corpo più freddo a uno più caldo.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Secondo principio, enunciato di Kelvin</div>
+        <p>È impossibile realizzare una trasformazione ciclica il cui <em>unico</em> risultato sia trasformare
+          integralmente in lavoro il calore assorbito da una sola sorgente.</p>
+      </div>
+
+      <p>La parolina che regge tutto è <strong>«unico»</strong>. Il calore <em>può</em> andare dal freddo al
+        caldo: è quello che fa un frigorifero ogni giorno. Ma non è l'unico risultato — c'è anche una bolletta
+        da pagare, cioè del lavoro speso e altro calore riversato nella cucina. Allo stesso modo il calore
+        <em>può</em> essere convertito integralmente in lavoro: succede in un'espansione isoterma. Ma quella non
+        è ciclica, il gas resta espanso, e una macchina che funziona una volta sola non è una macchina.</p>
+
+      <h3>4.1 — I due enunciati sono lo stesso enunciato</h3>
+
+      <p>Sembrano parlare di cose diverse — uno di calore che risale, l'altro di macchine — e invece sono
+        equivalenti: da ciascuno si deduce l'altro. Vediamo un verso, che è il più istruttivo.</p>
+
+      <div class="method">
+        <p><strong>Se esistesse una macchina che viola Kelvin, si violerebbe anche Clausius.</strong></p>
+        <p><span class="step-num">1</span>Supponiamo di avere una macchina $M$ che prende $Q$ da una sorgente
+          calda e lo trasforma <em>tutto</em> in lavoro $L = Q$, senza cedere niente a nessuno. Viola Kelvin per
+          costruzione.</p>
+        <p><span class="step-num">2</span>Prendiamo quel lavoro e usiamolo per far girare un frigorifero
+          ordinario, che con $L$ di lavoro sposta $Q_f$ dal freddo al caldo e riversa nel caldo $Q_f + L$.</p>
+        <p><span class="step-num">3</span>Guardiamo il bilancio complessivo delle due macchine insieme. La
+          sorgente calda: perde $Q$ per $M$, riceve $Q_f + L = Q_f + Q$ dal frigorifero, quindi
+          <strong>guadagna $Q_f$</strong>. La sorgente fredda: <strong>perde $Q_f$</strong>. Il lavoro netto è
+          zero, perché quello prodotto da $M$ è stato tutto consumato dal frigorifero.</p>
+        <p><span class="step-num">4</span>Risultato unico dell'operazione: $Q_f$ è passato dal freddo al caldo e
+          nient'altro è cambiato. Che è esattamente ciò che Clausius vieta. <strong>Assurdo</strong> — quindi la
+          macchina $M$ non può esistere.</p>
+      </div>
+
+      <p>Il ragionamento all'incontrario funziona in modo simmetrico, ed è un esercizio che vale la pena
+        provare: se il calore risalisse spontaneamente si potrebbe costruire una macchina a una sola sorgente.
+        I due divieti sono la stessa cosa detta con parole diverse.</p>
+
+      <h3>4.2 — Non si può vincere, non si può pareggiare</h3>
+
+      <p>Messi insieme, i due principi si riassumono in una battuta che è anche un ottimo promemoria:</p>
+
+      <div class="principi">
+        <div>
+          <div class="num">PRIMO PRINCIPIO</div>
+          <h4>Non si può vincere</h4>
+          <p>Non si può ottenere più lavoro dell'energia che si mette dentro. $\eta \le 1$: il
+            <strong>moto perpetuo di prima specie</strong> è vietato.</p>
+        </div>
+        <div>
+          <div class="num">SECONDO PRINCIPIO</div>
+          <h4>Non si può nemmeno pareggiare</h4>
+          <p>Non si può nemmeno ottenerne <em>tanto quanto</em>: una parte del calore deve essere buttata via.
+            $\eta \lt 1$: il <strong>moto perpetuo di seconda specie</strong> è vietato.</p>
+        </div>
+      </div>
+
+      <p>Il simulatore qui sotto vi lascia progettare una macchina qualunque: decidete quanto calore assorbe e
+        quanto lavoro produce, e vi dice se il vostro progetto è legale, illegale, o semplicemente
+        ridicolo.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="mp-modo"></div>
+        <div class="ctrl">
+          <label><span id="mp-lab1">calore assorbito dalla sorgente calda</span>: <span class="val-badge" id="mp-qav">1000</span> J</label>
+          <input type="range" id="mp-qa" min="100" max="2000" step="50" value="1000">
+        </div>
+        <div class="ctrl">
+          <label><span id="mp-lab2">lavoro prodotto per ciclo</span>: <span class="val-badge" id="mp-lv">300</span> J</label>
+          <input type="range" id="mp-l" min="0" max="2000" step="50" value="300">
+        </div>
+        <svg id="mp-svg" viewBox="0 0 680 300" role="img"
+             aria-label="Schema di una macchina termica con i flussi di calore e di lavoro"></svg>
+        <div class="sp-cols">
+          <div>calore ceduto al freddo: <span class="val-badge" id="mp-qc">—</span></div>
+          <div>rendimento (o COP): <span class="val-badge" id="mp-eta">—</span></div>
+          <div>verdetto: <span class="val-badge" id="mp-ver">—</span></div>
+        </div>
+        <div class="eq-out" id="mp-out"></div>
+      </div>
+
+      <p>Provate a spingere il lavoro fino a eguagliare il calore assorbito: la macchina diventa un moto
+        perpetuo di seconda specie e il verdetto lo dice. Spingetelo oltre: si viola anche il primo principio, e
+        siamo nel regno della fantasia. Poi passate alla modalità <em>frigorifero</em> e guardate una cosa che
+        sorprende sempre: il <strong>coefficiente di prestazione può essere molto maggiore di uno</strong>. Un
+        condizionatore che consuma $1$ kW può spostare $4$ kW di calore. Non è una violazione: non sta
+        <em>creando</em> energia, la sta <em>spostando</em>, e spostare costa meno che produrre.</p>
+
+      <div class="curiosita"><strong>L'ufficio brevetti e i moti perpetui.</strong> L'Ufficio brevetti degli
+        Stati Uniti ha una regola speciale: per le domande che riguardano macchine a moto perpetuo pretende un
+        <em>modello funzionante</em>, unica categoria per cui lo richiede. La regola nasce da un secolo di
+        domande su ruote squilibrate, magneti in cerchio e sifoni che si autoalimentano — nessuna delle quali ha
+        mai funzionato, tutte con lo stesso errore: contare l'energia guadagnata in un tratto e dimenticare
+        quella spesa nel tratto di ritorno. In un famoso episodio dei <em>Simpson</em>, Lisa costruisce una
+        macchina a moto perpetuo che va sempre più veloce, e Homer la rimprovera: «in questa casa si rispettano
+        le leggi della termodinamica!». È probabilmente la battuta di fisica più citata della televisione.</div>
+
+      <div class="warnbox"><strong>Il secondo principio non vieta gli ordinamenti locali.</strong> Un'obiezione
+        che si sente spesso: «se il disordine aumenta sempre, come fa un embrione a organizzarsi, o un fiocco di
+        neve a formarsi?». La risposta sta nella parola <em>isolato</em>. Il secondo principio dice che
+        l'entropia non diminuisce in un sistema <strong>isolato</strong>; un essere vivente non lo è affatto,
+        mangia e respira e irradia calore, e l'ordine che costruisce dentro di sé lo paga con un disordine
+        maggiore riversato fuori. La Terra intera riceve luce concentrata dal Sole e restituisce infrarosso
+        diffuso: è quel flusso, non l'energia in sé, a pagare tutta la complessità della biosfera.</div>
+    </section>
+
+    <!-- 5 — L'ENTROPIA -->
+    <section id="sec5">
+      <h2>5. L'entropia: contare in quanti modi</h2>
+
+      <p>I due enunciati del secondo principio sono divieti, e i divieti sono scomodi: non si mettono in una
+        formula. Clausius cercò per vent'anni una grandezza che trasformasse quei divieti in una
+        disuguaglianza, e nel 1865 la trovò. La chiamò <strong>entropia</strong>, dal greco <em>ἐν-τροπή</em>,
+        «trasformazione interna», scegliendo apposta una parola che somigliasse a «energia».</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Entropia, definizione di Clausius</div>
+        $$\Delta S = \frac{Q}{T} \qquad \text{(per uno scambio reversibile a temperatura } T \text{ costante)}$$
+        <p class="formula-note">Si misura in <strong>joule su kelvin</strong>. La temperatura è quella
+          <em>assoluta</em>: qui la $T$ compare senza il $\Delta$, quindi i kelvin sono obbligatori. Per una
+          trasformazione a temperatura variabile bisogna sommare i contributi di ogni pezzetto, cioè integrare
+          $\mathrm{d}S = \delta Q/T$.</p>
+      </div>
+
+      <p>Perché proprio $Q/T$? Guardiamo che cosa succede quando del calore passa spontaneamente da un corpo
+        caldo a temperatura $T_c$ a uno freddo a temperatura $T_f$, con $T_c \gt T_f$. Il caldo perde entropia
+        per $-Q/T_c$, il freddo ne guadagna per $+Q/T_f$. Il bilancio è</p>
+
+      $$\Delta S = \frac{Q}{T_f} - \frac{Q}{T_c} = Q\left(\frac{1}{T_f} - \frac{1}{T_c}\right) \gt 0$$
+
+      <p>perché $T_f \lt T_c$ e quindi $1/T_f \gt 1/T_c$. Lo stesso calore, ceduto a temperatura più bassa,
+        «vale» più entropia. Se il calore andasse nel verso sbagliato il segno si rovescerebbe e l'entropia
+        diminuirebbe: ecco il divieto di Clausius trasformato in disuguaglianza.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Secondo principio, versione entropica</div>
+        $$\Delta S_{\text{universo}} \ge 0$$
+        <p class="formula-note">Vale l'uguale <em>solo</em> per le trasformazioni reversibili, che sono ideali:
+          in ogni processo reale l'entropia dell'universo aumenta, punto. Notate che si parla dell'universo,
+          cioè sistema più ambiente: l'entropia di un pezzo può benissimo diminuire, purché quella di
+          qualcos'altro aumenti di più.</p>
+      </div>
+
+      <h3>5.1 — Boltzmann: l'entropia è un conteggio</h3>
+
+      <p>La definizione di Clausius è operativa ma muta: dice come calcolare l'entropia, non che cosa sia. La
+        risposta arriva vent'anni dopo da <strong>Ludwig Boltzmann</strong>, con quella che è forse la formula
+        più densa della fisica, e che è incisa sulla sua tomba a Vienna.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Entropia, definizione di Boltzmann</div>
+        $$S = k_B \ln W$$
+        <p class="formula-note">$W$ è il numero di <strong>microstati</strong> — configurazioni microscopiche
+          delle singole particelle — compatibili con il <strong>macrostato</strong> osservato, cioè con quei
+          pochi numeri che misuriamo. $k_B = 1{,}380\,649\times10^{-23}$ J/K è la costante di Boltzmann, la
+          stessa che compare in $\langle K\rangle = \frac32 k_B T$.</p>
+      </div>
+
+      <p>L'entropia, insomma, misura <strong>in quanti modi diversi le particelle possono disporsi senza che ce
+        ne accorgiamo</strong>. Non è «disordine» — quella è un'analogia comoda ma traditrice, perché disordine
+        è una parola estetica e $W$ è un numero. È <em>molteplicità</em>: quante configurazioni microscopiche
+        corrispondono alla stessa descrizione macroscopica.</p>
+
+      <p>E qui il secondo principio smette di essere un divieto e diventa quasi un'ovvietà statistica: un
+        sistema lasciato a sé passa da configurazioni poco numerose a configurazioni molto numerose,
+        semplicemente perché ce ne sono di più. Non è vietato tornare indietro: è <em>improbabile</em>. Ma
+        vediamo quanto.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>numero di particelle $N$: <span class="val-badge" id="en-nv">10</span></label>
+          <input type="range" id="en-n" min="2" max="40" step="1" value="10">
+        </div>
+        <div class="ctrl">
+          <label>particelle nella metà di sinistra: <span class="val-badge" id="en-kv">5</span></label>
+          <input type="range" id="en-k" min="0" max="10" step="1" value="5">
+        </div>
+        <svg id="en-svg" viewBox="0 0 680 320" role="img"
+             aria-label="Particelle in una scatola divisa in due metà e distribuzione dei microstati"></svg>
+        <p class="cap">A sinistra la scatola con la configurazione scelta; a destra quanti microstati
+          corrispondono a ciascun macrostato «$k$ particelle a sinistra».</p>
+        <div class="sp-cols">
+          <div>microstati di questo macrostato: <span class="val-badge" id="en-w">—</span></div>
+          <div>probabilità del macrostato: <span class="val-badge" id="en-p">—</span></div>
+          <div>entropia $S = k_B\ln W$: <span class="val-badge" id="en-s">—</span></div>
+          <div>tutte a sinistra, una volta ogni: <span class="val-badge" id="en-t">—</span></div>
+        </div>
+        <div class="eq-out" id="en-out"></div>
+      </div>
+
+      <p>Con dieci particelle, ritrovarle tutte a sinistra capita una volta su $1024$: immaginando un
+        rimescolamento ogni nanosecondo, un microsecondo di attesa. Con quaranta si sale a una volta su mille
+        miliardi, cioè un quarto d'ora. E con le $2{,}5\times10^{22}$ molecole di un litro d'aria l'attesa ha un
+        numero di zeri che non sta su questa pagina. <strong>Il
+        secondo principio non è una legge assoluta: è una legge statistica</strong> — ma con numeri talmente
+        grandi che la differenza non è osservabile nemmeno in linea di principio.</p>
+
+      <div class="curiosita"><strong>Boltzmann e la sua tomba.</strong> Boltzmann sostenne per tutta la vita che
+        la materia fosse fatta di atomi e che il secondo principio fosse statistico, contro l'ostilità di
+        colleghi autorevoli — Ernst Mach su tutti — per i quali gli atomi erano un'ipotesi metafisica, non
+        essendo mai stati visti. Morì suicida nel 1906, a Duino vicino a Trieste, pochi anni prima che
+        l'esistenza degli atomi diventasse indiscutibile: l'articolo di Einstein sul moto browniano è del 1905, e
+        gli esperimenti di Perrin che lo confermarono sono del 1908. Sulla sua tomba, al Zentralfriedhof di
+        Vienna, c'è scritto $S = k \log W$: la formula ci finì per volontà di chi lo ricordava, non sua.</div>
+
+      <h3>5.2 — L'espansione libera, ovvero l'entropia senza calore</h3>
+
+      <p>C'è un esperimento mentale che chiarisce tutto. Un recipiente isolato, diviso in due metà da un setto:
+        a sinistra un gas, a destra il vuoto. Si toglie il setto. Il gas riempie tutto il recipiente.</p>
+
+      <p>Facciamo i conti col primo principio. Il recipiente è isolato, quindi $Q = 0$. Il gas si espande, ma non
+        spinge contro niente — dall'altra parte c'è il vuoto — quindi $L = 0$. Dunque $\Delta U = 0$: la
+        temperatura non cambia. Eppure <strong>qualcosa è cambiato</strong>, perché il gas non tornerà mai
+        spontaneamente tutto a sinistra.</p>
+
+      <p>Quel qualcosa è l'entropia. Ogni molecola ha ora il doppio dello spazio, quindi il doppio dei posti in
+        cui stare; con $N$ molecole i microstati si moltiplicano per $2^N$, e</p>
+
+      $$\Delta S = k_B \ln(2^N \cdot W_0) - k_B\ln W_0 = N k_B \ln 2$$
+
+      <p>che per una mole fa $\Delta S = R\ln 2 = 8{,}314 \cdot 0{,}693 = 5{,}76$ J/K. Positiva, come dev'essere,
+        e ottenuta <strong>senza che una sola caloria abbia attraversato il contorno</strong>. È la prova che
+        l'entropia non è «calore diviso temperatura» in senso letterale: quella era una ricetta per calcolarla
+        nei casi reversibili, non la sua natura.</p>
+
+      <div class="example">
+        <p><strong>② Esercizio.</strong> Un cubetto di ghiaccio da $30$ g fonde in un bicchiere d'acqua a
+          $25\ °$C. Calcola la variazione di entropia del ghiaccio, quella dell'acqua e quella dell'universo,
+          trattando l'acqua come un serbatoio termico. ($L_f = 334$ kJ/kg.)</p>
+        <button class="btn btn-toggle" data-target="#sol-td2">Mostra la soluzione</button>
+        <div class="solution" id="sol-td2" hidden>
+          <p><span class="step-num">1</span><strong>Il calore in gioco.</strong> Per fondere il ghiaccio serve
+            $$Q = m L_f = 0{,}030 \cdot 334\,000 = 10\,020\ \text{J}$$ Il ghiaccio lo assorbe, l'acqua lo cede.</p>
+          <p><span class="step-num">2</span><strong>Entropia del ghiaccio.</strong> La fusione avviene tutta a
+            $T = 273{,}15$ K, quindi la temperatura è costante e si può usare direttamente $Q/T$:
+            $$\Delta S_{gh} = \frac{+10\,020}{273{,}15} = +36{,}7\ \text{J/K}$$</p>
+          <p><span class="step-num">3</span><strong>Entropia dell'acqua.</strong> È un serbatoio: cede quel
+            calore restando a $T = 298{,}15$ K.
+            $$\Delta S_{ac} = \frac{-10\,020}{298{,}15} = -33{,}6\ \text{J/K}$$</p>
+          <p><span class="step-num">4</span><strong>L'universo.</strong>
+            $$\Delta S_{\text{univ}} = 36{,}7 - 33{,}6 = +3{,}1\ \text{J/K} \gt 0$$
+            Positiva, come impone il secondo principio. Notate <em>perché</em> è positiva: lo stesso calore è
+            entrato a temperatura più bassa di quella a cui è uscito, e a temperatura più bassa lo stesso calore
+            porta più entropia.</p>
+          <p><span class="step-num">5</span><strong>Il caso limite.</strong> Se l'acqua fosse a $0\ °$C esatti,
+            le due temperature coinciderebbero e verrebbe $\Delta S_{\text{univ}} = 0$: la trasformazione
+            sarebbe <strong>reversibile</strong>. Non è un caso — è la definizione operativa di reversibilità:
+            scambiare calore attraverso differenze di temperatura infinitesime. Peccato che a
+            differenza zero il processo impieghi un tempo infinito.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — LA FRECCIA DEL TEMPO -->
+    <section id="sec6">
+      <h2>6. La freccia del tempo</h2>
+
+      <p>Prendete una qualunque legge della fisica vista finora e sostituite $t$ con $-t$. I principi della
+        dinamica sopravvivono senza un graffio: un pianeta che percorre la sua orbita al contrario obbedisce
+        alle stesse equazioni, un urto elastico filmato al rovescio è ancora un urto elastico legittimo. La
+        gravitazione, l'elettromagnetismo, la meccanica quantistica: tutte simmetriche rispetto
+        all'inversione del tempo.</p>
+
+      <p>Eppure noi distinguiamo benissimo il prima dal poi. Un bicchiere che cade e si rompe, il fumo che esce
+        dal camino, il latte che si mescola nel caffè: nessuno di questi film regge la proiezione al contrario, e
+        non perché violi la meccanica — i pezzi di vetro che si ricompongono rispetterebbero ogni singola
+        equazione del moto — ma perché sarebbe <em>assurdamente improbabile</em>.</p>
+
+      <div class="definition">
+        <div class="formula-title">La freccia del tempo termodinamica</div>
+        <p>Il secondo principio è l'<strong>unica legge fondamentale della fisica che distingue il passato dal
+          futuro</strong>. Il futuro è la direzione in cui l'entropia cresce.</p>
+      </div>
+
+      <p>Detto così sembra risolto, e invece è qui che comincia il problema serio. Se le leggi microscopiche
+        sono simmetriche, da dove esce l'asimmetria macroscopica? La risposta migliore che abbiamo non è nelle
+        leggi ma nelle <strong>condizioni iniziali</strong>: l'universo è partito, quattordici miliardi di anni
+        fa, da uno stato di entropia straordinariamente bassa. Da allora sta salendo, e quella salita è ciò che
+        chiamiamo scorrere del tempo. Perché sia partito da lì nessuno lo sa: è, secondo Roger Penrose, la
+        condizione iniziale più improbabile e meno spiegata di tutta la cosmologia.</p>
+
+      <div class="curiosita"><strong>Le due culture, e l'esame di Snow.</strong> Charles Snow — lo stesso della
+        battuta sui tre principi — era un chimico diventato romanziere, e nel 1959 tenne una conferenza celebre
+        sulla frattura fra cultura umanistica e cultura scientifica. Vi raccontò di aver chiesto più volte, a
+        tavolate di intellettuali che si dicevano colti, di enunciare il secondo principio della termodinamica:
+        la risposta era gelo imbarazzato. «Eppure — commentò — chiedere questo equivale grosso modo a chiedere:
+        avete mai letto un'opera di Shakespeare?». La battuta si porta dietro una polemica ancora aperta, ma il
+        punto resta: il secondo principio non è un dettaglio tecnico, è il motivo per cui il tempo ha una
+        direzione, le cose invecchiano e nessuno torna indietro.</div>
+
+      <div class="warnbox"><strong>Il diavoletto di Maxwell.</strong> Maxwell immaginò nel 1867 un esserino
+        microscopico che, sorvegliando uno sportello fra due recipienti, lasciasse passare a destra solo le
+        molecole veloci e a sinistra solo le lente: senza compiere lavoro creerebbe una differenza di
+        temperatura dal nulla, violando il secondo principio. Ci è voluto un secolo per chiudere la questione, e
+        la risposta è arrivata dalla teoria dell'informazione: il diavoletto deve <em>ricordare</em> quale
+        molecola sta arrivando, la sua memoria è finita, e prima o poi deve cancellarla. Il <strong>principio di
+        Landauer</strong> (1961) dice che cancellare un bit costa almeno $k_B T\ln 2$ di energia dissipata — ed
+        è esattamente il conto che rimette in pari il bilancio. Il diavoletto non è battuto dalla fisica delle
+        molecole ma dalla fisica dell'<em>informazione</em>: un legame fra entropia e informazione che è
+        diventato un capitolo intero della scienza.</div>
+    </section>
+
+    <!-- 7 — I POTENZIALI TERMODINAMICI -->
+    <section id="sec7">
+      <h2>7. Chi decide se una cosa succede: l'energia libera</h2>
+
+      <p>Il secondo principio ha un difetto pratico micidiale: per usarlo bisogna calcolare l'entropia
+        dell'<em>universo</em>, cioè anche quella dell'ambiente. In laboratorio questo è scomodissimo. Sarebbe
+        molto meglio avere un criterio che guarda solo il sistema — e che tenga già conto, dietro le quinte,
+        dell'entropia scaricata fuori.</p>
+
+      <p>Quel criterio esiste, e nasce da una riscrittura. Prima però serve un'altra grandezza, che in chimica si
+        usa più dell'energia interna.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Entalpia</div>
+        $$H = U + pV$$
+        <p class="formula-note">A pressione costante — cioè in una beuta aperta sul banco, che è come si lavora
+          quasi sempre — la variazione di entalpia è esattamente il calore scambiato: $\Delta H = Q_p$. Il
+          termine $pV$ tiene conto del lavoro che il sistema deve spendere per farsi spazio contro
+          l'atmosfera.</p>
+      </div>
+
+      <p>Una reazione con $\Delta H \lt 0$ si dice <strong>esotermica</strong>: scalda l'ambiente, come una
+        combustione. Una con $\Delta H \gt 0$ è <strong>endotermica</strong>: raffredda, come le buste del
+        ghiaccio istantaneo che si usano sui campi da gioco.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Energia libera di Gibbs</div>
+        $$G = H - TS \qquad\Longrightarrow\qquad \Delta G = \Delta H - T\Delta S$$
+        <p class="formula-note">A temperatura e pressione costanti, una trasformazione è
+          <strong>spontanea</strong> se e solo se $\Delta G \lt 0$. Se $\Delta G \gt 0$ è spontanea la
+          trasformazione inversa; se $\Delta G = 0$ il sistema è all'<strong>equilibrio</strong>.</p>
+      </div>
+
+      <p>Questa formuletta è, senza esagerare, il motore di tutta la chimica. E la sua struttura è parlante: due
+        termini che si contendono la decisione. $\Delta H$ è la voce dell'<em>energia</em>, che spinge verso gli
+        stati a bassa energia; $-T\Delta S$ è la voce dell'<em>entropia</em>, che spinge verso gli stati più
+        numerosi. Chi vince dipende dalla temperatura, che fa da moltiplicatore: al freddo comanda l'energia, al
+        caldo comanda l'entropia.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="gb-preset"></div>
+        <div class="ctrl">
+          <label>$\Delta H$: <span class="val-badge" id="gb-dhv">6,0</span> kJ/mol</label>
+          <input type="range" id="gb-dh" min="-200" max="200" step="0.5" value="6">
+        </div>
+        <div class="ctrl">
+          <label>$\Delta S$: <span class="val-badge" id="gb-dsv">22</span> J/(mol·K)</label>
+          <input type="range" id="gb-ds" min="-300" max="300" step="1" value="22">
+        </div>
+        <div class="ctrl">
+          <label>temperatura: <span class="val-badge" id="gb-tv">250</span> K</label>
+          <input type="range" id="gb-t" min="100" max="1200" step="1" value="250">
+          <span class="toggle-row"><input type="checkbox" id="gb-lock" checked>
+            <label for="gb-lock">🔒 blocca la scala</label></span>
+        </div>
+        <svg id="gb-svg" viewBox="0 0 680 320" role="img"
+             aria-label="Energia libera di Gibbs in funzione della temperatura"></svg>
+        <p class="cap">$\Delta G$ contro $T$ è una <strong>retta</strong> di pendenza $-\Delta S$ e intercetta
+          $\Delta H$. Dove taglia lo zero, la trasformazione cambia verso.</p>
+        <div class="sp-cols">
+          <div>$\Delta G$ a questa temperatura: <span class="val-badge" id="gb-dg">—</span></div>
+          <div>verso spontaneo: <span class="val-badge" id="gb-sp">—</span></div>
+          <div>temperatura di inversione: <span class="val-badge" id="gb-ti">—</span></div>
+          <div>chi comanda: <span class="val-badge" id="gb-cmd">—</span></div>
+        </div>
+        <div class="eq-out" id="gb-out"></div>
+      </div>
+
+      <p>I quattro casi possibili si riassumono in una tabellina che vale la pena tenere a mente:</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead>
+            <tr><th>$\Delta H$</th><th>$\Delta S$</th><th>Spontanea?</th><th>Esempio</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>$\lt 0$</td><td>$\gt 0$</td><td class="l"><strong>sempre</strong></td>
+              <td class="l">esplosione di un gas: libera energia e produce più molecole</td></tr>
+            <tr><td>$\gt 0$</td><td>$\lt 0$</td><td class="l"><strong>mai</strong></td>
+              <td class="l">il verso opposto della precedente</td></tr>
+            <tr><td>$\lt 0$</td><td>$\lt 0$</td><td class="l">solo a <strong>bassa</strong> $T$</td>
+              <td class="l">solidificazione dell'acqua: perde energia ma si ordina</td></tr>
+            <tr><td>$\gt 0$</td><td>$\gt 0$</td><td class="l">solo ad <strong>alta</strong> $T$</td>
+              <td class="l">fusione del ghiaccio: costa energia ma libera disordine</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Provate il preset «fusione del ghiaccio»: la retta taglia lo zero a $272{,}7$ K. Non è un dato
+        inserito a mano — <strong>è il punto di fusione dell'acqua che esce dai conti</strong>, da due numeri
+        misurati in laboratorio con un calorimetro. Con i valori tabulati a tre cifre,
+        $\Delta H = 6{,}01$ kJ/mol e $\Delta S = 22{,}0$ J/(mol·K), si ottiene $273{,}2$ K: il punto di fusione
+        al decimo di grado. La temperatura a cui il ghiaccio fonde non è un capriccio della natura: è il
+        valore in cui il richiamo dell'energia e quello dell'entropia si equivalgono esattamente.</p>
+
+      <div class="curiosita"><strong>Il prof di chimica aveva ragione.</strong> Chi ha fatto chimica ha sentito
+        ripetere fino alla nausea «delta gi minore di zero, spontanea» come se fosse una formuletta da imparare.
+        Vista da qui è tutt'altro: $\Delta G \lt 0$ è il secondo principio travestito. Il conto è breve — a
+        pressione e temperatura costanti l'ambiente riceve $-\Delta H$ di calore alla temperatura $T$, quindi
+        $\Delta S_{\text{amb}} = -\Delta H/T$, e allora
+        $$\Delta S_{\text{univ}} = \Delta S_{\text{sist}} - \frac{\Delta H}{T} = -\frac{\Delta G}{T}$$
+        Dire «$\Delta G \lt 0$» e dire «$\Delta S_{\text{univ}} \gt 0$» è letteralmente la stessa frase, divisa
+        per $-T$. La chimica non ha una legge sua: usa la termodinamica in una forma comoda per chi lavora a
+        pressione atmosferica.</div>
+
+      <div class="example">
+        <p><strong>③ Esercizio.</strong> Per l'evaporazione dell'acqua si misurano $\Delta H = 40{,}7$ kJ/mol e
+          $\Delta S = 109$ J/(mol·K). A quale temperatura l'acqua bolle? E perché a $20\ °$C i panni stesi si
+          asciugano lo stesso, se a quella temperatura $\Delta G$ è positiva?</p>
+        <button class="btn btn-toggle" data-target="#sol-td3">Mostra la soluzione</button>
+        <div class="solution" id="sol-td3" hidden>
+          <p><span class="step-num">1</span><strong>La temperatura di inversione.</strong> All'equilibrio
+            $\Delta G = 0$, cioè $\Delta H = T\Delta S$:
+            $$T = \frac{\Delta H}{\Delta S} = \frac{40\,700}{109} = 373{,}4\ \text{K} = 100{,}2\ °\text{C}$$
+            I due numeri, misurati con un calorimetro, restituiscono il punto di ebollizione a due decimi di
+            grado.</p>
+          <p><span class="step-num">2</span><strong>A $20\ °$C.</strong> $T = 293{,}15$ K:
+            $$\Delta G = 40\,700 - 293{,}15 \cdot 109 = 40\,700 - 31\,953 = +8747\ \text{J/mol}$$
+            Positiva: l'evaporazione <em>in massa</em>, quella che chiamiamo ebollizione, non è spontanea. Ed è
+            vero: a venti gradi l'acqua non bolle.</p>
+          <p><span class="step-num">3</span><strong>Ma i panni si asciugano.</strong> Il conto appena fatto vale
+            per il vapore <em>puro a una atmosfera</em>. All'aria aperta il vapore d'acqua è invece diluito fra
+            azoto e ossigeno, e questo aggiunge un pezzo di entropia di mescolamento che il conto standard non
+            comprende: le molecole d'acqua hanno molti più posti dove andare.</p>
+          <p><span class="step-num">4</span><strong>Il ruolo dell'umidità.</strong> È per questo che i panni si
+            asciugano in fretta con l'aria secca e non si asciugano affatto in una giornata di nebbia: quando
+            l'aria è già satura di vapore, quel guadagno entropico sparisce, $\Delta G$ torna positiva e
+            l'evaporazione netta si ferma. Ed è per lo stesso motivo che il vento asciuga: porta via il vapore
+            appena formato e tiene bassa l'umidità a contatto col tessuto.</p>
+          <p><span class="step-num">5</span><strong>Morale.</strong> «Non spontaneo» non vuol dire «impossibile»:
+            vuol dire «non in <em>quelle</em> condizioni». Cambiare la concentrazione, la pressione o la
+            temperatura sposta $\Delta G$, e con esso il verso in cui il mondo si muove.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — LA CINETICA CHIMICA -->
+    <section id="sec8">
+      <h2>8. Se succede è una cosa, quando succede è un'altra</h2>
+
+      <p>C'è una domanda che la termodinamica non sa nemmeno formulare: <strong>quanto ci mette</strong>. Un
+        foglio di carta all'aria ha $\Delta G$ fortemente negativa per la combustione — bruciare gli
+        converrebbe, termodinamicamente parlando — eppure sta lì per secoli senza fare niente. Il diamante è
+        instabile rispetto alla grafite, e non per questo si sbriciola fra le dita. La spontaneità è un fatto di
+        <em>destinazione</em>; la velocità è un fatto di <em>strada</em>.</p>
+
+      <div class="definition">
+        <div class="formula-title">Energia di attivazione</div>
+        <p>Per trasformarsi, le molecole devono prima passare attraverso una configurazione intermedia scomoda
+          e ad alta energia, lo <strong>stato di transizione</strong>. La differenza di energia fra i reagenti e
+          quel valico si chiama <strong>energia di attivazione</strong> $E_a$ ed è la vera responsabile della
+          lentezza.</p>
+        <p class="formula-note">L'immagine giusta è un valico di montagna fra due valli: che la valle di arrivo
+          sia più bassa non aiuta a scavalcare il passo. Serve energia in prestito, e la restituzione avviene
+          solo dopo.</p>
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">Legge di Arrhenius (1889)</div>
+        $$k = A\,e^{-E_a/RT}$$
+        <p class="formula-note">$k$ è la costante di velocità della reazione, $A$ un fattore che dipende da
+          quanto spesso le molecole si incontrano con l'orientamento giusto, $R = 8{,}314$ J/(mol·K) la costante
+          dei gas. L'esponenziale è la frazione di molecole che, alla temperatura $T$, hanno abbastanza energia
+          per scavalcare il valico.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>energia di attivazione: <span class="val-badge" id="ci-eav">75</span> kJ/mol</label>
+          <input type="range" id="ci-ea" min="20" max="150" step="1" value="75">
+        </div>
+        <div class="ctrl">
+          <label>temperatura: <span class="val-badge" id="ci-tv">300</span> K</label>
+          <input type="range" id="ci-t" min="250" max="600" step="5" value="300">
+          <label>catalizzatore: abbassa $E_a$ del <span class="val-badge" id="ci-cv">0</span> %</label>
+          <input type="range" id="ci-c" min="0" max="80" step="5" value="0">
+        </div>
+        <svg id="ci-svg" viewBox="0 0 680 320" role="img"
+             aria-label="Profilo energetico di una reazione con la barriera di attivazione e curva di Arrhenius"></svg>
+        <p class="cap">A sinistra il cammino della reazione, a destra la velocità in funzione della temperatura
+          (scala logaritmica).</p>
+        <div class="sp-cols">
+          <div>frazione che scavalca: <span class="val-badge" id="ci-fr">—</span></div>
+          <div>guadagno del catalizzatore: <span class="val-badge" id="ci-gc">—</span></div>
+          <div>scaldando di $10$ K la velocità: <span class="val-badge" id="ci-d10">—</span></div>
+          <div>$E_a$ effettiva: <span class="val-badge" id="ci-eaf">—</span></div>
+        </div>
+        <div class="eq-out" id="ci-out"></div>
+      </div>
+
+      <p>Due conseguenze da ricordare. La prima è la <strong>regola del dieci gradi</strong>: per molte reazioni
+        organiche un aumento di $10$ K raddoppia la velocità, e il simulatore mostra che questo corrisponde a
+        un'energia di attivazione intorno ai $50$-$55$ kJ/mol — proprio l'ordine di grandezza tipico. È il
+        motivo per cui il frigorifero conserva il cibo (rallenta) e la pentola a pressione cuoce prima
+        (accelera).</p>
+
+      <p>La seconda è la potenza dei <strong>catalizzatori</strong>. Abbassare la barriera del $30\%$ non fa
+        andare la reazione una volta e mezzo più veloce: la fa andare migliaia di volte più veloce, perché il
+        guadagno è <em>esponenziale</em>. Gli enzimi sono i catalizzatori dei viventi, e sono
+        spettacolarmente bravi: la <strong>catalasi</strong>, che smaltisce l'acqua ossigenata prodotta dal
+        nostro metabolismo, abbassa la barriera da circa $75$ a $8$ kJ/mol e accelera la reazione di un fattore
+        con undici zeri.</p>
+
+      <div class="warnbox"><strong>Un catalizzatore non cambia il traguardo.</strong> Abbassando la barriera
+        accelera <em>entrambi</em> i versi della reazione, di uno stesso fattore: fa arrivare prima
+        all'equilibrio, non lo sposta. La posizione dell'equilibrio è decisa da $\Delta G$, che il
+        catalizzatore non tocca. Se qualcuno vi propone una sostanza che «fa rendere di più» una reazione senza
+        cambiarne le condizioni, sta vendendo un moto perpetuo travestito da chimica.</div>
+
+      <h3>8.1 — L'equilibrio dinamico: fermo di fuori, frenetico dentro</h3>
+
+      <p>Quando una reazione «finisce», nella stragrande maggioranza dei casi non è finita affatto. Le
+        concentrazioni smettono di cambiare perché la reazione diretta e quella inversa procedono alla
+        <strong>stessa velocità</strong>: il traffico continua, ma in pareggio. È l'<strong>equilibrio
+        dinamico</strong>, e senza di esso non si capirebbero né la respirazione né le batterie.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>velocità diretta $k_1$: <span class="val-badge" id="ed-k1v">0,80</span> s⁻¹</label>
+          <input type="range" id="ed-k1" min="0.05" max="2" step="0.05" value="0.8">
+        </div>
+        <div class="ctrl">
+          <label>velocità inversa $k_2$: <span class="val-badge" id="ed-k2v">0,20</span> s⁻¹</label>
+          <input type="range" id="ed-k2" min="0.05" max="2" step="0.05" value="0.2">
+          <span class="toggle-row"><input type="checkbox" id="ed-lock" checked>
+            <label for="ed-lock">🔒 blocca la scala</label></span>
+        </div>
+        <svg id="ed-svg" viewBox="0 0 680 320" role="img"
+             aria-label="Concentrazioni e velocità di una reazione reversibile che va all'equilibrio"></svg>
+        <p class="cap">Si parte con tutto $A$ e niente $B$. Le curve tratteggiate sono le due velocità: si
+          incontrano, e da lì in poi restano uguali.</p>
+        <div class="sp-cols">
+          <div>$A$ all'equilibrio: <span class="val-badge" id="ed-ae">—</span></div>
+          <div>$B$ all'equilibrio: <span class="val-badge" id="ed-be">—</span></div>
+          <div>costante $K = k_1/k_2$: <span class="val-badge" id="ed-k">—</span></div>
+          <div>tempo caratteristico: <span class="val-badge" id="ed-tau">—</span></div>
+        </div>
+        <div class="eq-out" id="ed-out"></div>
+      </div>
+
+      <p>Il tempo caratteristico con cui si arriva all'equilibrio è $\tau = 1/(k_1+k_2)$: la stessa struttura
+        esponenziale della legge di raffreddamento di Newton della lezione scorsa, e per lo stesso motivo — la
+        velocità con cui si colma una differenza è proporzionale alla differenza stessa. Cambiano i nomi delle
+        grandezze, non la matematica.</p>
+
+      <div class="curiosita"><strong>Le Chatelier, ovvero il sistema che si oppone.</strong> Se si perturba un
+        sistema all'equilibrio, esso reagisce spostandosi nel verso che <em>attenua</em> la perturbazione: si
+        aggiunge reagente e l'equilibrio si sposta a destra, si aumenta la pressione e si sposta dove ci sono
+        meno molecole gassose. È il <strong>principio di Le Chatelier</strong> (1884), ed è l'analogo chimico
+        della legge di Lenz che incontrerete in elettromagnetismo — e, se ci pensate, dello stesso principio di
+        inerzia. La natura, quando la si spinge, tende a spingere indietro.</div>
+
+      <div class="example">
+        <p><strong>④ Esercizio.</strong> Una reazione raddoppia la propria velocità quando si passa da $300$ a
+          $310$ K. Quanto vale la sua energia di attivazione? E di quante volte accelera se la si porta a
+          $350$ K?</p>
+        <button class="btn btn-toggle" data-target="#sol-td4">Mostra la soluzione</button>
+        <div class="solution" id="sol-td4" hidden>
+          <p><span class="step-num">1</span><strong>Il rapporto fra due velocità.</strong> Il fattore $A$ è lo
+            stesso alle due temperature e se ne va nel rapporto:
+            $$\frac{k_2}{k_1} = \frac{A\,e^{-E_a/RT_2}}{A\,e^{-E_a/RT_1}}
+            = e^{-\frac{E_a}{R}\left(\frac{1}{T_2}-\frac{1}{T_1}\right)}$$
+            È il vantaggio dei rapporti: eliminano le costanti che non si sanno.</p>
+          <p><span class="step-num">2</span><strong>Si ricava $E_a$.</strong> Prendendo il logaritmo e imponendo
+            $k_2/k_1 = 2$:
+            $$E_a = \frac{R\,T_1T_2}{T_2-T_1}\ln 2 = \frac{8{,}314 \cdot 300 \cdot 310}{10} \cdot 0{,}6931
+            = 77\,320 \cdot 0{,}6931 = 53{,}6\ \text{kJ/mol}$$</p>
+          <p><span class="step-num">3</span><strong>Fino a $350$ K.</strong> Con la stessa formula, da $300$ a
+            $350$:
+            $$\frac{k}{k_0} = \exp\left[-\frac{53\,591}{8{,}314}\left(\frac{1}{350}-\frac{1}{300}\right)\right]
+            = e^{3{,}069} = 21{,}5$$
+            Cinquanta gradi in più e la reazione va <strong>ventidue volte</strong> più veloce.</p>
+          <p><span class="step-num">4</span><strong>Il controllo.</strong> Cinquanta gradi sono cinque scatti da
+            dieci, e la regola del pollice direbbe $2^5 = 32$ volte. Viene $21{,}5$, cioè meno: la regola del
+            raddoppio <em>sovrastima</em> se applicata a intervalli lunghi, perché il fattore di raddoppio vale
+            a $300$ K e si riduce man mano che la temperatura sale — nell'esponente compare $1/T$, non $T$.</p>
+          <p><span class="step-num">5</span><strong>Perché ha senso in cucina.</strong> Un'energia di attivazione
+            di $50$ kJ/mol è tipica delle reazioni di degradazione degli alimenti. Dal banco a $20\ °$C al
+            frigorifero a $4\ °$C ci sono sedici gradi, cioè un fattore $3{,}3$ di rallentamento: il latte dura
+            tre volte di più. Al congelatore a $-18\ °$C il fattore diventa $21$, ed è per quello che i
+            surgelati durano mesi anziché giorni.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 — REDOX E PILA -->
+    <section id="sec9">
+      <h2>9. Reazioni che spostano elettroni: le redox e la pila</h2>
+
+      <p>Fra tutte le reazioni chimiche ce n'è una famiglia che ci riguarda da vicino, perché è quella che
+        alimenta i telefoni, le automobili elettriche e i nostri stessi muscoli: le reazioni in cui
+        <strong>gli elettroni cambiano proprietario</strong>.</p>
+
+      <div class="definition">
+        <div class="formula-title">Ossidazione e riduzione</div>
+        <p>Una specie si <strong>ossida</strong> quando <em>cede</em> elettroni, si <strong>riduce</strong>
+          quando li <em>acquista</em>. Le due cose non possono avvenire separatamente — gli elettroni non
+          restano per strada — e quindi si parla sempre di reazioni di <strong>ossidoriduzione</strong>, o
+          redox.</p>
+        <p class="formula-note">Chi si ossida fa da <em>riducente</em> (riduce l'altro), chi si riduce fa da
+          <em>ossidante</em>. La confusione dei nomi è tradizionale e nessuno l'ha mai sistemata; la
+          filastrocca che funziona è: <em>ossidazione è perdita, riduzione è acquisto</em>.</p>
+      </div>
+
+      <p>Il nome viene dall'ossigeno, che è l'ossidante più diffuso del pianeta: la ruggine, la combustione e il
+        nostro respiro sono tutte reazioni in cui qualcosa cede elettroni all'ossigeno. Ma l'ossigeno non è
+        indispensabile: quello che conta è il trasferimento di carica.</p>
+
+      <p>Ed ecco l'idea che ha cambiato il mondo. Se la reazione avviene <em>in un mucchio</em>, gli elettroni
+        saltano da una molecola all'altra a distanza di nanometri e tutta l'energia esce come calore. Ma se si
+        separano fisicamente i due mezzi-processi e si costringono gli elettroni a fare il giro lungo, per un
+        filo, allora quella stessa energia diventa <strong>corrente elettrica</strong>.</p>
+
+      <h3>9.1 — La pila: costringere gli elettroni a fare il giro lungo</h3>
+
+      <p>Ogni coppia metallo-ione ha una tendenza propria a prendersi gli elettroni, misurata dal suo
+        <strong>potenziale standard di riduzione</strong> $E^\circ$. È una scala relativa: si è scelto per
+        convenzione lo zero sull'idrogeno, e tutto il resto è misurato rispetto a quello. Chi ha il potenziale
+        più alto vince e si riduce, l'altro si ossida.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="pv-a"></div>
+        <div class="sim-btns" id="pv-b"></div>
+        <svg id="pv-svg" viewBox="0 0 680 320" role="img"
+             aria-label="Schema di una pila con due semicelle, ponte salino e circuito esterno"></svg>
+        <p class="cap">Scegliete i due metalli. La pila si costruisce da sola: chi ha il potenziale più basso
+          diventa l'anodo e si consuma.</p>
+        <div class="sp-cols">
+          <div>anodo (si ossida): <span class="val-badge" id="pv-an">—</span></div>
+          <div>catodo (si riduce): <span class="val-badge" id="pv-ca">—</span></div>
+          <div>forza elettromotrice: <span class="val-badge" id="pv-fem">—</span></div>
+          <div>elementi per fare $12$ V: <span class="val-badge" id="pv-n">—</span></div>
+        </div>
+        <div class="eq-out" id="pv-out"></div>
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">Forza elettromotrice di una pila</div>
+        $$\Delta E^\circ = E^\circ_{\text{catodo}} - E^\circ_{\text{anodo}}$$
+        <p class="formula-note">E il legame con la termodinamica è diretto:
+          $\Delta G^\circ = -nF\Delta E^\circ$, con $n$ il numero di elettroni scambiati e
+          $F = 96\,485$ C/mol la <strong>costante di Faraday</strong>, cioè la carica di una mole di elettroni.
+          Una pila funziona <em>se e solo se</em> $\Delta E^\circ \gt 0$, che è come dire $\Delta G^\circ \lt 0$:
+          il criterio di spontaneità della sezione 7, travestito da voltmetro.</p>
+      </div>
+
+      <p>La pila più famosa è quella <strong>Daniell</strong>, zinco e rame: $0{,}34 - (-0{,}76) = 1{,}10$ V. Lo
+        zinco si scioglie lentamente cedendo elettroni, il rame si deposita sull'altro elettrodo, e nel mezzo un
+        <strong>ponte salino</strong> lascia migrare gli ioni per tenere elettricamente neutre le due soluzioni
+        — senza di esso la pila si blocca in pochi istanti, per accumulo di carica.</p>
+
+      <div class="curiosita"><strong>La rana di Galvani e il torto che aveva ragione.</strong> Nel 1780 Luigi
+        Galvani, a Bologna, osservò che le zampe di una rana dissezionata si contraevano quando venivano toccate
+        contemporaneamente da due metalli diversi. Ne concluse l'esistenza di un'<em>elettricità animale</em>,
+        propria dei tessuti viventi. <strong>Alessandro Volta</strong>, a Pavia, non ci credette: sostenne che
+        l'elettricità nasceva dal contatto fra i due metalli e che la rana faceva solo da rivelatore. Per
+        dimostrarlo costruì, nel 1799, una catasta di dischetti di zinco e rame separati da panno bagnato — la
+        <strong>pila</strong>, primo generatore di corrente continua della storia — e la controversia sembrò
+        chiusa a suo favore. Sembrò: oggi sappiamo che i potenziali di membrana dei neuroni esistono davvero e
+        che l'impulso nervoso è un fenomeno elettrochimico. Avevano ragione tutti e due, ognuno sul proprio
+        terreno, ed è una delle poche dispute scientifiche finite in pareggio.</div>
+
+      <div class="warnbox"><strong>La pila non «contiene» elettricità.</strong> Una pila carica non è un
+        serbatoio di elettroni: contiene <em>reagenti separati</em>. L'energia sta nella differenza di energia
+        libera fra reagenti e prodotti, e la pila è scarica quando i reagenti sono finiti. È la stessa
+        distinzione fra un corpo che «contiene calore» (sbagliato) e un corpo che contiene energia interna
+        (giusto): l'elettricità, come il calore, è un modo di trasferire energia, non una sostanza da
+        immagazzinare.</div>
+
+      <div class="example">
+        <p><strong>⑤ Esercizio.</strong> Quante pile Daniell servono in serie per alimentare un dispositivo a
+          $12$ V? E quanta carica può erogare, al massimo, una pila con un elettrodo di zinco da $65{,}4$ g
+          (una mole)? Quanta energia?</p>
+        <button class="btn btn-toggle" data-target="#sol-td5">Mostra la soluzione</button>
+        <div class="solution" id="sol-td5" hidden>
+          <p><span class="step-num">1</span><strong>In serie le tensioni si sommano.</strong>
+            $12/1{,}10 = 10{,}9$, quindi servono <strong>$11$ elementi</strong>, che danno $12{,}1$ V. Con dieci
+            si arriverebbe a $11{,}0$ V, e sotto tensione il dispositivo probabilmente non parte.</p>
+          <p><span class="step-num">2</span><strong>La carica.</strong> Lo zinco si ossida secondo
+            $\text{Zn} \to \text{Zn}^{2+} + 2e^-$: <em>due</em> elettroni per atomo. Una mole di zinco libera
+            quindi due moli di elettroni:
+            $$Q = nF = 2 \cdot 96\,485 = 192\,970\ \text{C}$$</p>
+          <p><span class="step-num">3</span><strong>In unità da catalogo.</strong> I costruttori usano gli
+            amperora: $192\,970/3600 = 53{,}6$ Ah. Una pila stilo commerciale ne dichiara circa $2{,}5$, quindi
+            il nostro elettrodo da una mole vale una ventina di stilo — se solo tutto lo zinco reagisse davvero,
+            cosa che in pratica non succede mai.</p>
+          <p><span class="step-num">4</span><strong>L'energia.</strong>
+            $$W = Q\,\Delta E = 192\,970 \cdot 1{,}10 = 212\,267\ \text{J} \approx 212\ \text{kJ}$$
+            Equivalentemente $\Delta G^\circ = -nF\Delta E^\circ = -212$ kJ/mol: negativa, come dev'essere per
+            una reazione spontanea.</p>
+          <p><span class="step-num">5</span><strong>Un confronto che ridimensiona.</strong> Duecentododici
+            chilojoule sono l'energia di un panino piccolo, o quella che serve a scaldare mezzo litro d'acqua di
+            cento gradi. E pesano più di sessantacinque grammi di solo zinco, senza contare il resto della pila.
+            La bassa densità energetica delle batterie è il vero collo di bottiglia dell'elettrificazione, e non
+            è un problema di ingegneria: è scritto nei potenziali standard.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 — TERZO PRINCIPIO E MORTE TERMICA -->
+    <section id="sec10">
+      <h2>10. Il terzo principio, e come va a finire</h2>
+
+      <p>Resta l'ultimo principio, il meno citato e in un certo senso il più malinconico: dice che c'è un limite
+        a cui ci si può avvicinare quanto si vuole e che non si raggiunge mai.</p>
+
+      <div class="definition">
+        <div class="formula-title">Terzo principio (Nernst, 1906)</div>
+        <p>L'entropia di un cristallo perfetto tende a zero quando la temperatura tende allo zero assoluto.
+          Conseguenza operativa: <strong>è impossibile raffreddare un sistema fino a $0$ K con un numero finito
+          di operazioni</strong>.</p>
+      </div>
+
+      <p>Il motivo si capisce con la formula di Boltzmann. Allo zero assoluto un cristallo perfetto avrebbe una
+        sola configurazione possibile — tutte le particelle nel loro stato di minima energia — quindi $W = 1$ e
+        $S = k_B\ln 1 = 0$. L'entropia ha uno zero <em>assoluto</em>, non convenzionale: è l'unica grandezza
+        estensiva della termodinamica per cui abbia senso dire «vale tanto», e non solo «è variata di tanto».</p>
+
+      <p>Quanto ci si è avvicinati? Molto più di quanto si creda. Le tecniche di raffreddamento laser e di
+        raffreddamento per evaporazione hanno portato campioni di atomi a poche centinaia di
+        <strong>picokelvin</strong>, cioè a meno di un miliardesimo di grado dallo zero. Il posto più freddo
+        dell'universo conosciuto non è nello spazio profondo — lì la radiazione di fondo tiene tutto a
+        $2{,}7$ K — ma dentro un laboratorio, su questo pianeta.</p>
+
+      <div class="curiosita"><strong>Perché diventa sempre più difficile.</strong> Ogni tecnica di
+        raffreddamento funziona sfruttando una differenza, e più ci si avvicina allo zero meno differenze
+        restano da sfruttare: si finisce per doversi accontentare di dimezzare, poi dimezzare ancora. È la
+        stessa struttura del paradosso di Zenone, e infatti il terzo principio si può enunciare così: lo zero
+        assoluto sta a distanza finita sulla scala delle temperature ma a distanza infinita sulla scala degli
+        sforzi.</div>
+
+      <h3>10.1 — La morte termica dell'universo</h3>
+
+      <p>Clausius, nello stesso lavoro del 1865 in cui introdusse l'entropia, si spinse fino in fondo con due
+        frasi che sono rimaste: «l'energia dell'universo è costante; l'entropia dell'universo tende a un
+        massimo». Se le prendiamo alla lettera, il futuro è un universo in cui tutto è alla stessa temperatura:
+        niente differenze, niente flussi, niente macchine, niente vita. Una condizione che l'Ottocento chiamò
+        con enfasi <strong>morte termica</strong>.</p>
+
+      <p>Prima di rassegnarsi conviene però guardare le ipotesi, che sono parecchie e non tutte solide.
+        L'universo si sta espandendo, e un sistema che si espande non ha un'entropia massima fissa da
+        raggiungere. La gravità, poi, si comporta al contrario di tutto il resto: un gas che si concentra sotto
+        il proprio peso <em>aumenta</em> la propria entropia invece di diminuirla, e i sistemi autogravitanti
+        hanno capacità termica negativa — se perdono energia si scaldano, ed è per questo che le stelle esistono.
+        Su scale cosmologiche, insomma, il conto è molto più aperto di quanto suggerisca la frase di
+        Clausius.</p>
+
+      <div class="warnbox"><strong>Quello che possiamo dire con sicurezza è più modesto — e più vicino.</strong>
+        Il Sole ha davanti a sé circa cinque miliardi di anni prima di esaurire l'idrogeno del nucleo. È una
+        macchina termica alimentata da una differenza di temperatura fra il suo interno e lo spazio, e quella
+        differenza finirà. Tutto ciò che viviamo — il clima, le piante, il cibo, il vento, il petrolio — è
+        alimentato dal flusso di energia <em>a bassa entropia</em> che ci arriva da quella differenza. Non
+        consumiamo energia: quella si conserva. Consumiamo <strong>entropia bassa</strong>, e quella no.</div>
+
+      <div class="example">
+        <p><strong>⑥ Esercizio.</strong> Una centrale termoelettrica brucia combustibile per $1000$ MW termici e
+          immette in rete $400$ MW elettrici. Qual è il suo rendimento? Che fine fa il resto? E se lo si smaltisce
+          in un fiume scaldandolo di $5$ K, quanta acqua serve al secondo?</p>
+        <button class="btn btn-toggle" data-target="#sol-td6">Mostra la soluzione</button>
+        <div class="solution" id="sol-td6" hidden>
+          <p><span class="step-num">1</span><strong>Il rendimento.</strong>
+            $$\eta = \frac{L}{Q_{\text{ass}}} = \frac{400}{1000} = 0{,}40 = 40\%$$
+            È un valore realistico per una centrale a vapore; i cicli combinati moderni arrivano al $60\%$, ma
+            non oltre.</p>
+          <p><span class="step-num">2</span><strong>Il resto non sparisce.</strong> Per il primo principio su un
+            ciclo, $Q_{\text{ced}} = Q_{\text{ass}} - L = 1000 - 400 = 600$ MW. Seicento megawatt di calore
+            <em>devono</em> essere scaricati a bassa temperatura: non è uno spreco evitabile con una progettazione
+            migliore, è il pedaggio che il secondo principio impone a chiunque voglia produrre lavoro
+            ciclicamente.</p>
+          <p><span class="step-num">3</span><strong>Il fiume.</strong> Con $c = 4186$ J/(kg·K) e $\Delta T = 5$ K,
+            ogni chilogrammo d'acqua può portarsi via $4186 \cdot 5 = 20\,930$ J. Quindi
+            $$\frac{\Delta m}{\Delta t} = \frac{600\times10^{6}}{20\,930} = 28\,667\ \text{kg/s}
+            \approx 29\ \text{m}^3\text{/s}$$</p>
+          <p><span class="step-num">4</span><strong>Che cosa vuol dire.</strong> Ventinove metri cubi al secondo
+            sono la portata di un fiume vero, non di un torrente: è il motivo per cui le centrali termoelettriche
+            e nucleari si costruiscono sui grandi fiumi o sulla costa, e per cui nelle estati di siccità alcune
+            sono costrette a ridurre la potenza. Il vincolo non è il combustibile: è dove buttare il calore.</p>
+          <p><span class="step-num">5</span><strong>Le torri di raffreddamento.</strong> Le grandi torri a
+            forma di iperboloide che si vedono nelle centrali servono esattamente a questo, e sfruttano il calore
+            latente di vaporizzazione della lezione precedente: evaporando una piccola frazione dell'acqua si
+            smaltisce moltissima energia. Il pennacchio bianco che ne esce è vapore condensato, cioè acqua — non
+            fumo, e non inquinamento.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 — QUIZ -->
+    <section id="quiz">
+      <h2>11. Quiz finale</h2>
+      <p>Dodici domande a risposta multipla e due aperte, sui quattro principi e su tutto quello che ne
+        discende.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 8 — I principi della termodinamica · Fisica · Quarto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nc(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      /* ============ 1 — IL PRINCIPIO ZERO ============ */
+      (function () {
+        var svg = document.getElementById('pz-svg');
+        if (!svg) { return; }
+        var TAMB = 20, CORPO = 400;   // capacita' termica di ciascun corpo, in J/K
+
+        function lettura(T, r) { return (T + r * TAMB) / (1 + r); }
+
+        function disegna() {
+          var TA = parseFloat(document.getElementById('pz-ta').value);
+          var TB = parseFloat(document.getElementById('pz-tb').value);
+          var r = parseFloat(document.getElementById('pz-c').value) / 100;
+          var LA = lettura(TA, r), LB = lettura(TB, r);
+          var errA = LA - TA;
+          var Q = CORPO * (TB - TA) / 2;
+          var s = '', i;
+          var BOX = [[60, TA, LA, 'A'], [400, TB, LB, 'B']];
+          for (i = 0; i < 2; i++) {
+            var x = BOX[i][0], T = BOX[i][1], L = BOX[i][2];
+            var cal = Math.max(0, Math.min(1, (T + 20) / 140));
+            var col = 'rgb(' + Math.round(60 + 190 * cal) + ',' + Math.round(110 - 40 * cal) + ',' +
+              Math.round(230 - 190 * cal) + ')';
+            s += '<rect x="' + x + '" y="90" width="150" height="140" rx="10" fill="' + col +
+              '" opacity="0.32" stroke="' + col + '" stroke-width="2.6"/>';
+            s += '<text x="' + (x + 75) + '" y="76" text-anchor="middle" class="lbl">corpo ' + BOX[i][3] + '</text>';
+            s += '<text x="' + (x + 75) + '" y="148" text-anchor="middle" class="lbl">vera: ' + nc(T, 0) + ' °C</text>';
+            s += '<text x="' + (x + 75) + '" y="176" text-anchor="middle" class="em">letta: ' + nc(L, 2) + ' °C</text>';
+            // il termometro appoggiato al corpo
+            var tx = x + 160;
+            s += '<rect x="' + tx + '" y="110" width="14" height="100" rx="7" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="1.8"/>';
+            var h = Math.max(4, Math.min(96, 96 * (L + 30) / 180));
+            s += '<rect x="' + (tx + 3) + '" y="' + (208 - h).toFixed(1) + '" width="8" height="' + h.toFixed(1) +
+              '" rx="4" fill="var(--magenta)"/>';
+          }
+          s += '<text x="340" y="270" text-anchor="middle" class="lbl-s">stesso termometro, ' +
+            'stessa partenza da ' + TAMB + ' °C, capacità pari al ' + Math.round(r * 100) + '% di quella dei corpi</text>';
+          var uguali = Math.abs(LA - LB) < 1e-9;
+          s += '<text x="340" y="300" text-anchor="middle" class="em">' +
+            (uguali ? 'letture uguali → nessuno scambio di calore' : 'letture diverse → il calore passerà') + '</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('pz-tav').textContent = nc(TA, 0);
+          document.getElementById('pz-tbv').textContent = nc(TB, 0);
+          document.getElementById('pz-cv').textContent = Math.round(r * 100);
+          document.getElementById('pz-la').textContent = nc(LA, 2) + ' °C';
+          document.getElementById('pz-lb').textContent = nc(LB, 2) + ' °C';
+          document.getElementById('pz-err').textContent = nc(errA, 2) + ' °C';
+          document.getElementById('pz-q').textContent = nc(Q, 0) + ' J';
+          var el = document.getElementById('pz-out');
+          el.innerHTML = uguali
+            ? 'Le due letture coincidono a <strong>' + nc(LA, 2) + ' °C</strong> — e sono entrambe sbagliate ' +
+              'di ' + nc(errA, 2) + ' °C rispetto al valore vero. Eppure il calore scambiato fra $A$ e $B$ è ' +
+              '<strong>esattamente zero</strong>. Il termometro sbaglia la misura ma non sbaglia il confronto: ' +
+              'è il principio zero che glielo garantisce.'
+            : 'Le letture differiscono di <strong>' + nc(Math.abs(LA - LB), 2) + ' °C</strong>, e mettendo $A$ e ' +
+              '$B$ a contatto passerebbero ' + nc(Math.abs(Q), 0) + ' J ' +
+              (Q > 0 ? 'da $B$ ad $A$' : 'da $A$ a $B$') + '. Notate che la differenza fra le letture non è ' +
+              'quella fra le temperature vere: vale $\\Delta T/(1+r) = ' +
+              nc(Math.abs(TA - TB), 0) + '/' + nc(1 + r, 2).replace(',', '{,}') + '$, cioè è compressa dello ' +
+              'stesso fattore per tutti i corpi. Una compressione uniforme non cambia l\'ordine, e non può ' +
+              'trasformare due letture diverse in due temperature uguali.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['pz-ta', 'pz-tb', 'pz-c'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        disegna();
+      })();
+
+      /* ============ 2 — REVERSIBILE E IRREVERSIBILE ============ */
+      (function () {
+        var svg = document.getElementById('tr-svg');
+        if (!svg) { return; }
+        var V1 = 1.0, P1 = 100, K = P1 * V1;   // kPa·L = J
+
+        function pgas(V) { return K / V; }
+
+        function lavoroPassi(V2, n) {
+          var dV = (V2 - V1) / n, L = 0, i;
+          for (i = 1; i <= n; i++) {
+            var Vi = V1 + i * dV;
+            L += pgas(Vi) * dV;
+          }
+          return L;
+        }
+
+        function disegna() {
+          var V2 = parseFloat(document.getElementById('tr-v2').value);
+          var n = parseInt(document.getElementById('tr-n').value, 10);
+          var lock = document.getElementById('tr-lock').checked;
+          var L = lavoroPassi(V2, n);
+          var Lr = K * Math.log(V2 / V1);
+          var X0 = 66, X1 = 640, Y0 = 268, Y1 = 40;
+          var VM = lock ? 5.2 : Math.max(V1, V2) * 1.15;
+          var PM = lock ? 360 : Math.max(pgas(Math.min(V1, V2)), P1) * 1.15;
+          var px = function (v) { return X0 + (X1 - X0) * v / VM; };
+          var py = function (p) { return Y0 - (Y0 - Y1) * p / PM; };
+          var s = '', i;
+          for (i = 0; i <= 4; i++) {
+            s += '<text x="' + px(VM * i / 4).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' +
+              nc(VM * i / 4, 1) + '</text>';
+            s += '<text x="' + (X0 - 6) + '" y="' + (py(PM * i / 4) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' +
+              Math.round(PM * i / 4) + '</text>';
+          }
+          // i gradini, con l'area
+          var dV = (V2 - V1) / n;
+          for (i = 1; i <= n; i++) {
+            var Va = V1 + (i - 1) * dV, Vb = V1 + i * dV;
+            var pe = pgas(Vb);
+            var xa = px(Math.min(Va, Vb)), xb = px(Math.max(Va, Vb));
+            s += '<rect x="' + xa.toFixed(1) + '" y="' + py(pe).toFixed(1) + '" width="' + Math.max(0.5, xb - xa).toFixed(1) +
+              '" height="' + (Y0 - py(pe)).toFixed(1) + '" fill="var(--accent)" opacity="0.18" stroke="var(--accent)" stroke-width="1"/>';
+          }
+          // la curva reversibile
+          var pts = [];
+          for (i = 0; i <= 200; i++) {
+            var v = 0.25 + (VM - 0.25) * i / 200;
+            pts.push(px(v).toFixed(1) + ',' + py(pgas(v)).toFixed(1));
+          }
+          s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--magenta)" stroke-width="2.8"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + X1 + '" y="' + (Y0 + 34) + '" text-anchor="end" class="lbl-s">volume (L)</text>';
+          s += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 14) + '" class="lbl-s">pressione (kPa)</text>';
+          s += '<circle cx="' + px(V1).toFixed(1) + '" cy="' + py(P1).toFixed(1) + '" r="5.5" fill="var(--gold)"/>';
+          s += '<circle cx="' + px(V2).toFixed(1) + '" cy="' + py(pgas(V2)).toFixed(1) + '" r="5.5" fill="var(--magenta)"/>';
+          s += '<text x="' + (px(V1) + 8).toFixed(1) + '" y="' + (py(P1) - 8).toFixed(1) + '" class="lbl-s">stato iniziale</text>';
+          s += '<text x="' + (px(V2) + 8).toFixed(1) + '" y="' + (py(pgas(V2)) - 8).toFixed(1) + '" class="lbl-s">stato finale</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('tr-v2v').textContent = nc(V2, 1);
+          document.getElementById('tr-nv').textContent = n;
+          document.getElementById('tr-l').textContent = nc(L, 1) + ' J';
+          document.getElementById('tr-lr').textContent = nc(Lr, 1) + ' J';
+          document.getElementById('tr-fr').textContent = nc(L / Lr * 100, 1) + ' %';
+          document.getElementById('tr-lp').textContent = nc(Math.abs(Lr - L), 1) + ' J';
+          var esp = V2 > V1;
+          var el = document.getElementById('tr-out');
+          el.innerHTML = (esp
+            ? 'Espansione da ' + nc(V1, 1) + ' a ' + nc(V2, 1) + ' L in <strong>' + n +
+              (n === 1 ? ' passo' : ' passi') + '</strong>: il gas compie ' + nc(L, 1) + ' J contro i ' +
+              nc(Lr, 1) + ' J del cammino reversibile, cioè il <strong>' + nc(L / Lr * 100, 1) +
+              '%</strong>. I ' + nc(Lr - L, 1) + ' J mancanti non sono finiti da nessuna parte: ' +
+              '<strong>non sono mai stati prodotti</strong>. '
+            : 'Compressione da ' + nc(V1, 1) + ' a ' + nc(V2, 1) + ' L in <strong>' + n +
+              (n === 1 ? ' passo' : ' passi') + '</strong>: bisogna spendere ' + nc(-L, 1) +
+              ' J contro i ' + nc(-Lr, 1) + ' J del cammino reversibile, cioè il <strong>' +
+              nc(L / Lr * 100, 1) + '%</strong> — di più, non di meno. ') +
+            'Il lavoro è $L = \\int p\\,\\mathrm{d}V$, e con i gradini la pressione esterna è costante a tratti: ' +
+            'l\'area sotto la scaletta ' + (esp ? 'sta sempre sotto' : 'sta sempre sopra') + ' quella sotto la curva. ' +
+            (n >= 20
+              ? 'Con ' + n + ' passi la scaletta è ormai indistinguibile dalla curva: siamo <em>quasi</em> reversibili.'
+              : 'Alzate il numero dei passi e guardate la scaletta appiattirsi contro la curva.');
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['tr-v2', 'tr-n'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('tr-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ============ 3 — IL CICLO RETTANGOLARE ============ */
+      (function () {
+        var svg = document.getElementById('pp-svg');
+        if (!svg) { return; }
+
+        function disegna() {
+          var p1 = parseFloat(document.getElementById('pp-p1').value);
+          var dp = parseFloat(document.getElementById('pp-dp').value);
+          var v1 = parseFloat(document.getElementById('pp-v1').value);
+          var dv = parseFloat(document.getElementById('pp-dv').value);
+          var lock = document.getElementById('pp-lock').checked;
+          var p2 = p1 + dp, v2 = v1 + dv;
+          // energia interna di un gas perfetto monoatomico: U = 3/2 pV   (kPa·L = J)
+          var U = function (p, v) { return 1.5 * p * v; };
+          var tappe = [
+            ['A→B', 'isocora', 0, U(p2, v1) - U(p1, v1)],
+            ['B→C', 'isobara', p2 * (v2 - v1), U(p2, v2) - U(p2, v1)],
+            ['C→D', 'isocora', 0, U(p1, v2) - U(p2, v2)],
+            ['D→A', 'isobara', p1 * (v1 - v2), U(p1, v1) - U(p1, v2)]
+          ];
+          var Ltot = 0, Utot = 0, Qtot = 0, Qass = 0, i;
+          for (i = 0; i < 4; i++) {
+            var Q = tappe[i][3] + tappe[i][2];
+            tappe[i].push(Q);
+            Ltot += tappe[i][2];
+            Utot += tappe[i][3];
+            Qtot += Q;
+            if (Q > 0) { Qass += Q; }
+          }
+          var eta = Ltot / Qass;
+          var X0 = 70, X1 = 400, Y0 = 280, Y1 = 40;
+          var VM = lock ? 9.5 : v2 * 1.2;
+          var PM = lock ? 420 : p2 * 1.2;
+          var px = function (v) { return X0 + (X1 - X0) * v / VM; };
+          var py = function (p) { return Y0 - (Y0 - Y1) * p / PM; };
+          var s = '';
+          s += '<rect x="' + px(v1).toFixed(1) + '" y="' + py(p2).toFixed(1) + '" width="' + (px(v2) - px(v1)).toFixed(1) +
+            '" height="' + (py(p1) - py(p2)).toFixed(1) + '" fill="var(--accent)" opacity="0.16"/>';
+          var ang = [[v1, p1, 'A'], [v1, p2, 'B'], [v2, p2, 'C'], [v2, p1, 'D']];
+          var pts = [];
+          for (i = 0; i < 4; i++) { pts.push(px(ang[i][0]).toFixed(1) + ',' + py(ang[i][1]).toFixed(1)); }
+          s += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+          for (i = 0; i < 4; i++) {
+            var a = ang[i], b = ang[(i + 1) % 4];
+            var mx = (px(a[0]) + px(b[0])) / 2, my = (py(a[1]) + py(b[1])) / 2;
+            var dx = px(b[0]) - px(a[0]), dy = py(b[1]) - py(a[1]);
+            var nn = Math.sqrt(dx * dx + dy * dy) || 1;
+            s += '<polygon points="' + (mx + 7 * dx / nn) + ',' + (my + 7 * dy / nn) + ' ' +
+              (mx - 5 * dx / nn + 4 * dy / nn) + ',' + (my - 5 * dy / nn - 4 * dx / nn) + ' ' +
+              (mx - 5 * dx / nn - 4 * dy / nn) + ',' + (my - 5 * dy / nn + 4 * dx / nn) +
+              '" fill="var(--magenta)"/>';
+            s += '<circle cx="' + px(a[0]).toFixed(1) + '" cy="' + py(a[1]).toFixed(1) + '" r="5" fill="var(--gold)"/>';
+            s += '<text x="' + (px(a[0]) + (a[0] === v1 ? -14 : 10)) + '" y="' + (py(a[1]) + (a[1] === p1 ? 16 : -8)) +
+              '" class="lbl">' + a[2] + '</text>';
+          }
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + X1 + '" y="' + (Y0 + 32) + '" text-anchor="end" class="lbl-s">V (L)</text>';
+          s += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 14) + '" class="lbl-s">p (kPa)</text>';
+          s += '<text x="' + ((px(v1) + px(v2)) / 2).toFixed(1) + '" y="' + ((py(p1) + py(p2)) / 2).toFixed(1) +
+            '" text-anchor="middle" class="em">L = ' + nc(Ltot, 0) + ' J</text>';
+          // il diagramma dei flussi
+          var FX = 470;
+          s += '<rect x="' + FX + '" y="60" width="170" height="42" rx="8" fill="#ef4444" opacity="0.3" stroke="#ef4444" stroke-width="2"/>';
+          s += '<text x="' + (FX + 85) + '" y="86" text-anchor="middle" class="lbl">assorbe ' + nc(Qass, 0) + ' J</text>';
+          s += '<rect x="' + FX + '" y="140" width="170" height="52" rx="8" fill="var(--accent)" opacity="0.22" stroke="var(--accent)" stroke-width="2"/>';
+          s += '<text x="' + (FX + 85) + '" y="163" text-anchor="middle" class="lbl">macchina</text>';
+          s += '<text x="' + (FX + 85) + '" y="182" text-anchor="middle" class="em">η = ' + nc(eta * 100, 1) + ' %</text>';
+          s += '<rect x="' + FX + '" y="230" width="170" height="42" rx="8" fill="#3b82f6" opacity="0.28" stroke="#3b82f6" stroke-width="2"/>';
+          s += '<text x="' + (FX + 85) + '" y="256" text-anchor="middle" class="lbl">cede ' + nc(Qass - Ltot, 0) + ' J</text>';
+          s += '<line x1="' + (FX + 85) + '" y1="102" x2="' + (FX + 85) + '" y2="138" stroke="#ef4444" stroke-width="2.6"/>';
+          s += '<line x1="' + (FX + 85) + '" y1="192" x2="' + (FX + 85) + '" y2="228" stroke="#3b82f6" stroke-width="2.6"/>';
+          svg.innerHTML = s;
+
+          document.getElementById('pp-p1v').textContent = Math.round(p1);
+          document.getElementById('pp-dpv').textContent = Math.round(dp);
+          document.getElementById('pp-v1v').textContent = nc(v1, 1);
+          document.getElementById('pp-dvv').textContent = nc(dv, 1);
+          var t = '<div class="table-container"><table class="tabf"><thead><tr><th>tappa</th><th>tipo</th>' +
+            '<th>L (J)</th><th>ΔU (J)</th><th>Q (J)</th></tr></thead><tbody>';
+          for (i = 0; i < 4; i++) {
+            t += '<tr><td class="lab">' + tappe[i][0] + '</td><td>' + tappe[i][1] + '</td><td>' +
+              nc(tappe[i][2], 0) + '</td><td>' + nc(tappe[i][3], 0) + '</td><td>' + nc(tappe[i][4], 0) + '</td></tr>';
+          }
+          t += '<tr><td class="lab"><strong>ciclo</strong></td><td>—</td><td><strong>' + nc(Ltot, 0) +
+            '</strong></td><td><strong>' + nc(Utot, 0) + '</strong></td><td><strong>' + nc(Qtot, 0) +
+            '</strong></td></tr></tbody></table></div>';
+          document.getElementById('pp-tab').innerHTML = t;
+          var el = document.getElementById('pp-out');
+          el.innerHTML = 'Il lavoro del ciclo è l\'area del rettangolo, $(p_2-p_1)(V_2-V_1) = ' +
+            nc(p2 - p1, 0) + ' \\cdot ' + nc(v2 - v1, 1).replace(',', '{,}') + ' = ' + nc(Ltot, 0) +
+            '$ J, e coincide con il calore netto. La colonna $\\Delta U$ somma a <strong>zero</strong>: è la ' +
+            'firma di una funzione di stato. Il rendimento vale <strong>' + nc(eta * 100, 1) +
+            '%</strong>, perché dei ' + nc(Qass, 0) + ' J assorbiti ben ' + nc(Qass - Ltot, 0) +
+            ' finiscono nella sorgente fredda. Muovete pure i cursori: non riuscirete a portarlo neanche ' +
+            'vicino al 100%.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['pp-p1', 'pp-dp', 'pp-v1', 'pp-dv'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        document.getElementById('pp-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nc(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      /* ============ 4 — MACCHINE POSSIBILI E IMPOSSIBILI ============ */
+      (function () {
+        var svg = document.getElementById('mp-svg');
+        if (!svg) { return; }
+        var MODI = ['motore', 'frigorifero'];
+        var sel = 0;
+
+        function disegna() {
+          var Q = parseFloat(document.getElementById('mp-qa').value);
+          var L = parseFloat(document.getElementById('mp-l').value);
+          var s = '';
+          var verdetto, dettaglio, resa, resaLab, Qaltro;
+          if (sel === 0) {
+            // motore: assorbe Q dal caldo, produce L, cede Q - L al freddo
+            Qaltro = Q - L;
+            resa = L / Q;
+            resaLab = nc(resa * 100, 1) + ' %';
+            if (L > Q) {
+              verdetto = 'impossibile (1° principio)';
+              dettaglio = 'Con $\\eta = ' + nc(resa * 100, 1) + '\\%$ la macchina produrrebbe più lavoro ' +
+                'dell\'energia che riceve. Il bilancio non torna: è il <strong>moto perpetuo di prima ' +
+                'specie</strong>, quello che chiunque riconosce come impossibile.';
+            } else if (L === Q) {
+              verdetto = 'impossibile (2° principio)';
+              dettaglio = 'Il bilancio energetico torna perfettamente — $\\eta = 100\\%$, niente si crea — ' +
+                'eppure la macchina è vietata: convertirebbe integralmente in lavoro il calore di una sola ' +
+                'sorgente, senza cederne un joule. È esattamente ciò che <strong>l\'enunciato di Kelvin</strong> ' +
+                'esclude: il <strong>moto perpetuo di seconda specie</strong>. Se esistesse, una nave potrebbe ' +
+                'navigare raffreddando l\'oceano.';
+            } else if (L === 0) {
+              verdetto = 'legale, ma inutile';
+              dettaglio = 'Nessun lavoro prodotto: tutto il calore entra e riesce. Non è una macchina, è un ' +
+                'radiatore. Perfettamente lecito e perfettamente inservibile.';
+            } else {
+              verdetto = 'compatibile coi principi';
+              dettaglio = 'La macchina assorbe ' + nc(Q, 0) + ' J, ne converte ' + nc(L, 0) +
+                ' in lavoro e ne butta ' + nc(Qaltro, 0) + ' nella sorgente fredda: $\\eta = ' +
+                nc(resa * 100, 1).replace(',', '{,}') + '\\%$. Nessun principio è violato — il che non vuol ' +
+                'dire che sia <em>costruibile</em>: esiste un secondo limite, più severo, che dipende dalle ' +
+                'temperature delle due sorgenti e che ricaveremo nella prossima lezione con Carnot.';
+            }
+          } else {
+            // frigorifero: estrae Q dal freddo, spende L, cede Q + L al caldo
+            Qaltro = Q + L;
+            resa = L > 0 ? Q / L : Infinity;
+            resaLab = L > 0 ? nc(resa, 2) : '∞';
+            if (L === 0) {
+              verdetto = 'impossibile (2° principio)';
+              dettaglio = 'Calore che risale dal freddo al caldo <strong>senza spendere nulla</strong>: è ' +
+                'precisamente ciò che <strong>l\'enunciato di Clausius</strong> vieta. Se funzionasse, un ' +
+                'frigorifero aperto raffredderebbe la cucina invece di scaldarla.';
+            } else {
+              verdetto = 'compatibile coi principi';
+              dettaglio = 'Spendendo ' + nc(L, 0) + ' J di lavoro la macchina sposta ' + nc(Q, 0) +
+                ' J dal freddo al caldo, e ne riversa nel caldo ' + nc(Qaltro, 0) + ' in tutto. Il ' +
+                '<strong>coefficiente di prestazione</strong> $\\text{COP} = Q_f/L = ' +
+                nc(resa, 2).replace(',', '{,}') + '$ ' +
+                (resa > 1
+                  ? 'è <strong>maggiore di uno</strong>, e non è un imbroglio: la macchina non crea energia, ' +
+                    'la <em>trasporta</em>. È il principio della pompa di calore, che scalda una casa con un ' +
+                    'terzo dell\'energia elettrica che servirebbe a una stufa.'
+                  : 'è minore di uno: state spendendo più lavoro del calore che spostate. Legale, ma converrebbe ' +
+                    'una stufa.');
+            }
+          }
+          // schema dei flussi
+          var CX = 340;
+          s += '<rect x="' + (CX - 250) + '" y="30" width="500" height="34" rx="8" fill="#ef4444" opacity="0.28" stroke="#ef4444" stroke-width="2"/>';
+          s += '<text x="' + CX + '" y="52" text-anchor="middle" class="lbl">sorgente calda</text>';
+          s += '<rect x="' + (CX - 250) + '" y="238" width="500" height="34" rx="8" fill="#3b82f6" opacity="0.28" stroke="#3b82f6" stroke-width="2"/>';
+          s += '<text x="' + CX + '" y="260" text-anchor="middle" class="lbl">sorgente fredda</text>';
+          var vietata = verdetto.indexOf('impossibile') === 0;
+          s += '<circle cx="' + CX + '" cy="150" r="52" fill="' + (vietata ? '#ef4444' : 'var(--accent)') +
+            '" opacity="0.22" stroke="' + (vietata ? '#ef4444' : 'var(--accent)') + '" stroke-width="2.6"/>';
+          s += '<text x="' + CX + '" y="146" text-anchor="middle" class="lbl">' + MODI[sel] + '</text>';
+          s += '<text x="' + CX + '" y="166" text-anchor="middle" class="lbl-s">' +
+            (sel === 0 ? 'η = ' + resaLab : 'COP = ' + resaLab) + '</text>';
+          // freccia calda-macchina
+          var su = sel === 0 ? nc(Q, 0) : nc(Qaltro, 0);
+          var giu = sel === 0 ? nc(Qaltro, 0) : nc(Q, 0);
+          var vsu = sel === 0 ? -1 : 1;   // -1 = scende dal caldo alla macchina
+          s += '<line x1="' + (CX - 90) + '" y1="' + (vsu < 0 ? 66 : 96) + '" x2="' + (CX - 90) + '" y2="' +
+            (vsu < 0 ? 96 : 66) + '" stroke="#ef4444" stroke-width="3.4" marker-fill="none"/>';
+          s += '<polygon points="' + (CX - 90) + ',' + (vsu < 0 ? 100 : 62) + ' ' + (CX - 97) + ',' +
+            (vsu < 0 ? 88 : 74) + ' ' + (CX - 83) + ',' + (vsu < 0 ? 88 : 74) + '" fill="#ef4444"/>';
+          s += '<text x="' + (CX - 82) + '" y="86" class="lbl-s">' + su + ' J</text>';
+          s += '<line x1="' + (CX - 90) + '" y1="204" x2="' + (CX - 90) + '" y2="234" stroke="#3b82f6" stroke-width="3.4"/>';
+          s += '<polygon points="' + (CX - 90) + ',' + (sel === 0 ? 238 : 200) + ' ' + (CX - 97) + ',' +
+            (sel === 0 ? 226 : 212) + ' ' + (CX - 83) + ',' + (sel === 0 ? 226 : 212) + '" fill="#3b82f6"/>';
+          s += '<text x="' + (CX - 82) + '" y="224" class="lbl-s">' + giu + ' J</text>';
+          // il lavoro
+          s += '<line x1="' + (CX + 52) + '" y1="150" x2="' + (CX + 170) + '" y2="150" stroke="var(--gold)" stroke-width="3.4"/>';
+          s += '<polygon points="' + (CX + (sel === 0 ? 178 : 44)) + ',150 ' + (CX + (sel === 0 ? 166 : 56)) +
+            ',144 ' + (CX + (sel === 0 ? 166 : 56)) + ',156" fill="var(--gold)"/>';
+          s += '<text x="' + (CX + 111) + '" y="140" text-anchor="middle" class="em">L = ' + nc(L, 0) + ' J</text>';
+          s += '<text x="' + (CX + 111) + '" y="172" text-anchor="middle" class="lbl-s">' +
+            (sel === 0 ? 'prodotto' : 'speso') + '</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('mp-qav').textContent = Math.round(Q);
+          document.getElementById('mp-lv').textContent = Math.round(L);
+          document.getElementById('mp-lab1').textContent = sel === 0
+            ? 'calore assorbito dalla sorgente calda' : 'calore estratto dalla sorgente fredda';
+          document.getElementById('mp-lab2').textContent = sel === 0
+            ? 'lavoro prodotto per ciclo' : 'lavoro speso per ciclo';
+          document.getElementById('mp-qc').textContent = sel === 0
+            ? nc(Qaltro, 0) + ' J' : nc(Qaltro, 0) + ' J al caldo';
+          document.getElementById('mp-eta').textContent = resaLab;
+          document.getElementById('mp-ver').textContent = verdetto;
+          var el = document.getElementById('mp-out');
+          el.innerHTML = dettaglio;
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        var host = document.getElementById('mp-modo');
+        MODI.forEach(function (n, i) {
+          var b = document.createElement('button');
+          b.className = 'btn' + (i === 0 ? ' active' : '');
+          b.type = 'button';
+          b.textContent = n;
+          b.addEventListener('click', function () {
+            sel = i;
+            Array.prototype.forEach.call(host.children, function (o, j) {
+              if (j === i) { o.classList.add('active'); } else { o.classList.remove('active'); }
+            });
+            disegna();
+          });
+          host.appendChild(b);
+        });
+        ['mp-qa', 'mp-l'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        disegna();
+      })();
+
+      /* ============ 5 — MICROSTATI ED ENTROPIA ============ */
+      (function () {
+        var svg = document.getElementById('en-svg');
+        if (!svg) { return; }
+        var KB = 1.380649e-23;
+
+        function binom(n, k) {
+          var r = 1, i;
+          for (i = 1; i <= k; i++) { r = r * (n - k + i) / i; }
+          return Math.round(r);
+        }
+
+        function tempo(secondi) {
+          if (secondi < 1e-6) { return nc(secondi * 1e9, 1) + ' ns'; }
+          if (secondi < 1e-3) { return nc(secondi * 1e6, 1) + ' µs'; }
+          if (secondi < 1) { return nc(secondi * 1e3, 1) + ' ms'; }
+          if (secondi < 90) { return nc(secondi, 1) + ' s'; }
+          if (secondi < 5400) { return nc(secondi / 60, 1) + ' minuti'; }
+          if (secondi < 172800) { return nc(secondi / 3600, 1) + ' ore'; }
+          if (secondi < 3.15e9) { return nc(secondi / 86400, 1) + ' giorni'; }
+          return nc(secondi / 3.156e7, 1) + ' anni';
+        }
+
+        function disegna() {
+          var N = parseInt(document.getElementById('en-n').value, 10);
+          var sk = document.getElementById('en-k');
+          if (parseInt(sk.max, 10) !== N) { sk.max = N; }
+          var k = Math.min(N, parseInt(sk.value, 10));
+          if (parseInt(sk.value, 10) !== k) { sk.value = k; }
+          var W = binom(N, k);
+          var tot = Math.pow(2, N);
+          var P = W / tot;
+          var S = KB * Math.log(W);
+          var attesa = tot * 1e-9;
+          var s = '', i;
+          // la scatola
+          var BX = 26, BY = 46, BW = 300, BH = 240;
+          s += '<rect x="' + BX + '" y="' + BY + '" width="' + BW + '" height="' + BH +
+            '" rx="6" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2.4"/>';
+          s += '<line x1="' + (BX + BW / 2) + '" y1="' + BY + '" x2="' + (BX + BW / 2) + '" y2="' + (BY + BH) +
+            '" stroke="var(--border)" stroke-width="2" stroke-dasharray="6 5"/>';
+          var col = 10, i2;
+          for (i2 = 0; i2 < N; i2++) {
+            var sinistra = i2 < k;
+            var idx = sinistra ? i2 : i2 - k;
+            var quanti = sinistra ? k : N - k;
+            var perRiga = Math.min(5, Math.max(1, Math.ceil(Math.sqrt(quanti))));
+            var cx = BX + (sinistra ? 22 : BW / 2 + 22) + (idx % perRiga) * (BW / 2 - 44) / Math.max(1, perRiga - 1);
+            var cy = BY + 30 + Math.floor(idx / perRiga) * 26;
+            if (perRiga === 1) { cx = BX + (sinistra ? BW / 4 : 3 * BW / 4); }
+            cy = Math.min(cy, BY + BH - 18);
+            s += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="7" fill="' +
+              (sinistra ? 'var(--accent)' : 'var(--muted)') + '" opacity="0.85"/>';
+          }
+          s += '<text x="' + (BX + BW / 4) + '" y="' + (BY + BH + 20) + '" text-anchor="middle" class="lbl">' +
+            k + ' a sinistra</text>';
+          s += '<text x="' + (BX + 3 * BW / 4) + '" y="' + (BY + BH + 20) + '" text-anchor="middle" class="lbl">' +
+            (N - k) + ' a destra</text>';
+          s += '<text x="' + BX + '" y="34" class="lbl-s">un macrostato: quanti a sinistra. Un microstato: quali.</text>';
+          // istogramma dei microstati
+          var GX0 = 372, GX1 = 648, GY0 = 268, GY1 = 52;
+          var Wmax = binom(N, Math.floor(N / 2));
+          var bw = (GX1 - GX0) / (N + 1);
+          for (i = 0; i <= N; i++) {
+            var Wi = binom(N, i);
+            var h = (GY0 - GY1) * Wi / Wmax;
+            s += '<rect x="' + (GX0 + i * bw + 0.6).toFixed(1) + '" y="' + (GY0 - h).toFixed(1) + '" width="' +
+              Math.max(1, bw - 1.2).toFixed(1) + '" height="' + h.toFixed(1) + '" fill="' +
+              (i === k ? 'var(--magenta)' : 'var(--accent)') + '" opacity="' + (i === k ? '0.95' : '0.4') + '"/>';
+          }
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX1 + '" y2="' + GY0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX0 + '" y2="' + GY1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + GX1 + '" y="' + (GY0 + 20) + '" text-anchor="end" class="lbl-s">particelle a sinistra</text>';
+          s += '<text x="' + (GX0 - 4) + '" y="' + (GY1 - 14) + '" class="lbl-s">numero di microstati</text>';
+          s += '<text x="' + GX0 + '" y="' + (GY0 + 20) + '" text-anchor="middle" class="lbl-s">0</text>';
+          s += '<text x="' + (GX0 + (N + 1) * bw / 2).toFixed(1) + '" y="' + (GY0 + 34) +
+            '" text-anchor="middle" class="lbl-s">il picco centrale contiene quasi tutti i casi</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('en-nv').textContent = N;
+          document.getElementById('en-kv').textContent = k;
+          document.getElementById('en-w').textContent = W.toLocaleString('it-IT');
+          document.getElementById('en-p').textContent = nc(P * 100, 2) + ' %';
+          document.getElementById('en-s').textContent = S.toExponential(2).replace('.', ',') + ' J/K';
+          document.getElementById('en-t').textContent = tempo(attesa);
+          var el = document.getElementById('en-out');
+          el.innerHTML = 'Il macrostato «' + k + ' a sinistra» si realizza in $W = \\binom{' + N + '}{' + k +
+            '} = ' + W + '$ modi diversi, su $2^{' + N + '} = ' + tot + '$ microstati totali: una probabilità ' +
+            'del ' + nc(P * 100, 2) + '%. La sua entropia vale $S = k_B\\ln W = ' +
+            S.toExponential(2).replace('.', '{,}').replace('e', '\\times10^{') + '}$ J/K. ' +
+            (k === 0 || k === N
+              ? '<strong>Questo è il macrostato più raro possibile</strong>: un solo microstato. Aspettando che ' +
+                'capiti da solo, con un rimescolamento ogni nanosecondo, ci vorrebbe in media ' + tempo(attesa) +
+                '. E stiamo parlando di ' + N + ' particelle: in un litro d\'aria ce ne sono ' +
+                'circa $2{,}5\\times10^{22}$.'
+              : 'Il massimo si ha per metà e metà, ed è lì che il sistema passa quasi tutto il suo tempo — non ' +
+                'perché ci sia una forza che ce lo spinge, ma perché <strong>ci sono molti più modi</strong> di ' +
+                'stare lì. Per tornare tutte a sinistra servirebbero in media ' + tempo(attesa) + '.');
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['en-n', 'en-k'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        disegna();
+      })();
+
+      /* ============ 7 — L'ENERGIA LIBERA DI GIBBS ============ */
+      (function () {
+        var svg = document.getElementById('gb-svg');
+        if (!svg) { return; }
+        var PRESET = [
+          ['fusione del ghiaccio', 6, 22, 250],
+          ['evaporazione dell\'acqua', 40.5, 109, 350],
+          ['sintesi dell\'ammoniaca', -92.5, -199, 400],
+          ['nitrato d\'ammonio in acqua', 25.5, 108, 298],
+          ['calcare che diventa calce', 178, 161, 1000]
+        ];
+
+        function disegna() {
+          var dH = parseFloat(document.getElementById('gb-dh').value);
+          var dS = parseFloat(document.getElementById('gb-ds').value);
+          var T = parseFloat(document.getElementById('gb-t').value);
+          var lock = document.getElementById('gb-lock').checked;
+          var dG = dH - T * dS / 1000;
+          var Ti = dS !== 0 ? dH * 1000 / dS : null;
+          var X0 = 70, X1 = 640, Y0 = 280, Y1 = 42;
+          var TM = lock ? 1200 : 1200;
+          var GM = lock ? 260 : Math.max(30, Math.abs(dH) * 1.2, Math.abs(dH - 1200 * dS / 1000) * 1.2);
+          var px = function (t) { return X0 + (X1 - X0) * t / TM; };
+          var py = function (g) { return (Y0 + Y1) / 2 - (Y0 - Y1) / 2 * g / GM; };
+          var s = '', i;
+          s += '<rect x="' + X0 + '" y="' + Y1 + '" width="' + (X1 - X0) + '" height="' + (py(0) - Y1).toFixed(1) +
+            '" fill="#ef4444" opacity="0.07"/>';
+          s += '<rect x="' + X0 + '" y="' + py(0).toFixed(1) + '" width="' + (X1 - X0) + '" height="' +
+            (Y0 - py(0)).toFixed(1) + '" fill="#22c55e" opacity="0.09"/>';
+          s += '<text x="' + (X1 - 8) + '" y="' + (Y1 + 20) + '" text-anchor="end" class="lbl-s">ΔG &gt; 0: non spontanea</text>';
+          s += '<text x="' + (X1 - 8) + '" y="' + (Y0 - 10) + '" text-anchor="end" class="lbl-s">ΔG &lt; 0: spontanea</text>';
+          for (i = 0; i <= 4; i++) {
+            s += '<text x="' + px(TM * i / 4).toFixed(1) + '" y="' + (Y0 + 20) + '" text-anchor="middle" class="lbl-s">' +
+              Math.round(TM * i / 4) + '</text>';
+          }
+          s += '<line x1="' + X0 + '" y1="' + py(0).toFixed(1) + '" x2="' + X1 + '" y2="' + py(0).toFixed(1) +
+            '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + X1 + '" y="' + (Y0 + 38) + '" text-anchor="end" class="lbl-s">temperatura (K)</text>';
+          s += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 16) + '" class="lbl-s">ΔG (kJ/mol)</text>';
+          var pts = [];
+          for (i = 0; i <= 120; i++) {
+            var t = TM * i / 120;
+            pts.push(px(t).toFixed(1) + ',' + py(dH - t * dS / 1000).toFixed(1));
+          }
+          s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+          if (Ti !== null && Ti > 0 && Ti < TM) {
+            s += '<line x1="' + px(Ti).toFixed(1) + '" y1="' + Y1 + '" x2="' + px(Ti).toFixed(1) + '" y2="' + Y0 +
+              '" stroke="var(--gold)" stroke-width="1.8" stroke-dasharray="6 4"/>';
+            s += '<text x="' + (px(Ti) + 6).toFixed(1) + '" y="' + (Y1 + 16) + '" class="lbl-s">' +
+              nc(Ti, 1) + ' K</text>';
+          }
+          s += '<circle cx="' + px(T).toFixed(1) + '" cy="' + py(dG).toFixed(1) + '" r="6.5" fill="var(--magenta)"/>';
+          svg.innerHTML = s;
+
+          document.getElementById('gb-dhv').textContent = nc(dH, 1);
+          document.getElementById('gb-dsv').textContent = nc(dS, 0);
+          document.getElementById('gb-tv').textContent = Math.round(T);
+          document.getElementById('gb-dg').textContent = nc(dG, 1) + ' kJ/mol';
+          document.getElementById('gb-sp').textContent = dG < 0 ? 'diretto (spontanea)'
+            : (dG > 0 ? 'inverso' : 'equilibrio');
+          document.getElementById('gb-ti').textContent = (Ti !== null && Ti > 0)
+            ? nc(Ti, 1) + ' K' : 'non esiste';
+          document.getElementById('gb-cmd').textContent = Math.abs(dH) > Math.abs(T * dS / 1000)
+            ? 'l\'energia (ΔH)' : 'l\'entropia (TΔS)';
+          var el = document.getElementById('gb-out');
+          el.innerHTML = '$\\Delta G = \\Delta H - T\\Delta S = ' + nc(dH, 1).replace(',', '{,}') + ' - ' +
+            Math.round(T) + ' \\cdot ' + nc(dS / 1000, 3).replace(',', '{,}') + ' = ' +
+            nc(dG, 1).replace(',', '{,}') + '$ kJ/mol. ' +
+            (dG < 0 ? 'Negativa: <strong>la trasformazione avviene da sola</strong>. '
+                    : (dG > 0 ? 'Positiva: da sola avviene la trasformazione <strong>inversa</strong>. '
+                              : 'Nulla: siamo <strong>esattamente all\'equilibrio</strong>. ')) +
+            ((Ti !== null && Ti > 0 && Ti < 3000)
+              ? 'Il verso si inverte a $T = \\Delta H/\\Delta S = ' + nc(Ti, 1).replace(',', '{,}') +
+                '$ K, dove i due termini si equivalgono: sopra comanda ' +
+                (dS > 0 ? 'l\'entropia, sotto l\'energia' : 'l\'energia, sotto l\'entropia') + '. '
+              : 'I due termini hanno segni concordi con lo stesso verso a ogni temperatura: nessuna inversione, ' +
+                'la trasformazione è ' + (dG < 0 ? 'sempre' : 'mai') + ' spontanea. ') +
+            'Ricordate che questo criterio vale a $T$ e $p$ costanti — che è come si lavora sul banco di un ' +
+            'laboratorio, non dentro un motore.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        var host = document.getElementById('gb-preset');
+        PRESET.forEach(function (p) {
+          var b = document.createElement('button');
+          b.className = 'btn btn-secondary';
+          b.type = 'button';
+          b.textContent = p[0];
+          b.addEventListener('click', function () {
+            document.getElementById('gb-dh').value = p[1];
+            document.getElementById('gb-ds').value = p[2];
+            document.getElementById('gb-t').value = p[3];
+            disegna();
+          });
+          host.appendChild(b);
+        });
+        ['gb-dh', 'gb-ds', 'gb-t'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        document.getElementById('gb-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nc(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      function grande(x) {
+        if (x < 1000) { return nc(x, 1); }
+        var e = Math.floor(Math.log(x) / Math.LN10);
+        return nc(x / Math.pow(10, e), 2) + '·10^' + e;
+      }
+
+      /* ============ 8 — ARRHENIUS E LA BARRIERA ============ */
+      (function () {
+        var svg = document.getElementById('ci-svg');
+        if (!svg) { return; }
+        var RGAS = 8.314, DHR = -30;   // calore di reazione, kJ/mol, fissato
+
+        function frazione(Ea, T) { return Math.exp(-Ea * 1000 / (RGAS * T)); }
+
+        function disegna() {
+          var Ea = parseFloat(document.getElementById('ci-ea').value);
+          var T = parseFloat(document.getElementById('ci-t').value);
+          var cat = parseFloat(document.getElementById('ci-c').value) / 100;
+          var Eaf = Ea * (1 - cat);
+          var f = frazione(Eaf, T);
+          var guad = frazione(Eaf, T) / frazione(Ea, T);
+          var d10 = frazione(Eaf, T + 10) / frazione(Eaf, T);
+          var s = '', i;
+          // profilo energetico
+          var PX0 = 30, PX1 = 320, PY0 = 268, PY1 = 50;
+          var EMAX = 160;
+          var ey = function (E) { return PY0 - (PY0 - PY1) * (E + 60) / (EMAX + 60); };
+          s += '<line x1="' + PX0 + '" y1="' + ey(0).toFixed(1) + '" x2="' + PX1 + '" y2="' + ey(0).toFixed(1) +
+            '" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4"/>';
+          var camm = [[Ea, 'var(--muted)', 'senza catalizzatore'], [Eaf, 'var(--accent)', 'con catalizzatore']];
+          for (i = 0; i < (cat > 0 ? 2 : 1); i++) {
+            var barr = camm[i][0], pts = [], j;
+            for (j = 0; j <= 100; j++) {
+              var u = j / 100;
+              var E = barr * Math.exp(-Math.pow((u - 0.5) * 4.2, 2)) + DHR * u;
+              pts.push((PX0 + (PX1 - PX0) * u).toFixed(1) + ',' + ey(E).toFixed(1));
+            }
+            s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + camm[i][1] +
+              '" stroke-width="' + (i === 0 && cat > 0 ? 2 : 3) + '"' +
+              (i === 0 && cat > 0 ? ' stroke-dasharray="6 4"' : '') + '/>';
+          }
+          s += '<text x="' + PX0 + '" y="' + (ey(0) + 20) + '" class="lbl-s">reagenti</text>';
+          s += '<text x="' + PX1 + '" y="' + (ey(DHR) + 20) + '" text-anchor="end" class="lbl-s">prodotti</text>';
+          s += '<line x1="' + ((PX0 + PX1) / 2 - 60) + '" y1="' + ey(0).toFixed(1) + '" x2="' +
+            ((PX0 + PX1) / 2 - 60) + '" y2="' + ey(Eaf).toFixed(1) + '" stroke="var(--magenta)" stroke-width="2"/>';
+          s += '<text x="' + ((PX0 + PX1) / 2 - 54) + '" y="' + ((ey(0) + ey(Eaf)) / 2).toFixed(1) +
+            '" class="em">Eₐ = ' + nc(Eaf, 0) + '</text>';
+          s += '<text x="' + PX0 + '" y="36" class="lbl-s">energia (kJ/mol) lungo il cammino di reazione</text>';
+          // curva di Arrhenius, scala logaritmica
+          var GX0 = 400, GX1 = 648, GY0 = 268, GY1 = 50;
+          var T0 = 250, T1 = 600;
+          var lo = Math.log(frazione(Eaf, T0)) / Math.LN10;
+          var hi = Math.log(frazione(Eaf, T1)) / Math.LN10;
+          if (!(hi > lo)) { hi = lo + 1; }
+          var gx = function (t) { return GX0 + (GX1 - GX0) * (t - T0) / (T1 - T0); };
+          var gy = function (v) {
+            var l = Math.log(v) / Math.LN10;
+            return GY0 - (GY0 - GY1) * (l - lo) / (hi - lo);
+          };
+          var pts2 = [];
+          for (i = 0; i <= 120; i++) {
+            var t = T0 + (T1 - T0) * i / 120;
+            pts2.push(gx(t).toFixed(1) + ',' + gy(frazione(Eaf, t)).toFixed(1));
+          }
+          s += '<polyline points="' + pts2.join(' ') + '" fill="none" stroke="var(--gold)" stroke-width="3"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX1 + '" y2="' + GY0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX0 + '" y2="' + GY1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<circle cx="' + gx(T).toFixed(1) + '" cy="' + gy(f).toFixed(1) + '" r="6" fill="var(--magenta)"/>';
+          for (i = 0; i <= 3; i++) {
+            s += '<text x="' + gx(T0 + (T1 - T0) * i / 3).toFixed(1) + '" y="' + (GY0 + 18) +
+              '" text-anchor="middle" class="lbl-s">' + Math.round(T0 + (T1 - T0) * i / 3) + '</text>';
+          }
+          s += '<text x="' + GX1 + '" y="' + (GY0 + 36) + '" text-anchor="end" class="lbl-s">T (K)</text>';
+          s += '<text x="' + (GX0 - 4) + '" y="' + (GY1 - 16) + '" class="lbl-s">velocità (scala log)</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('ci-eav').textContent = Math.round(Ea);
+          document.getElementById('ci-tv').textContent = Math.round(T);
+          document.getElementById('ci-cv').textContent = Math.round(cat * 100);
+          document.getElementById('ci-fr').textContent = f.toExponential(2).replace('.', ',');
+          document.getElementById('ci-gc').textContent = cat > 0 ? grande(guad) + ' volte' : '—';
+          document.getElementById('ci-d10').textContent = 'x ' + nc(d10, 2);
+          document.getElementById('ci-eaf').textContent = nc(Eaf, 1) + ' kJ/mol';
+          var el = document.getElementById('ci-out');
+          el.innerHTML = 'Alla temperatura di ' + Math.round(T) + ' K la frazione di molecole che riesce a ' +
+            'scavalcare una barriera di ' + nc(Eaf, 0) + ' kJ/mol è $e^{-E_a/RT} = ' +
+            f.toExponential(2).replace('.', '{,}').replace('e', '\\times10^{') + '}$: ' +
+            'una su ' + grande(1 / f) + '. ' +
+            (cat > 0
+              ? 'Il catalizzatore ha abbassato la barriera del ' + Math.round(cat * 100) + '% e la reazione va ' +
+                '<strong>' + grande(guad) + ' volte</strong> più veloce: il guadagno è esponenziale, ed è per ' +
+                'questo che gli enzimi sembrano magici. '
+              : 'Accendete il cursore del catalizzatore e guardate che cosa succede al numero. ') +
+            'Scaldando di soli $10$ K la velocità si moltiplica per <strong>' + nc(d10, 2) +
+            '</strong>: ' + (d10 > 1.8 && d10 < 2.2
+              ? 'siamo esattamente nella «regola del raddoppio» che si insegna in laboratorio.'
+              : (d10 >= 2.2
+                ? 'più del raddoppio — barriera alta e temperatura bassa rendono la reazione ipersensibile.'
+                : 'meno del raddoppio: a barriera bassa o temperatura alta la sensibilità cala.'));
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['ci-ea', 'ci-t', 'ci-c'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        disegna();
+      })();
+
+      /* ============ 8.1 — L'EQUILIBRIO DINAMICO ============ */
+      (function () {
+        var svg = document.getElementById('ed-svg');
+        if (!svg) { return; }
+
+        function disegna() {
+          var k1 = parseFloat(document.getElementById('ed-k1').value);
+          var k2 = parseFloat(document.getElementById('ed-k2').value);
+          var lock = document.getElementById('ed-lock').checked;
+          var ks = k1 + k2;
+          var Aeq = k2 / ks, Beq = k1 / ks;
+          var tau = 1 / ks;
+          var K = k1 / k2;
+          var X0 = 62, X1 = 640, Y0 = 262, Y1 = 42;
+          var TM = lock ? 20 : Math.max(2, 5 * tau);
+          var px = function (t) { return X0 + (X1 - X0) * t / TM; };
+          var py = function (c) { return Y0 - (Y0 - Y1) * c; };
+          var A = function (t) { return Aeq + (1 - Aeq) * Math.exp(-ks * t); };
+          var s = '', i;
+          for (i = 0; i <= 4; i++) {
+            s += '<line x1="' + X0 + '" y1="' + py(i / 4).toFixed(1) + '" x2="' + X1 + '" y2="' + py(i / 4).toFixed(1) +
+              '" stroke="var(--border)" stroke-width="1"/>';
+            s += '<text x="' + (X0 - 7) + '" y="' + (py(i / 4) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' +
+              nc(i / 4, 2) + '</text>';
+            s += '<text x="' + px(TM * i / 4).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' +
+              nc(TM * i / 4, 1) + '</text>';
+          }
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">tempo (s)</text>';
+          s += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 16) + '" class="lbl-s">concentrazione (frazione)</text>';
+          var pa = [], pb = [], v1 = [], v2 = [];
+          var vmax = Math.max(k1, k2 * 1) || 1;
+          for (i = 0; i <= 300; i++) {
+            var t = TM * i / 300;
+            var a = A(t), b = 1 - a;
+            pa.push(px(t).toFixed(1) + ',' + py(a).toFixed(1));
+            pb.push(px(t).toFixed(1) + ',' + py(b).toFixed(1));
+            v1.push(px(t).toFixed(1) + ',' + py(k1 * a / vmax).toFixed(1));
+            v2.push(px(t).toFixed(1) + ',' + py(k2 * b / vmax).toFixed(1));
+          }
+          s += '<polyline points="' + v1.join(' ') + '" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-dasharray="6 4"/>';
+          s += '<polyline points="' + v2.join(' ') + '" fill="none" stroke="var(--magenta)" stroke-width="1.8" stroke-dasharray="6 4"/>';
+          s += '<polyline points="' + pa.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+          s += '<polyline points="' + pb.join(' ') + '" fill="none" stroke="#22c55e" stroke-width="3"/>';
+          s += '<text x="' + (X1 - 6) + '" y="' + (py(Aeq) - 8).toFixed(1) + '" text-anchor="end" style="fill:var(--accent); font-size:11.5px;">A</text>';
+          s += '<text x="' + (X1 - 6) + '" y="' + (py(Beq) - 8).toFixed(1) + '" text-anchor="end" style="fill:#22c55e; font-size:11.5px;">B</text>';
+          if (5 * tau <= TM) {
+            s += '<line x1="' + px(5 * tau).toFixed(1) + '" y1="' + Y1 + '" x2="' + px(5 * tau).toFixed(1) +
+              '" y2="' + Y0 + '" stroke="var(--border)" stroke-width="1.4" stroke-dasharray="3 4"/>';
+            s += '<text x="' + (px(5 * tau) + 5).toFixed(1) + '" y="' + (Y1 + 14) + '" class="lbl-s">5τ</text>';
+          }
+          svg.innerHTML = s;
+
+          document.getElementById('ed-k1v').textContent = nc(k1, 2);
+          document.getElementById('ed-k2v').textContent = nc(k2, 2);
+          document.getElementById('ed-ae').textContent = nc(Aeq, 3);
+          document.getElementById('ed-be').textContent = nc(Beq, 3);
+          document.getElementById('ed-k').textContent = nc(K, 2);
+          document.getElementById('ed-tau').textContent = nc(tau, 2) + ' s';
+          var el = document.getElementById('ed-out');
+          el.innerHTML = 'All\'equilibrio le due velocità si pareggiano: $k_1[A] = k_2[B]$, cioè ' +
+            nc(k1, 2).replace(',', '{,}') + ' \\cdot ' + nc(Aeq, 3).replace(',', '{,}') + ' = ' +
+            nc(k2, 2).replace(',', '{,}') + ' \\cdot ' + nc(Beq, 3).replace(',', '{,}') + ' = ' +
+            nc(k1 * Aeq, 3).replace(',', '{,}') + '. Da qui la <strong>costante di equilibrio</strong> ' +
+            '$K = [B]/[A] = k_1/k_2 = ' + nc(K, 2).replace(',', '{,}') + '$. ' +
+            'Le concentrazioni si fermano, le reazioni <strong>no</strong>: continuano entrambe, alla stessa ' +
+            'velocità, e il pareggio è ciò che chiamiamo equilibrio. Il tempo caratteristico è ' +
+            '$\\tau = 1/(k_1+k_2) = ' + nc(tau, 2).replace(',', '{,}') + '$ s, e dopo $5\\tau$ ' +
+            '(cioè ' + nc(5 * tau, 1) + ' s) siamo praticamente arrivati.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['ed-k1', 'ed-k2'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('ed-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ============ 9 — LA PILA ============ */
+      (function () {
+        var svg = document.getElementById('pv-svg');
+        if (!svg) { return; }
+        var MET = [
+          ['Mg', -2.37], ['Al', -1.66], ['Zn', -0.76], ['Fe', -0.44],
+          ['Pb', -0.13], ['H₂', 0.00], ['Cu', 0.34], ['Ag', 0.80]
+        ];
+        var a = 2, b = 6;   // zinco e rame: la pila Daniell
+
+        function disegna() {
+          var Ea = MET[a][1], Eb = MET[b][1];
+          var cat = Ea > Eb ? a : b;
+          var an = Ea > Eb ? b : a;
+          var fem = MET[cat][1] - MET[an][1];
+          var n12 = fem > 0 ? Math.ceil(12 / fem) : 0;
+          var s = '';
+          var CX = 340;
+          // vaschette
+          s += '<rect x="70" y="120" width="180" height="140" rx="6" fill="#3b82f6" opacity="0.12" stroke="var(--muted)" stroke-width="2"/>';
+          s += '<rect x="430" y="120" width="180" height="140" rx="6" fill="#f97316" opacity="0.12" stroke="var(--muted)" stroke-width="2"/>';
+          // elettrodi
+          s += '<rect x="150" y="60" width="22" height="150" fill="var(--muted)" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<rect x="510" y="60" width="22" height="150" fill="var(--gold)" opacity="0.7" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="161" y="50" text-anchor="middle" class="lbl">' + MET[an][0] + '</text>';
+          s += '<text x="521" y="50" text-anchor="middle" class="lbl">' + MET[cat][0] + '</text>';
+          s += '<text x="161" y="284" text-anchor="middle" class="lbl-s">ANODO (−): si ossida, si consuma</text>';
+          s += '<text x="521" y="284" text-anchor="middle" class="lbl-s">CATODO (+): si riduce, cresce</text>';
+          s += '<text x="161" y="240" text-anchor="middle" class="lbl-s">E° = ' + nc(MET[an][1], 2) + ' V</text>';
+          s += '<text x="521" y="240" text-anchor="middle" class="lbl-s">E° = ' + nc(MET[cat][1], 2) + ' V</text>';
+          // filo esterno col voltmetro
+          s += '<polyline points="161,60 161,26 521,26 521,60" fill="none" stroke="var(--text-soft)" stroke-width="2.4"/>';
+          s += '<circle cx="' + CX + '" cy="26" r="18" fill="var(--surface)" stroke="var(--accent)" stroke-width="2.4"/>';
+          s += '<text x="' + CX + '" y="31" text-anchor="middle" class="em">V</text>';
+          // elettroni: vanno dall'anodo al catodo nel filo
+          var i;
+          for (i = 0; i < 5; i++) {
+            var xe = 200 + i * 72;
+            s += '<circle cx="' + xe + '" cy="26" r="4.5" fill="var(--magenta)"/>';
+            s += '<polygon points="' + (xe + 16) + ',26 ' + (xe + 7) + ',22 ' + (xe + 7) + ',30" fill="var(--magenta)"/>';
+          }
+          s += '<text x="' + CX + '" y="62" text-anchor="middle" class="lbl-s">gli elettroni fanno il giro lungo →</text>';
+          // ponte salino
+          s += '<path d="M250,150 C250,100 430,100 430,150" fill="none" stroke="#22c55e" stroke-width="12" opacity="0.5"/>';
+          s += '<text x="' + CX + '" y="112" text-anchor="middle" class="lbl-s">ponte salino</text>';
+          s += '<text x="' + CX + '" y="180" text-anchor="middle" class="em">Δ E° = ' + nc(fem, 2) + ' V</text>';
+          s += '<text x="' + CX + '" y="204" text-anchor="middle" class="lbl-s">' +
+            (a === b ? 'due elettrodi uguali: nessuna differenza, nessuna pila' : 'la pila funziona') + '</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('pv-an').textContent = MET[an][0] + ' (' + nc(MET[an][1], 2) + ' V)';
+          document.getElementById('pv-ca').textContent = MET[cat][0] + ' (' + nc(MET[cat][1], 2) + ' V)';
+          document.getElementById('pv-fem').textContent = nc(fem, 2) + ' V';
+          document.getElementById('pv-n').textContent = n12 > 0 ? n12 + ' in serie' : '—';
+          var el = document.getElementById('pv-out');
+          el.innerHTML = a === b
+            ? 'Due elettrodi dello stesso metallo hanno lo stesso potenziale standard: $\\Delta E^\\circ = 0$ e ' +
+              'non passa corrente. <strong>Una pila vive di differenze</strong>, esattamente come una macchina ' +
+              'termica vive della differenza fra due temperature. Senza dislivello non si estrae lavoro: è il ' +
+              'secondo principio in versione elettrochimica.'
+            : '$\\Delta E^\\circ = E^\\circ_{cat} - E^\\circ_{an} = ' + nc(MET[cat][1], 2).replace(',', '{,}') +
+              ' - (' + nc(MET[an][1], 2).replace(',', '{,}') + ') = ' + nc(fem, 2).replace(',', '{,}') + '$ V. ' +
+              'Il <strong>' + MET[an][0] + '</strong>, che ha il potenziale più basso, cede elettroni e si ' +
+              'consuma; il <strong>' + MET[cat][0] + '</strong> li acquista e si deposita. Con due elettroni ' +
+              'scambiati l\'energia libera vale $\\Delta G^\\circ = -nF\\Delta E^\\circ = -2 \\cdot 96485 \\cdot ' +
+              nc(fem, 2).replace(',', '{,}') + ' = ' + nc(-2 * 96485 * fem / 1000, 0).replace(',', '{,}') +
+              '$ kJ/mol: negativa, quindi spontanea. Per arrivare a $12$ V servono <strong>' + n12 +
+              ' elementi</strong> in serie.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        function riga(host, quale) {
+          var lab = document.createElement('span');
+          lab.className = 'lbl';
+          lab.style.cssText = 'font-size:0.88rem; color:var(--muted); font-weight:600; margin-right:0.3rem;';
+          lab.textContent = quale === 0 ? 'primo elettrodo:' : 'secondo elettrodo:';
+          host.appendChild(lab);
+          MET.forEach(function (m, i) {
+            var btn = document.createElement('button');
+            btn.className = 'btn' + (i === (quale === 0 ? a : b) ? ' active' : '');
+            btn.type = 'button';
+            btn.textContent = m[0];
+            btn.addEventListener('click', function () {
+              if (quale === 0) { a = i; } else { b = i; }
+              Array.prototype.forEach.call(host.children, function (o) {
+                if (o.tagName === 'BUTTON') { o.classList.remove('active'); }
+              });
+              btn.classList.add('active');
+              disegna();
+            });
+            host.appendChild(btn);
+          });
+        }
+        riga(document.getElementById('pv-a'), 0);
+        riga(document.getElementById('pv-b'), 1);
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Che cosa afferma il <strong>principio zero</strong> della termodinamica?',
+        options: [
+          'che l\'equilibrio termico è transitivo, e quindi che ha senso parlare di temperatura',
+          'che l\'energia si conserva in ogni trasformazione',
+          'che il calore passa spontaneamente dal caldo al freddo',
+          'che allo zero assoluto l\'entropia si annulla'
+        ],
+        correct: 0,
+        explain: 'Se $A$ è in equilibrio con $C$ e $B$ è in equilibrio con $C$, allora $A$ e $B$ lo sono fra loro. È una <em>relazione di equivalenza</em>, e ogni classe di equivalenza si può etichettare con un numero: quel numero è la temperatura. Senza questo principio nessun termometro avrebbe senso — e infatti è stato formulato per ultimo, quando ci si accorse che i primi due lo davano per scontato.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Una macchina compie un <strong>ciclo</strong> e torna allo stato di partenza. Che cosa vale?',
+        options: [
+          '$Q = 0$: su un ciclo non si scambia calore',
+          '$Q_{tot} = L_{tot}$, perché $\\Delta U = 0$',
+          '$L = 0$: su un ciclo il lavoro netto è nullo',
+          '$\\Delta U = Q + L$'
+        ],
+        correct: 1,
+        explain: 'L\'energia interna è una <strong>funzione di stato</strong>: se lo stato finale coincide con quello iniziale, $\\Delta U = 0$ necessariamente. Dal primo principio $\\Delta U = Q - L$ segue allora $Q_{tot} = L_{tot}$: la macchina può produrre lavoro solo consumando esattamente altrettanto calore netto. Non un joule di più — è il divieto del moto perpetuo di prima specie.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Perché si scrive $\\Delta U$ ma non si scrive mai $\\Delta Q$?',
+        options: [
+          'perché il calore non varia mai',
+          'per una convenzione tipografica senza vero significato',
+          'perché $U$ è una funzione di stato mentre $Q$ è una grandezza di percorso: un corpo non «possiede» calore',
+          'perché $Q$ si misura in calorie e $U$ in joule'
+        ],
+        correct: 2,
+        explain: 'Il $\\Delta$ ha senso solo per qualcosa che il sistema <em>possiede</em> in ciascuno stato. L\'energia interna è una proprietà del sistema; il calore è energia <strong>in transito</strong> attraverso il contorno, e dipende dalla strada percorsa. L\'analogia: si può parlare del dislivello fra due rifugi, non del «dislivello del cammino».'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'In un recipiente isolato un gas si espande liberamente nel vuoto. Che cosa succede?',
+        options: [
+          'la temperatura scende, perché il gas compie lavoro espandendosi',
+          'l\'entropia resta costante, perché non c\'è scambio di calore',
+          'la trasformazione è reversibile, perché non c\'è attrito',
+          '$Q = 0$ e $L = 0$, quindi $\\Delta U = 0$, ma l\'entropia aumenta di $Nk_B\\ln 2$'
+        ],
+        correct: 3,
+        explain: 'Non c\'è scambio di calore (il recipiente è isolato) e non c\'è lavoro (il gas spinge contro il vuoto, cioè contro niente): l\'energia interna, e con essa la temperatura, non cambia. Ma i microstati raddoppiano per ogni molecola, quindi $W$ si moltiplica per $2^N$ e $\\Delta S = Nk_B\\ln 2 \\gt 0$. È la prova che l\'entropia <strong>non è</strong> «calore diviso temperatura» in senso letterale: quella è una ricetta valida per i cammini reversibili.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'L\'enunciato di <strong>Kelvin</strong> vieta:',
+        options: [
+          'una macchina ciclica che converta integralmente in lavoro il calore di una sola sorgente',
+          'che il calore passi dal freddo al caldo in qualunque circostanza',
+          'che un gas si espanda convertendo tutto il calore assorbito in lavoro',
+          'che il rendimento di una macchina superi il $50\\%$'
+        ],
+        correct: 0,
+        explain: 'Le parole che contano sono <em>ciclica</em> e <em>una sola sorgente</em>. Un\'espansione isoterma converte davvero tutto il calore in lavoro, ma non è ciclica: il gas resta espanso, e una macchina che funziona una volta sola non è una macchina. E il calore può benissimo risalire dal freddo al caldo — lo fa ogni frigorifero — purché non sia l\'<em>unico</em> risultato.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Nella formula di Boltzmann $S = k_B\\ln W$, che cos\'è $W$?',
+        options: [
+          'il lavoro compiuto dal sistema',
+          'il numero di microstati compatibili con il macrostato osservato',
+          'la probabilità che il sistema si trovi in quello stato',
+          'il numero di particelle del sistema'
+        ],
+        correct: 1,
+        explain: 'È la <strong>molteplicità</strong>: quante configurazioni microscopiche diverse producono la stessa descrizione macroscopica. Da qui il secondo principio smette di essere un divieto e diventa quasi ovvio — un sistema evolve verso i macrostati più numerosi semplicemente perché ce ne sono di più. «Disordine» è un\'analogia comoda ma traditrice: $W$ è un conteggio, non un giudizio estetico.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Un gas si espande dallo stesso stato iniziale allo stesso stato finale, una volta in un solo passo brusco e una volta in venti passi. Nel confronto:',
+        options: [
+          'il lavoro è lo stesso, perché gli stati estremi coincidono',
+          'il passo unico dà più lavoro, perché è più violento',
+          'i venti passi danno più lavoro, e il massimo si ha nel limite reversibile',
+          'nel passo unico l\'energia mancante si ritrova come calore'
+        ],
+        correct: 2,
+        explain: 'Il lavoro è $L = \\int p\\,\\mathrm{d}V$ e <strong>dipende dal cammino</strong>: gli stati estremi non bastano a determinarlo. Espandendo di colpo il gas spinge contro la pressione finale, bassa, e produce poco; a fettine spinge via via contro pressioni maggiori. Il lavoro reversibile è il <em>massimo ottenibile</em>. Attenzione all\'ultima opzione: l\'energia mancante non si è trasformata in calore, <strong>non è mai stata prodotta</strong>.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Una reazione <strong>endotermica</strong> ($\\Delta H \\gt 0$) può essere spontanea?',
+        options: [
+          'mai: assorbire energia è sempre non spontaneo',
+          'solo se avviene in un sistema isolato',
+          'sì, ma solo a bassa temperatura',
+          'sì, se $\\Delta S \\gt 0$ e la temperatura è abbastanza alta da rendere $T\\Delta S \\gt \\Delta H$'
+        ],
+        correct: 3,
+        explain: 'La spontaneità è decisa da $\\Delta G = \\Delta H - T\\Delta S$, non da $\\Delta H$ da solo. Con $\\Delta H \\gt 0$ e $\\Delta S \\gt 0$ il termine entropico cresce con la temperatura e prima o poi vince: la fusione del ghiaccio ne è l\'esempio quotidiano, ed è endotermica. Il nitrato d\'ammonio che si scioglie in acqua raffreddandola è un altro caso: assorbe calore, eppure si scioglie da solo.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Che cosa fa esattamente un <strong>catalizzatore</strong>?',
+        options: [
+          'abbassa la barriera di attivazione, accelerando entrambi i versi della reazione senza spostare l\'equilibrio',
+          'rende spontanea una reazione che non lo era',
+          'sposta l\'equilibrio verso i prodotti',
+          'aumenta l\'energia dei reagenti fino a superare la barriera'
+        ],
+        correct: 0,
+        explain: 'Il catalizzatore apre un cammino alternativo con un valico più basso, e la moltiplicazione della velocità è <em>esponenziale</em> nel guadagno di barriera. Ma abbassa la barriera nei <strong>due versi allo stesso modo</strong>: fa arrivare prima all\'equilibrio, non lo sposta. La posizione dell\'equilibrio dipende da $\\Delta G$, che il catalizzatore non tocca. Chi promette una sostanza che «fa rendere di più» una reazione a parità di condizioni sta vendendo un moto perpetuo travestito da chimica.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Un condizionatore consuma $1$ kW elettrico e sposta $4$ kW di calore dall\'interno all\'esterno. Che cosa se ne conclude?',
+        options: [
+          'che il dato è falso: nessuna macchina può avere resa maggiore di uno',
+          'che è normale: il COP vale $4$, la macchina non crea energia ma la trasporta, e nell\'esterno finiscono $5$ kW',
+          'che viola l\'enunciato di Clausius, perché sposta calore dal freddo al caldo',
+          'che viola il primo principio, perché produce più energia di quella consumata'
+        ],
+        correct: 1,
+        explain: 'Il coefficiente di prestazione $\\text{COP} = Q_f/L$ <em>può</em> superare abbondantemente l\'unità, e nelle pompe di calore vale tipicamente $3$-$5$. Nessun principio è violato: l\'energia non viene creata, viene <strong>spostata</strong>, e spostare costa meno che produrre. Il bilancio torna al joule: all\'esterno finiscono $4 + 1 = 5$ kW. E Clausius non è violato perché il trasferimento non è l\'unico risultato — c\'è una bolletta da pagare.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Del calore $Q$ passa spontaneamente da un corpo a $500$ K a uno a $300$ K. L\'entropia dell\'universo:',
+        options: [
+          'resta invariata, perché il calore ceduto è uguale a quello assorbito',
+          'diminuisce, perché il corpo caldo ne perde di più',
+          'aumenta, perché lo stesso calore ceduto a temperatura minore «vale» più entropia',
+          'non è definita, perché la trasformazione è irreversibile'
+        ],
+        correct: 2,
+        explain: '$\\Delta S = Q/300 - Q/500 = Q(1/300 - 1/500) \\gt 0$, perché $1/T$ è maggiore alla temperatura minore. L\'energia si conserva — il calore ceduto <em>è</em> uguale a quello assorbito — ma l\'entropia no: è proprio questa asimmetria a dare al processo una direzione. E l\'entropia è definita benissimo anche per i processi irreversibili: essendo una funzione di stato, basta calcolarla lungo un cammino reversibile immaginario che colleghi gli stessi stati.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Il <strong>terzo principio</strong> afferma che:',
+        options: [
+          'lo zero assoluto è la temperatura più bassa mai raggiunta in laboratorio',
+          'a $0$ K ogni moto cessa completamente',
+          'l\'entropia di un sistema è sempre positiva',
+          'lo zero assoluto non è raggiungibile con un numero finito di operazioni, e l\'entropia di un cristallo perfetto vi tende a zero'
+        ],
+        correct: 3,
+        explain: 'La forma di Nernst riguarda l\'entropia: a $0$ K un cristallo perfetto avrebbe un solo microstato, quindi $W = 1$ e $S = k_B\\ln 1 = 0$. La conseguenza operativa è l\'<strong>irraggiungibilità</strong>: ogni tecnica di raffreddamento sfrutta una differenza, e avvicinandosi allo zero le differenze da sfruttare si esauriscono. Nei laboratori si è scesi sotto il miliardesimo di kelvin — il posto più freddo dell\'universo noto non è nello spazio, dove la radiazione di fondo tiene tutto a $2{,}7$ K, ma su questo pianeta.'
+      },
+      {
+        type: 'open',
+        text: 'Il secondo principio dice che l\'entropia non diminuisce, eppure un embrione si organizza, un cristallo si forma, una città si costruisce. Spiega perché non c\'è contraddizione, e in che senso «non consumiamo energia, consumiamo entropia bassa».',
+        keywords: ['isolato', 'universo', 'ambiente', 'aumenta', 'sole', 'flusso', 'calore', 'esporta'],
+        requiredMatches: 4,
+        explain: 'La parola decisiva dell\'enunciato è <strong>isolato</strong>. Il secondo principio vieta all\'entropia di diminuire in un sistema che non scambia nulla con l\'esterno; un essere vivente, un cristallo che si forma, una città, non sono affatto isolati: mangiano, respirano, si scaldano e <strong>irradiano calore</strong>. L\'ordine costruito all\'interno è pagato con un aumento maggiore dell\'entropia dell\'ambiente, e il bilancio dell\'universo resta positivo — spesso di parecchio. Sul secondo punto: l\'energia, per il primo principio, <em>si conserva</em>, quindi è impossibile consumarla; quello che si consuma è la sua <strong>qualità</strong>. La Terra riceve dal Sole radiazione concentrata a circa $5800$ K e restituisce nello spazio la stessa quantità di energia sotto forma di infrarosso a circa $255$ K: stessa energia, entropia molto maggiore. È quel flusso — energia che entra a bassa entropia ed esce ad alta entropia — a pagare le piante, il clima, il vento, il cibo e tutto ciò che chiamiamo vita. Una macchina termica, del resto, non si alimenta di calore ma di <em>differenze</em> di temperatura: quando le differenze si esauriscono l\'energia c\'è ancora tutta, e non serve più a niente.'
+      },
+      {
+        type: 'open',
+        text: 'Un foglio di carta ha $\\Delta G$ fortemente negativa per la combustione, eppure resta su uno scaffale per secoli senza bruciare. Spiega la differenza fra <strong>spontaneità</strong> e <strong>velocità</strong>, e come si interviene sull\'una e sull\'altra.',
+        keywords: ['attivazione', 'barriera', 'cinetica', 'arrhenius', 'catalizzatore', 'temperatura', 'esponenziale', 'equilibrio'],
+        requiredMatches: 4,
+        explain: 'Sono due domande diverse, e la termodinamica risponde solo alla prima. La <strong>spontaneità</strong> ($\\Delta G \\lt 0$) dice <em>dove</em> il sistema vuole andare: confronta lo stato di partenza con quello di arrivo, e non dice una parola sul tempo. La <strong>velocità</strong> è materia della cinetica e dipende dall\'<strong>energia di attivazione</strong>: per trasformarsi le molecole devono prima passare per uno stato di transizione ad alta energia, e la frazione che ci riesce è $e^{-E_a/RT}$, un numero che può essere piccolissimo. L\'immagine giusta è un valico di montagna fra due valli: che la valle di arrivo sia più bassa non aiuta a scavalcare il passo. Per intervenire sulla <em>velocità</em> ci sono due strade, entrambe con effetto esponenziale: alzare la <strong>temperatura</strong> (una fiammella sul foglio, e la carta brucia in un istante) oppure abbassare la barriera con un <strong>catalizzatore</strong>. Per intervenire sulla <em>spontaneità</em>, invece, bisogna cambiare $\\Delta H$, $\\Delta S$ o $T$, cioè cambiare le condizioni: un catalizzatore non serve a niente, perché accelera i due versi allo stesso modo e lascia l\'equilibrio dov\'era. E per fortuna che le barriere esistono: senza di esse tutto ciò che è termodinamicamente instabile — noi compresi, che siamo combustibili in atmosfera di ossigeno — brucerebbe all\'istante.'
+      }
+    ];
+  </script>
+
+</body>
+
+</html>

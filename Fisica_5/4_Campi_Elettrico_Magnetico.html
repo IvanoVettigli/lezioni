@@ -51,6 +51,11 @@
                            background: color-mix(in srgb, var(--green) 16%, transparent); border: 1px solid color-mix(in srgb, var(--green) 45%, transparent);
                            border-radius: 8px; padding: 0.15rem 0.7rem; margin: 0 0.15rem; font-variant-numeric: tabular-nums; }
     .unit-box p { margin: 0; }
+
+    /* selettore a linguette (materiali magnetici, §9.2) */
+    .frame-tabs { display: inline-flex; gap: 0.4rem; margin: 0.3rem 0; flex-wrap: wrap; }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .frame-tabs .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
   </style>
 </head>
 
@@ -746,6 +751,166 @@
         troviamo poi i <strong>magnetometri fluxgate</strong> a bordo delle sonde spaziali (per mappare campi deboli come
         quello terrestre o planetario) e i <strong>SQUID</strong> superconduttori, così sensibili da "sentire" persino
         i debolissimi campi magnetici prodotti dalle correnti dei neuroni del cervello.</p>
+
+      <h3>9.2 — Perché la calamita attacca il ferro e non l'alluminio</h3>
+
+      <p>Provate a passare una calamita su oggetti diversi. Il ferro e l'acciaio si attaccano con forza; una
+        moneta di rame, un cucchiaio di alluminio, un bicchiere d'acqua sembrano non accorgersene affatto. Eppure
+        <em>tutti</em> i materiali reagiscono a un campo magnetico: solo che lo fanno in tre modi profondamente
+        diversi, e la differenza si capisce solo guardando dentro gli atomi.</p>
+
+      <div class="definition">
+        <strong>Ogni atomo è una minuscola spira.</strong> Gli elettroni di un atomo si muovono attorno al
+        nucleo e possiedono inoltre una proprietà intrinseca chiamata <em>spin</em>: entrambe le cose
+        equivalgono a piccolissime correnti, e quindi ogni elettrone si comporta come un microscopico
+        magnete. Il <strong>momento magnetico</strong> dell'atomo è la somma vettoriale di tutti questi
+        contributi.
+      </div>
+
+      <p>Da qui nasce tutto. La domanda decisiva è: <em>quella somma vettoriale, dà zero oppure no?</em></p>
+
+      <div class="sp-cols">
+        <div class="definition">
+          <strong>① Diamagnetismo — i momenti si cancellano</strong>
+          <p>Se gli elettroni sono tutti appaiati, i loro momenti si annullano a due a due e l'atomo, da
+            fermo, non è un magnete. Quando però arriva un campo esterno, questo modifica il moto degli
+            elettroni e — per la <strong>legge di Lenz</strong>, che incontreremo nella prossima lezione —
+            la variazione genera un momento <em>opposto</em> al campo che l'ha causata.</p>
+          <p>Risultato: una debolissima <strong>repulsione</strong>. È l'unico caso in cui un materiale
+            viene <em>respinto</em> da una calamita.</p>
+        </div>
+        <div class="definition">
+          <strong>② Paramagnetismo — momenti scompigliati</strong>
+          <p>Se l'atomo ha elettroni spaiati, possiede un momento magnetico permanente. Ma l'agitazione
+            termica orienta questi momenti <strong>a caso</strong>, e in media si annullano: il materiale non
+            è magnetico.</p>
+          <p>Un campo esterno li allinea <em>parzialmente</em>, vincendo un po' del disordine termico: nasce
+            una debole <strong>attrazione</strong>, tanto più forte quanto più il materiale è freddo.</p>
+        </div>
+        <div class="definition">
+          <strong>③ Ferromagnetismo — i momenti cospirano</strong>
+          <p>In pochi materiali — ferro, cobalto, nichel e le loro leghe — c'è di più: un'interazione
+            quantistica detta <em>di scambio</em> fa sì che ogni momento <strong>trascini con sé i
+            vicini</strong>, allineandoli anche <em>senza</em> campo esterno.</p>
+          <p>L'effetto si amplifica su se stesso e produce un'attrazione fortissima — e la capacità di
+            restare magnetizzati anche dopo che il campo è stato tolto: sono i <strong>magneti
+            permanenti</strong>.</p>
+        </div>
+      </div>
+
+      <p>Nel simulatore ogni freccia è il momento magnetico di un atomo. Cambiate materiale, poi alzate il
+        campo e la temperatura e guardate che cosa fanno.</p>
+
+      <div class="ckt">
+        <div class="frame-tabs" id="mm-modo">
+          <button class="btn active" data-m="dia">diamagnetico</button>
+          <button class="btn btn-secondary" data-m="para">paramagnetico</button>
+          <button class="btn btn-secondary" data-m="ferro">ferromagnetico</button>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:0.5rem 1.4rem; align-items:center; margin:0.5rem 0;">
+          <label for="mm-b" style="font-size:0.9rem; color:var(--muted); font-weight:600;">campo esterno = <span id="mm-bv">0,0</span> (unità arbitrarie)</label>
+          <input type="range" id="mm-b" min="0" max="1" step="0.02" value="0">
+          <label for="mm-t" style="font-size:0.9rem; color:var(--muted); font-weight:600;">temperatura = <span id="mm-tv">300</span> K</label>
+          <input type="range" id="mm-t" min="50" max="1500" step="10" value="300">
+        </div>
+        <svg viewBox="0 0 660 300" id="mm-svg" role="img" aria-label="momenti magnetici atomici in un campo esterno"></svg>
+        <div class="sp-cols" style="margin-top:0.5rem;">
+          <div>Magnetizzazione: <span class="val-badge" id="mm-M">0,00</span></div>
+          <div>Comportamento: <span class="val-badge" id="mm-tipo">—</span></div>
+          <div>Suscettività tipica: <span class="val-badge" id="mm-chi">—</span></div>
+        </div>
+        <p class="eq-out" id="mm-msg" style="font-size:0.95rem;"></p>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Tipo</th><th>Suscettività $\chi_m$</th><th>Effetto</th><th>Esempi</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Diamagnetici</strong></td><td>$\approx -10^{-5}$ (negativa)</td><td>respinti debolissimamente</td><td>acqua, rame, oro, bismuto, grafite, <em>quasi tutta la materia organica</em></td></tr>
+            <tr><td><strong>Paramagnetici</strong></td><td>$+10^{-5}$ … $+10^{-3}$</td><td>attratti debolmente; l'effetto cala scaldando</td><td>alluminio, platino, ossigeno liquido</td></tr>
+            <tr><td><strong>Ferromagnetici</strong></td><td>fino a $+10^{5}$</td><td>attratti fortemente; restano magnetizzati</td><td>ferro, cobalto, nichel, gadolinio, ferriti</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="curiosita"><strong>Il diamagnetismo c'è sempre, anche dove non si vede.</strong> Non è una
+        proprietà di pochi materiali: è di <em>tutti</em>, perché il meccanismo di Lenz agisce comunque. Solo
+        che è debolissimo, e negli altri due casi resta sepolto sotto effetti mille o un milione di volte più
+        grandi. Con campi abbastanza intensi però si vede, eccome: nel 1997 <strong>Andre Geim</strong> fece
+        <em>levitare una rana viva</em> dentro un magnete da 16 tesla, sfruttando il diamagnetismo dell'acqua
+        di cui è fatta. Gli valse l'Ig Nobel nel 2000 — e dieci anni dopo lo stesso Geim prese il Nobel vero
+        per il grafene. La rana, per la cronaca, stava benissimo.</div>
+
+      <h3>9.3 — I domini di Weiss e la temperatura di Curie</h3>
+
+      <p>Resta una domanda: se in un pezzo di ferro i momenti si allineano da soli, perché un chiodo qualunque
+        non è già una calamita?</p>
+
+      <p>La risposta la diede <strong>Pierre Weiss</strong> nel 1907. L'allineamento c'è, ma non su tutto il
+        pezzo: il materiale si divide spontaneamente in <strong>domini</strong>, regioni microscopiche —
+        tipicamente da un micrometro a qualche decina — all'interno delle quali i momenti sono
+        <em>tutti</em> allineati. Domini diversi però puntano in direzioni diverse, e sommandosi si
+        annullano. Il ferro «non magnetizzato» è pieno di magnetismo: solo, disordinato su larga scala.</p>
+
+      <div class="definition">
+        <strong>Che cosa fa il campo esterno.</strong> Non gira gli atomi uno per uno. Fa una cosa più
+        efficiente: <strong>sposta le pareti fra i domini</strong>. I domini già orientati bene
+        <em>crescono</em> a spese di quelli orientati male, come bolle che si mangiano le vicine. Solo quando
+        il campo è molto forte, e resta un dominio solo, i momenti ruotano tutti insieme fino ad allinearsi
+        del tutto: il materiale è in <strong>saturazione</strong> e non può dare di più.
+      </div>
+
+      <div class="ckt">
+        <div style="display:flex; flex-wrap:wrap; gap:0.5rem 1.4rem; align-items:center; margin:0.5rem 0;">
+          <label for="dw-b" style="font-size:0.9rem; color:var(--muted); font-weight:600;">campo applicato = <span id="dw-bv">0,00</span></label>
+          <input type="range" id="dw-b" min="0" max="1" step="0.02" value="0">
+          <button class="btn btn-secondary" id="dw-reset">↺ Smagnetizza</button>
+        </div>
+        <svg viewBox="0 0 660 300" id="dw-svg" role="img" aria-label="domini di Weiss che crescono al crescere del campo"></svg>
+        <div class="sp-cols" style="margin-top:0.5rem;">
+          <div>Magnetizzazione: <span class="val-badge" id="dw-M">0%</span></div>
+          <div>Fase: <span class="val-badge" id="dw-fase">domini disordinati</span></div>
+        </div>
+      </div>
+
+      <p>E se invece di applicare un campo <strong>scaldiamo</strong> il materiale? L'agitazione termica
+        combatte contro l'interazione di scambio, e a una temperatura precisa la vince del tutto:</p>
+
+      <div class="definition">
+        <strong>Temperatura di Curie $T_C$.</strong> Sopra di essa il ferromagnetismo <strong>scompare</strong>
+        e il materiale diventa un normale paramagnete. Sotto, ricompare. È una vera transizione di fase, come
+        la fusione del ghiaccio.
+        <div class="table-container" style="margin-top:0.6rem;">
+          <table>
+            <thead><tr><th>Materiale</th><th>$T_C$</th></tr></thead>
+            <tbody>
+              <tr><td>Ferro</td><td>$1043$ K $= 770$ °C</td></tr>
+              <tr><td>Nichel</td><td>$631$ K $= 358$ °C</td></tr>
+              <tr><td>Cobalto</td><td>$1394$ K $= 1121$ °C</td></tr>
+              <tr><td>Gadolinio</td><td>$292$ K $= 19$ °C</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p>Tornate al primo simulatore, mettetelo su «ferromagnetico» e alzate lentamente la temperatura: attorno
+        ai 1043 K l'ordine collassa di colpo. Il simulatore non lo fa per finta — risolve l'equazione di campo
+        medio di Weiss, <span>$m = \tanh\!\big(\frac{T_C}{T}m + h\big)$</span>, la stessa che si studia
+        all'università.</p>
+
+      <div class="curiosita"><strong>Un magnete che si accende in frigorifero.</strong> Guardate l'ultima riga
+        della tabella: il gadolinio ha $T_C$ a 19 °C. In una stanza a 25 gradi è un banale paramagnete; messo
+        in frigorifero diventa ferromagnetico e si attacca alle calamite. Non è solo una curiosità da fiera:
+        su questo effetto si stanno progettando i <em>frigoriferi magnetici</em>, che raffreddano
+        magnetizzando e smagnetizzando un materiale invece di comprimere un gas — senza compressore, senza
+        gas serra e con molto meno rumore.</div>
+
+      <div class="curiosita"><strong>Perché scaldare cancella i dati.</strong> Un disco rigido registra le
+        informazioni come minuscole regioni magnetizzate. Portarlo sopra la temperatura di Curie del suo
+        rivestimento distrugge <em>irreversibilmente</em> ogni orientazione: i dati non sono danneggiati,
+        semplicemente non esistono più. È il motivo per cui la distruzione certificata dei supporti passa dal
+        forno o dallo smagnetizzatore, e non dal cestino del sistema operativo.</div>
+
     </section>
 
     <!-- 9 — FORZA DI LORENTZ -->
@@ -1934,6 +2099,251 @@
       })();
     });
   </script>
+
+  <!-- Sezioni 9.2 e 9.3: i materiali magnetici -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      // freccia = segmento + punta triangolare (niente <marker>: darebbe id duplicati)
+      function frecciaSVG(x, y, ang, L, col, sp) {
+        var dx = L * Math.cos(ang), dy = -L * Math.sin(ang);
+        var x1 = x - dx / 2, y1 = y - dy / 2, x2 = x + dx / 2, y2 = y + dy / 2;
+        var px = -(y2 - y1), py = (x2 - x1);
+        var n = Math.sqrt(px * px + py * py) || 1;
+        px /= n; py /= n;
+        var s = Math.min(L * 0.42, 7);
+        var bx = x2 - (dx / L) * s, by = y2 - (dy / L) * s;
+        return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) +
+          '" y2="' + by.toFixed(1) + '" stroke="' + col + '" stroke-width="' + (sp || 2) + '" stroke-linecap="round"/>' +
+          '<polygon points="' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+          (bx + px * s * 0.5).toFixed(1) + ',' + (by + py * s * 0.5).toFixed(1) + ' ' +
+          (bx - px * s * 0.5).toFixed(1) + ',' + (by - py * s * 0.5).toFixed(1) + '" fill="' + col + '"/>';
+      }
+
+      /* ================= 9.2 — i momenti magnetici atomici ================= */
+      (function () {
+        var svg = document.getElementById('mm-svg');
+        if (!svg) { return; }
+
+        var TC = 1043;                       // temperatura di Curie del ferro, in kelvin
+        var NX = 15, NY = 4, NA = NX * NY;   // 60 atomi
+        var X0 = 70, Y0 = 78, DX = 36, DY = 44;
+        var modo = 'dia';
+
+        // orientazioni di partenza: pseudocasuali ma sempre le stesse, e accoppiate
+        // a due a due in verso opposto, cosi' che a campo nullo la somma sia esattamente zero
+        var ANG = [];
+        (function () {
+          var s = 20250808, k;
+          for (k = 0; k < NA / 2; k++) {
+            s = (s * 16807) % 2147483647;
+            ANG.push((s / 2147483647) * 2 * Math.PI - Math.PI);
+          }
+          for (k = 0; k < NA / 2; k++) {
+            var a = ANG[k] + Math.PI;
+            if (a > Math.PI) { a -= 2 * Math.PI; }
+            ANG.push(a);
+          }
+        })();
+
+        // equazione di campo medio di Weiss: m = tanh(TC/T * m + h).
+        // La risolvo per bisezione sulla radice positiva: e' l'unica per h > 0,
+        // ed e' quella stabile (magnetizzazione spontanea) per h = 0 e T < TC.
+        function weiss(T, h) {
+          var a = TC / Math.max(T, 1);
+          function f(m) { return Math.tanh(a * m + h) - m; }
+          if (f(1e-7) <= 0) { return 0; }    // niente radice positiva: materiale smagnetizzato
+          var lo = 1e-7, hi = 1, i, md;
+          for (i = 0; i < 80; i++) {
+            md = (lo + hi) / 2;
+            if (f(md) > 0) { lo = md; } else { hi = md; }
+          }
+          return (lo + hi) / 2;
+        }
+
+        function disegna() {
+          var B = parseFloat(document.getElementById('mm-b').value);
+          var T = parseFloat(document.getElementById('mm-t').value);
+          var g = '', i, j, M = 0;
+
+          // il campo esterno, in alto
+          if (B > 0.005) {
+            for (i = 0; i < 6; i++) {
+              g += frecciaSVG(150 + i * 84, 30, 0, 54 * Math.min(1, 0.4 + B), 'var(--accent)', 2.4);
+            }
+            g += '<text x="26" y="35" class="lbl">B esterno</text>';
+          } else {
+            g += '<text x="26" y="35" class="lbl-s">nessun campo esterno</text>';
+          }
+
+          // grado di allineamento
+          var p = 0;
+          if (modo === 'para') { p = Math.tanh(0.6 * B * 300 / (T + 50)); }
+          if (modo === 'ferro') { p = weiss(T, 2 * B); }
+
+          for (j = 0; j < NY; j++) {
+            for (i = 0; i < NX; i++) {
+              var k = j * NX + i;
+              var cx = X0 + i * DX, cy = Y0 + j * DY;
+              g += '<circle cx="' + cx + '" cy="' + cy + '" r="13" fill="none" stroke="var(--border)" stroke-width="1.2"/>';
+              if (modo === 'dia') {
+                // nessun momento proprio: solo quello indotto, opposto al campo (legge di Lenz)
+                if (B > 0.005) {
+                  g += frecciaSVG(cx, cy, Math.PI, 20 * Math.min(1, B), 'var(--magenta)', 2);
+                } else {
+                  g += '<circle cx="' + cx + '" cy="' + cy + '" r="4" fill="var(--muted)"/>';
+                }
+              } else {
+                var a = ANG[k] * (1 - p);
+                g += frecciaSVG(cx, cy, a, 22, 'var(--accent)', 2.2);
+                M += Math.cos(a);
+              }
+            }
+          }
+          M = (modo === 'dia') ? -0.14 * B : M / NA;
+
+          // la magnetizzazione risultante
+          g += '<text x="26" y="272" class="lbl">magnetizzazione risultante</text>';
+          if (Math.abs(M) > 0.02) {
+            g += frecciaSVG(430, 267, M > 0 ? 0 : Math.PI, Math.min(180, Math.abs(M) * 180), 'var(--magenta)', 3.4);
+          } else {
+            g += '<text x="430" y="272" text-anchor="middle" class="em">≈ 0</text>';
+          }
+          svg.innerHTML = g;
+
+          document.getElementById('mm-bv').textContent = nf(B, 2);
+          document.getElementById('mm-tv').textContent = Math.round(T);
+          document.getElementById('mm-M').textContent = nf(M, 2);
+
+          var tipo, chi, msg;
+          if (modo === 'dia') {
+            tipo = 'respinto';
+            chi = 'circa −10⁻⁵';
+            msg = (B < 0.01)
+              ? 'Senza campo non succede nulla: i momenti degli elettroni si annullano a coppie e l\'atomo non è un magnete.'
+              : 'Il campo induce nei singoli atomi un momento <strong>opposto</strong> a sé stesso, per la legge di Lenz: il materiale viene <strong>respinto</strong>. L\'effetto è debolissimo e la temperatura non c\'entra quasi nulla — provate a spostarne il cursore.';
+          } else if (modo === 'para') {
+            tipo = 'attratto debolmente';
+            chi = 'da +10⁻⁵ a +10⁻³';
+            msg = (B < 0.01)
+              ? 'Ogni atomo è un magnete, ma l\'agitazione termica lo orienta a caso: sommando tutto si ottiene zero.'
+              : (T > 900
+                ? 'A temperatura alta il disordine vince: l\'allineamento cala e con esso la magnetizzazione. È la <strong>legge di Curie</strong>, $\\chi_m \\propto 1/T$.'
+                : 'Il campo allinea <em>parzialmente</em> i momenti, vincendo un po\' di disordine termico. Raffreddate e guardate l\'allineamento migliorare.');
+          } else {
+            tipo = (T < TC) ? 'ferromagnetico' : 'paramagnetico (sopra $T_C$)';
+            chi = 'fino a +10⁵';
+            msg = (T < TC * 0.9)
+              ? 'L\'interazione di scambio allinea i momenti <strong>anche a campo nullo</strong>: la magnetizzazione resta alta da sola. È il magnete permanente.'
+              : (T < TC
+                ? 'Ci stiamo avvicinando alla <strong>temperatura di Curie</strong> ($1043$ K per il ferro): l\'ordine spontaneo si sta sgretolando in fretta.'
+                : 'Sopra $T_C$ il ferromagnetismo è <strong>sparito</strong>: a campo nullo la magnetizzazione è esattamente zero e il materiale si comporta da normale paramagnete.');
+          }
+          document.getElementById('mm-tipo').innerHTML = tipo;
+          document.getElementById('mm-chi').textContent = chi;
+          var el = document.getElementById('mm-msg');
+          el.innerHTML = msg;
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        var bs = document.querySelectorAll('#mm-modo button');
+        Array.prototype.forEach.call(bs, function (b) {
+          b.addEventListener('click', function () {
+            modo = b.getAttribute('data-m');
+            Array.prototype.forEach.call(bs, function (x) {
+              x.className = (x === b) ? 'btn active' : 'btn btn-secondary';
+            });
+            disegna();
+          });
+        });
+        document.getElementById('mm-b').addEventListener('input', disegna);
+        document.getElementById('mm-t').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 9.3 — i domini di Weiss ================= */
+      (function () {
+        var svg = document.getElementById('dw-svg');
+        if (!svg) { return; }
+
+        var DIR0 = [0, Math.PI, Math.PI / 2, -Math.PI / 2, 0, Math.PI];  // sei domini: a campo nullo si annullano
+        var COL = ['#22c55e', '#ef4444', '#8b5cf6', '#f59e0b', '#22c55e', '#ef4444'];
+        var X0 = 50, XW = 560, Y0 = 70, H = 150, BSOGLIA = 0.55;
+
+        function disegna() {
+          var B = parseFloat(document.getElementById('dw-b').value);
+          var i, j, g = '';
+
+          // fase 1: le pareti si spostano;  fase 2: i momenti ruotano fino alla saturazione
+          var t1 = Math.min(B / BSOGLIA, 1);
+          var wFav = 1 / 3 + (0.9 - 1 / 3) * t1;          // frazione occupata dai due domini favorevoli
+          var wAltro = (1 - wFav) / 4;
+          var t2 = (B > BSOGLIA) ? (B - BSOGLIA) / (1 - BSOGLIA) : 0;
+
+          var larg = [], dirs = [], M = 0;
+          for (i = 0; i < 6; i++) {
+            var fav = (DIR0[i] === 0);
+            larg.push(fav ? wFav / 2 : wAltro);
+            dirs.push(DIR0[i] * (1 - t2));
+            M += larg[i] * Math.cos(dirs[i]);
+          }
+
+          // il campo applicato
+          if (B > 0.005) {
+            for (i = 0; i < 5; i++) {
+              g += frecciaSVG(160 + i * 96, 32, 0, 60 * Math.min(1, 0.4 + B), 'var(--accent)', 2.4);
+            }
+            g += '<text x="24" y="37" class="lbl">B applicato</text>';
+          } else {
+            g += '<text x="24" y="37" class="lbl-s">campo assente: i domini puntano in direzioni diverse</text>';
+          }
+
+          // i domini
+          var x = X0;
+          for (i = 0; i < 6; i++) {
+            var w = larg[i] * XW;
+            g += '<rect x="' + x.toFixed(1) + '" y="' + Y0 + '" width="' + w.toFixed(1) + '" height="' + H +
+              '" fill="' + COL[i] + '" opacity="0.16" stroke="var(--text-soft)" stroke-width="1.4"/>';
+            var nfr = Math.max(1, Math.round(w / 34));
+            var L = Math.min(26, w * 0.8);
+            for (j = 0; j < nfr; j++) {
+              g += frecciaSVG(x + w * (j + 0.5) / nfr, Y0 + H / 2, dirs[i], L, COL[i], 2.6);
+            }
+            x += w;
+          }
+          g += '<text x="' + X0 + '" y="' + (Y0 + H + 26) + '" class="lbl-s">ogni riquadro è un dominio: al suo interno i momenti sono tutti allineati</text>';
+
+          // la magnetizzazione complessiva
+          g += '<text x="' + X0 + '" y="' + (Y0 + H + 58) + '" class="lbl">magnetizzazione complessiva</text>';
+          if (M > 0.015) {
+            g += frecciaSVG(440, Y0 + H + 53, 0, M * 170, 'var(--magenta)', 3.4);
+          } else {
+            g += '<text x="440" y="' + (Y0 + H + 58) + '" text-anchor="middle" class="em">≈ 0</text>';
+          }
+          svg.innerHTML = g;
+
+          document.getElementById('dw-bv').textContent = nf(B, 2);
+          document.getElementById('dw-M').textContent = Math.round(M * 100) + '%';
+          var fase;
+          if (B < 0.02) { fase = 'domini disordinati'; }
+          else if (B <= BSOGLIA) { fase = 'le pareti si spostano'; }
+          else if (B < 0.98) { fase = 'i momenti ruotano'; }
+          else { fase = 'saturazione'; }
+          document.getElementById('dw-fase').textContent = fase;
+        }
+
+        document.getElementById('dw-b').addEventListener('input', disegna);
+        document.getElementById('dw-reset').addEventListener('click', function () {
+          document.getElementById('dw-b').value = 0;
+          disegna();
+        });
+        disegna();
+      })();
+    });
+  </script>
+
 </body>
 
 </html>

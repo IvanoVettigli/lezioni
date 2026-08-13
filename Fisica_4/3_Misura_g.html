@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 3 — Misurare g</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .qbox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.8rem 0; }
+    .qbox .qt { font-weight: 600; margin-bottom: 0.45rem; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.4rem 0.55rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+    .tabf tr.vuota td { color: var(--muted); font-style: italic; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+    .crono { font-family: Consolas, monospace; font-size: 1.7rem; font-weight: 800; color: var(--accent);
+             background: var(--surface); border: 2px solid var(--border); border-radius: 10px;
+             padding: 0.15rem 0.8rem; letter-spacing: 0.05em; }
+    .passo { border: 2px solid var(--accent); border-radius: 14px; padding: 0.2rem 1.1rem 0.9rem;
+             margin: 1.3rem 0; background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+    .passo > h3:first-child { margin-top: 0.8rem; color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quarto anno · Lezione 3</div>
+    <h1>Misurare <em>g</em></h1>
+    <p>Un'esperienza di laboratorio dall'inizio alla fine — e poi la stessa misura usata per
+      guardare sottoterra senza scavare</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quarto anno</a>
+    <span class="sep">/</span> Misurare g
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove eravamo rimasti.</strong> Nella <a href="2_Gravitazione.html">lezione 2</a> abbiamo scritto
+      $g = GM_T/R_T^2$ e usato il valore $9{,}81$ m/s² decine di volte. Ma da dove viene quel numero? Nessuno
+      lo ha mai letto su un display: va <em>misurato</em>. In questa lezione lo misuriamo davvero, con lo
+      strumento più semplice del mondo — un filo e un peso — e con tutta la procedura del terzo anno: raccolta
+      dati, media, scarto quadratico medio, metodo grafico, incertezza sul risultato. Poi scopriremo che quella
+      stessa misura, fatta con qualche cifra decimale in più, serve a trovare petrolio e cavità nel sottosuolo.
+    </div>
+
+    <!-- 1 — IL PENDOLO -->
+    <section id="sec1">
+      <h2>1. Il pendolo: l'orologio che scoprì un ragazzo annoiato in chiesa</h2>
+
+      <p>La leggenda dice che nel 1583 uno studente di medicina diciannovenne, annoiato durante una funzione nel
+        Duomo di Pisa, si mise a guardare oscillare una grande lampada appesa alla volta. Non avendo un
+        orologio, contò i battiti del proprio polso. E notò una cosa che nessuno aveva notato: mentre le
+        oscillazioni si smorzavano e diventavano sempre più piccole, il <em>tempo</em> di ciascuna restava lo
+        stesso.</p>
+
+      <p>Lo studente era <strong>Galileo Galilei</strong>. La proprietà che aveva scoperto si chiama
+        <strong>isocronismo</strong> — «tempi uguali» — ed è alla base di ogni orologio a pendolo costruito nei
+        tre secoli successivi.</p>
+
+      <div class="definition">
+        <strong>Pendolo semplice.</strong> Un punto materiale di massa $m$ appeso a un filo inestensibile e di
+        massa trascurabile, lungo $L$, libero di oscillare in un piano verticale. Per <strong>piccole
+        oscillazioni</strong> il suo periodo vale
+        $$T = 2\pi\sqrt{\frac{L}{g}}$$
+        e non dipende <em>né dalla massa né dall'ampiezza</em>.
+      </div>
+
+      <p>Le due assenze in quella formula sono la cosa interessante, e vale la pena guardarle una per una.</p>
+
+      <div class="sp-cols">
+        <div class="definition">
+          <strong>Non dipende dalla massa</strong>
+          <p>Come per la caduta libera: la forza di richiamo è proporzionale a $m$, ma anche l'inerzia lo è, e le
+            due si semplificano. Un pendolo di piombo e uno di sughero, lunghi uguale, battono lo stesso tempo.</p>
+        </div>
+        <div class="definition">
+          <strong>Non dipende dall'ampiezza</strong>
+          <p>È l'isocronismo di Galileo — ma è vero solo <em>approssimativamente</em>, per oscillazioni piccole.
+            Ci torneremo nella sezione 7, perché è esattamente il tipo di dettaglio che separa una misura fatta
+            bene da una fatta male.</p>
+        </div>
+      </div>
+
+      <div class="curiosita"><strong>Il metro «universale» che non se ne fece nulla.</strong> Un pendolo lungo
+        $99{,}4$ cm ha un periodo di esattamente due secondi. Nel Seicento si propose seriamente di definire
+        così l'unità di lunghezza: «il metro è la lunghezza del pendolo che batte il secondo». Sarebbe stata
+        una definizione riproducibile ovunque, senza campioni da custodire. Fu scartata proprio per il motivo di
+        questa lezione: quel pendolo <em>non</em> ha la stessa lunghezza dappertutto, perché $g$ cambia da
+        Parigi all'equatore. Un difetto per il metro, un'opportunità per il geofisico.</div>
+
+      <h3>1.1 — Da dove viene la formula</h3>
+
+      <p>Serve un pezzo di trigonometria e l'approssimazione delle piccole oscillazioni. Su un pendolo spostato
+        di un angolo $\theta$ agiscono il peso $m\vec g$ e la tensione del filo. Scomponendo il peso lungo la
+        direzione del moto (tangente all'arco) e lungo il filo, la componente che riporta indietro il pendolo è</p>
+
+      $$F_{\text{tang}} = -\,m\,g\sin\theta$$
+
+      <p>col segno meno perché punta sempre verso la posizione di equilibrio. Chiamando $s = L\theta$ lo
+        spostamento lungo l'arco, per angoli piccoli vale $\sin\theta \approx \theta$ (in radianti!) e quindi</p>
+
+      $$F \approx -\,m\,g\,\theta = -\,\frac{m g}{L}\,s$$
+
+      <div class="definition">
+        <strong>È la legge di Hooke travestita.</strong> Quella formula ha esattamente la forma $F = -k\,s$ che
+        avete studiato l'anno scorso per le molle, con $k = mg/L$. E il periodo di un oscillatore armonico vale
+        $T = 2\pi\sqrt{m/k}$, da cui
+        $$T = 2\pi\sqrt{\frac{m}{mg/L}} = 2\pi\sqrt{\frac{L}{g}}$$
+        La massa si semplifica proprio qui, sotto radice. Un pendolo <em>è</em> una molla, per angoli piccoli.
+      </div>
+
+      <p>Rovesciando la formula si ottiene lo strumento di misura che ci serve:</p>
+
+      <div class="definition">
+        $$g = \frac{4\pi^2 L}{T^2}$$
+        <p class="formula-note">Due sole grandezze da misurare, e nessuna delle due è difficile: una lunghezza
+          col metro a nastro e un tempo col cronometro. È questa semplicità che ha reso il pendolo lo strumento
+          di misura di $g$ per due secoli e mezzo.</p>
+      </div>
+    </section>
+
+    <!-- 2 — GLI ERRORI, PRIMA DI COMINCIARE -->
+    <section id="sec2">
+      <h2>2. Dove sbaglieremo: le incertezze, decise <em>prima</em></h2>
+
+      <p>Il terzo anno insegna una regola che vale sempre: le incertezze si stimano <strong>prima</strong> di
+        fare l'esperimento, non dopo aver visto i risultati. Solo così si può progettare la misura invece di
+        subirla. Guardiamo allora la formula $g = 4\pi^2 L/T^2$ e chiediamoci quali errori ci aspettano.</p>
+
+      <table class="tabf">
+        <thead><tr><th>Grandezza</th><th>Strumento</th><th>Incertezza tipica</th><th>Che tipo di errore</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Lunghezza $L$</td><td class="l">metro a nastro</td><td>$\pm 2$ mm</td>
+              <td class="l">di sensibilità, più il problema di individuare il <em>centro</em> della massa</td></tr>
+          <tr><td class="lab">Periodo $T$</td><td class="l">cronometro a mano</td><td>$\pm 0{,}15$ s</td>
+              <td class="l"><strong>tempo di reazione</strong>: casuale, e molto più grande della sensibilità del cronometro</td></tr>
+        </tbody>
+      </table>
+
+      <div class="warnbox"><strong>Il cronometro non è il problema: siete voi.</strong> Un cronometro digitale
+        legge il centesimo di secondo, ma fra il momento in cui il pendolo passa e il momento in cui il dito
+        preme passano circa <strong>due decimi di secondo</strong>. Se misurate un solo periodo ($\approx 2$ s)
+        con un errore di $0{,}2$ s, sbagliate del $10\%$ — e siccome $T$ compare al quadrato, su $g$
+        sbagliereste del <strong>20 per cento</strong>. Inaccettabile.</div>
+
+      <div class="definition">
+        <strong>Il trucco che salva l'esperimento: contare molte oscillazioni.</strong> Invece di cronometrare
+        un periodo, se ne cronometrano <strong>dieci</strong> e si divide per dieci:
+        $$T = \frac{t_{10}}{10}, \qquad \Delta T = \frac{\Delta t_{10}}{10}$$
+        L'errore di reazione resta lo stesso in valore assoluto — si preme una volta all'inizio e una alla fine,
+        indipendentemente da quante oscillazioni ci sono in mezzo — ma diviso per dieci diventa
+        $0{,}015$ s. L'errore relativo passa dal $10\%$ all'$1\%$.
+        <p class="formula-note">È un'idea che ricorre in tutto il laboratorio: quando l'errore è
+          <em>sulla singola lettura</em> e non sulla grandezza, conviene misurare tanti eventi insieme. Lo stesso
+          principio sta dietro alla pesata di mille chiodi per conoscere la massa di uno.</p>
+      </div>
+
+      <h3>2.1 — Come si propaga l'errore fino a $g$</h3>
+
+      <p>La formula contiene un prodotto e una potenza, quindi si usa la regola degli errori relativi vista al
+        terzo anno: <em>nei prodotti e nei quozienti gli errori relativi si sommano, e una potenza $n$-esima
+        moltiplica l'errore relativo per $n$</em>.</p>
+
+      <div class="definition">
+        $$\frac{\Delta g}{g} = \frac{\Delta L}{L} + 2\,\frac{\Delta T}{T}$$
+        <p class="formula-note">Quel <strong>2</strong> davanti a $\Delta T/T$ è la cosa più importante di tutta
+          la progettazione: un errore sul tempo <em>pesa il doppio</em> di un errore sulla lunghezza. Conviene
+          quindi investire fatica sul cronometraggio (contare molte oscillazioni) più che sul metro.</p>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">Verifica di progetto. Con $L = 1{,}000 \pm 0{,}002$ m e $t_{10} = 20{,}06 \pm 0{,}15$ s,
+          quale incertezza ci si deve aspettare su $g$?</div>
+        <button class="btn btn-toggle" data-target="#sol-prog">Mostra la soluzione</button>
+        <div id="sol-prog" class="hidden">
+          <p><span class="step-num">1</span>$T = 2{,}006$ s, $\Delta T = 0{,}015$ s.</p>
+          <p><span class="step-num">2</span>Errori relativi: $\Delta L/L = 0{,}002$ (cioè lo $0{,}2\%$) e
+            $\Delta T/T = 0{,}0075$ (lo $0{,}75\%$).</p>
+          <p><span class="step-num">3</span>$\dfrac{\Delta g}{g} = 0{,}002 + 2\cdot 0{,}0075 = 0{,}017$, cioè
+            l'<strong>$1{,}7\%$</strong>.</p>
+          <p><span class="step-num">4</span>$g = 4\pi^2 \cdot 1{,}000 / (2{,}006)^2 = 9{,}81$ m/s², e
+            $\Delta g = 0{,}017 \cdot 9{,}81 = 0{,}17$ m/s². Il risultato si scriverà
+            $g = 9{,}8 \pm 0{,}2$ m/s².</p>
+          <p><span class="step-num">5</span><strong>Morale.</strong> Con una sola misura non si va oltre la
+            seconda cifra. Per guadagnarne un'altra bisogna <em>ripetere</em>: è quello che faremo, misurando
+            otto lunghezze diverse.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — L'ESPERIMENTO, PASSO A -->
+    <section id="sec3">
+      <div class="passo">
+        <h2>3. L'esperimento, passo A: il montaggio</h2>
+
+        <p>Il pendolo che useremo è simulato, ma si comporta come quello vero: c'è l'attrito dell'aria, c'è il
+          vostro tempo di reazione, e i numeri che leggerete non saranno mai due volte identici. Prima di
+          misurare, però, bisogna montare bene — ed è qui che si fanno gli errori più costosi, perché sono
+          <strong>sistematici</strong> e nessuna ripetizione li corregge.</p>
+
+        <div class="definition">
+          <strong>Tre regole di montaggio.</strong>
+          <ul>
+            <li><strong>$L$ si misura dal punto di sospensione al <em>centro</em> della massa</strong>, non alla
+              sua cima. Con una sferetta da $2$ cm di diametro, sbagliare questo punto significa un errore
+              sistematico di $1$ cm — cinque volte più grande dell'incertezza dello strumento.</li>
+            <li><strong>Il filo dev'essere inestensibile e leggero</strong> rispetto alla massa. Un filo elastico
+              allunga il pendolo mentre oscilla; un filo pesante lo trasforma in un pendolo composto, che ha
+              un'altra formula (la vedremo nella lezione 6).</li>
+            <li><strong>Le oscillazioni devono restare in un piano</strong>. Se il pendolo comincia a descrivere
+              un'ellisse — cosa facilissima se lo si lascia andare male — non è più il sistema che abbiamo
+              studiato, ed è tempo perso.</li>
+          </ul>
+        </div>
+
+        <div class="warnbox"><strong>Errori casuali ed errori sistematici, la differenza che conta.</strong> Se
+          cronometrate male, a volte in anticipo e a volte in ritardo, l'errore è <strong>casuale</strong>: fate
+          la media di molte misure e si riduce. Se invece misurate sempre $L$ fino alla cima della sferetta
+          invece che al centro, l'errore è <strong>sistematico</strong>: potete ripetere mille volte, la media
+          resterà sbagliata dello stesso identico ammontare. La statistica non salva da un errore di
+          metodo.</div>
+      </div>
+    </section>
+
+    <!-- 4 — PASSO B: RACCOLTA DEI DATI -->
+    <section id="sec4">
+      <div class="passo">
+        <h2>4. L'esperimento, passo B: la raccolta dei dati</h2>
+
+        <p>Otto lunghezze, da venti centimetri a un metro e sessanta. Per ognuna si avvia il pendolo, si aspetta
+          che si stabilizzi, e si cronometrano <strong>dieci oscillazioni complete</strong>. Una oscillazione
+          completa è andata <em>e</em> ritorno: è l'errore più comune contarne mezza.</p>
+
+        <div class="figbox">
+          <div class="ctrl">
+            <label for="pe-i">lunghezza scelta: <span class="val-badge" id="pe-Lv">0,20</span> m</label>
+            <input type="range" id="pe-i" min="0" max="7" step="1" value="0">
+            <button class="btn" id="pe-crono" type="button">⏱ Cronometra 10 oscillazioni</button>
+            <button class="btn btn-secondary" id="pe-tutte" type="button">⏩ Misura tutte</button>
+            <button class="btn btn-secondary" id="pe-azzera" type="button">↺ Azzera i dati</button>
+          </div>
+          <svg id="pe-svg" viewBox="0 0 660 300" aria-label="Pendolo simulato in oscillazione"></svg>
+          <p class="cap"><span class="crono" id="pe-display">0,00 s</span></p>
+        </div>
+
+        <div class="table-container">
+          <table class="tabf">
+            <thead><tr><th>#</th><th>$L$ (m)</th><th>$t_{10}$ (s)</th><th>$T = t_{10}/10$ (s)</th><th>$T^2$ (s²)</th><th>$g = 4\pi^2 L/T^2$</th></tr></thead>
+            <tbody id="pe-tab"></tbody>
+          </table>
+        </div>
+        <p class="eq-out" id="pe-out"></p>
+
+        <div class="note"><strong>Perché non tutte le misure sono uguali.</strong> Rifate due volte la stessa
+          lunghezza e otterrete due numeri diversi: è il vostro tempo di reazione, che cambia a ogni pressione
+          del dito. Non è un difetto dell'esperimento, è <em>l'esperimento</em>: quella dispersione è
+          l'informazione che ci dirà quanto vale l'incertezza sul risultato. Un laboratorio in cui tutte le
+          misure vengono identiche è un laboratorio in cui qualcuno sta copiando.</div>
+      </div>
+    </section>
+
+    <!-- 5 — PASSO C: ANALISI -->
+    <section id="sec5">
+      <div class="passo">
+        <h2>5. L'esperimento, passo C: l'analisi dei dati</h2>
+
+        <p>Adesso abbiamo otto valori di $g$, uno per ogni lunghezza, e sono tutti diversi. Il mestiere del
+          fisico comincia qui: trasformare otto numeri discordi in <strong>un</strong> risultato con la sua
+          incertezza.</p>
+
+        <div class="figbox">
+          <svg id="an-svg" viewBox="0 0 660 280" aria-label="I valori di g misurati, con la media e la fascia di incertezza"></svg>
+          <p class="cap" id="an-cap"></p>
+        </div>
+
+        <div class="sp-cols">
+          <div>Valore medio $\bar g$: <span class="val-badge" id="an-media">—</span></div>
+          <div>Semidispersione: <span class="val-badge" id="an-semi">—</span></div>
+          <div>Scarto quadratico medio: <span class="val-badge" id="an-sq">—</span></div>
+          <div>Errore sulla media: <span class="val-badge" id="an-errm">—</span></div>
+        </div>
+        <p class="eq-out" id="an-out"></p>
+
+        <div class="definition">
+          <strong>Le tre grandezze, e quando si usano.</strong>
+          <ul>
+            <li><strong>Semidispersione</strong> $\;\dfrac{g_{\max}-g_{\min}}{2}$: rozza ma onesta, si usa quando
+              le misure sono poche (tre o quattro).</li>
+            <li><strong>Scarto quadratico medio</strong> $\;\sigma = \sqrt{\dfrac{\sum (g_i-\bar g)^2}{n-1}}$:
+              misura quanto sono sparse le <em>singole</em> misure. È la larghezza della campana.</li>
+            <li><strong>Errore sulla media</strong> $\;\sigma_{\bar g} = \dfrac{\sigma}{\sqrt{n}}$: misura quanto
+              è incerta la <em>media</em>, che è molto meglio determinata delle singole misure. È questo il
+              numero da scrivere accanto al risultato finale.</li>
+          </ul>
+          <p class="formula-note">Quel $\sqrt{n}$ è il motivo per cui in laboratorio si ripete: quadruplicando
+            il numero di misure si dimezza l'incertezza. Ma solo per gli errori <em>casuali</em> — sui
+            sistematici non funziona, ed è per questo che il passo A contava più di questo.</p>
+        </div>
+
+        <div class="warnbox"><strong>Come si scrive un risultato.</strong> L'incertezza si arrotonda a
+          <strong>una sola cifra significativa</strong>, e il valore si tronca alla stessa posizione decimale.
+          Scrivere $g = 9{,}8147 \pm 0{,}0832$ è sbagliato due volte: se il centesimo è già incerto, i
+          diecimillesimi non significano nulla. La forma giusta è $g = 9{,}81 \pm 0{,}08$ m/s².</div>
+      </div>
+    </section>
+
+    <!-- 6 — IL METODO GRAFICO -->
+    <section id="sec6">
+      <div class="passo">
+        <h2>6. Il metodo grafico: la legge sotto processo</h2>
+
+        <p>C'è un modo migliore di usare gli stessi dati, e non serve a ottenere un numero più preciso: serve a
+          <strong>mettere alla prova la legge</strong>. Il metodo della sezione 5 dà per scontato che
+          $T = 2\pi\sqrt{L/g}$ sia vera, e ne ricava $g$. Il metodo grafico invece chiede ai dati se quella
+          formula è vera o no.</p>
+
+        <div class="definition">
+          <strong>La linearizzazione.</strong> Il grafico di $T$ contro $L$ è una curva, e a occhio nessuno sa
+          distinguere una radice quadrata da qualcos'altro. Elevando al quadrato però
+          $$T^2 = \frac{4\pi^2}{g}\,L$$
+          e questa è l'equazione di una <strong>retta passante per l'origine</strong>, con coefficiente angolare
+          $m = 4\pi^2/g$. Di una retta l'occhio si accorge subito, e soprattutto si accorge subito se i punti
+          <em>non</em> ci stanno.
+        </div>
+
+        <div class="figbox">
+          <div class="ctrl">
+            <label class="toggle-row"><input type="checkbox" id="gr-barre" checked> mostra le barre d'errore</label>
+            <label class="toggle-row"><input type="checkbox" id="gr-mm" checked> mostra le rette di massima e minima pendenza</label>
+            <label class="toggle-row"><input type="checkbox" id="gr-lock" checked> 🔒 blocca la scala</label>
+          </div>
+          <svg id="gr-svg" viewBox="0 0 660 330" aria-label="Grafico di T al quadrato contro L, con la retta di regressione"></svg>
+          <p class="cap" id="gr-cap"></p>
+        </div>
+        <div class="sp-cols">
+          <div>Coefficiente angolare: <span class="val-badge" id="gr-m">—</span></div>
+          <div>Pendenza minima · massima: <span class="val-badge" id="gr-mm2">—</span></div>
+          <div>Risultato del metodo grafico: <span class="val-badge" id="gr-g">—</span></div>
+        </div>
+        <p class="eq-out" id="gr-out"></p>
+
+        <div class="definition">
+          <strong>Le rette di massima e minima pendenza.</strong> Ogni punto sperimentale non è un punto: è un
+          segmento verticale lungo $2\Delta(T^2)$, dove $\Delta(T^2) = 2T\,\Delta T$. Fra tutte le rette per
+          l'origine che attraversano <em>tutte</em> le barre d'errore si prendono la più pendente e la meno
+          pendente: da lì
+          $$g_{\max} = \frac{4\pi^2}{m_{\min}}, \qquad g_{\min} = \frac{4\pi^2}{m_{\max}},
+            \qquad \Delta g = \frac{g_{\max} - g_{\min}}{2}$$
+          È il modo grafico di propagare l'incertezza, e ha un pregio che il conto non ha: se le due rette non
+          riescono a passare per tutte le barre, il grafico ve lo mostra a occhio — e allora o le incertezze
+          sono state sottostimate, o la legge è sbagliata.
+        </div>
+
+        <div class="qbox">
+          <div class="qt">Perché la retta deve passare <em>per l'origine</em>, e che cosa significherebbe se non
+            ci passasse?</div>
+          <button class="btn btn-toggle" data-target="#sol-orig">Mostra la risposta</button>
+          <div id="sol-orig" class="hidden">
+            <p>Perché la formula $T^2 = (4\pi^2/g)L$ non ha termine noto: un pendolo di lunghezza nulla ha
+              periodo nullo. Se i dati mostrassero una retta con intercetta $q \ne 0$ significativamente diversa
+              da zero, ci sarebbe un <strong>errore sistematico</strong> nella misura di $L$ — tipicamente
+              proprio quello del passo A, avere misurato la lunghezza fino alla cima della sferetta invece che al
+              suo centro. Un'intercetta positiva corrisponde a un pendolo sistematicamente <em>più lungo</em> di
+              quanto scritto sul quaderno.</p>
+            <p>È un esempio bellissimo di che cosa può fare un grafico e non può fare una media: la media
+              inghiotte l'errore sistematico senza fiatare, il grafico lo <em>mostra</em>.</p>
+          </div>
+        </div>
+
+        <div class="note"><strong>Confronto fra i due metodi.</strong> Danno numeri compatibili, ma servono a
+          cose diverse. Il metodo dei rapporti (sezione 5) è più rapido e dà subito la dispersione delle misure;
+          il metodo grafico usa tutti i dati insieme, individua i punti anomali, smaschera gli errori
+          sistematici e — soprattutto — verifica che la legge sia quella. In una relazione di laboratorio
+          seria si riportano entrambi.</div>
+      </div>
+    </section>
+
+    <!-- 7 — FIN DOVE VALE -->
+    <section id="sec7">
+      <h2>7. Fin dove vale: ampiezza, attrito e pendoli veri</h2>
+
+      <p>Abbiamo usato due approssimazioni, e un fisico onesto va sempre a controllare quanto costano.</p>
+
+      <h3>7.1 — L'isocronismo è falso (di poco)</h3>
+
+      <p>Il passaggio $\sin\theta \approx \theta$ vale solo per angoli piccoli. Il periodo vero di un pendolo si
+        può sviluppare in serie:</p>
+
+      $$T = T_0\left(1 + \frac{1}{16}\,\theta_0^2 + \frac{11}{3072}\,\theta_0^4 + \dots\right)$$
+
+      <p>con $\theta_0$ l'ampiezza <strong>in radianti</strong>. Il termine correttivo è piccolo, ma non è zero:
+        provate a vedere quanto vale.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="am-t">ampiezza: <span class="val-badge" id="am-tv">10</span>°</label>
+          <input type="range" id="am-t" min="1" max="60" step="1" value="10">
+        </div>
+        <svg id="am-svg" viewBox="0 0 660 260" aria-label="Errore percentuale del periodo in funzione dell'ampiezza"></svg>
+        <div class="sp-cols">
+          <div>Correzione sul periodo: <span class="val-badge" id="am-corr">—</span></div>
+          <div>Errore che ne segue su $g$: <span class="val-badge" id="am-g">—</span></div>
+        </div>
+        <p class="eq-out" id="am-out"></p>
+      </div>
+
+      <div class="definition">
+        <strong>La regola pratica.</strong> Sotto i $10°$ la correzione resta sotto il $0{,}2\%$, cioè molto meno
+        dell'incertezza del nostro cronometraggio: si può ignorare. Sopra i $20°$ diventa confrontabile con
+        l'errore casuale, e ignorarla significa introdurre un errore <strong>sistematico</strong> — sempre
+        nello stesso verso, sempre a sottostimare $g$. Galileo, in chiesa, guardava una lampada che oscillava
+        di pochi gradi: fu fortunato, ed è per questo che l'isocronismo gli sembrò esatto.
+      </div>
+
+      <h3>7.2 — L'attrito, e perché stavolta non dà fastidio</h3>
+
+      <p>L'aria smorza le oscillazioni: dopo dieci periodi l'ampiezza è visibilmente calata. Sorprendentemente,
+        però, questo <em>non</em> falsa quasi per niente la misura del periodo: uno smorzamento debole cambia la
+        frequenza di una quantità che va come il <em>quadrato</em> del coefficiente di smorzamento, e per un
+        pendolo in aria è del tutto trascurabile. L'attrito peggiora la vita in un altro modo: riducendo
+        l'ampiezza, rende meno netti i passaggi dal punto più basso e quindi <em>aumenta</em> l'errore di
+        cronometraggio.</p>
+
+      <div class="curiosita"><strong>Il pendolo, per due secoli, è stato lo strumento.</strong> Dal Settecento
+        agli anni Trenta del Novecento tutte le mappe gravimetriche del pianeta sono state fatte così: si
+        portava un pendolo di riferimento in giro per il mondo — a bordo di navi, in cima alle montagne, giù
+        nelle miniere — e se ne cronometrava il periodo con cura maniacale. Le spedizioni olandesi di
+        <strong>Vening Meinesz</strong> negli anni Venti lo fecero perfino a bordo di <em>sottomarini</em>, per
+        avere una piattaforma abbastanza ferma da misurare $g$ in mezzo all'oceano. Scoprirono così le grandi
+        anomalie negative sopra le fosse oceaniche: uno dei primi indizi della tettonica a placche.</div>
+
+      <div class="warnbox"><strong>E oggi?</strong> Il gravimetro assoluto moderno non usa pendoli: lascia
+        <em>cadere</em> nel vuoto un prisma di vetro e ne misura la posizione con un interferometro laser,
+        contando le frange. In pochi minuti ottiene $g$ con otto cifre significative — una parte su
+        $10^9$, cioè un miliardesimo. A quella precisione si vede la marea <em>terrestre</em>: la crosta solida
+        si alza e si abbassa di una trentina di centimetri al giorno per l'attrazione di Luna e Sole, e il
+        gravimetro se ne accorge.</div>
+    </section>
+
+    <!-- 8 — GRAVIMETRIA -->
+    <section id="sec8">
+      <h2>8. Guardare sottoterra senza scavare: la gravimetria</h2>
+
+      <p>Finora abbiamo trattato $g$ come una proprietà della Terra intera. Ma il campo in un punto dipende da
+        <em>tutta</em> la massa che sta intorno, e quindi anche da quella che sta appena sotto i vostri piedi. Se
+        laggiù, invece della solita roccia, c'è una caverna piena d'aria oppure un corpo minerale più denso, il
+        valore di $g$ in superficie cambia — pochissimo, ma cambia.</p>
+
+      <div class="definition">
+        <strong>Anomalia di gravità.</strong> La differenza fra il valore misurato di $g$ e quello che ci si
+        aspetterebbe da una Terra «regolare» in quel punto. Si misura in <strong>milligal</strong>:
+        $$1\ \text{Gal} = 1\ \text{cm/s}^2, \qquad 1\ \text{mGal} = 10^{-5}\ \text{m/s}^2 \approx 10^{-6}\,g$$
+        Un gravimetro da campagna legge il centesimo di mGal, cioè <strong>un decimilionesimo</strong> di $g$;
+        i migliori arrivano al microgal, un miliardesimo. Il pendolo del laboratorio, con il suo $1\%$, è
+        centomila volte troppo grossolano — ma il principio è identico.
+      </div>
+
+      <p>Per una massa anomala approssimabile a una sfera, il conto si fa in due righe con la legge di Newton.
+        Chiamando $z$ la profondità del centro, $x$ la distanza orizzontale del punto di misura e $\Delta m$ la
+        massa in eccesso o in difetto rispetto alla roccia circostante, la componente <em>verticale</em>
+        dell'attrazione — l'unica che il gravimetro sente — vale</p>
+
+      <div class="definition">
+        $$\Delta g(x) = \frac{G\,\Delta m\;z}{\left(x^2+z^2\right)^{3/2}},
+          \qquad \Delta m = \frac{4}{3}\pi R^3 \Delta\rho$$
+        <p class="formula-note">Quel fattore $z/(x^2+z^2)^{1/2}$ in più rispetto alla legge di Newton è il
+          coseno dell'angolo con la verticale: della forza si «vede» solo la componente lungo il filo a piombo.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="gv-R">raggio del corpo: <span class="val-badge" id="gv-Rv">25</span> m</label>
+          <input type="range" id="gv-R" min="8" max="60" step="1" value="25">
+          <label for="gv-z">profondità del centro: <span class="val-badge" id="gv-zv">60</span> m</label>
+          <input type="range" id="gv-z" min="25" max="200" step="5" value="60">
+        </div>
+        <div class="ctrl">
+          <label for="gv-rho">contrasto di densità: <span class="val-badge" id="gv-rhov">−2000</span> kg/m³</label>
+          <input type="range" id="gv-rho" min="-2000" max="2000" step="100" value="-2000">
+          <label class="toggle-row"><input type="checkbox" id="gv-noise" checked> rumore dello strumento</label>
+          <label class="toggle-row"><input type="checkbox" id="gv-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg id="gv-svg" viewBox="0 0 660 340" aria-label="Anomalia di gravità sopra un corpo sepolto e sezione del sottosuolo"></svg>
+        <p class="cap" id="gv-cap"></p>
+      </div>
+      <div class="sp-cols">
+        <div>Massa anomala: <span class="val-badge" id="gv-dm">—</span></div>
+        <div>Anomalia massima: <span class="val-badge" id="gv-max">—</span></div>
+        <div>Larghezza a metà altezza: <span class="val-badge" id="gv-half">—</span></div>
+        <div>Profondità stimata dal grafico: <span class="val-badge" id="gv-zst">—</span></div>
+      </div>
+      <p class="eq-out" id="gv-out"></p>
+
+      <div class="definition">
+        <strong>Il trucco del geofisico: la profondità si legge dalla <em>larghezza</em>.</strong> Imponendo
+        $\Delta g(x_{1/2}) = \tfrac12 \Delta g(0)$ si trova
+        $$x_{1/2} = z\,\sqrt{2^{2/3}-1} = 0{,}766\,z \qquad\Longrightarrow\qquad z = 1{,}305\;x_{1/2}$$
+        Bastano quindi la <em>forma</em> della curva e un righello: un'anomalia stretta è superficiale, una larga
+        è profonda. L'ampiezza, invece, dipende dal prodotto $R^3\Delta\rho$ e non permette di separare i due —
+        una sfera piccola e densissima e una grande e poco densa danno la stessa curva.
+      </div>
+
+      <div class="warnbox"><strong>L'ambiguità è strutturale, non è colpa dello strumento.</strong> Si dimostra
+        che <em>infinite</em> distribuzioni di massa diverse producono in superficie lo stesso identico campo:
+        è il cosiddetto <strong>problema inverso</strong>, ed è mal posto. Per questo la gravimetria da sola non
+        conclude mai: fornisce un vincolo forte, e va combinata con altri dati — la geologia di superficie, i
+        sondaggi, e soprattutto la sismica della prossima sezione, che è molto più brava a dire <em>dove</em>
+        sono le cose.</div>
+
+      <div class="curiosita"><strong>A che cosa serve, in pratica.</strong> A cercare i giacimenti di petrolio,
+        che si accumulano attorno ai <em>duomi salini</em> — il sale è meno denso della roccia e dà una
+        bella anomalia negativa. A trovare cavità e sinkhole prima che ci passi sopra un'autostrada. A seguire
+        il magma dentro un vulcano: quando risale, l'anomalia cresce, e l'Etna è sorvegliata anche così. Ad
+        archeologia: le camere sepolte sotto le piramidi sono state cercate anche con il gravimetro (e più di
+        recente con i <em>muoni</em> cosmici, che è la stessa idea con un'altra particella). E dallo spazio: i
+        satelliti gemelli <strong>GRACE</strong> misurano da vent'anni le variazioni del campo terrestre e
+        pesano, mese per mese, quanta acqua ha perso una falda e quanto ghiaccio ha perso la Groenlandia.</div>
+    </section>
+
+    <!-- 9 — LE ONDE -->
+    <section id="sec9">
+      <h2>9. La stessa domanda, un altro strumento: le onde sismiche</h2>
+
+      <p>C'è un secondo modo per guardare sottoterra, e usa quello che avete studiato l'anno scorso sulle onde.
+        Si dà un colpo — una mazzata su una piastra d'acciaio, o una piccola carica — e si ascolta con una fila
+        di <strong>geofoni</strong> disposti a distanze crescenti. Per ciascuno si annota l'istante del
+        <em>primo arrivo</em>. Da quei tempi si ricostruisce la struttura del sottosuolo.</p>
+
+      <div class="definition">
+        <strong>Perché funziona.</strong> La velocità delle onde elastiche dipende dal materiale: qualche
+        centinaio di metri al secondo in un terreno sciolto, alcune migliaia in una roccia compatta. Al confine
+        fra due strati l'onda si <em>rifrange</em>, esattamente come la luce nella lezione di ottica del terzo
+        anno, e vale la stessa legge di Snell. Se lo strato profondo è più veloce, esiste un angolo critico
+        $\theta_c$ con $\sin\theta_c = v_1/v_2$ oltre il quale l'onda viaggia <strong>lungo l'interfaccia</strong>
+        e rispedisce continuamente energia verso l'alto: è l'<em>onda di testa</em>.
+      </div>
+
+      <p>Ai geofoni vicini arriva prima l'onda diretta, che va in linea retta nello strato lento. Ai geofoni
+        lontani arriva prima l'onda di testa, che fa un giro più lungo ma per gran parte del tragitto viaggia
+        nello strato veloce. Il grafico dei tempi di primo arrivo in funzione della distanza — la
+        <strong>dromocrona</strong> — è quindi una <em>spezzata</em>: due rette con pendenze diverse.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="sm-v1">velocità dello strato superficiale: <span class="val-badge" id="sm-v1v">800</span> m/s</label>
+          <input type="range" id="sm-v1" min="400" max="1400" step="50" value="800">
+          <label for="sm-v2">velocità dello strato profondo: <span class="val-badge" id="sm-v2v">2500</span> m/s</label>
+          <input type="range" id="sm-v2" min="1600" max="5000" step="100" value="2500">
+        </div>
+        <div class="ctrl">
+          <label for="sm-h">profondità dell'interfaccia: <span class="val-badge" id="sm-hv">20</span> m</label>
+          <input type="range" id="sm-h" min="5" max="45" step="1" value="20">
+          <label class="toggle-row"><input type="checkbox" id="sm-noise" checked> errore di lettura sui primi arrivi</label>
+          <label class="toggle-row"><input type="checkbox" id="sm-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg id="sm-svg" viewBox="0 0 660 360" aria-label="Dromocrona dei primi arrivi e sezione a due strati"></svg>
+        <p class="cap" id="sm-cap"></p>
+      </div>
+      <div class="sp-cols">
+        <div>Distanza di incrocio: <span class="val-badge" id="sm-xc">—</span></div>
+        <div>$v_1$ ricostruita: <span class="val-badge" id="sm-v1r">—</span></div>
+        <div>$v_2$ ricostruita: <span class="val-badge" id="sm-v2r">—</span></div>
+        <div>Profondità ricostruita: <span class="val-badge" id="sm-hr">—</span></div>
+      </div>
+      <p class="eq-out" id="sm-out"></p>
+
+      <div class="definition">
+        <strong>Le formule dell'interpretazione.</strong> Detti $m_1$ e $m_2$ i coefficienti angolari dei due
+        tratti e $t_i$ l'intercetta del secondo:
+        $$v_1 = \frac{1}{m_1}, \qquad v_2 = \frac{1}{m_2}, \qquad
+          h = \frac{t_i}{2}\cdot\frac{v_1}{\cos\theta_c}, \quad \cos\theta_c = \sqrt{1-\left(\frac{v_1}{v_2}\right)^2}$$
+        La distanza a cui le due rette si incrociano vale
+        $$x_c = 2h\sqrt{\frac{v_2+v_1}{v_2-v_1}}$$
+        e dice quanto lungo deve essere lo stendimento di geofoni: se è più corto di $x_c$, l'onda di testa non
+        arriva mai per prima e lo strato profondo resta invisibile.
+      </div>
+
+      <div class="warnbox"><strong>Il limite del metodo.</strong> La rifrazione funziona solo se le velocità
+        <em>crescono</em> con la profondità. Uno strato lento nascosto sotto uno veloce non produce nessuna onda
+        di testa e semplicemente non compare nella dromocrona: si chiama <em>strato cieco</em>, ed è la trappola
+        classica dell'interpretazione. Anche qui, come per la gravimetria, il problema inverso non ha una
+        soluzione unica.</div>
+
+      <div class="curiosita"><strong>Dalla cava al mantello.</strong> La stessa tecnica, con i terremoti al posto
+        della mazza e l'intero pianeta al posto del cantiere, ha permesso di disegnare l'interno della Terra
+        senza mai scavare oltre i dodici chilometri. Nel 1909 il croato <strong>Andrija Mohorovičić</strong>,
+        studiando un terremoto vicino a Zagabria, notò due arrivi distinti dove ce ne doveva essere uno solo: era
+        la firma di una brusca discontinuità di velocità a una trentina di chilometri di profondità. È il
+        confine fra crosta e mantello, e oggi si chiama <strong>Moho</strong> in suo onore. Vent'anni dopo,
+        l'assenza di onde trasversali in una vasta «zona d'ombra» dall'altra parte del pianeta rivelò che il
+        nucleo esterno è <em>liquido</em>: le onde S non attraversano i fluidi. Non abbiamo mai visto il nucleo
+        terrestre. Sappiamo che è liquido perché non abbiamo sentito qualcosa che avremmo dovuto sentire.</div>
+
+      <div class="note"><strong>Due strumenti, una domanda.</strong> Gravimetria e sismica rispondono alla stessa
+        domanda — che cosa c'è là sotto? — usando due capitoli diversi di questo corso: la legge di Newton l'una,
+        la propagazione delle onde l'altra. Nessuna delle due, da sola, dà una risposta univoca; insieme si
+        vincolano a vicenda, e con qualche sondaggio di verifica diventano una mappa. È il modo in cui, in
+        pratica, la fisica esce dal laboratorio e va a lavorare.</div>
+    </section>
+
+    <!-- 10 — QUIZ -->
+    <section id="quiz">
+      <h2>10. Quiz finale</h2>
+      <p>Dodici domande a risposta multipla e due aperte, sull'esperienza e sulle sue applicazioni.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 3 — Misurare g · Fisica · Quarto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var GVERO = 9.806;          // il valore che l'esperimento deve ritrovare
+      var SIGMA = 0.15;           // errore di reazione sul cronometro, in secondi
+      var DT = 0.015;             // incertezza sul periodo, cioe' SIGMA/10
+      var LUNG = [0.20, 0.40, 0.60, 0.80, 1.00, 1.20, 1.40, 1.60];
+      var GN = 6.674e-11;
+
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      // generatore riproducibile: Park-Miller piu' Box-Muller
+      var SEME = 20260812, pronto = null;
+      function gauss() {
+        if (pronto !== null) { var v = pronto; pronto = null; return v; }
+        SEME = (SEME * 16807) % 2147483647; var u1 = Math.max(SEME / 2147483647, 1e-12);
+        SEME = (SEME * 16807) % 2147483647; var u2 = SEME / 2147483647;
+        var r = Math.sqrt(-2 * Math.log(u1));
+        pronto = r * Math.sin(2 * Math.PI * u2);
+        return r * Math.cos(2 * Math.PI * u2);
+      }
+      function rnd(s) { return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; }
+
+      function frec(x1, y1, x2, y2, col, sp) {
+        var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy);
+        if (L < 0.8) { return ''; }
+        var s = Math.min(L * 0.38, 9);
+        var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+        var bx = x2 - ux * s, by = y2 - uy * s;
+        return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) +
+          '" stroke="' + col + '" stroke-width="' + sp + '" stroke-linecap="round"/>' +
+          '<polygon points="' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+          (bx + px * s * 0.5).toFixed(1) + ',' + (by + py * s * 0.5).toFixed(1) + ' ' +
+          (bx - px * s * 0.5).toFixed(1) + ',' + (by - py * s * 0.5).toFixed(1) + '" fill="' + col + '"/>';
+      }
+
+      /* ================= L'ESPERIMENTO: raccolta, analisi, grafico ================= */
+      (function () {
+        var svg = document.getElementById('pe-svg');
+        if (!svg) { return; }
+        var DATI = [];                      // t10 misurato per ogni lunghezza, null se non ancora fatto
+        var k;
+        for (k = 0; k < LUNG.length; k++) { DATI.push(null); }
+        var idx = 0, raf = null, t0 = 0;
+
+        function periodoVero(L) { return 2 * Math.PI * Math.sqrt(L / GVERO); }
+        function misura(L) {
+          var t = 10 * periodoVero(L) + SIGMA * gauss();
+          return Math.round(t * 100) / 100;
+        }
+
+        // ---------------- il pendolo che oscilla ----------------
+        function disegnaPendolo(t) {
+          var L = LUNG[idx];
+          var XP = 330, YP = 40, PXM = 130;
+          var A = 0.14 * Math.exp(-t / 40);                       // ampiezza che si smorza lentamente
+          var th = A * Math.cos(2 * Math.PI * t / periodoVero(L));
+          var Lp = L * PXM;
+          var bx = XP + Lp * Math.sin(th), by = YP + Lp * Math.cos(th);
+          var g = '';
+          g += '<line x1="' + (XP - 60) + '" y1="' + YP + '" x2="' + (XP + 60) + '" y2="' + YP + '" stroke="var(--text-soft)" stroke-width="5"/>';
+          g += '<line x1="' + XP + '" y1="' + YP + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) + '" stroke="var(--text-soft)" stroke-width="1.8"/>';
+          g += '<line x1="' + XP + '" y1="' + YP + '" x2="' + XP + '" y2="' + (YP + Lp).toFixed(1) + '" stroke="var(--border)" stroke-width="1.2" stroke-dasharray="5 5"/>';
+          g += '<circle cx="' + bx.toFixed(1) + '" cy="' + by.toFixed(1) + '" r="11" fill="var(--magenta)"/>';
+          g += '<text x="' + (XP + 14) + '" y="' + (YP + Lp / 2).toFixed(1) + '" class="lbl">L = ' + nf(L, 2) + ' m</text>';
+          g += '<text x="24" y="30" class="lbl">periodo atteso: ' + nf(periodoVero(L), 3) + ' s · dieci oscillazioni: ' +
+            nf(10 * periodoVero(L), 2) + ' s</text>';
+          g += '<text x="24" y="52" class="lbl-s">l\'ampiezza si smorza, il periodo no</text>';
+          svg.innerHTML = g;
+        }
+
+        function anima(ts) {
+          if (!t0) { t0 = ts; }
+          disegnaPendolo((ts - t0) / 1000);
+          raf = requestAnimationFrame(anima);
+        }
+        document.addEventListener('visibilitychange', function () {
+          if (document.hidden && raf) { cancelAnimationFrame(raf); raf = null; }
+          else if (!document.hidden && !raf) { t0 = 0; raf = requestAnimationFrame(anima); }
+        });
+
+        // ---------------- la tabella ----------------
+        function riga(i) {
+          var L = LUNG[i], t10 = DATI[i];
+          if (t10 === null) {
+            return '<tr class="vuota"><td>' + (i + 1) + '</td><td>' + nf(L, 2) + '</td><td colspan="4">— da misurare —</td></tr>';
+          }
+          var T = t10 / 10, T2 = T * T, gi = 4 * Math.PI * Math.PI * L / T2;
+          return '<tr><td>' + (i + 1) + '</td><td>' + nf(L, 2) + '</td><td>' + nf(t10, 2) + '</td><td>' +
+            nf(T, 3) + '</td><td>' + nf(T2, 4) + '</td><td>' + nf(gi, 3) + '</td></tr>';
+        }
+        function fatti() {
+          var v = [], i;
+          for (i = 0; i < DATI.length; i++) {
+            if (DATI[i] !== null) {
+              var T = DATI[i] / 10;
+              v.push({ L: LUNG[i], t10: DATI[i], T: T, T2: T * T, g: 4 * Math.PI * Math.PI * LUNG[i] / (T * T) });
+            }
+          }
+          return v;
+        }
+
+        // ---------------- analisi ----------------
+        function statistiche(v) {
+          var n = v.length, i, s = 0;
+          if (n === 0) { return null; }
+          for (i = 0; i < n; i++) { s += v[i].g; }
+          var med = s / n, q = 0, mn = v[0].g, mx = v[0].g;
+          for (i = 0; i < n; i++) {
+            q += (v[i].g - med) * (v[i].g - med);
+            if (v[i].g < mn) { mn = v[i].g; }
+            if (v[i].g > mx) { mx = v[i].g; }
+          }
+          var sq = n > 1 ? Math.sqrt(q / (n - 1)) : 0;
+          return { n: n, media: med, semi: (mx - mn) / 2, sq: sq, errm: n > 1 ? sq / Math.sqrt(n) : 0, min: mn, max: mx };
+        }
+
+        function disegnaAnalisi(v) {
+          var sv = document.getElementById('an-svg');
+          var st = statistiche(v);
+          if (!st) {
+            sv.innerHTML = '<text x="330" y="140" text-anchor="middle" class="lbl-s">nessuna misura ancora raccolta</text>';
+            ['an-media', 'an-semi', 'an-sq', 'an-errm'].forEach(function (id) { document.getElementById(id).textContent = '—'; });
+            document.getElementById('an-out').textContent = 'Raccogliete almeno tre misure nel passo B, poi tornate qui.';
+            return;
+          }
+          var X0 = 70, X1 = 610, Y0 = 236, Y1 = 40;
+          var lo = Math.min(st.min, GVERO) - 0.25, hi = Math.max(st.max, GVERO) + 0.25;
+          var py = function (g) { return Y0 - (Y0 - Y1) * (g - lo) / (hi - lo); };
+          var g = '', i;
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 4; i++) {
+            var gv = lo + (hi - lo) * i / 4;
+            g += '<line x1="' + X0 + '" y1="' + py(gv).toFixed(1) + '" x2="' + X1 + '" y2="' + py(gv).toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + (X0 - 8) + '" y="' + (py(gv) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(gv, 2) + '</text>';
+          }
+          // la fascia dello scarto quadratico medio
+          g += '<rect x="' + X0 + '" y="' + py(st.media + st.sq).toFixed(1) + '" width="' + (X1 - X0) + '" height="' +
+            Math.max(1, (py(st.media - st.sq) - py(st.media + st.sq))).toFixed(1) + '" fill="var(--accent)" opacity="0.15"/>';
+          g += '<line x1="' + X0 + '" y1="' + py(st.media).toFixed(1) + '" x2="' + X1 + '" y2="' + py(st.media).toFixed(1) +
+            '" stroke="var(--accent)" stroke-width="2.6"/>';
+          g += '<text x="' + (X1 - 6) + '" y="' + (py(st.media) - 8).toFixed(1) + '" text-anchor="end" class="em">media = ' + nf(st.media, 3) + '</text>';
+          for (i = 0; i < v.length; i++) {
+            var x = X0 + (X1 - X0) * (i + 0.5) / v.length;
+            g += '<circle cx="' + x.toFixed(1) + '" cy="' + py(v[i].g).toFixed(1) + '" r="6" fill="var(--magenta)"/>';
+            g += '<text x="' + x.toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' + nf(v[i].L, 1) + '</text>';
+          }
+          g += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">lunghezza del pendolo (m)</text>';
+          svg2(sv, g);
+
+          document.getElementById('an-media').textContent = nf(st.media, 3) + ' m/s²';
+          document.getElementById('an-semi').textContent = nf(st.semi, 3) + ' m/s²';
+          document.getElementById('an-sq').textContent = nf(st.sq, 3) + ' m/s²';
+          document.getElementById('an-errm').textContent = nf(st.errm, 3) + ' m/s²';
+          document.getElementById('an-cap').textContent =
+            'Ogni pallino è un valore di g ricavato da una singola lunghezza; la banda è larga ±σ attorno alla media.';
+          var arr = Math.max(0.01, Math.pow(10, Math.floor(Math.log(Math.max(st.errm, 1e-3)) / Math.LN10)));
+          var el = document.getElementById('an-out');
+          el.innerHTML = 'Con ' + st.n + ' misure il risultato è <strong>g = ' + nf(st.media, 2) + ' ± ' +
+            nf(Math.max(st.errm, 0.01), 2) + ' m/s²</strong>. ' +
+            (Math.abs(st.media - GVERO) <= 2 * Math.max(st.errm, 0.01)
+              ? 'È <strong>compatibile</strong> con il valore atteso di ' + nf(GVERO, 3) + ' m/s²: la differenza sta dentro due deviazioni.'
+              : 'La differenza dal valore atteso di ' + nf(GVERO, 3) + ' m/s² supera le due deviazioni: con poche misure capita, ' +
+                'ed è esattamente il motivo per cui una misura senza incertezza non vuol dire niente.');
+        }
+
+        function svg2(el, g) { el.innerHTML = g; }
+
+        // ---------------- il grafico T^2 contro L ----------------
+        function disegnaGrafico(v) {
+          var sv = document.getElementById('gr-svg');
+          if (v.length < 2) {
+            sv.innerHTML = '<text x="330" y="160" text-anchor="middle" class="lbl-s">servono almeno due misure</text>';
+            ['gr-m', 'gr-mm2', 'gr-g'].forEach(function (id) { document.getElementById(id).textContent = '—'; });
+            document.getElementById('gr-out').textContent = 'Raccogliete i dati nel passo B: il grafico si costruisce da solo.';
+            return;
+          }
+          var i, sxy = 0, sxx = 0, mmax = -1e9, mmin = 1e9;
+          for (i = 0; i < v.length; i++) {
+            sxy += v[i].L * v[i].T2; sxx += v[i].L * v[i].L;
+            var dy = 2 * v[i].T * DT;
+            mmax = Math.max(mmax, (v[i].T2 + dy) / v[i].L);
+            mmin = Math.min(mmin, (v[i].T2 - dy) / v[i].L);
+          }
+          var m = sxy / sxx;
+          var K = 4 * Math.PI * Math.PI;
+          var gfit = K / m, gmin = K / mmax, gmax = K / mmin, dg = (gmax - gmin) / 2;
+
+          var lock = document.getElementById('gr-lock').checked;
+          var X0 = 72, X1 = 610, Y0 = 268, Y1 = 34;
+          var XM = 1.75, YM = lock ? 7 : Math.max(v[v.length - 1].T2 * 1.15, 0.5);
+          var px = function (L) { return X0 + (X1 - X0) * L / XM; };
+          var py = function (y) { return Y0 - (Y0 - Y1) * Math.min(1, y / YM); };
+          var g = '';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 7; i++) {
+            var Lx = XM * i / 7;
+            g += '<text x="' + px(Lx).toFixed(1) + '" y="' + (Y0 + 19) + '" text-anchor="middle" class="lbl-s">' + nf(Lx, 2) + '</text>';
+          }
+          for (i = 0; i <= 4; i++) {
+            var yv = YM * i / 4;
+            g += '<line x1="' + X0 + '" y1="' + py(yv).toFixed(1) + '" x2="' + X1 + '" y2="' + py(yv).toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + (X0 - 8) + '" y="' + (py(yv) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(yv, 1) + '</text>';
+          }
+          g += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">L (m)</text>';
+          g += '<text x="' + (X0 - 6) + '" y="' + (Y1 - 8) + '" class="lbl-s">T² (s²)</text>';
+          if (document.getElementById('gr-mm').checked) {
+            g += '<line x1="' + px(0) + '" y1="' + py(0) + '" x2="' + px(XM).toFixed(1) + '" y2="' + py(mmax * XM).toFixed(1) +
+              '" stroke="var(--gold)" stroke-width="1.8" stroke-dasharray="6 5"/>';
+            g += '<line x1="' + px(0) + '" y1="' + py(0) + '" x2="' + px(XM).toFixed(1) + '" y2="' + py(mmin * XM).toFixed(1) +
+              '" stroke="var(--gold)" stroke-width="1.8" stroke-dasharray="6 5"/>';
+          }
+          g += '<line x1="' + px(0) + '" y1="' + py(0) + '" x2="' + px(XM).toFixed(1) + '" y2="' + py(m * XM).toFixed(1) +
+            '" stroke="var(--accent)" stroke-width="3"/>';
+          for (i = 0; i < v.length; i++) {
+            var dy2 = 2 * v[i].T * DT;
+            if (document.getElementById('gr-barre').checked) {
+              g += '<line x1="' + px(v[i].L).toFixed(1) + '" y1="' + py(v[i].T2 - dy2).toFixed(1) + '" x2="' + px(v[i].L).toFixed(1) +
+                '" y2="' + py(v[i].T2 + dy2).toFixed(1) + '" stroke="var(--magenta)" stroke-width="2"/>';
+            }
+            g += '<circle cx="' + px(v[i].L).toFixed(1) + '" cy="' + py(v[i].T2).toFixed(1) + '" r="5" fill="var(--magenta)"/>';
+          }
+          sv.innerHTML = g;
+
+          document.getElementById('gr-m').textContent = nf(m, 4) + ' s²/m';
+          document.getElementById('gr-mm2').textContent = nf(mmin, 4) + ' · ' + nf(mmax, 4);
+          document.getElementById('gr-g').textContent = nf(gfit, 2) + ' ± ' + nf(Math.max(dg, 0.01), 2) + ' m/s²';
+          document.getElementById('gr-cap').textContent =
+            'Retta di regressione vincolata a passare per l\'origine, come impone la formula.';
+          var el = document.getElementById('gr-out');
+          el.innerHTML = 'Il coefficiente angolare vale ' + nf(m, 4) + ' s²/m, e da $m = 4\\pi^2/g$ segue ' +
+            '<strong>g = ' + nf(gfit, 2) + ' ± ' + nf(Math.max(dg, 0.01), 2) + ' m/s²</strong>. ' +
+            'I punti si dispongono su una retta per l\'origine: la legge $T = 2\\pi\\sqrt{L/g}$ regge alla prova, ' +
+            'e questo è un risultato che la sola media non avrebbe potuto dare.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        function aggiorna() {
+          var i, h = '';
+          for (i = 0; i < LUNG.length; i++) { h += riga(i); }
+          document.getElementById('pe-tab').innerHTML = h;
+          var v = fatti();
+          document.getElementById('pe-out').textContent = v.length === 0
+            ? 'Nessuna misura raccolta. Scegliete una lunghezza e premete «Cronometra».'
+            : 'Misure raccolte: ' + v.length + ' su ' + LUNG.length + '.';
+          disegnaAnalisi(v);
+          disegnaGrafico(v);
+        }
+
+        document.getElementById('pe-i').addEventListener('input', function () {
+          idx = parseInt(this.value, 10);
+          document.getElementById('pe-Lv').textContent = nf(LUNG[idx], 2);
+        });
+        document.getElementById('pe-crono').addEventListener('click', function () {
+          DATI[idx] = misura(LUNG[idx]);
+          document.getElementById('pe-display').textContent = nf(DATI[idx], 2) + ' s';
+          aggiorna();
+        });
+        document.getElementById('pe-tutte').addEventListener('click', function () {
+          var i;
+          for (i = 0; i < LUNG.length; i++) { if (DATI[i] === null) { DATI[i] = misura(LUNG[i]); } }
+          document.getElementById('pe-display').textContent = nf(DATI[LUNG.length - 1], 2) + ' s';
+          aggiorna();
+        });
+        document.getElementById('pe-azzera').addEventListener('click', function () {
+          var i;
+          for (i = 0; i < LUNG.length; i++) { DATI[i] = null; }
+          document.getElementById('pe-display').textContent = '0,00 s';
+          aggiorna();
+        });
+        ['gr-barre', 'gr-mm', 'gr-lock'].forEach(function (id) {
+          document.getElementById(id).addEventListener('change', function () { disegnaGrafico(fatti()); });
+        });
+        aggiorna();
+        raf = requestAnimationFrame(anima);
+      })();
+
+      /* ================= 7.1 — LA CORREZIONE DI AMPIEZZA ================= */
+      (function () {
+        var svg = document.getElementById('am-svg');
+        if (!svg) { return; }
+        function corr(gradi) {
+          var t = gradi * Math.PI / 180;
+          return t * t / 16 + 11 * Math.pow(t, 4) / 3072;
+        }
+        function disegna() {
+          var A = parseFloat(document.getElementById('am-t').value);
+          var X0 = 66, X1 = 606, Y0 = 208, Y1 = 30, XM = 60, YM = corr(60) * 100;
+          var px = function (a) { return X0 + (X1 - X0) * a / XM; };
+          var py = function (p) { return Y0 - (Y0 - Y1) * Math.min(1, p / YM); };
+          var g = '', i;
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 6; i++) {
+            g += '<text x="' + px(XM * i / 6).toFixed(1) + '" y="' + (Y0 + 19) + '" text-anchor="middle" class="lbl-s">' + Math.round(XM * i / 6) + '°</text>';
+          }
+          for (i = 0; i <= 4; i++) {
+            var pv = YM * i / 4;
+            g += '<line x1="' + X0 + '" y1="' + py(pv).toFixed(1) + '" x2="' + X1 + '" y2="' + py(pv).toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + (X0 - 8) + '" y="' + (py(pv) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(pv, 1) + '%</text>';
+          }
+          var pts = [];
+          for (i = 0; i <= 240; i++) { var a = XM * i / 240; pts.push(px(a).toFixed(1) + ',' + py(corr(a) * 100).toFixed(1)); }
+          g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+          g += '<line x1="' + px(10).toFixed(1) + '" y1="' + Y0 + '" x2="' + px(10).toFixed(1) + '" y2="' + Y1 +
+            '" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="4 5"/>';
+          g += '<text x="' + (px(10) + 5).toFixed(1) + '" y="' + (Y1 + 14) + '" class="lbl-s">10°: soglia pratica</text>';
+          g += '<circle cx="' + px(A).toFixed(1) + '" cy="' + py(corr(A) * 100).toFixed(1) + '" r="6.5" fill="var(--magenta)"/>';
+          g += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">ampiezza iniziale</text>';
+          svg.innerHTML = g;
+          document.getElementById('am-tv').textContent = Math.round(A);
+          document.getElementById('am-corr').textContent = '+' + nf(corr(A) * 100, 3) + '%';
+          document.getElementById('am-g').textContent = '−' + nf(2 * corr(A) * 100, 3) + '%';
+          var el = document.getElementById('am-out');
+          el.innerHTML = 'A ' + Math.round(A) + '° il periodo vero è più lungo dello <strong>' + nf(corr(A) * 100, 3) +
+            '%</strong> rispetto alla formula delle piccole oscillazioni. Siccome $g \\propto 1/T^2$, usare la formula ' +
+            'approssimata fa <strong>sottostimare</strong> $g$ del ' + nf(2 * corr(A) * 100, 3) + '%. ' +
+            (A <= 10 ? 'Sotto la nostra incertezza sperimentale: si può ignorare.'
+                     : 'Ormai confrontabile con l\'errore casuale: qui ignorarla è un errore sistematico vero.');
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        document.getElementById('am-t').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ================= 8 — LA GRAVIMETRIA ================= */
+      (function () {
+        var svg = document.getElementById('gv-svg');
+        if (!svg) { return; }
+        var XMAX = 300;                    // mezza lunghezza del profilo, in metri
+
+        function anomalia(x, R, z, drho) {
+          var dm = 4 / 3 * Math.PI * R * R * R * drho;
+          return GN * dm * z / Math.pow(x * x + z * z, 1.5) * 1e5;   // in mGal
+        }
+
+        function disegna() {
+          var R = parseFloat(document.getElementById('gv-R').value);
+          var z = parseFloat(document.getElementById('gv-z').value);
+          var drho = parseFloat(document.getElementById('gv-rho').value);
+          var lock = document.getElementById('gv-lock').checked;
+          var rumore = document.getElementById('gv-noise').checked;
+          var dm = 4 / 3 * Math.PI * R * R * R * drho;
+          var A0 = anomalia(0, R, z, drho);
+          var xhalf = z * Math.sqrt(Math.pow(2, 2 / 3) - 1);
+
+          var X0 = 60, X1 = 610, Y0 = 150, Y1 = 34, YS = 190, YB = 330;
+          var AMAX = lock ? 1.2 : Math.max(Math.abs(A0) * 1.25, 0.02);
+          var px = function (x) { return (X0 + X1) / 2 + (X1 - X0) / 2 * x / XMAX; };
+          var py = function (a) { return (Y0 + Y1) / 2 - (Y0 - Y1) / 2 * Math.max(-1, Math.min(1, a / AMAX)); };
+          var g = '', i;
+          var r = rnd(4242);
+
+          // il grafico dell'anomalia
+          g += '<line x1="' + X0 + '" y1="' + py(0).toFixed(1) + '" x2="' + X1 + '" y2="' + py(0).toFixed(1) + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = -3; i <= 3; i++) {
+            g += '<text x="' + px(XMAX * i / 3).toFixed(1) + '" y="' + (Y0 + 16) + '" text-anchor="middle" class="lbl-s">' + Math.round(XMAX * i / 3) + '</text>';
+          }
+          for (i = -2; i <= 2; i++) {
+            var av = AMAX * i / 2;
+            g += '<text x="' + (X0 - 8) + '" y="' + (py(av) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(av, 2) + '</text>';
+          }
+          g += '<text x="' + (X0 - 6) + '" y="' + (Y1 - 8) + '" class="lbl-s">anomalia (mGal)</text>';
+          var pts = [];
+          for (i = 0; i <= 300; i++) {
+            var x = -XMAX + 2 * XMAX * i / 300;
+            var a = anomalia(x, R, z, drho);
+            if (rumore) { a += (r() - 0.5) * 0.02 * Math.max(1, Math.abs(A0)); }
+            pts.push(px(x).toFixed(1) + ',' + py(a).toFixed(1));
+          }
+          g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--magenta)" stroke-width="2.6"/>';
+          // le due tacche alla mezza altezza
+          if (Math.abs(A0) > 1e-6) {
+            g += '<line x1="' + px(-xhalf).toFixed(1) + '" y1="' + py(A0 / 2).toFixed(1) + '" x2="' + px(xhalf).toFixed(1) +
+              '" y2="' + py(A0 / 2).toFixed(1) + '" stroke="var(--gold)" stroke-width="2" stroke-dasharray="5 4"/>';
+            g += '<text x="' + px(xhalf + 12).toFixed(1) + '" y="' + (py(A0 / 2) - 6).toFixed(1) + '" class="em">metà altezza</text>';
+          }
+
+          // la sezione del sottosuolo
+          g += '<rect x="' + X0 + '" y="' + YS + '" width="' + (X1 - X0) + '" height="' + (YB - YS) + '" fill="var(--gold)" opacity="0.13"/>';
+          g += '<line x1="' + X0 + '" y1="' + YS + '" x2="' + X1 + '" y2="' + YS + '" stroke="var(--text-soft)" stroke-width="2.5"/>';
+          var SCz = (YB - YS) / 220;
+          var cy = YS + z * SCz, rr = Math.max(3, R * SCz);
+          g += '<circle cx="' + px(0).toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + rr.toFixed(1) + '" fill="' +
+            (drho < 0 ? 'var(--surface)' : 'var(--primary)') + '" opacity="' + (drho < 0 ? '0.95' : '0.6') +
+            '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<line x1="' + (px(0) - 40).toFixed(1) + '" y1="' + YS + '" x2="' + (px(0) - 40).toFixed(1) + '" y2="' + cy.toFixed(1) +
+            '" stroke="var(--accent)" stroke-width="1.6" stroke-dasharray="4 4"/>';
+          g += '<text x="' + (px(0) - 46).toFixed(1) + '" y="' + ((YS + cy) / 2).toFixed(1) + '" text-anchor="end" class="lbl-s">z = ' + Math.round(z) + ' m</text>';
+          g += '<text x="' + (X0 + 8) + '" y="' + (YS + 18) + '" class="lbl-s">superficie · distanza in metri</text>';
+          svg.innerHTML = g;
+
+          document.getElementById('gv-Rv').textContent = Math.round(R);
+          document.getElementById('gv-zv').textContent = Math.round(z);
+          document.getElementById('gv-rhov').textContent = (drho < 0 ? '−' : '+') + Math.abs(drho);
+          document.getElementById('gv-dm').textContent = (dm < 0 ? '−' : '+') + nf(Math.abs(dm) / 1e6, 2) + ' · 10⁶ kg';
+          document.getElementById('gv-max').textContent = nf(A0, 4) + ' mGal';
+          document.getElementById('gv-half').textContent = nf(xhalf, 1) + ' m';
+          document.getElementById('gv-zst').textContent = nf(1.305 * xhalf, 1) + ' m';
+          document.getElementById('gv-cap').textContent =
+            'In alto il profilo che leggerebbe il gravimetro camminando in superficie; in basso la sezione vera.';
+          var el = document.getElementById('gv-out');
+          el.innerHTML = (Math.abs(A0) < 0.01)
+            ? 'Anomalia di appena ' + nf(Math.abs(A0), 4) + ' mGal: siamo al limite di ciò che uno strumento da campagna ' +
+              'distingue dal rumore. Un corpo così piccolo o così profondo, in pratica, <strong>non si vede</strong>.'
+            : 'Il corpo produce un\'anomalia di <strong>' + nf(A0, 3) + ' mGal</strong> — ' +
+              (drho < 0 ? 'negativa, perché lì c\'è <em>meno</em> massa del previsto: è la firma di una cavità o di un duomo salino.'
+                        : 'positiva, perché lì c\'è massa in eccesso: è la firma di un corpo minerale denso.') +
+              ' Dalla larghezza a metà altezza si stima una profondità di ' + nf(1.305 * xhalf, 0) +
+              ' m, che coincide con quella vera: la forma della curva dice <em>dove</em>, l\'altezza dice <em>quanto</em>.';
+        }
+        ['gv-R', 'gv-z', 'gv-rho'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        ['gv-noise', 'gv-lock'].forEach(function (id) { document.getElementById(id).addEventListener('change', disegna); });
+        disegna();
+      })();
+
+      /* ================= 9 — LA SISMICA A RIFRAZIONE ================= */
+      (function () {
+        var svg = document.getElementById('sm-svg');
+        if (!svg) { return; }
+        var XG = [], i;
+        for (i = 1; i <= 6; i++) { XG.push(i * 2); }          // vicino allo scoppio: ogni 2 m
+        for (i = 3; i <= 60; i++) { XG.push(i * 5); }         // poi ogni 5 m fino a 300 m
+
+        function fit(xs, ts) {
+          var n = xs.length, sx = 0, st = 0, sxx = 0, sxt = 0, k;
+          for (k = 0; k < n; k++) { sx += xs[k]; st += ts[k]; sxx += xs[k] * xs[k]; sxt += xs[k] * ts[k]; }
+          var den = n * sxx - sx * sx;
+          var m = (n * sxt - sx * st) / den;
+          return { m: m, q: (st - m * sx) / n };
+        }
+
+        function disegna() {
+          var v1 = parseFloat(document.getElementById('sm-v1').value);
+          var v2 = parseFloat(document.getElementById('sm-v2').value);
+          var h = parseFloat(document.getElementById('sm-h').value);
+          var rumore = document.getElementById('sm-noise').checked;
+          var lock = document.getElementById('sm-lock').checked;
+          var cth = Math.sqrt(1 - (v1 / v2) * (v1 / v2));
+          var ti = 2 * h * cth / v1;
+          var xc = 2 * h * Math.sqrt((v2 + v1) / (v2 - v1));
+          var r = rnd(31337), k;
+
+          var picks = [], dir = { x: [], t: [] }, ref = { x: [], t: [] };
+          for (k = 0; k < XG.length; k++) {
+            var x = XG[k];
+            var td = x / v1, tr = x / v2 + ti;
+            var t = Math.min(td, tr);
+            if (rumore) { t += (r() - 0.5) * 0.001; }
+            picks.push([x, t]);
+            if (td <= tr) { dir.x.push(x); dir.t.push(t); } else { ref.x.push(x); ref.t.push(t); }
+          }
+
+          var X0 = 66, X1 = 610, Y0 = 200, Y1 = 34, YS = 240, YB = 350;
+          var TM = lock ? 0.42 : Math.max(picks[picks.length - 1][1] * 1.15, 0.02);
+          var px = function (x) { return X0 + (X1 - X0) * x / 300; };
+          var py = function (t) { return Y0 - (Y0 - Y1) * Math.min(1, t / TM); };
+          var g = '';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (k = 0; k <= 6; k++) {
+            g += '<text x="' + px(50 * k).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' + (50 * k) + '</text>';
+          }
+          for (k = 0; k <= 4; k++) {
+            var tv = TM * k / 4;
+            g += '<line x1="' + X0 + '" y1="' + py(tv).toFixed(1) + '" x2="' + X1 + '" y2="' + py(tv).toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + (X0 - 8) + '" y="' + (py(tv) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(tv * 1000, 0) + '</text>';
+          }
+          g += '<text x="' + (X0 - 6) + '" y="' + (Y1 - 8) + '" class="lbl-s">tempo di primo arrivo (ms)</text>';
+          g += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">distanza dal punto di scoppio (m)</text>';
+
+          var f1 = null, f2 = null;
+          if (dir.x.length >= 3) {
+            f1 = fit(dir.x, dir.t);
+            g += '<line x1="' + px(0) + '" y1="' + py(f1.q).toFixed(1) + '" x2="' + px(300).toFixed(1) + '" y2="' + py(f1.q + f1.m * 300).toFixed(1) +
+              '" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="6 5" opacity="0.9"/>';
+          }
+          if (ref.x.length >= 3) {
+            f2 = fit(ref.x, ref.t);
+            g += '<line x1="' + px(0) + '" y1="' + py(f2.q).toFixed(1) + '" x2="' + px(300).toFixed(1) + '" y2="' + py(f2.q + f2.m * 300).toFixed(1) +
+              '" stroke="var(--gold)" stroke-width="1.8" stroke-dasharray="6 5" opacity="0.9"/>';
+            g += '<circle cx="' + px(0) + '" cy="' + py(f2.q).toFixed(1) + '" r="4.5" fill="var(--gold)"/>';
+            g += '<text x="' + (px(0) + 8) + '" y="' + (py(f2.q) - 8).toFixed(1) + '" class="em">intercetta t_i</text>';
+          }
+          for (k = 0; k < picks.length; k++) {
+            g += '<circle cx="' + px(picks[k][0]).toFixed(1) + '" cy="' + py(picks[k][1]).toFixed(1) + '" r="3.2" fill="var(--magenta)"/>';
+          }
+          if (xc < 300) {
+            g += '<line x1="' + px(xc).toFixed(1) + '" y1="' + Y0 + '" x2="' + px(xc).toFixed(1) + '" y2="' + Y1 +
+              '" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="3 4"/>';
+            g += '<text x="' + (px(xc) + 5).toFixed(1) + '" y="' + (Y1 + 14) + '" class="lbl-s">incrocio</text>';
+          }
+
+          // la sezione a due strati, con il cammino dell'onda di testa
+          var SCz = (YB - YS) / 60;
+          var yint = YS + h * SCz;
+          g += '<rect x="' + X0 + '" y="' + YS + '" width="' + (X1 - X0) + '" height="' + (yint - YS).toFixed(1) + '" fill="var(--gold)" opacity="0.16"/>';
+          g += '<rect x="' + X0 + '" y="' + yint.toFixed(1) + '" width="' + (X1 - X0) + '" height="' + (YB - yint).toFixed(1) + '" fill="var(--primary)" opacity="0.2"/>';
+          g += '<line x1="' + X0 + '" y1="' + yint.toFixed(1) + '" x2="' + X1 + '" y2="' + yint.toFixed(1) + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<text x="' + (X0 + 8) + '" y="' + (YS + 16) + '" class="lbl-s">v₁ = ' + Math.round(v1) + ' m/s</text>';
+          g += '<text x="' + (X0 + 8) + '" y="' + (yint + 20).toFixed(1) + '" class="lbl-s">v₂ = ' + Math.round(v2) + ' m/s</text>';
+          var xg = 240, tanth = (v1 / v2) / cth, dx = h * tanth;
+          g += '<line x1="' + px(0) + '" y1="' + YS + '" x2="' + px(dx).toFixed(1) + '" y2="' + yint.toFixed(1) + '" stroke="var(--magenta)" stroke-width="2"/>';
+          g += '<line x1="' + px(dx).toFixed(1) + '" y1="' + yint.toFixed(1) + '" x2="' + px(xg - dx).toFixed(1) + '" y2="' + yint.toFixed(1) + '" stroke="var(--magenta)" stroke-width="2.6"/>';
+          g += '<line x1="' + px(xg - dx).toFixed(1) + '" y1="' + yint.toFixed(1) + '" x2="' + px(xg).toFixed(1) + '" y2="' + YS + '" stroke="var(--magenta)" stroke-width="2"/>';
+          g += '<polygon points="' + (px(0) - 7) + ',' + (YS - 12) + ' ' + (px(0) + 7) + ',' + (YS - 12) + ' ' + px(0) + ',' + YS + '" fill="var(--text-soft)"/>';
+          g += '<text x="' + (px(0) + 10) + '" y="' + (YS - 14) + '" class="lbl-s">scoppio</text>';
+          g += '<text x="' + px(xg).toFixed(1) + '" y="' + (YS - 14) + '" text-anchor="middle" class="lbl-s">geofono</text>';
+          svg.innerHTML = g;
+
+          document.getElementById('sm-v1v').textContent = Math.round(v1);
+          document.getElementById('sm-v2v').textContent = Math.round(v2);
+          document.getElementById('sm-hv').textContent = Math.round(h);
+          document.getElementById('sm-xc').textContent = nf(xc, 1) + ' m';
+          var el = document.getElementById('sm-out');
+          if (f1 && f2) {
+            var v1r = 1 / f1.m, v2r = 1 / f2.m;
+            var cthr = Math.sqrt(Math.max(1e-9, 1 - (v1r / v2r) * (v1r / v2r)));
+            var hr = f2.q / 2 * v1r / cthr;
+            document.getElementById('sm-v1r').textContent = nf(v1r, 0) + ' m/s';
+            document.getElementById('sm-v2r').textContent = nf(v2r, 0) + ' m/s';
+            document.getElementById('sm-hr').textContent = nf(hr, 1) + ' m';
+            el.innerHTML = 'Dalle due pendenze si ricostruiscono $v_1 = ' + nf(v1r, 0) + '$ m/s e $v_2 = ' + nf(v2r, 0) +
+              '$ m/s, e dall\'intercetta una profondità di <strong>' + nf(hr, 1) + ' m</strong> contro i ' + Math.round(h) +
+              ' m veri. Tutto questo <em>senza scavare</em>: bastano una mazza, una fila di geofoni e un grafico.';
+          } else {
+            document.getElementById('sm-v1r').textContent = '—';
+            document.getElementById('sm-v2r').textContent = '—';
+            document.getElementById('sm-hr').textContent = '—';
+            el.innerHTML = (ref.x.length < 3)
+              ? 'La distanza di incrocio è <strong>' + nf(xc, 0) + ' m</strong>, oltre la fine dello stendimento: ' +
+                'l\'onda di testa non arriva mai per prima e lo strato profondo resta <strong>invisibile</strong>. ' +
+                'Avvicinate l\'interfaccia o allargate il contrasto di velocità — oppure, sul campo, allungate la fila di geofoni.'
+              : 'La distanza di incrocio è <strong>' + nf(xc, 0) + ' m</strong>, cioè prima del terzo geofono: ' +
+                'sul primo tratto restano troppo pochi punti per tracciare la retta dell\'onda diretta e $v_1$ non si può misurare. ' +
+                'Sul campo si rimedia infittendo i geofoni vicino al punto di scoppio.';
+          }
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          document.getElementById('sm-cap').textContent =
+            'In alto la dromocrona (ogni pallino è un geofono); in basso la sezione con il cammino dell\'onda di testa.';
+        }
+        ['sm-v1', 'sm-v2', 'sm-h'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        ['sm-noise', 'sm-lock'].forEach(function (id) { document.getElementById(id).addEventListener('change', disegna); });
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      { type: 'mc', diff: 'easy', text: 'Il periodo di un pendolo semplice, per piccole oscillazioni, dipende:',
+        options: ['dalla massa appesa', 'dall\'ampiezza iniziale', 'dalla massa e dalla lunghezza', 'solo dalla lunghezza e da $g$'],
+        correct: 3, explain: 'La massa si semplifica (la forza di richiamo e l\'inerzia sono entrambe proporzionali a $m$) e l\'ampiezza non compare, purché resti piccola. È l\'isocronismo scoperto da Galileo.' },
+
+      { type: 'mc', diff: 'easy', text: 'Perché in laboratorio si cronometrano <strong>dieci</strong> oscillazioni invece di una?',
+        options: ['perché l\'errore di reazione, diviso per dieci, diventa dieci volte più piccolo', 'perché il pendolo si scalda', 'perché la prima oscillazione è sempre sbagliata', 'per far durare di più l\'esperienza'],
+        correct: 0, explain: 'Si preme il cronometro una volta all\'inizio e una alla fine, comunque: l\'errore assoluto è lo stesso, ma diviso per dieci l\'errore relativo crolla dal 10% all\'1%.' },
+
+      { type: 'mc', diff: 'easy', text: 'Nella formula $g = 4\\pi^2 L/T^2$, un errore relativo sul <em>tempo</em>:',
+        options: ['conta la metà di uno sulla lunghezza', 'conta il doppio di uno sulla lunghezza', 'non conta', 'conta uguale'],
+        correct: 1, explain: '$\\Delta g/g = \\Delta L/L + 2\\Delta T/T$: il tempo compare al quadrato, quindi il suo errore relativo va moltiplicato per due. Ecco perché conviene investire fatica sul cronometraggio.' },
+
+      { type: 'mc', diff: 'medium', text: 'Misurare sempre $L$ fino alla cima della sferetta invece che al suo centro produce:',
+        options: ['un errore casuale, che la media elimina', 'nessun errore apprezzabile', 'un errore sistematico, che nessuna ripetizione corregge', 'un errore che cresce col numero di misure'],
+        correct: 2, explain: 'La statistica riduce solo gli errori casuali. Un errore di metodo sposta tutte le misure nello stesso verso, e la media resta sbagliata dello stesso ammontare: si scopre solo ragionando, o guardando l\'intercetta del grafico.' },
+
+      { type: 'mc', diff: 'medium', text: 'Perché si grafica $T^2$ contro $L$ e non $T$ contro $L$?',
+        options: ['perché $T^2$ contro $L$ dà una retta, e di una retta l\'occhio giudica subito la bontà', 'perché $T$ non si può misurare direttamente', 'per far tornare le unità di misura', 'perché $T^2$ ha un errore minore'],
+        correct: 0, explain: 'È la <em>linearizzazione</em>: $T^2 = (4\\pi^2/g)L$ è una retta per l\'origine. Nessuno sa distinguere a occhio una radice quadrata da un\'altra curva; tutti sanno vedere se dei punti stanno su una retta.' },
+
+      { type: 'mc', diff: 'medium', text: 'Se nel grafico $T^2$ contro $L$ la retta migliore avesse un\'intercetta chiaramente positiva, la spiegazione più probabile sarebbe:',
+        options: ['il pendolo oscilla troppo piano', 'un errore sistematico nella misura della lunghezza', 'un difetto del cronometro', 'la legge del pendolo è falsa'],
+        correct: 1, explain: 'Un pendolo di lunghezza nulla ha periodo nullo: la retta deve passare per l\'origine. Un\'intercetta positiva significa che i pendoli erano sistematicamente più lunghi di quanto annotato.' },
+
+      { type: 'mc', diff: 'medium', text: 'L\'errore sulla <em>media</em> di $n$ misure vale $\\sigma/\\sqrt{n}$. Per dimezzarlo bisogna:',
+        options: ['raddoppiare il numero di misure', 'usare uno strumento migliore', 'quadruplicare il numero di misure', 'non è possibile'],
+        correct: 2, explain: 'La radice quadrata è impietosa: per guadagnare un fattore due servono quattro volte i dati, per un fattore dieci ne servono cento. E su un errore sistematico non funziona affatto.' },
+
+      { type: 'mc', diff: 'hard', text: 'Un pendolo viene fatto oscillare con ampiezza di $30°$ e si usa la formula delle piccole oscillazioni. Il valore di $g$ che si ottiene è:',
+        options: ['esatto: l\'isocronismo è perfetto', 'sovrastimato', 'imprevedibile', 'sottostimato di circa il $3{,}5\\%$'],
+        correct: 3, explain: 'A $30°$ il periodo vero è più lungo dell\'$1{,}74\\%$; siccome $g \\propto 1/T^2$, l\'errore su $g$ raddoppia — circa il $3{,}5\\%$ — e ha segno negativo. È un errore <em>sistematico</em>: non si vede dalla dispersione dei dati.' },
+
+      { type: 'mc', diff: 'hard', text: 'Nell\'anomalia di gravità sopra un corpo sepolto, la <strong>larghezza</strong> della curva dice soprattutto:',
+        options: ['la densità del corpo', 'il volume del corpo', 'la sua profondità', 'la precisione dello strumento'],
+        correct: 2, explain: '$x_{1/2} = 0{,}766\\,z$: la forma dà la profondità. L\'altezza invece dipende dal prodotto $R^3\\Delta\\rho$, e da sola non permette di separare un corpo piccolo e denso da uno grande e leggero.' },
+
+      { type: 'mc', diff: 'hard', text: 'Il «problema inverso» della gravimetria consiste nel fatto che:',
+        options: ['distribuzioni di massa diverse possono produrre lo stesso campo in superficie', 'il gravimetro misura al contrario', 'l\'anomalia è sempre negativa', 'serve conoscere $G$ con dieci cifre'],
+        correct: 0, explain: 'È una proprietà matematica del campo, non un difetto dello strumento: infinite sorgenti diverse danno lo stesso dato. Per questo la gravimetria si combina sempre con altri metodi.' },
+
+      { type: 'mc', diff: 'hard', text: 'Nella sismica a rifrazione, la dromocrona dei primi arrivi è una spezzata perché:',
+        options: ['i geofoni hanno sensibilità diverse', 'da una certa distanza in poi arriva prima l\'onda di testa, che viaggia nello strato veloce', 'l\'onda cambia frequenza', 'il terreno assorbe le onde lente'],
+        correct: 1, explain: 'Vicino vince l\'onda diretta; lontano vince quella che fa un giro più lungo ma quasi tutto nello strato veloce. Il punto in cui si scambiano è la distanza di incrocio, e da essa (o dall\'intercetta) si ricava la profondità.' },
+
+      { type: 'mc', diff: 'hard', text: 'Uno strato <em>lento</em> sepolto sotto uno veloce, nella sismica a rifrazione:',
+        options: ['produce una terza retta nella dromocrona', 'raddoppia i tempi di arrivo', 'sposta la distanza di incrocio verso l\'origine', 'non produce nessuna onda di testa e resta invisibile'],
+        correct: 3, explain: 'Si chiama <em>strato cieco</em>. La rifrazione critica esiste solo se la velocità aumenta con la profondità: anche qui il problema inverso non ha soluzione unica.' },
+
+      { type: 'open', diff: 'hard', text: 'Un compagno ottiene $g = 9{,}8147 \\pm 0{,}0832$ m/s². Spiega che cosa c\'è di sbagliato nel modo in cui ha scritto il risultato, e riscrivilo correttamente.',
+        keywords: ['cifra', 'significativ', 'arrotond', 'incertezza', 'decimal', 'sensat', '9,81', '0,08'],
+        requiredMatches: 2,
+        explain: 'Il valore e l\'incertezza sono scritti con troppe cifre, e per giunta incoerenti fra loro.<br><br>Regola 1: l\'<strong>incertezza si arrotonda a una sola cifra significativa</strong> (al massimo due, se la prima è un 1). Quindi $0{,}0832 \\to 0{,}08$.<br><br>Regola 2: il <strong>valore si tronca alla stessa posizione decimale</strong> dell\'incertezza. Se l\'incertezza è sul centesimo, i millesimi e i decimillesimi non hanno alcun significato: dire che il valore è $9{,}8147$ quando non si conosce nemmeno il secondo decimale è una contraddizione.<br><br>La forma corretta è $g = 9{,}81 \\pm 0{,}08$ m/s², oppure $(9{,}81 \\pm 0{,}08)$ m/s². Si può aggiungere l\'errore relativo, $0{,}8\\%$, che è spesso il numero più informativo di tutti.' },
+
+      { type: 'open', diff: 'hard', text: 'Gravimetria e sismica a rifrazione rispondono alla stessa domanda — che cosa c\'è sotto? — con strumenti diversi. Descrivi come funziona ciascuna e perché nessuna delle due, da sola, dà una risposta certa.',
+        keywords: ['anomal', 'densit', 'profondit', 'larghezza', 'geofon', 'onda', 'rifra', 'velocit', 'invers', 'univoc', 'strato', 'cieco'],
+        requiredMatches: 4,
+        explain: 'La <strong>gravimetria</strong> misura in superficie minuscole variazioni di $g$ (frazioni di milligal, cioè miliardesimi di $g$). Un corpo più denso della roccia circostante dà un\'anomalia positiva, una cavità o un duomo salino una negativa. Dalla <em>larghezza</em> della curva si ricava la profondità ($x_{1/2} = 0{,}766\\,z$), dall\'<em>altezza</em> il prodotto fra volume e contrasto di densità.<br><br>La <strong>sismica a rifrazione</strong> manda nel terreno un impulso elastico e legge, su una fila di geofoni, i tempi di primo arrivo. Vicino arriva prima l\'onda diretta, lontano l\'onda di testa che viaggia lungo l\'interfaccia nello strato veloce: la dromocrona è una spezzata, e dalle due pendenze si ricavano $v_1$ e $v_2$, dall\'intercetta la profondità dell\'interfaccia.<br><br>Nessuna delle due è risolutiva perché entrambe affrontano un <strong>problema inverso</strong> mal posto. Nella gravimetria infinite distribuzioni di massa danno lo stesso campo in superficie: un corpo piccolo e densissimo e uno grande e leggero sono indistinguibili. Nella sismica uno strato lento sotto uno veloce non genera onda di testa e resta del tutto invisibile (<em>strato cieco</em>).<br><br>Per questo sul campo si usano <strong>insieme</strong>, e con qualche sondaggio di verifica: la sismica dice bene <em>dove</em> stanno le interfacce, la gravimetria dice <em>quanta</em> massa c\'è, e i due vincoli combinati restringono enormemente le soluzioni possibili.' }
+    ];
+  </script>
+
+</body>
+
+</html>

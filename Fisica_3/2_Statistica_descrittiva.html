@@ -31,6 +31,7 @@
     .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; }
     .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
     .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; color: var(--muted); }
     .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
     .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.5rem 0.7rem; text-align: center; }
     .stat .n { font-size: 1.2rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
@@ -233,6 +234,124 @@
         <tr><td class="lab">Effetto</td><td>rovinano l'<strong>accuratezza</strong></td><td>rovinano la <strong>precisione</strong></td></tr>
         <tr><td class="lab">Come si affrontano</td><td>tarando, cambiando metodo, facendo ripetere ad altri</td><td>con la <strong>statistica</strong></td></tr>
       </table>
+
+      <h3>2.4 — E allora, come si riducono?</h3>
+
+      <p>La tabella dice che gli errori casuali «si trattano con la statistica». Ma <em>come</em>, in pratica?
+        Il primo metodo è quello che viene in mente a tutti, e si chiama <strong>forza bruta</strong>: fare
+        tante misure e mediarle. Funziona — ma molto peggio di quanto si spera.</p>
+
+      <div class="theorem">
+        Se ogni singola misura ha incertezza $\sigma$, la <strong>media</strong> di $N$ misure ha incertezza
+        $$\sigma_{\bar x} = \frac{\sigma}{\sqrt{N}}$$
+        L'errore non cala come $N$: cala come la sua <strong>radice quadrata</strong>.
+      </div>
+
+      <div class="warnbox"><strong>Il conto è impietoso.</strong> Per <em>dimezzare</em> l'incertezza non
+        bastano il doppio delle misure: ne servono <strong>quattro volte</strong> tante. Per guadagnare un
+        fattore dieci ne servono <strong>cento</strong> volte tante. Se una misura richiede un minuto, passare
+        da un'ora di lavoro a un'incertezza dieci volte minore significa <em>cento ore</em>. E per guadagnare
+        un altro fattore dieci, diecimila. A un certo punto la forza bruta smette semplicemente di essere una
+        strategia.</div>
+
+      <div class="curiosita"><strong>Da dove viene quella radice quadrata?</strong> È lo stesso $\sqrt{N}$ che
+        incontrerete nel <strong>cammino aleatorio</strong> (la <em>random walk</em>): un ubriaco che a ogni
+        passo va a caso a destra o a sinistra, dopo $N$ passi non si trova a distanza $N$ dal lampione, ma a
+        distanza $\sqrt{N}$. Gli errori casuali fanno esattamente la stessa cosa: si sommano <em>a caso</em>,
+        e quindi si accumulano molto più lentamente di quanto crescerebbero se andassero tutti nello stesso
+        verso — che è poi il motivo per cui, mediando, si compensano. Lo capirete fino in fondo il quarto anno,
+        studiando il moto browniano e la <strong>meccanica statistica</strong>: la stessa radice quadrata che
+        qui vi limita è quella che, là, tiene insieme la termodinamica.</div>
+
+      <p>C'è poi un secondo motivo, ancora più stringente, per cui non ha senso continuare a misurare
+        all'infinito: <strong>gli errori sistematici non si riducono per niente</strong>. Sotto un certo
+        livello l'incertezza totale smette di calare, e quel livello è il sistematico residuo. Provate a
+        vederlo qui sotto.</p>
+
+      <div class="ckt">
+        <div class="controls">
+          <div class="control-group"><label>incertezza di una singola misura: <span class="val" id="rd-s-val">4,0</span> mm</label>
+            <input type="range" id="rd-s" min="0.5" max="10" step="0.5" value="4"></div>
+          <div class="control-group"><label>numero di misure: <span class="val" id="rd-n-val">25</span></label>
+            <input type="range" id="rd-n" min="1" max="200" step="1" value="25"></div>
+        </div>
+        <div class="controls">
+          <div class="control-group"><label>errore sistematico residuo: <span class="val" id="rd-sys-val">0,5</span> mm</label>
+            <input type="range" id="rd-sys" min="0" max="3" step="0.1" value="0.5"></div>
+          <div class="control-group"><label class="toggle-row"><input type="checkbox" id="rd-lock" checked> 🔒 blocca la scala</label></div>
+        </div>
+        <div id="rd-svg"></div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="rd-cas">—</div><div class="l">errore casuale sulla media</div></div>
+          <div class="stat"><div class="n" id="rd-tot">—</div><div class="l">errore totale</div></div>
+          <div class="stat"><div class="n" id="rd-nec">—</div><div class="l">misure per dimezzarlo</div></div>
+          <div class="stat"><div class="n" id="rd-cross">—</div><div class="l">oltre queste, inutile</div></div>
+        </div>
+        <p class="eq-out" id="rd-out"></p>
+      </div>
+
+      <p>Superato quel punto, l'unica strada è <strong>cambiare metodo</strong>. Ed è qui che comincia il
+        mestiere vero dello sperimentale: non «misurare di più», ma <em>misurare meglio</em>, inventando
+        procedure che rendano l'errore piccolo per costruzione. Ecco cinque idee che tornano continuamente.</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>① Amplificare la grandezza</h4>
+          <p>Se l'errore sta nella <em>lettura</em> e non nella cosa misurata, conviene misurare un multiplo
+            e poi dividere: l'errore assoluto resta lo stesso, quello relativo si divide.</p>
+          <p class="es"><strong>Esempio.</strong> Cronometrare <strong>dieci</strong> oscillazioni del pendolo
+            invece di una: l'errore di reazione è lo stesso, ma spalmato su dieci periodi. L'errore relativo
+            crolla dal $10\%$ all'$1\%$ — <em>senza fare nessuna misura in più</em>.</p>
+        </div>
+        <div class="prop-card">
+          <h4>② Misurare una differenza, non un valore</h4>
+          <p>Confrontare l'incognita con un campione noto e leggere solo lo <strong>scarto</strong>: gli errori
+            comuni ai due rami si cancellano da soli.</p>
+          <p class="es"><strong>Esempio.</strong> La bilancia a bracci uguali non pesa: <em>confronta</em>. Il
+            ponte di Wheatstone non misura una resistenza: cerca lo <strong>zero</strong> del galvanometro. E
+            uno strumento è sempre più preciso vicino allo zero che a fondo scala.</p>
+        </div>
+        <div class="prop-card">
+          <h4>③ Invertire e rifare</h4>
+          <p>Ripetere la misura scambiando le parti: il sistematico cambia di segno e, mediando le due letture,
+            <strong>sparisce</strong>. È l'unico modo di battere un sistematico senza sapere quanto vale.</p>
+          <p class="es"><strong>Esempio.</strong> Pesare l'oggetto prima su un piatto e poi sull'altro
+            (metodo di Gauss): se i bracci non sono uguali, la media geometrica delle due letture dà la massa
+            giusta comunque.</p>
+        </div>
+        <div class="prop-card">
+          <h4>④ Cambiare la grandezza da misurare</h4>
+          <p>Se una grandezza è difficile da misurare, se ne misura un'altra, lenta e comoda, legata a quella
+            da una formula.</p>
+          <p class="es"><strong>Esempio.</strong> Nessun cronometro sa misurare la velocità di un proiettile;
+            ma il <strong>pendolo balistico</strong> la trasforma in un'altezza di qualche centimetro, che si
+            legge con un righello. Lo vedrete al quarto anno.</p>
+        </div>
+        <div class="prop-card">
+          <h4>⑤ Aumentare la sensibilità</h4>
+          <p>Costruire lo strumento in modo che una variazione minuscola produca un effetto grande e ben
+            leggibile.</p>
+          <p class="es"><strong>Esempio.</strong> La <strong>leva ottica</strong> di Cavendish: uno specchietto
+            e un raggio di luce lungo metri trasformano una rotazione invisibile in uno spostamento di
+            centimetri. Oggi la stessa idea, portata all'estremo con gli interferometri, misura spostamenti
+            mille volte più piccoli di un protone.</p>
+        </div>
+        <div class="prop-card">
+          <h4>Il criterio che li unisce</h4>
+          <p>In tutti e cinque i casi non si è misurato <em>di più</em>: si è cambiato ciò che si misura, o come
+            lo si misura, in modo che <strong>l'errore entri divisibile per un numero grande</strong>.</p>
+          <p class="es">Ed è per questo che progettare un esperimento è più difficile che eseguirlo — e vale
+            molti più punti in una relazione di laboratorio.</p>
+        </div>
+      </div>
+
+      <div class="curiosita"><strong>Un caso da manuale: la misura di $\alpha$.</strong> Il momento magnetico
+        dell'elettrone è oggi noto con una precisione di circa una parte su $10^{13}$: è la grandezza fisica
+        misurata meglio di tutte. Non ci si è arrivati ripetendo l'esperimento $10^{26}$ volte — sarebbe
+        impossibile in ogni universo immaginabile — ma inventando un metodo (una singola particella intrappolata
+        in un campo magnetico, il cui salto quantico si conta uno per uno) in cui l'errore è piccolo
+        <em>per costruzione</em>. La statistica dice quanto si può guadagnare mediando; l'ingegno dice quanto
+        si può guadagnare cambiando idea.</div>
 
       <p>E siccome i secondi si trattano con la statistica, è ora di andarsela a riprendere.</p>
     </section>
@@ -1264,6 +1383,93 @@
           modoEl.appendChild(b);
         });
         draw();
+      })();
+
+      /* ====== 2.4 — QUANTO SI GUADAGNA MEDIANDO ====== */
+      (function () {
+        var host = document.getElementById('rd-svg');
+        if (!host) { return; }
+
+        function nfr(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+        function tot(s, n, sy) { return Math.sqrt(s * s / n + sy * sy); }
+
+        function disegna() {
+          var s = parseFloat(document.getElementById('rd-s').value);
+          var n = parseFloat(document.getElementById('rd-n').value);
+          var sy = parseFloat(document.getElementById('rd-sys').value);
+          var lock = document.getElementById('rd-lock').checked;
+          var cas = s / Math.sqrt(n);
+          var T = tot(s, n, sy);
+          var NMAX = 200;
+          var YM = lock ? 10 : Math.max(1, s * 1.05);
+          var X0 = 62, X1 = 600, Y0 = 236, Y1 = 30;
+          var px = function (u) { return X0 + (X1 - X0) * (u - 1) / (NMAX - 1); };
+          var py = function (u) { return Y0 - (Y0 - Y1) * Math.min(1, u / YM); };
+          var g = '<svg viewBox="0 0 640 280" role="img" aria-label="Errore sulla media in funzione del numero di misure">';
+          var i;
+          for (i = 0; i <= 5; i++) {
+            var yv = YM * i / 5;
+            g += '<line x1="' + X0 + '" y1="' + py(yv).toFixed(1) + '" x2="' + X1 + '" y2="' + py(yv).toFixed(1) +
+              '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + (X0 - 8) + '" y="' + (py(yv) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' +
+              nfr(yv, 1) + '</text>';
+          }
+          for (i = 0; i <= 4; i++) {
+            var nv = 1 + (NMAX - 1) * i / 4;
+            g += '<text x="' + px(nv).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' +
+              Math.round(nv) + '</text>';
+          }
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--muted)" stroke-width="2"/>';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--muted)" stroke-width="2"/>';
+          g += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">numero di misure N</text>';
+          g += '<text x="' + (X0 - 6) + '" y="' + (Y1 - 10) + '" class="lbl-s">incertezza (mm)</text>';
+          // la sola parte casuale
+          var pa = [], pb = [];
+          for (i = 0; i <= 260; i++) {
+            var nn = 1 + (NMAX - 1) * i / 260;
+            pa.push(px(nn).toFixed(1) + ',' + py(s / Math.sqrt(nn)).toFixed(1));
+            pb.push(px(nn).toFixed(1) + ',' + py(tot(s, nn, sy)).toFixed(1));
+          }
+          g += '<polyline points="' + pa.join(' ') + '" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-dasharray="6 4"/>';
+          g += '<polyline points="' + pb.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+          if (sy > 0) {
+            g += '<line x1="' + X0 + '" y1="' + py(sy).toFixed(1) + '" x2="' + X1 + '" y2="' + py(sy).toFixed(1) +
+              '" stroke="var(--magenta)" stroke-width="2" stroke-dasharray="7 5"/>';
+            g += '<text x="' + (X1 - 6) + '" y="' + (py(sy) - 7).toFixed(1) +
+              '" text-anchor="end" class="em">il muro del sistematico</text>';
+          }
+          g += '<circle cx="' + px(n).toFixed(1) + '" cy="' + py(T).toFixed(1) + '" r="6" fill="var(--magenta)"/>';
+          g += '<text x="' + (X0 + 12) + '" y="' + (Y1 + 4) + '" class="lbl">tratteggio grigio: solo errore casuale · linea piena: errore totale</text>';
+          g += '</svg>';
+          host.innerHTML = g;
+
+          document.getElementById('rd-s-val').textContent = nfr(s, 1);
+          document.getElementById('rd-n-val').textContent = Math.round(n);
+          document.getElementById('rd-sys-val').textContent = nfr(sy, 1);
+          document.getElementById('rd-cas').textContent = nfr(cas, 3) + ' mm';
+          document.getElementById('rd-tot').textContent = nfr(T, 3) + ' mm';
+          document.getElementById('rd-nec').textContent = (sy > 0 && T / 2 <= sy)
+            ? 'impossibile' : Math.ceil(s * s / (T * T / 4 - sy * sy));
+          var ncross = (sy > 0) ? Math.ceil(s * s / (sy * sy)) : Infinity;
+          document.getElementById('rd-cross').textContent = isFinite(ncross) ? ncross : 'nessun limite';
+          var el = document.getElementById('rd-out');
+          el.innerHTML = 'Con $N = ' + Math.round(n) + '$ l\'errore casuale sulla media vale ' +
+            '$\\sigma/\\sqrt{N} = ' + nfr(cas, 3).replace(',', '{,}') + '$ mm, ma sommato in quadratura al ' +
+            'sistematico l\'incertezza totale resta <strong>' + nfr(T, 3) + ' mm</strong>. ' +
+            (sy > 0
+              ? 'Oltre <strong>N = ' + ncross + '</strong> misure il termine casuale scende sotto il ' +
+                'sistematico e continuare non serve quasi a nulla: la curva si appiattisce sul muro magenta. ' +
+                'Per scendere sotto ' + nfr(sy, 1) + ' mm bisogna <em>cambiare metodo</em>, non fare più misure.'
+              : 'Con sistematico nullo la curva scende per sempre — ma sempre come $1/\\sqrt{N}$: per dimezzarla ' +
+                'servono quattro volte le misure, per dividerla per dieci ne servono cento volte.');
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['rd-s', 'rd-n', 'rd-sys'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        document.getElementById('rd-lock').addEventListener('change', disegna);
+        disegna();
       })();
 
     });

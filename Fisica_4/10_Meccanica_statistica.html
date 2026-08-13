@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 10 — La meccanica statistica</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .epigrafe { border-left: 4px solid var(--muted); background: var(--surface-2); border-radius: 8px;
+                padding: 1rem 1.3rem; margin: 1.3rem 0; font-style: italic; }
+    .epigrafe .fonte { display: block; margin-top: 0.6rem; font-style: normal; font-size: 0.86rem;
+                       color: var(--muted); text-align: right; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quarto anno · Lezione 10</div>
+    <h1>La meccanica statistica</h1>
+    <p>Che cosa succede quando si smette di seguire le singole particelle
+      e si comincia a contarle</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quarto anno</a>
+    <span class="sep">/</span> La meccanica statistica
+  </nav>
+
+  <main>
+
+    <div class="epigrafe">
+      «Ludwig Boltzmann, che passò gran parte della sua vita a studiare la meccanica statistica, morì nel
+      1906, per mano propria. Paul Ehrenfest, che ne proseguì il lavoro, morì allo stesso modo nel 1933.
+      Ora tocca a noi studiare meccanica statistica. Forse sarà saggio affrontare l'argomento con
+      cautela.»
+      <span class="fonte">David L. Goodstein, <em>States of Matter</em>, prima pagina</span>
+    </div>
+
+    <div class="note">
+      <strong>L'avvertimento è ironico, il problema no.</strong> La meccanica statistica è il tentativo di
+      ricavare tutta la termodinamica — temperatura, pressione, entropia, i quattro principi — a partire dalle
+      leggi del moto delle singole particelle. È il programma più ambizioso della fisica classica, e ha
+      funzionato; ma per farlo funzionare bisogna rinunciare a una cosa a cui i fisici erano affezionatissimi:
+      <strong>l'idea di poter sapere tutto</strong>. Non seguiremo più le particelle una per una. Le
+      conteremo.
+    </div>
+
+    <!-- 1 — TORNARE AL GAS PERFETTO -->
+    <section id="sec1">
+      <h2>1. Torniamo al gas perfetto, ma da sotto</h2>
+
+      <p>Nella lezione precedente abbiamo usato l'equazione di stato $pV = nRT$ come un fatto sperimentale:
+        tre leggi misurate in laboratorio, fuse in una formula. Nessuno ha chiesto <em>perché</em>. Adesso lo
+        chiediamo, e la risposta arriverà dal basso — dalle molecole.</p>
+
+      <div class="definition">
+        <div class="formula-title">Le ipotesi del modello cinetico</div>
+        <p>Un gas è un insieme di moltissime particelle che: <strong>(a)</strong> hanno volume proprio
+          trascurabile rispetto al recipiente; <strong>(b)</strong> non esercitano forze a distanza fra loro;
+          <strong>(c)</strong> si muovono in tutte le direzioni con la stessa probabilità;
+          <strong>(d)</strong> urtano fra loro e con le pareti in modo perfettamente elastico.</p>
+        <p class="formula-note">Sono le stesse ipotesi del gas perfetto della lezione 9, riscritte dal punto di
+          vista microscopico. Valgono bene quando il gas è <strong>rarefatto</strong> — cioè quando la distanza
+          media fra le molecole è molto maggiore delle loro dimensioni — e <strong>lontano dalla
+          liquefazione</strong>, dove le forze attrattive diventano decisive.</p>
+      </div>
+
+      <p>Quanto è rarefatta l'aria di questa stanza? Il conto è istruttivo. In un metro cubo a temperatura
+        ambiente ci sono circa $2{,}5\times10^{25}$ molecole, quindi ognuna ha a disposizione un volumetto di
+        $4\times10^{-26}$ m³, cioè un cubetto di lato $3{,}4$ nanometri. Il diametro di una molecola di azoto è
+        circa $0{,}3$ nm: <strong>dieci volte meno</strong>. In volume, le molecole occupano meno di un
+        millesimo dello spazio. L'aria è quasi tutta vuoto — ed è per questo che il modello funziona.</p>
+
+      <h3>1.1 — Il programma riduzionista</h3>
+
+      <p>Il fisico, davanti a un fenomeno complicato, ha un riflesso preciso: <em>di che cosa è fatto?</em> Un
+        gas è fatto di molecole che obbediscono a $\vec F = m\vec a$; quindi, in linea di principio, basta
+        scrivere le equazioni del moto di tutte e risolverle. In linea di principio.</p>
+
+      <div class="warnbox"><strong>In pratica è disperato, e non per poco.</strong> Per descrivere un litro
+        d'aria servirebbero le posizioni e le velocità di $2{,}5\times10^{22}$ molecole, cioè
+        $1{,}5\times10^{23}$ numeri. Scriverli su un disco rigido richiederebbe una massa di silicio maggiore
+        di quella della Terra; risolvere le equazioni del moto richiederebbe più tempo dell'età dell'universo.
+        E anche riuscendoci, quei numeri non ci direbbero niente: nessuno vuole sapere dove sta la molecola
+        numero $7\,432\,891\,004$.</div>
+
+      <p>La mossa della meccanica statistica è rinunciare consapevolmente. Non calcoliamo dove va ogni
+        molecola: calcoliamo <strong>medie</strong>, e scopriamo che le medie obbediscono a leggi semplici e
+        precise. Il paradosso è che <em>la rinuncia rende la teoria più forte</em>: le leggi che ne escono
+        sono valide per qualunque gas, con qualunque numero di particelle, purché siano tante.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>numero di molecole: <span class="val-badge" id="gm-nv">60</span></label>
+          <input type="range" id="gm-n" min="10" max="200" step="10" value="60">
+          <label>temperatura: <span class="val-badge" id="gm-tv">300</span> K</label>
+          <input type="range" id="gm-t" min="50" max="900" step="10" value="300">
+        </div>
+        <div class="ctrl">
+          <label>lato del recipiente: <span class="val-badge" id="gm-lv">1,0</span> (unità arbitrarie)</label>
+          <input type="range" id="gm-l" min="0.6" max="2" step="0.1" value="1">
+          <span class="toggle-row"><input type="checkbox" id="gm-scia">
+            <label for="gm-scia">mostra le tracce</label></span>
+          <span class="toggle-row"><input type="checkbox" id="gm-lock" checked>
+            <label for="gm-lock">🔒 blocca la scala</label></span>
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="gm-go" type="button">▶ avvia</button>
+          <button class="btn btn-secondary" id="gm-stop" type="button">⏸ ferma</button>
+        </div>
+        <svg id="gm-svg" viewBox="0 0 680 340" role="img"
+             aria-label="Molecole in un recipiente e conteggio degli urti sulle pareti"></svg>
+        <p class="cap">A sinistra il gas, a destra il conteggio degli urti sulla parete destra e la pressione
+          che ne risulta.</p>
+        <div class="sp-cols">
+          <div>velocità quadratica media: <span class="val-badge" id="gm-vrms">—</span></div>
+          <div>urti al secondo sulla parete: <span class="val-badge" id="gm-urti">—</span></div>
+          <div>pressione misurata: <span class="val-badge" id="gm-pm">—</span></div>
+          <div>pressione da $pV = Nk_BT$: <span class="val-badge" id="gm-pt">—</span></div>
+        </div>
+        <div class="eq-out" id="gm-out"></div>
+      </div>
+    </section>
+
+    <!-- 2 — LA PRESSIONE VIENE DAGLI URTI -->
+    <section id="sec2">
+      <h2>2. La pressione è una pioggia di urti</h2>
+
+      <p>Guardiamo che cosa succede quando una molecola colpisce una parete perpendicolarmente e rimbalza
+        elasticamente. La sua quantità di moto passa da $+mv_x$ a $-mv_x$: la variazione è $2mv_x$, e per il
+        terzo principio la parete riceve esattamente questa spinta. Una sola molecola dà un colpetto
+        impercettibile; ma i colpetti sono tantissimi e continui, e la loro somma è una forza costante.</p>
+
+      <div class="method">
+        <p><strong>Il conto, in quattro passi.</strong></p>
+        <p><span class="step-num">1</span>Consideriamo un cubo di lato $\ell$ e una molecola che si muove
+          avanti e indietro lungo $x$. Fra due urti consecutivi sulla stessa parete passa il tempo
+          $\Delta t = 2\ell/v_x$, e ogni urto trasferisce $2mv_x$. La forza media di quella molecola è
+          quindi $$F_1 = \frac{2mv_x}{2\ell/v_x} = \frac{mv_x^2}{\ell}$$</p>
+        <p><span class="step-num">2</span>Con $N$ molecole la forza totale è $F = \frac{Nm\langle v_x^2\rangle}{\ell}$,
+          dove $\langle v_x^2\rangle$ è la media dei quadrati.</p>
+        <p><span class="step-num">3</span>Le direzioni sono equivalenti, quindi
+          $\langle v_x^2\rangle = \langle v_y^2\rangle = \langle v_z^2\rangle = \frac13\langle v^2\rangle$.
+          Dividendo per l'area $\ell^2$ si ottiene la pressione, e $\ell^3 = V$:</p>
+        <p><span class="step-num">4</span>$$\boxed{\;p = \frac{1}{3}\,\frac{N}{V}\,m\,\langle v^2\rangle\;}$$</p>
+      </div>
+
+      <p>Questa formula è notevole per due motivi. Il primo: <strong>lega una grandezza macroscopica
+        misurabile con un barometro a proprietà microscopiche invisibili</strong>. Il secondo: non compare
+        nessuna forza fra le molecole, nessuna sostanza, nessuna proprietà chimica — solo massa, numero e
+        velocità. È il motivo per cui tutti i gas rarefatti si comportano allo stesso modo.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">La stessa formula, scritta con l'energia</div>
+        $$pV = \frac{2}{3}N\left\langle \frac12 mv^2\right\rangle = \frac{2}{3}N\langle K\rangle$$
+        <p class="formula-note">Basta moltiplicare per $V$ e riconoscere l'energia cinetica. Ora confrontiamola
+          con l'equazione di stato $pV = Nk_BT$, che sappiamo essere vera per via sperimentale.</p>
+      </div>
+
+      <p>Il confronto è immediato e dà un risultato che è il cuore di tutta la lezione:</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Che cos'è la temperatura</div>
+        $$\langle K \rangle = \frac{3}{2}k_B T$$
+        <p class="formula-note">La temperatura assoluta è, a meno di una costante, l'<strong>energia cinetica
+          media</strong> di traslazione delle particelle. Non è una definizione arbitraria: è una
+          <em>conseguenza</em> del confronto fra il conto microscopico e l'equazione di stato misurata in
+          laboratorio.</p>
+      </div>
+
+      <p>La costante $k_B = 1{,}380\,649\times10^{-23}$ J/K si chiama <strong>costante di Boltzmann</strong>, e
+        il suo ruolo è puramente di conversione: traduce i kelvin in joule. Se avessimo misurato la temperatura
+        direttamente in energia — e i fisici teorici lo fanno — quella costante non esisterebbe. Dal 2019 il
+        kelvin è definito proprio fissandone il valore.</p>
+
+      <h3>2.1 — Quanto vanno veloci le molecole</h3>
+
+      <p>Dalla formula si ricava subito la <strong>velocità quadratica media</strong>:</p>
+
+      $$v_{rms} = \sqrt{\langle v^2\rangle} = \sqrt{\frac{3k_BT}{m}} = \sqrt{\frac{3RT}{M}}$$
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>gas</th><th>massa molare (g/mol)</th><th>$v_{rms}$ a $20\ °$C (m/s)</th>
+            <th>in km/h</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">idrogeno H₂</td><td>$2{,}0$</td><td>$1912$</td><td>$6883$</td></tr>
+            <tr><td class="lab">elio He</td><td>$4{,}0$</td><td>$1352$</td><td>$4867$</td></tr>
+            <tr><td class="lab">azoto N₂</td><td>$28{,}0$</td><td>$511$</td><td>$1840$</td></tr>
+            <tr><td class="lab">ossigeno O₂</td><td>$32{,}0$</td><td>$478$</td><td>$1721$</td></tr>
+            <tr><td class="lab">anidride carbonica CO₂</td><td>$44{,}0$</td><td>$408$</td><td>$1468$</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Le molecole d'aria che state respirando viaggiano a più di <strong>millecinquecento chilometri
+        all'ora</strong>, cioè oltre la velocità del suono. La cosa non deve stupire: il suono <em>è</em> una
+        perturbazione che si propaga per urti fra queste molecole, e non può che viaggiare a una velocità dello
+        stesso ordine.</p>
+
+      <div class="curiosita"><strong>Perché la Luna non ha atmosfera.</strong> Una molecola può sfuggire a un
+        corpo celeste se la sua velocità supera quella di fuga. Sulla Terra la velocità di fuga è
+        $11{,}2$ km/s, cioè ventidue volte la $v_{rms}$ dell'azoto: la coda veloce della distribuzione perde
+        qualche molecola ogni tanto, e in miliardi di anni la Terra ha perso quasi tutto il suo idrogeno e il
+        suo elio — che infatti sono rarissimi nell'aria, pur essendo gli elementi più abbondanti
+        dell'universo. Sulla Luna la velocità di fuga è $2{,}4$ km/s, appena quattro volte la $v_{rms}$: troppo
+        poco, e l'atmosfera se n'è andata tutta. Su Titano, che è piccola come la Luna ma freddissima
+        ($94$ K), la $v_{rms}$ è così bassa che l'atmosfera è rimasta — ed è più densa della nostra.</div>
+
+      <div class="warnbox"><strong>E i solidi?</strong> Nei solidi le particelle non traslano: oscillano attorno
+        a posizioni fisse in un reticolo, e la loro energia è per metà cinetica e per metà potenziale elastica.
+        Il conteggio dei gradi di libertà cambia, e cambia il calore specifico — si ottiene la
+        <em>legge di Dulong e Petit</em>, $c = 3R$ per mole, che funziona bene a temperatura ambiente e
+        clamorosamente male alle basse temperature. Anche quella fu una delle «nubi» di Kelvin, e anche quella
+        fu risolta dalla meccanica quantistica, con i modelli di Einstein e di Debye. Per ora restiamo ai gas,
+        dove il conto è pulito.</div>
+    </section>
+
+    <!-- 3 — PROPRIETÀ EMERGENTI -->
+    <section id="sec3">
+      <h2>3. Temperatura e pressione non esistono, per una molecola sola</h2>
+
+      <p>C'è una conseguenza del ragionamento appena fatto che vale la pena isolare, perché è concettualmente
+        la più importante e la più facile da dimenticare.</p>
+
+      <div class="definition">
+        <div class="formula-title">Proprietà emergenti</div>
+        <p>La temperatura è una <strong>media</strong>, la pressione è una <strong>somma di moltissimi urti</strong>.
+          Nessuna delle due ha senso per una singola particella: chiedere «qual è la temperatura di questo
+          atomo?» è come chiedere qual è il reddito medio di una persona sola, o il tasso di natalità di un
+          individuo.</p>
+        <p class="formula-note">Le proprietà emergenti non sono meno reali di quelle microscopiche: sono
+          <em>di un altro livello</em>. Un'onda del mare esiste davvero, pur non essendo una proprietà di
+          nessuna singola molecola d'acqua.</p>
+      </div>
+
+      <p>Questo spiega anche perché la termodinamica ha potuto funzionare per un secolo <em>senza</em> sapere
+        nulla di atomi. Le grandezze di cui parla — temperatura, pressione, entropia — vivono al livello
+        macroscopico e obbediscono a leggi proprie. La meccanica statistica non le ha sostituite: ha mostrato
+        <strong>da dove vengono</strong>.</p>
+
+      <div class="curiosita"><strong>Quanto grande deve essere «grande»?</strong> Le fluttuazioni relative di
+        una media su $N$ oggetti vanno come $1/\sqrt N$ — lo stesso $\sqrt N$ che governa l'errore di misura
+        nella lezione 2 del terzo anno, e la camminata aleatoria che vedremo fra poco. Con $N = 100$
+        particelle la pressione fluttuerebbe del $10\%$: un barometro impazzito. Con
+        $N = 10^{22}$ le fluttuazioni sono dell'ordine di $10^{-11}$, cioè invisibili a qualunque strumento.
+        <strong>La termodinamica non è esatta: è solo così precisa che non riusciamo a coglierla in
+        fallo.</strong></div>
+    </section>
+
+    <!-- 4 — LA DISTRIBUZIONE DI MAXWELL -->
+    <section id="sec4">
+      <h2>4. Non tutte le molecole vanno alla stessa velocità</h2>
+
+      <p>Finora abbiamo parlato solo di <em>medie</em>. Ma le molecole non viaggiano tutte a $511$ m/s: alcune
+        sono quasi ferme, altre corrono al doppio della media. La domanda naturale è: <strong>quante ce ne sono
+        a ciascuna velocità?</strong> La risposta la trovò James Clerk Maxwell nel 1860, ed è il primo esempio
+        nella storia della fisica di una legge <em>statistica</em> fondamentale.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Distribuzione di Maxwell-Boltzmann</div>
+        $$f(v) = 4\pi\left(\frac{m}{2\pi k_B T}\right)^{3/2} v^2\,e^{-mv^2/(2k_BT)}$$
+        <p class="formula-note">$f(v)\,\mathrm{d}v$ è la frazione di molecole con velocità fra $v$ e
+          $v + \mathrm{d}v$. Il fattore esponenziale è la <strong>gaussiana</strong> incontrata in statistica —
+          una per ciascuna delle tre componenti della velocità — e il fattore $v^2$ davanti nasce dalla
+          geometria: le direzioni possibili con velocità $v$ stanno su una sfera di raggio $v$, la cui
+          superficie va appunto come $v^2$.</p>
+      </div>
+
+      <p>La curva non è simmetrica: parte da zero, sale a un massimo e poi scende con una <strong>coda lunga a
+        destra</strong>. È quella coda a fare la differenza in mezza fisica — sono le molecole della coda a
+        evaporare, a scavalcare le barriere di attivazione delle reazioni chimiche, a sfuggire alla gravità di
+        un pianeta.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="mb-gas"></div>
+        <div class="ctrl">
+          <label>temperatura: <span class="val-badge" id="mb-tv">300</span> K</label>
+          <input type="range" id="mb-t" min="50" max="1200" step="10" value="300">
+          <span class="toggle-row"><input type="checkbox" id="mb-due">
+            <label for="mb-due">confronta con $300$ K</label></span>
+          <span class="toggle-row"><input type="checkbox" id="mb-lock" checked>
+            <label for="mb-lock">🔒 blocca la scala</label></span>
+        </div>
+        <svg id="mb-svg" viewBox="0 0 680 320" role="img"
+             aria-label="Distribuzione delle velocità di Maxwell-Boltzmann"></svg>
+        <p class="cap">Le tre velocità caratteristiche sono segnate sull'asse: sono sempre in questo ordine, e
+          il loro rapporto non dipende né dal gas né dalla temperatura.</p>
+        <div class="sp-cols">
+          <div>più probabile $v_p$: <span class="val-badge" id="mb-vp">—</span></div>
+          <div>media $\langle v\rangle$: <span class="val-badge" id="mb-vm">—</span></div>
+          <div>quadratica media $v_{rms}$: <span class="val-badge" id="mb-vq">—</span></div>
+          <div>oltre il doppio di $v_p$: <span class="val-badge" id="mb-coda">—</span></div>
+        </div>
+        <div class="eq-out" id="mb-out"></div>
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-title">Le tre velocità</div>
+        $$v_p = \sqrt{\frac{2k_BT}{m}} \qquad \langle v\rangle = \sqrt{\frac{8k_BT}{\pi m}} \qquad
+        v_{rms} = \sqrt{\frac{3k_BT}{m}}$$
+        <p class="formula-note">Il rapporto fra le tre è fissato: $v_p : \langle v\rangle : v_{rms} =
+          \sqrt2 : \sqrt{8/\pi} : \sqrt3 = 1 : 1{,}128 : 1{,}225$. Cambiando gas o temperatura la curva si
+          allarga o si stringe, ma <strong>la sua forma resta la stessa</strong>: è sempre la stessa funzione,
+          riscalata.</p>
+      </div>
+
+      <p>Un dettaglio che il simulatore rende evidente: alzando la temperatura la curva non solo si sposta a
+        destra ma <strong>si abbassa e si allarga</strong>. Deve farlo, perché l'area sotto la curva è sempre
+        $1$ — è una distribuzione di probabilità, e la somma di tutte le frazioni fa il totale. Notate anche
+        come cresce la coda: raddoppiando la temperatura la frazione di molecole molto veloci può moltiplicarsi
+        per centinaia. È lo stesso esponenziale della legge di Arrhenius della lezione 8, e non è una
+        coincidenza: <strong>è la stessa distribuzione</strong>.</p>
+
+      <div class="curiosita"><strong>Maxwell, e il primo argomento statistico della fisica.</strong> Quando
+        Maxwell pubblicò la distribuzione, nel 1860, l'idea stessa di applicare la probabilità alla natura era
+        sospetta: la probabilità serviva a descrivere l'ignoranza umana, non il mondo. Maxwell aveva letto uno
+        studio di statistica <em>sociale</em> — le tavole di Quetelet sulle statistiche demografiche — e ne
+        aveva importato il metodo. Il ponte fra micro e macro, insomma, è stato costruito con strumenti presi
+        in prestito dalle scienze sociali. La teoria cinetica è nata così.</div>
+    </section>
+
+    <!-- 5 — IL MOTO BROWNIANO -->
+    <section id="sec5">
+      <h2>5. Come facciamo a sapere che gli atomi esistono</h2>
+
+      <p>Tutto quello che abbiamo fatto finora poggia su un'ipotesi che nell'Ottocento era tutt'altro che
+        accettata: che la materia sia fatta di particelle discrete. Ernst Mach e i suoi allievi la
+        consideravano una comoda finzione, non una realtà — <em>gli atomi non li ha mai visti nessuno</em>. E
+        avevano un punto: nessun esperimento dell'epoca li mostrava.</p>
+
+      <p>La prova arrivò da una direzione inattesa, e la storia comincia in botanica.</p>
+
+      <div class="definition">
+        <div class="formula-title">Il moto browniano</div>
+        <p>Nel 1827 il botanico <strong>Robert Brown</strong>, osservando al microscopio granuli di polline
+          sospesi in acqua, li vide muoversi <em>a scatti</em>, in modo incessante e irregolare, senza nessuna
+          causa apparente. Pensò dapprima a una forma di vita; poi ripeté con polvere di roccia e di vetro, e
+          il fenomeno c'era lo stesso. Non era biologia.</p>
+      </div>
+
+      <p>Per ottant'anni fu una curiosità senza spiegazione. Poi, nel 1905, <strong>Albert Einstein</strong>
+        pubblicò — nello stesso anno miracoloso della relatività e dei quanti di luce — un articolo che ne dava
+        la teoria quantitativa. L'idea è semplicissima: il granello è bombardato da tutti i lati dalle molecole
+        d'acqua, e siccome gli urti sono <em>casuali</em>, di tanto in tanto ce ne sono più da una parte che
+        dall'altra. Il granello, che è milioni di volte più pesante di una molecola ma non infinitamente,
+        sente quello sbilanciamento e si sposta.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">La relazione di Einstein (1905)</div>
+        $$\langle x^2 \rangle = 2Dt \qquad\text{con}\qquad D = \frac{k_B T}{6\pi\eta a}$$
+        <p class="formula-note">$\langle x^2\rangle$ è lo spostamento quadratico medio in un tempo $t$, $\eta$
+          la viscosità del liquido e $a$ il raggio del granello. Il punto decisivo è che <strong>a destra
+          compare $k_B$</strong>, cioè $R/N_A$: misurando il tragitto di un granello al microscopio si ricava
+          il <em>numero di Avogadro</em>.</p>
+      </div>
+
+      <p>È questo che chiude la partita. Jean Perrin fece la misura fra il 1908 e il 1911, ottenne un numero
+        di Avogadro compatibile con quelli ricavati da fenomeni completamente diversi, e prese il Nobel nel
+        1926. Se gli atomi non esistessero, quel numero non avrebbe dovuto significare nulla; invece
+        coincideva. <strong>Il dibattito finì.</strong></p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>numero di camminatori: <span class="val-badge" id="br-nv">6</span></label>
+          <input type="range" id="br-n" min="1" max="12" step="1" value="6">
+          <label>passi compiuti: <span class="val-badge" id="br-pv">400</span></label>
+          <input type="range" id="br-p" min="20" max="2000" step="20" value="400">
+        </div>
+        <div class="ctrl">
+          <span class="toggle-row"><input type="checkbox" id="br-med" checked>
+            <label for="br-med">mostra il raggio $\sqrt{\langle r^2\rangle}$</label></span>
+          <span class="toggle-row"><input type="checkbox" id="br-lock" checked>
+            <label for="br-lock">🔒 blocca la scala</label></span>
+        </div>
+        <svg id="br-svg" viewBox="0 0 680 340" role="img"
+             aria-label="Traiettorie di moto browniano in due dimensioni"></svg>
+        <p class="cap">Ogni traccia è un granello che parte dal centro. Il cerchio tratteggiato ha raggio
+          $\sqrt{2Dt}$ per una camminata a passi unitari.</p>
+        <div class="sp-cols">
+          <div>distanza tipica prevista: <span class="val-badge" id="br-att">—</span></div>
+          <div>distanza tipica misurata: <span class="val-badge" id="br-mis">—</span></div>
+          <div>distanza massima raggiunta: <span class="val-badge" id="br-max">—</span></div>
+          <div>rapporto misurato/previsto: <span class="val-badge" id="br-rap">—</span></div>
+        </div>
+        <div class="eq-out" id="br-out"></div>
+      </div>
+
+      <div class="warnbox"><strong>Perché la materia non si espande, allora?</strong> Se ogni particella
+        vagabonda a caso, perché una goccia d'inchiostro in un bicchiere si diffonde ma un cucchiaino di
+        zucchero sul tavolo resta fermo? Perché nei solidi e nei liquidi le forze fra le particelle sono
+        <em>vincoli</em>: la camminata aleatoria libera vale per le particelle di un gas, o per un granello
+        <em>sospeso</em> in un fluido. La diffusione esiste anche nei solidi, ma con coefficienti $D$
+        milioni di volte più piccoli: il rame diffonde dentro l'oro, solo che ci mette secoli.</div>
+
+      <div class="curiosita"><strong>Boltzmann non fece in tempo.</strong> Sostenne per tutta la vita che la
+        materia fosse fatta di atomi e che il secondo principio fosse una legge statistica, contro l'ostilità
+        di colleghi autorevolissimi. Fu attaccato duramente, in un'epoca in cui la scuola energetista di Mach
+        e Ostwald dominava la fisica di lingua tedesca, e soffriva di quello che oggi chiameremmo un disturbo
+        bipolare. Si tolse la vita nel 1906 a Duino, vicino a Trieste, mentre era in vacanza con la famiglia:
+        l'articolo di Einstein sul moto browniano era dell'anno prima, gli esperimenti di Perrin sarebbero
+        arrivati due anni dopo. Non lo seppe mai.</div>
+    </section>
+
+    <!-- 6 — LA CAMMINATA ALEATORIA -->
+    <section id="sec6">
+      <h2>6. La camminata aleatoria, e perché tutto va come $\sqrt N$</h2>
+
+      <p>Il moto browniano è un caso particolare di un oggetto matematico che compare ovunque, e che vale la
+        pena studiare da solo. Immaginate un ubriaco che parte da un lampione e a ogni passo decide con una
+        moneta se andare a destra o a sinistra. Dopo $N$ passi, dove sarà?</p>
+
+      <div class="definition">
+        <div class="formula-title">Camminata aleatoria in una dimensione</div>
+        <p>A ogni passo la posizione cambia di $+1$ con probabilità $p$ e di $-1$ con probabilità $q = 1-p$.
+          Se $d$ è il numero di passi verso destra, la posizione finale è $x = d - (N-d) = 2d - N$, e
+          <strong>$d$ segue la distribuzione binomiale</strong> già incontrata in statistica.</p>
+        <p class="formula-note">Da $\langle d\rangle = Np$ e $\sigma_d^2 = Npq$ seguono immediatamente
+          $$\langle x\rangle = N(2p-1) \qquad \sigma_x = 2\sqrt{Npq}$$
+          e nel caso della moneta equa ($p = q = 1/2$): $\langle x\rangle = 0$ e
+          $\boxed{\sigma_x = \sqrt N}$.</p>
+      </div>
+
+      <p>Questo è <strong>il risultato più riutilizzabile di tutta la lezione</strong>. Con la moneta equa
+        l'ubriaco in media non si allontana affatto — è ugualmente probabile che finisca a destra o a sinistra
+        — ma la sua <em>distanza tipica</em> dal lampione cresce come la radice del numero di passi. Per
+        allontanarsi il doppio servono quattro volte i passi; per allontanarsi dieci volte tanto, cento volte
+        i passi.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="rw-modo"></div>
+        <div class="ctrl">
+          <label>numero di passi $N$: <span class="val-badge" id="rw-nv">40</span></label>
+          <input type="range" id="rw-n" min="4" max="120" step="2" value="40">
+          <label>probabilità di andare a destra: <span class="val-badge" id="rw-pv">0,50</span></label>
+          <input type="range" id="rw-p" min="0.1" max="0.9" step="0.05" value="0.5">
+          <span class="toggle-row"><input type="checkbox" id="rw-lock" checked>
+            <label for="rw-lock">🔒 blocca la scala</label></span>
+        </div>
+        <svg id="rw-svg" viewBox="0 0 680 330" role="img"
+             aria-label="Distribuzione della posizione finale di una camminata aleatoria"></svg>
+        <p class="cap">In alto la distribuzione esatta (binomiale), sovrapposta alla gaussiana che
+          l'approssima; in basso qualche traiettoria.</p>
+        <div class="sp-cols">
+          <div>posizione media: <span class="val-badge" id="rw-med">—</span></div>
+          <div>scarto tipico $\sigma_x$: <span class="val-badge" id="rw-sig">—</span></div>
+          <div>$\sigma_x$ con moneta equa: <span class="val-badge" id="rw-sq">—</span></div>
+          <div>probabilità di tornare al via: <span class="val-badge" id="rw-zero">—</span></div>
+        </div>
+        <div class="eq-out" id="rw-out"></div>
+      </div>
+
+      <div class="curiosita"><strong>Lo stesso $\sqrt N$, tre volte in tre anni.</strong> Nella lezione 2 del
+        terzo anno l'errore su una media di $N$ misure va come $\sigma/\sqrt N$: per dimezzarlo servono quattro
+        volte i dati. Qui la distanza percorsa da un camminatore va come $\sqrt N$: per raddoppiarla servono
+        quattro volte i passi. E nella lezione 5 del quinto anno la stima Monte Carlo converge come
+        $1/\sqrt N$. <strong>È sempre lo stesso teorema</strong> — il teorema del limite centrale — visto da tre
+        angolazioni diverse. Quando somme di cose indipendenti si accumulano, il totale cresce come il numero
+        di addendi e le fluttuazioni come la sua radice; il loro rapporto, cioè l'errore relativo, cala.</div>
+
+      <p>Provate ora a spostare il cursore della probabilità. Con una moneta <strong>non equa</strong>, o con
+        un dado in cui quattro facce su sei mandano a destra, la camminata acquista una <em>deriva</em>: la
+        posizione media cresce linearmente con $N$ mentre le fluttuazioni continuano a crescere come $\sqrt N$.
+        Prima o poi la deriva vince, e il moto diventa praticamente deterministico. È la differenza fra il
+        percorso di una molecola in un gas fermo e quello in un gas che soffia.</p>
+
+      <div class="warnbox"><strong>In più dimensioni cambia poco, e cambia tutto.</strong> In due o tre
+        dimensioni ogni componente è una camminata indipendente, quindi $\langle r^2\rangle = \langle x^2
+        \rangle + \langle y^2\rangle + \ldots$ e la distanza tipica va ancora come $\sqrt N$. Ma c'è una
+        differenza qualitativa scoperta da <strong>Pólya</strong> nel 1921: in una e in due dimensioni la
+        camminata torna al punto di partenza con probabilità $1$, prima o poi; in <strong>tre</strong>
+        dimensioni no — la probabilità di tornare è circa $0{,}34$. Come disse Shizuo Kakutani: «un ubriaco
+        prima o poi trova la strada di casa, un uccello ubriaco può perdersi per sempre».</div>
+    </section>
+
+    <!-- 7 — I MERCATI AZIONARI -->
+    <section id="sec7">
+      <h2>7. Un'applicazione inattesa: i mercati azionari</h2>
+
+      <p>Un'<strong>azione</strong> è una quota di proprietà di una società: chi la possiede possiede una
+        frazione dell'azienda, dei suoi utili e dei suoi debiti. Il suo <em>prezzo</em> non è deciso da
+        nessuno — è semplicemente il prezzo a cui, in questo istante, qualcuno è disposto a comprarla e
+        qualcun altro a venderla.</p>
+
+      <p>Quel prezzo cambia di continuo, spinto da moltissime cause indipendenti: notizie, bilanci, umori,
+        decisioni di migliaia di operatori. Ed è esattamente la situazione della camminata aleatoria — tanti
+        contributi piccoli e indipendenti che si sommano. Lo notò per primo <strong>Louis Bachelier</strong>
+        nel 1900, nella sua tesi di dottorato: <em>cinque anni prima di Einstein</em>, e con la stessa
+        matematica.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il modello più semplice</div>
+        $$\frac{\Delta S}{S} = \mu\,\Delta t + \sigma\,\varepsilon\sqrt{\Delta t}$$
+        <p class="formula-note">La <em>variazione percentuale</em> del prezzo $S$ ha una parte prevedibile (la
+          deriva $\mu$, la tendenza di fondo) e una casuale, con $\varepsilon$ estratto da una gaussiana
+          standard. Il parametro $\sigma$ si chiama <strong>volatilità</strong> ed è la misura del rischio. Si
+          lavora sulle variazioni <em>relative</em> perché un euro di variazione significa cose diverse per
+          un'azione da $10$ euro e per una da $1000$.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>rendimento atteso $\mu$: <span class="val-badge" id="az-mv">6</span> % all'anno</label>
+          <input type="range" id="az-m" min="-10" max="20" step="1" value="6">
+          <label>volatilità $\sigma$: <span class="val-badge" id="az-sv">20</span> % all'anno</label>
+          <input type="range" id="az-s" min="5" max="60" step="1" value="20">
+        </div>
+        <div class="ctrl">
+          <label>quanti scenari: <span class="val-badge" id="az-kv">8</span></label>
+          <input type="range" id="az-k" min="1" max="24" step="1" value="8">
+          <span class="toggle-row"><input type="checkbox" id="az-lock" checked>
+            <label for="az-lock">🔒 blocca la scala</label></span>
+        </div>
+        <svg id="az-svg" viewBox="0 0 680 330" role="img"
+             aria-label="Simulazione di scenari di prezzo di un'azione su dieci anni"></svg>
+        <p class="cap">Dieci anni di storia simulata, partendo da $100$ euro. Tutti gli scenari hanno gli
+          stessi parametri: cambia solo il caso.</p>
+        <div class="sp-cols">
+          <div>valore atteso a 10 anni: <span class="val-badge" id="az-att">—</span></div>
+          <div>scenario migliore: <span class="val-badge" id="az-max">—</span></div>
+          <div>scenario peggiore: <span class="val-badge" id="az-min">—</span></div>
+          <div>in quanti hanno perso: <span class="val-badge" id="az-perd">—</span></div>
+        </div>
+        <div class="eq-out" id="az-out"></div>
+      </div>
+
+      <p>La cosa da guardare non è quale scenario «vince», ma <strong>quanto sono diversi fra loro</strong> pur
+        avendo gli stessi identici parametri. È il punto che il modello insegna meglio di qualunque discorso:
+        con volatilità alta, la storia effettivamente accaduta dice pochissimo su quella che poteva accadere.
+        Guardare il grafico di un'azione salita del $200\%$ e concluderne che il gestore era bravo è, con
+        buona probabilità, un caso di <em>pregiudizio di sopravvivenza</em> — lo stesso di cui si parla nella
+        lezione 8 di Matematica del secondo anno.</p>
+
+      <div class="warnbox"><strong>Il modello è troppo semplice, e si sa dove.</strong> Le variazioni reali dei
+        prezzi <em>non</em> sono gaussiane: hanno <strong>code grasse</strong>, cioè eventi estremi molto più
+        frequenti di quanto la gaussiana preveda. Un crollo come quello del 19 ottobre 1987 — meno $22\%$ in un
+        giorno — secondo un modello gaussiano dovrebbe capitare una volta ogni molti miliardi di età
+        dell'universo; è capitato. Benoît Mandelbrot lo segnalava già negli anni Sessanta e fu largamente
+        ignorato. Le versioni serie del modello aggiungono volatilità variabile nel tempo, salti, memoria — e
+        restano modelli.</div>
+    </section>
+
+    <!-- 8 — MICROSTATI, MACROSTATI, ENTROPIA -->
+    <section id="sec8">
+      <h2>8. Microstati, macrostati e il ritorno dell'entropia</h2>
+
+      <p>Torniamo alla domanda di fondo: che cos'è lo <em>stato</em> di un sistema? Ne abbiamo già visto uno,
+        quello macroscopico: tre o quattro numeri — pressione, volume, temperatura — e basta. Ma esiste anche
+        una descrizione completa.</p>
+
+      <div class="definition">
+        <div class="formula-title">Microstato e macrostato</div>
+        <p>Il <strong>microstato</strong> è la specifica completa di posizione e quantità di moto di
+          <em>ogni</em> particella. Il <strong>macrostato</strong> è quello che possiamo misurare: pochi numeri
+          medi.</p>
+        <p class="formula-note">Per $N$ particelle il microstato è un punto in uno spazio a $6N$ dimensioni —
+          lo <strong>spazio delle fasi</strong> già incontrato nella lezione 5. Con
+          $N \approx 10^{23}$ le dimensioni sono $6\times10^{23}$: un numero così grande che per molti scopi
+          conviene trattarlo come infinito. Per disegnare qualcosa ci si accontenta di seguire un campione di
+          particelle, tracciando la loro posizione e la loro quantità di moto.</p>
+      </div>
+
+      <p>Il punto cruciale è che <strong>a un macrostato corrispondono moltissimi microstati diversi</strong>.
+        Scambiare due molecole d'aria in questa stanza produce un microstato completamente diverso e un
+        macrostato identico: nessuno strumento potrebbe accorgersene.</p>
+
+      <h3>8.1 — Il sistema a due stati</h3>
+
+      <p>Prendiamo il caso più semplice possibile: $N$ particelle in un recipiente diviso idealmente a metà, e
+        come unica informazione «a destra o a sinistra». Il macrostato è il numero $k$ di particelle a
+        sinistra; il microstato dice <em>quali</em>. Il numero di microstati per ciascun macrostato è il
+        coefficiente binomiale $\binom{N}{k}$.</p>
+
+      <p>Con $N = 4$: c'è <strong>un solo</strong> modo di avere tutte e quattro a sinistra, e <strong>sei</strong>
+        modi di averne due e due. Con $N = 100$ il rapporto diventa $10^{29}$. Con $N = 10^{23}$ il rapporto ha
+        un numero di cifre che non sta su questa pagina.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>numero di particelle: <span class="val-badge" id="ms-nv">30</span></label>
+          <input type="range" id="ms-n" min="4" max="60" step="2" value="30">
+          <label>passi di rimescolamento: <span class="val-badge" id="ms-tv">0</span></label>
+          <input type="range" id="ms-t" min="0" max="400" step="1" value="0">
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="ms-go" type="button">▶ avvia</button>
+          <button class="btn btn-secondary" id="ms-stop" type="button">⏸ ferma</button>
+          <button class="btn btn-secondary" id="ms-reset" type="button">↺ tutte a sinistra</button>
+        </div>
+        <svg id="ms-svg" viewBox="0 0 680 340" role="img"
+             aria-label="Modello a due stati: particelle che passano da una metà all'altra"></svg>
+        <p class="cap">A ogni passo si sceglie una particella a caso e la si sposta nell'altra metà: è il
+          modello delle urne di Ehrenfest. Si parte con tutte a sinistra.</p>
+        <div class="sp-cols">
+          <div>particelle a sinistra: <span class="val-badge" id="ms-k">—</span></div>
+          <div>microstati di questo macrostato: <span class="val-badge" id="ms-w">—</span></div>
+          <div>entropia $S = k_B\ln W$: <span class="val-badge" id="ms-s">—</span></div>
+          <div>attesa per tornare tutte a sinistra: <span class="val-badge" id="ms-att">—</span></div>
+        </div>
+        <div class="eq-out" id="ms-out"></div>
+      </div>
+
+      <p>Avviate la simulazione partendo da tutte a sinistra e guardate che cosa succede. Il sistema si porta
+        rapidamente verso metà e metà, e lì resta a oscillare. <strong>Nessuna legge glielo impone</strong>: a
+        ogni passo la particella scelta ha la stessa probabilità di andare in un verso o nell'altro. Il sistema
+        va verso il centro semplicemente perché <em>là ci sono più microstati</em>.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">L'entropia di Boltzmann, per la seconda volta</div>
+        $$S = k_B \ln W$$
+        <p class="formula-note">$W$ è il numero di microstati compatibili col macrostato. È la stessa formula
+          della lezione 8, ma adesso abbiamo il diritto di scriverla: sappiamo che cosa sono i microstati e
+          perché contarli.</p>
+      </div>
+
+      <h3>8.2 — Perché proprio il logaritmo</h3>
+
+      <p>Tre motivi, in ordine di importanza.</p>
+
+      <div class="method">
+        <p><span class="step-num">1</span><strong>L'additività.</strong> Se si mettono insieme due sistemi
+          indipendenti, i microstati si <em>moltiplicano</em>: $W = W_1 W_2$. Ma l'entropia, come l'energia e
+          il volume, deve <strong>sommarsi</strong>: raddoppiando la quantità di materia deve raddoppiare.
+          L'unica funzione che trasforma prodotti in somme è il logaritmo — e questo, da solo, la determina a
+          meno di una costante.</p>
+        <p><span class="step-num">2</span><strong>La dimensione dei numeri.</strong> Per una mole $W$ è
+          dell'ordine di $10^{10^{23}}$: un numero con dieci miliardi di miliardi di miliardi di cifre. Il suo
+          logaritmo è un numero ordinario, che si scrive e si maneggia.</p>
+        <p><span class="step-num">3</span><strong>La comodità nei conti.</strong> Massimizzare $W$ e
+          massimizzare $\ln W$ è la stessa cosa, perché il logaritmo è crescente; ma con il logaritmo le
+          derivate dei prodotti diventano somme, e i conti si fanno.</p>
+      </div>
+
+      <p>La costante $k_B$, poi, non è arbitraria: è fissata dalla richiesta che questa entropia coincida
+        numericamente con quella di Clausius, $\Delta S = Q/T$, che era stata definita cinquant'anni prima su
+        basi puramente macroscopiche. Che due strade così diverse portino allo stesso numero è, francamente,
+        una delle cose più belle della fisica. E $k_B$ tornerà ancora, in un contesto che non c'entra
+        apparentemente nulla: nella lezione 12, nella legge che lega la temperatura di una stella alla luce
+        che emette.</p>
+
+      <div class="curiosita"><strong>Gli interruttori, e il gatto.</strong> Immaginate una parete con dieci
+        interruttori. Il <em>macrostato</em> «tre accesi» si realizza in $\binom{10}{3} = 120$ modi; il
+        macrostato «tutti spenti» in un modo solo. Se un gatto passeggia sulla parete premendo interruttori a
+        caso, lo troverete quasi sempre in configurazioni «intermedie», e quasi mai con tutti gli interruttori
+        allineati. Non perché al gatto piaccia il disordine: perché di configurazioni disordinate ce ne sono
+        di più. Questo è tutto il secondo principio. La parola «disordine» è un'analogia comoda ma va usata con
+        prudenza — l'entropia è un <em>conteggio</em>, non un giudizio estetico, e ci sono casi (i cristalli
+        liquidi, certe sospensioni colloidali) in cui il sistema si <em>ordina</em> spontaneamente proprio
+        perché così aumenta il numero totale di microstati.</div>
+
+      <h3>8.3 — La stessa formula fuori dalla fisica: Shannon</h3>
+
+      <p>Nel 1948 <strong>Claude Shannon</strong>, ai Bell Labs, cercava una misura di «quanta informazione»
+        contiene un messaggio. Arrivò a questa:</p>
+
+      $$H = -\sum_i p_i \log_2 p_i$$
+
+      <p>che è la formula di Boltzmann scritta per un caso più generale, in cui i microstati non sono
+        equiprobabili. Se lo sono tutti, con $W$ possibilità, si riduce a $H = \log_2 W$: identica a
+        $S = k_B\ln W$ a meno della base del logaritmo e della costante.</p>
+
+      <div class="definition">
+        <div class="formula-title">Come si interpreta</div>
+        <p>$H$ misura la <strong>sorpresa media</strong>, cioè quanti bit servono in media per comunicare
+          l'esito. Un evento certo non porta informazione ($H = 0$); un lancio di moneta equa porta esattamente
+          $1$ bit; una lettera dell'alfabeto italiano ne porterebbe $\log_2 21 = 4{,}4$ se le lettere fossero
+          equiprobabili — ma non lo sono, e il valore vero è intorno a $4$.</p>
+        <p class="formula-note">Da qui nasce tutta la <strong>compressione dei dati</strong>: un file si può
+          comprimere esattamente fino alla sua entropia, e non oltre. Il fatto che i file di testo si
+          comprimano molto e quelli già compressi per niente è una conseguenza diretta di questo teorema.</p>
+      </div>
+
+      <p>Che entropia termodinamica ed entropia informativa siano <em>la stessa grandezza</em> e non solo
+        analoghe è stato chiarito dal <strong>principio di Landauer</strong> visto nella lezione 8: cancellare
+        un bit di informazione costa almeno $k_BT\ln 2$ di energia dissipata. L'informazione è fisica.</p>
+
+      <div class="curiosita"><strong>Perché si chiama entropia.</strong> Shannon non sapeva che nome dare alla
+        sua grandezza. Il racconto — riferito da lui stesso — è che fu von Neumann a suggerirglielo:
+        «chiamala entropia, per due motivi. Primo, la tua funzione di incertezza è già stata usata in
+        meccanica statistica con quel nome. Secondo, e più importante: nessuno sa davvero che cosa sia
+        l'entropia, quindi in una discussione avrai sempre un vantaggio».</div>
+    </section>
+
+    <!-- 9 — FUNZIONE DI PARTIZIONE (facoltativa) -->
+    <section id="sec9" class="optional">
+      <h2>9. La funzione di partizione</h2>
+
+      <p>Tutto quello che abbiamo fatto finora si può riassumere in un unico oggetto matematico, dal quale si
+        ricavano <em>tutte</em> le proprietà termodinamiche del sistema derivando. È la macchina più potente
+        della meccanica statistica.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Funzione di partizione</div>
+        $$Z = \sum_i e^{-E_i/(k_BT)}$$
+        <p class="formula-note">La somma corre su tutti gli stati accessibili al sistema, con $E_i$ l'energia
+          dello stato $i$. Il fattore $e^{-E/k_BT}$ si chiama <strong>fattore di Boltzmann</strong> ed esprime
+          la probabilità relativa di trovare il sistema in quello stato: gli stati ad alta energia sono
+          esponenzialmente rari.</p>
+      </div>
+
+      <p>La lettera $Z$ viene dal tedesco <em>Zustandssumme</em>, «somma sugli stati». E il motivo per cui è
+        così importante è questo elenco:</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>grandezza</th><th>si ottiene da $Z$ così</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">energia media</td><td>$\langle E\rangle = k_BT^2\dfrac{\partial \ln Z}{\partial T}$</td></tr>
+            <tr><td class="lab">energia libera</td><td>$F = -k_BT\ln Z$</td></tr>
+            <tr><td class="lab">entropia</td><td>$S = -\dfrac{\partial F}{\partial T}$</td></tr>
+            <tr><td class="lab">pressione</td><td>$p = -\dfrac{\partial F}{\partial V}$</td></tr>
+            <tr><td class="lab">calore specifico</td><td>$C_V = \dfrac{\partial \langle E\rangle}{\partial T}$</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Cioè: <strong>se sapete calcolare $Z$, sapete tutto</strong>. Non serve altro. Tutta la
+        termodinamica di un sistema — la sua equazione di stato, i suoi calori specifici, le sue transizioni di
+        fase — è codificata in quella somma, e il lavoro del fisico statistico si riduce a saperla fare.
+        Ricavare $pV = Nk_BT$ dalla $Z$ del gas perfetto è un esercizio di poche righe.</p>
+
+      <div class="curiosita"><strong>Dove è finita la funzione di partizione.</strong> È sconfinata parecchio
+        oltre la fisica, e sempre per la stessa ragione: descrive un sistema di molte parti che interagiscono e
+        che tende a minimizzare qualcosa. La si trova nei <strong>modelli di reti neurali</strong> — la
+        prossima lezione — dove l'«energia» è l'errore da minimizzare e la «temperatura» un parametro che
+        regola quanto la ricerca è disposta a esplorare (è il <em>simulated annealing</em>, la
+        ricottura simulata). La si trova nella <strong>biologia molecolare</strong>, per prevedere come si
+        ripiega una proteina. La si trova nell'<strong>economia</strong>, nei modelli di scelta discreta di
+        McFadden — Nobel nel 2000 — dove le «energie» sono le utilità delle alternative. Il formalismo è
+        sempre lo stesso; cambia il significato dei simboli.</div>
+    </section>
+
+    <!-- 10 — EQUILIBRIO E LONTANO DALL'EQUILIBRIO -->
+    <section id="sec10">
+      <h2>10. Quando il sistema non è all'equilibrio</h2>
+
+      <p>C'è un limite di cui non abbiamo mai parlato, e che riguarda tutto quello che abbiamo fatto: la
+        meccanica statistica che abbiamo costruito vale <strong>all'equilibrio</strong>. Un gas in un
+        recipiente chiuso, lasciato in pace abbastanza a lungo. È la situazione più semplice, ed è anche —
+        guardandosi intorno — la meno frequente.</p>
+
+      <p>Il sistema più interessante che conosciamo, un essere vivente, non è all'equilibrio nemmeno per un
+        istante: attraversato da flussi continui di materia ed energia, raggiunge l'equilibrio solo quando
+        muore. Lo stesso vale per l'atmosfera, per una fiamma, per una città.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il caso più semplice fuori dall'equilibrio: la diffusione</div>
+        $$J = -D\,\frac{\partial c}{\partial x} \qquad\Longrightarrow\qquad
+        \frac{\partial c}{\partial t} = D\,\frac{\partial^2 c}{\partial x^2}$$
+        <p class="formula-note">La prima è la <strong>legge di Fick</strong> (1855): il flusso di materia è
+          proporzionale al gradiente di concentrazione, e il segno meno dice che va dal molto al poco. Unendola
+          alla conservazione della materia si ottiene l'<strong>equazione di diffusione</strong>, che è la
+          stessa equazione della propagazione del calore per conduzione — e la stessa che descrive il moto
+          browniano dal punto di vista della densità di probabilità.</p>
+      </div>
+
+      <p>Notate la struttura: <em>flusso proporzionale alla causa che lo produce</em>. È la stessa forma della
+        legge di Ohm, della conduzione termica di Fourier, della viscosità di Newton. Queste sono le relazioni
+        <strong>lineari</strong>, valide <em>vicino</em> all'equilibrio, dove le forze che spingono sono
+        piccole. Lì la teoria è solida e c'è persino un principio di ottimo — il sistema sceglie lo stato che
+        <em>minimizza</em> la produzione di entropia.</p>
+
+      <div class="warnbox"><strong>Lontano dall'equilibrio le cose cambiano radicalmente.</strong> Quando i
+        gradienti diventano grandi le relazioni smettono di essere lineari, e succede una cosa
+        controintuitiva: il sistema può <strong>organizzarsi spontaneamente</strong>. Un fluido scaldato da
+        sotto, oltre una certa soglia, smette di condurre calore e forma celle di convezione esagonali
+        regolarissime — le <em>celle di Bénard</em>. Certe reazioni chimiche, come quella di
+        Belousov-Zhabotinsky, oscillano periodicamente di colore invece di andare all'equilibrio, e il loro
+        scopritore fece fatica a farsi pubblicare perché i revisori dicevano che violava il secondo
+        principio. Non lo violava: erano sistemi <em>aperti</em>.</div>
+
+      <p><strong>Ilya Prigogine</strong> chiamò questi oggetti <em>strutture dissipative</em> e ne fece la
+        teoria, prendendo il Nobel per la chimica nel 1977. L'idea centrale è che <strong>l'ordine può nascere
+        dal flusso</strong>: un sistema attraversato da una corrente di energia può creare e mantenere
+        strutture complesse, pagandole con l'entropia che esporta all'esterno. È il quadro concettuale in cui
+        si inserisce la vita — ed è il motivo per cui la frase «la vita viola il secondo principio» è, oltre
+        che sbagliata, esattamente all'incontrario.</p>
+
+      <p class="formula-note">Un'ultima avvertenza sull'ambito: quest'anno tutti i sistemi sono
+        <strong>classici</strong>, cioè le particelle sono distinguibili e le energie continue. I sistemi
+        quantistici hanno statistiche diverse — di Bose-Einstein e di Fermi-Dirac — che cambiano tutto alle
+        basse temperature: il calore specifico dei solidi, i superconduttori, i laser, le stelle di neutroni.
+        Se ne parlerà il prossimo anno.</p>
+    </section>
+
+    <!-- 11 — LA PERCOLAZIONE -->
+    <section id="sec11">
+      <h2>11. La percolazione: quando un dettaglio cambia tutto di colpo</h2>
+
+      <p>Il nome viene dal caffè: <em>percolare</em> è quello che fa l'acqua che attraversa la polvere nella
+        moka. La domanda matematica è: se un mezzo è fatto di pezzi permeabili e impermeabili disposti a caso,
+        <strong>a partire da quale frazione di pezzi permeabili il liquido riesce ad attraversarlo tutto?</strong></p>
+
+      <div class="definition">
+        <div class="formula-title">Il modello</div>
+        <p>Si prende una griglia quadrata. Ogni casella è <strong>occupata</strong> con probabilità $p$ e vuota
+          con probabilità $1-p$, in modo indipendente. Due caselle occupate adiacenti (sopra, sotto, destra,
+          sinistra) appartengono allo stesso <strong>grappolo</strong>. Ci si chiede se esiste un grappolo che
+          va da un bordo all'altro.</p>
+      </div>
+
+      <p>Si potrebbe pensare che la cosa cambi gradualmente: più caselle occupate, più è probabile
+        attraversare. E invece no. Esiste una <strong>probabilità critica</strong> $p_c$ sotto la quale
+        l'attraversamento è praticamente impossibile e sopra la quale è praticamente certo, e il passaggio
+        avviene in un intervallo strettissimo. È una <strong>transizione di fase</strong>, del tutto analoga
+        alla fusione di un solido.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="pc-modo"></div>
+        <div class="ctrl">
+          <label>densità $p$: <span class="val-badge" id="pc-pv">0,55</span></label>
+          <input type="range" id="pc-p" min="0.05" max="0.95" step="0.01" value="0.55">
+          <label>lato della griglia: <span class="val-badge" id="pc-lv">40</span></label>
+          <input type="range" id="pc-l" min="16" max="70" step="2" value="40">
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="pc-new" type="button">🎲 rigenera</button>
+          <span class="toggle-row"><input type="checkbox" id="pc-pac">
+            <label for="pc-pac">effetto Pac-Man (bordi periodici)</label></span>
+        </div>
+        <svg id="pc-svg" viewBox="0 0 680 350" role="img"
+             aria-label="Griglia di percolazione con il grappolo che attraversa evidenziato"></svg>
+        <p class="cap">In azzurro le caselle occupate, in magenta il grappolo che tocca il bordo sinistro (o
+          il fuoco che si propaga). A destra la frazione bruciata in funzione di $p$.</p>
+        <div class="sp-cols">
+          <div>caselle occupate: <span class="val-badge" id="pc-occ">—</span></div>
+          <div>grappolo più grande: <span class="val-badge" id="pc-gra">—</span></div>
+          <div>attraversa?: <span class="val-badge" id="pc-att">—</span></div>
+          <div>soglia critica teorica: <span class="val-badge" id="pc-pc">—</span></div>
+        </div>
+        <div class="eq-out" id="pc-out"></div>
+      </div>
+
+      <h3>11.1 — L'incendio nella foresta</h3>
+
+      <p>La versione più intuitiva del modello è questa: la griglia è una foresta, le caselle occupate sono
+        alberi, e si dà fuoco a tutti gli alberi della colonna di sinistra. Il fuoco passa da un albero a un
+        vicino adiacente. La domanda diventa: <strong>l'incendio arriva dall'altra parte?</strong></p>
+
+      <p>Muovete il cursore della densità e guardate la frazione bruciata. Con $p = 0{,}45$ l'incendio si
+        spegne quasi subito; con $p = 0{,}70$ brucia praticamente tutto; e in mezzo, intorno a
+        $p_c \simeq 0{,}5927$, il comportamento cambia bruscamente. Ed è lì, esattamente lì, che compaiono i
+        grappoli più belli: strutture ramificate su tutte le scale, <strong>frattali</strong>, dove togliere un
+        solo albero può fare la differenza fra un incendio locale e un disastro.</p>
+
+      <div class="curiosita"><strong>L'effetto Pac-Man, e perché serve.</strong> Una griglia finita ha un
+        problema fastidioso: i bordi. Le caselle sul bordo hanno meno vicini di quelle interne, e questo
+        falsa le statistiche proprio dove il fenomeno è più delicato. Il trucco standard è dichiarare che
+        <strong>il bordo destro confina col sinistro e quello alto col basso</strong>: uscendo da una parte si
+        rientra dall'altra, come nel videogioco. Tecnicamente si chiamano <em>condizioni al contorno
+        periodiche</em>, e la griglia diventa la superficie di una ciambella. Non è un imbroglio: è il modo più
+        pulito di simulare un sistema infinito con un calcolatore finito, ed è usato ovunque, dalla dinamica
+        molecolare alla cosmologia.</div>
+
+      <div class="warnbox"><strong>Un problema risolto in due dimensioni e aperto in tre.</strong> Per la
+        percolazione di <em>legame</em> su reticolo quadrato si sa dimostrare che $p_c = 1/2$ esattamente,
+        e il risultato è del 1980. Per la percolazione di <em>sito</em>, quella del nostro simulatore, il
+        valore $0{,}592746\ldots$ è noto solo <strong>numericamente</strong>, con una ventina di cifre e
+        nessuna formula chiusa. E in tre dimensioni non si sa dimostrare quasi niente: $p_c \approx 0{,}3116$
+        è un dato di calcolatore. È uno dei tanti casi in cui un modello formulabile in due righe resiste da
+        mezzo secolo.</div>
+
+      <p>Il modello ha applicazioni serie e concrete: la diffusione dei liquidi nelle rocce porose (da cui il
+        nome), la conduzione elettrica nei materiali compositi, la robustezza delle reti — e soprattutto le
+        <strong>epidemie</strong>. Se ogni individuo contagia in media $R_0$ persone, la trasmissione è un
+        processo di percolazione sulla rete dei contatti, e la soglia critica è $R_0 = 1$: sotto, l'epidemia si
+        spegne da sola; sopra, dilaga. Vaccinare una frazione della popolazione equivale a togliere caselle
+        dalla griglia, e l'<em>immunità di gregge</em> è esattamente il portare il sistema sotto la soglia di
+        percolazione. La matematica è la stessa dell'incendio nella foresta.</p>
+    </section>
+
+    <!-- 12 — LORENZ E IL CAOS -->
+    <section id="sec12">
+      <h2>12. Le equazioni di Lorenz, e i limiti del prevedere</h2>
+
+      <p>Chiudiamo con un problema che sta al confine fra la meccanica statistica e tutto il resto. Nel 1963
+        <strong>Edward Lorenz</strong>, meteorologo al MIT, studiava un modello semplificatissimo della
+        convezione atmosferica: tre equazioni, tre variabili, nessuna casualità.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il sistema di Lorenz</div>
+        $$\dot x = \sigma(y - x) \qquad \dot y = x(\rho - z) - y \qquad \dot z = xy - \beta z$$
+        <p class="formula-note">Con i valori classici $\sigma = 10$, $\rho = 28$, $\beta = 8/3$. Le tre
+          variabili rappresentano, molto alla lontana, l'intensità della convezione e due gradienti di
+          temperatura. Sono equazioni <strong>deterministiche</strong>: dato lo stato iniziale, il futuro è
+          completamente determinato.</p>
+      </div>
+
+      <p>Deterministiche, ma non prevedibili. Lorenz se ne accorse per caso: rilanciando una simulazione a
+        partire da valori stampati su carta — arrotondati alla terza cifra invece che alla sesta — ottenne una
+        previsione completamente diversa dopo poche settimane simulate. La differenza iniziale era di una parte
+        su mille, e si era amplificata fino a cambiare tutto.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>parametro $\rho$: <span class="val-badge" id="lz-rv">28</span></label>
+          <input type="range" id="lz-r" min="1" max="45" step="0.5" value="28">
+          <label>differenza iniziale: <span class="val-badge" id="lz-dv">1e-5</span></label>
+          <input type="range" id="lz-d" min="-9" max="-2" step="1" value="-5">
+        </div>
+        <div class="ctrl">
+          <label>durata: <span class="val-badge" id="lz-tv">30</span> unità di tempo</label>
+          <input type="range" id="lz-t" min="5" max="60" step="1" value="30">
+          <span class="toggle-row"><input type="checkbox" id="lz-lock" checked>
+            <label for="lz-lock">🔒 blocca la scala</label></span>
+        </div>
+        <svg id="lz-svg" viewBox="0 0 680 340" role="img"
+             aria-label="Attrattore di Lorenz e divergenza di due traiettorie vicine"></svg>
+        <p class="cap">A sinistra la traiettoria nel piano $x$-$z$; a destra la distanza fra due traiettorie
+          che partono quasi dallo stesso punto, in scala logaritmica.</p>
+        <div class="sp-cols">
+          <div>distanza iniziale: <span class="val-badge" id="lz-d0">—</span></div>
+          <div>distanza finale: <span class="val-badge" id="lz-df">—</span></div>
+          <div>fattore di amplificazione: <span class="val-badge" id="lz-amp">—</span></div>
+          <div>comportamento: <span class="val-badge" id="lz-com">—</span></div>
+        </div>
+        <div class="eq-out" id="lz-out"></div>
+      </div>
+
+      <p>Il grafico di destra è la cosa da guardare: la distanza fra le due traiettorie cresce
+        <strong>esponenzialmente</strong>, cioè una retta in scala logaritmica. La pendenza di quella retta è
+        l'<em>esponente di Lyapunov</em>, e misura quanto in fretta si perde l'informazione iniziale. Finché la
+        distanza resta piccola le due traiettorie sono indistinguibili; quando raggiunge le dimensioni
+        dell'attrattore, ogni previsione è finita.</p>
+
+      <div class="definition">
+        <div class="formula-title">Caos deterministico</div>
+        <p>Un sistema è <strong>caotico</strong> se è deterministico ma <em>dipende in modo sensibile dalle
+          condizioni iniziali</em>: due stati iniziali arbitrariamente vicini divergono esponenzialmente. Non
+          c'è nessun caso, nessuna casualità: c'è solo l'impossibilità pratica di conoscere lo stato iniziale
+          con precisione infinita.</p>
+        <p class="formula-note">La conseguenza è brutale e quantitativa: se l'errore raddoppia ogni giorno, per
+          guadagnare <em>una settimana</em> di previsione bisogna migliorare le misure iniziali di un fattore
+          $128$. È il motivo per cui le previsioni del tempo sono buone a tre giorni, discrete a sette e prive
+          di senso a trenta — e non è un problema di calcolatori: è una proprietà dell'atmosfera.</p>
+      </div>
+
+      <p>Abbassate il cursore di $\rho$ sotto $24$ e guardate che cosa succede: il caos sparisce e il sistema
+        si acquieta in un ciclo o in un punto. <strong>Il caos non è generico, è un regime</strong>: gli stessi
+        identici equazioni, con parametri diversi, si comportano in modo del tutto ordinato. La transizione fra
+        i due regimi avviene a un valore preciso, ed è ancora una volta una specie di transizione di fase.</p>
+
+      <div class="curiosita"><strong>L'effetto farfalla, e il titolo che non era di Lorenz.</strong> La frase
+        «il battito d'ali di una farfalla in Brasile può provocare un tornado in Texas» è il titolo di una
+        conferenza del 1972 — scritto però dall'organizzatore, non da Lorenz, che non aveva mandato il titolo
+        in tempo. Lorenz nei suoi primi lavori parlava di un gabbiano. La forma dell'attrattore, che assomiglia
+        a una farfalla, è una coincidenza che ha aiutato molto la fortuna dell'immagine. Una precisazione che
+        conta: la farfalla non «causa» il tornado più di qualunque altra cosa — semplicemente, in un sistema
+        caotico ogni dettaglio finisce per contare, e questo rende priva di senso l'idea stessa di isolare una
+        causa.</div>
+
+      <div class="note">
+        <strong>Dove ci lascia questa lezione.</strong> Abbiamo cominciato rinunciando a seguire le singole
+        particelle e finiamo scoprendo che, anche potendo, non servirebbe: in un sistema caotico la conoscenza
+        esatta dello stato iniziale è irraggiungibile per principio pratico, e la descrizione statistica non è
+        un ripiego ma <em>l'unica descrizione sensata</em>. La meccanica statistica, nata come scorciatoia, si
+        è rivelata il modo giusto di guardare i sistemi con molte parti — cioè, guardandosi intorno,
+        praticamente tutti. Nella prossima lezione la stessa matematica servirà a descrivere una rete di
+        neuroni.
+      </div>
+    </section>
+
+    <!-- 13 — QUIZ -->
+    <section id="quiz">
+      <h2>13. Quiz finale</h2>
+      <p>Dodici domande a risposta multipla e due aperte, dal gas perfetto al caos.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 10 — La meccanica statistica · Fisica · Quarto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nc(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      var KB = 1.380649e-23, NAV = 6.02214076e23;
+
+      var STOP = [];
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { STOP.forEach(function (f) { f(); }); }
+      });
+      window.addEventListener('pagehide', function () { STOP.forEach(function (f) { f(); }); });
+
+      /* ============ 1 — IL GAS NEL RECIPIENTE ============ */
+      (function () {
+        var svg = document.getElementById('gm-svg');
+        if (!svg) { return; }
+        // simulazione bidimensionale in unita' del simulatore: m = 1, kB = 1,
+        // temperatura normalizzata a 1 quando lo slider segna 300 K
+        var MN2 = 28.014e-3 / NAV;
+        var raf = null, ultimo = 0, seme = 20260814;
+        var part = [], impulso = 0, tempo = 0, urti = 0, scie = [];
+
+        function rnd() { seme = (seme * 16807) % 2147483647; return (seme - 1) / 2147483646; }
+        function gauss() {
+          var u = Math.max(1e-12, rnd()), v = rnd();
+          return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+        }
+
+        function crea() {
+          var N = parseInt(document.getElementById('gm-n').value, 10);
+          var Ts = parseFloat(document.getElementById('gm-t').value) / 300;
+          var Lb = parseFloat(document.getElementById('gm-l').value);
+          var sig = Math.sqrt(Ts);          // deviazione di ciascuna componente: sqrt(kT/m)
+          part = [];
+          scie = [];
+          seme = 20260814;
+          for (var i = 0; i < N; i++) {
+            part.push({ x: rnd() * Lb, y: rnd() * Lb, vx: gauss() * sig, vy: gauss() * sig });
+            scie.push([]);
+          }
+          impulso = 0; tempo = 0; urti = 0;
+        }
+
+        function passo(dt) {
+          var Lb = parseFloat(document.getElementById('gm-l').value);
+          for (var i = 0; i < part.length; i++) {
+            var p = part[i];
+            p.x += p.vx * dt; p.y += p.vy * dt;
+            if (p.x < 0) { p.x = -p.x; p.vx = -p.vx; }
+            if (p.x > Lb) { impulso += 2 * Math.abs(p.vx); urti++; p.x = 2 * Lb - p.x; p.vx = -p.vx; }
+            if (p.y < 0) { p.y = -p.y; p.vy = -p.vy; }
+            if (p.y > Lb) { p.y = 2 * Lb - p.y; p.vy = -p.vy; }
+          }
+          tempo += dt;
+        }
+
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+        STOP.push(ferma);
+
+        function tick(ts) {
+          var dt = ultimo ? Math.min(0.03, (ts - ultimo) / 1000) : 0.016;
+          ultimo = ts;
+          var k;
+          for (k = 0; k < 4; k++) { passo(dt / 4); }
+          if (document.getElementById('gm-scia').checked) {
+            for (k = 0; k < part.length; k++) {
+              scie[k].push([part[k].x, part[k].y]);
+              if (scie[k].length > 60) { scie[k].shift(); }
+            }
+          }
+          disegna();
+          if (raf) { raf = requestAnimationFrame(tick); }
+        }
+
+        function disegna() {
+          var N = part.length;
+          var Tk = parseFloat(document.getElementById('gm-t').value);
+          var Ts = Tk / 300;
+          var Lb = parseFloat(document.getElementById('gm-l').value);
+          var lock = document.getElementById('gm-lock').checked;
+          var A = Lb * Lb;
+          var pteo = N * Ts / A;
+          var pmis = tempo > 0 ? impulso / (tempo * Lb) : 0;
+          var vfis = Math.sqrt(2 * KB * Tk / MN2);
+          var BX = 30, BY = 44, BS = 280;
+          var sc = BS / Math.max(0.6, parseFloat(document.getElementById('gm-l').max));
+          var s = '', i;
+          s += '<rect x="' + BX + '" y="' + BY + '" width="' + (Lb * sc).toFixed(1) + '" height="' +
+            (Lb * sc).toFixed(1) + '" rx="4" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2.4"/>';
+          s += '<line x1="' + (BX + Lb * sc).toFixed(1) + '" y1="' + BY + '" x2="' + (BX + Lb * sc).toFixed(1) +
+            '" y2="' + (BY + Lb * sc).toFixed(1) + '" stroke="var(--magenta)" stroke-width="4"/>';
+          if (document.getElementById('gm-scia').checked) {
+            for (i = 0; i < scie.length; i++) {
+              if (scie[i].length < 2) { continue; }
+              var pts = scie[i].map(function (q) {
+                return (BX + q[0] * sc).toFixed(1) + ',' + (BY + q[1] * sc).toFixed(1);
+              });
+              s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="0.8" opacity="0.45"/>';
+            }
+          }
+          for (i = 0; i < part.length; i++) {
+            var v = Math.sqrt(part[i].vx * part[i].vx + part[i].vy * part[i].vy);
+            var f = Math.min(1, v / (2.6 * Math.sqrt(Ts)));
+            s += '<circle cx="' + (BX + part[i].x * sc).toFixed(1) + '" cy="' + (BY + part[i].y * sc).toFixed(1) +
+              '" r="3.4" fill="rgb(' + Math.round(60 + 190 * f) + ',' + Math.round(140 - 60 * f) + ',' +
+              Math.round(240 - 200 * f) + ')"/>';
+          }
+          s += '<text x="' + BX + '" y="32" class="lbl-s">simulazione 2D · rosso = veloce, blu = lento</text>';
+          s += '<text x="' + (BX + Lb * sc + 6).toFixed(1) + '" y="' + (BY + 14) +
+            '" style="fill:var(--magenta); font-size:11.5px;">parete</text>';
+          // le due pressioni a confronto
+          var GX = 360, GY0 = 300, GY1 = 60, GW = 90;
+          var PM = lock ? 900 : Math.max(10, pteo * 1.6);
+          var barre = [[pteo, 'teorica', 'var(--accent)'], [pmis, 'misurata', 'var(--magenta)']];
+          for (i = 0; i < 2; i++) {
+            var h = (GY0 - GY1) * Math.min(1, barre[i][0] / PM);
+            s += '<rect x="' + (GX + i * 130) + '" y="' + (GY0 - h).toFixed(1) + '" width="' + GW + '" height="' +
+              h.toFixed(1) + '" fill="' + barre[i][2] + '" opacity="0.45" stroke="' + barre[i][2] + '" stroke-width="2"/>';
+            s += '<text x="' + (GX + i * 130 + GW / 2) + '" y="' + (GY0 - h - 10).toFixed(1) +
+              '" text-anchor="middle" class="em">' + nc(barre[i][0], 1) + '</text>';
+            s += '<text x="' + (GX + i * 130 + GW / 2) + '" y="' + (GY0 + 18) + '" text-anchor="middle" class="lbl">' +
+              barre[i][1] + '</text>';
+          }
+          s += '<line x1="' + (GX - 12) + '" y1="' + GY0 + '" x2="' + (GX + 250) + '" y2="' + GY0 +
+            '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + (GX + 120) + '" y="46" text-anchor="middle" class="lbl-s">pressione, unità del simulatore</text>';
+          s += '<text x="' + (GX + 120) + '" y="' + (GY0 + 40) + '" text-anchor="middle" class="lbl-s">urti contati: ' +
+            urti + ' in ' + nc(tempo, 1) + ' unità di tempo</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('gm-nv').textContent = N;
+          document.getElementById('gm-tv').textContent = Math.round(Tk);
+          document.getElementById('gm-lv').textContent = nc(Lb, 1);
+          document.getElementById('gm-vrms').textContent = nc(vfis, 0) + ' m/s';
+          document.getElementById('gm-urti').textContent = urti;
+          document.getElementById('gm-pm').textContent = tempo > 0 ? nc(pmis, 2) : '—';
+          document.getElementById('gm-pt').textContent = nc(pteo, 2);
+          var el = document.getElementById('gm-out');
+          el.innerHTML = 'La pressione teorica è $p = Nk_BT/A = ' + N + ' \\cdot ' +
+            nc(Ts, 2).replace(',', '{,}') + '/' + nc(A, 2).replace(',', '{,}') + ' = ' +
+            nc(pteo, 2).replace(',', '{,}') + '$ (unità del simulatore, dove $k_B = 1$ e $m = 1$). ' +
+            (tempo > 2
+              ? 'Contando davvero gli urti si ottiene <strong>' + nc(pmis, 2) + '</strong>, cioè lo ' +
+                nc(pmis / pteo * 100, 1) + '% del previsto: la pressione <em>è</em> la pioggia di urti, e ' +
+                'più a lungo si aspetta più il conteggio si stabilizza — le fluttuazioni vanno come ' +
+                '$1/\\sqrt{\\text{urti}}$.'
+              : 'Premete «avvia» e lasciate correre qualche secondo: il conteggio degli urti deve convergere ' +
+                'al valore teorico.') +
+            ' Per l\'azoto a ' + Math.round(Tk) + ' K la velocità quadratica media vale ' + nc(vfis, 0) +
+            ' m/s.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['gm-n', 'gm-t', 'gm-l'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', function () { crea(); disegna(); });
+        });
+        ['gm-scia', 'gm-lock'].forEach(function (id) {
+          document.getElementById(id).addEventListener('change', disegna);
+        });
+        document.getElementById('gm-go').addEventListener('click', function () {
+          if (!raf) { ultimo = 0; raf = requestAnimationFrame(tick); }
+        });
+        document.getElementById('gm-stop').addEventListener('click', ferma);
+        crea();
+        disegna();
+      })();
+
+      /* ============ 4 — MAXWELL-BOLTZMANN ============ */
+      (function () {
+        var svg = document.getElementById('mb-svg');
+        if (!svg) { return; }
+        var GAS = [['idrogeno H₂', 2.016], ['elio He', 4.003], ['azoto N₂', 28.014],
+                   ['ossigeno O₂', 31.998], ['anidride carbonica CO₂', 44.010]];
+        var sel = 2;
+
+        function fdist(v, M, T) {
+          var m = M * 1e-3 / NAV;
+          var a = m / (2 * Math.PI * KB * T);
+          return 4 * Math.PI * Math.pow(a, 1.5) * v * v * Math.exp(-m * v * v / (2 * KB * T));
+        }
+
+        function disegna() {
+          var T = parseFloat(document.getElementById('mb-t').value);
+          var due = document.getElementById('mb-due').checked;
+          var lock = document.getElementById('mb-lock').checked;
+          var M = GAS[sel][1], m = M * 1e-3 / NAV;
+          var vp = Math.sqrt(2 * KB * T / m);
+          var vm = Math.sqrt(8 * KB * T / (Math.PI * m));
+          var vq = Math.sqrt(3 * KB * T / m);
+          var X0 = 66, X1 = 646, Y0 = 268, Y1 = 44;
+          var VM = lock ? 4200 : Math.max(600, vq * 3);
+          var FM = lock ? 4.2e-3 : fdist(vp, M, T) * 1.15;
+          var px = function (v) { return X0 + (X1 - X0) * v / VM; };
+          var py = function (f) { return Y0 - (Y0 - Y1) * Math.min(1.02, f / FM); };
+          var s = '', i;
+          if (due) {
+            var pts0 = [];
+            for (i = 0; i <= 300; i++) {
+              var v0 = VM * i / 300;
+              pts0.push(px(v0).toFixed(1) + ',' + py(fdist(v0, M, 300)).toFixed(1));
+            }
+            s += '<polyline points="' + pts0.join(' ') + '" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 4"/>';
+          }
+          var pts = [], area = [];
+          for (i = 0; i <= 300; i++) {
+            var v = VM * i / 300;
+            pts.push(px(v).toFixed(1) + ',' + py(fdist(v, M, T)).toFixed(1));
+            if (v >= 2 * vp) { area.push(px(v).toFixed(1) + ',' + py(fdist(v, M, T)).toFixed(1)); }
+          }
+          if (area.length > 1) {
+            s += '<polygon points="' + px(2 * vp).toFixed(1) + ',' + Y0 + ' ' + area.join(' ') + ' ' +
+              px(VM).toFixed(1) + ',' + Y0 + '" fill="var(--gold)" opacity="0.3"/>';
+          }
+          s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+          var segni = [[vp, 'v_p', 'var(--magenta)'], [vm, '⟨v⟩', 'var(--gold)'], [vq, 'v_rms', '#22c55e']];
+          for (i = 0; i < 3; i++) {
+            if (segni[i][0] > VM) { continue; }
+            s += '<line x1="' + px(segni[i][0]).toFixed(1) + '" y1="' + Y0 + '" x2="' + px(segni[i][0]).toFixed(1) +
+              '" y2="' + py(fdist(segni[i][0], M, T)).toFixed(1) + '" stroke="' + segni[i][2] +
+              '" stroke-width="1.8" stroke-dasharray="5 4"/>';
+            s += '<text x="' + (px(segni[i][0]) + 4).toFixed(1) + '" y="' + (Y1 + 14 + i * 15) +
+              '" style="fill:' + segni[i][2] + '; font-size:11.5px;">' + segni[i][1] + ' = ' +
+              nc(segni[i][0], 0) + '</text>';
+          }
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 4; i++) {
+            s += '<text x="' + px(VM * i / 4).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' +
+              Math.round(VM * i / 4) + '</text>';
+          }
+          s += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">velocità (m/s)</text>';
+          s += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 16) + '" class="lbl-s">frazione di molecole</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('mb-tv').textContent = Math.round(T);
+          document.getElementById('mb-vp').textContent = nc(vp, 0) + ' m/s';
+          document.getElementById('mb-vm').textContent = nc(vm, 0) + ' m/s';
+          document.getElementById('mb-vq').textContent = nc(vq, 0) + ' m/s';
+          document.getElementById('mb-coda').textContent = nc(4.601, 2) + ' %';
+          var el = document.getElementById('mb-out');
+          el.innerHTML = 'Per ' + GAS[sel][0] + ' a ' + Math.round(T) + ' K le tre velocità valgono ' +
+            nc(vp, 0) + ', ' + nc(vm, 0) + ' e ' + nc(vq, 0) + ' m/s, sempre nello stesso ordine e sempre ' +
+            'nello stesso rapporto: $1 : 1{,}128 : 1{,}225$. La zona dorata è la <strong>coda</strong>, cioè ' +
+            'le molecole con $v \\gt 2v_p$: sono il <strong>4,6%</strong> del totale, e — cosa notevole — ' +
+            'questa percentuale <em>non dipende né dal gas né dalla temperatura</em>, perché la curva è ' +
+            'sempre la stessa riscalata. Cambiando temperatura cambia <em>dove</em> sta quel 4,6%, e con esso ' +
+            'la capacità di quelle molecole di evaporare o di far avvenire una reazione.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        var host = document.getElementById('mb-gas');
+        GAS.forEach(function (g, i) {
+          var b = document.createElement('button');
+          b.className = 'btn' + (i === sel ? ' active' : '');
+          b.type = 'button';
+          b.textContent = g[0];
+          b.addEventListener('click', function () {
+            sel = i;
+            Array.prototype.forEach.call(host.children, function (o, j) {
+              if (j === i) { o.classList.add('active'); } else { o.classList.remove('active'); }
+            });
+            disegna();
+          });
+          host.appendChild(b);
+        });
+        document.getElementById('mb-t').addEventListener('input', disegna);
+        ['mb-due', 'mb-lock'].forEach(function (id) {
+          document.getElementById(id).addEventListener('change', disegna);
+        });
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nc(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      function prng(s0) {
+        var s = s0;
+        return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+      }
+
+      function binom(n, k) {
+        var r = 1, i;
+        for (i = 1; i <= k; i++) { r = r * (n - k + i) / i; }
+        return r;
+      }
+
+      /* ============ 5 — MOTO BROWNIANO ============ */
+      (function () {
+        var svg = document.getElementById('br-svg');
+        if (!svg) { return; }
+
+        function disegna() {
+          var NW = parseInt(document.getElementById('br-n').value, 10);
+          var P = parseInt(document.getElementById('br-p').value, 10);
+          var mostra = document.getElementById('br-med').checked;
+          var lock = document.getElementById('br-lock').checked;
+          var rnd = prng(20260815);
+          var CX = 210, CY = 175;
+          var RM = lock ? 46 : Math.max(20, Math.sqrt(P) * 2.4);
+          var sc = 150 / RM;
+          var s = '', i, j;
+          var dist = [], dmax = 0, somma2 = 0;
+          var COL = ['var(--accent)', 'var(--magenta)', 'var(--gold)', '#22c55e', '#f97316', '#a855f7'];
+          for (i = 0; i < NW; i++) {
+            var x = 0, y = 0, pts = [CX + ',' + CY];
+            for (j = 0; j < P; j++) {
+              var th = rnd() * 2 * Math.PI;
+              x += Math.cos(th); y += Math.sin(th);
+              if (j % Math.max(1, Math.floor(P / 260)) === 0 || j === P - 1) {
+                pts.push((CX + x * sc).toFixed(1) + ',' + (CY + y * sc).toFixed(1));
+              }
+            }
+            var d = Math.sqrt(x * x + y * y);
+            dist.push(d);
+            somma2 += d * d;
+            if (d > dmax) { dmax = d; }
+            s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + COL[i % COL.length] +
+              '" stroke-width="1.1" opacity="0.8"/>';
+            s += '<circle cx="' + (CX + x * sc).toFixed(1) + '" cy="' + (CY + y * sc).toFixed(1) + '" r="3.4" fill="' +
+              COL[i % COL.length] + '"/>';
+          }
+          var rms = Math.sqrt(somma2 / NW);
+          var atteso = Math.sqrt(P);
+          if (mostra) {
+            s += '<circle cx="' + CX + '" cy="' + CY + '" r="' + (atteso * sc).toFixed(1) +
+              '" fill="none" stroke="var(--text-soft)" stroke-width="1.8" stroke-dasharray="7 5"/>';
+            s += '<text x="' + CX + '" y="' + (CY - atteso * sc - 6).toFixed(1) +
+              '" text-anchor="middle" class="lbl-s">raggio √N = ' + nc(atteso, 1) + '</text>';
+          }
+          s += '<circle cx="' + CX + '" cy="' + CY + '" r="4" fill="var(--text)"/>';
+          s += '<text x="20" y="30" class="lbl-s">' + NW + ' granelli, ' + P + ' passi ciascuno</text>';
+          // il grafico della distanza contro la radice dei passi
+          var GX0 = 420, GX1 = 650, GY0 = 300, GY1 = 60;
+          var gx = function (n) { return GX0 + (GX1 - GX0) * n / 2000; };
+          var gy = function (d) { return GY0 - (GY0 - GY1) * Math.min(1, d / 46); };
+          var pts2 = [];
+          for (i = 0; i <= 120; i++) {
+            var n = 2000 * i / 120;
+            pts2.push(gx(n).toFixed(1) + ',' + gy(Math.sqrt(n)).toFixed(1));
+          }
+          s += '<polyline points="' + pts2.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2.6"/>';
+          s += '<circle cx="' + gx(P).toFixed(1) + '" cy="' + gy(rms).toFixed(1) + '" r="5.5" fill="var(--magenta)"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX1 + '" y2="' + GY0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX0 + '" y2="' + GY1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + GX1 + '" y="' + (GY0 + 22) + '" text-anchor="end" class="lbl-s">passi</text>';
+          s += '<text x="' + (GX0 - 4) + '" y="' + (GY1 - 16) + '" class="lbl-s">distanza dal via</text>';
+          s += '<text x="' + ((GX0 + GX1) / 2) + '" y="' + (GY1 - 34) + '" text-anchor="middle" class="lbl-s">' +
+            'la curva è √N</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('br-nv').textContent = NW;
+          document.getElementById('br-pv').textContent = P;
+          document.getElementById('br-att').textContent = nc(atteso, 2);
+          document.getElementById('br-mis').textContent = nc(rms, 2);
+          document.getElementById('br-max').textContent = nc(dmax, 2);
+          document.getElementById('br-rap').textContent = nc(rms / atteso, 3);
+          var el = document.getElementById('br-out');
+          el.innerHTML = 'Con passi di lunghezza $1$ in direzione casuale, lo spostamento quadratico medio dopo ' +
+            '$N$ passi vale <strong>$\\langle r^2\\rangle = N$</strong>: i termini incrociati si annullano in ' +
+            'media perché le direzioni sono indipendenti. La distanza tipica è quindi $\\sqrt N = ' +
+            nc(atteso, 2).replace(',', '{,}') + '$, e su questi ' + NW + ' granelli si misura ' +
+            nc(rms, 2) + ' (rapporto ' + nc(rms / atteso, 3) + '). ' +
+            (NW < 5
+              ? 'Con così pochi camminatori la media è rumorosa: alzate il cursore e guardate il rapporto ' +
+                'avvicinarsi a uno.'
+              : 'Notate che <strong>quadruplicando i passi la distanza raddoppia soltanto</strong>: è il ' +
+                'motivo per cui la diffusione è un modo lentissimo di trasportare materia su lunghe distanze, ' +
+                'e per cui i polmoni e le branchie hanno superfici enormi e spessori minimi.');
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['br-n', 'br-p'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        ['br-med', 'br-lock'].forEach(function (id) { document.getElementById(id).addEventListener('change', disegna); });
+        disegna();
+      })();
+
+      /* ============ 6 — LA CAMMINATA ALEATORIA ============ */
+      (function () {
+        var svg = document.getElementById('rw-svg');
+        if (!svg) { return; }
+        var MODI = ['moneta', 'dado (1-4 a destra)'];
+        var sel = 0;
+
+        function disegna() {
+          if (sel === 1) { document.getElementById('rw-p').value = 4 / 6; }
+          var N = parseInt(document.getElementById('rw-n').value, 10);
+          var p = sel === 1 ? 4 / 6 : parseFloat(document.getElementById('rw-p').value);
+          var q = 1 - p;
+          var lock = document.getElementById('rw-lock').checked;
+          var media = N * (2 * p - 1);
+          var sigma = 2 * Math.sqrt(N * p * q);
+          var sigq = Math.sqrt(N);
+          var s = '', i;
+          var X0 = 60, X1 = 646, Y0 = 190, Y1 = 46;
+          var XM = lock ? 120 : N * 1.05;
+          var px = function (x) { return (X0 + X1) / 2 + (X1 - X0) / 2 * x / XM; };
+          // distribuzione binomiale della posizione
+          var pmax = 0, prob = [];
+          for (i = 0; i <= N; i++) {
+            var pr = binom(N, i) * Math.pow(p, i) * Math.pow(q, N - i);
+            prob.push(pr);
+            if (pr > pmax) { pmax = pr; }
+          }
+          var py = function (v) { return Y0 - (Y0 - Y1) * v / pmax; };
+          var bw = Math.max(1.5, (X1 - X0) / XM / 2 * 0.9);
+          for (i = 0; i <= N; i++) {
+            var x = 2 * i - N;
+            if (Math.abs(x) > XM) { continue; }
+            s += '<rect x="' + (px(x) - bw / 2).toFixed(1) + '" y="' + py(prob[i]).toFixed(1) + '" width="' +
+              bw.toFixed(1) + '" height="' + (Y0 - py(prob[i])).toFixed(1) + '" fill="var(--accent)" opacity="0.55"/>';
+          }
+          // la gaussiana che l'approssima
+          var pts = [];
+          for (i = 0; i <= 300; i++) {
+            var xx = -XM + 2 * XM * i / 300;
+            var g = Math.exp(-(xx - media) * (xx - media) / (2 * sigma * sigma)) *
+              (2 / (sigma * Math.sqrt(2 * Math.PI)));
+            pts.push(px(xx).toFixed(1) + ',' + py(g).toFixed(1));
+          }
+          s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--magenta)" stroke-width="2.4"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + px(media).toFixed(1) + '" y1="' + Y0 + '" x2="' + px(media).toFixed(1) + '" y2="' + Y1 +
+            '" stroke="var(--gold)" stroke-width="1.8" stroke-dasharray="5 4"/>';
+          s += '<text x="' + (px(media) + 5).toFixed(1) + '" y="' + (Y1 + 12) + '" class="lbl-s">media ' +
+            nc(media, 1) + '</text>';
+          s += '<line x1="' + px(media - sigma).toFixed(1) + '" y1="' + (Y0 - 8) + '" x2="' + px(media + sigma).toFixed(1) +
+            '" y2="' + (Y0 - 8) + '" stroke="var(--magenta)" stroke-width="2.4"/>';
+          s += '<text x="' + px(media).toFixed(1) + '" y="' + (Y0 - 14) + '" text-anchor="middle" class="em">±σ</text>';
+          for (i = -2; i <= 2; i++) {
+            s += '<text x="' + px(XM * i / 2).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' +
+              Math.round(XM * i / 2) + '</text>';
+          }
+          s += '<text x="' + X1 + '" y="' + (Y0 + 34) + '" text-anchor="end" class="lbl-s">posizione finale</text>';
+          // qualche traiettoria
+          var TY0 = 320, TY1 = 226;
+          var rnd = prng(20260816);
+          for (var w = 0; w < 5; w++) {
+            var xx2 = 0, tp = [];
+            for (i = 0; i <= N; i++) {
+              tp.push((X0 + (X1 - X0) * i / N).toFixed(1) + ',' +
+                ((TY0 + TY1) / 2 - (TY0 - TY1) / 2 * xx2 / XM).toFixed(1));
+              if (rnd() < p) { xx2 += 1; } else { xx2 -= 1; }
+            }
+            s += '<polyline points="' + tp.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="1.3" opacity="0.7"/>';
+          }
+          s += '<line x1="' + X0 + '" y1="' + ((TY0 + TY1) / 2) + '" x2="' + X1 + '" y2="' + ((TY0 + TY1) / 2) +
+            '" stroke="var(--border)" stroke-width="1.4" stroke-dasharray="4 4"/>';
+          s += '<text x="' + X0 + '" y="' + (TY1 - 6) + '" class="lbl-s">cinque cammini estratti a caso</text>';
+          svg.innerHTML = s;
+
+          var pzero = (N % 2 === 0) ? binom(N, N / 2) * Math.pow(p, N / 2) * Math.pow(q, N / 2) : 0;
+          document.getElementById('rw-nv').textContent = N;
+          document.getElementById('rw-pv').textContent = nc(p, 2);
+          document.getElementById('rw-med').textContent = nc(media, 1);
+          document.getElementById('rw-sig').textContent = nc(sigma, 2);
+          document.getElementById('rw-sq').textContent = nc(sigq, 2);
+          document.getElementById('rw-zero').textContent = N % 2 === 0 ? nc(pzero * 100, 2) + ' %' : '0 % (N dispari)';
+          var el = document.getElementById('rw-out');
+          el.innerHTML = 'Con $N = ' + N + '$ passi e probabilità $p = ' + nc(p, 2).replace(',', '{,}') +
+            '$: la posizione media vale $N(2p-1) = ' + nc(media, 1).replace(',', '{,}') +
+            '$ e lo scarto tipico $2\\sqrt{Npq} = ' + nc(sigma, 2).replace(',', '{,}') + '$. ' +
+            (Math.abs(p - 0.5) < 1e-9
+              ? 'Con la moneta equa la media è <strong>zero</strong> e lo scarto si riduce a $\\sqrt N = ' +
+                nc(sigq, 2).replace(',', '{,}') + '$: il camminatore non va da nessuna parte <em>in media</em>, ' +
+                'ma la sua distanza tipica cresce come la radice dei passi.'
+              : 'Con la moneta truccata compare una <strong>deriva</strong>: la media cresce come $N$ mentre le ' +
+                'fluttuazioni crescono solo come $\\sqrt N$. Il loro rapporto vale ' +
+                nc(Math.abs(media) / sigma, 2) + ', e cresce con $N$: prima o poi la deriva domina e il moto ' +
+                'diventa quasi deterministico.') +
+            ' La curva magenta è la <strong>gaussiana</strong> che approssima la binomiale: già con qualche ' +
+            'decina di passi le due sono indistinguibili, ed è il teorema del limite centrale al lavoro.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        var host = document.getElementById('rw-modo');
+        MODI.forEach(function (n, i) {
+          var b = document.createElement('button');
+          b.className = 'btn' + (i === 0 ? ' active' : '');
+          b.type = 'button';
+          b.textContent = n;
+          b.addEventListener('click', function () {
+            sel = i;
+            Array.prototype.forEach.call(host.children, function (o, j) {
+              if (j === i) { o.classList.add('active'); } else { o.classList.remove('active'); }
+            });
+            document.getElementById('rw-p').disabled = (i === 1);
+            disegna();
+          });
+          host.appendChild(b);
+        });
+        ['rw-n', 'rw-p'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', function () { sel = 0; disegna(); });
+        });
+        document.getElementById('rw-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ============ 7 — I MERCATI AZIONARI ============ */
+      (function () {
+        var svg = document.getElementById('az-svg');
+        if (!svg) { return; }
+        var S0 = 100, ANNI = 10, PASSI = 250;
+
+        function disegna() {
+          var mu = parseFloat(document.getElementById('az-m').value) / 100;
+          var sig = parseFloat(document.getElementById('az-s').value) / 100;
+          var K = parseInt(document.getElementById('az-k').value, 10);
+          var lock = document.getElementById('az-lock').checked;
+          var rnd = prng(20260817);
+          function gauss() {
+            var u = Math.max(1e-12, rnd()), v = rnd();
+            return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+          }
+          var dt = ANNI / PASSI;
+          var X0 = 62, X1 = 646, Y0 = 288, Y1 = 44;
+          var YM = lock ? 500 : 300;
+          var px = function (t) { return X0 + (X1 - X0) * t / ANNI; };
+          var py = function (v) { return Y0 - (Y0 - Y1) * Math.min(1.02, v / YM); };
+          var s = '', i, j;
+          var fin = [], persi = 0;
+          for (i = 0; i < K; i++) {
+            var S = S0, pts = [px(0).toFixed(1) + ',' + py(S0).toFixed(1)];
+            for (j = 1; j <= PASSI; j++) {
+              S = S * Math.exp((mu - sig * sig / 2) * dt + sig * Math.sqrt(dt) * gauss());
+              pts.push(px(j * dt).toFixed(1) + ',' + py(S).toFixed(1));
+            }
+            fin.push(S);
+            if (S < S0) { persi++; }
+            s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="1.4" opacity="0.7"/>';
+          }
+          var att = S0 * Math.exp(mu * ANNI);
+          var pts2 = [];
+          for (i = 0; i <= 100; i++) {
+            pts2.push(px(ANNI * i / 100).toFixed(1) + ',' + py(S0 * Math.exp(mu * ANNI * i / 100)).toFixed(1));
+          }
+          s += '<polyline points="' + pts2.join(' ') + '" fill="none" stroke="var(--magenta)" stroke-width="2.8" stroke-dasharray="8 4"/>';
+          s += '<line x1="' + X0 + '" y1="' + py(S0).toFixed(1) + '" x2="' + X1 + '" y2="' + py(S0).toFixed(1) +
+            '" stroke="var(--border)" stroke-width="1.4"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 5; i++) {
+            s += '<text x="' + px(ANNI * i / 5).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' +
+              Math.round(ANNI * i / 5) + '</text>';
+            s += '<text x="' + (X0 - 6) + '" y="' + (py(YM * i / 5) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' +
+              Math.round(YM * i / 5) + '</text>';
+          }
+          s += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">anni</text>';
+          s += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 16) + '" class="lbl-s">valore (euro)</text>';
+          s += '<text x="' + (X1 - 6) + '" y="' + (py(att) - 8).toFixed(1) +
+            '" text-anchor="end" style="fill:var(--magenta); font-size:11.5px;">valore atteso: ' +
+            nc(att, 0) + ' €</text>';
+          svg.innerHTML = s;
+
+          fin.sort(function (a, b) { return a - b; });
+          document.getElementById('az-mv').textContent = Math.round(mu * 100);
+          document.getElementById('az-sv').textContent = Math.round(sig * 100);
+          document.getElementById('az-kv').textContent = K;
+          document.getElementById('az-att').textContent = nc(att, 0) + ' €';
+          document.getElementById('az-max').textContent = nc(fin[fin.length - 1], 0) + ' €';
+          document.getElementById('az-min').textContent = nc(fin[0], 0) + ' €';
+          document.getElementById('az-perd').textContent = persi + ' su ' + K;
+          var el = document.getElementById('az-out');
+          el.innerHTML = 'Con rendimento atteso del ' + Math.round(mu * 100) + '% e volatilità del ' +
+            Math.round(sig * 100) + '%, il valore <em>atteso</em> dopo dieci anni è ' +
+            '$100\\,e^{\\mu t} = ' + nc(att, 0) + '$ €. Ma i singoli scenari vanno da ' + nc(fin[0], 0) +
+            ' a ' + nc(fin[fin.length - 1], 0) + ' €, e <strong>' + persi + ' su ' + K +
+            '</strong> finiscono sotto il capitale iniziale — con gli stessi identici parametri. ' +
+            'Notate il termine $-\\sigma^2/2$ nell\'esponente: è il <em>freno della volatilità</em>, e dice che ' +
+            'un investimento molto ballerino rende <strong>meno</strong> di uno tranquillo a parità di ' +
+            'rendimento medio. Guadagnare il $50\\%$ e poi perdere il $50\\%$ non riporta al punto di ' +
+            'partenza: lascia al $75\\%$.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['az-m', 'az-s', 'az-k'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        document.getElementById('az-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nc(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      function prng(s0) {
+        var s = s0;
+        return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+      }
+
+      var KB2 = 1.380649e-23;
+      var PCRIT = 0.592746;
+
+      var FERMA = [];
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { FERMA.forEach(function (f) { f(); }); }
+      });
+      window.addEventListener('pagehide', function () { FERMA.forEach(function (f) { f(); }); });
+
+      /* ============ 8 — IL SISTEMA A DUE STATI (URNE DI EHRENFEST) ============ */
+      (function () {
+        var svg = document.getElementById('ms-svg');
+        if (!svg) { return; }
+        var raf = null, stato = [], storia = [], passi = 0;
+        var rnd = prng(20260818);
+
+        function reset() {
+          var N = parseInt(document.getElementById('ms-n').value, 10);
+          stato = [];
+          for (var i = 0; i < N; i++) { stato.push(0); }   // 0 = sinistra
+          storia = [N];
+          passi = 0;
+          document.getElementById('ms-t').value = 0;
+        }
+
+        function avanza(quanti) {
+          var N = stato.length;
+          for (var i = 0; i < quanti; i++) {
+            var j = Math.min(N - 1, Math.floor(rnd() * N));
+            stato[j] = 1 - stato[j];
+            passi++;
+            var k = 0;
+            for (var q = 0; q < N; q++) { if (stato[q] === 0) { k++; } }
+            storia.push(k);
+            if (storia.length > 401) { storia.shift(); }
+          }
+          document.getElementById('ms-t').value = Math.min(400, passi);
+        }
+
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+        FERMA.push(ferma);
+
+        function tick() {
+          avanza(1);
+          disegna();
+          if (raf) { raf = requestAnimationFrame(tick); }
+        }
+
+        function logbin(n, k) {
+          var r = 0, i;
+          for (i = 1; i <= k; i++) { r += Math.log(n - k + i) - Math.log(i); }
+          return r;
+        }
+
+        function disegna() {
+          var N = stato.length;
+          var k = 0, i;
+          for (i = 0; i < N; i++) { if (stato[i] === 0) { k++; } }
+          var lnW = logbin(N, k);
+          var S = KB2 * lnW;
+          var s = '';
+          // la scatola divisa in due
+          var BX = 26, BY = 46, BW = 300, BH = 190;
+          s += '<rect x="' + BX + '" y="' + BY + '" width="' + BW + '" height="' + BH +
+            '" rx="6" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2.4"/>';
+          s += '<line x1="' + (BX + BW / 2) + '" y1="' + BY + '" x2="' + (BX + BW / 2) + '" y2="' + (BY + BH) +
+            '" stroke="var(--border)" stroke-width="2" stroke-dasharray="6 5"/>';
+          var ci = 0, cd = 0;
+          for (i = 0; i < N; i++) {
+            var sin = stato[i] === 0;
+            var idx = sin ? ci++ : cd++;
+            var perRiga = 6;
+            var cx = BX + (sin ? 20 : BW / 2 + 20) + (idx % perRiga) * (BW / 2 - 40) / (perRiga - 1);
+            var cy = BY + 24 + Math.floor(idx / perRiga) * 22;
+            cy = Math.min(cy, BY + BH - 14);
+            s += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="6" fill="' +
+              (sin ? 'var(--accent)' : 'var(--muted)') + '" opacity="0.85"/>';
+          }
+          s += '<text x="' + (BX + BW / 4) + '" y="' + (BY + BH + 20) + '" text-anchor="middle" class="lbl">' +
+            k + ' a sinistra</text>';
+          s += '<text x="' + (BX + 3 * BW / 4) + '" y="' + (BY + BH + 20) + '" text-anchor="middle" class="lbl">' +
+            (N - k) + ' a destra</text>';
+          s += '<text x="' + BX + '" y="34" class="lbl-s">passi compiuti: ' + passi + '</text>';
+          // la storia di k nel tempo
+          var GX0 = 372, GX1 = 648, GY0 = 300, GY1 = 50;
+          var gx = function (t) { return GX0 + (GX1 - GX0) * t / 400; };
+          var gy = function (v) { return GY0 - (GY0 - GY1) * v / N; };
+          s += '<line x1="' + GX0 + '" y1="' + gy(N / 2).toFixed(1) + '" x2="' + GX1 + '" y2="' + gy(N / 2).toFixed(1) +
+            '" stroke="var(--magenta)" stroke-width="1.8" stroke-dasharray="6 4"/>';
+          s += '<text x="' + (GX1 - 4) + '" y="' + (gy(N / 2) - 6).toFixed(1) +
+            '" text-anchor="end" style="fill:var(--magenta); font-size:11.5px;">N/2</text>';
+          // l'andamento medio previsto
+          var pm = [];
+          for (i = 0; i <= 200; i++) {
+            var t = 400 * i / 200;
+            pm.push(gx(t).toFixed(1) + ',' + gy(N / 2 + (N / 2) * Math.pow(1 - 2 / N, t)).toFixed(1));
+          }
+          s += '<polyline points="' + pm.join(' ') + '" fill="none" stroke="var(--gold)" stroke-width="2" stroke-dasharray="4 3"/>';
+          var ph = [];
+          for (i = 0; i < storia.length; i++) { ph.push(gx(i).toFixed(1) + ',' + gy(storia[i]).toFixed(1)); }
+          if (ph.length > 1) {
+            s += '<polyline points="' + ph.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2"/>';
+          }
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX1 + '" y2="' + GY0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX0 + '" y2="' + GY1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + GX1 + '" y="' + (GY0 + 22) + '" text-anchor="end" class="lbl-s">passi</text>';
+          s += '<text x="' + (GX0 - 4) + '" y="' + (GY1 - 16) + '" class="lbl-s">quante a sinistra</text>';
+          s += '<text x="' + ((GX0 + GX1) / 2) + '" y="' + (GY1 - 32) + '" text-anchor="middle" class="lbl-s">' +
+            'oro: andamento medio previsto</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('ms-nv').textContent = N;
+          document.getElementById('ms-tv').textContent = Math.min(400, passi);
+          document.getElementById('ms-k').textContent = k;
+          document.getElementById('ms-w').textContent = lnW < 30
+            ? Math.round(Math.exp(lnW)).toLocaleString('it-IT')
+            : Math.exp(lnW).toExponential(2).replace('.', ',');
+          document.getElementById('ms-s').textContent = S.toExponential(2).replace('.', ',') + ' J/K';
+          var att = Math.pow(2, N);
+          document.getElementById('ms-att').textContent = att < 1e15
+            ? Math.round(att).toLocaleString('it-IT') + ' passi'
+            : att.toExponential(2).replace('.', ',') + ' passi';
+          var el = document.getElementById('ms-out');
+          el.innerHTML = 'Il macrostato «' + k + ' a sinistra» si realizza in $\\binom{' + N + '}{' + k +
+            '}$ modi. Il valore medio previsto dopo $t$ passi è ' +
+            '$\\langle k\\rangle = \\frac N2\\left[1 + \\left(1-\\frac2N\\right)^t\\right]$: è la curva ' +
+            'dorata, ed è un <strong>rilassamento esponenziale</strong> verso $N/2$ — la stessa forma della ' +
+            'legge di raffreddamento di Newton. ' +
+            (k === N
+              ? 'Ora siamo nel macrostato più raro possibile: <strong>un solo microstato</strong>. Per ' +
+                'ritrovarlo per caso servirebbero in media $2^{' + N + '}$ passi.'
+              : 'Nessuna forza spinge le particelle verso il centro: a ogni passo la particella scelta ha la ' +
+                'stessa probabilità di andare di là o di qua. Il sistema ci va perché <strong>là ci sono più ' +
+                'microstati</strong>, e per tornare tutte a sinistra servirebbero in media $2^{' + N +
+                '}$ passi.');
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        document.getElementById('ms-n').addEventListener('input', function () { ferma(); reset(); disegna(); });
+        document.getElementById('ms-t').addEventListener('input', function () {
+          ferma();
+          var voluti = parseInt(document.getElementById('ms-t').value, 10);
+          if (voluti > passi) { avanza(voluti - passi); } else if (voluti < passi) { reset(); avanza(voluti); }
+          disegna();
+        });
+        document.getElementById('ms-go').addEventListener('click', function () {
+          if (!raf) { raf = requestAnimationFrame(tick); }
+        });
+        document.getElementById('ms-stop').addEventListener('click', ferma);
+        document.getElementById('ms-reset').addEventListener('click', function () { ferma(); reset(); disegna(); });
+        reset();
+        disegna();
+      })();
+
+      /* ============ 11 — LA PERCOLAZIONE ============ */
+      (function () {
+        var svg = document.getElementById('pc-svg');
+        if (!svg) { return; }
+        var MODI = ['grappoli', 'incendio nella foresta'];
+        var sel = 1;
+        var semebase = 20260819;
+
+        function costruisci(Lg, p, seed) {
+          var rnd = prng(seed);
+          var g = [];
+          for (var i = 0; i < Lg * Lg; i++) { g.push(rnd() < p ? 1 : 0); }
+          return g;
+        }
+
+        function propaga(g, Lg, pac) {
+          // parte dalla colonna di sinistra, BFS sui vicini occupati
+          var vis = new Array(Lg * Lg);
+          var coda = [], i, j;
+          for (j = 0; j < Lg; j++) {
+            var id = j * Lg;
+            if (g[id]) { vis[id] = 1; coda.push(id); }
+          }
+          var testa = 0;
+          while (testa < coda.length) {
+            var c = coda[testa++];
+            var r = Math.floor(c / Lg), col = c % Lg;
+            var vic = [[r, col - 1], [r, col + 1], [r - 1, col], [r + 1, col]];
+            for (i = 0; i < 4; i++) {
+              var rr = vic[i][0], cc = vic[i][1];
+              if (pac) { rr = (rr + Lg) % Lg; } else if (rr < 0 || rr >= Lg) { continue; }
+              if (cc < 0 || cc >= Lg) { continue; }
+              var nid = rr * Lg + cc;
+              if (g[nid] && !vis[nid]) { vis[nid] = 1; coda.push(nid); }
+            }
+          }
+          return vis;
+        }
+
+        function disegna() {
+          var Lg = parseInt(document.getElementById('pc-l').value, 10);
+          var p = parseFloat(document.getElementById('pc-p').value);
+          var pac = document.getElementById('pc-pac').checked;
+          var g = costruisci(Lg, p, semebase);
+          var vis = propaga(g, Lg, pac);
+          var occ = 0, bruc = 0, attraversa = false, i, j;
+          for (i = 0; i < Lg * Lg; i++) {
+            if (g[i]) { occ++; }
+            if (vis[i]) { bruc++; if (i % Lg === Lg - 1) { attraversa = true; } }
+          }
+          var BX = 26, BY = 44, BS = 292;
+          var cell = BS / Lg;
+          var s = '';
+          s += '<rect x="' + BX + '" y="' + BY + '" width="' + BS + '" height="' + BS +
+            '" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i < Lg; i++) {
+            for (j = 0; j < Lg; j++) {
+              var id = i * Lg + j;
+              if (!g[id]) { continue; }
+              s += '<rect x="' + (BX + j * cell).toFixed(2) + '" y="' + (BY + i * cell).toFixed(2) + '" width="' +
+                cell.toFixed(2) + '" height="' + cell.toFixed(2) + '" fill="' +
+                (vis[id] ? 'var(--magenta)' : 'var(--accent)') + '" opacity="' + (vis[id] ? '0.95' : '0.5') + '"/>';
+            }
+          }
+          s += '<text x="' + BX + '" y="34" class="lbl-s">' +
+            (sel === 1 ? 'magenta: bruciato · azzurro: albero risparmiato' :
+              'magenta: grappolo che tocca il bordo sinistro') + '</text>';
+          // la curva della frazione raggiunta contro p
+          var GX0 = 372, GX1 = 648, GY0 = 300, GY1 = 60;
+          var gx = function (v) { return GX0 + (GX1 - GX0) * v; };
+          var gy = function (v) { return GY0 - (GY0 - GY1) * v; };
+          var pts = [];
+          for (i = 0; i <= 30; i++) {
+            var pp = i / 30;
+            var gg = costruisci(28, pp, semebase + 7);
+            var vv = propaga(gg, 28, pac);
+            var b = 0;
+            for (j = 0; j < 28 * 28; j++) { if (vv[j]) { b++; } }
+            pts.push(gx(pp).toFixed(1) + ',' + gy(b / (28 * 28)).toFixed(1));
+          }
+          s += '<line x1="' + gx(PCRIT).toFixed(1) + '" y1="' + GY1 + '" x2="' + gx(PCRIT).toFixed(1) + '" y2="' + GY0 +
+            '" stroke="var(--gold)" stroke-width="2" stroke-dasharray="6 4"/>';
+          s += '<text x="' + (gx(PCRIT) + 5).toFixed(1) + '" y="' + (GY1 + 14) + '" style="fill:var(--gold); font-size:11.5px;">p_c</text>';
+          s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2.6"/>';
+          s += '<circle cx="' + gx(p).toFixed(1) + '" cy="' + gy(bruc / (Lg * Lg)).toFixed(1) + '" r="5.5" fill="var(--magenta)"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX1 + '" y2="' + GY0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX0 + '" y2="' + GY1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 4; i++) {
+            s += '<text x="' + gx(i / 4).toFixed(1) + '" y="' + (GY0 + 18) + '" text-anchor="middle" class="lbl-s">' +
+              nc(i / 4, 2) + '</text>';
+          }
+          s += '<text x="' + GX1 + '" y="' + (GY0 + 36) + '" text-anchor="end" class="lbl-s">densità p</text>';
+          s += '<text x="' + (GX0 - 4) + '" y="' + (GY1 - 16) + '" class="lbl-s">frazione raggiunta</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('pc-pv').textContent = nc(p, 2);
+          document.getElementById('pc-lv').textContent = Lg;
+          document.getElementById('pc-occ').textContent = occ + ' su ' + (Lg * Lg) +
+            ' (' + nc(occ / (Lg * Lg) * 100, 1) + '%)';
+          document.getElementById('pc-gra').textContent = bruc + ' caselle';
+          document.getElementById('pc-att').textContent = attraversa ? 'sì, da parte a parte' : 'no, si ferma';
+          document.getElementById('pc-pc').textContent = nc(PCRIT, 4);
+          var el = document.getElementById('pc-out');
+          el.innerHTML = 'Con densità $p = ' + nc(p, 2).replace(',', '{,}') + '$ ' +
+            (sel === 1 ? 'l\'incendio' : 'il grappolo di sinistra') + ' raggiunge ' + bruc +
+            ' caselle su ' + (Lg * Lg) + ', cioè il ' + nc(bruc / (Lg * Lg) * 100, 1) + '%, e ' +
+            (attraversa ? '<strong>attraversa</strong> tutta la griglia. ' : '<strong>non attraversa</strong>. ') +
+            (Math.abs(p - PCRIT) < 0.04
+              ? 'Siete <strong>proprio sulla soglia critica</strong> $p_c = 0{,}5927$: guardate la forma dei ' +
+                'grappoli, ramificata su tutte le scale. Qui togliere o aggiungere un solo albero può cambiare ' +
+                'il destino dell\'intera foresta, ed è la definizione operativa di sistema critico.'
+              : (p < PCRIT
+                ? 'Siete <strong>sotto</strong> la soglia: i grappoli restano piccoli e isolati, e la loro ' +
+                  'dimensione tipica cresce solo avvicinandosi a $p_c$.'
+                : 'Siete <strong>sopra</strong> la soglia: esiste un grappolo «infinito» che pervade tutto il ' +
+                  'sistema, e la frazione che gli appartiene cresce rapidamente con $p$.')) +
+            ' La transizione è netta: fra $p = 0{,}55$ e $p = 0{,}65$ si passa da un incendio locale a un ' +
+            'disastro totale, ed è una <strong>transizione di fase</strong> a tutti gli effetti.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        var host = document.getElementById('pc-modo');
+        MODI.forEach(function (n, i) {
+          var b = document.createElement('button');
+          b.className = 'btn' + (i === sel ? ' active' : '');
+          b.type = 'button';
+          b.textContent = n;
+          b.addEventListener('click', function () {
+            sel = i;
+            Array.prototype.forEach.call(host.children, function (o, j) {
+              if (j === i) { o.classList.add('active'); } else { o.classList.remove('active'); }
+            });
+            disegna();
+          });
+          host.appendChild(b);
+        });
+        ['pc-p', 'pc-l'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('pc-pac').addEventListener('change', disegna);
+        document.getElementById('pc-new').addEventListener('click', function () {
+          semebase = (semebase * 16807) % 2147483647;
+          disegna();
+        });
+        disegna();
+      })();
+
+      /* ============ 12 — LE EQUAZIONI DI LORENZ ============ */
+      (function () {
+        var svg = document.getElementById('lz-svg');
+        if (!svg) { return; }
+        var SIG = 10, BETA = 8 / 3;
+
+        function campo(v, rho) {
+          return [SIG * (v[1] - v[0]), v[0] * (rho - v[2]) - v[1], v[0] * v[1] - BETA * v[2]];
+        }
+
+        function rk4(v, h, rho) {
+          var i;
+          var k1 = campo(v, rho);
+          var a = [v[0] + h / 2 * k1[0], v[1] + h / 2 * k1[1], v[2] + h / 2 * k1[2]];
+          var k2 = campo(a, rho);
+          var b = [v[0] + h / 2 * k2[0], v[1] + h / 2 * k2[1], v[2] + h / 2 * k2[2]];
+          var k3 = campo(b, rho);
+          var c = [v[0] + h * k3[0], v[1] + h * k3[1], v[2] + h * k3[2]];
+          var k4 = campo(c, rho);
+          var out = [];
+          for (i = 0; i < 3; i++) {
+            out.push(v[i] + h / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+          }
+          return out;
+        }
+
+        function disegna() {
+          var rho = parseFloat(document.getElementById('lz-r').value);
+          var esp = parseFloat(document.getElementById('lz-d').value);
+          var T = parseFloat(document.getElementById('lz-t').value);
+          var lock = document.getElementById('lz-lock').checked;
+          var d0 = Math.pow(10, esp);
+          var h = 0.005, n = Math.round(T / h);
+          var v1 = [1, 1, 20], v2 = [1 + d0, 1, 20];
+          var traccia = [], dist = [], i;
+          for (i = 0; i < n; i++) {
+            v1 = rk4(v1, h, rho);
+            v2 = rk4(v2, h, rho);
+            if (i % 3 === 0) { traccia.push([v1[0], v1[2]]); }
+            var dx = v1[0] - v2[0], dy = v1[1] - v2[1], dz = v1[2] - v2[2];
+            var d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            if (i % 6 === 0) { dist.push([i * h, Math.max(1e-16, d)]); }
+          }
+          var dfin = dist.length ? dist[dist.length - 1][1] : d0;
+          var X0 = 30, X1 = 330, Y0 = 310, Y1 = 46;
+          var XM = lock ? 22 : 22, ZM = lock ? 55 : 55;
+          var px = function (x) { return (X0 + X1) / 2 + (X1 - X0) / 2 * x / XM; };
+          var py = function (z) { return Y0 - (Y0 - Y1) * z / ZM; };
+          var s = '', pts = [];
+          for (i = 0; i < traccia.length; i++) {
+            pts.push(px(traccia[i][0]).toFixed(1) + ',' + py(traccia[i][1]).toFixed(1));
+          }
+          s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="0.9" opacity="0.85"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + px(0).toFixed(1) + '" y1="' + Y0 + '" x2="' + px(0).toFixed(1) + '" y2="' + Y1 +
+            '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + X1 + '" y="' + (Y0 + 22) + '" text-anchor="end" class="lbl-s">x</text>';
+          s += '<text x="' + (px(0) + 6).toFixed(1) + '" y="' + (Y1 - 14) + '" class="lbl-s">z</text>';
+          s += '<text x="' + X0 + '" y="34" class="lbl-s">l\'attrattore nel piano x-z</text>';
+          // la divergenza, in scala logaritmica
+          var GX0 = 400, GX1 = 650, GY0 = 310, GY1 = 60;
+          var lo = -16, hi = 2;
+          var gx = function (t) { return GX0 + (GX1 - GX0) * t / T; };
+          var gy = function (d) {
+            var l = Math.log(d) / Math.LN10;
+            return GY0 - (GY0 - GY1) * (l - lo) / (hi - lo);
+          };
+          var pts2 = [];
+          for (i = 0; i < dist.length; i++) {
+            pts2.push(gx(dist[i][0]).toFixed(1) + ',' + gy(dist[i][1]).toFixed(1));
+          }
+          s += '<polyline points="' + pts2.join(' ') + '" fill="none" stroke="var(--magenta)" stroke-width="2"/>';
+          s += '<line x1="' + GX0 + '" y1="' + gy(30).toFixed(1) + '" x2="' + GX1 + '" y2="' + gy(30).toFixed(1) +
+            '" stroke="var(--gold)" stroke-width="1.6" stroke-dasharray="5 4"/>';
+          s += '<text x="' + (GX1 - 4) + '" y="' + (gy(30) - 6).toFixed(1) +
+            '" text-anchor="end" style="fill:var(--gold); font-size:11.5px;">dimensione dell\'attrattore</text>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX1 + '" y2="' + GY0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX0 + '" y2="' + GY1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 3; i++) {
+            s += '<text x="' + gx(T * i / 3).toFixed(1) + '" y="' + (GY0 + 18) + '" text-anchor="middle" class="lbl-s">' +
+              Math.round(T * i / 3) + '</text>';
+          }
+          for (i = 0; i <= 3; i++) {
+            var lv = lo + (hi - lo) * i / 3;
+            s += '<text x="' + (GX0 - 6) + '" y="' + (GY0 - (GY0 - GY1) * i / 3 + 4).toFixed(1) +
+              '" text-anchor="end" class="lbl-s">10^' + Math.round(lv) + '</text>';
+          }
+          s += '<text x="' + GX1 + '" y="' + (GY0 + 36) + '" text-anchor="end" class="lbl-s">tempo</text>';
+          s += '<text x="' + (GX0 - 4) + '" y="' + (GY1 - 16) + '" class="lbl-s">distanza fra le due</text>';
+          svg.innerHTML = s;
+
+          var caos = rho > 24.74;
+          document.getElementById('lz-rv').textContent = nc(rho, 1);
+          document.getElementById('lz-dv').textContent = '10^' + Math.round(esp);
+          document.getElementById('lz-tv').textContent = Math.round(T);
+          document.getElementById('lz-d0').textContent = d0.toExponential(0).replace('.', ',');
+          document.getElementById('lz-df').textContent = dfin.toExponential(2).replace('.', ',');
+          document.getElementById('lz-amp').textContent = (dfin / d0).toExponential(1).replace('.', ',');
+          document.getElementById('lz-com').textContent = caos ? 'caotico' : 'regolare';
+          var el = document.getElementById('lz-out');
+          el.innerHTML = 'Con $\\rho = ' + nc(rho, 1).replace(',', '{,}') + '$ il sistema è <strong>' +
+            (caos ? 'caotico' : 'regolare') + '</strong>' +
+            (caos
+              ? ': due traiettorie che partono a distanza $' + d0.toExponential(0).replace('.', '{,}').replace('e-', '\\times10^{-') +
+                '}$ finiscono a distanza $' + dfin.toExponential(2).replace('.', '{,}').replace('e', '\\times10^{') +
+                '}$, con un\'amplificazione di ' + (dfin / d0).toExponential(1).replace('.', ',') +
+                ' volte. Nel grafico logaritmico la crescita è una <strong>retta</strong>: la divergenza è ' +
+                'esponenziale, e la sua pendenza è l\'esponente di Lyapunov. Quando la distanza raggiunge la ' +
+                'dimensione dell\'attrattore (linea dorata) la previsione è finita, e da lì in poi le due ' +
+                'traiettorie sono due storie indipendenti.'
+              : ': la traiettoria finisce in un punto fisso o in un ciclo, e le due partenze vicine restano ' +
+                'vicine per sempre. La soglia sta a $\\rho \\simeq 24{,}74$: sotto, ordine; sopra, caos. ' +
+                'Le stesse equazioni, con un solo parametro cambiato.') +
+            ' Provate anche a rendere la differenza iniziale mille volte più piccola: guadagnerete solo un ' +
+            'po\' di tempo, non la prevedibilità.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['lz-r', 'lz-d', 'lz-t'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        document.getElementById('lz-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Da dove viene, microscopicamente, la pressione di un gas sulle pareti del recipiente?',
+        options: [
+          'dalla somma degli urti delle molecole, ciascuno dei quali trasferisce $2mv_x$ di quantità di moto',
+          'dal peso del gas che schiaccia le pareti',
+          'dalla repulsione elettrica fra le molecole e la parete',
+          'dall\'energia potenziale delle molecole'
+        ],
+        correct: 0,
+        explain: 'Ogni molecola che rimbalza elasticamente inverte la sua $v_x$ e cede alla parete $2mv_x$; contando gli urti si arriva a $p = \\frac13\\frac{N}{V}m\\langle v^2\\rangle$. Il singolo colpetto è impercettibile, ma sono $10^{27}$ al secondo su un centimetro quadrato: la loro somma è una forza perfettamente costante.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Confrontando il risultato della teoria cinetica con $pV = Nk_BT$ si ottiene:',
+        options: [
+          'che la pressione è proporzionale alla massa delle molecole',
+          '$\\langle K\\rangle = \\frac32 k_BT$: la temperatura assoluta è l\'energia cinetica media di traslazione',
+          'che il volume è proporzionale al numero di molecole',
+          'che l\'energia interna dipende dal tipo di gas'
+        ],
+        correct: 1,
+        explain: 'Non è una definizione arbitraria ma una <em>conseguenza</em>: da un lato il conto microscopico dà $pV = \\frac23 N\\langle K\\rangle$, dall\'altro l\'esperimento dà $pV = Nk_BT$. Il confronto è immediato, e la costante $k_B$ serve solo a tradurre i kelvin in joule.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Che senso ha chiedersi qual è la temperatura di un singolo atomo?',
+        options: [
+          'si calcola dividendo la temperatura del gas per il numero di atomi',
+          'è la sua energia cinetica divisa per $k_B$',
+          'nessuno: la temperatura è una media, cioè una proprietà <em>emergente</em> di un insieme',
+          'dipende dalla posizione dell\'atomo nel recipiente'
+        ],
+        correct: 2,
+        explain: 'Come chiedere il reddito medio di una persona sola o il tasso di natalità di un individuo. Un singolo atomo ha un\'energia cinetica, non una temperatura. Le proprietà emergenti non sono meno reali di quelle microscopiche: sono <em>di un altro livello</em>, e obbediscono a leggi proprie — è per questo che la termodinamica ha funzionato per un secolo senza sapere nulla di atomi.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Nella stessa stanza, idrogeno e ossigeno sono alla stessa temperatura. Le loro molecole:',
+        options: [
+          'hanno la stessa velocità, perché la temperatura è la stessa',
+          'l\'ossigeno va più veloce, perché le sue molecole sono più pesanti',
+          'hanno la stessa quantità di moto media',
+          'hanno la stessa energia cinetica media, quindi l\'idrogeno va $4$ volte più veloce'
+        ],
+        correct: 3,
+        explain: 'Stessa temperatura significa stessa $\\langle K\\rangle = \\frac32k_BT$, non stessa velocità: da $\\frac12 mv^2$ uguale segue $v \\propto 1/\\sqrt m$. L\'ossigeno pesa $16$ volte l\'idrogeno, quindi va $\\sqrt{16} = 4$ volte più lento. È lo stesso motivo per cui la Terra ha perso quasi tutto il suo idrogeno e ha tenuto l\'azoto.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Nella distribuzione di Maxwell-Boltzmann, la frazione di molecole con velocità superiore al doppio di quella più probabile:',
+        options: [
+          'vale circa il $4{,}6\\%$, e non dipende né dal gas né dalla temperatura',
+          'cresce linearmente con la temperatura',
+          'è nulla, perché nessuna molecola può superare il doppio della media',
+          'dipende dalla massa delle molecole'
+        ],
+        correct: 0,
+        explain: 'La curva è <strong>sempre la stessa funzione riscalata</strong>: cambiando gas o temperatura si allarga o si stringe, ma le proporzioni restano. Riscritta nella variabile $x = v/v_p$ non contiene più né $m$ né $T$. Quello che cambia con la temperatura è <em>dove</em> sta quel $4{,}6\\%$, cioè quanta energia hanno quelle molecole — ed è questo a governare evaporazione e reazioni chimiche.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Che cosa dimostrò lo studio del moto browniano?',
+        options: [
+          'che i granelli di polline sono vivi',
+          'che la materia è fatta di particelle discrete: dalla misura del tragitto si ricava il numero di Avogadro',
+          'che i liquidi hanno viscosità',
+          'che l\'energia si conserva anche nei fenomeni microscopici'
+        ],
+        correct: 1,
+        explain: 'Einstein nel 1905 ricavò $\\langle x^2\\rangle = 2Dt$ con $D = k_BT/6\\pi\\eta a$: a destra compare $k_B = R/N_A$, quindi guardando muoversi un granello al microscopio si <em>conta</em> quante molecole ci sono in una mole. Perrin lo fece fra il 1908 e il 1911, trovò un valore compatibile con quelli ottenuti da fenomeni completamente diversi, e il dibattito sull\'esistenza degli atomi finì lì.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Un camminatore aleatorio compie $N$ passi di lunghezza $1$ in direzione casuale. Per raddoppiare la sua distanza tipica dal punto di partenza servono:',
+        options: [
+          'il doppio dei passi',
+          'lo stesso numero di passi, ma più lunghi',
+          'quattro volte i passi, perché la distanza va come $\\sqrt N$',
+          'non si può, perché in media resta al punto di partenza'
+        ],
+        correct: 2,
+        explain: '$\\langle r^2\\rangle = N$ perché i termini incrociati si annullano in media, quindi la distanza tipica è $\\sqrt N$. L\'ultima risposta confonde due cose diverse: la <em>posizione media</em> è davvero zero (destra e sinistra si compensano), ma la <em>distanza tipica</em> no. È lo stesso $\\sqrt N$ dell\'errore sulla media di $N$ misure e della convergenza Monte Carlo.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'In un recipiente diviso idealmente a metà, partendo con tutte le particelle a sinistra, il sistema si porta rapidamente verso metà e metà. Perché?',
+        options: [
+          'perché una forza le spinge verso il centro',
+          'perché la pressione è maggiore a sinistra',
+          'perché il secondo principio glielo impone come legge dinamica',
+          'perché al macrostato «metà e metà» corrispondono moltissimi più microstati'
+        ],
+        correct: 3,
+        explain: 'Nessuna forza è in gioco: a ogni istante ciascuna particella ha la stessa probabilità di andare di qua o di là. Il sistema va verso il centro <strong>perché là ci sono più modi di stare</strong>: $\\binom{N}{N/2}$ contro $1$. Il secondo principio non è una legge dinamica in più — è la constatazione statistica di questo fatto.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Perché nell\'entropia di Boltzmann compare il <strong>logaritmo</strong> del numero di microstati?',
+        options: [
+          'perché unendo due sistemi i microstati si moltiplicano mentre l\'entropia deve sommarsi',
+          'solo per comodità, perché $W$ è un numero enorme',
+          'perché il logaritmo compare anche nella legge dei gas',
+          'per far tornare le unità di misura'
+        ],
+        correct: 0,
+        explain: 'È l\'argomento decisivo, e da solo determina la forma della funzione a meno di una costante: $W = W_1W_2$ ma $S = S_1 + S_2$, e l\'unica funzione che trasforma prodotti in somme è il logaritmo. Le altre ragioni — maneggiare numeri come $10^{10^{23}}$, e il fatto che massimizzare $W$ o $\\ln W$ sia la stessa cosa — sono comodità reali, ma vengono dopo.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'L\'entropia di Shannon $H = -\\sum p_i\\log_2 p_i$ misura:',
+        options: [
+          'la lunghezza di un messaggio in caratteri',
+          'l\'informazione media, cioè quanti bit servono in media per comunicare l\'esito',
+          'la velocità di trasmissione di un canale',
+          'il numero di errori in una trasmissione'
+        ],
+        correct: 1,
+        explain: 'Un evento certo non porta informazione ($H = 0$); un lancio di moneta equa porta esattamente $1$ bit. Se gli esiti sono $W$ ed equiprobabili si riduce a $H = \\log_2 W$: la formula di Boltzmann, a meno della base e della costante. Da qui nasce il limite teorico della <strong>compressione dei dati</strong> — e che le due entropie siano la stessa grandezza, non solo analoghe, lo dice il principio di Landauer.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'In un modello di percolazione, aumentando la densità $p$ delle caselle occupate:',
+        options: [
+          'la probabilità di attraversare cresce in modo lineare',
+          'non succede niente di particolare, è tutto graduale',
+          'esiste una soglia critica $p_c$ attraversata la quale il comportamento cambia bruscamente: è una transizione di fase',
+          'l\'attraversamento è sempre possibile, purché si aspetti abbastanza'
+        ],
+        correct: 2,
+        explain: 'Sotto $p_c$ i grappoli restano piccoli e isolati, sopra ne esiste uno che pervade tutto il sistema, e il passaggio avviene in un intervallo strettissimo. Per il reticolo quadrato $p_c = 0{,}592746\\ldots$, noto solo numericamente. Proprio sulla soglia i grappoli sono <strong>frattali</strong> e un singolo albero può cambiare il destino della foresta — ed è la stessa matematica della soglia $R_0 = 1$ delle epidemie.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Un sistema caotico come quello di Lorenz è:',
+        options: [
+          'governato dal caso, cioè con equazioni che contengono numeri casuali',
+          'imprevedibile perché le sue equazioni non si sanno risolvere',
+          'prevedibile in linea di principio ma non in pratica per limiti dei calcolatori',
+          'perfettamente deterministico, ma con dipendenza sensibile dalle condizioni iniziali: due stati vicini divergono esponenzialmente'
+        ],
+        correct: 3,
+        explain: 'Nelle equazioni non c\'è nessuna casualità: dato lo stato iniziale <em>esatto</em>, il futuro è determinato. Il problema è che lo stato iniziale esatto non è conoscibile, e ogni errore raddoppia a intervalli regolari. La conseguenza è quantitativa: per guadagnare una settimana di previsione bisogna migliorare le misure di un fattore $128$. Non è un limite dei calcolatori — è una proprietà del sistema.'
+      },
+      {
+        type: 'open',
+        text: 'Spiega come la teoria cinetica arriva alla relazione $\\langle K\\rangle = \\frac32 k_BT$, partendo dagli urti sulle pareti. Poi spiega in che senso temperatura e pressione sono <strong>proprietà emergenti</strong> e perché questo non le rende meno reali.',
+        keywords: ['urti', 'quantità di moto', 'media', 'equazione di stato', 'emergente', 'singola', 'confronto', 'parete'],
+        requiredMatches: 4,
+        explain: 'Il conto parte da una singola molecola che rimbalza elasticamente su una parete: la sua quantità di moto passa da $+mv_x$ a $-mv_x$, quindi cede $2mv_x$, e fra due urti sulla stessa parete passa il tempo $2\\ell/v_x$. La forza media di quella molecola è allora $mv_x^2/\\ell$; sommando su $N$ molecole, usando l\'equivalenza delle tre direzioni ($\\langle v_x^2\\rangle = \\frac13\\langle v^2\\rangle$) e dividendo per l\'area si ottiene $$p = \\frac13\\frac{N}{V}m\\langle v^2\\rangle \\quad\\Longleftrightarrow\\quad pV = \\frac23 N\\langle K\\rangle$$ A questo punto si <strong>confronta</strong> con l\'equazione di stato $pV = Nk_BT$, che è un fatto sperimentale indipendente, e segue $\\langle K\\rangle = \\frac32 k_BT$. Il passaggio decisivo è quel confronto: la temperatura non viene <em>definita</em> come energia cinetica, si <em>scopre</em> che lo è. Sul secondo punto: la temperatura è una <strong>media</strong> e la pressione una <strong>somma di moltissimi urti</strong>, quindi nessuna delle due ha senso per una particella sola — chiedere la temperatura di un atomo è come chiedere il tasso di natalità di una persona. Ma emergente non vuol dire illusorio: le proprietà emergenti vivono a un altro livello di descrizione e obbediscono a leggi proprie, precise e verificabili. La prova migliore è storica: la termodinamica ha funzionato benissimo per un secolo <em>senza</em> sapere nulla di atomi. La meccanica statistica non l\'ha sostituita — ha mostrato da dove viene.'
+      },
+      {
+        type: 'open',
+        text: 'Un granello di polline in acqua si muove a scatti, senza che nulla lo spinga. Spiega perché questo fenomeno è stato la prova decisiva dell\'esistenza degli atomi, e che ruolo ha in tutta la storia la legge del $\\sqrt N$.',
+        keywords: ['urti', 'casual', 'sbilanciamento', 'einstein', 'avogadro', 'perrin', 'radice', 'diffusione'],
+        requiredMatches: 4,
+        explain: 'Il granello è bombardato da tutti i lati dalle molecole del liquido. Se gli urti fossero infinitamente numerosi e perfettamente simmetrici si compenserebbero esattamente e il granello resterebbe fermo; ma sono <strong>discreti e casuali</strong>, quindi in ogni istante ce ne sono un po\' di più da una parte, e quello <em>sbilanciamento</em> sposta il granello. Il moto browniano è dunque la prova visibile che il liquido non è un continuo: è fatto di pezzi. La prova diventa <strong>decisiva</strong>, e non solo suggestiva, grazie al conto di Einstein del 1905: $\\langle x^2\\rangle = 2Dt$ con $D = k_BT/(6\\pi\\eta a)$. In quella formula compare $k_B = R/N_A$, cioè una costante che dipende da <em>quanti</em> sono gli atomi; misurando al microscopio il tragitto di un granello si ricava quindi il <strong>numero di Avogadro</strong>. Perrin lo fece fra il 1908 e il 1911 e ottenne un valore compatibile con quelli ricavati da fenomeni del tutto diversi — l\'elettrochimica, la radioattività, la radiazione del corpo nero. Che strade indipendenti dessero lo stesso numero chiuse la questione. Il $\\sqrt N$ entra due volte. Prima nel fenomeno: gli urti si sommano come una camminata aleatoria, quindi lo sbilanciamento netto su $N$ urti non è nullo ma dell\'ordine di $\\sqrt N$, e la distanza percorsa dal granello cresce come la radice del tempo — non linearmente. Poi nel ragionamento generale: le fluttuazioni relative di una media su $N$ oggetti vanno come $1/\\sqrt N$, e questo spiega perché il granello, che è colpito da relativamente poche molecole, trema visibilmente, mentre un oggetto macroscopico, colpito da $10^{20}$ molecole al secondo, sta perfettamente immobile.'
+      }
+    ];
+  </script>
+
+</body>
+
+</html>

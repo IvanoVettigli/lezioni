@@ -1,0 +1,2078 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 6 — Baricentro e rotazioni</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .qbox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.8rem 0; }
+    .qbox .qt { font-weight: 600; margin-bottom: 0.45rem; }
+    .qbox.tosto { border-left-color: var(--gold); }
+    .qbox.tosto .qt::before { content: "★ "; color: var(--gold); }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    /* ---- il dizionario traslazioni/rotazioni ---- */
+    .dizio { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.95rem; }
+    .dizio th, .dizio td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: center; }
+    .dizio th { background: var(--surface-2); }
+    .dizio tr td:first-child { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); font-weight: 600; }
+    .dizio tr td:last-child { background: color-mix(in srgb, var(--magenta) 8%, var(--surface)); font-weight: 600; }
+
+    /* ---- CSS dedicato alla sezione facoltativa 11: angoli di Eulero ---- */
+    #sec11 .eulbox { border: 2px solid #0ea5e9; border-radius: 14px; padding: 0.9rem 1.2rem; margin: 1.2rem 0;
+                     background: color-mix(in srgb, #0ea5e9 8%, var(--surface)); }
+    #sec11 .eulbox h4 { margin: 0 0 0.45rem; color: #0ea5e9; font-size: 1.03rem; }
+    #sec11 .eulbox > *:last-child { margin-bottom: 0; }
+    #sec11 .angoli { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    #sec11 .angolo { border: 1px solid var(--border); border-top: 4px solid #0ea5e9; border-radius: 10px;
+                     padding: 0.75rem 0.9rem; background: var(--surface); }
+    #sec11 .angolo .nome { font-weight: 800; color: #0ea5e9; font-size: 1.1rem; }
+    #sec11 .angolo .sotto { color: var(--muted); font-size: 0.86rem; }
+    #sec11 .passo-el { border-left: 4px solid #0ea5e9; padding: 0.15rem 0 0.15rem 0.9rem; margin: 0.9rem 0; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quarto anno · Lezione 6</div>
+    <h1>Baricentro e rotazioni</h1>
+    <p>Il punto in cui un corpo «si comporta come se fosse tutto lì»,
+      e che cosa succede quando invece di traslare gira</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quarto anno</a>
+    <span class="sep">/</span> Baricentro e rotazioni
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove eravamo rimasti.</strong> Fin qui abbiamo trattato i corpi come <em>punti materiali</em>: una
+      massa, una posizione, una velocità. È stata un'approssimazione formidabile, ma ha un limite evidente —
+      un punto non può <strong>ruotare</strong>. In questa lezione il corpo acquista una forma, e con la forma
+      arrivano il baricentro, il momento d'inerzia, la trottola che non cade e il pendolo che dimostra che la
+      Terra gira.
+    </div>
+
+    <!-- 1 — IL CENTRO DI MASSA -->
+    <section id="sec1">
+      <h2>1. Il centro di massa</h2>
+
+      <p>Nella lezione scorsa abbiamo scritto, senza dimostrarla, la formula
+        $\vec P_{\text{tot}} = M_{\text{tot}}\,\vec v_{\text{CM}}$. È il momento di dire che cos'è quel
+        pedice.</p>
+
+      <div class="definition">
+        <strong>Centro di massa.</strong> Per un sistema di punti materiali:
+        $$x_{\text{CM}} = \frac{\sum_i m_i x_i}{\sum_i m_i}, \qquad
+          y_{\text{CM}} = \frac{\sum_i m_i y_i}{\sum_i m_i}$$
+        È una <strong>media pesata</strong> delle posizioni, con le masse come pesi. Per un corpo continuo la
+        somma diventa un integrale, ma l'idea non cambia.
+        <p class="formula-note">Il <strong>baricentro</strong> è il punto di applicazione della risultante dei
+          pesi. Coincide con il centro di massa ogni volta che $g$ è uniforme, cioè sempre nei nostri problemi:
+          useremo i due nomi come sinonimi, ricordando che in linea di principio non lo sono.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="cm-m1">massa in A: <span class="val-badge" id="cm-m1v">3,0</span> kg</label>
+          <input type="range" id="cm-m1" min="0.5" max="10" step="0.5" value="3">
+          <label for="cm-m2">massa in B: <span class="val-badge" id="cm-m2v">3,0</span> kg</label>
+          <input type="range" id="cm-m2" min="0.5" max="10" step="0.5" value="3">
+          <label for="cm-m3">massa in C: <span class="val-badge" id="cm-m3v">3,0</span> kg</label>
+          <input type="range" id="cm-m3" min="0.5" max="10" step="0.5" value="3">
+          <label class="toggle-row"><input type="checkbox" id="cm-ell"> mostra la figura a «L»</label>
+        </div>
+        <svg id="cm-svg" viewBox="0 0 660 340" aria-label="Centro di massa di tre masse ai vertici di un triangolo"></svg>
+        <div class="sp-cols">
+          <div>Massa totale: <span class="val-badge" id="cm-mt">—</span></div>
+          <div>Coordinate del centro di massa: <span class="val-badge" id="cm-xy">—</span></div>
+          <div>È dentro il triangolo? <span class="val-badge" id="cm-dentro">—</span></div>
+        </div>
+        <p class="eq-out" id="cm-out"></p>
+      </div>
+
+      <div class="warnbox"><strong>Il centro di massa può stare dove non c'è materia.</strong> Accendete la
+        casella della figura a «L»: il baricentro cade nell'incavo, cioè <em>fuori dal corpo</em>. Lo stesso
+        vale per una ciambella, per un ferro di cavallo, per un anello. Non è un'anomalia: il centro di massa è
+        una media, e la media di due numeri può benissimo non essere nessuno dei due.</div>
+
+      <div class="definition">
+        <strong>Perché è così utile.</strong> Si dimostra che il centro di massa di un sistema si muove
+        <em>esattamente</em> come un punto materiale che avesse tutta la massa e fosse soggetto alla sola
+        risultante delle forze <strong>esterne</strong>:
+        $$M_{\text{tot}}\,\vec a_{\text{CM}} = \vec F_{\text{esterna}}$$
+        Le forze interne, per il terzo principio, si cancellano a coppie e non entrano.
+      </div>
+
+      <div class="curiosita"><strong>Tre conseguenze spettacolari.</strong>
+        <ul>
+          <li>Un fuoco d'artificio che esplode a mezz'aria: i frammenti volano in tutte le direzioni, ma il
+            <strong>centro di massa continua la parabola</strong> come se nulla fosse, perché l'esplosione è
+            una forza interna. Provate a guardarlo con questa idea in testa: il «centro» della sfera luminosa
+            cade come un sasso.</li>
+          <li>Una ballerina che esegue un <em>grand jeté</em> sembra restare sospesa a mezz'aria. Non è
+            un'illusione ottica né una bugia: il baricentro descrive la solita parabola, ma alzando le braccia
+            e le gambe durante il salto la ballerina alza il baricentro <em>rispetto al proprio corpo</em>, e
+            così la <strong>testa</strong> percorre un tratto quasi orizzontale.</li>
+          <li>Il salto in alto con il <em>fosbury flop</em>: inarcandosi all'indietro, l'atleta fa passare il
+            corpo sopra l'asticella mentre il suo baricentro passa <strong>sotto</strong>. È esattamente il
+            trucco della figura a «L», applicato a un essere umano — e valse a Dick Fosbury l'oro olimpico nel
+            1968.</li>
+        </ul>
+      </div>
+
+      <div class="note"><strong>Perché tanto spesso si va a sedersi <em>sul</em> centro di massa.</strong> Un
+        sistema di riferimento si può scegliere dove si vuole: quello del centro di massa non è più «vero» degli
+        altri, è solo enormemente più comodo, e per quattro ragioni precise.
+        <ul>
+          <li><strong>La quantità di moto totale è zero.</strong> Per definizione $\vec P = M\vec v_{\text{CM}}$,
+            e visto dal centro di massa $\vec v_{\text{CM}} = \vec 0$: quindi lì $\vec P_{\text{tot}} = \vec 0$
+            <em>sempre</em>. Un'equazione vettoriale in meno da portarsi dietro, e per questo i fisici delle
+            particelle lo chiamano <em>sistema del centro di quantità di moto</em> e ci fanno tutti i conti.</li>
+          <li><strong>Se il sistema è isolato, quel riferimento è inerziale.</strong> Poiché
+            $M\vec a_{\text{CM}} = \vec F_{\text{esterna}}$, quando le forze esterne sono nulle il centro di massa
+            va di moto rettilineo uniforme: viaggiando con lui valgono ancora i tre principi della dinamica, senza
+            forze apparenti da inventare.</li>
+          <li><strong>Il moto si spezza in due pezzi indipendenti.</strong> Si dimostra (è il
+            <em>teorema di König</em>) che l'energia cinetica di un sistema si scrive sempre come
+            $$K = \underbrace{\tfrac12 M v_{\text{CM}}^2}_{\text{come se fosse un punto}} +
+                  \underbrace{K_{\text{interna}}}_{\text{vista dal centro di massa}}$$
+            e altrettanto vale per il momento angolare. Traslazione del tutto e moto interno smettono di
+            interferire: si possono studiare separatamente, ed è esattamente quello che faremo con il
+            rotolamento nella sezione 3.</li>
+          <li><strong>Molti problemi diventano simmetrici.</strong> In un urto fra due corpi, visto dal centro
+            di massa, i due arrivano sempre <em>l'uno contro l'altro</em> con quantità di moto opposte e, se
+            l'urto è elastico, ripartono con le stesse velocità scambiate di segno; se è completamente
+            anelastico, si fermano entrambi. Nel laboratorio la stessa scena è un disordine di numeri diversi.
+            Lo avete già visto nella <a href="5_Quantita_moto_impulso.html#sec7">lezione 5</a>, accendendo la
+            casella del centro di massa nel simulatore degli urti.</li>
+        </ul>
+        <p style="margin:0.6rem 0 0;">Il prezzo da pagare è che le velocità <em>misurate</em> in laboratorio non
+          sono quelle del conto: alla fine bisogna ricordarsi di tornare indietro sommando
+          $\vec v_{\text{CM}}$. È un cambio di riferimento galileiano come quello della nave della lezione 1 — e
+          nella fisica delle alte energie ha un nome commerciale, «collider» contro «bersaglio fisso»: far
+          scontrare due fasci opposti significa lavorare <em>direttamente</em> nel sistema del centro di massa,
+          e non sprecare energia per trascinare in avanti i prodotti dell'urto.</p>
+      </div>
+
+      <h3>1.1 — Baricentro ed equilibrio</h3>
+
+      <p>Il baricentro decide anche quando un corpo appoggiato sta in piedi e quando si ribalta. La regola è
+        semplice: <strong>finché la verticale per il baricentro cade dentro la base d'appoggio, il corpo
+        torna giù; appena esce, si ribalta.</strong></p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="eq-a">inclinazione del piano: <span class="val-badge" id="eq-av">12</span>°</label>
+          <input type="range" id="eq-a" min="0" max="60" step="1" value="12">
+          <label for="eq-h">altezza della cassa: <span class="val-badge" id="eq-hv">1,60</span> m</label>
+          <input type="range" id="eq-h" min="0.3" max="2.5" step="0.05" value="1.6">
+          <label for="eq-b">larghezza della base: <span class="val-badge" id="eq-bv">0,80</span> m</label>
+          <input type="range" id="eq-b" min="0.2" max="2" step="0.05" value="0.8">
+        </div>
+        <svg id="eq-svg" viewBox="0 0 660 300" aria-label="Cassa su un piano inclinato: ribaltamento quando la verticale del baricentro esce dalla base"></svg>
+        <div class="sp-cols">
+          <div>Angolo di ribaltamento: <span class="val-badge" id="eq-crit">—</span></div>
+          <div>Verticale del baricentro: <span class="val-badge" id="eq-pos">—</span></div>
+          <div>Stato: <span class="val-badge" id="eq-stato">—</span></div>
+        </div>
+        <p class="eq-out" id="eq-out"></p>
+      </div>
+
+      <div class="note"><strong>Perché i camion si ribaltano in curva e le auto da corsa no.</strong> Vale la
+        stessa disuguaglianza, con la forza centrifuga al posto della componente del peso: si ribalta quando
+        $\dfrac{v^2}{gR} \gt \dfrac{b}{2h}$, con $b$ la carreggiata e $h$ l'altezza del baricentro. Un'auto da
+        corsa ha $h$ di venti centimetri e $b$ di un metro e ottanta: il rapporto è $4{,}5$, e in pratica prima
+        slittano le gomme. Un TIR carico ha $h$ vicino a due metri e $b$ di due e mezzo: rapporto $0{,}6$, e il
+        ribaltamento arriva <em>prima</em> dello slittamento. È il motivo per cui i camion hanno limiti di
+        velocità più bassi nelle rotatorie, e perché caricarli male è pericoloso.</div>
+    </section>
+
+    <!-- 2 — IL MOMENTO D'INERZIA -->
+    <section id="sec2">
+      <h2>2. Il momento d'inerzia</h2>
+
+      <p>Per far partire una traslazione bisogna vincere la massa. Per far partire una rotazione bisogna
+        vincere qualcos'altro: e quel qualcos'altro dipende non solo da quanta materia c'è, ma da
+        <strong>dove</strong> è messa.</p>
+
+      <div class="definition">
+        <strong>Momento d'inerzia</strong> rispetto a un asse:
+        $$I = \sum_i m_i\,r_i^2$$
+        dove $r_i$ è la distanza dell'$i$-esimo pezzo <em>dall'asse</em>. Si misura in kg·m². Quel
+        <strong>quadrato</strong> è tutto: portare la massa al doppio della distanza dall'asse la rende quattro
+        volte più difficile da far girare.
+      </div>
+
+      <table class="tabf">
+        <thead><tr><th>Corpo (massa $M$, raggio $R$ o lunghezza $L$)</th><th>Asse</th><th>$I$</th><th>$k = I/MR^2$</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Anello sottile o cilindro cavo</td><td class="l">asse di simmetria</td><td>$M R^2$</td><td>$1$</td></tr>
+          <tr><td class="lab">Disco o cilindro pieno</td><td class="l">asse di simmetria</td><td>$\tfrac12 M R^2$</td><td>$0{,}5$</td></tr>
+          <tr><td class="lab">Sfera piena</td><td class="l">diametro</td><td>$\tfrac25 M R^2$</td><td>$0{,}4$</td></tr>
+          <tr><td class="lab">Guscio sferico sottile</td><td class="l">diametro</td><td>$\tfrac23 M R^2$</td><td>$0{,}667$</td></tr>
+          <tr><td class="lab">Asta sottile di lunghezza $L$</td><td class="l">baricentro, perpendicolare</td><td>$\tfrac{1}{12} M L^2$</td><td>—</td></tr>
+          <tr><td class="lab">Asta sottile di lunghezza $L$</td><td class="l">estremo, perpendicolare</td><td>$\tfrac13 M L^2$</td><td>—</td></tr>
+        </tbody>
+      </table>
+
+      <div class="definition">
+        <strong>Teorema degli assi paralleli (Huygens-Steiner).</strong> Se $I_{\text{CM}}$ è il momento
+        d'inerzia rispetto a un asse passante per il centro di massa, rispetto a un asse parallelo a distanza
+        $d$ vale
+        $$I = I_{\text{CM}} + M d^2$$
+        <p class="formula-note">Guardate le ultime due righe della tabella: $\frac{1}{12}ML^2 + M(L/2)^2 = \frac{1}{12}ML^2 + \frac14 ML^2 = \frac13 ML^2$. Torna. E si vede subito una cosa importante: fra
+          tutti gli assi paralleli, quello che passa per il centro di massa è <strong>sempre</strong> quello
+          con il momento d'inerzia minimo.</p>
+      </div>
+
+      <p>Il modo più bello di vedere il momento d'inerzia all'opera è una gara di rotolamento. Cinque corpi,
+        tutti con la stessa massa e lo stesso raggio, lasciati insieme in cima a un piano inclinato. Chi
+        arriva prima?</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="mi-a">inclinazione: <span class="val-badge" id="mi-av">15</span>°</label>
+          <input type="range" id="mi-a" min="3" max="35" step="1" value="15">
+          <label for="mi-l">lunghezza della pista: <span class="val-badge" id="mi-lv">3,0</span> m</label>
+          <input type="range" id="mi-l" min="1" max="6" step="0.5" value="3">
+          <button class="btn" id="mi-via" type="button">🏁 Via!</button>
+          <button class="btn btn-secondary" id="mi-reset" type="button">↺ In cima</button>
+        </div>
+        <svg id="mi-svg" viewBox="0 0 660 330" aria-label="Gara di rotolamento fra cinque corpi con momenti d'inerzia diversi"></svg>
+        <div class="sp-cols">
+          <div>Ordine d'arrivo: <span class="val-badge" id="mi-ord">—</span></div>
+          <div>Tempo del primo: <span class="val-badge" id="mi-t1">—</span></div>
+          <div>Tempo dell'ultimo: <span class="val-badge" id="mi-t2">—</span></div>
+        </div>
+        <p class="eq-out" id="mi-out"></p>
+      </div>
+
+      <div class="warnbox"><strong>Il risultato è controintuitivo due volte.</strong> Primo: la classifica
+        <em>non dipende</em> né dalla massa né dal raggio, ma solo dalla <strong>forma</strong> — cioè da
+        $k = I/MR^2$. Una biglia di vetro e una palla da bowling arrivano insieme. Secondo: vince sempre chi ha
+        la massa <em>concentrata al centro</em>, perché deve spendere meno energia a far girare e ne tiene di
+        più per avanzare. E chi <strong>striscia senza attrito</strong> batte tutti, perché non deve girare
+        affatto.</div>
+    </section>
+
+    <!-- 3 — LA DINAMICA DELLE ROTAZIONI -->
+    <section id="sec3">
+      <h2>3. La dinamica delle rotazioni: un dizionario</h2>
+
+      <p>A questo punto conviene fermarsi e mettere in colonna quello che sappiamo. Tutta la dinamica delle
+        rotazioni si ottiene da quella delle traslazioni con una sostituzione meccanica di simboli, e vale la
+        pena impararla come si impara un dizionario.</p>
+
+      <table class="dizio">
+        <thead><tr><th>Traslazioni</th><th>Rotazioni</th></tr></thead>
+        <tbody>
+          <tr><td>spostamento $s$</td><td>angolo $\theta$</td></tr>
+          <tr><td>velocità $v = \Delta s/\Delta t$</td><td>velocità angolare $\omega = \Delta\theta/\Delta t$</td></tr>
+          <tr><td>accelerazione $a$</td><td>accelerazione angolare $\alpha$</td></tr>
+          <tr><td>massa $m$</td><td>momento d'inerzia $I$</td></tr>
+          <tr><td>forza $F$</td><td>momento della forza $M = F\,b$</td></tr>
+          <tr><td>$F = ma$</td><td>$M = I\alpha$</td></tr>
+          <tr><td>quantità di moto $p = mv$</td><td>momento angolare $L = I\omega$</td></tr>
+          <tr><td>$F = \mathrm{d}p/\mathrm{d}t$</td><td>$M = \mathrm{d}L/\mathrm{d}t$</td></tr>
+          <tr><td>energia cinetica $\frac12 mv^2$</td><td>energia di rotazione $\frac12 I\omega^2$</td></tr>
+          <tr><td>lavoro $W = F s$</td><td>lavoro $W = M\theta$</td></tr>
+          <tr><td>potenza $P = Fv$</td><td>potenza $P = M\omega$</td></tr>
+        </tbody>
+      </table>
+
+      <div class="definition">
+        <strong>Il rotolamento senza strisciare.</strong> Quando una ruota rotola senza slittare, il punto di
+        contatto è <em>istantaneamente fermo</em>, e valgono i legami
+        $$v_{\text{CM}} = \omega R, \qquad a_{\text{CM}} = \alpha R$$
+        L'energia cinetica totale è la somma dei due contributi:
+        $$K = \underbrace{\tfrac12 M v_{\text{CM}}^2}_{\text{traslazione}} +
+              \underbrace{\tfrac12 I \omega^2}_{\text{rotazione}} = \tfrac12 (1+k)\,M v_{\text{CM}}^2$$
+        e da qui, con la conservazione dell'energia su un piano inclinato, l'accelerazione della gara:
+        $$a = \frac{g\sin\theta}{1+k}$$
+      </div>
+
+      <div class="note"><strong>Ecco il $5/7$, finalmente per intero.</strong> Per una sfera piena
+        $k = 2/5$, quindi $a = \dfrac{g\sin\theta}{1+2/5} = \dfrac{5}{7}g\sin\theta$: è il numero che vi
+        avevo promesso nella lezione 1, quando la pallina di Galileo scendeva più lenta del previsto, e di cui
+        avevamo dato la ragione energetica nella lezione 4. Adesso lo sappiamo <em>ricavare</em>.</div>
+
+      <div class="curiosita"><strong>Il punto di contatto che sta fermo.</strong> È l'affermazione più
+        sorprendente di questa sezione, ed è vera: nel rotolamento puro il punto della ruota che tocca terra ha
+        velocità <strong>zero</strong>. È per questo che l'attrito statico non compie lavoro e la ruota non si
+        scalda, ed è per questo che la ruota è stata una delle invenzioni più importanti della storia. Il punto
+        <em>in cima</em> alla ruota, invece, si muove a $2v_{\text{CM}}$: guardate la foto di un'auto in corsa
+        e vedrete la parte alta del pneumatico mossa e quella bassa nitida. Lo avevamo già incontrato con la
+        cicloide, nella lezione 1.</div>
+    </section>
+
+    <!-- 4 — IL DISCO DI EULERO -->
+    <section id="sec4">
+      <h2>4. Il disco di Eulero</h2>
+
+      <p>Prendete una moneta e fatela roteare su un tavolo. Sapete già che cosa succede: il disco si inclina
+        sempre di più, e il rumore del contatto diventa sempre più rapido, fino a un
+        <em>brrrrrrrp</em> acutissimo che si spegne di colpo. Quel finale è uno dei problemi aperti più
+        divertenti della meccanica classica.</p>
+
+      <div class="definition">
+        <strong>Che cosa sta girando.</strong> Attenzione: nella fase finale il disco quasi non <em>ruota</em>
+        più attorno al proprio asse — quello che gira velocissimo è il <strong>punto di contatto</strong>, che
+        corre lungo il bordo. Il moto si chiama <em>rotolamento con precessione</em>, e per un disco di raggio
+        $a$ inclinato di un angolo piccolo $\alpha$ rispetto al piano la frequenza di precessione vale
+        $$\Omega = \sqrt{\frac{4g}{3\,a\,\alpha}}$$
+        <p class="formula-note">Per $\alpha \to 0$ quella radice <strong>diverge</strong>: la frequenza tende
+          all'infinito. Ed è proprio quello che sentite.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="de-a">raggio del disco: <span class="val-badge" id="de-av">3,8</span> cm</label>
+          <input type="range" id="de-a" min="1" max="10" step="0.2" value="3.8">
+          <label for="de-t">durata totale: <span class="val-badge" id="de-tv">18</span> s</label>
+          <input type="range" id="de-t" min="4" max="60" step="1" value="18">
+          <label class="toggle-row"><input type="checkbox" id="de-lock" checked> 🔒 blocca la scala</label>
+          <button class="btn" id="de-via" type="button">▶ Fai partire</button>
+          <button class="btn btn-secondary" id="de-stop" type="button">⏸ Ferma</button>
+        </div>
+        <svg id="de-svg" viewBox="0 0 660 340" aria-label="Disco di Eulero: l'inclinazione cala e la frequenza di precessione diverge"></svg>
+        <div class="sp-cols">
+          <div>Tempo: <span class="val-badge" id="de-tnow">—</span></div>
+          <div>Inclinazione: <span class="val-badge" id="de-ang">—</span></div>
+          <div>Frequenza di precessione: <span class="val-badge" id="de-f">—</span></div>
+          <div>Giri già fatti: <span class="val-badge" id="de-giri">—</span></div>
+        </div>
+        <p class="eq-out" id="de-out"></p>
+      </div>
+
+      <div class="curiosita"><strong>La singolarità in tempo finito.</strong> Nel 2000 <strong>Keith
+        Moffatt</strong> pubblicò su <em>Nature</em> un articolo di una pagina in cui mostrava che, se
+        l'energia viene dissipata dalla <em>viscosità del sottile strato d'aria</em> schiacciato fra il disco e
+        il tavolo, allora $\alpha$ va a zero come $(t_0-t)^{1/3}$ e la frequenza diverge come
+        $(t_0-t)^{-1/6}$: il moto finisce in un <strong>tempo finito</strong> con frequenza infinita. È il tipo
+        di comportamento che i matematici chiamano <em>singolarità in tempo finito</em>, e che si incontra in
+        contesti molto più seri — per esempio nel problema, ancora aperto e da un milione di dollari, se le
+        equazioni di Navier-Stokes possano produrne una.
+        <p style="margin:0.6rem 0 0;">La storia non finisce lì. Altri hanno obiettato che a dissipare non è
+          l'aria ma l'attrito di rotolamento, o gli urti microscopici del bordo; esperimenti in camera a vuoto
+          hanno mostrato che il disco continua a comportarsi quasi allo stesso modo. <strong>Non c'è ancora un
+          accordo definitivo su che cosa fermi una monetina che gira su un tavolo.</strong> Vale la pena
+          ricordarselo, la prossima volta che qualcuno dice che la fisica classica è un capitolo chiuso.</p>
+      </div>
+
+      <div class="note"><strong>Provateci davvero.</strong> Serve una superficie molto liscia — un tavolo di
+        vetro o uno specchio — e un disco pesante e ben lucidato: una moneta grossa va benissimo. Registrate il
+        suono con il telefono e guardate lo spettrogramma: vedrete la frequenza salire e poi troncarsi di
+        netto. È un esperimento di fisica moderna che costa cinquanta centesimi.</div>
+    </section>
+
+    <!-- 5 — IL GIROSCOPIO -->
+    <section id="sec5">
+      <h2>5. Il giroscopio, la trottola e la bicicletta</h2>
+
+      <p>Una trottola ferma cade. Una trottola che gira, no: si mette invece a descrivere lentamente un cono
+        attorno alla verticale. È il fenomeno più antintuitivo di tutta la meccanica, ed è una conseguenza
+        diretta di una sola formula.</p>
+
+      <div class="definition">
+        <strong>Precessione.</strong> Il peso esercita rispetto al punto d'appoggio un momento $M = m g r$,
+        orizzontale e perpendicolare all'asse. Poiché $\vec M = \mathrm{d}\vec L/\mathrm{d}t$, il momento
+        angolare non <em>cala</em>: <strong>ruota</strong>. Il vettore $\vec L$ si sposta di
+        $\mathrm{d}\vec L = \vec M\,\mathrm{d}t$, cioè perpendicolarmente a sé stesso, e la velocità angolare
+        di precessione risulta
+        $$\Omega_p = \frac{M}{L} = \frac{m\,g\,r}{I\,\omega}$$
+        <p class="formula-note">Notate il $\omega$ al <strong>denominatore</strong>: più la trottola gira in
+          fretta, <em>più lentamente</em> precede. E quando l'attrito la rallenta, la precessione accelera,
+          finché la trottola non cade — che è esattamente quello che avete visto succedere mille volte.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="gi-w">giri al secondo del volano: <span class="val-badge" id="gi-wv">30</span></label>
+          <input type="range" id="gi-w" min="2" max="80" step="1" value="30">
+          <label for="gi-m">massa: <span class="val-badge" id="gi-mv">0,50</span> kg</label>
+          <input type="range" id="gi-m" min="0.1" max="3" step="0.05" value="0.5">
+          <label for="gi-r">distanza dal perno: <span class="val-badge" id="gi-rv">0,12</span> m</label>
+          <input type="range" id="gi-r" min="0.02" max="0.3" step="0.01" value="0.12">
+          <label for="gi-R">raggio del volano: <span class="val-badge" id="gi-Rv">0,060</span> m</label>
+          <input type="range" id="gi-R" min="0.02" max="0.15" step="0.005" value="0.06">
+        </div>
+        <svg id="gi-svg" viewBox="0 0 660 320" aria-label="Giroscopio in precessione attorno al perno"></svg>
+        <div class="sp-cols">
+          <div>Momento angolare $L$: <span class="val-badge" id="gi-L">—</span></div>
+          <div>Momento del peso $M$: <span class="val-badge" id="gi-M">—</span></div>
+          <div>Velocità di precessione: <span class="val-badge" id="gi-op">—</span></div>
+          <div>Periodo di precessione: <span class="val-badge" id="gi-Tp">—</span></div>
+        </div>
+        <p class="eq-out" id="gi-out"></p>
+      </div>
+
+      <div class="curiosita"><strong>La bicicletta: attenzione alla spiegazione sbagliata.</strong> Si legge
+        spesso che la bicicletta sta in piedi «per effetto giroscopico delle ruote». È in gran parte falso, e
+        lo si è dimostrato sperimentalmente: nel 1970 <strong>David Jones</strong> costruì biciclette con una
+        seconda ruota controrotante che annullava il momento angolare, e restavano guidabilissime; nel 2011 un
+        gruppo olandese pubblicò su <em>Science</em> una bicicletta senza effetto giroscopico <em>e</em> senza
+        avancorsa, che continuava a stare in piedi da sola. Il contributo giroscopico c'è, ma è piccolo: quello
+        che davvero tiene su la bici è la <strong>geometria dello sterzo</strong>, che fa girare il manubrio
+        dalla parte giusta quando la bici si inclina, e soprattutto il <strong>ciclista</strong>, che sterza
+        verso il lato in cui sta cadendo. Provate: è impossibile stare in equilibrio con il manubrio
+        bloccato.</div>
+
+      <div class="curiosita"><strong>Dove i giroscopi servono per davvero.</strong> Nelle bussole giroscopiche
+        delle navi, che indicano il nord <em>geografico</em> e non quello magnetico. Nelle piattaforme inerziali
+        di aerei e missili, che sanno dove sono senza guardare fuori. Nei telescopi spaziali: Hubble si punta
+        con quattro ruote di reazione, cioè volani che, accelerando, fanno ruotare il telescopio dalla parte
+        opposta — conservazione del momento angolare, nient'altro. E nel vostro telefono, dove un giroscopio
+        MEMS grande un millimetro capisce se lo state girando.</div>
+    </section>
+
+    <!-- 6 — LA PRECESSIONE DEGLI EQUINOZI -->
+    <section id="sec6">
+      <h2>6. La precessione degli equinozi</h2>
+
+      <p>La Terra è una trottola. Gira su sé stessa in un giorno, il suo asse è inclinato di $23{,}44°$
+        rispetto alla perpendicolare all'orbita, e non è una sfera perfetta: è schiacciata ai poli e rigonfia
+        all'equatore di una ventina di chilometri. Su quel rigonfiamento il Sole e la Luna esercitano un
+        momento — e succede esattamente quello che succede alla trottola.</p>
+
+      <div class="definition">
+        <strong>Precessione luni-solare.</strong> L'asse terrestre descrive un cono di semiapertura
+        $23{,}44°$ con un periodo di circa <strong>25 772 anni</strong> — il cosiddetto «anno platonico».
+        La formula è la stessa del giroscopio, $\Omega_p = M/(I\omega)$: qui $\omega$ è la rotazione
+        giornaliera (velocissima) e $M$ è piccolo, e per questo il periodo è così lungo.
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="pr-t">anno: <span class="val-badge" id="pr-tv">2026</span></label>
+          <input type="range" id="pr-t" min="-11000" max="15000" step="100" value="2000">
+          <button class="btn btn-secondary" id="pr-oggi" type="button">⏱ Torna a oggi</button>
+        </div>
+        <svg id="pr-svg" viewBox="0 0 660 340" aria-label="Precessione dell'asse terrestre: la stella polare cambia nei millenni"></svg>
+        <div class="sp-cols">
+          <div>Stella più vicina al polo: <span class="val-badge" id="pr-stella">—</span></div>
+          <div>Distanza dal polo: <span class="val-badge" id="pr-dist">—</span></div>
+          <div>Scarto del punto vernale: <span class="val-badge" id="pr-vern">—</span></div>
+          <div>Costellazione all'equinozio: <span class="val-badge" id="pr-cost">—</span></div>
+        </div>
+        <p class="eq-out" id="pr-out"></p>
+      </div>
+
+      <div class="curiosita"><strong>Perché il vostro segno zodiacale è sbagliato di uno.</strong> I segni
+        dello zodiaco furono fissati dai Babilonesi circa duemilacinquecento anni fa, quando l'equinozio di
+        primavera cadeva davanti alla costellazione dell'Ariete. Da allora la precessione ha spostato il punto
+        vernale di quasi $35°$, cioè di più di un segno: oggi l'equinozio cade nei Pesci e fra qualche secolo
+        entrerà nell'Acquario (di qui la canzone). L'astrologia occidentale ha continuato a usare i segni
+        <em>fissi</em> del calendario babilonese: chi si dice «Ariete» ha in realtà il Sole nei Pesci.
+        L'astronomia lo sa da Ipparco, che scoprì la precessione nel II secolo a.C. confrontando le proprie
+        misure con quelle dei Babilonesi — uno dei più bei risultati dell'antichità, ottenuto con l'unico
+        strumento di cui disponeva: archivi vecchi di secoli.</div>
+
+      <div class="curiosita"><strong>E il Natale che si è staccato dal solstizio.</strong> Qui la precessione
+        entra in un modo più sottile, attraverso il calendario. L'<strong>anno tropico</strong> — il tempo fra
+        due equinozi di primavera — è di $365{,}2422$ giorni; il calendario giuliano, con il suo bisestile ogni
+        quattro anni, ne assumeva $365{,}25$. La differenza è di soli $11$ minuti e $14$ secondi all'anno, ma
+        fa un giorno ogni $128$ anni: nel 1582 l'equinozio era arretrato di dieci giorni rispetto al 21 marzo
+        stabilito dal concilio di Nicea, e la Pasqua stava scivolando verso l'estate. La riforma
+        <strong>gregoriana</strong> tolse dieci giorni di colpo (dal 4 si passò al 15 ottobre 1582) e cambiò la
+        regola dei bisestili: i secolari non divisibili per 400 non lo sono più. Il Natale, fissato al 25
+        dicembre quando il solstizio cadeva lì, oggi arriva tre-quattro giorni <em>dopo</em> il solstizio del
+        21: la festa è rimasta ferma sul calendario, il cielo si è mosso.
+        <p style="margin:0.6rem 0 0;">Le chiese ortodosse non accettarono la riforma, ed è per questo che il
+          loro Natale cade il 7 gennaio: tredici giorni di scarto accumulati dal 1582 a oggi. Una differenza di
+          undici minuti all'anno, moltiplicata per qualche secolo, e le feste di mezzo mondo si spostano.</p>
+      </div>
+    </section>
+
+    <!-- 7 — LA PRECESSIONE DI MERCURIO -->
+    <section id="sec7">
+      <h2>7. La precessione di Mercurio, dove Newton si ferma</h2>
+
+      <p>C'è un'altra precessione, e questa ha fatto crollare una teoria vecchia di due secoli.</p>
+
+      <p>Nella lezione 2 abbiamo visto che, con una forza esattamente proporzionale a $1/r^2$, l'orbita è
+        un'ellisse <em>chiusa</em>: dopo un giro il pianeta ripassa esattamente dove era. È una proprietà
+        eccezionale — vale solo per $1/r^2$ e per la forza elastica, ed è il contenuto del
+        <em>teorema di Bertrand</em>. Basta cambiare la legge di un pelo e l'ellisse si mette a
+        <strong>ruotare lentamente</strong>: il perielio precede.</p>
+
+      <div class="definition">
+        <strong>Il conto dell'Ottocento.</strong> Il perielio di Mercurio precede di circa
+        <strong>574 secondi d'arco per secolo</strong>. La meccanica newtoniana ne spiega quasi tutti come
+        perturbazioni degli altri pianeti (Venere, Giove, la Terra…), più una parte dovuta al fatto che le
+        coordinate si misurano rispetto agli equinozi, che a loro volta precedono. Sommando tutto restavano
+        però <strong>43 secondi d'arco per secolo</strong> senza spiegazione. Sono $0{,}012$ gradi al secolo:
+        un errore ridicolo, e nessuno riusciva a farlo sparire.
+      </div>
+
+      <div class="curiosita"><strong>Il pianeta che non c'era.</strong> Nel 1859 <strong>Urbain Le
+        Verrier</strong> — lo stesso che aveva scoperto Nettuno sulla punta della penna, come abbiamo
+        raccontato nella lezione 2 — provò la stessa medicina: ipotizzò un pianeta interno all'orbita di
+        Mercurio e lo chiamò <strong>Vulcano</strong>. Fu cercato per cinquant'anni; ci furono decine di
+        avvistamenti, tutti falsi. La ricetta che aveva funzionato con Nettuno, stavolta, non funzionava: non
+        mancava un pianeta, mancava una <em>teoria</em>.</div>
+
+      <div class="warnbox"><strong>Il 18 novembre 1915.</strong> Einstein, che stava completando la relatività
+        generale, calcolò la precessione del perielio prevista dalla sua teoria e trovò
+        $$\Delta\varphi = \frac{6\pi G M_\odot}{a\,(1-e^2)\,c^2} \ \text{per orbita}$$
+        che per Mercurio fa esattamente <strong>43 secondi d'arco per secolo</strong>. Scrisse a un amico di
+        aver avuto palpitazioni per giorni: la teoria non era stata costruita per spiegare quel numero, e il
+        numero era uscito da solo. È uno dei momenti più belli della storia della fisica, e ci ritornerete
+        l'anno prossimo studiando la relatività generale.
+        <p style="margin:0.6rem 0 0;">Il punto per noi, oggi, è un altro: <strong>la meccanica di Newton ha un
+          confine</strong>, e quel confine si trova guardando molto da vicino una precessione. Tutto quello che
+          stiamo studiando è vero <em>entro</em> quel confine — che per fortuna contiene le automobili, i
+          ponti, i satelliti e le trottole.</p>
+      </div>
+    </section>
+
+    <!-- 8 — IL PENDOLO DI FOUCAULT -->
+    <section id="sec8">
+      <h2>8. Il pendolo di Foucault: la prova che la Terra gira</h2>
+
+      <p>Nel febbraio del 1851 <strong>Léon Foucault</strong> appese alla cupola del Panthéon di Parigi una
+        sfera di ottone di $28$ kg con un filo di $67$ metri, la mise in oscillazione e invitò il pubblico con
+        una frase che è rimasta: <em>«Siete invitati a venire a vedere la Terra girare.»</em></p>
+
+      <div class="definition">
+        <strong>Che cosa si vede.</strong> Il piano di oscillazione del pendolo ruota lentamente rispetto al
+        pavimento. Non perché una forza lo faccia ruotare: perché il pendolo, non essendo vincolato a nulla se
+        non alla verticale, <strong>tende a mantenere il proprio piano</strong> — e sotto di lui è il pavimento
+        a girare. La velocità apparente di rotazione dipende dalla latitudine $\lambda$:
+        $$\Omega_{\text{app}} = \Omega_{\text{Terra}}\,\sin\lambda = 15{,}04\,\frac{°}{\text{h}} \cdot \sin\lambda
+          \qquad\Longrightarrow\qquad T = \frac{23{,}93\ \text{h}}{\sin\lambda}$$
+        <p class="formula-note">Al polo il piano compie un giro in un giorno siderale; all'equatore
+          $\sin\lambda = 0$ e il piano <em>non ruota affatto</em>. A Parigi ($48{,}87°$ N) il giro dura
+          $31{,}8$ ore, cioè circa $11°$ all'ora: abbastanza da vedere lo spostamento in un quarto d'ora, con
+          un po' di pazienza.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="fo-lat">latitudine: <span class="val-badge" id="fo-latv">48,9</span>° N</label>
+          <input type="range" id="fo-lat" min="0" max="90" step="0.1" value="48.9">
+          <label for="fo-acc">accelerazione del tempo: <span class="val-badge" id="fo-accv">2000</span>×</label>
+          <input type="range" id="fo-acc" min="200" max="8000" step="100" value="2000">
+          <button class="btn" id="fo-via" type="button">▶ Avvia</button>
+          <button class="btn btn-secondary" id="fo-reset" type="button">↺ Azzera</button>
+        </div>
+        <svg id="fo-svg" viewBox="0 0 660 340" aria-label="Pendolo di Foucault visto dall'alto: il piano di oscillazione ruota"></svg>
+        <div class="sp-cols">
+          <div>Rotazione apparente: <span class="val-badge" id="fo-om">—</span></div>
+          <div>Periodo del giro completo: <span class="val-badge" id="fo-per">—</span></div>
+          <div>Tempo trascorso: <span class="val-badge" id="fo-t">—</span></div>
+          <div>Angolo accumulato: <span class="val-badge" id="fo-ang">—</span></div>
+        </div>
+        <p class="eq-out" id="fo-out"></p>
+      </div>
+
+      <div class="curiosita"><strong>Duecentotto anni di ritardo.</strong> Copernico pubblicò il
+        <em>De revolutionibus</em> nel 1543. Il pendolo di Foucault è del 1851. Per <strong>tre secoli</strong>
+        il moto della Terra è stato accettato senza che nessuno ne avesse una prova <em>diretta</em>, ottenuta
+        in laboratorio: si avevano ottimi argomenti indiretti — le fasi di Venere, i satelliti di Giove, le
+        leggi di Keplero, l'aberrazione della luce di Bradley (1729) — ma nessun esperimento terrestre. Foucault
+        fu il primo, e lo fece con un filo e un peso.</div>
+
+      <div class="curiosita"><strong>Copernico, Galileo e una faccenda meno semplice di come la si racconta.</strong>
+        Nel <em>Dialogo sopra i due massimi sistemi</em> (1632) Galileo mise la sua difesa del copernicanesimo
+        in bocca a due personaggi, Salviati e Sagredo, e affidò le tesi tolemaiche a un terzo,
+        <strong>Simplicio</strong> — nome che rimanda al commentatore Simplicio di Cilicia, ma che in italiano
+        suonava inevitabilmente come «il semplicione». Nell'ultima pagina Galileo fece pronunciare a Simplicio
+        l'argomento preferito di papa <strong>Urbano VIII</strong>, che era stato suo protettore. Il papa si
+        sentì messo in ridicolo, e il processo del 1633 partì anche da lì.
+        <p style="margin:0.6rem 0 0;">Arthur Koestler, nel suo libro <em>The Sleepwalkers</em> (1959),
+          sostenne che la vicenda va letta senza agiografie: gli scienziati non procedono per illuminazioni
+          logiche ma «come sonnambuli», per intuizioni, ostinazioni ed errori, e Galileo non aveva, nel 1632,
+          prove decisive del moto terrestre — anzi, la sua «prova» preferita, quella delle maree, era
+          sbagliata, e rifiutò le ellissi di Keplero che avrebbero rafforzato la sua posizione. La tesi di
+          Koestler è discussa e molti storici la considerano ingenerosa. Ma il punto che ci riguarda resta
+          valido: <strong>avere ragione non è la stessa cosa che avere le prove</strong>, e la prova
+          sperimentale del moto terrestre arrivò due secoli dopo, con un pendolo.</p>
+      </div>
+
+      <div class="note"><strong>Da che parte gira?</strong> Nell'emisfero settentrionale il piano ruota in
+        senso <em>orario</em> visto dall'alto; in quello meridionale, antiorario. È lo stesso effetto — la
+        <strong>forza di Coriolis</strong> — che fa girare i cicloni in versi opposti nei due emisferi. Non è
+        invece quello che decide il verso del vortice nel lavandino: lì l'effetto di Coriolis è milioni di
+        volte più debole delle irregolarità della vasca e del modo in cui si è tolto il tappo. Il pendolo
+        funziona proprio perché è enorme, pesante e lentissimo: serve un esperimento costruito apposta per
+        rendere visibile una cosa piccolissima.</div>
+    </section>
+
+    <!-- 9 — IL PENDOLO COMPOSTO -->
+    <section id="sec9">
+      <h2>9. Il pendolo composto</h2>
+
+      <p>Nella lezione 3 abbiamo misurato $g$ con un pendolo, e per farlo abbiamo dovuto supporre che tutta la
+        massa fosse concentrata in un punto all'estremità del filo. Non è mai vero. Adesso abbiamo gli
+        strumenti per fare il conto giusto.</p>
+
+      <div class="definition">
+        <strong>Pendolo composto</strong> (o fisico): un corpo rigido qualunque, libero di oscillare attorno a
+        un asse orizzontale che non passa per il baricentro. Scrivendo $M = I\alpha$ con il momento del peso
+        $-Mgd\sin\theta$ e approssimando $\sin\theta \approx \theta$:
+        $$T = 2\pi\sqrt{\frac{I}{M\,g\,d}}$$
+        dove $d$ è la distanza fra l'asse e il baricentro e $I$ il momento d'inerzia <em>rispetto all'asse</em>.
+        <p class="formula-note">Se tutta la massa fosse concentrata a distanza $d$ si avrebbe $I = Md^2$ e la
+          formula si ridurrebbe a $T = 2\pi\sqrt{d/g}$, il pendolo semplice. Il pendolo composto oscilla come
+          un pendolo semplice di <strong>lunghezza ridotta</strong> $\ell_{\text{eq}} = I/(Md)$.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="pc-L">lunghezza dell'asta: <span class="val-badge" id="pc-Lv">1,00</span> m</label>
+          <input type="range" id="pc-L" min="0.3" max="2" step="0.05" value="1">
+          <label for="pc-d">perno a <span class="val-badge" id="pc-dv">0,40</span> · L dal baricentro</label>
+          <input type="range" id="pc-d" min="0.02" max="0.5" step="0.01" value="0.4">
+          <label class="toggle-row"><input type="checkbox" id="pc-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg id="pc-svg" viewBox="0 0 660 330" aria-label="Periodo del pendolo composto in funzione della distanza fra perno e baricentro"></svg>
+        <div class="sp-cols">
+          <div>Momento d'inerzia: <span class="val-badge" id="pc-I">—</span></div>
+          <div>Periodo: <span class="val-badge" id="pc-T">—</span></div>
+          <div>Lunghezza ridotta: <span class="val-badge" id="pc-leq">—</span></div>
+          <div>Distanza di periodo minimo: <span class="val-badge" id="pc-dmin">—</span></div>
+        </div>
+        <p class="eq-out" id="pc-out"></p>
+      </div>
+
+      <div class="warnbox"><strong>Due sorprese nella curva.</strong> Primo: avvicinando il perno al
+        baricentro il periodo <strong>non</strong> tende a zero, ma va all'<em>infinito</em> — con $d \to 0$
+        sparisce la forza di richiamo, e un corpo appeso esattamente al baricentro resta fermo in qualunque
+        posizione (equilibrio indifferente). Secondo: esiste una distanza di <strong>periodo minimo</strong>,
+        per un'asta omogenea $d = L/\sqrt{12} \approx 0{,}289\,L$. E per ogni periodo maggiore del minimo
+        esistono <em>due</em> distanze che lo realizzano.</div>
+
+      <div class="curiosita"><strong>Il pendolo reversibile di Kater, e perché quelle due distanze contano.</strong>
+        Nel 1817 il capitano <strong>Henry Kater</strong> capì che se si trovano due assi di sospensione, dalle
+        parti opposte del baricentro, per cui il periodo è lo <em>stesso</em>, allora la loro distanza è
+        esattamente la lunghezza ridotta $\ell_{\text{eq}}$, e vale
+        $$g = \frac{4\pi^2\,\ell_{\text{eq}}}{T^2}$$
+        Il bello è che in questa formula <strong>non compaiono né la massa né il momento d'inerzia</strong>:
+        basta misurare una distanza fra due coltelli e un tempo. Il pendolo di Kater fu per più di un secolo lo
+        strumento più preciso per misurare $g$ — meglio di una parte su centomila — ed è il metodo che avrebbe
+        risolto quasi tutte le incertezze dell'esperienza della lezione 3.</div>
+    </section>
+
+    <!-- 10 — ESERCIZI GUIDATI -->
+    <section id="sec10">
+      <h2>10. Cinque esercizi guidati</h2>
+
+      <div class="qbox">
+        <div class="qt">① Dove si trova il centro di massa del sistema Terra-Luna? ($M_T = 5{,}97\times10^{24}$
+          kg, $M_L = 7{,}35\times10^{22}$ kg, distanza $384\,400$ km, raggio terrestre $6371$ km.)</div>
+        <button class="btn btn-toggle" data-target="#sol-b1">Mostra la soluzione</button>
+        <div id="sol-b1" class="hidden">
+          <p><span class="step-num">1</span>Mettiamo l'origine al centro della Terra. Allora
+            $x_T = 0$ e $x_L = 384\,400$ km.</p>
+          <p><span class="step-num">2</span>$$x_{\text{CM}} = \frac{M_L\,x_L}{M_T + M_L} =
+            384\,400 \cdot \frac{7{,}35\times10^{22}}{6{,}045\times10^{24}} = 384\,400 \cdot 0{,}01216 =
+            4674\ \text{km}$$</p>
+          <p><span class="step-num">3</span><strong>È dentro la Terra</strong>, a circa tre quarti del raggio
+            dal centro: $4674 \lt 6371$. Quindi la Terra non «sta ferma mentre la Luna le gira attorno»: le due
+            girano entrambe attorno a un punto che sta sotto la crosta terrestre, e il centro della Terra
+            descrive ogni mese una circonferenza di quasi cinquemila chilometri di raggio.</p>
+          <p><span class="step-num">4</span>Per il sistema Sole-Giove il conto dà invece un baricentro
+            <em>fuori</em> dalla superficie del Sole: è quel piccolo tentennamento che permette di scoprire i
+            pianeti extrasolari col metodo delle velocità radiali.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">② Un'asta omogenea di $2{,}0$ kg e $1{,}2$ m porta all'estremo una massa puntiforme di
+          $0{,}50$ kg. Calcola il momento d'inerzia rispetto a un asse perpendicolare passante per l'altro
+          estremo.</div>
+        <button class="btn btn-toggle" data-target="#sol-b2">Mostra la soluzione</button>
+        <div id="sol-b2" class="hidden">
+          <p><span class="step-num">1</span><strong>Il momento d'inerzia è additivo</strong>: si calcolano i
+            pezzi separatamente e si sommano (purché sia lo stesso asse).</p>
+          <p><span class="step-num">2</span>L'asta, con Huygens-Steiner:
+            $I_{\text{asta}} = \frac{1}{12}ML^2 + M(L/2)^2 = \frac{1}{12}\cdot 2 \cdot 1{,}44 + 2 \cdot 0{,}36 = 0{,}24 + 0{,}72 = 0{,}96$ kg·m². (È la formula $\frac13 ML^2$ della tabella.)</p>
+          <p><span class="step-num">3</span>La massa puntiforme: $I_m = m\,L^2 = 0{,}50 \cdot 1{,}44 = 0{,}72$ kg·m².</p>
+          <p><span class="step-num">4</span>Totale: $I = 0{,}96 + 0{,}72 = 1{,}68$ kg·m². Notate che
+            $0{,}50$ kg messi all'estremo contano quasi quanto tutti i $2{,}0$ kg dell'asta: è il quadrato
+            della distanza che comanda.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">③ Una massa $m_1 = 3{,}0$ kg pende da un filo che passa su una carrucola a disco pieno
+          ($M = 1{,}0$ kg, $R = 0{,}10$ m) e va a tirare un blocco $m_2 = 2{,}0$ kg su un tavolo liscio.
+          Trova l'accelerazione e le due tensioni.</div>
+        <button class="btn btn-toggle" data-target="#sol-b3">Mostra la soluzione</button>
+        <div id="sol-b3" class="hidden">
+          <p><span class="step-num">1</span><strong>La carrucola ha massa</strong>, quindi le due tensioni sono
+            <em>diverse</em>: è la loro differenza a farla accelerare. Questo è l'errore classico da evitare.</p>
+          <p><span class="step-num">2</span>Le tre equazioni:
+            $$m_1 g - T_1 = m_1 a, \qquad T_2 = m_2 a, \qquad (T_1 - T_2)R = I\alpha = \tfrac12 MR^2 \cdot \frac{a}{R}$$
+            L'ultima si semplifica in $T_1 - T_2 = \frac12 M a$.</p>
+          <p><span class="step-num">3</span>Sommando le tre: $m_1 g = \left(m_1 + m_2 + \frac{M}{2}\right)a$,
+            cioè
+            $$a = \frac{m_1 g}{m_1 + m_2 + M/2} = \frac{3{,}0 \cdot 9{,}81}{3{,}0 + 2{,}0 + 0{,}50} =
+              \frac{29{,}43}{5{,}5} = 5{,}35\ \text{m/s}^2$$</p>
+          <p><span class="step-num">4</span>$T_2 = m_2 a = 10{,}7$ N; $T_1 = m_1(g-a) = 3{,}0 \cdot 4{,}46 = 13{,}4$ N. Differenza: $2{,}68$ N, che è proprio $\frac12 M a = 0{,}5 \cdot 1 \cdot 5{,}35$. ✓</p>
+          <p><span class="step-num">5</span><strong>Il senso fisico.</strong> Il termine $M/2$ al denominatore
+            si comporta come una massa aggiuntiva: la carrucola «pesa» metà della sua massa, perché è un disco
+            ($k = 1/2$). Se fosse un anello peserebbe per intero. Se fosse ideale, senza massa, si tornerebbe
+            al $a = m_1g/(m_1+m_2) = 5{,}89$ m/s² della lezione 1.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">④ Una sfera piena parte da ferma e rotola senza strisciare lungo un piano inclinato,
+          scendendo di $1{,}5$ m in verticale. Con che velocità arriva in fondo? E quale frazione dell'energia
+          è finita in rotazione?</div>
+        <button class="btn btn-toggle" data-target="#sol-b4">Mostra la soluzione</button>
+        <div id="sol-b4" class="hidden">
+          <p><span class="step-num">1</span>L'attrito statico del rotolamento <strong>non dissipa</strong> (il
+            punto di contatto è fermo), quindi l'energia meccanica si conserva:
+            $$Mgh = \tfrac12 M v^2 + \tfrac12 I\omega^2 = \tfrac12(1+k)\,M v^2$$</p>
+          <p><span class="step-num">2</span>Per la sfera piena $k = 2/5$, quindi
+            $$v = \sqrt{\frac{2gh}{1+k}} = \sqrt{\frac{2 \cdot 9{,}81 \cdot 1{,}5}{1{,}4}} =
+              \sqrt{21{,}02} = 4{,}59\ \text{m/s}$$</p>
+          <p><span class="step-num">3</span>Se scivolasse senza attrito arriverebbe a $\sqrt{2gh} = 5{,}42$
+            m/s: il rotolamento la rallenta del $15\%$.</p>
+          <p><span class="step-num">4</span>Frazione rotazionale:
+            $\dfrac{\frac12 I\omega^2}{Mgh} = \dfrac{k}{1+k} = \dfrac{0{,}4}{1{,}4} = \dfrac{2}{7} = 28{,}6\%$.
+            Ed ecco di nuovo il $2/7$ e il $5/7$ della lezione 4.</p>
+          <p><span class="step-num">5</span>Né la massa né il raggio compaiono da nessuna parte: sono
+            spariti nella semplificazione. Solo la <em>forma</em> conta.</p>
+        </div>
+      </div>
+
+      <div class="qbox tosto">
+        <div class="qt">⑤ Una giostra a disco ($M = 150$ kg, $R = 2{,}0$ m) ruota a $0{,}25$ giri al secondo.
+          Un bambino di $30$ kg, inizialmente fermo, ci salta sopra sul bordo. Che cosa succede alla velocità
+          di rotazione e all'energia?</div>
+        <button class="btn btn-toggle" data-target="#sol-b5">Mostra la soluzione</button>
+        <div id="sol-b5" class="hidden">
+          <p><span class="step-num">1</span><strong>Quale legge usare.</strong> Durante il salto non ci sono
+            momenti esterni rispetto all'asse, quindi si conserva il <strong>momento angolare</strong>.
+            L'energia no: è un urto completamente anelastico, la versione rotazionale del pendolo balistico.</p>
+          <p><span class="step-num">2</span>Prima: $I = \frac12 MR^2 = \frac12 \cdot 150 \cdot 4 = 300$ kg·m²,
+            $\omega = 2\pi \cdot 0{,}25 = 1{,}571$ rad/s, quindi $L = 471{,}2$ kg·m²/s.</p>
+          <p><span class="step-num">3</span>Dopo: il bambino è una massa puntiforme sul bordo,
+            $I' = 300 + 30 \cdot 2{,}0^2 = 420$ kg·m².</p>
+          <p><span class="step-num">4</span>$$\omega' = \frac{L}{I'} = \frac{471{,}2}{420} = 1{,}122\
+            \text{rad/s} = 0{,}179\ \text{giri/s}$$
+            La giostra rallenta del $29\%$.</p>
+          <p><span class="step-num">5</span>Energie: prima $\frac12 \cdot 300 \cdot 1{,}571^2 = 370$ J; dopo
+            $\frac12 \cdot 420 \cdot 1{,}122^2 = 264$ J. Ne mancano $106$, cioè il
+            <strong>$28{,}6\%$</strong> — finiti nell'attrito fra le scarpe e la pedana. E come nel pendolo
+            balistico il rapporto è esatto: $K'/K = I/I' = 300/420$.</p>
+          <p><span class="step-num">6</span>Se il bambino, una volta salito, si trascinasse fino al centro, $I'$
+            tornerebbe a $300$ e la giostra riaccelererebbe a $1{,}571$ rad/s: stavolta l'energia
+            <em>aumenterebbe</em>, e a metterla sarebbero le sue braccia. È di nuovo la pattinatrice.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 — FACOLTATIVA: ANGOLI DI EULERO ED EULERO-LAGRANGE -->
+    <section id="sec11" class="optional">
+      <h2>11. Gli angoli di Eulero e l'equazione di Eulero-Lagrange</h2>
+
+      <p>Fin qui abbiamo fatto ruotare i corpi attorno a un <em>asse fisso</em>, e ci è bastato un angolo. Ma
+        una trottola che precede e nuta ruota attorno a un asse che a sua volta si muove, e per descriverla
+        serve qualcosa di più. Serve, come sempre in questa storia, Eulero.</p>
+
+      <h3>11.1 — Quanti numeri servono per dire come è messo un corpo rigido</h3>
+
+      <div class="eulbox">
+        <h4>Sei, e non uno di più</h4>
+        <p>Un corpo rigido è un insieme di punti le cui distanze reciproche non cambiano mai. Per dire dove si
+          trova bastano <strong>sei numeri</strong>: tre per la posizione del baricentro, tre per
+          l'orientamento. Sono i suoi <em>gradi di libertà</em>. Il punto materiale ne aveva tre, e per questo
+          non poteva ruotare.</p>
+        <p style="margin-bottom:0;"><strong>Teorema di Eulero sulle rotazioni</strong> (1775): qualunque
+          spostamento di un corpo rigido con un punto fisso è una <em>singola rotazione</em> attorno a un asse
+          passante per quel punto. Comunque giriate un dado tenendo fermo il centro, esiste sempre una diagonale
+          immaginaria attorno alla quale l'avreste potuto girare in una volta sola.</p>
+      </div>
+
+      <p>I tre numeri dell'orientamento si possono scegliere in molti modi. La scelta classica, ed è ancora
+        quella usata in meccanica celeste e nella dinamica del corpo rigido, sono i <strong>tre angoli di
+        Eulero</strong>: si porta il sistema del corpo su quello fisso con tre rotazioni successive, nella
+        sequenza $z$ – $x$ – $z$.</p>
+
+      <div class="angoli">
+        <div class="angolo">
+          <span class="nome">φ — precessione</span>
+          <span class="sotto">rotazione attorno all'asse verticale fisso $z$</span>
+          <p style="margin:0.5rem 0 0;">È il lento giro dell'asse della trottola attorno alla verticale — e,
+            per la Terra, il cono di 25 772 anni della sezione 6.</p>
+        </div>
+        <div class="angolo">
+          <span class="nome">θ — nutazione</span>
+          <span class="sotto">inclinazione fra l'asse del corpo e la verticale</span>
+          <p style="margin:0.5rem 0 0;">È l'apertura del cono. Se oscilla, la punta dell'asse disegna
+            festoni: si chiama <em>nutazione</em>, e la Terra ne ha una di $9{,}2$ secondi d'arco con
+            periodo di $18{,}6$ anni, dovuta alla Luna.</p>
+        </div>
+        <div class="angolo">
+          <span class="nome">ψ — rotazione propria</span>
+          <span class="sotto">rotazione del corpo attorno al proprio asse</span>
+          <p style="margin:0.5rem 0 0;">È il giro «vero» della trottola su sé stessa, quello che per la Terra
+            dura un giorno.</p>
+        </div>
+      </div>
+
+      <div class="eulbox">
+        <h4>La linea dei nodi</h4>
+        <p style="margin-bottom:0;">L'intersezione fra il piano orizzontale fisso e il piano
+          «equatoriale» del corpo si chiama <strong>linea dei nodi</strong>: è l'asse attorno a cui avviene la
+          seconda rotazione. Nel disegno qui sotto è la retta arancione, e vedrete che ruota con $\varphi$ e
+          non con $\psi$.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="ea-f">φ precessione: <span class="val-badge" id="ea-fv">40</span>°</label>
+          <input type="range" id="ea-f" min="0" max="360" step="1" value="40">
+          <label for="ea-t">θ nutazione: <span class="val-badge" id="ea-tv">35</span>°</label>
+          <input type="range" id="ea-t" min="0" max="180" step="1" value="35">
+          <label for="ea-p">ψ rotazione propria: <span class="val-badge" id="ea-pv">0</span>°</label>
+          <input type="range" id="ea-p" min="0" max="360" step="1" value="0">
+          <button class="btn btn-secondary" id="ea-gl" type="button">⚠ Vai al blocco cardanico (θ = 0)</button>
+        </div>
+        <svg id="ea-svg" viewBox="0 0 660 340" aria-label="I tre angoli di Eulero applicati a una trottola"></svg>
+        <div class="sp-cols">
+          <div>Asse del corpo: <span class="val-badge" id="ea-asse">—</span></div>
+          <div>Determinante della matrice: <span class="val-badge" id="ea-det">—</span></div>
+          <div>Ortogonalità (scarto): <span class="val-badge" id="ea-ort">—</span></div>
+          <div>Gradi di libertà effettivi: <span class="val-badge" id="ea-gdl">—</span></div>
+        </div>
+        <p class="eq-out" id="ea-out"></p>
+      </div>
+
+      <div class="warnbox"><strong>Il blocco cardanico, e l'Apollo 11.</strong> Quando $\theta = 0$ i due assi
+        di $\varphi$ e $\psi$ coincidono: le due rotazioni fanno la <em>stessa cosa</em>, si è persa una
+        direzione di controllo e la terna di angoli non è più univoca. Si chiama <strong>gimbal
+        lock</strong>, e non è un problema matematico astratto: la piattaforma inerziale delle Apollo era
+        montata su soli tre cardani, e se fosse arrivata in quella configurazione avrebbe perso il
+        riferimento, costringendo l'equipaggio a riallinearla puntando le stelle a mano. Sui pannelli c'era una
+        zona rossa da evitare, e Michael Collins chiese scherzosamente di aggiungere un quarto cardano; gli
+        risposero che pesava troppo. Per lo stesso motivo, oggi, la grafica 3D e la robotica usano i
+        <strong>quaternioni</strong> invece degli angoli di Eulero: quattro numeri al posto di tre, e il blocco
+        sparisce.</div>
+
+      <h3>11.2 — Eulero-Lagrange all'opera sulle rotazioni</h3>
+
+      <p>Nella lezione 4 abbiamo incontrato l'equazione di Eulero-Lagrange: si scrive la lagrangiana
+        $\mathcal{L} = T - V$ e poi, per ogni coordinata $q$,</p>
+      $$\frac{\mathrm{d}}{\mathrm{d}t}\left(\frac{\partial \mathcal{L}}{\partial \dot q}\right)
+        - \frac{\partial \mathcal{L}}{\partial q} = 0$$
+      <p>Qui il metodo dà il meglio di sé, perché le forze vincolari di un corpo rigido — le tensioni interne
+        che tengono insieme i pezzi, la reazione del perno — sono complicatissime da scrivere e
+        <strong>non compaiono mai</strong>.</p>
+
+      <div class="passo-el">
+        <p><strong>Esempio guidato: il pendolo composto.</strong> Coordinata: l'angolo $\theta$ con la
+          verticale. L'energia cinetica di un corpo rigido che ruota attorno a un asse fisso è
+          $T = \frac12 I\dot\theta^2$; l'energia potenziale dipende solo dalla quota del baricentro,
+          $V = -Mgd\cos\theta$. Quindi
+          $$\mathcal{L} = \tfrac12 I\dot\theta^2 + M g d\cos\theta$$</p>
+      </div>
+      <div class="passo-el">
+        <p>Le due derivate: $\dfrac{\partial\mathcal{L}}{\partial\dot\theta} = I\dot\theta$, la cui derivata
+          temporale è $I\ddot\theta$; e $\dfrac{\partial\mathcal{L}}{\partial\theta} = -Mgd\sin\theta$.
+          L'equazione diventa
+          $$I\ddot\theta + M g d\sin\theta = 0 \;\Longrightarrow\;
+            \ddot\theta = -\frac{Mgd}{I}\sin\theta$$
+          e per piccole oscillazioni $\omega^2 = Mgd/I$, cioè $T = 2\pi\sqrt{I/(Mgd)}$: <strong>è la formula
+          della sezione 9</strong>, ricavata senza disegnare una sola forza e senza mai nominare la reazione
+          del perno.</p>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">① Ricava con Eulero-Lagrange l'accelerazione di un cilindro pieno che rotola senza
+          strisciare lungo un piano inclinato di angolo $\beta$.</div>
+        <button class="btn btn-toggle" data-target="#sol-el1">Mostra la soluzione</button>
+        <div id="sol-el1" class="hidden">
+          <p><span class="step-num">1</span><strong>Una sola coordinata.</strong> Il vincolo di rotolamento
+            lega $\theta$ a $s$ tramite $s = R\theta$: il sistema ha un solo grado di libertà, e scegliamo $s$,
+            la distanza percorsa lungo il piano.</p>
+          <p><span class="step-num">2</span>Energia cinetica, traslazione più rotazione, con
+            $\omega = \dot s/R$ e $I = \frac12 MR^2$:
+            $$T = \tfrac12 M\dot s^2 + \tfrac12 \cdot \tfrac12 MR^2 \cdot \frac{\dot s^2}{R^2} =
+              \tfrac34 M\dot s^2$$
+            Il raggio è sparito da solo.</p>
+          <p><span class="step-num">3</span>Energia potenziale: scendendo di $s$ lungo il piano si perde
+            quota $s\sin\beta$, quindi $V = -Mg\,s\sin\beta$ e
+            $$\mathcal{L} = \tfrac34 M\dot s^2 + M g s \sin\beta$$</p>
+          <p><span class="step-num">4</span>Le derivate: $\partial\mathcal{L}/\partial\dot s = \frac32 M\dot s$,
+            la cui derivata è $\frac32 M\ddot s$; $\partial\mathcal{L}/\partial s = Mg\sin\beta$. Quindi
+            $$\tfrac32 M\ddot s = M g\sin\beta \;\Longrightarrow\;
+              \ddot s = \tfrac23\,g\sin\beta$$</p>
+          <p><span class="step-num">5</span><strong>Controllo.</strong> Con la formula generale
+            $a = g\sin\beta/(1+k)$ e $k = 1/2$ si ottiene $g\sin\beta/1{,}5 = \frac23 g\sin\beta$. ✓ E notate
+            che l'<em>attrito statico</em>, che nel metodo newtoniano bisogna introdurre come incognita e poi
+            eliminare, qui non è mai comparso: è una forza vincolare, e le forze vincolari con Lagrange
+            spariscono.</p>
+        </div>
+      </div>
+
+      <div class="qbox tosto">
+        <div class="qt">② Scrivi la lagrangiana della trottola simmetrica in angoli di Eulero e mostra che due
+          quantità si conservano. Che cosa sono?</div>
+        <button class="btn btn-toggle" data-target="#sol-el2">Mostra la soluzione</button>
+        <div id="sol-el2" class="hidden">
+          <p><span class="step-num">1</span>Per una trottola simmetrica ($I_1 = I_2 \ne I_3$) con la punta
+            fissa, l'energia cinetica in angoli di Eulero è
+            $$T = \tfrac12 I_1\left(\dot\theta^2 + \dot\varphi^2\sin^2\theta\right)
+                + \tfrac12 I_3\left(\dot\psi + \dot\varphi\cos\theta\right)^2$$
+            e l'energia potenziale è quella del baricentro, a quota $d\cos\theta$:
+            $V = M g d\cos\theta$.</p>
+          <p><span class="step-num">2</span><strong>La cosa da guardare.</strong> Nella lagrangiana
+            $\mathcal{L} = T - V$ compaiono $\dot\varphi$ e $\dot\psi$, ma <em>non</em> compaiono $\varphi$ e
+            $\psi$. Coordinate di questo tipo si chiamano <strong>cicliche</strong>.</p>
+          <p><span class="step-num">3</span>Per una coordinata ciclica $q$ si ha
+            $\partial\mathcal{L}/\partial q = 0$, e l'equazione di Eulero-Lagrange si riduce a
+            $$\frac{\mathrm{d}}{\mathrm{d}t}\left(\frac{\partial\mathcal{L}}{\partial \dot q}\right) = 0
+              \;\Longrightarrow\; p_q = \frac{\partial\mathcal{L}}{\partial \dot q} = \text{costante}$$
+            Il momento coniugato si conserva, e lo si legge dalla lagrangiana senza fare nessun conto.</p>
+          <p><span class="step-num">4</span>Le due costanti sono $p_\varphi$, cioè la componente del momento
+            angolare lungo la <strong>verticale fissa</strong>, e $p_\psi$, cioè la componente lungo
+            l'<strong>asse della trottola</strong>. Fisicamente: il peso ha momento nullo rispetto alla
+            verticale (è parallelo a essa) e nullo rispetto all'asse della trottola (lo interseca). Il momento
+            angolare si conserva esattamente lungo quelle due direzioni, e solo lungo quelle.</p>
+          <p><span class="step-num">5</span><strong>E qui si chiude il cerchio con la lezione scorsa.</strong>
+            «La coordinata non compare nella lagrangiana» significa «cambiarla non cambia la fisica», cioè
+            <em>simmetria</em>; e la conclusione è «il momento coniugato si conserva». È il teorema di Noether,
+            applicato a una trottola. Aggiungendo l'energia totale — conservata perché $\mathcal{L}$ non
+            dipende dal tempo — si hanno tre costanti del moto, e il problema della trottola pesante si
+            risolve per quadrature. Fu Lagrange a farlo, e la soluzione completa contiene nutazione,
+            precessione e i festoni che si vedono guardando una trottola vera.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 — QUIZ -->
+    <section id="quiz">
+      <h2>12. Quiz finale</h2>
+      <p>Dodici domande a risposta multipla e due aperte, sulle idee di tutta la lezione.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 6 — Baricentro e rotazioni · Fisica · Quarto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var G = 9.81;
+      var STOP = [];
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { STOP.forEach(function (f) { f(); }); }
+      });
+      window.addEventListener('pagehide', function () { STOP.forEach(function (f) { f(); }); });
+
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      function frec(x1, y1, x2, y2, col, sp) {
+        var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy);
+        if (L < 0.8) { return ''; }
+        var s = Math.min(L * 0.38, 10);
+        var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+        var bx = x2 - ux * s, by = y2 - uy * s;
+        return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) +
+          '" stroke="' + col + '" stroke-width="' + sp + '" stroke-linecap="round"/>' +
+          '<polygon points="' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+          (bx + px * s * 0.5).toFixed(1) + ',' + (by + py * s * 0.5).toFixed(1) + ' ' +
+          (bx - px * s * 0.5).toFixed(1) + ',' + (by - py * s * 0.5).toFixed(1) + '" fill="' + col + '"/>';
+      }
+
+      /* ============ 1 — IL CENTRO DI MASSA ============ */
+      (function () {
+        var svg = document.getElementById('cm-svg');
+        if (!svg) { return; }
+        var VERT = [[1.0, 1.0], [7.0, 1.6], [3.6, 6.2]];       // A, B, C in metri
+        // la figura a L: due rettangoli, con area e centro
+        var RETT = [[0, 0, 2, 6], [2, 0, 4, 2]];
+
+        function disegna() {
+          var m = [parseFloat(document.getElementById('cm-m1').value),
+                   parseFloat(document.getElementById('cm-m2').value),
+                   parseFloat(document.getElementById('cm-m3').value)];
+          var ell = document.getElementById('cm-ell').checked;
+          var s = '', i;
+          var X0 = 60, Y0 = 296, PXM = 68;
+          var sx = function (u) { return X0 + u * PXM; };
+          var sy = function (u) { return Y0 - u * PXM; };
+
+          if (!ell) {
+            var M = m[0] + m[1] + m[2];
+            var cx = (m[0] * VERT[0][0] + m[1] * VERT[1][0] + m[2] * VERT[2][0]) / M;
+            var cy = (m[0] * VERT[0][1] + m[1] * VERT[1][1] + m[2] * VERT[2][1]) / M;
+            s += '<polygon points="' + VERT.map(function (v) { return sx(v[0]).toFixed(1) + ',' + sy(v[1]).toFixed(1); }).join(' ') +
+              '" fill="var(--accent)" opacity="0.10" stroke="var(--border)" stroke-width="1.6"/>';
+            var NOMI = ['A', 'B', 'C'];
+            for (i = 0; i < 3; i++) {
+              var r = 7 + m[i] * 2.1;
+              s += '<circle cx="' + sx(VERT[i][0]).toFixed(1) + '" cy="' + sy(VERT[i][1]).toFixed(1) + '" r="' + r.toFixed(1) +
+                '" fill="var(--accent)" opacity="0.6" stroke="var(--accent)" stroke-width="2"/>';
+              s += '<text x="' + sx(VERT[i][0]).toFixed(1) + '" y="' + (sy(VERT[i][1]) - r - 8).toFixed(1) +
+                '" text-anchor="middle" class="lbl">' + NOMI[i] + ' — ' + nf(m[i], 1) + ' kg</text>';
+            }
+            s += '<circle cx="' + sx(cx).toFixed(1) + '" cy="' + sy(cy).toFixed(1) + '" r="9" fill="none" stroke="var(--magenta)" stroke-width="3"/>';
+            s += '<line x1="' + (sx(cx) - 14).toFixed(1) + '" y1="' + sy(cy).toFixed(1) + '" x2="' + (sx(cx) + 14).toFixed(1) +
+              '" y2="' + sy(cy).toFixed(1) + '" stroke="var(--magenta)" stroke-width="2"/>';
+            s += '<line x1="' + sx(cx).toFixed(1) + '" y1="' + (sy(cy) - 14).toFixed(1) + '" x2="' + sx(cx).toFixed(1) +
+              '" y2="' + (sy(cy) + 14).toFixed(1) + '" stroke="var(--magenta)" stroke-width="2"/>';
+            s += '<text x="' + (sx(cx) + 18).toFixed(1) + '" y="' + (sy(cy) + 5).toFixed(1) + '" class="em">centro di massa</text>';
+            document.getElementById('cm-mt').textContent = nf(M, 1) + ' kg';
+            document.getElementById('cm-xy').textContent = '(' + nf(cx, 2) + ' ; ' + nf(cy, 2) + ') m';
+            document.getElementById('cm-dentro').textContent = 'sì, sempre';
+            var el = document.getElementById('cm-out');
+            el.innerHTML = '$x_{CM} = \\dfrac{' + nf(m[0], 1).replace(',', '{,}') + '\\cdot 1 + ' +
+              nf(m[1], 1).replace(',', '{,}') + '\\cdot 7 + ' + nf(m[2], 1).replace(',', '{,}') +
+              '\\cdot 3{,}6}{' + nf(M, 1).replace(',', '{,}') + '} = ' + nf(cx, 2).replace(',', '{,}') + '$ m. ' +
+              'Con tre masse <strong>positive</strong> il centro di massa cade sempre dentro il triangolo: è una ' +
+              'media pesata, e una media sta sempre fra gli estremi. Per uscire dal corpo serve una forma ' +
+              '<em>non convessa</em> — provate la casella qui sopra.';
+            if (typeof renderMathIn === 'function') { renderMathIn(el); }
+          } else {
+            var A = 0, gx = 0, gy = 0, k;
+            for (k = 0; k < RETT.length; k++) {
+              var r0 = RETT[k], ar = r0[2] * r0[3];
+              A += ar; gx += ar * (r0[0] + r0[2] / 2); gy += ar * (r0[1] + r0[3] / 2);
+              s += '<rect x="' + sx(r0[0]).toFixed(1) + '" y="' + sy(r0[1] + r0[3]).toFixed(1) +
+                '" width="' + (r0[2] * PXM).toFixed(1) + '" height="' + (r0[3] * PXM).toFixed(1) +
+                '" fill="var(--gold)" opacity="0.35" stroke="var(--gold)" stroke-width="2"/>';
+              s += '<circle cx="' + sx(r0[0] + r0[2] / 2).toFixed(1) + '" cy="' + sy(r0[1] + r0[3] / 2).toFixed(1) +
+                '" r="4.5" fill="var(--gold)"/>';
+              s += '<text x="' + sx(r0[0] + r0[2] / 2).toFixed(1) + '" y="' + (sy(r0[1] + r0[3] / 2) - 10).toFixed(1) +
+                '" text-anchor="middle" class="lbl-s">area ' + nf(ar, 0) + '</text>';
+            }
+            gx /= A; gy /= A;
+            s += '<circle cx="' + sx(gx).toFixed(1) + '" cy="' + sy(gy).toFixed(1) + '" r="9" fill="none" stroke="var(--magenta)" stroke-width="3"/>';
+            s += '<line x1="' + (sx(gx) - 14).toFixed(1) + '" y1="' + sy(gy).toFixed(1) + '" x2="' + (sx(gx) + 14).toFixed(1) +
+              '" y2="' + sy(gy).toFixed(1) + '" stroke="var(--magenta)" stroke-width="2"/>';
+            s += '<line x1="' + sx(gx).toFixed(1) + '" y1="' + (sy(gy) - 14).toFixed(1) + '" x2="' + sx(gx).toFixed(1) +
+              '" y2="' + (sy(gy) + 14).toFixed(1) + '" stroke="var(--magenta)" stroke-width="2"/>';
+            s += '<text x="' + (sx(gx) + 18).toFixed(1) + '" y="' + (sy(gy) + 5).toFixed(1) + '" class="em">baricentro — fuori dal corpo!</text>';
+            document.getElementById('cm-mt').textContent = 'area ' + nf(A, 0) + ' (unità²)';
+            document.getElementById('cm-xy').textContent = '(' + nf(gx, 2) + ' ; ' + nf(gy, 2) + ')';
+            document.getElementById('cm-dentro').textContent = 'no: è nell\'incavo';
+            document.getElementById('cm-out').innerHTML = 'Trattando la «L» come due rettangoli di area ' +
+              nf(RETT[0][2] * RETT[0][3], 0) + ' e ' + nf(RETT[1][2] * RETT[1][3], 0) +
+              ', con centri in (1 ; 3) e (4 ; 1), la media pesata dà (' + nf(gx, 2) + ' ; ' + nf(gy, 2) +
+              '): un punto che <strong>non appartiene alla figura</strong>. È il trucco del fosbury flop, ' +
+              'e il motivo per cui il baricentro di una ciambella sta nel buco.';
+          }
+          svg.innerHTML = s;
+          document.getElementById('cm-m1v').textContent = nf(m[0], 1);
+          document.getElementById('cm-m2v').textContent = nf(m[1], 1);
+          document.getElementById('cm-m3v').textContent = nf(m[2], 1);
+        }
+        ['cm-m1', 'cm-m2', 'cm-m3'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('cm-ell').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ============ 1.1 — EQUILIBRIO E RIBALTAMENTO ============ */
+      (function () {
+        var svg = document.getElementById('eq-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var a = parseFloat(document.getElementById('eq-a').value);
+          var h = parseFloat(document.getElementById('eq-h').value);
+          var b = parseFloat(document.getElementById('eq-b').value);
+          var r = a * Math.PI / 180;
+          var crit = Math.atan(b / h) * 180 / Math.PI;
+          var sco = h / 2 * Math.tan(r);          // scostamento della verticale dal centro della base
+          var ribalta = sco > b / 2 + 1e-12;
+          var PXM = 76, X0 = 90, Y0 = 214;
+          var s = '';
+          // il piano inclinato
+          var LP = 470;
+          var ex = X0 + LP * Math.cos(r), ey = Y0 - LP * Math.sin(r);
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + ex.toFixed(1) + '" y2="' + ey.toFixed(1) +
+            '" stroke="var(--text-soft)" stroke-width="3"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + (X0 + LP) + '" y2="' + Y0 +
+            '" stroke="var(--border)" stroke-width="1.4" stroke-dasharray="5 5"/>';
+          s += '<path d="M' + (X0 + 60) + ',' + Y0 + ' A60,60 0 0 0 ' + (X0 + 60 * Math.cos(r)).toFixed(1) +
+            ',' + (Y0 - 60 * Math.sin(r)).toFixed(1) + '" fill="none" stroke="var(--muted)" stroke-width="1.6"/>';
+          s += '<text x="' + (X0 + 70) + '" y="' + (Y0 - 12) + '" class="lbl-s">' + nf(a, 0) + '°</text>';
+          // la cassa, appoggiata a metà pista
+          var d0 = 230;
+          var bx = X0 + d0 * Math.cos(r), by = Y0 - d0 * Math.sin(r);
+          var ux = Math.cos(r), uy = -Math.sin(r);       // lungo il piano, in salita
+          // normale al piano rivolta verso l'alto: perpendicolare a u, con nx*ux + ny*uy = 0
+          var nx = -Math.sin(r), ny = -Math.cos(r);
+          function P(u, v) { return [bx + ux * u * PXM + nx * v * PXM, by + uy * u * PXM + ny * v * PXM]; }
+          var q = [P(-b / 2, 0), P(b / 2, 0), P(b / 2, h), P(-b / 2, h)];
+          s += '<polygon points="' + q.map(function (t) { return t[0].toFixed(1) + ',' + t[1].toFixed(1); }).join(' ') +
+            '" fill="' + (ribalta ? 'var(--red)' : 'var(--accent)') + '" opacity="0.35" stroke="' +
+            (ribalta ? 'var(--red)' : 'var(--accent)') + '" stroke-width="2.4"/>';
+          var cm = P(0, h / 2);
+          s += '<circle cx="' + cm[0].toFixed(1) + '" cy="' + cm[1].toFixed(1) + '" r="6" fill="var(--magenta)"/>';
+          // la verticale per il baricentro
+          s += '<line x1="' + cm[0].toFixed(1) + '" y1="' + cm[1].toFixed(1) + '" x2="' + cm[0].toFixed(1) +
+            '" y2="' + (Y0 + 46) + '" stroke="var(--magenta)" stroke-width="2" stroke-dasharray="6 4"/>';
+          // gli spigoli della base, evidenziati
+          s += '<circle cx="' + q[0][0].toFixed(1) + '" cy="' + q[0][1].toFixed(1) + '" r="4" fill="var(--gold)"/>';
+          s += '<circle cx="' + q[1][0].toFixed(1) + '" cy="' + q[1][1].toFixed(1) + '" r="4" fill="var(--gold)"/>';
+          s += '<text x="24" y="28" class="lbl">' + (ribalta
+            ? 'la verticale è uscita dalla base: SI RIBALTA'
+            : 'la verticale cade dentro la base: sta in piedi') + '</text>';
+          s += '<text x="24" y="' + (Y0 + 70) + '" class="lbl-s">angolo di ribaltamento: arctan(b/h) = arctan(' +
+            nf(b, 2) + '/' + nf(h, 2) + ') = ' + nf(crit, 1) + '°</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('eq-av').textContent = nf(a, 0);
+          document.getElementById('eq-hv').textContent = nf(h, 2);
+          document.getElementById('eq-bv').textContent = nf(b, 2);
+          document.getElementById('eq-crit').textContent = nf(crit, 1) + '°';
+          document.getElementById('eq-pos').textContent = nf(sco, 3) + ' m dal centro (limite ' + nf(b / 2, 3) + ')';
+          document.getElementById('eq-stato').textContent = ribalta ? 'si ribalta' : 'stabile';
+          var el = document.getElementById('eq-out');
+          el.innerHTML = 'La verticale per il baricentro è spostata di $\\frac{h}{2}\\tan\\alpha = ' +
+            nf(sco, 3).replace(',', '{,}') + '$ m rispetto al centro della base, che è larga ' +
+            nf(b, 2) + ' m: il limite è ' + nf(b / 2, 3) + ' m. Si ribalta quando ' +
+            '$\\tan\\alpha \\gt b/h$, cioè oltre i <strong>' + nf(crit, 1) + '°</strong>. ' +
+            'Notate che <strong>la massa non compare</strong>: contano solo le proporzioni. Un armadio alto e ' +
+            'stretto si rovescia prima di uno basso e largo, per pieno che sia.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['eq-a', 'eq-h', 'eq-b'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        disegna();
+      })();
+
+      /* ============ 2 — LA GARA DI ROTOLAMENTO ============ */
+      (function () {
+        var svg = document.getElementById('mi-svg');
+        if (!svg) { return; }
+        var CORPI = [
+          { n: 'blocco che striscia (senza attrito)', k: 0, c: 'var(--muted)', pieno: 2 },
+          { n: 'sfera piena', k: 0.4, c: 'var(--accent)', pieno: 1 },
+          { n: 'cilindro pieno', k: 0.5, c: 'var(--green)', pieno: 1 },
+          { n: 'guscio sferico', k: 2 / 3, c: 'var(--gold)', pieno: 0 },
+          { n: 'anello o cilindro cavo', k: 1, c: 'var(--magenta)', pieno: 0 }
+        ];
+        var t = 0, raf = null, ultimo = 0;
+
+        function par() {
+          var a = parseFloat(document.getElementById('mi-a').value);
+          var L = parseFloat(document.getElementById('mi-l').value);
+          return { a: a, L: L, r: a * Math.PI / 180 };
+        }
+        function acc(k, r) { return G * Math.sin(r) / (1 + k); }
+        function tempo(k, p) { return Math.sqrt(2 * p.L / acc(k, p.r)); }
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+        STOP.push(ferma);
+
+        function tick(ts) {
+          var p = par();
+          var dt = ultimo ? Math.min(0.05, (ts - ultimo) / 1000) : 0.016;
+          ultimo = ts;
+          t += dt;
+          disegna();
+          if (t < tempo(1, p) + 0.7) { raf = requestAnimationFrame(tick); } else { raf = null; }
+        }
+
+        function disegna() {
+          var p = par(), s = '', i;
+          var X0 = 54, Y0 = 292, PXM = 540 / Math.max(p.L, 0.5);
+          var ex = X0 + p.L * PXM * Math.cos(p.r), ey = Y0 - p.L * PXM * Math.sin(p.r);
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + ex.toFixed(1) + '" y2="' + ey.toFixed(1) +
+            '" stroke="var(--text-soft)" stroke-width="3"/>';
+          s += '<line x1="' + ex.toFixed(1) + '" y1="' + ey.toFixed(1) + '" x2="' + ex.toFixed(1) + '" y2="' + Y0 +
+            '" stroke="var(--border)" stroke-width="1.4" stroke-dasharray="4 4"/>';
+          s += '<text x="' + (ex - 6).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="end" class="lbl-s">partenza</text>';
+          s += '<text x="' + (X0 + 6) + '" y="' + (Y0 + 18) + '" class="lbl-s">arrivo</text>';
+          for (i = 0; i < CORPI.length; i++) {
+            var ti = tempo(CORPI[i].k, p);
+            var d = Math.min(p.L, 0.5 * acc(CORPI[i].k, p.r) * t * t);
+            var u = p.L - d;                                  // si scende verso il basso, cioe' verso X0
+            var cx = X0 + u * PXM * Math.cos(p.r) - (i - 2) * 9 * Math.sin(p.r);
+            var cy = Y0 - u * PXM * Math.sin(p.r) - 15 - (i - 2) * 9 * Math.cos(p.r);
+            var R = 12;
+            if (CORPI[i].pieno === 2) {
+              s += '<rect x="' + (cx - R).toFixed(1) + '" y="' + (cy - R * 0.8).toFixed(1) + '" width="' + (2 * R) +
+                '" height="' + (1.6 * R).toFixed(1) + '" rx="3" fill="' + CORPI[i].c + '" opacity="0.55" stroke="' + CORPI[i].c + '" stroke-width="2"/>';
+            } else {
+              s += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + R + '" fill="' + CORPI[i].c +
+                '" opacity="' + (CORPI[i].pieno ? '0.55' : '0.12') + '" stroke="' + CORPI[i].c + '" stroke-width="2.4"/>';
+              // il raggio disegnato mostra la rotazione
+              var th = d / 0.012;
+              s += '<line x1="' + cx.toFixed(1) + '" y1="' + cy.toFixed(1) + '" x2="' + (cx + R * Math.cos(th)).toFixed(1) +
+                '" y2="' + (cy + R * Math.sin(th)).toFixed(1) + '" stroke="' + CORPI[i].c + '" stroke-width="2"/>';
+            }
+            // la legenda con i tempi
+            s += '<rect x="24" y="' + (26 + i * 22) + '" width="12" height="12" fill="' + CORPI[i].c + '" opacity="0.7"/>';
+            s += '<text x="44" y="' + (37 + i * 22) + '" class="lbl-s">' + CORPI[i].n + ' — k = ' +
+              nf(CORPI[i].k, 3) + ' — a = ' + nf(acc(CORPI[i].k, p.r), 3) + ' m/s² — arrivo a ' + nf(ti, 3) + ' s' +
+              (t >= ti ? '  ✔' : '') + '</text>';
+          }
+          s += '<text x="470" y="37" class="lbl">t = ' + nf(t, 2) + ' s</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('mi-av').textContent = nf(p.a, 0);
+          document.getElementById('mi-lv').textContent = nf(p.L, 1);
+          var ord = CORPI.slice().sort(function (x, y) { return x.k - y.k; });
+          document.getElementById('mi-ord').textContent = ord.map(function (c) { return c.n.split(' ')[0]; }).join(' → ');
+          document.getElementById('mi-t1').textContent = nf(tempo(0, p), 3) + ' s';
+          document.getElementById('mi-t2').textContent = nf(tempo(1, p), 3) + ' s';
+          var el = document.getElementById('mi-out');
+          el.innerHTML = '$a = \\dfrac{g\\sin\\theta}{1+k}$: né la massa né il raggio compaiono, solo ' +
+            '<strong>k = I/MR²</strong>. Il rapporto fra il tempo dell\'ultimo e quello del primo vale ' +
+            '$\\sqrt{2/1} = ' + nf(Math.sqrt(2), 3).replace(',', '{,}') + '$, sempre, per qualunque ' +
+            'inclinazione e qualunque lunghezza: ' + nf(tempo(1, p), 3) + ' s contro ' + nf(tempo(0, p), 3) + ' s.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        function reset() { ferma(); t = 0; ultimo = 0; disegna(); }
+        ['mi-a', 'mi-l'].forEach(function (id) { document.getElementById(id).addEventListener('input', reset); });
+        document.getElementById('mi-reset').addEventListener('click', reset);
+        document.getElementById('mi-via').addEventListener('click', function () {
+          ferma(); t = 0; ultimo = 0; raf = requestAnimationFrame(tick);
+        });
+        disegna();
+      })();
+
+      /* ============ 4 — IL DISCO DI EULERO ============ */
+      (function () {
+        var svg = document.getElementById('de-svg');
+        if (!svg) { return; }
+        var A0 = 0.35;                     // inclinazione iniziale, in radianti (circa 20 gradi)
+        var t = 0, raf = null, ultimo = 0, fase = 0;
+
+        function par() {
+          var a = parseFloat(document.getElementById('de-a').value) / 100;   // da cm a metri
+          var t0 = parseFloat(document.getElementById('de-t').value);
+          return { a: a, t0: t0, C: Math.sqrt(4 * G / (3 * a * A0)) };
+        }
+        function alfa(t, p) { return A0 * Math.pow(Math.max(0, 1 - t / p.t0), 1 / 3); }
+        function omega(t, p) {
+          var al = alfa(t, p);
+          return al > 1e-9 ? Math.sqrt(4 * G / (3 * p.a * al)) : Infinity;
+        }
+        function giri(t, p) {
+          var u = Math.max(0, 1 - t / p.t0);
+          return p.C / (2 * Math.PI) * p.t0 * 1.2 * (1 - Math.pow(u, 5 / 6));
+        }
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+        STOP.push(ferma);
+
+        function tick(ts) {
+          var p = par();
+          var dt = ultimo ? Math.min(0.05, (ts - ultimo) / 1000) : 0.016;
+          ultimo = ts;
+          t = Math.min(p.t0 * 0.999, t + dt);
+          fase += Math.min(40, omega(t, p)) * dt;
+          disegna();
+          if (t < p.t0 * 0.998) { raf = requestAnimationFrame(tick); } else { raf = null; }
+        }
+
+        function disegna() {
+          var p = par(), s = '', i;
+          var al = alfa(t, p), om = omega(t, p), f = om / (2 * Math.PI);
+          // pannello di sinistra: il disco inclinato visto in prospettiva
+          var CX = 156, CY = 168, RD = 92;
+          s += '<ellipse cx="' + CX + '" cy="' + (CY + 84) + '" rx="120" ry="26" fill="var(--border)" opacity="0.35"/>';
+          var ry = RD * Math.max(0.06, Math.sin(al) * 2.2);
+          s += '<ellipse cx="' + CX + '" cy="' + CY + '" rx="' + RD + '" ry="' + ry.toFixed(1) +
+            '" fill="var(--gold)" opacity="0.30" stroke="var(--gold)" stroke-width="3"/>';
+          var pxc = CX + RD * Math.cos(fase), pyc = CY + ry * Math.sin(fase);
+          s += '<circle cx="' + pxc.toFixed(1) + '" cy="' + pyc.toFixed(1) + '" r="6" fill="var(--magenta)"/>';
+          s += '<text x="' + CX + '" y="34" text-anchor="middle" class="lbl">il punto di contatto corre sul bordo</text>';
+          s += '<text x="' + CX + '" y="' + (CY + 126) + '" text-anchor="middle" class="lbl-s">inclinazione ' +
+            nf(al * 180 / Math.PI, 2) + '° — ' + (isFinite(f) ? nf(f, 2) : '∞') + ' giri/s</text>';
+
+          // pannello di destra: la frequenza nel tempo
+          var lock = document.getElementById('de-lock').checked;
+          var X0 = 356, X1 = 638, Y0 = 268, Y1 = 52;
+          var TM = lock ? 60 : p.t0;
+          var FM = lock ? 40 : Math.max(6, p.C / (2 * Math.PI) * Math.pow(0.02, -1 / 6));
+          var px = function (u) { return X0 + (X1 - X0) * Math.min(1, u / TM); };
+          var py = function (u) { return Y0 - (Y0 - Y1) * Math.min(1, u / FM); };
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 4; i++) {
+            s += '<text x="' + px(TM * i / 4).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' + nf(TM * i / 4, 0) + '</text>';
+            s += '<text x="' + (X0 - 7) + '" y="' + (py(FM * i / 4) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(FM * i / 4, 0) + '</text>';
+          }
+          s += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">tempo (s)</text>';
+          s += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 12) + '" class="lbl-s">giri al secondo</text>';
+          var pts = [];
+          for (i = 0; i <= 300; i++) {
+            var tt = p.t0 * i / 301;
+            pts.push(px(tt).toFixed(1) + ',' + py(omega(tt, p) / (2 * Math.PI)).toFixed(1));
+          }
+          s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2.6"/>';
+          s += '<line x1="' + px(p.t0).toFixed(1) + '" y1="' + Y0 + '" x2="' + px(p.t0).toFixed(1) + '" y2="' + Y1 +
+            '" stroke="var(--red)" stroke-width="1.6" stroke-dasharray="5 4"/>';
+          s += '<text x="' + (px(p.t0) - 5).toFixed(1) + '" y="' + (Y1 + 12) + '" text-anchor="end" style="fill:var(--red); font-size:11.5px;">t₀</text>';
+          if (isFinite(f)) {
+            s += '<circle cx="' + px(t).toFixed(1) + '" cy="' + py(f).toFixed(1) + '" r="5.5" fill="var(--magenta)"/>';
+          }
+          svg.innerHTML = s;
+
+          document.getElementById('de-av').textContent = nf(p.a * 100, 1);
+          document.getElementById('de-tv').textContent = nf(p.t0, 0);
+          document.getElementById('de-tnow').textContent = nf(t, 2) + ' s';
+          document.getElementById('de-ang').textContent = nf(al * 180 / Math.PI, 2) + '°';
+          document.getElementById('de-f').textContent = (isFinite(f) ? nf(f, 2) : '∞') + ' giri/s';
+          document.getElementById('de-giri').textContent = nf(giri(t, p), 0);
+          var el = document.getElementById('de-out');
+          el.innerHTML = '$\\Omega = \\sqrt{\\dfrac{4g}{3a\\alpha}}$ con $a = ' + nf(p.a * 100, 1).replace(',', '{,}') +
+            '$ cm. Nel modello di Moffatt $\\alpha \\propto (t_0-t)^{1/3}$, quindi la frequenza cresce come ' +
+            '$(t_0-t)^{-1/6}$ e diventa <strong>infinita</strong> all\'istante $t_0 = ' + nf(p.t0, 0) +
+            '$ s. Eppure il numero totale di giri resta <em>finito</em>: circa <strong>' +
+            nf(giri(p.t0, p), 0) + '</strong>. Una frequenza infinita in un tempo finito, con un numero finito ' +
+            'di giri: è la firma di una singolarità.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        function reset() { ferma(); t = 0; fase = 0; ultimo = 0; disegna(); }
+        ['de-a', 'de-t'].forEach(function (id) { document.getElementById(id).addEventListener('input', reset); });
+        document.getElementById('de-lock').addEventListener('change', disegna);
+        document.getElementById('de-stop').addEventListener('click', ferma);
+        document.getElementById('de-via').addEventListener('click', function () {
+          ferma(); t = 0; fase = 0; ultimo = 0; raf = requestAnimationFrame(tick);
+        });
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var G = 9.81;
+      var STOP2 = [];
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { STOP2.forEach(function (f) { f(); }); }
+      });
+      window.addEventListener('pagehide', function () { STOP2.forEach(function (f) { f(); }); });
+
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      function frec(x1, y1, x2, y2, col, sp) {
+        var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy);
+        if (L < 0.8) { return ''; }
+        var s = Math.min(L * 0.34, 11);
+        var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+        var bx = x2 - ux * s, by = y2 - uy * s;
+        return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) +
+          '" stroke="' + col + '" stroke-width="' + sp + '" stroke-linecap="round"/>' +
+          '<polygon points="' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+          (bx + px * s * 0.5).toFixed(1) + ',' + (by + py * s * 0.5).toFixed(1) + ' ' +
+          (bx - px * s * 0.5).toFixed(1) + ',' + (by - py * s * 0.5).toFixed(1) + '" fill="' + col + '"/>';
+      }
+
+      /* ============ 5 — IL GIROSCOPIO ============ */
+      (function () {
+        var svg = document.getElementById('gi-svg');
+        if (!svg) { return; }
+        var ang = 0, spin = 0, raf = null, ultimo = 0;
+
+        function dati() {
+          var f = parseFloat(document.getElementById('gi-w').value);
+          var m = parseFloat(document.getElementById('gi-m').value);
+          var r = parseFloat(document.getElementById('gi-r').value);
+          var R = parseFloat(document.getElementById('gi-R').value);
+          var I = 0.5 * m * R * R;
+          var w = 2 * Math.PI * f;
+          var L = I * w;
+          var M = m * G * r;
+          var op = M / L;
+          return { f: f, m: m, r: r, R: R, I: I, w: w, L: L, M: M, op: op, Tp: 2 * Math.PI / op };
+        }
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+        STOP2.push(ferma);
+
+        function tick(ts) {
+          var d = dati();
+          var dt = ultimo ? Math.min(0.05, (ts - ultimo) / 1000) : 0.016;
+          ultimo = ts;
+          ang += d.op * dt * 4;             // precessione accelerata quattro volte
+          spin += Math.min(30, d.w) * dt;
+          disegna();
+          raf = requestAnimationFrame(tick);
+        }
+
+        function disegna() {
+          var d = dati(), s = '', i;
+          // vista dall'alto, a sinistra
+          var CX = 160, CY = 176, SC = 380;
+          var rr = d.r * SC;
+          s += '<circle cx="' + CX + '" cy="' + CY + '" r="' + rr.toFixed(1) +
+            '" fill="none" stroke="var(--border)" stroke-width="1.4" stroke-dasharray="5 5"/>';
+          s += '<circle cx="' + CX + '" cy="' + CY + '" r="5" fill="var(--text-soft)"/>';
+          var ax = CX + rr * Math.cos(ang), ay = CY + rr * Math.sin(ang);
+          s += '<line x1="' + CX + '" y1="' + CY + '" x2="' + ax.toFixed(1) + '" y2="' + ay.toFixed(1) +
+            '" stroke="var(--text-soft)" stroke-width="4"/>';
+          var RR = Math.max(9, d.R * SC * 0.6);
+          s += '<circle cx="' + ax.toFixed(1) + '" cy="' + ay.toFixed(1) + '" r="' + RR.toFixed(1) +
+            '" fill="var(--accent)" opacity="0.45" stroke="var(--accent)" stroke-width="2.5"/>';
+          s += '<line x1="' + ax.toFixed(1) + '" y1="' + ay.toFixed(1) + '" x2="' + (ax + RR * Math.cos(spin)).toFixed(1) +
+            '" y2="' + (ay + RR * Math.sin(spin)).toFixed(1) + '" stroke="var(--accent)" stroke-width="2"/>';
+          // il vettore L e il vettore M
+          s += frec(CX, CY, CX + rr * 1.35 * Math.cos(ang), CY + rr * 1.35 * Math.sin(ang), 'var(--gold)', 3);
+          s += '<text x="' + (CX + rr * 1.4 * Math.cos(ang)).toFixed(1) + '" y="' + (CY + rr * 1.4 * Math.sin(ang) - 8).toFixed(1) +
+            '" style="fill:var(--gold); font-size:13px; font-weight:700;">L</text>';
+          s += frec(ax, ay, ax - 42 * Math.sin(ang), ay + 42 * Math.cos(ang), 'var(--magenta)', 3);
+          s += '<text x="' + (ax - 50 * Math.sin(ang)).toFixed(1) + '" y="' + (ay + 52 * Math.cos(ang)).toFixed(1) +
+            '" class="em">M = dL/dt</text>';
+          s += '<text x="' + CX + '" y="30" text-anchor="middle" class="lbl">vista dall\'alto</text>';
+          s += '<text x="' + CX + '" y="' + (CY + rr + 44).toFixed(1) + '" text-anchor="middle" class="lbl-s">il momento è sempre perpendicolare a L: L ruota, non cala</text>';
+
+          // vista laterale, a destra
+          var PX = 420, PY = 246, LL = 150;
+          s += '<line x1="' + (PX - 40) + '" y1="' + PY + '" x2="' + (PX + 210) + '" y2="' + PY + '" stroke="var(--text-soft)" stroke-width="3"/>';
+          s += '<line x1="' + PX + '" y1="' + PY + '" x2="' + PX + '" y2="' + (PY - 160) + '" stroke="var(--border)" stroke-width="1.4" stroke-dasharray="4 4"/>';
+          var incl = 0.55;
+          var tx = PX + LL * Math.cos(incl), ty = PY - LL * Math.sin(incl);
+          s += '<line x1="' + PX + '" y1="' + PY + '" x2="' + tx.toFixed(1) + '" y2="' + ty.toFixed(1) + '" stroke="var(--text-soft)" stroke-width="4"/>';
+          s += '<circle cx="' + PX + '" cy="' + PY + '" r="5" fill="var(--text-soft)"/>';
+          s += '<ellipse cx="' + tx.toFixed(1) + '" cy="' + ty.toFixed(1) + '" rx="' + (RR * 0.5).toFixed(1) +
+            '" ry="' + (RR * 1.5).toFixed(1) + '" fill="var(--accent)" opacity="0.45" stroke="var(--accent)" stroke-width="2.5"/>';
+          s += frec(tx, ty, tx, ty + 46, 'var(--magenta)', 3);
+          s += '<text x="' + (tx + 8).toFixed(1) + '" y="' + (ty + 40).toFixed(1) + '" class="lbl-s">mg</text>';
+          s += '<text x="' + (PX + 86) + '" y="' + (PY + 22) + '" text-anchor="middle" class="lbl-s">braccio r = ' + nf(d.r, 2) + ' m</text>';
+          s += '<text x="' + (PX + 86) + '" y="70" text-anchor="middle" class="lbl">vista di lato</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('gi-wv').textContent = nf(d.f, 0);
+          document.getElementById('gi-mv').textContent = nf(d.m, 2);
+          document.getElementById('gi-rv').textContent = nf(d.r, 2);
+          document.getElementById('gi-Rv').textContent = nf(d.R, 3);
+          document.getElementById('gi-L').textContent = nf(d.L, 4) + ' kg·m²/s';
+          document.getElementById('gi-M').textContent = nf(d.M, 3) + ' N·m';
+          document.getElementById('gi-op').textContent = nf(d.op, 3) + ' rad/s';
+          document.getElementById('gi-Tp').textContent = nf(d.Tp, 2) + ' s';
+          var el = document.getElementById('gi-out');
+          el.innerHTML = '$\\Omega_p = \\dfrac{mgr}{I\\omega} = \\dfrac{' + nf(d.M, 3).replace(',', '{,}') + '}{' +
+            nf(d.L, 4).replace(',', '{,}') + '} = ' + nf(d.op, 3).replace(',', '{,}') + '$ rad/s, cioè un giro ' +
+            'di precessione ogni <strong>' + nf(d.Tp, 2) + ' s</strong>. ' +
+            'Raddoppiate i giri del volano e la precessione <strong>dimezza</strong>; raddoppiate la massa e ' +
+            'resta uguale (la massa sta sia in $M$ sia in $I$, e si semplifica), ma raddoppiando il braccio ' +
+            'la precessione raddoppia.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['gi-w', 'gi-m', 'gi-r', 'gi-R'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        raf = requestAnimationFrame(tick);
+      })();
+
+      /* ============ 6 — LA PRECESSIONE DEGLI EQUINOZI ============ */
+      (function () {
+        var svg = document.getElementById('pr-svg');
+        if (!svg) { return; }
+        var PER = 25772, OBL = 23.44;
+        // stelle vicine al cerchio di precessione: epoca di massimo avvicinamento e distanza minima
+        var STELLE = [
+          { n: 'Polaris (α Ursae Minoris)', y: 2100, off: 0.45 },
+          { n: 'Alderamin (α Cephei)', y: 7500, off: 3.0 },
+          { n: 'Vega (α Lyrae)', y: 13727, off: 5.0 },
+          { n: 'Thuban (α Draconis)', y: -2787, off: 0.1 },
+          { n: 'Kochab (β Ursae Minoris)', y: -1000, off: 7.0 }
+        ];
+        var ZOD = ['Acquario', 'Capricorno', 'Sagittario', 'Scorpione', 'Bilancia', 'Vergine',
+                   'Leone', 'Cancro', 'Gemelli', 'Toro', 'Ariete', 'Pesci'];
+
+        function beta(t) { return -2 * Math.PI * (t - 2000) / PER; }
+        function dist(t, st) {
+          var db = beta(t) - beta(st.y);
+          while (db > Math.PI) { db -= 2 * Math.PI; }
+          while (db < -Math.PI) { db += 2 * Math.PI; }
+          return Math.sqrt(Math.pow(OBL * db, 2) + st.off * st.off);
+        }
+
+        function disegna() {
+          var t = parseFloat(document.getElementById('pr-t').value);
+          var s = '', i;
+          var CX = 210, CY = 178, RAD = 120;
+          s += '<circle cx="' + CX + '" cy="' + CY + '" r="' + RAD + '" fill="none" stroke="var(--border)" stroke-width="1.6" stroke-dasharray="6 5"/>';
+          s += '<circle cx="' + CX + '" cy="' + CY + '" r="5" fill="var(--gold)"/>';
+          s += '<text x="' + (CX + 10) + '" y="' + (CY - 8) + '" class="lbl-s">polo dell\'eclittica</text>';
+          s += '<text x="' + CX + '" y="34" text-anchor="middle" class="lbl">il cerchio di precessione (23,44° di raggio)</text>';
+          for (i = 0; i < STELLE.length; i++) {
+            var b = beta(STELLE[i].y);
+            var rr = RAD * (1 + STELLE[i].off / OBL * 0.42);
+            var sx = CX + rr * Math.cos(b), sy = CY + rr * Math.sin(b);
+            var vicina = dist(t, STELLE[i]) < 6;
+            s += '<circle cx="' + sx.toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="' + (vicina ? 6 : 4) +
+              '" fill="' + (vicina ? 'var(--magenta)' : 'var(--text-soft)') + '"/>';
+            s += '<text x="' + sx.toFixed(1) + '" y="' + (sy - 10).toFixed(1) + '" text-anchor="middle" class="lbl-s">' +
+              STELLE[i].n.split(' ')[0] + '</text>';
+          }
+          var bp = beta(t);
+          var px = CX + RAD * Math.cos(bp), py = CY + RAD * Math.sin(bp);
+          s += frec(CX, CY, px, py, 'var(--accent)', 3);
+          s += '<circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="7" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+          s += '<text x="' + CX + '" y="' + (CY + RAD + 52) + '" text-anchor="middle" class="lbl-s">il cerchietto è il polo celeste nell\'anno scelto</text>';
+
+          // pannello di destra: lo spostamento del punto vernale
+          var BX = 400, BY = 96, BW = 232;
+          var shift = (t - 2000) * 360 / PER;
+          var n = Math.floor((t - 2600) / (PER / 12));
+          var idx = ((n % 12) + 12) % 12;
+          s += '<text x="' + BX + '" y="' + (BY - 34) + '" class="lbl">il punto vernale</text>';
+          s += '<rect x="' + BX + '" y="' + (BY - 18) + '" width="' + BW + '" height="26" rx="6" fill="var(--surface)" stroke="var(--border)" stroke-width="1.4"/>';
+          var frac = ((t - 2600) / (PER / 12)) - n;
+          s += '<rect x="' + (BX + 2) + '" y="' + (BY - 16) + '" width="' + ((BW - 4) * frac).toFixed(1) +
+            '" height="22" rx="5" fill="var(--accent)" opacity="0.4"/>';
+          s += '<text x="' + (BX + BW / 2) + '" y="' + (BY + 1) + '" text-anchor="middle" class="lbl">' + ZOD[idx] + '</text>';
+          s += '<text x="' + BX + '" y="' + (BY + 40) + '" class="lbl-s">scarto rispetto al 2000: ' + nf(shift, 1) + '°</text>';
+          s += '<text x="' + BX + '" y="' + (BY + 62) + '" class="lbl-s">velocità: 50,3 secondi d\'arco all\'anno</text>';
+          s += '<text x="' + BX + '" y="' + (BY + 96) + '" class="lbl">anno ' + (t < 0 ? nf(-t, 0) + ' a.C.' : nf(t, 0) + ' d.C.') + '</text>';
+          s += '<text x="' + BX + '" y="' + (BY + 128) + '" class="lbl-s">periodo completo: 25 772 anni</text>';
+          s += '<text x="' + BX + '" y="' + (BY + 150) + '" class="lbl-s">(«anno platonico»)</text>';
+          svg.innerHTML = s;
+
+          var best = STELLE[0], bd = dist(t, STELLE[0]);
+          for (i = 1; i < STELLE.length; i++) {
+            if (dist(t, STELLE[i]) < bd) { bd = dist(t, STELLE[i]); best = STELLE[i]; }
+          }
+          document.getElementById('pr-tv').textContent = (t < 0 ? nf(-t, 0) + ' a.C.' : nf(t, 0));
+          document.getElementById('pr-stella').textContent = best.n;
+          document.getElementById('pr-dist').textContent = nf(bd, 1) + '°';
+          document.getElementById('pr-vern').textContent = nf(shift, 1) + '°';
+          document.getElementById('pr-cost').textContent = ZOD[idx];
+          var el = document.getElementById('pr-out');
+          el.innerHTML = 'Nell\'anno indicato la stella più vicina al polo celeste è <strong>' + best.n +
+            '</strong>, a ' + nf(bd, 1) + '° di distanza' +
+            (bd < 1 ? ' — abbastanza vicina da meritare il nome di «stella polare».'
+                    : ' — troppo lontana per fare da polare: in quell\'epoca il cielo non ne ha una decente.') +
+            ' Il punto vernale è nel <strong>' + ZOD[idx] + '</strong>, spostato di ' + nf(shift, 1) +
+            '° rispetto a oggi. ' +
+            '<em>(Schema semplificato: il cerchio è diviso in dodici parti uguali, mentre le costellazioni ' +
+            'reali hanno ampiezze diverse.)</em>';
+        }
+        document.getElementById('pr-t').addEventListener('input', disegna);
+        document.getElementById('pr-oggi').addEventListener('click', function () {
+          document.getElementById('pr-t').value = 2000;
+          disegna();
+        });
+        disegna();
+      })();
+
+      /* ============ 8 — IL PENDOLO DI FOUCAULT ============ */
+      (function () {
+        var svg = document.getElementById('fo-svg');
+        if (!svg) { return; }
+        var OT = 15.041;              // gradi all'ora, giorno siderale
+        var tore = 0, raf = null, ultimo = 0, fase = 0;
+
+        function dati() {
+          var lat = parseFloat(document.getElementById('fo-lat').value);
+          var acc = parseFloat(document.getElementById('fo-acc').value);
+          var om = OT * Math.sin(lat * Math.PI / 180);
+          return { lat: lat, acc: acc, om: om, per: om > 1e-9 ? 360 / om : Infinity };
+        }
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+        STOP2.push(ferma);
+
+        function tick(ts) {
+          var d = dati();
+          var dt = ultimo ? Math.min(0.05, (ts - ultimo) / 1000) : 0.016;
+          ultimo = ts;
+          tore += dt * d.acc / 3600;
+          fase += dt * 3.1;
+          disegna();
+          raf = requestAnimationFrame(tick);
+        }
+
+        function disegna() {
+          var d = dati(), s = '', i;
+          var CX = 200, CY = 178, RAD = 130;
+          var ang = -d.om * tore * Math.PI / 180;      // orario nell'emisfero nord
+          s += '<circle cx="' + CX + '" cy="' + CY + '" r="' + RAD + '" fill="var(--surface)" stroke="var(--border)" stroke-width="1.6"/>';
+          for (i = 0; i < 12; i++) {
+            var a = i * Math.PI / 6;
+            s += '<line x1="' + (CX + (RAD - 8) * Math.cos(a)).toFixed(1) + '" y1="' + (CY + (RAD - 8) * Math.sin(a)).toFixed(1) +
+              '" x2="' + (CX + RAD * Math.cos(a)).toFixed(1) + '" y2="' + (CY + RAD * Math.sin(a)).toFixed(1) +
+              '" stroke="var(--border)" stroke-width="1.6"/>';
+          }
+          // le tracce lasciate nella sabbia
+          for (i = 0; i <= 26; i++) {
+            var f = i / 26;
+            var aa = -d.om * tore * f * Math.PI / 180;
+            s += '<line x1="' + (CX - RAD * 0.92 * Math.cos(aa)).toFixed(1) + '" y1="' + (CY - RAD * 0.92 * Math.sin(aa)).toFixed(1) +
+              '" x2="' + (CX + RAD * 0.92 * Math.cos(aa)).toFixed(1) + '" y2="' + (CY + RAD * 0.92 * Math.sin(aa)).toFixed(1) +
+              '" stroke="var(--gold)" stroke-width="1" opacity="' + (0.10 + 0.25 * f).toFixed(2) + '"/>';
+          }
+          // il piano attuale e la sfera
+          s += '<line x1="' + (CX - RAD * 0.92 * Math.cos(ang)).toFixed(1) + '" y1="' + (CY - RAD * 0.92 * Math.sin(ang)).toFixed(1) +
+            '" x2="' + (CX + RAD * 0.92 * Math.cos(ang)).toFixed(1) + '" y2="' + (CY + RAD * 0.92 * Math.sin(ang)).toFixed(1) +
+            '" stroke="var(--accent)" stroke-width="2.6"/>';
+          var pos = Math.sin(fase) * RAD * 0.92;
+          s += '<circle cx="' + (CX + pos * Math.cos(ang)).toFixed(1) + '" cy="' + (CY + pos * Math.sin(ang)).toFixed(1) +
+            '" r="9" fill="var(--magenta)"/>';
+          s += '<circle cx="' + CX + '" cy="' + CY + '" r="3" fill="var(--text-soft)"/>';
+          s += '<text x="' + CX + '" y="30" text-anchor="middle" class="lbl">il pendolo visto dall\'alto</text>';
+
+          // il pannello con la latitudine
+          var BX = 400, BY = 92;
+          s += '<text x="' + BX + '" y="' + (BY - 34) + '" class="lbl">latitudine ' + nf(d.lat, 1) + '° N</text>';
+          var TX = BX + 96, TY = BY + 66, TR = 62;
+          s += '<circle cx="' + TX + '" cy="' + TY + '" r="' + TR + '" fill="var(--accent)" opacity="0.12" stroke="var(--border)" stroke-width="1.6"/>';
+          s += '<line x1="' + (TX - TR) + '" y1="' + TY + '" x2="' + (TX + TR) + '" y2="' + TY + '" stroke="var(--border)" stroke-width="1.2"/>';
+          s += '<line x1="' + TX + '" y1="' + (TY - TR - 16) + '" x2="' + TX + '" y2="' + (TY + TR + 16) + '" stroke="var(--text-soft)" stroke-width="1.6" stroke-dasharray="4 4"/>';
+          var la = d.lat * Math.PI / 180;
+          var lx = TX + TR * Math.cos(la), ly = TY - TR * Math.sin(la);
+          s += '<circle cx="' + lx.toFixed(1) + '" cy="' + ly.toFixed(1) + '" r="6" fill="var(--magenta)"/>';
+          s += '<line x1="' + TX + '" y1="' + TY + '" x2="' + lx.toFixed(1) + '" y2="' + ly.toFixed(1) + '" stroke="var(--magenta)" stroke-width="1.6"/>';
+          s += '<text x="' + BX + '" y="' + (BY + 168) + '" class="lbl-s">Ω = 15,04°/h · sin(' + nf(d.lat, 1) + '°) = ' + nf(d.om, 2) + '°/h</text>';
+          s += '<text x="' + BX + '" y="' + (BY + 190) + '" class="lbl-s">' +
+            (isFinite(d.per) ? 'giro completo in ' + nf(d.per, 1) + ' ore' : 'il piano non ruota mai') + '</text>';
+          s += '<text x="' + BX + '" y="' + (BY + 218) + '" class="lbl-s">tempo simulato: ' + nf(tore, 2) + ' ore</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('fo-latv').textContent = nf(d.lat, 1);
+          document.getElementById('fo-accv').textContent = nf(d.acc, 0);
+          document.getElementById('fo-om').textContent = nf(d.om, 2) + ' °/h';
+          document.getElementById('fo-per').textContent = isFinite(d.per) ? nf(d.per, 1) + ' h' : 'mai';
+          document.getElementById('fo-t').textContent = nf(tore, 2) + ' h';
+          document.getElementById('fo-ang').textContent = nf(d.om * tore, 1) + '°';
+          var el = document.getElementById('fo-out');
+          el.innerHTML = 'A latitudine $' + nf(d.lat, 1).replace(',', '{,}') + '°$ il piano ruota di ' +
+            '$15{,}04° \\cdot \\sin\\lambda = ' + nf(d.om, 2).replace(',', '{,}') + '$ gradi all\'ora, ' +
+            (isFinite(d.per)
+              ? 'e compie un giro completo in <strong>' + nf(d.per, 1) + ' ore</strong>.'
+              : 'cioè <strong>non ruota affatto</strong>: all\'equatore il pendolo di Foucault non funziona.') +
+            (d.lat > 89.5 ? ' Al polo il giro dura esattamente un giorno siderale, 23,93 ore.' : '') +
+            (Math.abs(d.lat - 48.9) < 0.3 ? ' È la latitudine del Panthéon di Parigi: 31,8 ore.' : '');
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['fo-lat', 'fo-acc'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('fo-reset').addEventListener('click', function () { ferma(); tore = 0; ultimo = 0; disegna(); });
+        document.getElementById('fo-via').addEventListener('click', function () {
+          if (!raf) { ultimo = 0; raf = requestAnimationFrame(tick); }
+        });
+        disegna();
+      })();
+
+      /* ============ 9 — IL PENDOLO COMPOSTO ============ */
+      (function () {
+        var svg = document.getElementById('pc-svg');
+        if (!svg) { return; }
+        function periodo(L, d) { return 2 * Math.PI * Math.sqrt((L * L / 12 + d * d) / (G * d)); }
+
+        function disegna() {
+          var L = parseFloat(document.getElementById('pc-L').value);
+          var fr = parseFloat(document.getElementById('pc-d').value);
+          var lock = document.getElementById('pc-lock').checked;
+          var d = fr * L;
+          var I = L * L / 12 + d * d;                 // per unita' di massa
+          var T = periodo(L, d);
+          var leq = I / d;
+          var dmin = L / Math.sqrt(12);
+          var Tmin = periodo(L, dmin);
+          var s = '', i;
+          // a sinistra: l'asta appesa
+          var PX = 130, PY = 62, SC = 108;
+          s += '<circle cx="' + PX + '" cy="' + PY + '" r="5" fill="var(--text-soft)"/>';
+          s += '<line x1="' + (PX - 44) + '" y1="' + (PY - 8) + '" x2="' + (PX + 44) + '" y2="' + (PY - 8) + '" stroke="var(--text-soft)" stroke-width="4"/>';
+          var incl = 0.32;
+          var ux = Math.sin(incl), uy = Math.cos(incl);
+          var cxg = PX + d * SC * ux, cyg = PY + d * SC * uy;
+          var a1x = cxg - (L / 2) * SC * ux, a1y = cyg - (L / 2) * SC * uy;
+          var a2x = cxg + (L / 2) * SC * ux, a2y = cyg + (L / 2) * SC * uy;
+          s += '<line x1="' + a1x.toFixed(1) + '" y1="' + a1y.toFixed(1) + '" x2="' + a2x.toFixed(1) + '" y2="' + a2y.toFixed(1) +
+            '" stroke="var(--accent)" stroke-width="9" stroke-linecap="round" opacity="0.55"/>';
+          s += '<circle cx="' + cxg.toFixed(1) + '" cy="' + cyg.toFixed(1) + '" r="7" fill="var(--magenta)"/>';
+          s += '<text x="' + (cxg + 14).toFixed(1) + '" y="' + (cyg + 5).toFixed(1) + '" class="em">baricentro</text>';
+          s += '<text x="' + (PX + 12) + '" y="' + (PY + 4) + '" class="lbl-s">perno</text>';
+          // la lunghezza ridotta
+          var lx = PX + leq * SC * ux, ly = PY + leq * SC * uy;
+          s += '<circle cx="' + lx.toFixed(1) + '" cy="' + ly.toFixed(1) + '" r="6" fill="none" stroke="var(--gold)" stroke-width="2.5"/>';
+          s += '<text x="' + (lx + 12).toFixed(1) + '" y="' + (ly + 5).toFixed(1) + '" style="fill:var(--gold); font-size:12px; font-weight:700;">centro di oscillazione</text>';
+
+          // a destra: il grafico del periodo
+          var X0 = 356, X1 = 636, Y0 = 268, Y1 = 56;
+          var DM = 0.5, TM = lock ? 6 : Math.max(2, periodo(L, 0.02 * L) * 1.05);
+          var px = function (u) { return X0 + (X1 - X0) * u / DM; };
+          var py = function (u) { return Y0 - (Y0 - Y1) * Math.min(1, u / TM); };
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 5; i++) {
+            s += '<text x="' + px(DM * i / 5).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' + nf(DM * i / 5, 2) + '</text>';
+            s += '<text x="' + (X0 - 7) + '" y="' + (py(TM * i / 5) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(TM * i / 5, 1) + '</text>';
+          }
+          s += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">perno / L</text>';
+          s += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 12) + '" class="lbl-s">periodo (s)</text>';
+          var pts = [];
+          for (i = 1; i <= 250; i++) {
+            var f2 = DM * i / 250;
+            pts.push(px(f2).toFixed(1) + ',' + py(periodo(L, f2 * L)).toFixed(1));
+          }
+          s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2.6"/>';
+          s += '<line x1="' + px(dmin / L).toFixed(1) + '" y1="' + Y0 + '" x2="' + px(dmin / L).toFixed(1) + '" y2="' + py(Tmin).toFixed(1) +
+            '" stroke="var(--gold)" stroke-width="1.6" stroke-dasharray="5 4"/>';
+          s += '<text x="' + (px(dmin / L) + 6).toFixed(1) + '" y="' + (py(Tmin) - 8).toFixed(1) + '" style="fill:var(--gold); font-size:11.5px;">minimo a 0,289·L</text>';
+          s += '<circle cx="' + px(fr).toFixed(1) + '" cy="' + py(T).toFixed(1) + '" r="6" fill="var(--magenta)"/>';
+          svg.innerHTML = s;
+
+          document.getElementById('pc-Lv').textContent = nf(L, 2);
+          document.getElementById('pc-dv').textContent = nf(fr, 2);
+          document.getElementById('pc-I').textContent = nf(I, 4) + ' kg·m² per kg';
+          document.getElementById('pc-T').textContent = nf(T, 4) + ' s';
+          document.getElementById('pc-leq').textContent = nf(leq, 4) + ' m';
+          document.getElementById('pc-dmin').textContent = nf(dmin, 4) + ' m (T = ' + nf(Tmin, 4) + ' s)';
+          var el = document.getElementById('pc-out');
+          el.innerHTML = '$T = 2\\pi\\sqrt{\\dfrac{I}{Mgd}} = ' + nf(T, 4).replace(',', '{,}') + '$ s. ' +
+            'Un pendolo <em>semplice</em> con lo stesso periodo sarebbe lungo $\\ell_{eq} = I/(Md) = ' +
+            nf(leq, 4).replace(',', '{,}') + '$ m, e il punto a quella distanza dal perno si chiama ' +
+            '<strong>centro di oscillazione</strong>: appendendo l\'asta <em>lì</em> il periodo non cambia — ' +
+            'è il principio del pendolo reversibile di Kater. Il minimo è a $L/\\sqrt{12} = ' +
+            nf(dmin, 3).replace(',', '{,}') + '$ m, dove $T = ' + nf(Tmin, 4).replace(',', '{,}') + '$ s.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['pc-L', 'pc-d'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('pc-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ============ 11 — GLI ANGOLI DI EULERO ============ */
+      (function () {
+        var svg = document.getElementById('ea-svg');
+        if (!svg) { return; }
+        var AZ = -0.75, EL = 0.42;
+
+        function mul(A, B) {
+          var C = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], i, j, k;
+          for (i = 0; i < 3; i++) {
+            for (j = 0; j < 3; j++) {
+              for (k = 0; k < 3; k++) { C[i][j] += A[i][k] * B[k][j]; }
+            }
+          }
+          return C;
+        }
+        function Rz(a) {
+          return [[Math.cos(a), -Math.sin(a), 0], [Math.sin(a), Math.cos(a), 0], [0, 0, 1]];
+        }
+        function Rx(a) {
+          return [[1, 0, 0], [0, Math.cos(a), -Math.sin(a)], [0, Math.sin(a), Math.cos(a)]];
+        }
+        function app(A, v) {
+          return [A[0][0] * v[0] + A[0][1] * v[1] + A[0][2] * v[2],
+                  A[1][0] * v[0] + A[1][1] * v[1] + A[1][2] * v[2],
+                  A[2][0] * v[0] + A[2][1] * v[1] + A[2][2] * v[2]];
+        }
+        function proj(v, cx, cy, sc) {
+          var ux = [-Math.sin(AZ), Math.cos(AZ), 0];
+          var wx = [-Math.cos(AZ) * Math.sin(EL), -Math.sin(AZ) * Math.sin(EL), Math.cos(EL)];
+          return [cx + sc * (v[0] * ux[0] + v[1] * ux[1] + v[2] * ux[2]),
+                  cy - sc * (v[0] * wx[0] + v[1] * wx[1] + v[2] * wx[2])];
+        }
+
+        function disegna() {
+          var f = parseFloat(document.getElementById('ea-f').value) * Math.PI / 180;
+          var th = parseFloat(document.getElementById('ea-t').value) * Math.PI / 180;
+          var ps = parseFloat(document.getElementById('ea-p').value) * Math.PI / 180;
+          var R = mul(mul(Rz(f), Rx(th)), Rz(ps));
+          var CX = 330, CY = 200, SC = 108;
+          var s = '', i;
+          var O = proj([0, 0, 0], CX, CY, SC);
+          // gli assi fissi
+          var ASSI = [[[1.35, 0, 0], 'x'], [[0, 1.35, 0], 'y'], [[0, 0, 1.35], 'z']];
+          for (i = 0; i < 3; i++) {
+            var pa = proj(ASSI[i][0], CX, CY, SC);
+            s += frec(O[0], O[1], pa[0], pa[1], 'var(--muted)', 1.8);
+            s += '<text x="' + (pa[0] + 6).toFixed(1) + '" y="' + (pa[1] - 4).toFixed(1) + '" class="lbl-s">' + ASSI[i][1] + '</text>';
+          }
+          // il piano orizzontale fisso
+          var quad = [[-1.15, -1.15, 0], [1.15, -1.15, 0], [1.15, 1.15, 0], [-1.15, 1.15, 0]];
+          s += '<polygon points="' + quad.map(function (q) {
+            var t = proj(q, CX, CY, SC); return t[0].toFixed(1) + ',' + t[1].toFixed(1);
+          }).join(' ') + '" fill="var(--border)" opacity="0.20"/>';
+          // la linea dei nodi
+          var nod = [Math.cos(f), Math.sin(f), 0];
+          var n1 = proj([-nod[0] * 1.25, -nod[1] * 1.25, 0], CX, CY, SC);
+          var n2 = proj([nod[0] * 1.25, nod[1] * 1.25, 0], CX, CY, SC);
+          s += '<line x1="' + n1[0].toFixed(1) + '" y1="' + n1[1].toFixed(1) + '" x2="' + n2[0].toFixed(1) +
+            '" y2="' + n2[1].toFixed(1) + '" stroke="#f97316" stroke-width="2.6"/>';
+          s += '<text x="' + (n2[0] + 6).toFixed(1) + '" y="' + (n2[1] + 14).toFixed(1) +
+            '" style="fill:#f97316; font-size:11.5px; font-weight:700;">linea dei nodi</text>';
+          // il disco del corpo
+          var pts = [];
+          for (i = 0; i <= 60; i++) {
+            var a = 2 * Math.PI * i / 60;
+            var v = app(R, [0.62 * Math.cos(a), 0.62 * Math.sin(a), 0]);
+            var t2 = proj(v, CX, CY, SC);
+            pts.push(t2[0].toFixed(1) + ',' + t2[1].toFixed(1));
+          }
+          s += '<polygon points="' + pts.join(' ') + '" fill="#0ea5e9" opacity="0.28" stroke="#0ea5e9" stroke-width="2.4"/>';
+          // l'asse del corpo
+          var e3 = app(R, [0, 0, 1]);
+          var pe = proj([e3[0] * 1.3, e3[1] * 1.3, e3[2] * 1.3], CX, CY, SC);
+          s += frec(O[0], O[1], pe[0], pe[1], '#0ea5e9', 3.4);
+          s += '<text x="' + (pe[0] + 8).toFixed(1) + '" y="' + (pe[1] - 6).toFixed(1) +
+            '" style="fill:#0ea5e9; font-size:12.5px; font-weight:700;">asse del corpo</text>';
+          // un riferimento solidale al corpo, per vedere psi
+          var m1 = app(R, [0.62, 0, 0]);
+          var pm = proj(m1, CX, CY, SC);
+          var po = O;
+          s += '<line x1="' + po[0].toFixed(1) + '" y1="' + po[1].toFixed(1) + '" x2="' + pm[0].toFixed(1) +
+            '" y2="' + pm[1].toFixed(1) + '" stroke="var(--magenta)" stroke-width="2.6"/>';
+          s += '<circle cx="' + pm[0].toFixed(1) + '" cy="' + pm[1].toFixed(1) + '" r="5" fill="var(--magenta)"/>';
+
+          // controlli numerici: ortogonalità e determinante
+          var det = R[0][0] * (R[1][1] * R[2][2] - R[1][2] * R[2][1])
+                  - R[0][1] * (R[1][0] * R[2][2] - R[1][2] * R[2][0])
+                  + R[0][2] * (R[1][0] * R[2][1] - R[1][1] * R[2][0]);
+          var err = 0, j, k;
+          for (i = 0; i < 3; i++) {
+            for (j = 0; j < 3; j++) {
+              var sca = 0;
+              for (k = 0; k < 3; k++) { sca += R[i][k] * R[j][k]; }
+              err = Math.max(err, Math.abs(sca - (i === j ? 1 : 0)));
+            }
+          }
+          var bloccato = Math.abs(Math.sin(th)) < 1e-6;
+          s += '<text x="24" y="30" class="lbl">' + (bloccato
+            ? '⚠ blocco cardanico: φ e ψ ruotano attorno allo stesso asse'
+            : 'i tre angoli individuano un solo orientamento') + '</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('ea-fv').textContent = nf(f * 180 / Math.PI, 0);
+          document.getElementById('ea-tv').textContent = nf(th * 180 / Math.PI, 0);
+          document.getElementById('ea-pv').textContent = nf(ps * 180 / Math.PI, 0);
+          document.getElementById('ea-asse').textContent = '(' + nf(e3[0], 3) + ' ; ' + nf(e3[1], 3) + ' ; ' + nf(e3[2], 3) + ')';
+          document.getElementById('ea-det').textContent = nf(det, 6);
+          document.getElementById('ea-ort').textContent = err.toExponential(1).replace('.', ',');
+          document.getElementById('ea-gdl').textContent = bloccato ? '2 (uno perso!)' : '3';
+          var el = document.getElementById('ea-out');
+          el.innerHTML = 'L\'asse del corpo punta in $(\\sin\\varphi\\sin\\theta,\\,-\\cos\\varphi\\sin\\theta,\\,\\cos\\theta) = (' +
+            nf(e3[0], 3).replace(',', '{,}') + ' ; ' + nf(e3[1], 3).replace(',', '{,}') + ' ; ' +
+            nf(e3[2], 3).replace(',', '{,}') + ')$: dipende da $\\varphi$ e $\\theta$, ma <strong>non da ' +
+            '$\\psi$</strong> — la rotazione propria fa girare il corpo senza spostarne l\'asse. ' +
+            'La matrice è ortogonale a meno di ' + err.toExponential(1) + ' e ha determinante ' + nf(det, 6) +
+            ': è una rotazione pura, senza deformazioni né riflessioni. ' +
+            (bloccato
+              ? '<strong>Con θ = 0 il disco è orizzontale e φ e ψ fanno esattamente la stessa cosa</strong>: ' +
+                'muovete i due cursori e guardate il segmento magenta — solo la somma φ+ψ conta. Si è perso un grado di libertà.'
+              : 'Portate θ a zero con il pulsante per vedere il blocco cardanico.');
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['ea-f', 'ea-t', 'ea-p'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('ea-gl').addEventListener('click', function () {
+          document.getElementById('ea-t').value = 0;
+          disegna();
+        });
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Il centro di massa di un corpo può trovarsi in un punto dove non c\'è materia?',
+        options: [
+          'Sì: succede per tutti i corpi di forma non convessa, come una ciambella o un ferro di cavallo',
+          'No, mai: è per definizione un punto del corpo',
+          'Solo se il corpo è in movimento',
+          'Solo se il corpo ha densità variabile'
+        ],
+        correct: 0,
+        explain: 'Il centro di massa è una <em>media pesata</em> delle posizioni, e una media può cadere dove non c\'è nessuno dei punti mediati. Per una ciambella cade nel buco. È il principio del fosbury flop: l\'atleta passa sopra l\'asticella mentre il suo baricentro passa sotto.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Due sbarre hanno la stessa massa e la stessa lunghezza, ma una ha la massa concentrata al centro e l\'altra alle estremità. Quale è più difficile da far ruotare attorno al centro?',
+        options: [
+          'Quella con la massa al centro',
+          'Sono uguali, perché la massa è la stessa',
+          'Quella con la massa alle estremità',
+          'Dipende dalla velocità di rotazione'
+        ],
+        correct: 2,
+        explain: '$I = \\sum m_i r_i^2$: conta la distanza <em>dall\'asse</em>, e per giunta al quadrato. La massa portata al doppio della distanza pesa quattro volte tanto. È il motivo per cui i funamboli usano una lunga pertica: aumenta enormemente il momento d\'inerzia e rende le oscillazioni lentissime da correggere.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Un\'asta omogenea di massa $M$ e lunghezza $L$ ha $I_{CM} = \\frac{1}{12}ML^2$. Quanto vale rispetto a un asse parallelo passante per un estremo?',
+        options: ['$\\frac{1}{6}ML^2$', '$\\frac13 ML^2$', '$\\frac{1}{12}ML^2$, non cambia', '$ML^2$'],
+        correct: 1,
+        explain: 'Per il teorema di Huygens-Steiner $I = I_{CM} + Md^2$ con $d = L/2$: $\\frac{1}{12}ML^2 + \\frac14 ML^2 = \\frac13 ML^2$. Il teorema mostra anche che l\'asse per il centro di massa è <em>sempre</em> quello di momento d\'inerzia minimo fra tutti i paralleli.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Sfera piena, cilindro pieno, guscio sferico e anello — tutti con la stessa massa e lo stesso raggio — vengono lasciati insieme in cima a un piano inclinato. Chi arriva primo?',
+        options: [
+          'L\'anello, perché ha il momento d\'inerzia maggiore',
+          'Arrivano tutti insieme, come nella caduta libera',
+          'Dipende dalla massa e dal raggio',
+          'La sfera piena, perché ha il $k = I/MR^2$ più piccolo'
+        ],
+        correct: 3,
+        explain: '$a = \\dfrac{g\\sin\\theta}{1+k}$ con $k = I/MR^2$: né la massa né il raggio compaiono. Vince chi ha la massa più concentrata verso l\'asse, cioè il $k$ minore — sfera piena ($0{,}4$), poi cilindro pieno ($0{,}5$), guscio ($0{,}667$), anello ($1$). Chi striscia senza attrito ($k=0$) batte tutti.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Una ruota rotola senza strisciare. Qual è la velocità del punto della ruota che tocca terra?',
+        options: [
+          'Zero: il punto di contatto è istantaneamente fermo',
+          'Uguale a quella del centro',
+          'Il doppio di quella del centro',
+          'Uguale in modulo ma opposta a quella del centro'
+        ],
+        correct: 0,
+        explain: 'Nel rotolamento puro il punto di contatto ha velocità nulla — la traslazione $v$ e la rotazione $-\\omega R = -v$ si cancellano esattamente. È per questo che l\'attrito statico non compie lavoro. Il punto in cima, invece, va a $2v$: in una foto di un\'auto in corsa la parte alta del pneumatico è mossa e quella bassa nitida.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Nel disco di Eulero, che cosa diverge mentre il disco si appiattisce?',
+        options: [
+          'L\'energia cinetica del disco',
+          'La frequenza con cui il punto di contatto corre lungo il bordo',
+          'La velocità con cui il disco ruota attorno al proprio asse',
+          'Il numero totale di giri compiuti'
+        ],
+        correct: 1,
+        explain: 'A divergere è la <strong>precessione</strong> del punto di contatto, $\\Omega = \\sqrt{4g/(3a\\alpha)}$, che tende all\'infinito per $\\alpha \\to 0$. L\'energia invece <em>cala</em> (è la dissipazione a far calare $\\alpha$), e il numero totale di giri resta finito, perché $\\Omega$ diverge abbastanza lentamente da essere integrabile.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Che cosa succede alla velocità di precessione di una trottola man mano che l\'attrito ne rallenta la rotazione propria?',
+        options: [
+          'Rallenta anche la precessione, proporzionalmente',
+          'La precessione non cambia: dipende solo dal peso',
+          'La precessione accelera, perché $\\Omega_p = mgr/(I\\omega)$ ha $\\omega$ al denominatore',
+          'La trottola cade subito, senza precedere'
+        ],
+        correct: 2,
+        explain: 'La precessione è <em>inversamente</em> proporzionale alla rotazione propria. Una trottola lanciata forte precede lentissimamente; quando l\'attrito la rallenta, la precessione accelera visibilmente, l\'inclinazione cresce e la trottola finisce per cadere. È esattamente la sequenza che si osserva ogni volta.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Perché chi è nato il 25 marzo, «Ariete» per l\'astrologia, ha in realtà il Sole nella costellazione dei Pesci?',
+        options: [
+          'Perché le costellazioni si sono spostate rispetto alle stelle',
+          'Perché il calendario gregoriano ha tolto dieci giorni nel 1582',
+          'Perché l\'orbita terrestre si è deformata',
+          'Perché la precessione degli equinozi ha spostato il punto vernale di più di un segno dai tempi dei Babilonesi'
+        ],
+        correct: 3,
+        explain: 'I segni furono fissati circa 2500 anni fa, quando l\'equinozio di primavera cadeva nell\'Ariete. La precessione, con il suo periodo di 25 772 anni, ha da allora spostato il punto vernale di quasi $35°$: oggi l\'equinozio è nei Pesci. L\'astrologia ha continuato a usare i segni fissi del calendario babilonese; l\'astronomia lo sa da Ipparco.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Che cosa aveva di speciale la precessione del perielio di Mercurio nell\'Ottocento?',
+        options: [
+          'Restavano 43 secondi d\'arco al secolo che la meccanica newtoniana non riusciva a spiegare',
+          'Mercurio precedeva al contrario rispetto agli altri pianeti',
+          'Era l\'unico pianeta a non precedere affatto',
+          'La precessione osservata era il doppio di quella prevista'
+        ],
+        correct: 0,
+        explain: 'Dei circa $574$ secondi d\'arco al secolo osservati, le perturbazioni degli altri pianeti e la precessione degli equinozi ne spiegavano tutti tranne $43$. Le Verrier ipotizzò un pianeta interno, Vulcano, che non fu mai trovato: la relatività generale, nel 1915, produsse esattamente quei $43$ secondi senza aggiungere nulla.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Quanto impiega il piano di oscillazione di un pendolo di Foucault a compiere un giro completo all\'equatore?',
+        options: [
+          'Ventiquattro ore, come al polo',
+          'Un tempo infinito: all\'equatore il piano non ruota affatto',
+          'Dodici ore',
+          'Sei ore'
+        ],
+        correct: 1,
+        explain: 'La velocità apparente è $\\Omega_{\\text{Terra}}\\sin\\lambda$, e a $\\lambda = 0$ vale zero: all\'equatore l\'esperimento non funziona. Al polo il giro dura un giorno siderale ($23{,}93$ h), a Parigi ($48{,}87°$) ne dura $31{,}8$. È il $\\sin\\lambda$ a rendere l\'esperimento anche una misura della latitudine.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Che cosa succede al periodo di un pendolo composto quando si avvicina il perno al baricentro?',
+        options: [
+          'Tende a zero, perché il braccio diminuisce',
+          'Resta costante: il periodo non dipende dal perno',
+          'Cresce senza limite, perché sparisce la forza di richiamo',
+          'Si dimezza ogni volta che si dimezza la distanza'
+        ],
+        correct: 2,
+        explain: '$T = 2\\pi\\sqrt{I/(Mgd)}$ e per $d \\to 0$ il denominatore va a zero: il periodo diverge. Nel limite, un corpo appeso esattamente al baricentro è in equilibrio indifferente e non oscilla affatto. Esiste invece una distanza di periodo <em>minimo</em>, che per un\'asta omogenea è $L/\\sqrt{12} \\approx 0{,}289\\,L$.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Che cos\'è il «blocco cardanico» (gimbal lock) negli angoli di Eulero?',
+        options: [
+          'Un errore di calcolo che si verifica quando gli angoli superano i 360°',
+          'L\'impossibilità di descrivere rotazioni superiori a un giro completo',
+          'Il fatto che il determinante della matrice di rotazione diventi negativo',
+          'La configurazione in cui due dei tre assi di rotazione coincidono e si perde un grado di libertà'
+        ],
+        correct: 3,
+        explain: 'Quando la nutazione $\\theta$ vale zero, gli assi di $\\varphi$ e $\\psi$ coincidono: le due rotazioni fanno la stessa cosa, conta solo la loro somma, e la terna di angoli non è più univoca. Non è un problema di calcolo ma della <em>parametrizzazione</em>: il determinante resta $+1$ e la matrice resta ortogonale. Per evitarlo si usano i quaternioni — o, sulle Apollo, si evitava a mano la zona rossa sul pannello.'
+      },
+      {
+        type: 'open',
+        text: 'In una gara di rotolamento su un piano inclinato la classifica non dipende né dalla massa né dal raggio dei corpi. Spiega perché, e di\' che cosa la determina.',
+        keywords: ['energia', 'momento d\'inerzia', 'forma', 'semplific', 'k', 'sfera', 'anello'],
+        requiredMatches: 3,
+        explain: 'Scrivendo la conservazione dell\'energia, $Mgh = \\frac12 Mv^2 + \\frac12 I\\omega^2$, e usando il vincolo di rotolamento $\\omega = v/R$ insieme alla forma $I = kMR^2$, si ottiene $Mgh = \\frac12(1+k)Mv^2$: la massa <strong>si semplifica</strong> perché compare in tutti i termini, e il raggio <strong>sparisce</strong> perché $I$ è proporzionale a $R^2$ mentre $\\omega^2$ è proporzionale a $1/R^2$. Resta $a = \\dfrac{g\\sin\\theta}{1+k}$, che dipende solo dal numero puro $k = I/MR^2$, cioè dalla <em>forma</em> — da come la massa è distribuita rispetto all\'asse. Vince chi ce l\'ha più concentrata al centro: sfera piena ($k = 0{,}4$), cilindro pieno ($0{,}5$), guscio sferico ($2/3$), anello ($1$). Un corpo che striscia senza attrito ha $k = 0$ e batte tutti, perché non deve spendere nulla per mettersi a girare.'
+      },
+      {
+        type: 'open',
+        text: 'Perché il pendolo di Foucault è considerato la prima prova <em>diretta</em> della rotazione terrestre, e perché è arrivato tre secoli dopo Copernico?',
+        keywords: ['piano', 'ruota', 'laboratorio', 'copernico', 'indirett', 'latitudine', '1851'],
+        requiredMatches: 3,
+        explain: 'Il pendolo, una volta messo in oscillazione, tende a <strong>mantenere il proprio piano</strong>: nessuna forza lo fa girare, ed è il pavimento — cioè la Terra — a ruotargli sotto. Lo si vede in un <em>laboratorio</em>, senza guardare il cielo e senza assumere nulla sul sistema solare: è questo a renderlo una prova diretta. La velocità apparente $\\Omega\\sin\\lambda$ dipende dalla latitudine, il che permette anche una verifica quantitativa: nulla all\'equatore, un giorno siderale al polo, $31{,}8$ ore al Panthéon. Fra il <em>De revolutionibus</em> (1543) e Foucault (1851) passano tre secoli in cui il moto terrestre era sostenuto da argomenti <em>indiretti</em> e via via più forti — fasi di Venere, satelliti di Giove, leggi di Keplero, aberrazione della luce di Bradley — ma da nessun esperimento terrestre. È un buon promemoria del fatto che avere ragione e avere le prove sono due cose diverse: Galileo, nel 1632, non aveva ancora né le une né le altre in forma decisiva, e la sua «prova» preferita, quella delle maree, era sbagliata.'
+      }
+    ];
+  </script>
+
+</body>
+
+</html>

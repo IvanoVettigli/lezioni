@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 7 — Temperatura e calore</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .qbox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.8rem 0; }
+    .qbox .qt { font-weight: 600; margin-bottom: 0.45rem; }
+    .qbox.tosto { border-left-color: var(--gold); }
+    .qbox.tosto .qt::before { content: "★ "; color: var(--gold); }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .stati { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .stati > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                   padding: 0.8rem 0.9rem; background: var(--surface); }
+    .stati h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+    .stati .solido { border-top-color: #64748b; }
+    .stati .solido h4 { color: #64748b; }
+    .stati .liquido { border-top-color: #3b82f6; }
+    .stati .liquido h4 { color: #3b82f6; }
+    .stati .gas { border-top-color: #f97316; }
+    .stati .gas h4 { color: #f97316; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quarto anno · Lezione 7</div>
+    <h1>Temperatura e calore</h1>
+    <p>Che cosa misura davvero un termometro, che cos'è il calore
+      e perché per due secoli si è creduto che fosse un fluido</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quarto anno</a>
+    <span class="sep">/</span> Temperatura e calore
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Un modulo nuovo.</strong> Con questa lezione la meccanica si mette da parte e comincia la
+      <strong>termodinamica</strong>: la scienza del calore, delle macchine e del motivo per cui il tempo ha una
+      direzione. È nata nell'Ottocento da un'esigenza pratica — capire perché le macchine a vapore rendevano
+      così poco — ed è finita per dirci qualcosa di profondo sull'universo. Cominciamo dalle due grandezze che
+      confonderemo di continuo se non le separiamo subito: la <strong>temperatura</strong> e il
+      <strong>calore</strong>.
+    </div>
+
+    <!-- 1 — GLI STATI DELLA MATERIA -->
+    <section id="sec1">
+      <h2>1. Gli stati della materia, visti da vicino</h2>
+
+      <p>Tutto quello che segue si capisce molto meglio se si tiene a mente una figura: la materia è fatta di
+        <strong>particelle in movimento</strong>, e i tre stati in cui la incontriamo sono tre modi diversi in
+        cui quel movimento convive con le forze che le tengono insieme.</p>
+
+      <div class="stati">
+        <div class="solido">
+          <h4>Solido</h4>
+          <p>Le particelle <strong>oscillano attorno a posizioni fisse</strong>, in genere ordinate in un
+            reticolo. L'agitazione c'è, ma non basta a rompere i legami.</p>
+          <p>Forma propria, volume proprio. Incomprimibile.</p>
+        </div>
+        <div class="liquido">
+          <h4>Liquido</h4>
+          <p>Le particelle restano <strong>a contatto</strong> ma possono scorrere le une sulle altre: i legami
+            si rompono e si riformano di continuo.</p>
+          <p>Nessuna forma propria, volume proprio. Quasi incomprimibile.</p>
+        </div>
+        <div class="gas">
+          <h4>Gas</h4>
+          <p>L'agitazione ha la meglio: le particelle sono <strong>lontane e libere</strong>, e interagiscono
+            solo negli urti.</p>
+          <p>Né forma né volume propri: occupa tutto lo spazio disponibile. Comprimibilissimo.</p>
+        </div>
+      </div>
+
+      <p>Il simulatore qui sotto mostra la stessa scatola di particelle mentre si alza la temperatura. Guardate
+        soprattutto il <strong>grafico a destra</strong>: mentre si continua a fornire energia, la temperatura a
+        un certo punto <em>smette di salire</em>.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="sm-e">energia fornita: <span class="val-badge" id="sm-ev">120</span> kJ per kg</label>
+          <input type="range" id="sm-e" min="0" max="3200" step="10" value="120">
+          <button class="btn" id="sm-anima" type="button">▶ Riscalda lentamente</button>
+          <button class="btn btn-secondary" id="sm-stop" type="button">⏸ Ferma</button>
+        </div>
+        <svg id="sm-svg" viewBox="0 0 660 330" aria-label="Particelle in una scatola e curva di riscaldamento dell'acqua"></svg>
+        <div class="sp-cols">
+          <div>Stato: <span class="val-badge" id="sm-stato">—</span></div>
+          <div>Temperatura: <span class="val-badge" id="sm-t">—</span></div>
+          <div>Energia già fornita: <span class="val-badge" id="sm-q">—</span></div>
+          <div>Velocità media delle particelle: <span class="val-badge" id="sm-v">—</span></div>
+        </div>
+        <p class="eq-out" id="sm-out"></p>
+      </div>
+
+      <div class="definition">
+        <strong>Passaggi di stato.</strong> Durante un passaggio di stato la temperatura <strong>non
+        cambia</strong>, per quanto si continui a scaldare: tutta l'energia fornita serve a <em>rompere i
+        legami</em>, non ad aumentare l'agitazione. I gradini orizzontali del grafico si chiamano
+        <em>plateau</em>, e la loro lunghezza è il <strong>calore latente</strong> di cui parleremo nella
+        sezione 7.
+        <table class="tabf" style="margin-top:0.7rem;">
+          <thead><tr><th>Da</th><th>A</th><th>Nome</th><th>Assorbe o cede calore?</th></tr></thead>
+          <tbody>
+            <tr><td>solido</td><td>liquido</td><td class="lab">fusione</td><td>assorbe</td></tr>
+            <tr><td>liquido</td><td>solido</td><td class="lab">solidificazione</td><td>cede</td></tr>
+            <tr><td>liquido</td><td>gas</td><td class="lab">vaporizzazione</td><td>assorbe</td></tr>
+            <tr><td>gas</td><td>liquido</td><td class="lab">condensazione</td><td>cede</td></tr>
+            <tr><td>solido</td><td>gas</td><td class="lab">sublimazione</td><td>assorbe</td></tr>
+            <tr><td>gas</td><td>solido</td><td class="lab">brinamento</td><td>cede</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="curiosita"><strong>Evaporazione e ebollizione non sono la stessa cosa.</strong> Una pozzanghera
+        si asciuga a venti gradi, molto sotto i cento: è l'<strong>evaporazione</strong>, che avviene solo alla
+        <em>superficie</em> e a qualunque temperatura, perché le molecole hanno velocità diverse e le più veloci
+        riescono a scappare. L'<strong>ebollizione</strong> invece coinvolge tutto il liquido, avviene a una
+        temperatura precisa, e consiste nella formazione di bolle di vapore <em>dentro</em> il liquido: succede
+        quando la pressione del vapore eguaglia quella esterna.
+        <p style="margin:0.6rem 0 0;">Da qui due conseguenze pratiche. Sull'Everest l'acqua bolle a circa
+          $70\ °$C, perché la pressione è un terzo di quella al livello del mare: si può bere il tè bollente
+          senza scottarsi, ma la pasta non cuoce. E la <strong>pentola a pressione</strong> fa l'opposto: tenendo
+          il vapore dentro alza la pressione a circa due atmosfere e porta l'ebollizione a $120\ °$C, dimezzando
+          i tempi di cottura.</p>
+      </div>
+
+      <div class="note"><strong>Perché sudare rinfresca.</strong> Se solo le molecole <em>più veloci</em>
+        riescono a evaporare, quelle che restano sono in media più lente: la temperatura del liquido rimasto
+        <strong>scende</strong>. È il motivo per cui il sudore raffredda, per cui si sente freddo uscendo
+        bagnati dall'acqua, e per cui in una giornata secca si soffre meno l'afa che in una umida — se l'aria è
+        già satura di vapore, il sudore non evapora e il meccanismo si inceppa.</div>
+    </section>
+
+    <!-- 2 — LA TEMPERATURA -->
+    <section id="sec2">
+      <h2>2. La temperatura e le sue scale</h2>
+
+      <p>Che cos'è la temperatura? La risposta onesta, a questo punto del corso, è una
+        <strong>definizione operativa</strong>: la temperatura è <em>ciò che misura il termometro</em>. Non è
+        una risposta insoddisfacente quanto sembra — è esattamente il modo in cui la fisica ha proceduto per due
+        secoli, e funziona.</p>
+
+      <div class="definition">
+        <strong>Come si costruisce un termometro.</strong> Serve una grandezza che cambi in modo
+        <em>riproducibile</em> con lo stato termico: il volume di un liquido, la resistenza di un filo, la
+        pressione di un gas a volume costante, il colore della luce emessa. Si sceglie la grandezza, si fissano
+        due punti di riferimento e si divide l'intervallo in parti uguali.
+        <p class="formula-note">Il punto delicato è che termometri costruiti su grandezze diverse
+          <em>non</em> danno esattamente la stessa scala nei punti intermedi, perché le loro grandezze non
+          variano in modo perfettamente proporzionale. La scala «vera» è quella del <strong>termometro a gas a
+          volume costante</strong>, e vedremo nella lezione 9 perché è privilegiata.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="ts-c">temperatura: <span class="val-badge" id="ts-cv">25</span> °C</label>
+          <input type="range" id="ts-c" min="-273.15" max="150" step="0.05" value="25">
+          <div class="sim-btns" id="ts-preset"></div>
+        </div>
+        <svg id="ts-svg" viewBox="0 0 660 300" aria-label="Confronto fra le scale Celsius, Fahrenheit e Kelvin"></svg>
+        <div class="sp-cols">
+          <div>Celsius: <span class="val-badge" id="ts-c2">—</span></div>
+          <div>Fahrenheit: <span class="val-badge" id="ts-f">—</span></div>
+          <div>Kelvin: <span class="val-badge" id="ts-k">—</span></div>
+          <div>Riferimento: <span class="val-badge" id="ts-rif">—</span></div>
+        </div>
+        <p class="eq-out" id="ts-out"></p>
+      </div>
+
+      <div class="definition">
+        <strong>Le tre scale, e come si passa da una all'altra.</strong>
+        $$T_F = \frac{9}{5}\,T_C + 32 \qquad T_C = \frac{5}{9}\,(T_F - 32) \qquad T_K = T_C + 273{,}15$$
+        <ul>
+          <li><strong>Celsius</strong> (1742): $0$ e $100$ ai punti di fusione e di ebollizione dell'acqua a
+            pressione atmosferica. Curiosamente Celsius li aveva messi al contrario — $0$ per l'ebollizione —
+            e furono invertiti dopo la sua morte.</li>
+          <li><strong>Fahrenheit</strong> (1724): $0$ alla temperatura di una miscela di ghiaccio, acqua e
+            sale, $96$ (poi $98{,}6$) alla temperatura del corpo umano. Sopravvive negli Stati Uniti.</li>
+          <li><strong>Kelvin</strong> (1848): stessa ampiezza del grado Celsius, ma lo zero è lo
+            <strong>zero assoluto</strong>. È l'unica scala <em>assoluta</em>, e l'unica del Sistema
+            Internazionale. Non si dice «gradi Kelvin»: si dice <strong>kelvin</strong>.</li>
+        </ul>
+      </div>
+
+      <div class="warnbox"><strong>Quando serve il kelvin e quando no.</strong> Per una
+        <em>differenza</em> di temperatura, Celsius e kelvin sono intercambiabili: un salto di $10\ °$C è un
+        salto di $10$ K, e nella formula $Q = mc\Delta T$ si può usare l'una o l'altro. Per una temperatura
+        <em>assoluta</em> no: nelle leggi dei gas, nella legge di Stefan-Boltzmann, in ogni formula dove $T$
+        compare da sola o moltiplicata, i gradi Celsius danno risultati privi di senso. Regola pratica: se nella
+        formula la $T$ compare senza il $\Delta$, va in kelvin.</div>
+
+      <div class="curiosita"><strong>Il punto triplo, e perché lo zero assoluto non è a $-273$ tondi.</strong>
+        Il punto di fusione dell'acqua dipende dalla pressione, quindi non è un riferimento abbastanza preciso.
+        Esiste però una condizione in cui ghiaccio, acqua e vapore coesistono in equilibrio, e capita a
+        <strong>una sola</strong> coppia di valori: $273{,}16$ K e $611{,}657$ Pa. È il <strong>punto
+        triplo</strong> dell'acqua, ed è riproducibile in qualunque laboratorio del mondo con una precisione di
+        un decimillesimo di grado. Fino al 2019 il kelvin era <em>definito</em> come $1/273{,}16$ della
+        temperatura del punto triplo — ed è per questo che lo zero assoluto cade a $-273{,}15\ °$C e non a un
+        numero rotondo: quel numero è una conseguenza, non una scelta.
+        <p style="margin:0.6rem 0 0;">Dal 2019 la definizione è cambiata di nuovo: si fissa il valore della
+          <strong>costante di Boltzmann</strong> $k = 1{,}380\,649\times10^{-23}$ J/K, esattamente come per il
+          metro si fissa $c$. La temperatura, insomma, è oggi definita a partire dall'energia.</p>
+      </div>
+
+      <div class="curiosita"><strong>A quaranta sotto zero fa lo stesso freddo dappertutto.</strong> Esiste una
+        temperatura in cui Celsius e Fahrenheit coincidono: basta imporre $T_C = \frac95 T_C + 32$, da cui
+        $-\frac45 T_C = 32$ e $T_C = -40$. È l'unica, ed è anche il motivo per cui i canadesi dicono
+        «quaranta sotto» senza specificare la scala: tanto non cambia nulla.</div>
+
+      <div class="qbox">
+        <div class="qt">① Un forno segna $350\ °$F. A quanti gradi Celsius corrisponde? E la febbre di
+          $38{,}5\ °$C, quanti Fahrenheit fa?</div>
+        <button class="btn btn-toggle" data-target="#sol-ca1">Mostra la soluzione</button>
+        <div id="sol-ca1" class="hidden">
+          <p><span class="step-num">1</span>$T_C = \frac59(350 - 32) = \frac59 \cdot 318 = 176{,}7\ °$C.
+            È la temperatura tipica di cottura di una torta.</p>
+          <p><span class="step-num">2</span>$T_F = \frac95 \cdot 38{,}5 + 32 = 69{,}3 + 32 = 101{,}3\ °$F.</p>
+          <p><span class="step-num">3</span><strong>Il controllo mentale che conviene imparare.</strong> Per
+            passare da Celsius a Fahrenheit: raddoppia e aggiungi $30$. Per $38{,}5$ darebbe $107$ contro il
+            valore vero $101{,}3$ — approssimato, ma sufficiente per capire se avete sbagliato di un fattore
+            grosso. Funziona bene fra $0$ e $25\ °$C, dove l'errore non supera i tre gradi; oltre peggiora in
+            fretta, perché il vero fattore è $1{,}8$ e non $2$, e la differenza si accumula.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — LA DILATAZIONE TERMICA -->
+    <section id="sec3">
+      <h2>3. La dilatazione termica</h2>
+
+      <p>Il primo effetto misurabile della temperatura, e quello su cui si basa il termometro più comune, è che
+        <strong>quasi tutto si dilata scaldandosi</strong>. Microscopicamente il motivo è che le particelle
+        oscillano di più e la distanza media fra loro cresce.</p>
+
+      <div class="definition">
+        <strong>Dilatazione lineare</strong> (una sbarra, un cavo, un binario):
+        $$\Delta L = \lambda\,L_0\,\Delta T \qquad\text{cioè}\qquad L = L_0\,(1 + \lambda\,\Delta T)$$
+        dove $\lambda$ è il <strong>coefficiente di dilatazione lineare</strong>, in $1/$K.
+        <p class="formula-note">Per la <strong>superficie</strong> il coefficiente è $2\lambda$, per il
+          <strong>volume</strong> è $3\lambda$. Non è una coincidenza: se ogni lato cresce di un fattore
+          $(1+\lambda\Delta T)$, il volume cresce di $(1+\lambda\Delta T)^3 \simeq 1 + 3\lambda\Delta T$,
+          perché i termini con $\lambda^2$ e $\lambda^3$ sono milionesimi di milionesimi.</p>
+      </div>
+
+      <table class="tabf">
+        <thead><tr><th>Materiale</th><th>$\lambda$ (10⁻⁶/K)</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Invar (lega Fe-Ni)</td><td>$1{,}2$</td><td class="l">inventata apposta per non dilatarsi: orologi, strumenti di precisione</td></tr>
+          <tr><td class="lab">Vetro pyrex</td><td>$3{,}3$</td><td class="l">per questo non si spacca versandoci acqua bollente</td></tr>
+          <tr><td class="lab">Vetro comune</td><td>$9$</td><td class="l">che invece si spacca</td></tr>
+          <tr><td class="lab">Acciaio / ferro</td><td>$12$</td><td class="l">binari, ponti, cemento armato</td></tr>
+          <tr><td class="lab">Cemento</td><td>$12$</td><td class="l">uguale a quello dell'acciaio: <strong>per questo il cemento armato funziona</strong></td></tr>
+          <tr><td class="lab">Rame</td><td>$17$</td><td class="l">tubature, cavi elettrici</td></tr>
+          <tr><td class="lab">Alluminio</td><td>$24$</td><td class="l">il doppio dell'acciaio</td></tr>
+        </tbody>
+      </table>
+
+      <div class="figbox">
+        <div class="sim-btns" id="dl-modo"></div>
+        <div class="ctrl">
+          <label for="dl-dt">salto di temperatura: <span class="val-badge" id="dl-dtv">60</span> K</label>
+          <input type="range" id="dl-dt" min="-100" max="300" step="5" value="60">
+          <label for="dl-l">dimensione iniziale: <span class="val-badge" id="dl-lv">1,00</span> m</label>
+          <input type="range" id="dl-l" min="0.1" max="10" step="0.1" value="1">
+          <label for="dl-esa">esagerazione del disegno: <span class="val-badge" id="dl-esav">2000</span>×</label>
+          <input type="range" id="dl-esa" min="200" max="5000" step="100" value="2000">
+        </div>
+        <svg id="dl-svg" viewBox="0 0 660 320" aria-label="Dilatazione di una sbarra, di una lastra forata e di una lamina bimetallica"></svg>
+        <div class="sp-cols">
+          <div>Coefficiente usato: <span class="val-badge" id="dl-lam">—</span></div>
+          <div>Variazione assoluta: <span class="val-badge" id="dl-abs">—</span></div>
+          <div>Variazione relativa: <span class="val-badge" id="dl-rel">—</span></div>
+          <div>Confronto: <span class="val-badge" id="dl-cfr">—</span></div>
+        </div>
+        <p class="eq-out" id="dl-out"></p>
+      </div>
+
+      <div class="warnbox"><strong>Il buco si allarga.</strong> È la domanda che in verifica sbagliano quasi
+        tutti: scaldando una lastra con un foro in mezzo, il foro si <em>allarga</em> o si <em>stringe</em>?
+        Si allarga, esattamente come se fosse fatto dello stesso materiale della lastra. Il modo più rapido di
+        convincersene è immaginare di aver ritagliato quel disco e di rimetterlo al suo posto: il disco si
+        dilata, quindi il buco che lo contiene deve fare altrettanto. La dilatazione è una
+        <strong>similitudine</strong>: la figura si ingrandisce tutta, buchi compresi.</div>
+
+      <div class="curiosita"><strong>Dove si vede tutti i giorni.</strong>
+        <ul>
+          <li>I <strong>giunti di dilatazione</strong> sui ponti e fra le rotaie: senza, d'estate i binari si
+            imbarcherebbero. Il record è la <em>rotaia saldata continua</em>, che si usa oggi: si posa il binario
+            già in tensione, così che d'estate la dilatazione la annulli invece di deformarlo.</li>
+          <li>La <strong>lamina bimetallica</strong>: due metalli con $\lambda$ diverso incollati insieme si
+            incurvano scaldandosi, perché uno vuole allungarsi più dell'altro. È il cuore dei vecchi termostati,
+            delle frecce delle automobili e dei salvavita termici.</li>
+          <li>Il <strong>cemento armato</strong> sta insieme perché acciaio e cemento hanno $\lambda$ quasi
+            identico. Se non fosse così, alla prima estate le barre si staccherebbero dal getto.</li>
+          <li>Il <strong>bicchiere che si spacca</strong> versandoci l'acqua bollente: la parete interna si
+            dilata prima di quella esterna, e la differenza spacca il vetro. Nel pyrex $\lambda$ è tre volte
+            minore, e non succede.</li>
+        </ul>
+      </div>
+
+      <div class="curiosita"><strong>L'anomalia dell'acqua, e perché la vita esiste.</strong> Fra $0$ e
+        $4\ °$C l'acqua si comporta al contrario: <strong>si contrae scaldandosi</strong>. Il massimo di
+        densità è a $3{,}98\ °$C. La conseguenza è enorme: in un lago che si raffredda, l'acqua a $4\ °$C va sul
+        fondo e quella più fredda resta in superficie, dove ghiaccia. Il ghiaccio, che è meno denso dell'acqua
+        liquida — altra anomalia — <strong>galleggia</strong> e fa da coperta isolante. I laghi ghiacciano dalla
+        superficie verso il basso e sul fondo restano $4\ °$C: se l'acqua si comportasse come tutti gli altri
+        liquidi, ghiaccerebbero dal fondo e ogni inverno ucciderebbero tutto quello che ci vive.</div>
+
+      <div class="qbox">
+        <div class="qt">② Un ponte d'acciaio è lungo $240$ m a $10\ °$C. Di quanto si allunga a $40\ °$C? E se
+          i giunti fossero bloccati, che sforzo si genererebbe? (Per l'acciaio $E = 2{,}0\times10^{11}$ Pa.)</div>
+        <button class="btn btn-toggle" data-target="#sol-ca2">Mostra la soluzione</button>
+        <div id="sol-ca2" class="hidden">
+          <p><span class="step-num">1</span>$\Delta T = 30$ K e $\lambda = 12\times10^{-6}$/K, quindi
+            $$\Delta L = \lambda L_0 \Delta T = 12\times10^{-6} \cdot 240 \cdot 30 = 0{,}0864\ \text{m}
+              = 8{,}6\ \text{cm}$$</p>
+          <p><span class="step-num">2</span>Otto centimetri e mezzo su un ponte: ecco perché i giunti ci sono, e
+            perché ci si sente il <em>tu-tunf</em> passandoci sopra in macchina.</p>
+          <p><span class="step-num">3</span>Se il ponte fosse bloccato, la deformazione impedita
+            $\varepsilon = \Delta L/L_0 = \lambda\Delta T = 3{,}6\times10^{-4}$ produrrebbe, per la legge di
+            Hooke del terzo anno,
+            $$\sigma = E\,\varepsilon = 2{,}0\times10^{11} \cdot 3{,}6\times10^{-4} = 7{,}2\times10^{7}\
+              \text{Pa} = 72\ \text{MPa}$$</p>
+          <p><span class="step-num">4</span><strong>Settantadue megapascal</strong>: circa un terzo del carico
+            di snervamento di un acciaio da costruzione, per un salto di temperatura del tutto ordinario. E
+            notate che <em>la lunghezza è sparita</em>: lo sforzo termico non dipende da quanto è lungo il
+            ponte, ma solo dal materiale e dal salto di temperatura.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — LA TEMPERATURA VISTA DA DENTRO -->
+    <section id="sec4">
+      <h2>4. Che cos'è la temperatura, davvero</h2>
+
+      <p>La definizione operativa ci ha portati fin qui, ma non risponde alla domanda vera. Che cosa distingue,
+        <em>nella materia</em>, un corpo caldo da uno freddo?</p>
+
+      <div class="definition">
+        <strong>L'interpretazione microscopica.</strong> La temperatura assoluta è proporzionale all'energia
+        cinetica <em>media</em> di agitazione delle particelle. Per un gas monoatomico, dove l'unica energia è
+        quella di traslazione, vale esattamente
+        $$\langle K \rangle = \frac{3}{2}\,k\,T$$
+        con $k = 1{,}380\,649\times10^{-23}$ J/K, la <strong>costante di Boltzmann</strong>.
+        <p class="formula-note">Nei solidi e nei liquidi le particelle hanno anche energia di vibrazione e di
+          rotazione, e il coefficiente cambia; ma l'idea resta: <strong>caldo significa agitato</strong>.
+          Ricaveremo questa formula per bene l'anno prossimo, con la teoria cinetica dei gas.</p>
+      </div>
+
+      <div class="warnbox"><strong>La temperatura di un singolo atomo non esiste.</strong> Questa è la
+        conseguenza più importante, e vale la pena fermarcisi. La formula parla di una <em>media</em>: chiedere
+        qual è la temperatura di una singola molecola è come chiedere qual è il tasso di natalità di una singola
+        persona. La domanda non è difficile — è <strong>priva di senso</strong>.
+        <p style="margin:0.6rem 0 0;">La temperatura è una <strong>proprietà emergente</strong>: esiste solo per
+          un insieme abbastanza numeroso di particelle, e non è contenuta in nessuna di esse. Lo stesso vale per
+          la pressione, per la densità di un fluido, per il colore di un oggetto. È uno dei concetti più
+          profondi della fisica, e lo ritroverete ovunque: nella meccanica statistica, nella biologia, nelle
+          scienze sociali. La materia, messa insieme in grande quantità, ha proprietà che i suoi pezzi
+          <em>non hanno</em>.</p>
+      </div>
+
+      <div class="curiosita"><strong>Lo zero assoluto, e perché non si raggiunge.</strong> Se la temperatura
+        misura l'agitazione, lo <strong>zero assoluto</strong> è la temperatura a cui l'agitazione è minima:
+        $-273{,}15\ °$C, ovvero $0$ K. Non «tutto fermo» — la meccanica quantistica lo vieta, resta sempre
+        l'energia di punto zero — ma il minimo possibile. Il terzo principio della termodinamica afferma che
+        <em>non</em> è raggiungibile in un numero finito di passaggi: ci si può avvicinare quanto si vuole,
+        pagando ogni volta di più. Il record da laboratorio è di qualche centinaio di picokelvin, cioè
+        miliardesimi di grado sopra lo zero — molto più freddo dello spazio profondo, che sta a $2{,}7$ K per la
+        radiazione fossile del Big Bang.</div>
+    </section>
+
+    <!-- 5 — IL CALORE -->
+    <section id="sec5">
+      <h2>5. Il calore: che cos'è e che cosa non è</h2>
+
+      <div class="curiosita"><strong>Due secoli sbagliando: il calorico.</strong> Fino a metà Ottocento la
+        teoria dominante era che il calore fosse un <strong>fluido</strong>: un fluido invisibile, senza peso,
+        che passava dai corpi caldi a quelli freddi e che si chiamava <em>calorico</em> (l'idea precedente,
+        ancora peggiore, era il <em>flogisto</em>: una sostanza che i corpi <em>perdevano</em> bruciando — e che
+        per far tornare i conti avrebbe dovuto avere peso negativo, visto che i metalli bruciando si appesantiscono).
+        <p style="margin:0.6rem 0 0;">La teoria del calorico non era stupida: spiegava benissimo l'equilibrio
+          termico, la conduzione, la calorimetria. Fu <strong>Benjamin Thompson, conte di Rumford</strong>, a
+          incrinarla nel 1798 mentre sovrintendeva alla foratura delle canne dei cannoni a Monaco. Osservò che
+          l'attrito della punta produceva calore <em>senza fine</em>, finché si continuava a girare: se il
+          calorico fosse stato un fluido contenuto nel metallo, prima o poi sarebbe finito. Fece bollire
+          l'acqua per due ore e mezza col solo attrito, e concluse che il calore doveva essere
+          <strong>movimento</strong>. Ci vollero altri cinquant'anni perché lo si accettasse.</p>
+      </div>
+
+      <div class="definition">
+        <strong>Calore.</strong> Non è una proprietà dei corpi: è <strong>energia in transito</strong>, quella
+        che passa spontaneamente da un corpo a temperatura maggiore a uno a temperatura minore. Si misura in
+        <strong>joule</strong>, come tutte le energie.
+        <p class="formula-note">Un corpo <em>non contiene calore</em>, come una banca non contiene bonifici:
+          contiene <strong>energia interna</strong>, che è la somma delle energie cinetiche e potenziali
+          microscopiche. Il calore è il <em>modo</em> in cui quell'energia si sposta. Dire «questo corpo ha molto
+          calore» è sbagliato quanto dire «questo conto ha molti bonifici».</p>
+      </div>
+
+      <div class="definition">
+        <strong>La legge fondamentale della calorimetria.</strong> Per scaldare una massa $m$ di una sostanza di
+        $\Delta T$ senza cambiarle stato serve
+        $$Q = m\,c\,\Delta T$$
+        dove $c$ è il <strong>calore specifico</strong>, in J/(kg·K): l'energia che serve per alzare di un
+        kelvin un chilogrammo di quella sostanza.
+      </div>
+
+      <table class="tabf">
+        <thead><tr><th>Sostanza</th><th>$c$ in J/(kg·K)</th><th>Che cosa significa</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Acqua</td><td>$4186$</td><td class="l">il più alto fra le sostanze comuni: l'acqua è un enorme magazzino termico</td></tr>
+          <tr><td class="lab">Ghiaccio</td><td>$2090$</td><td class="l">metà dell'acqua liquida: la stessa sostanza, stato diverso</td></tr>
+          <tr><td class="lab">Aria (a pressione costante)</td><td>$1005$</td><td class="l">ma la massa di un metro cubo d'aria è appena $1{,}2$ kg</td></tr>
+          <tr><td class="lab">Alluminio</td><td>$900$</td><td class="l">le pentole leggere si scaldano in fretta</td></tr>
+          <tr><td class="lab">Vetro</td><td>$840$</td><td class="l"></td></tr>
+          <tr><td class="lab">Ferro / acciaio</td><td>$450$</td><td class="l"></td></tr>
+          <tr><td class="lab">Rame</td><td>$385$</td><td class="l"></td></tr>
+          <tr><td class="lab">Piombo</td><td>$128$</td><td class="l">trentatré volte meno dell'acqua: basta pochissimo per scaldarlo</td></tr>
+        </tbody>
+      </table>
+
+      <div class="curiosita"><strong>La caloria, e la confusione delle etichette.</strong> Prima che si capisse
+        che il calore è energia, lo si misurava con una sua unità: la <strong>caloria</strong>, cioè l'energia
+        per scaldare di un grado un grammo d'acqua. Vale $1$ cal $= 4{,}186$ J — e quel numero, come vedremo
+        nell'ultima sezione, è una <em>misura</em>, non una definizione.
+        <p style="margin:0.6rem 0 0;">Sulle etichette dei cibi però le «calorie» sono
+          <strong>kilocalorie</strong>: una merendina da $200$ kcal contiene $200\,000$ cal, cioè
+        $837\,000$ J. Con quell'energia potreste sollevare una persona di $70$ kg di più di un
+        <em>chilometro</em> — se il corpo umano avesse rendimento $1$, che non ha (era il conto della lezione 4).</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="pt-m">massa d'acqua: <span class="val-badge" id="pt-mv">1,5</span> kg</label>
+          <input type="range" id="pt-m" min="0.2" max="5" step="0.1" value="1.5">
+          <label for="pt-p">potenza del fornello: <span class="val-badge" id="pt-pv">1800</span> W</label>
+          <input type="range" id="pt-p" min="500" max="3000" step="100" value="1800">
+          <label for="pt-r">rendimento: <span class="val-badge" id="pt-rv">70</span> %</label>
+          <input type="range" id="pt-r" min="20" max="100" step="5" value="70">
+          <label class="toggle-row"><input type="checkbox" id="pt-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg id="pt-svg" viewBox="0 0 660 310" aria-label="Riscaldamento di una pentola d'acqua sul fornello"></svg>
+        <div class="sp-cols">
+          <div>Energia per arrivare a $100\ °$C: <span class="val-badge" id="pt-q">—</span></div>
+          <div>Tempo per arrivare a bollire: <span class="val-badge" id="pt-t">—</span></div>
+          <div>Energia per farla evaporare tutta: <span class="val-badge" id="pt-qv">—</span></div>
+          <div>Tempo totale: <span class="val-badge" id="pt-tt">—</span></div>
+        </div>
+        <p class="eq-out" id="pt-out"></p>
+      </div>
+
+      <div class="curiosita"><strong>La brezza di mare, spiegata da un solo numero.</strong> L'acqua ha calore
+        specifico quattro volte e mezzo quello della sabbia (circa $800$ J/(kg·K)), e per di più mescola il
+        calore in profondità. Risultato: <strong>di giorno</strong> la sabbia si scalda molto più in fretta del
+        mare, l'aria sopra la spiaggia sale e viene rimpiazzata da quella che arriva dal largo — è la
+        <em>brezza di mare</em>, che soffia dal mare verso terra. <strong>Di notte</strong> la sabbia si
+        raffredda altrettanto in fretta mentre il mare resta tiepido, e il verso si inverte: è la
+        <em>brezza di terra</em>. Lo stesso principio, in grande, spiega perché il clima delle isole è mite e
+        quello delle steppe continentali ha estati torride e inverni gelidi.</div>
+    </section>
+
+    <!-- 6 — L'EQUILIBRIO TERMICO -->
+    <section id="sec6">
+      <h2>6. La temperatura di equilibrio e il calorimetro</h2>
+
+      <p>Mettete a contatto due corpi a temperature diverse e isolateli dal resto del mondo. Il calore passa dal
+        caldo al freddo finché le temperature non si pareggiano: quel valore comune si chiama
+        <strong>temperatura di equilibrio</strong>, e si calcola imponendo che il calore ceduto da uno sia
+        esattamente quello assorbito dall'altro.</p>
+
+      <div class="definition">
+        <strong>Equilibrio fra due corpi.</strong> Da $m_1c_1(T_e - T_1) + m_2c_2(T_e - T_2) = 0$ segue
+        $$T_e = \frac{m_1c_1T_1 + m_2c_2T_2}{m_1c_1 + m_2c_2}$$
+        <p class="formula-note">È una <strong>media pesata</strong> delle due temperature, con pesi
+          $m c$ — le <em>capacità termiche</em> dei due corpi. Esattamente la stessa struttura del centro di
+          massa della lezione 6, dove i pesi erano le masse. Quando in fisica compare una media pesata, conviene
+          chiedersi sempre <em>chi sono i pesi</em>.</p>
+      </div>
+
+      <div class="warnbox"><strong>Il termostato, o serbatoio termico.</strong> Se uno dei due corpi è
+        enormemente più grande dell'altro, il suo peso $mc$ domina e la temperatura di equilibrio coincide
+        praticamente con la sua: il corpo grande <em>impone</em> la temperatura senza cambiare la propria.
+        Si chiama <strong>serbatoio termico</strong> (o termostato), ed è un'idealizzazione utilissima: il mare,
+        l'atmosfera, un bagno d'acqua di laboratorio.
+        <p style="margin:0.6rem 0 0;">È il caso della <strong>spada temprata</strong>: la lama rovente immersa
+          nella tinozza si raffredda di colpo, e l'acqua non si accorge di nulla. Il raffreddamento rapido
+          «congela» la struttura cristallina in una forma dura e fragile — la martensite — ed è per questo che il
+          fabbro poi rinviene l'acciaio riscaldandolo di nuovo, per restituirgli un po' di tenacità.</p>
+      </div>
+
+      <h3>6.1 — Un'esperienza guidata: il calorimetro delle mescolanze</h3>
+
+      <p>È l'esperimento con cui si misura il calore specifico di un solido, e si può fare in un'aula con un
+        thermos, un termometro e una bilancia.</p>
+
+      <div class="definition">
+        <strong>Il procedimento.</strong>
+        <ol>
+          <li>Si mette nel calorimetro una massa nota d'acqua $m_a$ e si aspetta che tutto vada in equilibrio;
+            si legge $T_a$.</li>
+          <li>Si scalda un campione di massa $m_x$ del solido incognito in acqua bollente, così da sapere che
+            è a $T_x = 100\ °$C.</li>
+          <li>Lo si immerge rapidamente nel calorimetro, si mescola e si legge la temperatura di equilibrio
+            $T_e$.</li>
+          <li>Si impone che il calore ceduto dal solido sia quello assorbito dall'acqua:
+            $$m_x c_x (T_x - T_e) = m_a c_a (T_e - T_a) \;\Longrightarrow\;
+              c_x = \frac{m_a c_a (T_e - T_a)}{m_x (T_x - T_e)}$$</li>
+        </ol>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">③ Nel calorimetro ci sono $250$ g d'acqua a $18{,}0\ °$C. Vi si immerge un cilindro
+          metallico di $120$ g portato a $100\ °$C. L'equilibrio si stabilizza a $25{,}7\ °$C. Qual è il calore
+          specifico del metallo? Di che metallo si tratta?</div>
+        <button class="btn btn-toggle" data-target="#sol-ca3">Mostra la soluzione</button>
+        <div id="sol-ca3" class="hidden">
+          <p><span class="step-num">1</span>Calore assorbito dall'acqua, che si è scaldata di
+            $25{,}7 - 18{,}0 = 7{,}7$ K:
+            $Q_a = m_a c_a \Delta T_a = 0{,}250 \cdot 4186 \cdot 7{,}7 = 8058$ J.</p>
+          <p><span class="step-num">2</span>Lo stesso calore è stato ceduto dal metallo, che si è raffreddato di
+            $100 - 25{,}7 = 74{,}3$ K:
+            $$c_x = \frac{Q_a}{m_x\,\Delta T_x} = \frac{8058}{0{,}120 \cdot 74{,}3}
+              = \frac{8058}{8{,}916} = 904\ \text{J/(kg·K)}$$</p>
+          <p><span class="step-num">3</span>Nella tabella della sezione 5 c'è un solo candidato:
+            l'<strong>alluminio</strong>, con $900$ J/(kg·K). Lo scarto è dello $0{,}4\%$ — sospettosamente
+            buono per un esperimento da aula.</p>
+          <p><span class="step-num">4</span><strong>Perché «sospettosamente».</strong> Il conto ha ignorato due
+            cose. Primo: il calorimetro <em>stesso</em> assorbe calore, perché anche il suo recipiente si scalda
+            — la sua capacità termica si chiama <strong>equivalente in acqua</strong> e va misurata con una
+            prova preliminare. Secondo: nel trasferire il cilindro dall'acqua bollente al calorimetro se ne
+            perde un po', quindi la temperatura di partenza vera è minore di $100\ °$C. Il primo effetto fa
+            risultare $c_x$ troppo <em>piccolo</em>, il secondo troppo <em>grande</em>: qui si sono in buona
+            parte compensati, ed è un caso.</p>
+          <p><span class="step-num">5</span>La regola onesta è che <strong>un calorimetro da aula dà il calore
+            specifico con un errore del $10$-$20\%$</strong>: serve a riconoscere l'ordine di grandezza e a
+            distinguere un metallo leggero da uno pesante, non a certificare un materiale.
+            Con $c_x = 904 \pm 150$ si può escludere il rame ($385$) e il piombo ($128$), non molto di più.</p>
+        </div>
+      </div>
+
+      <div class="curiosita"><strong>Le calorie dei cibi si misurano così.</strong> Con una versione
+        industriale dello stesso strumento: la <strong>bomba calorimetrica</strong>. Si mette un campione secco
+        del cibo in un contenitore d'acciaio pieno di ossigeno a venticinque atmosfere, lo si immerge in un
+        bagno d'acqua e lo si incendia con una scintilla. Si misura di quanto sale la temperatura dell'acqua, e
+        da lì l'energia liberata. Il valore che leggete sulle etichette esce da lì — corretto, per proteine e
+        fibre, con coefficienti che tengono conto del fatto che il corpo umano <em>non</em> brucia tutto quello
+        che una bomba calorimetrica brucia.</div>
+    </section>
+
+    <!-- 7 — IL CALORE LATENTE -->
+    <section id="sec7">
+      <h2>7. Il calore latente</h2>
+
+      <div class="definition">
+        <strong>Calore latente.</strong> L'energia necessaria a far cambiare stato a un chilogrammo di sostanza,
+        <em>senza</em> variarne la temperatura:
+        $$Q = m\,L$$
+        Si misura in J/kg. Si chiama «latente» — nascosto — proprio perché il termometro non lo vede: si
+        fornisce energia e la temperatura resta ferma.
+      </div>
+
+      <table class="tabf">
+        <thead><tr><th>Sostanza</th><th>$L_{\text{fusione}}$ (kJ/kg)</th><th>$L_{\text{vaporizzazione}}$ (kJ/kg)</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Acqua</td><td>$334$</td><td>$2260$</td></tr>
+          <tr><td class="lab">Alcol etilico</td><td>$108$</td><td>$855$</td></tr>
+          <tr><td class="lab">Alluminio</td><td>$397$</td><td>$10\,900$</td></tr>
+          <tr><td class="lab">Piombo</td><td>$23$</td><td>$871$</td></tr>
+          <tr><td class="lab">Azoto</td><td>$25{,}7$</td><td>$199$</td></tr>
+        </tbody>
+      </table>
+
+      <div class="warnbox"><strong>Guardate i numeri dell'acqua, che sono enormi.</strong> Per sciogliere un
+        chilo di ghiaccio a $0\ °$C servono $334$ kJ: la stessa energia che porterebbe quel chilo d'acqua da
+        $0$ a <strong>$80\ °$C</strong>. E per farlo evaporare a $100\ °$C ne servono $2260$: cinque volte e
+        mezza l'energia per portarlo da $0$ a $100$. Ecco perché una pentola impiega dieci minuti ad arrivare a
+        bollore e poi <em>un'ora</em> a svuotarsi.</div>
+
+      <div class="curiosita"><strong>Tre conseguenze che vedete ogni giorno.</strong>
+        <ul>
+          <li><strong>Il ghiaccio nella bibita.</strong> Raffredda molto più di un pari peso d'acqua a
+            $0\ °$C, perché prima di scaldarsi deve <em>sciogliersi</em>, e per farlo ruba $334$ kJ/kg alla
+            bibita. È il calore latente a fare il lavoro, non la temperatura.</li>
+          <li><strong>Le ustioni da vapore.</strong> Il vapore a $100\ °$C è molto più pericoloso dell'acqua a
+            $100\ °$C: condensando sulla pelle cede prima $2260$ kJ/kg di calore latente, e solo dopo comincia a
+            raffreddarsi. A parità di massa, sei volte l'energia.</li>
+          <li><strong>Gli agrumi coperti d'acqua prima della gelata.</strong> I contadini irrigano i frutteti
+            quando si prevede il gelo: l'acqua che ghiaccia <em>cede</em> $334$ kJ per ogni chilo, e tiene la
+            pianta a $0\ °$C invece di lasciarla scendere a $-5$. Un guscio di ghiaccio, paradossalmente,
+            protegge dal freddo.</li>
+        </ul>
+      </div>
+
+      <div class="qbox tosto">
+        <div class="qt">④ Quanta energia serve per trasformare $2{,}0$ kg di ghiaccio a $-15\ °$C in vapore a
+          $100\ °$C? Fai il conto pezzo per pezzo e di' quale contributo domina.</div>
+        <button class="btn btn-toggle" data-target="#sol-ca4">Mostra la soluzione</button>
+        <div id="sol-ca4" class="hidden">
+          <p><span class="step-num">1</span><strong>Scaldare il ghiaccio</strong> da $-15$ a $0\ °$C, con
+            $c_{gh} = 2090$: $Q_1 = 2{,}0 \cdot 2090 \cdot 15 = 62\,700$ J $= 62{,}7$ kJ.</p>
+          <p><span class="step-num">2</span><strong>Fonderlo</strong> a $0\ °$C:
+            $Q_2 = 2{,}0 \cdot 334\,000 = 668\,000$ J $= 668$ kJ.</p>
+          <p><span class="step-num">3</span><strong>Scaldare l'acqua</strong> da $0$ a $100\ °$C:
+            $Q_3 = 2{,}0 \cdot 4186 \cdot 100 = 837\,200$ J $= 837{,}2$ kJ.</p>
+          <p><span class="step-num">4</span><strong>Farla evaporare</strong>:
+            $Q_4 = 2{,}0 \cdot 2\,260\,000 = 4\,520\,000$ J $= 4520$ kJ.</p>
+          <p><span class="step-num">5</span>Totale: $Q = 62{,}7 + 668 + 837{,}2 + 4520 = 6088$ kJ, cioè circa
+            <strong>$6{,}1$ MJ</strong>.</p>
+          <p><span class="step-num">6</span><strong>Domina la vaporizzazione</strong>, con il $74\%$ del totale;
+            il riscaldamento del ghiaccio è appena l'$1\%$. Se questa energia arrivasse da un fornello da
+            $2$ kW con rendimento perfetto, ci vorrebbero $6{,}09\times10^{6}/2000 = 3044$ s, cioè
+            <strong>cinquantun minuti</strong>. Di cui trentotto solo per l'ultimo pezzo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — IL RAFFREDDAMENTO -->
+    <section id="sec8">
+      <h2>8. Come si raffredda un corpo: la legge di Newton</h2>
+
+      <p>Finora abbiamo calcolato <em>quanta</em> energia serve, mai <em>quanto tempo</em> ci vuole. Per quello
+        serve sapere con che rapidità il calore passa da un corpo all'altro, e la relazione più semplice —
+        approssimata, ma sorprendentemente buona — la scrisse Newton.</p>
+
+      <div class="definition">
+        <strong>Legge del raffreddamento di Newton.</strong> Un corpo a temperatura $T$ immerso in un ambiente a
+        temperatura $T_a$ perde calore a una velocità proporzionale alla <em>differenza</em>:
+        $$\frac{\Delta T}{\Delta t} = -\frac{1}{\tau}\,(T - T_a)
+          \qquad\Longrightarrow\qquad
+          T(t) = T_a + (T_0 - T_a)\,e^{-t/\tau}$$
+        dove $\tau$ è il <strong>tempo caratteristico</strong>: il tempo in cui la differenza di temperatura si
+        riduce a $1/e$, cioè al $37\%$.
+        <p class="formula-note">Il corpo non arriva mai «esattamente» alla temperatura dell'ambiente: ci si
+          avvicina in modo <strong>asintotico</strong>, dimezzando lo scarto ogni $\tau\ln 2 = 0{,}693\,\tau$.
+          Nella pratica, dopo $5\tau$ la differenza è meno dell'$1\%$ di quella iniziale e si considera finita.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="nr-t1">temperatura iniziale del corpo: <span class="val-badge" id="nr-t1v">90</span> °C</label>
+          <input type="range" id="nr-t1" min="-20" max="200" step="5" value="90">
+          <label for="nr-ta">temperatura ambiente: <span class="val-badge" id="nr-tav">20</span> °C</label>
+          <input type="range" id="nr-ta" min="-20" max="60" step="1" value="20">
+          <label for="nr-tau">tempo caratteristico τ: <span class="val-badge" id="nr-tauv">8</span> min</label>
+          <input type="range" id="nr-tau" min="1" max="40" step="1" value="8">
+          <label class="toggle-row"><input type="checkbox" id="nr-due"> confronta con un secondo corpo (τ tripla)</label>
+          <label class="toggle-row"><input type="checkbox" id="nr-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg id="nr-svg" viewBox="0 0 660 320" aria-label="Curva esponenziale di raffreddamento secondo la legge di Newton"></svg>
+        <div class="sp-cols">
+          <div>Tempo di dimezzamento dello scarto: <span class="val-badge" id="nr-th">—</span></div>
+          <div>Temperatura dopo un τ: <span class="val-badge" id="nr-d1">—</span></div>
+          <div>Temperatura dopo tre τ: <span class="val-badge" id="nr-d3">—</span></div>
+          <div>Praticamente a regime dopo: <span class="val-badge" id="nr-d5">—</span></div>
+        </div>
+        <p class="eq-out" id="nr-out"></p>
+      </div>
+
+      <div class="curiosita"><strong>Il caffè e la questione del latte.</strong> Domanda classica: se dovete
+        allontanarvi dieci minuti e volete trovare il caffè il più caldo possibile, conviene metterci il latte
+        freddo <em>subito</em> o <em>dopo</em>? Risposta: <strong>subito</strong>. Aggiungendo il latte subito
+        la temperatura scende di colpo, ma da quel momento il caffè è <em>meno caldo dell'ambiente di quanto lo
+        sarebbe stato</em>, quindi si raffredda più lentamente — perché la velocità di raffreddamento è
+        proporzionale alla differenza. Chi aspetta lascia il caffè bollente a perdere calore rapidamente per
+        dieci minuti, e poi lo abbassa comunque. È un ragionamento che si fa in tre righe con la legge di
+        Newton, ed è controintuitivo quanto basta da essere un ottimo esercizio.</div>
+
+      <h3>8.1 — La prontezza di un termometro, e la misura che perturba</h3>
+
+      <div class="warnbox"><strong>Anche il termometro obbedisce a questa legge.</strong> Quando lo immergete in
+        un liquido, il termometro non segna subito la temperatura del liquido: ci arriva in modo esponenziale,
+        con un suo tempo caratteristico che si chiama <strong>prontezza</strong>. Un termometro a mercurio da
+        laboratorio ha $\tau$ di qualche decina di secondi; una termocoppia sottile, di frazioni di secondo.
+        Leggere troppo presto è uno degli errori sistematici più comuni in laboratorio — e ricade in pieno
+        nella lezione 2 del terzo anno.
+        <p style="margin:0.6rem 0 0;">C'è di peggio: il termometro, per segnare una temperatura, deve
+          <em>andare in equilibrio</em> con ciò che misura, e quindi <strong>scambia calore con esso</strong>.
+          Se il campione è piccolo, la sua temperatura cambia per il solo fatto di essere misurata. Il conto è
+          quello della media pesata di questa sezione, con i pesi $mc$ del liquido e del termometro. È il motivo
+          per cui un termometro va scelto con <em>capacità termica trascurabile</em> rispetto a ciò che misura —
+          e un promemoria che la misura non è mai un atto neutro.</p>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">⑤ Una tazza di tè passa da $85$ a $65\ °$C in $6$ minuti, in una stanza a $20\ °$C.
+          Quanto vale $\tau$? E quanto sarà la temperatura dopo mezz'ora?</div>
+        <button class="btn btn-toggle" data-target="#sol-ca5">Mostra la soluzione</button>
+        <div id="sol-ca5" class="hidden">
+          <p><span class="step-num">1</span>Si lavora sempre sulla <strong>differenza</strong> dall'ambiente:
+            all'inizio $\Delta_0 = 85 - 20 = 65$ K, dopo sei minuti $\Delta = 65 - 20 = 45$ K.</p>
+          <p><span class="step-num">2</span>Da $\Delta = \Delta_0 e^{-t/\tau}$ si ricava
+            $$\tau = \frac{t}{\ln(\Delta_0/\Delta)} = \frac{6}{\ln(65/45)} = \frac{6}{0{,}3677}
+              = 16{,}3\ \text{min}$$</p>
+          <p><span class="step-num">3</span>Dopo $30$ minuti:
+            $\Delta = 65\,e^{-30/16{,}3} = 65 \cdot e^{-1{,}840} = 65 \cdot 0{,}1588 = 10{,}3$ K, quindi
+            $$T = 20 + 10{,}3 = 30{,}3\ °\text{C}$$</p>
+          <p><span class="step-num">4</span><strong>Controllo di ragionevolezza.</strong> Trenta minuti sono
+            poco meno di due tempi caratteristici, e in due $\tau$ la differenza si riduce a
+            $e^{-2} = 13{,}5\%$ di quella iniziale, cioè a circa $9$ K. Il conto esatto dà $10{,}3$: coerente.
+            E il tè, dopo mezz'ora, è tiepido ma non ancora a temperatura ambiente — come l'esperienza
+            conferma.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 — LA PROPAGAZIONE DEL CALORE -->
+    <section id="sec9">
+      <h2>9. Come viaggia il calore: tre modi, non uno</h2>
+
+      <p>Abbiamo detto che il calore è energia che passa da un corpo caldo a uno freddo. Resta da capire
+        <strong>come</strong> ci passa — e le strade sono tre, con meccanismi fisici del tutto diversi.</p>
+
+      <h3>9.1 — Conduzione: il calore che cammina nella materia ferma</h3>
+
+      <div class="definition">
+        <strong>Conduzione.</strong> Le particelle più agitate urtano le vicine e ne aumentano l'agitazione,
+        che a sua volta si trasmette oltre: l'energia si propaga <em>senza che la materia si sposti</em>. È il
+        meccanismo dei solidi. Il flusso di calore attraverso una parete vale
+        $$\frac{Q}{\Delta t} = k\,A\,\frac{T_1 - T_2}{d}$$
+        con $A$ l'area, $d$ lo spessore e $k$ la <strong>conducibilità termica</strong>, in W/(m·K).
+        <p class="formula-note">Notate la struttura: flusso proporzionale alla differenza e inversamente
+          proporzionale allo spessore. È la stessa forma della prima legge di Ohm — differenza di potenziale al
+          posto della differenza di temperatura, e resistenza al posto di $d/(kA)$. La <em>resistenza
+          termica</em> si comporta esattamente come quella elettrica, comprese le regole per serie e parallelo.</p>
+      </div>
+
+      <table class="tabf">
+        <thead><tr><th>Materiale</th><th>$k$ in W/(m·K)</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Rame</td><td>$400$</td><td class="l">per questo le pentole buone hanno il fondo di rame</td></tr>
+          <tr><td class="lab">Alluminio</td><td>$237$</td><td class="l">dissipatori dei computer</td></tr>
+          <tr><td class="lab">Acciaio</td><td>$50$</td><td class="l">otto volte peggio del rame</td></tr>
+          <tr><td class="lab">Vetro</td><td>$1{,}0$</td><td class="l"></td></tr>
+          <tr><td class="lab">Acqua</td><td>$0{,}60$</td><td class="l">pessima conduttrice: trasporta calore per convezione, non per conduzione</td></tr>
+          <tr><td class="lab">Legno</td><td>$0{,}15$</td><td class="l">il manico della pentola</td></tr>
+          <tr><td class="lab">Lana di vetro, polistirolo</td><td>$0{,}04$</td><td class="l">isolanti: la loro forza è l'<strong>aria ferma</strong> intrappolata</td></tr>
+          <tr><td class="lab">Aria ferma</td><td>$0{,}026$</td><td class="l">l'isolante migliore che ci sia, purché non si muova</td></tr>
+        </tbody>
+      </table>
+
+      <div class="warnbox"><strong>Perché il metallo «è più freddo» del legno.</strong> Toccate un banco di
+        legno e la gamba metallica della sedia: il metallo sembra molto più freddo, eppure sono alla
+        <em>stessa temperatura</em> — sono nella stessa stanza da ore. Quello che il vostro dito misura non è la
+        temperatura, è la <strong>rapidità con cui gli viene sottratto calore</strong>. Il metallo conduce
+        diecimila volte meglio del legno, quindi porta via calore dal dito in fretta e attiva i recettori del
+        freddo. È l'esempio più immediato del fatto che le nostre sensazioni non sono strumenti di misura — e,
+        di nuovo, del perché serve un termometro.</div>
+
+      <h3>9.2 — Convezione: il calore che viaggia in valigia</h3>
+
+      <div class="definition">
+        <strong>Convezione.</strong> Nei fluidi il calore può viaggiare in un modo molto più efficiente:
+        <em>portato dalla materia stessa</em>. Il fluido scaldato si dilata, diventa meno denso, e per la spinta
+        di Archimede <strong>sale</strong>; quello freddo scende a prendere il suo posto. Si instaura una
+        <strong>cella convettiva</strong>, che continua a girare finché c'è una differenza di temperatura.
+        <p class="formula-note">Non è un meccanismo nuovo di trasporto: è conduzione più
+          <em>trasporto di massa</em>. Ma è molto più veloce, e per questo domina in tutti i fluidi. La
+          convezione <em>naturale</em> nasce dalla gravità; quella <em>forzata</em> la produce un ventilatore o
+          una pompa.</p>
+      </div>
+
+      <div class="curiosita"><strong>Il pianeta funziona a convezione.</strong> Le celle convettive
+        dell'atmosfera generano i venti, le nuvole e i temporali; quelle degli oceani muovono la corrente del
+        Golfo che tiene mite l'Europa; quelle del mantello terrestre trascinano le placche continentali; quelle
+        del Sole formano la granulazione che si vede sulla sua superficie, celle grandi come l'Italia. E in
+        casa: il termosifone si chiama così perché scalda per convezione, e per questo si mette
+        <strong>sotto la finestra</strong> e non a soffitto — l'aria calda sale da sola, quella fredda no.</div>
+
+      <h3>9.3 — Irraggiamento: il calore che attraversa il vuoto</h3>
+
+      <div class="definition">
+        <strong>Irraggiamento.</strong> Ogni corpo, per il solo fatto di avere una temperatura, emette
+        <strong>onde elettromagnetiche</strong>, e ne assorbe da ciò che lo circonda. Questo trasporto
+        <em>non richiede alcun mezzo</em>: funziona anche nel vuoto assoluto. La potenza emessa da una
+        superficie $A$ segue la <strong>legge di Stefan-Boltzmann</strong>:
+        $$P = \varepsilon\,\sigma\,A\,T^4, \qquad \sigma = 5{,}67\times10^{-8}\ \frac{\text{W}}{\text{m}^2\text{K}^4}$$
+        con $T$ in <strong>kelvin</strong> ed $\varepsilon$ l'<em>emissività</em>, fra $0$ e $1$.
+        <p class="formula-note">Quella <strong>quarta potenza</strong> è la cosa da ricordare: raddoppiando la
+          temperatura assoluta, la potenza irraggiata si moltiplica per <strong>sedici</strong>. È il motivo per
+          cui un corpo molto caldo si raffredda in fretta e uno tiepido quasi per niente.</p>
+      </div>
+
+      <div class="warnbox"><strong>Che cosa sono, queste onde?</strong> Qui dobbiamo fermarci, e vale la pena
+        dirlo apertamente. Le onde elettromagnetiche — la luce visibile, l'infrarosso, le microonde, i raggi X —
+        sono <em>oscillazioni di campo elettrico e magnetico</em> che si propagano nel vuoto alla velocità
+        $c$. Perché esistano, come nascano da una carica che accelera e perché viaggino a quella velocità
+        precisa sono i contenuti delle <strong>equazioni di Maxwell</strong>, che studierete l'anno prossimo.
+        <p style="margin:0.6rem 0 0;">Per adesso vi basta sapere tre cose: che ogni corpo caldo ne emette; che
+          la <em>lunghezza d'onda</em> del massimo dipende dalla temperatura (i corpi tiepidi emettono
+          nell'infrarosso, invisibile; sopra i $500\ °$C si comincia a vedere il rosso, e a $5500\ °$C — la
+          superficie del Sole — il massimo cade nel visibile, il che non è affatto una coincidenza); e che
+          l'energia trasportata è reale quanto quella di una fiamma.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="pr-modo"></div>
+        <div class="ctrl">
+          <label for="pr-dt">differenza di temperatura: <span class="val-badge" id="pr-dtv">40</span> K</label>
+          <input type="range" id="pr-dt" min="5" max="300" step="5" value="40">
+          <label for="pr-x">spessore o distanza: <span class="val-badge" id="pr-xv">10</span> cm</label>
+          <input type="range" id="pr-x" min="1" max="50" step="1" value="10">
+          <label class="toggle-row"><input type="checkbox" id="pr-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg id="pr-svg" viewBox="0 0 660 330" aria-label="I tre modi di propagazione del calore: conduzione, convezione, irraggiamento"></svg>
+        <div class="sp-cols">
+          <div>Meccanismo: <span class="val-badge" id="pr-mec">—</span></div>
+          <div>Serve un mezzo materiale? <span class="val-badge" id="pr-mez">—</span></div>
+          <div>Flusso di calore: <span class="val-badge" id="pr-flu">—</span></div>
+          <div>Come dipende dalla differenza: <span class="val-badge" id="pr-dip">—</span></div>
+        </div>
+        <p class="eq-out" id="pr-out"></p>
+      </div>
+
+      <div class="curiosita"><strong>Il thermos li combatte tutti e tre.</strong> Un thermos è un manuale di
+        questa sezione fatto oggetto. Ha una <strong>doppia parete di vetro</strong> (che conduce male) con il
+        <strong>vuoto</strong> in mezzo (niente materia, niente conduzione né convezione), e le superfici sono
+        <strong>argentate a specchio</strong> per avere emissività bassissima e riflettere l'irraggiamento. Il
+        tappo, di plastica, chiude l'unico ponte solido rimasto. Ogni pezzo combatte un meccanismo diverso —
+        ed è per questo che funziona sia col caffè caldo sia con l'acqua fredda: non «tiene il caldo», ostacola
+        lo <em>scambio</em>, in entrambi i versi.</div>
+
+      <div class="curiosita"><strong>La termocamera, e la casa che si guarda dall'esterno.</strong> Una
+        termocamera non «vede il caldo»: misura l'infrarosso emesso e, invertendo Stefan-Boltzmann, ne ricava la
+        temperatura della superficie. Puntata su una casa d'inverno mostra in giallo i ponti termici — i
+        travetti di cemento, i cassonetti delle tapparelle, i telai delle finestre — cioè esattamente i punti
+        dove la conduzione ha la strada più facile. Le diagnosi energetiche degli edifici si fanno così, e la
+        stessa tecnologia serve per misurare la febbre in aeroporto e per trovare le persone sotto le macerie.</div>
+
+      <div class="qbox">
+        <div class="qt">⑥ Una finestra di vetro singolo è larga $1{,}2$ m, alta $1{,}5$ m e spessa $4$ mm; fuori
+          ci sono $0\ °$C e dentro $20\ °$C. Quanta potenza si perde? E con un doppio vetro con
+          $12$ mm d'aria in mezzo?</div>
+        <button class="btn btn-toggle" data-target="#sol-ca6">Mostra la soluzione</button>
+        <div id="sol-ca6" class="hidden">
+          <p><span class="step-num">1</span>Area: $A = 1{,}2 \cdot 1{,}5 = 1{,}8$ m². Vetro singolo,
+            $k = 1{,}0$ e $d = 0{,}004$ m:
+            $$P = k\,A\,\frac{\Delta T}{d} = 1{,}0 \cdot 1{,}8 \cdot \frac{20}{0{,}004} = 9000\ \text{W}$$</p>
+          <p><span class="step-num">2</span><strong>Nove chilowatt da una finestra?</strong> È assurdo, e
+            l'assurdità insegna: il vetro <em>da solo</em> non isola quasi niente. Nella realtà il collo di
+            bottiglia non è il vetro ma i <strong>due sottili strati d'aria ferma</strong> attaccati alle due
+            facce, che valgono insieme una resistenza molto maggiore. La potenza reale è di circa $200$ W.</p>
+          <p><span class="step-num">3</span>Doppio vetro: le tre resistenze in serie sono i due vetri
+            ($d/k = 0{,}004/1{,}0 = 0{,}004$ ciascuno) e l'intercapedine d'aria
+            ($0{,}012/0{,}026 = 0{,}462$). La somma è $0{,}470$ m²K/W, e
+            $$P = A\,\frac{\Delta T}{\sum d/k} = 1{,}8 \cdot \frac{20}{0{,}470} = 76{,}6\ \text{W}$$</p>
+          <p><span class="step-num">4</span><strong>Da 9000 W a 77 W</strong>: l'intercapedine d'aria pesa
+            <em>più di cento volte</em> i due vetri messi insieme. Ed è la ragione per cui si mette il vuoto (o
+            un gas pesante come l'argon) nei vetri buoni, e per cui l'intercapedine non deve essere troppo
+            spessa: oltre i due centimetri l'aria comincia a fare <strong>convezione</strong> e l'isolamento
+            peggiora.</p>
+          <p><span class="step-num">5</span>Notate infine il collegamento: le resistenze termiche in serie si
+            <strong>sommano</strong>, esattamente come quelle elettriche. Un muro fatto di strati diversi si
+            calcola così, ed è quello che c'è dietro alla classe energetica di un edificio.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 — IL MULINELLO DI JOULE -->
+    <section id="sec10">
+      <h2>10. L'esperimento che chiude il cerchio: il mulinello di Joule</h2>
+
+      <p>Rumford aveva mostrato che l'attrito produce calore senza limiti. Restava da fare il passo decisivo:
+        misurare <em>quanto</em>. Cioè stabilire il tasso di cambio fra il joule della meccanica e la caloria
+        della termologia — e dimostrare che le due grandezze sono la stessa cosa.</p>
+
+      <div class="definition">
+        <strong>L'apparato di James Prescott Joule (1845).</strong> Due pesi appesi a delle corde scendono
+        lentamente facendo girare, tramite carrucole, un <strong>mulinello a palette</strong> immerso in un
+        recipiente d'acqua isolato. Le palette sbattono contro dei setti fissi, l'acqua viene rimescolata, e la
+        sua temperatura sale di pochissimo. Si misurano:
+        <ul>
+          <li>il lavoro meccanico compiuto dai pesi che scendono: $W = 2\,m\,g\,h \cdot n$, con $n$ il numero di
+            volte in cui li si è fatti scendere;</li>
+          <li>il calore ricevuto dall'acqua: $Q = m_a\,c_a\,\Delta T$.</li>
+        </ul>
+        Il rapporto $W/Q$ è l'<strong>equivalente meccanico della caloria</strong>.
+      </div>
+
+      <div class="qbox tosto">
+        <div class="qt">⑦ Nell'apparato ci sono $6{,}0$ kg d'acqua. Due pesi da $13{,}0$ kg ciascuno scendono
+          di $1{,}60$ m, e l'operazione viene ripetuta $20$ volte. Il termometro segna un aumento di
+          $0{,}325\ °$C. Quanto vale l'equivalente meccanico della caloria?</div>
+        <button class="btn btn-toggle" data-target="#sol-ca7">Mostra la soluzione</button>
+        <div id="sol-ca7" class="hidden">
+          <p><span class="step-num">1</span><strong>Il lavoro.</strong> Ogni discesa: due pesi da $13$ kg per
+            $1{,}60$ m, cioè $W_1 = 2 \cdot 13{,}0 \cdot 9{,}81 \cdot 1{,}60 = 408{,}1$ J. Ripetuta venti volte:
+            $$W = 20 \cdot 408{,}1 = 8162\ \text{J}$$</p>
+          <p><span class="step-num">2</span><strong>Il calore.</strong> In calorie, per non anticipare la
+            risposta: $Q = m_a\,c_a\,\Delta T$ con $c_a = 1$ cal/(g·K), cioè
+            $Q = 6000 \cdot 1 \cdot 0{,}325 = 1950$ cal.</p>
+          <p><span class="step-num">3</span><strong>Il rapporto.</strong>
+            $$\frac{W}{Q} = \frac{8162}{1950} = 4{,}19\ \frac{\text{J}}{\text{cal}}$$</p>
+          <p><span class="step-num">4</span>Il valore accettato è $4{,}186$ J/cal, e il conto non arrotondato dà
+            proprio $4{,}186$ — ma non fatevi illusioni: i dati di questo esercizio sono costruiti a tavolino,
+            e nessun apparato reale è così gentile. Joule, con strumenti del 1845 e su un salto di temperatura
+            di tre decimi di grado, arrivò a $4{,}15$: uno scarto dello $0{,}9\%$, che per l'epoca è
+            straordinario.</p>
+          <p><span class="step-num">5</span><strong>Perché è un esperimento difficilissimo.</strong> Il salto di
+            temperatura è minuscolo: bisogna leggere il termometro al millesimo di grado, isolare perfettamente
+            il recipiente, tenere conto della capacità termica del recipiente e delle palette, ed evitare che il
+            peso arrivi in fondo con energia cinetica residua (che non sarebbe finita in calore). Joule ci
+            lavorò per anni, e per anni non gli si credette: il suo lavoro fu accolto con freddezza dalla Royal
+            Society finché non intervenne un giovane William Thomson — il futuro lord Kelvin.</p>
+        </div>
+      </div>
+
+      <div class="warnbox"><strong>Che cosa ha dimostrato davvero.</strong> Non che «il calore si può ottenere
+        dal lavoro»: quello lo sapeva chiunque si sia mai strofinato le mani. Ha dimostrato che il rapporto è
+        <strong>sempre lo stesso</strong>, qualunque sia il modo in cui il lavoro viene fatto — mulinello,
+        attrito, corrente elettrica, compressione di un gas. E un rapporto costante fra due grandezze significa
+        che sono la <em>stessa grandezza</em> misurata in unità diverse, come i metri e i piedi.
+        <p style="margin:0.6rem 0 0;">Il calorico, con questo, è morto: se il calore fosse una sostanza, non si
+          potrebbe crearla girando una manovella. E si è aperta la strada al <strong>primo principio della
+          termodinamica</strong>, cioè alla conservazione dell'energia estesa ai fenomeni termici — che è
+          l'argomento con cui comincia la prossima lezione.</p>
+      </div>
+
+      <div class="curiosita"><strong>Un dettaglio che sa di leggenda.</strong> Si racconta che Joule, in viaggio
+        di nozze in Svizzera, abbia portato con sé un termometro per misurare la differenza di temperatura fra
+        la cima e il fondo di una cascata: l'energia potenziale persa dall'acqua doveva ricomparire come calore.
+        Per la cascata di Sallanches, alta $150$ m, il conto dà $\Delta T = gh/c_a = 9{,}81 \cdot 150/4186 =
+        0{,}35\ °$C — al limite di ciò che i suoi termometri potevano leggere, e comunque coperto
+        dall'evaporazione. La storia è probabilmente abbellita, ma dice bene che tipo di persona fosse.</div>
+    </section>
+
+    <!-- 11 — QUIZ -->
+    <section id="quiz">
+      <h2>11. Quiz finale</h2>
+      <p>Dodici domande a risposta multipla e due aperte, sulle idee di tutta la lezione.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 7 — Temperatura e calore · Fisica · Quarto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var STOP = [];
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { STOP.forEach(function (f) { f(); }); }
+      });
+      window.addEventListener('pagehide', function () { STOP.forEach(function (f) { f(); }); });
+
+      function nc(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      /* ============ 1 — STATI DELLA MATERIA E CURVA DI RISCALDAMENTO ============ */
+      (function () {
+        var svg = document.getElementById('sm-svg');
+        if (!svg) { return; }
+        // un chilogrammo d'acqua che parte da -40 gradi, energie in kJ
+        var C_GH = 2.090, C_AC = 4.186, C_VA = 2.010, L_F = 334, L_V = 2260;
+        var Q1 = C_GH * 40, Q2 = Q1 + L_F, Q3 = Q2 + C_AC * 100, Q4 = Q3 + L_V;
+        var raf = null, ultimo = 0, seme = 20260812;
+
+        function rnd() { seme = (seme * 16807) % 2147483647; return (seme - 1) / 2147483646; }
+
+        function tempe(Q) {
+          if (Q <= Q1) { return -40 + Q / C_GH; }
+          if (Q <= Q2) { return 0; }
+          if (Q <= Q3) { return (Q - Q2) / C_AC; }
+          if (Q <= Q4) { return 100; }
+          return 100 + (Q - Q4) / C_VA;
+        }
+        function stato(Q) {
+          if (Q < Q1) { return 'solido'; }
+          if (Q < Q2) { return 'fusione in corso'; }
+          if (Q < Q3) { return 'liquido'; }
+          if (Q < Q4) { return 'vaporizzazione in corso'; }
+          return 'vapore';
+        }
+        function fase(Q) {
+          if (Q < Q1) { return 0; }
+          if (Q < Q2) { return (Q - Q1) / L_F; }
+          if (Q < Q3) { return 1; }
+          if (Q < Q4) { return 1 + (Q - Q3) / L_V; }
+          return 2;
+        }
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+        STOP.push(ferma);
+
+        function tick(ts) {
+          var el = document.getElementById('sm-e');
+          var dt = ultimo ? Math.min(0.05, (ts - ultimo) / 1000) : 0.016;
+          ultimo = ts;
+          var v = parseFloat(el.value) + 420 * dt;
+          if (v >= parseFloat(el.max)) { v = parseFloat(el.max); ferma(); }
+          el.value = v;
+          disegna();
+          if (raf) { raf = requestAnimationFrame(tick); }
+        }
+
+        function disegna() {
+          var Q = parseFloat(document.getElementById('sm-e').value);
+          var T = tempe(Q), f = fase(Q);
+          var vrms = Math.sqrt(3 * 8.314 * (T + 273.15) / 0.018);
+          var s = '', i;
+          // la scatola di particelle
+          var BX = 26, BY = 44, BW = 300, BH = 250;
+          s += '<rect x="' + BX + '" y="' + BY + '" width="' + BW + '" height="' + BH +
+            '" rx="6" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2.4"/>';
+          var NP = 60, col = f < 0.5 ? '#64748b' : (f < 1.5 ? '#3b82f6' : '#f97316');
+          var agit = 0.15 + 0.85 * Math.min(1, (T + 273.15) / 420);
+          seme = 20260812;
+          for (i = 0; i < NP; i++) {
+            var px, py, r0 = rnd(), r1 = rnd(), r2 = rnd(), r3 = rnd();
+            if (f <= 1) {
+              // dal reticolo del solido alla disposizione disordinata del liquido
+              var col_i = i % 10, rig = Math.floor(i / 10);
+              var lx = BX + 24 + col_i * (BW - 48) / 9;
+              var ly = BY + BH - 26 - rig * 26;
+              var dx = (r0 - 0.5) * 16 * agit, dy = (r1 - 0.5) * 16 * agit;
+              var mx = BX + 12 + r2 * (BW - 24), my = BY + BH * 0.35 + r3 * (BH * 0.6);
+              px = lx * (1 - f) + mx * f + dx;
+              py = ly * (1 - f) + my * f + dy;
+            } else {
+              var g = f - 1;
+              var lx2 = BX + 12 + r2 * (BW - 24), ly2 = BY + BH * 0.35 + r3 * (BH * 0.6);
+              var gx = BX + 10 + r0 * (BW - 20), gy = BY + 10 + r1 * (BH - 20);
+              px = lx2 * (1 - g) + gx * g;
+              py = ly2 * (1 - g) + gy * g;
+            }
+            px = Math.max(BX + 6, Math.min(BX + BW - 6, px));
+            py = Math.max(BY + 6, Math.min(BY + BH - 6, py));
+            s += '<circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="5" fill="' + col + '" opacity="0.8"/>';
+          }
+          s += '<text x="' + BX + '" y="32" class="lbl">' + stato(Q) + ' — ' + nc(T, 1) + ' °C</text>';
+
+          // la curva di riscaldamento
+          var GX0 = 386, GX1 = 644, GY0 = 268, GY1 = 44;
+          var QM = 3200, TMIN = -50, TMAX = 160;
+          var gx = function (q) { return GX0 + (GX1 - GX0) * q / QM; };
+          var gy = function (t) { return GY0 - (GY0 - GY1) * (t - TMIN) / (TMAX - TMIN); };
+          s += '<line x1="' + GX0 + '" y1="' + gy(0).toFixed(1) + '" x2="' + GX1 + '" y2="' + gy(0).toFixed(1) +
+            '" stroke="var(--border)" stroke-width="1"/>';
+          s += '<line x1="' + GX0 + '" y1="' + gy(100).toFixed(1) + '" x2="' + GX1 + '" y2="' + gy(100).toFixed(1) +
+            '" stroke="var(--border)" stroke-width="1"/>';
+          s += '<text x="' + (GX0 - 6) + '" y="' + (gy(0) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">0 °C</text>';
+          s += '<text x="' + (GX0 - 6) + '" y="' + (gy(100) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">100 °C</text>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX1 + '" y2="' + GY0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX0 + '" y2="' + GY1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + GX1 + '" y="' + (GY0 + 32) + '" text-anchor="end" class="lbl-s">energia fornita (kJ/kg)</text>';
+          s += '<text x="' + (GX0 - 4) + '" y="' + (GY1 - 14) + '" class="lbl-s">temperatura</text>';
+          var pts = [];
+          for (i = 0; i <= 320; i++) {
+            var qq = QM * i / 320;
+            pts.push(gx(qq).toFixed(1) + ',' + gy(tempe(qq)).toFixed(1));
+          }
+          s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2.8"/>';
+          s += '<circle cx="' + gx(Q).toFixed(1) + '" cy="' + gy(T).toFixed(1) + '" r="6" fill="var(--magenta)"/>';
+          s += '<text x="' + gx((Q1 + Q2) / 2).toFixed(1) + '" y="' + (gy(0) - 8).toFixed(1) +
+            '" text-anchor="middle" class="lbl-s">fusione</text>';
+          s += '<text x="' + gx((Q3 + Q4) / 2).toFixed(1) + '" y="' + (gy(100) - 8).toFixed(1) +
+            '" text-anchor="middle" class="lbl-s">vaporizzazione</text>';
+          svg.innerHTML = s;
+
+          document.getElementById('sm-ev').textContent = Math.round(Q);
+          document.getElementById('sm-stato').textContent = stato(Q);
+          document.getElementById('sm-t').textContent = nc(T, 1) + ' °C';
+          document.getElementById('sm-q').textContent = Math.round(Q) + ' kJ per kg';
+          document.getElementById('sm-v').textContent = nc(vrms, 0) + ' m/s';
+          var el = document.getElementById('sm-out');
+          el.innerHTML = 'Con ' + Math.round(Q) + ' kJ per chilogrammo l\'acqua è <strong>' + stato(Q) +
+            '</strong> a ' + nc(T, 1) + ' °C. ' +
+            (f > 0 && f < 1
+              ? 'Siamo dentro il <strong>plateau di fusione</strong>: state fornendo energia e la temperatura non si muove di un decimo di grado, perché serve tutta a rompere il reticolo del ghiaccio.'
+              : (f > 1 && f < 2
+                ? 'Siamo nel <strong>plateau di vaporizzazione</strong>, il più lungo di tutti: 2260 kJ contro i 334 della fusione. Per questo la pentola bolle a lungo prima di svuotarsi.'
+                : 'Fuori dai plateau la temperatura sale in proporzione all\'energia, con pendenza $1/c$: il tratto del ghiaccio è <strong>due volte più ripido</strong> di quello dell\'acqua liquida, perché il suo calore specifico è la metà.')) +
+            ' <em>(La velocità indicata è quella quadratica media che avrebbero le molecole allo stato di vapore alla stessa temperatura: nel solido e nel liquido serve solo come termine di paragone.)</em>';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        document.getElementById('sm-e').addEventListener('input', function () { ferma(); disegna(); });
+        document.getElementById('sm-anima').addEventListener('click', function () {
+          if (!raf) { ultimo = 0; raf = requestAnimationFrame(tick); }
+        });
+        document.getElementById('sm-stop').addEventListener('click', ferma);
+        disegna();
+      })();
+
+      /* ============ 2 — LE SCALE DI TEMPERATURA ============ */
+      (function () {
+        var svg = document.getElementById('ts-svg');
+        if (!svg) { return; }
+        var RIF = [
+          ['zero assoluto', -273.15], ['azoto liquido', -195.8], ['la stessa in °C e °F', -40],
+          ['fusione del ghiaccio', 0], ['punto triplo', 0.01], ['corpo umano', 37],
+          ['ebollizione', 100]
+        ];
+
+        function disegna() {
+          var c = parseFloat(document.getElementById('ts-c').value);
+          var f = 9 / 5 * c + 32, k = c + 273.15;
+          var s = '', i;
+          var Y0 = 262, Y1 = 46, CMIN = -273.15, CMAX = 150;
+          var yy = function (t) { return Y0 - (Y0 - Y1) * (t - CMIN) / (CMAX - CMIN); };
+          var COL = [['Celsius', '°C', function (t) { return t; }, 120, 'var(--accent)'],
+                     ['Fahrenheit', '°F', function (t) { return 9 / 5 * t + 32; }, 300, 'var(--gold)'],
+                     ['Kelvin', 'K', function (t) { return t + 273.15; }, 480, 'var(--magenta)']];
+          for (i = 0; i < 3; i++) {
+            var x = COL[i][3];
+            s += '<rect x="' + (x - 16) + '" y="' + Y1 + '" width="32" height="' + (Y0 - Y1) +
+              '" rx="16" fill="var(--surface)" stroke="var(--text-soft)" stroke-width="2"/>';
+            s += '<rect x="' + (x - 12) + '" y="' + yy(c).toFixed(1) + '" width="24" height="' + (Y0 - yy(c)).toFixed(1) +
+              '" rx="12" fill="' + COL[i][4] + '" opacity="0.65"/>';
+            s += '<text x="' + x + '" y="' + (Y1 - 22) + '" text-anchor="middle" class="lbl">' + COL[i][0] + '</text>';
+            s += '<text x="' + x + '" y="' + (Y1 - 6) + '" text-anchor="middle" class="lbl-s">' +
+              nc(COL[i][2](c), 2) + ' ' + COL[i][1] + '</text>';
+            var j;
+            for (j = 0; j < RIF.length; j++) {
+              if (RIF[j][1] < CMIN - 1 || RIF[j][1] > CMAX) { continue; }
+              s += '<line x1="' + (x - 20) + '" y1="' + yy(RIF[j][1]).toFixed(1) + '" x2="' + (x - 16) +
+                '" y2="' + yy(RIF[j][1]).toFixed(1) + '" stroke="var(--muted)" stroke-width="1.4"/>';
+              if (i === 0) {
+                s += '<text x="' + (x - 26) + '" y="' + (yy(RIF[j][1]) + 4).toFixed(1) +
+                  '" text-anchor="end" class="lbl-s">' + RIF[j][0] + '</text>';
+              }
+            }
+          }
+          s += '<line x1="90" y1="' + yy(c).toFixed(1) + '" x2="510" y2="' + yy(c).toFixed(1) +
+            '" stroke="var(--magenta)" stroke-width="1.6" stroke-dasharray="6 4"/>';
+          s += '<text x="520" y="' + (yy(c) + 4).toFixed(1) + '" class="em">' + nc(c, 1) + ' °C</text>';
+          svg.innerHTML = s;
+
+          var vicino = RIF[0][0], dmin = 1e9;
+          for (i = 0; i < RIF.length; i++) {
+            if (Math.abs(c - RIF[i][1]) < dmin) { dmin = Math.abs(c - RIF[i][1]); vicino = RIF[i][0]; }
+          }
+          document.getElementById('ts-cv').textContent = nc(c, 2);
+          document.getElementById('ts-c2').textContent = nc(c, 2) + ' °C';
+          document.getElementById('ts-f').textContent = nc(f, 2) + ' °F';
+          document.getElementById('ts-k').textContent = nc(k, 2) + ' K';
+          document.getElementById('ts-rif').textContent = dmin < 3 ? vicino : '(fra i riferimenti)';
+          var el = document.getElementById('ts-out');
+          el.innerHTML = '$T_F = \\frac95 \\cdot ' + nc(c, 2).replace(',', '{,}') + ' + 32 = ' +
+            nc(f, 2).replace(',', '{,}') + '$ &nbsp;·&nbsp; $T_K = ' + nc(c, 2).replace(',', '{,}') +
+            ' + 273{,}15 = ' + nc(k, 2).replace(',', '{,}') + '$. ' +
+            (Math.abs(c + 40) < 0.5
+              ? 'Qui le due colonne segnano lo <strong>stesso numero</strong>: è l\'unico punto in cui Celsius e Fahrenheit coincidono.'
+              : (k < 0.01
+                ? 'Siamo allo <strong>zero assoluto</strong>: sotto non si può andare, e nemmeno arrivarci.'
+                : 'Le colonne salgono e scendono insieme, ma con passi diversi: un grado Fahrenheit vale $5/9$ di grado Celsius, mentre il kelvin ha esattamente la stessa ampiezza del grado Celsius e cambia solo l\'origine.'));
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        var host = document.getElementById('ts-preset');
+        RIF.forEach(function (r) {
+          var b = document.createElement('button');
+          b.className = 'btn btn-secondary';
+          b.type = 'button';
+          b.textContent = r[0];
+          b.addEventListener('click', function () {
+            document.getElementById('ts-c').value = r[1];
+            disegna();
+          });
+          host.appendChild(b);
+        });
+        document.getElementById('ts-c').addEventListener('input', disegna);
+        disegna();
+      })();
+
+      /* ============ 3 — LA DILATAZIONE ============ */
+      (function () {
+        var svg = document.getElementById('dl-svg');
+        if (!svg) { return; }
+        var MODI = [
+          { n: 'sbarra d\'acciaio', tipo: 'bar', lam: 12e-6 },
+          { n: 'lastra forata', tipo: 'for', lam: 24e-6 },
+          { n: 'lamina bimetallica', tipo: 'bim', lam: 12e-6 }
+        ];
+        var sel = 0;
+
+        function disegna() {
+          var dt = parseFloat(document.getElementById('dl-dt').value);
+          var L0 = parseFloat(document.getElementById('dl-l').value);
+          var esa = parseFloat(document.getElementById('dl-esa').value);
+          var M = MODI[sel];
+          var s = '', i;
+          var dL = M.lam * L0 * dt;
+          var X0 = 60, PXM = 480 / Math.max(L0, 0.1);
+          if (M.tipo === 'bar') {
+            var w0 = L0 * PXM, w1 = (L0 + dL * esa) * PXM;
+            s += '<rect x="' + X0 + '" y="110" width="' + w0.toFixed(1) + '" height="30" fill="var(--muted)" opacity="0.35" stroke="var(--muted)" stroke-width="1.6"/>';
+            s += '<rect x="' + X0 + '" y="170" width="' + w1.toFixed(1) + '" height="30" fill="var(--accent)" opacity="0.5" stroke="var(--accent)" stroke-width="2"/>';
+            s += '<text x="' + X0 + '" y="102" class="lbl-s">a temperatura iniziale</text>';
+            s += '<text x="' + X0 + '" y="162" class="lbl-s">dopo il salto di ' + nc(dt, 0) + ' K (allungamento esagerato ' + Math.round(esa) + ' volte)</text>';
+            s += '<line x1="' + (X0 + w0).toFixed(1) + '" y1="140" x2="' + (X0 + w0).toFixed(1) + '" y2="210" stroke="var(--border)" stroke-width="1.4" stroke-dasharray="4 4"/>';
+            s += '<line x1="' + (X0 + w1).toFixed(1) + '" y1="170" x2="' + (X0 + w1).toFixed(1) + '" y2="210" stroke="var(--magenta)" stroke-width="1.6"/>';
+            s += '<text x="' + (X0 + (w0 + w1) / 2).toFixed(1) + '" y="228" text-anchor="middle" class="em">ΔL = ' + nc(dL * 1000, 3) + ' mm</text>';
+          } else if (M.tipo === 'for') {
+            var CX = 250, CY = 165, R0 = 90, RF0 = 34;
+            var fatt = 1 + M.lam * dt * esa;
+            s += '<rect x="' + (CX - R0) + '" y="' + (CY - R0 * 0.7) + '" width="' + (2 * R0) + '" height="' + (1.4 * R0) +
+              '" fill="var(--muted)" opacity="0.25" stroke="var(--muted)" stroke-width="1.6"/>';
+            s += '<circle cx="' + CX + '" cy="' + CY + '" r="' + RF0 + '" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.6"/>';
+            s += '<rect x="' + (CX - R0 * fatt).toFixed(1) + '" y="' + (CY - R0 * 0.7 * fatt).toFixed(1) +
+              '" width="' + (2 * R0 * fatt).toFixed(1) + '" height="' + (1.4 * R0 * fatt).toFixed(1) +
+              '" fill="none" stroke="var(--accent)" stroke-width="2.4"/>';
+            s += '<circle cx="' + CX + '" cy="' + CY + '" r="' + (RF0 * fatt).toFixed(1) +
+              '" fill="none" stroke="var(--magenta)" stroke-width="2.8"/>';
+            s += '<text x="' + (CX + R0 * fatt + 14).toFixed(1) + '" y="' + CY + '" class="lbl">il <tspan class="em">foro</tspan> si allarga</text>';
+            s += '<text x="' + (CX + R0 * fatt + 14).toFixed(1) + '" y="' + (CY + 20) + '" class="lbl-s">come tutto il resto</text>';
+            s += '<text x="60" y="60" class="lbl">grigio: prima · colorato: dopo (esagerato ' + Math.round(esa) + ' volte)</text>';
+          } else {
+            var spess = 0.001, dlam = 24e-6 - 12e-6;
+            var rho = dt !== 0 ? 2 * spess / (3 * dlam * dt) : 1e9;
+            var Lb = 0.10;
+            // freccia in punta: la sagitta esatta dell'arco, non l'approssimazione
+            // parabolica, perche' a salti grandi l'arco non e' piu' piccolo
+            var defl = rho * (1 - Math.cos(Lb / rho));
+            var LX = 90, LY = 100, LP = 420;
+            var pts1 = [], pts2 = [];
+            for (i = 0; i <= 40; i++) {
+              var u = i / 40;
+              var yy = defl * u * u * esa * 0.35 * 1000;
+              pts1.push((LX + u * LP).toFixed(1) + ',' + (LY + yy).toFixed(1));
+              pts2.push((LX + u * LP).toFixed(1) + ',' + (LY + 14 + yy).toFixed(1));
+            }
+            s += '<polyline points="' + pts1.join(' ') + '" fill="none" stroke="#64748b" stroke-width="8" stroke-linecap="round"/>';
+            s += '<polyline points="' + pts2.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round"/>';
+            s += '<rect x="' + (LX - 16) + '" y="80" width="16" height="50" fill="var(--text-soft)"/>';
+            s += '<text x="' + (LX + 6) + '" y="70" class="lbl-s">grigio: acciaio (λ = 12) · azzurro: alluminio (λ = 24)</text>';
+            s += '<text x="' + (LX + 6) + '" y="' + (LY + 130) + '" class="lbl">l\'alluminio vorrebbe allungarsi di più: la lamina si incurva</text>';
+            s += '<text x="' + (LX + 6) + '" y="' + (LY + 152) + '" class="lbl-s">raggio di curvatura ' +
+              (dt !== 0 ? nc(rho, 3) + ' m' : 'infinito') + ' · freccia in punta ' + nc(defl * 1000, 2) + ' mm su 10 cm</text>';
+          }
+          svg.innerHTML = s;
+
+          document.getElementById('dl-dtv').textContent = nc(dt, 0);
+          document.getElementById('dl-lv').textContent = nc(L0, 2);
+          document.getElementById('dl-esav').textContent = Math.round(esa);
+          document.getElementById('dl-lam').textContent = nc(M.lam * 1e6, 1) + '·10⁻⁶ /K';
+          document.getElementById('dl-abs').textContent = M.tipo === 'for'
+            ? nc(2 * M.lam * L0 * L0 * dt * 1e4, 3) + ' cm² di area'
+            : nc(dL * 1000, 4) + ' mm';
+          document.getElementById('dl-rel').textContent = nc(M.lam * dt * 100, 5) + ' %';
+          document.getElementById('dl-cfr').textContent = 'su ' + nc(L0, 2) + ' m fa ' + nc(dL * 1e6, 0) + ' µm';
+          var el = document.getElementById('dl-out');
+          el.innerHTML = '$\\Delta L = \\lambda L_0 \\Delta T = ' + (M.lam * 1e6) + '\\times10^{-6} \\cdot ' +
+            nc(L0, 2).replace(',', '{,}') + ' \\cdot ' + nc(dt, 0) + ' = ' + nc(dL * 1000, 4).replace(',', '{,}') +
+            '$ mm, cioè una variazione relativa dello ' + nc(M.lam * dt * 100, 5) + '%. ' +
+            (M.tipo === 'for'
+              ? 'La superficie cresce del doppio ($2\\lambda\\Delta T$) e il volume del triplo. E il <strong>foro si allarga</strong>: la dilatazione è una similitudine, ingrandisce la figura buchi compresi.'
+              : (M.tipo === 'bim'
+                ? 'Con due metalli diversi incollati, la differenza di allungamento non può che diventare <strong>curvatura</strong>: il raggio è inversamente proporzionale a $\\Delta\\lambda\\,\\Delta T$, quindi più si scalda più si arriccia.'
+                : 'Sono numeri piccolissimi — micrometri — ed è per questo che il disegno è esagerato. Ma su un ponte di duecento metri diventano centimetri, e su una tubazione industriale metri.'));
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        var host = document.getElementById('dl-modo');
+        MODI.forEach(function (M, i) {
+          var b = document.createElement('button');
+          b.className = 'btn' + (i === 0 ? ' active' : '');
+          b.type = 'button';
+          b.textContent = M.n;
+          b.addEventListener('click', function () {
+            sel = i;
+            Array.prototype.forEach.call(host.children, function (o, j) {
+              if (j === i) { o.classList.add('active'); } else { o.classList.remove('active'); }
+            });
+            disegna();
+          });
+          host.appendChild(b);
+        });
+        ['dl-dt', 'dl-l', 'dl-esa'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', disegna);
+        });
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function nc(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      /* ============ 5 — LA PENTOLA SUL FORNELLO ============ */
+      (function () {
+        var svg = document.getElementById('pt-svg');
+        if (!svg) { return; }
+        var CA = 4186, LV = 2260000, T0 = 20;
+
+        function disegna() {
+          var m = parseFloat(document.getElementById('pt-m').value);
+          var P = parseFloat(document.getElementById('pt-p').value);
+          var r = parseFloat(document.getElementById('pt-r').value) / 100;
+          var lock = document.getElementById('pt-lock').checked;
+          var Pu = P * r;
+          var Q1 = m * CA * (100 - T0), t1 = Q1 / Pu;
+          var Qv = m * LV, tt = (Q1 + Qv) / Pu;
+          var X0 = 66, X1 = 636, Y0 = 258, Y1 = 40;
+          var TM = lock ? 7200 : Math.max(60, tt * 1.08);
+          var px = function (t) { return X0 + (X1 - X0) * Math.min(1, t / TM); };
+          var py = function (T) { return Y0 - (Y0 - Y1) * (T - 10) / 100; };
+          var s = '', i;
+          for (i = 0; i <= 5; i++) {
+            var Tv = 10 + 100 * i / 5;
+            s += '<line x1="' + X0 + '" y1="' + py(Tv).toFixed(1) + '" x2="' + X1 + '" y2="' + py(Tv).toFixed(1) +
+              '" stroke="var(--border)" stroke-width="1"/>';
+            s += '<text x="' + (X0 - 7) + '" y="' + (py(Tv) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' +
+              Math.round(Tv) + '</text>';
+            s += '<text x="' + px(TM * i / 5).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' +
+              nc(TM * i / 5 / 60, 0) + '</text>';
+          }
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">tempo (minuti)</text>';
+          s += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 14) + '" class="lbl-s">temperatura (°C)</text>';
+          var pts = [];
+          for (i = 0; i <= 300; i++) {
+            var t = TM * i / 300;
+            var T = t < t1 ? T0 + Pu * t / (m * CA) : 100;
+            if (t > tt) { break; }
+            pts.push(px(t).toFixed(1) + ',' + py(T).toFixed(1));
+          }
+          s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+          s += '<line x1="' + px(t1).toFixed(1) + '" y1="' + Y0 + '" x2="' + px(t1).toFixed(1) + '" y2="' + py(100).toFixed(1) +
+            '" stroke="var(--gold)" stroke-width="1.6" stroke-dasharray="5 4"/>';
+          s += '<text x="' + (px(t1) + 6).toFixed(1) + '" y="' + (Y1 + 16) + '" class="lbl-s">bolle dopo ' + nc(t1 / 60, 1) + ' min</text>';
+          if (tt <= TM) {
+            s += '<line x1="' + px(tt).toFixed(1) + '" y1="' + Y0 + '" x2="' + px(tt).toFixed(1) + '" y2="' + py(100).toFixed(1) +
+              '" stroke="var(--red)" stroke-width="1.6" stroke-dasharray="5 4"/>';
+            s += '<text x="' + (px(tt) - 6).toFixed(1) + '" y="' + (py(100) - 8).toFixed(1) +
+              '" text-anchor="end" style="fill:var(--red); font-size:11.5px;">pentola vuota</text>';
+          }
+          svg.innerHTML = s;
+
+          document.getElementById('pt-mv').textContent = nc(m, 1);
+          document.getElementById('pt-pv').textContent = Math.round(P);
+          document.getElementById('pt-rv').textContent = Math.round(r * 100);
+          document.getElementById('pt-q').textContent = nc(Q1 / 1000, 0) + ' kJ';
+          document.getElementById('pt-t').textContent = nc(t1 / 60, 1) + ' min';
+          document.getElementById('pt-qv').textContent = nc(Qv / 1000, 0) + ' kJ';
+          document.getElementById('pt-tt').textContent = nc(tt / 60, 1) + ' min';
+          var el = document.getElementById('pt-out');
+          el.innerHTML = 'Per portare ' + nc(m, 1) + ' kg d\'acqua da 20 a 100 °C servono ' +
+            '$Q = mc\\Delta T = ' + nc(Q1 / 1000, 0) + '$ kJ; con ' + Math.round(Pu) +
+            ' W utili ci vogliono <strong>' + nc(t1 / 60, 1) + ' minuti</strong>. Per farla evaporare tutta ne ' +
+            'servono altri ' + nc(Qv / 1000, 0) + ' kJ, cioè <strong>' + nc((tt - t1) / 60, 1) +
+            ' minuti</strong>: <strong>' + nc(Qv / Q1, 1) + ' volte</strong> l\'energia del riscaldamento. ' +
+            'Il grafico ha la stessa forma della curva della sezione 1 — rampa, poi plateau — e il plateau è ' +
+            'sempre molto più lungo di quanto ci si aspetti.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['pt-m', 'pt-p', 'pt-r'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('pt-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ============ 8 — IL RAFFREDDAMENTO DI NEWTON ============ */
+      (function () {
+        var svg = document.getElementById('nr-svg');
+        if (!svg) { return; }
+
+        function disegna() {
+          var T0 = parseFloat(document.getElementById('nr-t1').value);
+          var Ta = parseFloat(document.getElementById('nr-ta').value);
+          var tau = parseFloat(document.getElementById('nr-tau').value);
+          var due = document.getElementById('nr-due').checked;
+          var lock = document.getElementById('nr-lock').checked;
+          var X0 = 62, X1 = 634, Y0 = 258, Y1 = 38;
+          var TM = lock ? 120 : Math.max(10, 5 * tau);
+          var YMIN = lock ? -30 : Math.min(Ta, T0) - 8;
+          var YMAX = lock ? 210 : Math.max(Ta, T0) + 8;
+          var px = function (t) { return X0 + (X1 - X0) * t / TM; };
+          var py = function (T) { return Y0 - (Y0 - Y1) * (T - YMIN) / (YMAX - YMIN); };
+          var s = '', i;
+          for (i = 0; i <= 4; i++) {
+            var Tv = YMIN + (YMAX - YMIN) * i / 4;
+            s += '<line x1="' + X0 + '" y1="' + py(Tv).toFixed(1) + '" x2="' + X1 + '" y2="' + py(Tv).toFixed(1) +
+              '" stroke="var(--border)" stroke-width="1"/>';
+            s += '<text x="' + (X0 - 7) + '" y="' + (py(Tv) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' +
+              nc(Tv, 0) + '</text>';
+            s += '<text x="' + px(TM * i / 4).toFixed(1) + '" y="' + (Y0 + 18) + '" text-anchor="middle" class="lbl-s">' +
+              nc(TM * i / 4, 0) + '</text>';
+          }
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">tempo (minuti)</text>';
+          s += '<text x="' + (X0 - 4) + '" y="' + (Y1 - 14) + '" class="lbl-s">temperatura (°C)</text>';
+          s += '<line x1="' + X0 + '" y1="' + py(Ta).toFixed(1) + '" x2="' + X1 + '" y2="' + py(Ta).toFixed(1) +
+            '" stroke="var(--green)" stroke-width="2" stroke-dasharray="7 4"/>';
+          s += '<text x="' + (X1 - 4) + '" y="' + (py(Ta) - 7).toFixed(1) +
+            '" text-anchor="end" style="fill:var(--green); font-size:11.5px;">asintoto: la temperatura ambiente</text>';
+          var TT = [[tau, 'var(--accent)']];
+          if (due) { TT.push([3 * tau, 'var(--magenta)']); }
+          for (var q = 0; q < TT.length; q++) {
+            var pts = [];
+            for (i = 0; i <= 300; i++) {
+              var t = TM * i / 300;
+              pts.push(px(t).toFixed(1) + ',' + py(Ta + (T0 - Ta) * Math.exp(-t / TT[q][0])).toFixed(1));
+            }
+            s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + TT[q][1] + '" stroke-width="3"/>';
+          }
+          for (i = 1; i <= 3; i++) {
+            if (i * tau > TM) { break; }
+            var Ti = Ta + (T0 - Ta) * Math.exp(-i);
+            s += '<circle cx="' + px(i * tau).toFixed(1) + '" cy="' + py(Ti).toFixed(1) + '" r="4.5" fill="var(--gold)"/>';
+            s += '<text x="' + (px(i * tau) + 6).toFixed(1) + '" y="' + (py(Ti) - 7).toFixed(1) + '" class="lbl-s">' + i + 'τ</text>';
+          }
+          svg.innerHTML = s;
+
+          var d1 = Ta + (T0 - Ta) * Math.exp(-1);
+          var d3 = Ta + (T0 - Ta) * Math.exp(-3);
+          document.getElementById('nr-t1v').textContent = nc(T0, 0);
+          document.getElementById('nr-tav').textContent = nc(Ta, 0);
+          document.getElementById('nr-tauv').textContent = nc(tau, 0);
+          document.getElementById('nr-th').textContent = nc(tau * Math.LN2, 2) + ' min';
+          document.getElementById('nr-d1').textContent = nc(d1, 1) + ' °C';
+          document.getElementById('nr-d3').textContent = nc(d3, 1) + ' °C';
+          document.getElementById('nr-d5').textContent = nc(5 * tau, 0) + ' min';
+          var el = document.getElementById('nr-out');
+          el.innerHTML = '$T(t) = T_a + (T_0 - T_a)e^{-t/\\tau}$: dopo un $\\tau$ resta il <strong>37%</strong> ' +
+            'dello scarto iniziale (' + nc(d1, 1) + ' °C), dopo tre il <strong>5%</strong> (' + nc(d3, 1) +
+            ' °C), e lo scarto si dimezza ogni $\\tau\\ln 2 = ' + nc(tau * Math.LN2, 2).replace(',', '{,}') +
+            '$ minuti. ' +
+            (due
+              ? 'La curva magenta ha $\\tau$ tripla: <strong>parte più lenta e resta più calda a lungo</strong>. È la differenza fra una tazza di ceramica e una di metallo sottile — o fra un termometro pronto e uno pigro.'
+              : 'Notate che la curva non tocca mai la retta verde: l\'avvicinamento è <strong>asintotico</strong>, e «a temperatura ambiente» in pratica significa «entro l\'1%», cioè dopo cinque $\\tau$.');
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['nr-t1', 'nr-ta', 'nr-tau'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        ['nr-due', 'nr-lock'].forEach(function (id) { document.getElementById(id).addEventListener('change', disegna); });
+        disegna();
+      })();
+
+      /* ============ 9 — I TRE MODI DI PROPAGAZIONE ============ */
+      (function () {
+        var svg = document.getElementById('pr-svg');
+        if (!svg) { return; }
+        var SIG = 5.67e-8, KV = 1.0, HC = 10.0, EPS = 0.9, AA = 1.0, TAMB = 293.15;
+        var MODI = ['conduzione', 'convezione', 'irraggiamento'];
+        var sel = 0;
+
+        function flusso(i, dt, xcm) {
+          if (i === 0) { return KV * AA * dt / (xcm / 100); }
+          if (i === 1) { return HC * AA * dt; }
+          return EPS * SIG * AA * (Math.pow(TAMB + dt, 4) - Math.pow(TAMB, 4));
+        }
+
+        function disegna() {
+          var dt = parseFloat(document.getElementById('pr-dt').value);
+          var xcm = parseFloat(document.getElementById('pr-x').value);
+          var lock = document.getElementById('pr-lock').checked;
+          var P = flusso(sel, dt, xcm);
+          var s = '', i;
+          // il disegno
+          var DX = 24, DY = 46, DW = 300, DH = 250;
+          s += '<rect x="' + DX + '" y="' + DY + '" width="' + DW + '" height="' + DH +
+            '" rx="8" fill="var(--surface)" stroke="var(--border)" stroke-width="1.6"/>';
+          if (sel === 0) {
+            s += '<rect x="' + (DX + 30) + '" y="' + (DY + 60) + '" width="60" height="130" fill="#ef4444" opacity="0.35" stroke="#ef4444" stroke-width="2"/>';
+            s += '<rect x="' + (DX + 210) + '" y="' + (DY + 60) + '" width="60" height="130" fill="#3b82f6" opacity="0.35" stroke="#3b82f6" stroke-width="2"/>';
+            s += '<rect x="' + (DX + 90) + '" y="' + (DY + 60) + '" width="120" height="130" fill="var(--muted)" opacity="0.25" stroke="var(--muted)" stroke-width="2"/>';
+            for (i = 0; i < 5; i++) {
+              var yy = DY + 76 + i * 26;
+              s += '<line x1="' + (DX + 96) + '" y1="' + yy + '" x2="' + (DX + 200) + '" y2="' + yy +
+                '" stroke="var(--gold)" stroke-width="2.4"/>';
+              s += '<polygon points="' + (DX + 204) + ',' + yy + ' ' + (DX + 195) + ',' + (yy - 5) + ' ' +
+                (DX + 195) + ',' + (yy + 5) + '" fill="var(--gold)"/>';
+            }
+            s += '<text x="' + (DX + 150) + '" y="' + (DY + 214) + '" text-anchor="middle" class="lbl-s">la materia sta ferma, l\'energia passa</text>';
+            s += '<text x="' + (DX + 60) + '" y="' + (DY + 52) + '" text-anchor="middle" class="lbl">caldo</text>';
+            s += '<text x="' + (DX + 240) + '" y="' + (DY + 52) + '" text-anchor="middle" class="lbl">freddo</text>';
+          } else if (sel === 1) {
+            s += '<rect x="' + (DX + 40) + '" y="' + (DY + 40) + '" width="220" height="170" fill="#3b82f6" opacity="0.14" stroke="var(--muted)" stroke-width="1.6"/>';
+            s += '<rect x="' + (DX + 40) + '" y="' + (DY + 210) + '" width="220" height="12" fill="#ef4444" opacity="0.6"/>';
+            for (i = 0; i < 2; i++) {
+              var cx = DX + 95 + i * 110;
+              s += '<path d="M' + cx + ',' + (DY + 200) + ' C' + (cx - 46) + ',' + (DY + 150) + ' ' +
+                (cx - 46) + ',' + (DY + 80) + ' ' + cx + ',' + (DY + 56) +
+                ' C' + (cx + 46) + ',' + (DY + 80) + ' ' + (cx + 46) + ',' + (DY + 150) + ' ' + cx + ',' + (DY + 200) +
+                '" fill="none" stroke="var(--accent)" stroke-width="2.6"/>';
+              s += '<polygon points="' + (cx - 4) + ',' + (DY + 62) + ' ' + (cx + 8) + ',' + (DY + 56) + ' ' +
+                (cx - 2) + ',' + (DY + 50) + '" fill="var(--accent)"/>';
+            }
+            s += '<text x="' + (DX + 150) + '" y="' + (DY + 240) + '" text-anchor="middle" class="lbl-s">è il fluido stesso a portarsi via l\'energia</text>';
+          } else {
+            s += '<circle cx="' + (DX + 78) + '" cy="' + (DY + 125) + '" r="34" fill="#ef4444" opacity="0.5" stroke="#ef4444" stroke-width="2"/>';
+            s += '<rect x="' + (DX + 230) + '" y="' + (DY + 70) + '" width="42" height="110" fill="#3b82f6" opacity="0.3" stroke="#3b82f6" stroke-width="2"/>';
+            for (i = 0; i < 4; i++) {
+              var y2 = DY + 78 + i * 32, on = '';
+              var k;
+              for (k = 0; k <= 24; k++) {
+                var xx = DX + 118 + k * 4.6;
+                on += (k === 0 ? 'M' : 'L') + xx.toFixed(1) + ',' + (y2 + 7 * Math.sin(k * 0.9)).toFixed(1);
+              }
+              s += '<path d="' + on + '" fill="none" stroke="var(--gold)" stroke-width="2.2"/>';
+            }
+            s += '<text x="' + (DX + 150) + '" y="' + (DY + 220) + '" text-anchor="middle" class="lbl-s">onde elettromagnetiche: passano anche nel vuoto</text>';
+            s += '<text x="' + (DX + 150) + '" y="' + (DY + 240) + '" text-anchor="middle" class="lbl-s">(nessuna materia in mezzo)</text>';
+          }
+          // il grafico
+          var GX0 = 380, GX1 = 646, GY0 = 268, GY1 = 46;
+          var DTM = 300;
+          var PM = lock ? 3000 : Math.max(20, flusso(sel, DTM, xcm) * 1.08);
+          var gx = function (u) { return GX0 + (GX1 - GX0) * u / DTM; };
+          var gy = function (u) { return GY0 - (GY0 - GY1) * Math.min(1, u / PM); };
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX1 + '" y2="' + GY0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          s += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX0 + '" y2="' + GY1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 4; i++) {
+            s += '<text x="' + gx(DTM * i / 4).toFixed(1) + '" y="' + (GY0 + 18) + '" text-anchor="middle" class="lbl-s">' +
+              Math.round(DTM * i / 4) + '</text>';
+            s += '<text x="' + (GX0 - 6) + '" y="' + (gy(PM * i / 4) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' +
+              nc(PM * i / 4 / 1000, 1) + '</text>';
+          }
+          s += '<text x="' + GX1 + '" y="' + (GY0 + 36) + '" text-anchor="end" class="lbl-s">ΔT (K)</text>';
+          s += '<text x="' + (GX0 - 4) + '" y="' + (GY1 - 14) + '" class="lbl-s">flusso (kW su 1 m²)</text>';
+          var pts = [];
+          for (i = 0; i <= 240; i++) {
+            var d = DTM * i / 240;
+            pts.push(gx(d).toFixed(1) + ',' + gy(flusso(sel, d, xcm)).toFixed(1));
+          }
+          s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+          s += '<circle cx="' + gx(dt).toFixed(1) + '" cy="' + gy(P).toFixed(1) + '" r="6" fill="var(--magenta)"/>';
+          svg.innerHTML = s;
+
+          document.getElementById('pr-dtv').textContent = Math.round(dt);
+          document.getElementById('pr-xv').textContent = Math.round(xcm);
+          document.getElementById('pr-mec').textContent = MODI[sel];
+          document.getElementById('pr-mez').textContent = sel === 2 ? 'no, viaggia nel vuoto' : 'sì, indispensabile';
+          document.getElementById('pr-flu').textContent = nc(P, 1) + ' W su 1 m²';
+          document.getElementById('pr-dip').textContent = sel === 2 ? 'come T⁴ (quarta potenza)' : 'in modo lineare';
+          var el = document.getElementById('pr-out');
+          if (sel === 0) {
+            el.innerHTML = '$P = kA\\dfrac{\\Delta T}{d} = 1{,}0 \\cdot 1 \\cdot \\dfrac{' + Math.round(dt) +
+              '}{' + nc(xcm / 100, 2).replace(',', '{,}') + '} = ' + nc(P, 0).replace(',', '{,}') + '$ W ' +
+              '(vetro, un metro quadrato). Il flusso è <strong>inversamente proporzionale allo spessore</strong>: ' +
+              'raddoppiando il muro si dimezza la perdita. Ed è la stessa struttura della legge di Ohm — la ' +
+              'resistenza termica vale $d/(kA)$ e in serie si somma.';
+          } else if (sel === 1) {
+            el.innerHTML = '$P = hA\\Delta T = ' + HC + ' \\cdot 1 \\cdot ' + Math.round(dt) + ' = ' +
+              nc(P, 0).replace(',', '{,}') + '$ W, con $h$ il <em>coefficiente di scambio convettivo</em>: ' +
+              'circa $10$ W/(m²K) in aria ferma, dieci volte tanto con un ventilatore. ' +
+              'Notate che <strong>lo spessore non compare</strong>: non è la distanza a contare, è quanto ' +
+              'rapidamente il fluido rinnova il contatto. Per questo il vento raffredda.';
+          } else {
+            el.innerHTML = '$P = \\varepsilon\\sigma A(T^4 - T_a^4) = ' + nc(P, 0).replace(',', '{,}') + '$ W, ' +
+              'con $T = ' + nc(TAMB + dt, 0).replace(',', '{,}') + '$ K. La curva <strong>non è una retta</strong>: ' +
+              'è una quarta potenza, e per questo a piccole differenze l\'irraggiamento è trascurabile mentre ad ' +
+              'alte temperature diventa dominante. Raddoppiando la temperatura <em>assoluta</em>, la potenza si ' +
+              'moltiplica per sedici.';
+          }
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        var host = document.getElementById('pr-modo');
+        MODI.forEach(function (n, i) {
+          var b = document.createElement('button');
+          b.className = 'btn' + (i === 0 ? ' active' : '');
+          b.type = 'button';
+          b.textContent = n;
+          b.addEventListener('click', function () {
+            sel = i;
+            Array.prototype.forEach.call(host.children, function (o, j) {
+              if (j === i) { o.classList.add('active'); } else { o.classList.remove('active'); }
+            });
+            disegna();
+          });
+          host.appendChild(b);
+        });
+        ['pr-dt', 'pr-x'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('pr-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    window.quizData = [
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Si continua a scaldare del ghiaccio a $0\\ °$C. Finché non è tutto sciolto, la sua temperatura:',
+        options: [
+          'resta a $0\\ °$C: tutta l\'energia serve a rompere i legami del reticolo',
+          'sale lentamente, ma meno che se fosse acqua liquida',
+          'sale in proporzione all\'energia fornita, come sempre',
+          'scende, perché il ghiaccio assorbe calore'
+        ],
+        correct: 0,
+        explain: 'È il <strong>plateau</strong> della curva di riscaldamento: durante un passaggio di stato l\'energia fornita va a rompere i legami, non ad aumentare l\'agitazione. Serve il <em>calore latente di fusione</em>, $334$ kJ per ogni chilogrammo — la stessa energia che porterebbe quell\'acqua da $0$ a $80\\ °$C.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Che cos\'è il <strong>calore</strong>?',
+        options: [
+          'una proprietà dei corpi caldi, che ne misura quanto sono caldi',
+          'energia in transito da un corpo a temperatura maggiore a uno a temperatura minore',
+          'un fluido invisibile e senza peso che passa da un corpo all\'altro',
+          'la stessa cosa della temperatura, misurata in unità diverse'
+        ],
+        correct: 1,
+        explain: 'Un corpo <em>non contiene calore</em>: contiene <strong>energia interna</strong>. Il calore è il modo in cui quell\'energia si sposta, come un bonifico è il modo in cui si spostano i soldi. La terza risposta è la teoria del <em>calorico</em>, sostenuta fino a metà Ottocento e demolita da Rumford e Joule.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Una lastra metallica con un foro circolare al centro viene scaldata. Il foro:',
+        options: [
+          'si stringe, perché il metallo si espande verso l\'interno',
+          'resta uguale, perché nel foro non c\'è materia da dilatare',
+          'si allarga, esattamente come tutto il resto della lastra',
+          'si stringe o si allarga a seconda del materiale'
+        ],
+        correct: 2,
+        explain: 'La dilatazione è una <strong>similitudine</strong>: la figura si ingrandisce tutta, buchi compresi. Il modo più rapido di convincersene è immaginare di ritagliare quel disco e rimetterlo al suo posto — il disco si dilata, quindi il buco che lo contiene deve fare altrettanto.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Microscopicamente, la temperatura assoluta di un gas è proporzionale:',
+        options: [
+          'al numero di particelle contenute nel recipiente',
+          'alla velocità media delle particelle',
+          'all\'energia potenziale dei legami fra le particelle',
+          'all\'energia cinetica <em>media</em> di agitazione delle particelle'
+        ],
+        correct: 3,
+        explain: 'Vale $\\langle K \\rangle = \\frac32 kT$: la temperatura misura l\'agitazione <em>media</em>, non la velocità (che va come $\\sqrt T$) e non il numero di particelle. Ed è una media: <strong>la temperatura di un singolo atomo non esiste</strong>, è una proprietà emergente.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Nella stessa stanza, la gamba metallica della sedia sembra più fredda del banco di legno. Perché?',
+        options: [
+          'perché il metallo conduce molto meglio e porta via calore dal dito più in fretta',
+          'perché il metallo è effettivamente a una temperatura minore',
+          'perché il metallo ha calore specifico minore',
+          'perché il legno emette più radiazione infrarossa'
+        ],
+        correct: 0,
+        explain: 'Sono alla <em>stessa</em> temperatura: sono nella stessa stanza da ore. Quello che la pelle percepisce non è la temperatura ma la <strong>rapidità con cui le viene sottratto calore</strong>, e il metallo conduce migliaia di volte meglio del legno. Le sensazioni non sono strumenti di misura.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Due corpi a temperature diverse vengono messi a contatto e isolati. La temperatura di equilibrio è:',
+        options: [
+          'sempre la media aritmetica delle due temperature',
+          'la media delle due temperature pesata con le capacità termiche $mc$',
+          'la temperatura del corpo più grande',
+          'la media pesata con le sole masse'
+        ],
+        correct: 1,
+        explain: '$T_e = \\dfrac{m_1c_1T_1 + m_2c_2T_2}{m_1c_1 + m_2c_2}$: i pesi sono le <strong>capacità termiche</strong>, non le masse. La media aritmetica si ottiene solo nel caso particolare $m_1c_1 = m_2c_2$. Quando un peso domina enormemente sull\'altro si ha un <em>serbatoio termico</em>, che impone la propria temperatura senza cambiarla.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Perché il vapore a $100\\ °$C provoca ustioni molto più gravi dell\'acqua a $100\\ °$C?',
+        options: [
+          'perché è più caldo, nonostante il termometro segni lo stesso',
+          'perché si muove più velocemente e penetra nella pelle',
+          'perché condensando cede prima $2260$ kJ/kg di calore latente, e solo dopo comincia a raffreddarsi',
+          'perché ha calore specifico maggiore dell\'acqua liquida'
+        ],
+        correct: 2,
+        explain: 'A parità di massa il vapore cede circa sei volte l\'energia dell\'acqua bollente: prima i $2260$ kJ/kg della condensazione, poi i $4186 \\cdot 63 \\approx 264$ kJ/kg del raffreddamento fino alla temperatura della pelle. Il calore latente è enorme e il termometro non lo vede.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Nella legge di raffreddamento di Newton, dopo un tempo pari a $\\tau$ la differenza di temperatura rispetto all\'ambiente:',
+        options: [
+          'si è annullata',
+          'si è dimezzata',
+          'si è ridotta a un decimo',
+          'si è ridotta al $37\\%$, cioè a $1/e$'
+        ],
+        correct: 3,
+        explain: '$T = T_a + (T_0-T_a)e^{-t/\\tau}$, e per $t = \\tau$ l\'esponenziale vale $e^{-1} = 0{,}368$. Lo scarto si <em>dimezza</em> invece ogni $\\tau\\ln 2 = 0{,}693\\,\\tau$, e non si annulla mai: l\'avvicinamento è asintotico, e in pratica si considera finito dopo $5\\tau$.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Quale affermazione sull\'<strong>irraggiamento</strong> è corretta?',
+        options: [
+          'non ha bisogno di alcun mezzo materiale e la potenza emessa va come $T^4$',
+          'richiede un mezzo materiale, come la conduzione',
+          'la potenza emessa è proporzionale alla differenza di temperatura',
+          'avviene solo per corpi incandescenti, sopra i $500\\ °$C'
+        ],
+        correct: 0,
+        explain: 'È l\'unico dei tre meccanismi che funziona nel vuoto — per questo il Sole ci scalda. Segue la legge di Stefan-Boltzmann $P = \\varepsilon\\sigma A T^4$: raddoppiando la temperatura <em>assoluta</em> la potenza si moltiplica per sedici. E ogni corpo irraggia, a qualunque temperatura: quelli tiepidi lo fanno nell\'infrarosso, invisibile ma ben visibile a una termocamera.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Che cosa dimostrò davvero l\'esperimento del mulinello di Joule?',
+        options: [
+          'che l\'attrito produce calore',
+          'che il rapporto fra lavoro speso e calore prodotto è sempre lo stesso, quindi calore ed energia sono la stessa grandezza',
+          'che il calore è un fluido che si conserva',
+          'che l\'acqua ha calore specifico $4186$ J/(kg·K)'
+        ],
+        correct: 1,
+        explain: 'Che l\'attrito scaldi lo sapeva chiunque si sia strofinato le mani, e lo aveva già mostrato Rumford. Il risultato di Joule è che il rapporto vale $4{,}186$ J/cal <em>qualunque</em> sia il modo di fare il lavoro: e un rapporto costante fra due grandezze significa che sono la stessa grandezza in unità diverse. Da lì il primo principio della termodinamica.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'In quale di queste formule è <strong>obbligatorio</strong> usare i kelvin e non i gradi Celsius?',
+        options: [
+          '$Q = mc\\Delta T$',
+          '$\\Delta L = \\lambda L_0 \\Delta T$',
+          '$P = \\varepsilon\\sigma A T^4$',
+          'in nessuna: basta essere coerenti'
+        ],
+        correct: 2,
+        explain: 'La regola pratica è: se nella formula la $T$ compare <em>senza</em> il $\\Delta$, va in kelvin. Nelle prime due compaiono solo <strong>differenze</strong> di temperatura, e un salto di $10\\ °$C è identico a un salto di $10$ K. Nella legge di Stefan-Boltzmann la $T$ è assoluta ed elevata alla quarta: usare i Celsius darebbe risultati privi di senso, e a $0\\ °$C darebbe potenza nulla.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Perché i laghi ghiacciano dalla superficie verso il fondo, e non viceversa?',
+        options: [
+          'perché il ghiaccio si forma solo a contatto con l\'aria',
+          'perché il fondo è isolato dal terreno, che è più caldo',
+          'perché la convezione porta il calore verso il basso',
+          'perché l\'acqua ha densità massima a $4\\ °$C: quella più fredda resta sopra e ghiaccia lì'
+        ],
+        correct: 3,
+        explain: 'È l\'<strong>anomalia dell\'acqua</strong>: fra $0$ e $4\\ °$C si contrae scaldandosi, con il massimo di densità a $3{,}98\\ °$C. L\'acqua a $4\\ °$C va sul fondo, la più fredda resta in superficie e ghiaccia; e il ghiaccio, meno denso dell\'acqua liquida, galleggia facendo da coperta isolante. Se l\'acqua si comportasse come tutti gli altri liquidi, ogni inverno i laghi ghiaccerebbero dal fondo uccidendo tutto ciò che ci vive.'
+      },
+      {
+        type: 'open',
+        text: 'Spiega la differenza fra <strong>temperatura</strong> e <strong>calore</strong>, e perché la frase «questo corpo contiene molto calore» è scorretta. Che cosa contiene, allora?',
+        keywords: ['transito', 'energia interna', 'agitazione', 'media', 'joule', 'differenza', 'scambio'],
+        requiredMatches: 3,
+        explain: 'La <strong>temperatura</strong> è una proprietà <em>di stato</em> del corpo: misura l\'energia cinetica <em>media</em> di agitazione delle sue particelle, e come tutte le medie è una proprietà <strong>emergente</strong> — non ha senso per un singolo atomo. Il <strong>calore</strong> invece non è una proprietà di nessun corpo: è <strong>energia in transito</strong>, quella che passa spontaneamente da un corpo a temperatura maggiore a uno a temperatura minore, e si misura in joule come tutte le energie. Un corpo contiene <strong>energia interna</strong>, cioè la somma di tutte le energie cinetiche e potenziali microscopiche delle sue particelle; il calore è il <em>meccanismo di trasferimento</em> di quell\'energia. Dire «questo corpo ha molto calore» è sbagliato quanto dire «questo conto corrente ha molti bonifici»: il bonifico è un movimento, il saldo è una proprietà. Notate anche che due corpi possono avere la stessa temperatura e energie interne completamente diverse (una tazzina e una piscina a $20\\ °$C), e che il calore fluisce sempre secondo la <em>differenza di temperatura</em>, non secondo l\'energia interna.'
+      },
+      {
+        type: 'open',
+        text: 'Un thermos mantiene caldo il caffè e fredda l\'acqua. Spiega, meccanismo per meccanismo, come combatte tutti e tre i modi di propagazione del calore — e perché funziona in entrambi i versi.',
+        keywords: ['conduzione', 'convezione', 'irraggiamento', 'vuoto', 'specchia', 'argentat', 'emissivit', 'doppia parete'],
+        requiredMatches: 4,
+        explain: 'La <strong>doppia parete di vetro</strong> attacca la <strong>conduzione</strong>: il vetro ha $k \\approx 1$ W/(m·K), cioè quattrocento volte meno del rame, e il collo di bottiglia resta il tappo di plastica — l\'unico ponte solido rimasto fra interno ed esterno. Il <strong>vuoto</strong> fra le due pareti elimina insieme conduzione e <strong>convezione</strong>: senza materia non ci sono né urti fra particelle né correnti di fluido, e questi due meccanismi semplicemente non hanno più un mezzo in cui esistere. Restano le superfici <strong>argentate a specchio</strong>, che hanno emissività bassissima: emettono pochissimo per irraggiamento e riflettono quasi tutto quello che ricevono, ostacolando così il terzo meccanismo, l\'unico che il vuoto non fermerebbe. Il motivo per cui funziona in entrambi i versi è che <strong>nessuno di questi accorgimenti ha una direzione privilegiata</strong>: il thermos non «tiene il caldo», ostacola lo <em>scambio</em> di energia fra dentro e fuori, e uno scambio ostacolato lo è in tutti e due i sensi. Se dentro c\'è acqua ghiacciata, gli stessi tre ostacoli impediscono al calore dell\'ambiente di entrare.'
+      }
+    ];
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 4 — L'energia</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .qbox { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 8px; padding: 0.7rem 0.9rem; margin: 0.8rem 0; }
+    .qbox .qt { font-weight: 600; margin-bottom: 0.45rem; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.l { text-align: left; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    /* ---- CSS dedicato alla sezione facoltativa 10: la meccanica lagrangiana ---- */
+    #sec9 .lagbox { border: 2px solid #a855f7; border-radius: 14px; padding: 0.9rem 1.2rem; margin: 1.2rem 0;
+                     background: color-mix(in srgb, #a855f7 8%, var(--surface)); }
+    #sec9 .lagbox h4 { margin: 0 0 0.45rem; color: #a855f7; font-size: 1.03rem; }
+    #sec9 .lagbox > *:last-child { margin-bottom: 0; }
+    #sec9 .via { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 1rem; margin: 1.2rem 0; }
+    #sec9 .via > div { border: 1px solid var(--border); border-radius: 12px; padding: 0.85rem 1rem; }
+    #sec9 .via h4 { margin: 0 0 0.4rem; }
+    #sec9 .via-newton { background: color-mix(in srgb, var(--accent) 9%, var(--surface)); }
+    #sec9 .via-newton h4 { color: var(--accent); }
+    #sec9 .via-lagrange { background: color-mix(in srgb, #a855f7 10%, var(--surface)); }
+    #sec9 .via-lagrange h4 { color: #a855f7; }
+    #sec9 .passo-lag { border-left: 4px solid #a855f7; padding: 0.15rem 0 0.15rem 0.9rem; margin: 0.9rem 0; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Fisica · Quarto anno · Lezione 4</div>
+    <h1>L'energia</h1>
+    <p>La grandezza che nessuno sa dire che cosa sia — e che proprio per questo
+      è diventata il filo conduttore di tutta la fisica</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Fisica — Quarto anno</a>
+    <span class="sep">/</span> L'energia
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Dove eravamo rimasti.</strong> Con i tre principi della dinamica sappiamo, in linea di principio,
+      risolvere qualunque problema di meccanica: si elencano le forze, si scrive $\vec F = m\vec a$, si integra.
+      In pratica però quel programma è spesso impraticabile — provate a scriverlo per una pallina che scende
+      lungo una pista curva. In questa lezione costruiamo un secondo linguaggio, che di solito arriva alla
+      risposta in due righe invece che in due pagine: quello dell'<strong>energia</strong>.
+    </div>
+
+    <!-- 1 — IL LAVORO -->
+    <section id="sec1">
+      <h2>1. Il lavoro, guardato bene</h2>
+
+      <p>Il lavoro l'abbiamo già incontrato nella <a href="2_Gravitazione.html#sec5">lezione 2</a>, parlando di
+        campi conservativi. Adesso lo prendiamo sul serio, perché è il ponte fra il linguaggio delle forze e
+        quello dell'energia.</p>
+
+      <div class="definition">
+        <strong>Lavoro di una forza costante.</strong>
+        $$W = F\,s\,\cos\theta$$
+        dove $\theta$ è l'angolo fra la forza e lo spostamento. Si misura in <strong>joule</strong>:
+        $1$ J $= 1$ N·m. È una grandezza <strong>scalare</strong>, pur nascendo da due vettori.
+      </div>
+
+      <p>Quel coseno decide tutto, e conviene guardarne i tre casi con calma.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="lw-f">forza: <span class="val-badge" id="lw-fv">50</span> N</label>
+          <input type="range" id="lw-f" min="10" max="120" step="5" value="50">
+          <label for="lw-s">spostamento: <span class="val-badge" id="lw-sv">4,0</span> m</label>
+          <input type="range" id="lw-s" min="1" max="10" step="0.5" value="4">
+          <label for="lw-a">angolo: <span class="val-badge" id="lw-av">30</span>°</label>
+          <input type="range" id="lw-a" min="0" max="180" step="5" value="30">
+        </div>
+        <svg id="lw-svg" viewBox="0 0 660 260" aria-label="Lavoro di una forza inclinata rispetto allo spostamento"></svg>
+        <div class="sp-cols">
+          <div>Componente utile $F\cos\theta$: <span class="val-badge" id="lw-fu">—</span></div>
+          <div>Lavoro: <span class="val-badge" id="lw-w">—</span></div>
+        </div>
+        <p class="eq-out" id="lw-out"></p>
+      </div>
+
+      <div class="sp-cols">
+        <div class="definition">
+          <strong>$\theta \lt 90°$ — lavoro positivo</strong>
+          <p>La forza aiuta il moto e <em>cede</em> energia al corpo. È il caso del motore che spinge l'auto.</p>
+        </div>
+        <div class="definition">
+          <strong>$\theta = 90°$ — lavoro nullo</strong>
+          <p>Forza e spostamento sono perpendicolari: <strong>zero</strong>, per quanto grande sia la forza. La
+            forza centripeta non compie mai lavoro, e per questo un satellite mantiene la sua velocità per
+            sempre.</p>
+        </div>
+        <div class="definition">
+          <strong>$\theta \gt 90°$ — lavoro negativo</strong>
+          <p>La forza contrasta il moto e <em>toglie</em> energia. È sempre il caso dell'attrito, che si oppone
+            per definizione: $\theta = 180°$ e $\cos 180° = -1$.</p>
+        </div>
+      </div>
+
+      <div class="warnbox"><strong>Il lavoro della fisica non è la fatica.</strong> Reggete uno zaino pesante
+        stando fermi: lavoro <em>zero</em>, perché lo spostamento è nullo. Camminate in piano con lo zaino:
+        ancora zero, perché la forza è verticale e lo spostamento orizzontale. Eppure siete stanchi. Non è una
+        contraddizione: i vostri muscoli consumano energia anche solo per restare contratti — le fibre si
+        agganciano e si sganciano continuamente — ma quell'energia va in calore, non in lavoro meccanico sullo
+        zaino. La fisica sta misurando una cosa diversa dalla fatica, e lo dice apertamente.</div>
+
+      <div class="note"><strong>E se la forza cambia?</strong> La formula $W = Fs\cos\theta$ vale per forze
+        <em>costanti</em>. Se la forza varia lungo il percorso — come quella di una molla, che cresce con
+        l'allungamento — il lavoro si trova come <strong>area sotto il grafico</strong> della forza in funzione
+        dello spostamento. È lo stesso trucco con cui, in cinematica, lo spazio si legge come area sotto il
+        grafico della velocità. Lo useremo fra poco per l'energia elastica.</div>
+    </section>
+
+    <!-- 2 — LA POTENZA -->
+    <section id="sec2">
+      <h2>2. La potenza: non quanto, ma quanto in fretta</h2>
+
+      <p>Portare cento mattoni al terzo piano richiede sempre lo stesso lavoro, che li portiate in un'ora o in
+        un giorno. Ma non è affatto la stessa cosa, e la grandezza che coglie la differenza è la potenza.</p>
+
+      <div class="definition">
+        <strong>Potenza.</strong> Il lavoro compiuto nell'unità di tempo:
+        $$P = \frac{W}{\Delta t}$$
+        Si misura in <strong>watt</strong>: $1$ W $= 1$ J/s. Per un corpo che si muove a velocità $v$ sotto
+        l'azione di una forza $F$ parallela al moto vale anche la forma, spesso più comoda,
+        $$P = F\,v$$
+        che si ottiene subito da $W = Fs$ dividendo per $\Delta t$.
+      </div>
+
+      <div class="curiosita"><strong>Perché i motori si misurano in cavalli.</strong> Alla fine del Settecento
+        <strong>James Watt</strong> doveva vendere le sue macchine a vapore a gente che di macchine non sapeva
+        nulla, ma di cavalli sì. Misurò allora quanto lavoro faceva in un'ora un cavallo da traino in una
+        miniera, e definì il <em>horsepower</em> come unità commerciale. Il cavallo vapore continentale, quello
+        delle nostre auto, vale $1$ CV $= 735{,}5$ W (è la potenza per sollevare $75$ kg di un metro in un
+        secondo); quello anglosassone $1$ hp $= 745{,}7$ W. È l'unico caso in cui un'unità di misura è nata da
+        un'operazione di marketing — e le abbiamo poi intitolato l'unità del Sistema Internazionale.</div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="pw-m">massa da trainare: <span class="val-badge" id="pw-mv">1200</span> kg</label>
+          <input type="range" id="pw-m" min="60" max="2000" step="20" value="1200">
+          <label for="pw-v">velocità: <span class="val-badge" id="pw-vv">90</span> km/h</label>
+          <input type="range" id="pw-v" min="5" max="200" step="5" value="90">
+          <label for="pw-c">coefficiente di resistenza: <span class="val-badge" id="pw-cv">0,020</span></label>
+          <input type="range" id="pw-c" min="0.005" max="0.05" step="0.001" value="0.02">
+          <label class="toggle-row"><input type="checkbox" id="pw-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg id="pw-svg" viewBox="0 0 660 300" aria-label="Potenza necessaria in funzione della velocità"></svg>
+        <div class="sp-cols">
+          <div>Forza resistente: <span class="val-badge" id="pw-f">—</span></div>
+          <div>Potenza: <span class="val-badge" id="pw-p">—</span></div>
+          <div>In cavalli: <span class="val-badge" id="pw-cvv">—</span></div>
+        </div>
+        <p class="eq-out" id="pw-out"></p>
+      </div>
+
+      <table class="tabf">
+        <thead><tr><th>Sorgente</th><th>Potenza tipica</th><th>Per farsi un'idea</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Una persona, a lungo</td><td>$75$ W</td><td class="l">un decimo di cavallo: siamo animali da resistenza, non da potenza</td></tr>
+          <tr><td class="lab">Un ciclista da corsa</td><td>$400$ W</td><td class="l">e solo per una ventina di minuti</td></tr>
+          <tr><td class="lab">Uno sprinter, di picco</td><td>$1500$ W</td><td class="l">due cavalli, per due secondi</td></tr>
+          <tr><td class="lab">Un cavallo, a lungo</td><td>$750$ W</td><td class="l">è la definizione stessa di Watt</td></tr>
+          <tr><td class="lab">Un'utilitaria</td><td>$70$ kW ($95$ CV)</td><td class="l">novantacinque cavalli sotto il cofano, letteralmente</td></tr>
+          <tr><td class="lab">Un treno ad alta velocità</td><td>$9$ MW</td><td class="l">dodicimila cavalli</td></tr>
+          <tr><td class="lab">Una centrale nucleare</td><td>$1$ GW</td><td class="l">tredici milioni di persone che pedalano</td></tr>
+          <tr><td class="lab">Il Sole</td><td>$3{,}8\times10^{26}$ W</td><td class="l">nessun paragone regge</td></tr>
+        </tbody>
+      </table>
+
+      <div class="qbox">
+        <div class="qt">Un ascensore solleva $600$ kg di $18$ m in $20$ s. Che potenza serve al motore, e a
+          quanti cavalli corrisponde?</div>
+        <button class="btn btn-toggle" data-target="#sol-asc">Mostra la soluzione</button>
+        <div id="sol-asc" class="hidden">
+          <p><span class="step-num">1</span>Il lavoro è quello contro la gravità:
+            $W = mgh = 600 \cdot 9{,}81 \cdot 18 = 105\,948$ J, cioè circa $106$ kJ.</p>
+          <p><span class="step-num">2</span>$P = \dfrac{W}{\Delta t} = \dfrac{105\,948}{20} = 5297$ W, cioè
+            $5{,}3$ kW.</p>
+          <p><span class="step-num">3</span>In cavalli: $\dfrac{5297}{735{,}5} = 7{,}2$ CV.</p>
+          <p><span class="step-num">4</span><strong>Controllo con l'altra formula.</strong> La velocità di salita
+            è $18/20 = 0{,}90$ m/s e la forza è il peso, $5886$ N: $P = Fv = 5886 \cdot 0{,}90 = 5297$ W.
+            Stesso risultato per un'altra strada.</p>
+          <p><span class="step-num">5</span>Un ascensore reale monta un motore più potente, perché deve anche
+            accelerare, vincere gli attriti e avere un margine. E usa un <em>contrappeso</em>: bilanciando la
+            cabina, il motore deve sollevare solo lo sbilanciamento, non tutto il carico.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — CHE COS'È L'ENERGIA -->
+    <section id="sec3">
+      <h2>3. Che cos'è l'energia? (nessuno lo sa)</h2>
+
+      <p>Adesso la domanda difficile. Che cos'<em>è</em> l'energia? Non «a che cosa serve», non «come si
+        calcola»: che cosa è. La risposta più onesta che sia mai stata scritta la diede Richard Feynman nelle
+        sue lezioni, e comincia così: <em>«È importante rendersi conto che nella fisica di oggi non sappiamo
+        che cosa sia l'energia.»</em></p>
+
+      <div class="curiosita"><strong>I mattoncini di Dennis.</strong> Per spiegare che cosa sappiamo davvero,
+        Feynman inventò una parabola. Immaginate un bambino, Dennis, che possiede $28$ mattoncini
+        indistruttibili. Ogni sera la madre li conta: sono sempre $28$. Un giorno però ne trova solo $25$: dopo
+        una breve indagine ne scopre tre sotto il tappeto, e il conto torna. Un altro giorno ne trova $27$, ma
+        nota che la scatola dei giochi pesa $500$ grammi più del solito, e sapendo che ogni mattoncino pesa
+        $100$ grammi ne deduce che ce ne sono cinque dentro. Un altro giorno ancora l'acqua della vasca è più
+        alta del solito, e il livello in eccesso corrisponde esattamente a due mattoncini sommersi.
+        <p style="margin:0.6rem 0 0;">La madre non ha mai <em>visto</em> i mattoncini nascosti: ha inventato,
+          ogni volta, una nuova formula — «peso della scatola diviso cento», «altezza dell'acqua diviso tanto» —
+          e la somma di tutte quelle formule dà sempre $28$. <strong>L'energia è così.</strong> Non sappiamo che
+          cosa sia; sappiamo che esistono varie formule ($\frac12 mv^2$, $mgh$, $\frac12 kx^2$, $mc^2$, e altre
+          venti) la cui somma, in un sistema isolato, non cambia mai. Non c'è nessun «fluido energetico» da
+          qualche parte: c'è un <strong>numero</strong> che sappiamo calcolare e che rimane costante.</div>
+
+      <div class="definition">
+        <strong>Energia.</strong> Una grandezza scalare, misurata in <strong>joule</strong>, che si può
+        associare a un sistema in molte forme diverse, e la cui somma totale in un sistema isolato
+        <strong>si conserva</strong>. Il legame con il lavoro è la definizione operativa che useremo:
+        <em>l'energia di un sistema è la sua capacità di compiere lavoro</em> — una definizione comoda ma
+        <strong>non esaustiva</strong>, perché esistono forme di energia (quella termica di un corpo già in
+        equilibrio, per esempio) che non si possono convertire integralmente in lavoro. Lo vedremo con il
+        secondo principio della termodinamica.
+      </div>
+
+      <div class="curiosita"><strong>Quando il conto non torna, si inventa un mattoncino.</strong> Attorno al
+        1930 i fisici avevano un problema serio: nel <strong>decadimento beta</strong> un neutrone si trasforma
+        in protone ed elettrone, ma l'energia dell'elettrone usciva ogni volta <em>diversa</em>, e sempre minore
+        del previsto. Il conto non tornava. Niels Bohr, di fronte all'evidenza, arrivò a proporre di abbandonare
+        la conservazione dell'energia nei processi nucleari.
+        <p style="margin:0.6rem 0 0;">Wolfgang Pauli scelse la strada opposta. Il 4 dicembre 1930 scrisse una
+          lettera che comincia «Cari signore e signori radioattivi» e propose che a portarsi via l'energia
+          mancante fosse una particella nuova, neutra, così poco interagente da essere invisibile. Si scusava
+          per l'azzardo — «ho fatto una cosa terribile, ho postulato una particella che non può essere
+          rivelata» — e concludeva che non poteva partecipare al congresso perché c'era un ballo a Zurigo a cui
+          teneva molto.</p>
+        <p style="margin:0.6rem 0 0;">Quella particella è il <strong>neutrino</strong>, e fu osservata
+          ventisei anni dopo, nel 1956, da Reines e Cowan accanto a un reattore nucleare. È l'esempio più bello
+          di che cosa vuol dire prendere sul serio una legge di conservazione: davanti a un ammanco si può
+          buttare via la legge, oppure cercare il mattoncino sotto il tappeto. Quella volta, sotto il tappeto,
+          c'era una particella.</div>
+    </section>
+
+    <!-- 4 — LE FORZE DISSIPATIVE -->
+    <section id="sec4">
+      <h2>4. Forze dissipative: dove finisce l'energia «persa»</h2>
+
+      <p>Una cassa spinta su un pavimento scabro si ferma. L'energia cinetica che aveva è sparita. Dove?</p>
+
+      <div class="definition">
+        <strong>Forza dissipativa.</strong> Una forza il cui lavoro lungo un percorso chiuso <strong>non è
+        nullo</strong> — anzi, è sempre negativo. L'attrito è l'esempio principe: qualunque giro facciate,
+        tornando al punto di partenza l'attrito ha lavorato tutto il tempo, e sempre contro. Non esiste
+        un'energia potenziale d'attrito, perché non si può assegnare a ogni punto un numero: dipende da
+        <em>come</em> ci si è arrivati.
+        $$W_{\text{attrito}} = -\,\mu_d\,N\,\ell$$
+        dove $\ell$ è la lunghezza <strong>effettivamente percorsa</strong>, non lo spostamento netto.
+      </div>
+
+      <div class="warnbox"><strong>«Persa» è la parola sbagliata.</strong> L'energia non si perde: cambia forma.
+        Il lavoro dell'attrito si ritrova, quasi tutto, come <strong>energia interna</strong> dei due corpi che
+        strisciano — cioè come agitazione disordinata dei loro atomi, che noi percepiamo come calore. Strofinate
+        le mani e lo sentite in due secondi. Il freno di un'automobile che scende da un passo alpino trasforma
+        in calore centinaia di chilowatt: i dischi arrivano a cinquecento gradi, ed è per questo che si scende
+        con la marcia bassa.</div>
+
+      <p>La differenza fra forze conservative e dissipative è la ragione per cui l'energia meccanica, da sola,
+        non basta quasi mai:</p>
+
+      <table class="tabf">
+        <thead><tr><th></th><th>Conservative</th><th>Dissipative</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Esempi</td><td class="l">peso, forza elastica, forza elettrica</td><td class="l">attrito, resistenza dell'aria, urti anelastici</td></tr>
+          <tr><td class="lab">Lavoro su percorso chiuso</td><td>zero</td><td>negativo</td></tr>
+          <tr><td class="lab">Dipende dal percorso?</td><td>no, solo dagli estremi</td><td>sì, dalla lunghezza</td></tr>
+          <tr><td class="lab">Esiste $U$?</td><td>sì</td><td>no</td></tr>
+          <tr><td class="lab">Reversibile?</td><td>sì</td><td>no: il calore non torna indietro da solo</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note"><strong>Un anticipo.</strong> Quell'ultima riga contiene, in una frase, tutto il secondo
+        principio della termodinamica che studierete nella lezione 8. Il lavoro si trasforma <em>tutto</em> in
+        calore senza fatica; il calore non si ritrasforma tutto in lavoro nemmeno pagando. L'attrito è una
+        strada a senso unico, e da lì nasce la freccia del tempo.</div>
+    </section>
+
+    <!-- 5 — L'ENERGIA CINETICA -->
+    <section id="sec5">
+      <h2>5. L'energia cinetica</h2>
+
+      <p>Cominciamo dalla forma di energia più intuitiva: quella che un corpo possiede <em>perché si muove</em>.
+        E ricaviamola, invece di calarla dall'alto.</p>
+
+      <div class="definition">
+        <strong>Teorema dell'energia cinetica</strong> (o «delle forze vive»). Il lavoro totale compiuto da
+        tutte le forze su un corpo è uguale alla variazione della quantità $\frac12 mv^2$:
+        $$W_{\text{tot}} = \frac{1}{2}mv_f^2 - \frac{1}{2}mv_i^2 = \Delta K$$
+        <p class="formula-note">Si dimostra in due righe: per una forza costante, $W = Fs = mas$; dalla
+          cinematica $v_f^2 = v_i^2 + 2as$, quindi $as = (v_f^2 - v_i^2)/2$; sostituendo,
+          $W = m(v_f^2-v_i^2)/2$. La quantità $K = \frac12 mv^2$ si chiama <strong>energia cinetica</strong>.</p>
+      </div>
+
+      <div class="warnbox"><strong>Quel quadrato non è un dettaglio.</strong> Raddoppiando la velocità
+        l'energia cinetica <strong>quadruplica</strong>. È il motivo per cui a $100$ km/h lo spazio di frenata
+        non è il doppio che a $50$, ma <em>quattro volte</em> tanto — e perché un incidente a $130$ non è «un
+        po' peggio» di uno a $90$, ma il doppio in energia da smaltire. Guardate il grafico.</div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="ek-m">massa: <span class="val-badge" id="ek-mv">1200</span> kg</label>
+          <input type="range" id="ek-m" min="60" max="2000" step="20" value="1200">
+          <label for="ek-mu">attrito con l'asfalto: <span class="val-badge" id="ek-muv">0,80</span></label>
+          <input type="range" id="ek-mu" min="0.3" max="1" step="0.05" value="0.8">
+          <label for="ek-v">velocità: <span class="val-badge" id="ek-vv">50</span> km/h</label>
+          <input type="range" id="ek-v" min="10" max="150" step="5" value="50">
+          <label class="toggle-row"><input type="checkbox" id="ek-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg id="ek-svg" viewBox="0 0 660 300" aria-label="Energia cinetica e spazio di frenata in funzione della velocità"></svg>
+        <div class="sp-cols">
+          <div>Energia cinetica: <span class="val-badge" id="ek-k">—</span></div>
+          <div>Spazio di frenata: <span class="val-badge" id="ek-d">—</span></div>
+          <div>Con il doppio della velocità: <span class="val-badge" id="ek-d2">—</span></div>
+        </div>
+        <p class="eq-out" id="ek-out"></p>
+      </div>
+
+      <div class="definition">
+        <strong>Lo spazio di frenata, ricavato in tre righe.</strong> Frenando, l'unica forza che lavora è
+        l'attrito, e deve azzerare tutta l'energia cinetica:
+        $$\mu_d\,m g\,d = \frac{1}{2}m v^2 \;\Longrightarrow\; d = \frac{v^2}{2\mu_d\,g}$$
+        La massa <strong>si semplifica</strong>: un camion e un'utilitaria, con gli stessi pneumatici, si
+        fermano nello stesso spazio. E $d$ va con il <strong>quadrato</strong> della velocità.
+      </div>
+
+      <h3>5.1 — Il muscolo, la palestra e un conto che sorprende</h3>
+
+      <p>Un sollevatore di pesi solleva $150$ kg di $2{,}0$ m. Il lavoro è $mgh = 2943$ J, cioè meno di
+        <strong>tre chilojoule</strong>: l'energia contenuta in un grammo di zucchero. Eppure lo sforzo è
+        estremo. Come si spiega?</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="ms-m">carico: <span class="val-badge" id="ms-mv">150</span> kg</label>
+          <input type="range" id="ms-m" min="10" max="250" step="5" value="150">
+          <label for="ms-h">alzata: <span class="val-badge" id="ms-hv">2,0</span> m</label>
+          <input type="range" id="ms-h" min="0.3" max="2.5" step="0.1" value="2">
+          <label for="ms-t">durata: <span class="val-badge" id="ms-tv">1,5</span> s</label>
+          <input type="range" id="ms-t" min="0.5" max="6" step="0.1" value="1.5">
+        </div>
+        <svg id="ms-svg" viewBox="0 0 660 280" aria-label="Lavoro, potenza e resa del sollevamento pesi"></svg>
+        <div class="sp-cols">
+          <div>Lavoro meccanico: <span class="val-badge" id="ms-w">—</span></div>
+          <div>Potenza sviluppata: <span class="val-badge" id="ms-p">—</span></div>
+          <div>Energia spesa dal corpo: <span class="val-badge" id="ms-e">—</span></div>
+          <div>In cibo: <span class="val-badge" id="ms-cib">—</span></div>
+        </div>
+        <p class="eq-out" id="ms-out"></p>
+      </div>
+
+      <div class="definition">
+        <strong>Tre motivi, tutti veri insieme.</strong>
+        <ul>
+          <li><strong>La potenza, non il lavoro.</strong> Quei $2943$ J vanno erogati in un secondo e mezzo:
+            $P \approx 2000$ W, cioè quasi tre cavalli. È lì che sta lo sforzo.</li>
+          <li><strong>Il rendimento.</strong> Il muscolo converte in lavoro meccanico solo il $20$-$25\%$
+            dell'energia chimica che consuma: il resto diventa calore (per questo ci si scalda). Quindi al corpo
+            servono almeno $12$ kJ per farne $3$.</li>
+          <li><strong>Le leve svantaggiose.</strong> Come abbiamo visto nella lezione 1, i muscoli si attaccano
+            vicinissimi alle articolazioni: per sollevare un chilo con la mano, il bicipite ne tira sette o
+            otto. Il lavoro <em>interno</em> è molto maggiore di quello esterno.</li>
+        </ul>
+      </div>
+
+      <div class="curiosita"><strong>Ed ecco perché la palestra non fa dimagrire (da sola).</strong> Il conto è
+        impietoso: $3$ kJ di lavoro con un rendimento del $20\%$ fanno $15$ kJ consumati, cioè circa
+        <strong>3,6 kilocalorie</strong>. Un cornetto ne ha trecento: servirebbero ottanta sollevamenti da
+        $150$ kg per pareggiarlo. L'attività fisica fa benissimo per mille altri motivi — massa muscolare,
+        metabolismo basale, cuore, umore — ma il bilancio energetico diretto di una singola alzata è quasi
+        nulla. La fisica, qui, è più severa della pubblicità.</div>
+    </section>
+
+    <!-- 6 — ENERGIA POTENZIALE GRAVITAZIONALE -->
+    <section id="sec6">
+      <h2>6. L'energia potenziale gravitazionale</h2>
+
+      <p>Un corpo sollevato non si sta muovendo, eppure «può» fare qualcosa: basta lasciarlo andare. Quella
+        capacità di compiere lavoro <em>in virtù della posizione</em> è l'energia potenziale, e l'abbiamo già
+        incontrata nella lezione 2.</p>
+
+      <div class="definition">
+        <strong>Vicino alla superficie terrestre</strong> ($h$ piccolo rispetto a $R_T$, quindi $g$ costante):
+        $$U = m\,g\,h$$
+        dove $h$ è l'altezza misurata da un livello di riferimento <strong>scelto da noi</strong>. È la
+        differenza $\Delta U$ ad avere significato fisico, non il valore assoluto: si può mettere lo zero dove
+        si vuole, purché non lo si cambi a metà problema.
+        <p class="formula-note">Lontano dalla Terra si usa la forma generale $U = -GMm/r$, con lo zero
+          all'infinito. Le due espressioni sono coerenti: fra $R$ e $R+h$ con $h \ll R$ si ritrova $mgh$, come
+          abbiamo verificato nella lezione 2.</p>
+      </div>
+
+      <div class="note"><strong>Perché non conta il percorso.</strong> Il peso è una forza conservativa, quindi
+        il lavoro dipende solo dai due estremi. Salire di dieci metri per la scala o per una rampa lunghissima
+        richiede lo stesso lavoro contro la gravità: la rampa allunga la strada ma riduce la forza necessaria,
+        e il prodotto resta uguale. È il principio della <em>macchina semplice</em>: si può barattare forza con
+        spostamento, mai guadagnare energia.</div>
+    </section>
+
+    <!-- 7 — ENERGIA POTENZIALE ELASTICA -->
+    <section id="sec7">
+      <h2>7. L'energia potenziale elastica</h2>
+
+      <p>Anche una molla compressa «può» fare qualcosa. Ma qui la forza non è costante: cresce con la
+        deformazione, secondo la legge di Hooke $F = k\,x$ che avete studiato il terzo anno. Il lavoro si
+        calcola allora come <strong>area sotto il grafico</strong>.</p>
+
+      <div class="definition">
+        La forza cresce linearmente da $0$ a $kx$: il grafico è un triangolo di base $x$ e altezza $kx$, quindi
+        $$U_{\text{el}} = \frac{1}{2}k\,x^2$$
+        <p class="formula-note">Quel $\frac12$ è la metà del rettangolo: si sta usando la forza
+          <strong>media</strong>, che vale $kx/2$ perché la crescita è lineare. Anche qui compare un quadrato,
+          e con la stessa conseguenza: comprimere una molla del doppio costa <em>quattro</em> volte tanto.</p>
+      </div>
+
+      <div class="curiosita"><strong>Dove si nasconde.</strong> Nell'arco che scaglia la freccia, nella molla
+        dell'orologio a carica, negli ammortizzatori, nel trampolino, nel tendine d'Achille (che restituisce
+        fino al $90\%$ dell'energia a ogni passo di corsa, ed è il motivo per cui correre costa meno di quanto
+        i muscoli da soli farebbero pensare), e nelle molle a spirale delle vecchie sveglie, che immagazzinavano
+        abbastanza energia per ventiquattro ore di funzionamento.</div>
+
+      <h3>7.1 — L'energia di rotazione, in anticipo</h3>
+
+      <p>C'è una quarta forma di energia meccanica che incontreremo per esteso nella lezione 6, ma che conviene
+        nominare adesso perché altrimenti certi conti non tornano: un corpo che <strong>ruota</strong> possiede
+        energia anche se il suo centro sta fermo.</p>
+
+      <div class="definition">
+        $$K_{\text{rot}} = \frac{1}{2}I\,\omega^2$$
+        dove $\omega$ è la velocità angolare e $I$ il <strong>momento d'inerzia</strong>, che gioca per le
+        rotazioni lo stesso ruolo che la massa gioca per le traslazioni. La somiglianza con $\frac12 mv^2$ non
+        è casuale: è la stessa formula, con le grandezze rotazionali al posto di quelle traslazionali.
+      </div>
+
+      <div class="note"><strong>Il conto che non tornava.</strong> Ricordate il piano inclinato di Galileo,
+        nella lezione 1? La sfera rotolava invece di strisciare, e l'accelerazione risultava $\frac57 g\sin\theta$
+        invece di $g\sin\theta$. Adesso si capisce perché: una parte dell'energia potenziale non va in
+        traslazione ma in <strong>rotazione</strong>, e la palla arriva in fondo più lenta. Per una sfera piena
+        la quota rotazionale è esattamente $2/7$ del totale — da cui il $5/7$ che resta al moto di avanzamento.
+        È anche il motivo per cui, in una gara fra un cilindro pieno e uno cavo lungo un piano inclinato, vince
+        sempre quello pieno: ha il momento d'inerzia minore e spreca meno energia a girare.</div>
+    </section>
+
+    <!-- 8 — LA CONSERVAZIONE -->
+    <section id="sec8">
+      <h2>8. La conservazione dell'energia meccanica</h2>
+
+      <p>Ed eccoci al risultato che rende tutto questo utile. Se sul sistema agiscono <em>solo</em> forze
+        conservative, la somma di energia cinetica e potenziale non cambia mai.</p>
+
+      <div class="definition">
+        <strong>Conservazione dell'energia meccanica.</strong>
+        $$E = K + U = \text{costante} \qquad\text{cioè}\qquad
+          \frac12 m v_i^2 + U_i = \frac12 m v_f^2 + U_f$$
+        In presenza di forze dissipative la legge si corregge così:
+        $$\Delta E = W_{\text{dissipativo}} \quad (\text{sempre negativo})$$
+      </div>
+
+      <div class="warnbox"><strong>Il vantaggio pratico è enorme.</strong> La conservazione dell'energia
+        <em>non chiede il percorso</em>: mette in relazione solo lo stato iniziale e quello finale. Per sapere
+        con che velocità arriva in fondo una pallina che scende lungo una pista curva qualsiasi, con
+        $\vec F = m\vec a$ dovreste conoscere la forma della pista in ogni punto e integrare; con l'energia
+        bastano le due quote. È il motivo per cui, davanti a un problema di meccanica, la prima domanda da
+        farsi è sempre: <em>posso risolverlo con l'energia?</em></div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="cv-h">quota di partenza: <span class="val-badge" id="cv-hv">4,0</span> m</label>
+          <input type="range" id="cv-h" min="1.5" max="6" step="0.1" value="4">
+          <label for="cv-mu">attrito della pista: <span class="val-badge" id="cv-muv">0,00</span></label>
+          <input type="range" id="cv-mu" min="0" max="0.3" step="0.01" value="0">
+          <button class="btn" id="cv-via" type="button">▶ Lascia andare</button>
+          <button class="btn btn-secondary" id="cv-reset" type="button">↺ Riporta in cima</button>
+        </div>
+        <svg id="cv-svg" viewBox="0 0 660 340" aria-label="Pallina su una pista, con le barre di energia cinetica e potenziale"></svg>
+        <div class="sp-cols">
+          <div>Energia potenziale: <span class="val-badge" id="cv-u">—</span></div>
+          <div>Energia cinetica: <span class="val-badge" id="cv-k">—</span></div>
+          <div>Dissipata dall'attrito: <span class="val-badge" id="cv-d">—</span></div>
+          <div>Totale meccanica: <span class="val-badge" id="cv-e">—</span></div>
+        </div>
+        <p class="eq-out" id="cv-out"></p>
+      </div>
+
+      <h3>8.1 — Cinque esercizi, a difficoltà crescente</h3>
+
+      <div class="qbox">
+        <div class="qt">① Un sasso viene lasciato cadere da $20$ m. Con che velocità arriva a terra? Risolvilo
+          <strong>con l'energia</strong>.</div>
+        <button class="btn btn-toggle" data-target="#sol-e1">Mostra la soluzione</button>
+        <div id="sol-e1" class="hidden">
+          <p><span class="step-num">1</span>All'inizio: tutta potenziale, $U_i = mgh$, e $K_i = 0$.
+            Alla fine: tutta cinetica, $K_f = \frac12 mv^2$, e $U_f = 0$.</p>
+          <p><span class="step-num">2</span>$mgh = \frac12 mv^2$, e la massa <strong>si semplifica</strong>:
+            $$v = \sqrt{2gh} = \sqrt{2 \cdot 9{,}81 \cdot 20} = \sqrt{392{,}4} = 19{,}8\ \text{m/s}$$</p>
+          <p><span class="step-num">3</span>Stesso risultato della lezione 1, dove ci erano serviti due passaggi
+            di cinematica e il tempo di caduta. Qui il tempo non compare affatto: è il vantaggio del metodo
+            energetico, e anche il suo limite — se la domanda fosse stata «quanto tempo ci mette», l'energia non
+            avrebbe saputo rispondere.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">② Una molla di costante $k = 800$ N/m viene compressa di $12$ cm e lancia in verticale
+          una pallina da $50$ g. A che altezza arriva?</div>
+        <button class="btn btn-toggle" data-target="#sol-e2">Mostra la soluzione</button>
+        <div id="sol-e2" class="hidden">
+          <p><span class="step-num">1</span>Prima le unità: $x = 0{,}12$ m e $m = 0{,}050$ kg.</p>
+          <p><span class="step-num">2</span>Energia elastica iniziale:
+            $U_{\text{el}} = \frac12 k x^2 = \frac12 \cdot 800 \cdot 0{,}0144 = 5{,}76$ J.</p>
+          <p><span class="step-num">3</span>Tutta quell'energia diventa potenziale gravitazionale:
+            $mgh = 5{,}76$, da cui
+            $$h = \frac{5{,}76}{0{,}050 \cdot 9{,}81} = 11{,}7\ \text{m}$$</p>
+          <p><span class="step-num">4</span><strong>Qui la massa non si semplifica</strong>, perché compare solo
+            da un lato: una pallina più leggera arriva più in alto. È la differenza fra questo problema e il
+            precedente, e vale la pena notarla.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">③ Da che altezza minima deve partire un carrello per completare un «giro della morte»
+          di raggio $R = 5{,}0$ m? (Pista liscia.)</div>
+        <button class="btn btn-toggle" data-target="#sol-e3">Mostra la soluzione</button>
+        <div id="sol-e3" class="hidden">
+          <p><span class="step-num">1</span><strong>Prima la dinamica, poi l'energia.</strong> In cima al giro
+            serve almeno $v_{\text{alto}} = \sqrt{gR}$ (lezione 1, esercizio del giro della morte):
+            $v_{\text{alto}} = \sqrt{9{,}81 \cdot 5{,}0} = 7{,}00$ m/s.</p>
+          <p><span class="step-num">2</span>Adesso la conservazione, fra la partenza (ferma, quota $h$) e il
+            punto più alto del giro (quota $2R$, velocità $v_{\text{alto}}$):
+            $$mgh = mg(2R) + \tfrac12 m v_{\text{alto}}^2$$</p>
+          <p><span class="step-num">3</span>La massa si semplifica; sostituendo $v_{\text{alto}}^2 = gR$:
+            $$gh = 2gR + \tfrac12 gR \;\Longrightarrow\; h = \tfrac{5}{2}R = 2{,}5 \cdot 5{,}0 = 12{,}5\ \text{m}$$</p>
+          <p><span class="step-num">4</span><strong>Il risultato è notevole</strong>: la quota minima è sempre
+            $2{,}5$ volte il raggio, qualunque sia la massa e qualunque sia il raggio. Non basta partire
+            dall'altezza del giro ($2R$): serve quel mezzo raggio in più per avere, in cima, la velocità che
+            tiene il carrello attaccato alla guida.</p>
+          <p><span class="step-num">5</span>Nelle montagne russe vere si parte molto più in alto, sia per
+            l'attrito sia perché passare esattamente al limite significherebbe reazione nulla — e i passeggeri
+            sentirebbero il vuoto sotto di sé, che è spaventoso ma soprattutto pericoloso.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">④ Una cassa di $20$ kg parte da ferma in cima a uno scivolo alto $3{,}0$ m e lungo
+          $5{,}0$ m. Arriva in fondo a $6{,}0$ m/s. Quanta energia ha dissipato l'attrito, e quanto vale
+          $\mu_d$?</div>
+        <button class="btn btn-toggle" data-target="#sol-e4">Mostra la soluzione</button>
+        <div id="sol-e4" class="hidden">
+          <p><span class="step-num">1</span>Energia disponibile all'inizio:
+            $U_i = mgh = 20 \cdot 9{,}81 \cdot 3{,}0 = 588{,}6$ J.</p>
+          <p><span class="step-num">2</span>Energia cinetica all'arrivo:
+            $K_f = \frac12 \cdot 20 \cdot 36 = 360$ J.</p>
+          <p><span class="step-num">3</span>La differenza è quella dissipata:
+            $|W_{\text{attr}}| = 588{,}6 - 360 = 228{,}6$ J. <em>Se fosse stato liscio</em>, la cassa sarebbe
+            arrivata a $\sqrt{2gh} = 7{,}67$ m/s.</p>
+          <p><span class="step-num">4</span>Per trovare $\mu_d$ serve la geometria: $\sin\theta = 3{,}0/5{,}0 =
+            0{,}600$, quindi $\theta = 36{,}9°$ e $\cos\theta = 0{,}800$. La forza d'attrito vale
+            $\mu_d\,mg\cos\theta$ e agisce lungo tutti i $5{,}0$ m:
+            $$\mu_d = \frac{228{,}6}{mg\cos\theta \cdot \ell} = \frac{228{,}6}{20 \cdot 9{,}81 \cdot 0{,}800 \cdot 5{,}0} = 0{,}291$$</p>
+          <p><span class="step-num">5</span>Notate il metodo: l'energia dà subito il <em>quanto</em>, e solo per
+            risalire al coefficiente serve tornare alle forze. Nei problemi con attrito i due linguaggi si usano
+            insieme.</p>
+        </div>
+      </div>
+
+      <div class="qbox">
+        <div class="qt">⑤ <strong>Il pendolo balistico.</strong> Un proiettile di $10$ g si conficca in un blocco
+          di legno da $2{,}0$ kg appeso a un filo. Il blocco, col proiettile dentro, si solleva di $8{,}0$ cm.
+          Con che velocità viaggiava il proiettile?</div>
+        <button class="btn btn-toggle" data-target="#sol-e5">Mostra la soluzione</button>
+        <div id="sol-e5" class="hidden">
+          <p><span class="step-num">1</span><strong>Attenzione: l'energia da sola non basta.</strong> L'urto è
+            completamente anelastico — il proiettile resta dentro — e in un urto anelastico l'energia cinetica
+            <em>non si conserva</em>: gran parte va in deformazione e calore. Bisogna spezzare il problema in
+            due fasi con leggi diverse.</p>
+          <p><span class="step-num">2</span><strong>Fase 1, l'urto.</strong> Qui si conserva la
+            <strong>quantità di moto</strong> (che studieremo per esteso nella prossima lezione), perché l'urto
+            è istantaneo e le forze esterne non fanno in tempo ad agire:
+            $$m v = (m + M) V \;\Longrightarrow\; V = \frac{m}{m+M}\,v$$</p>
+          <p><span class="step-num">3</span><strong>Fase 2, la salita.</strong> Adesso agisce solo la gravità,
+            che è conservativa, e l'energia meccanica si conserva:
+            $$\tfrac12 (m+M) V^2 = (m+M)\,g\,h \;\Longrightarrow\; V = \sqrt{2gh}$$</p>
+          <p><span class="step-num">4</span>Numeri: $V = \sqrt{2 \cdot 9{,}81 \cdot 0{,}080} = 1{,}25$ m/s, e
+            quindi
+            $$v = \frac{m+M}{m}\,V = \frac{2{,}010}{0{,}010} \cdot 1{,}2528 = 252\ \text{m/s}$$</p>
+          <p><span class="step-num">5</span><strong>Quanto si è «perso» nell'urto?</strong> Prima:
+            $\frac12 \cdot 0{,}010 \cdot 252^2 = 318$ J. Dopo: $\frac12 \cdot 2{,}010 \cdot 1{,}253^2 = 1{,}58$ J.
+            È rimasto lo <strong>$0{,}5\%$</strong>: tutto il resto è andato in deformazione del legno e calore.
+            Ed è proprio questo che rende lo strumento utile — se l'urto fosse elastico il blocco rimbalzerebbe e
+            il conto non funzionerebbe.</p>
+        </div>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="pb-m">massa del proiettile: <span class="val-badge" id="pb-mv">10</span> g</label>
+          <input type="range" id="pb-m" min="2" max="50" step="1" value="10">
+          <label for="pb-M">massa del blocco: <span class="val-badge" id="pb-Mv">2,0</span> kg</label>
+          <input type="range" id="pb-M" min="0.5" max="6" step="0.1" value="2">
+          <label for="pb-v">velocità del proiettile: <span class="val-badge" id="pb-vv">252</span> m/s</label>
+          <input type="range" id="pb-v" min="50" max="500" step="1" value="252">
+          <button class="btn" id="pb-spara" type="button">💥 Spara</button>
+        </div>
+        <svg id="pb-svg" viewBox="0 0 660 300" aria-label="Pendolo balistico: il proiettile si conficca nel blocco che si solleva"></svg>
+        <div class="sp-cols">
+          <div>Velocità dopo l'urto: <span class="val-badge" id="pb-V">—</span></div>
+          <div>Salita del blocco: <span class="val-badge" id="pb-h">—</span></div>
+          <div>Energia prima · dopo: <span class="val-badge" id="pb-en">—</span></div>
+          <div>Energia rimasta: <span class="val-badge" id="pb-perc">—</span></div>
+        </div>
+        <p class="eq-out" id="pb-out"></p>
+      </div>
+
+      <div class="curiosita"><strong>Uno strumento vero.</strong> Il pendolo balistico fu inventato da
+        <strong>Benjamin Robins</strong> nel 1742 ed è stato per due secoli l'unico modo di misurare la velocità
+        di un proiettile: nessun cronometro era abbastanza rapido, ma un righello per misurare l'altezza della
+        salita ce l'avevano tutti. È un esempio perfetto del mestiere dello sperimentale: non potendo misurare
+        la grandezza che interessa, si misura qualcosa di lento e maneggevole e si risale all'altra con la
+        fisica.</div>
+    </section>
+
+    <!-- 9 — FACOLTATIVA: LA MECCANICA LAGRANGIANA -->
+    <section id="sec9" class="optional">
+      <h2>9. Un'altra strada: la meccanica lagrangiana</h2>
+
+      <p>Tutta la meccanica che abbiamo fatto finora parte dalle <strong>forze</strong>: si disegnano i vettori,
+        si sommano, si scrive $\vec F = m\vec a$. Funziona sempre, ma diventa scomodo appena il sistema ha
+        vincoli — una pallina obbligata a stare su una guida, un pendolo appeso a un filo — perché bisogna
+        tenere conto anche delle forze che i vincoli esercitano, e quelle non le conosciamo in anticipo.</p>
+
+      <p>A metà Settecento <strong>Joseph-Louis Lagrange</strong> — torinese, nato Giuseppe Luigi Lagrangia —
+        trovò una strada completamente diversa, che parte dalle <em>energie</em> invece che dalle forze. Nella
+        prefazione della sua <em>Mécanique analytique</em> (1788) si vantò di una cosa che nessun altro libro di
+        meccanica poteva dire: <em>«In quest'opera non si troverà alcuna figura.»</em></p>
+
+      <div class="via">
+        <div class="via-newton">
+          <h4>La via di Newton</h4>
+          <p>Si elencano <strong>tutte</strong> le forze, comprese quelle vincolari.</p>
+          <p>Sono <strong>vettori</strong>: servono un'equazione per ogni direzione dello spazio.</p>
+          <p>Le coordinate devono essere cartesiane, o si complica tutto.</p>
+        </div>
+        <div class="via-lagrange">
+          <h4>La via di Lagrange</h4>
+          <p>Servono solo due <strong>scalari</strong>: energia cinetica e potenziale. Le forze vincolari
+            <strong>spariscono da sole</strong>.</p>
+          <p>Un'equazione per ogni <strong>grado di libertà</strong>, non per ogni direzione: il pendolo ne ha
+            uno solo.</p>
+          <p>Si possono usare le coordinate che si vogliono: angoli, distanze lungo una curva, qualunque cosa.</p>
+        </div>
+      </div>
+
+      <h3>9.1 — La lagrangiana e il principio di minima azione</h3>
+
+      <div class="lagbox">
+        <h4>La funzione</h4>
+        <p>Si definisce la <strong>lagrangiana</strong> come differenza — non somma! — fra energia cinetica e
+          potenziale:</p>
+        $$\mathcal{L} = T - V$$
+        <p>Poi si calcola l'<strong>azione</strong>, cioè l'integrale della lagrangiana lungo tutta la storia
+          del moto fra due istanti:</p>
+        $$S = \int_{t_1}^{t_2} \mathcal{L}\,\mathrm{d}t$$
+      </div>
+
+      <div class="lagbox">
+        <h4>Il principio</h4>
+        <p>Fra <em>tutti</em> i cammini immaginabili che portano il sistema dalla configurazione iniziale a
+          quella finale nel tempo dato, la natura sceglie quello per cui l'azione è <strong>stazionaria</strong>
+          — di solito minima. È il <strong>principio di minima azione</strong>, e la sua formulazione ha una
+          qualità quasi inquietante: sembra che il sistema «sappia in anticipo» dove deve arrivare e scelga la
+          strada migliore.</p>
+        <p>Non è così, naturalmente: si dimostra che il principio è <em>matematicamente equivalente</em> a
+          $\vec F = m\vec a$. Ma è un'equivalenza che cambia il modo di pensare, ed è quella che sopravviverà
+          alla relatività e alla meccanica quantistica, dove le forze non ci sono più.</p>
+      </div>
+
+      <div class="lagbox">
+        <h4>L'equazione</h4>
+        <p>Imporre che l'azione sia stazionaria porta, per ogni coordinata $q$, all'equazione di
+          <strong>Eulero-Lagrange</strong>:</p>
+        $$\frac{\mathrm{d}}{\mathrm{d}t}\left(\frac{\partial \mathcal{L}}{\partial \dot q}\right)
+          - \frac{\partial \mathcal{L}}{\partial q} = 0$$
+        <p>dove $\dot q$ indica la derivata di $q$ rispetto al tempo. Una equazione per ogni grado di libertà, e
+          nient'altro.</p>
+      </div>
+
+      <div class="note"><strong>Provate su un caso che conoscete.</strong> Per un corpo libero in una
+        dimensione, $T = \frac12 m\dot x^2$ e $V = V(x)$, quindi $\mathcal{L} = \frac12 m\dot x^2 - V(x)$.
+        Allora $\dfrac{\partial \mathcal{L}}{\partial \dot x} = m\dot x$, la cui derivata temporale è $m\ddot x
+        = ma$; e $\dfrac{\partial \mathcal{L}}{\partial x} = -\dfrac{\mathrm{d}V}{\mathrm{d}x} = F$.
+        L'equazione di Eulero-Lagrange diventa $ma - F = 0$: è <strong>esattamente</strong> il secondo principio.
+        Non c'è nessuna fisica nuova — c'è un'altra grammatica.</div>
+
+      <h3>9.2 — Il pendolo, dall'inizio alla fine</h3>
+
+      <p>Vediamola all'opera sul caso in cui la via di Newton è più scomoda: il pendolo. Con le forze bisogna
+        scomporre il peso, tenere conto della tensione del filo (incognita!), e proiettare sulla tangente. Con
+        Lagrange bastano cinque righe, e la tensione non compare mai.</p>
+
+      <div class="passo-lag">
+        <p><strong>Passo 1 — scegliere la coordinata.</strong> Il pendolo ha <em>un solo</em> grado di libertà:
+          l'angolo $\theta$ con la verticale. Posizione della massa: $x = \ell\sin\theta$,
+          $y = -\ell\cos\theta$.</p>
+      </div>
+      <div class="passo-lag">
+        <p><strong>Passo 2 — l'energia cinetica.</strong> La massa si muove lungo un arco di raggio $\ell$, con
+          velocità $v = \ell\,\dot\theta$, quindi
+          $$T = \tfrac12 m\,\ell^2\,\dot\theta^2$$</p>
+      </div>
+      <div class="passo-lag">
+        <p><strong>Passo 3 — l'energia potenziale.</strong> Misurando le quote dal punto di sospensione,
+          $$V = -\,m\,g\,\ell\cos\theta$$</p>
+      </div>
+      <div class="passo-lag">
+        <p><strong>Passo 4 — la lagrangiana.</strong>
+          $$\mathcal{L} = T - V = \tfrac12 m\ell^2\dot\theta^2 + m g \ell\cos\theta$$</p>
+      </div>
+      <div class="passo-lag">
+        <p><strong>Passo 5 — le due derivate.</strong>
+          $$\frac{\partial \mathcal{L}}{\partial \dot\theta} = m\ell^2\dot\theta
+            \;\;\Longrightarrow\;\; \frac{\mathrm{d}}{\mathrm{d}t}\!\left(\cdot\right) = m\ell^2\ddot\theta,
+            \qquad
+            \frac{\partial \mathcal{L}}{\partial \theta} = -\,m g \ell\sin\theta$$</p>
+      </div>
+      <div class="passo-lag">
+        <p><strong>Passo 6 — l'equazione del moto.</strong> Sostituendo in Eulero-Lagrange:
+          $$m\ell^2\ddot\theta + m g \ell\sin\theta = 0 \;\Longrightarrow\;
+            \boxed{\;\ddot\theta = -\frac{g}{\ell}\,\sin\theta\;}$$
+          La massa si semplifica — di nuovo — e la tensione del filo non è mai comparsa.</p>
+      </div>
+
+      <div class="lagbox">
+        <h4>E il periodo?</h4>
+        <p>Quell'equazione, con il $\sin\theta$, non si risolve con le funzioni elementari. Per
+          <strong>piccole oscillazioni</strong> però $\sin\theta \approx \theta$ e diventa
+          $$\ddot\theta = -\frac{g}{\ell}\,\theta$$
+          che è l'equazione dell'oscillatore armonico: la soluzione è una sinusoide di pulsazione
+          $\omega = \sqrt{g/\ell}$, cioè
+          $$T = \frac{2\pi}{\omega} = 2\pi\sqrt{\frac{\ell}{g}}$$
+          Ed è la formula che avete usato per tutta la lezione 3 — ricavata, stavolta, senza mai disegnare una
+          forza.</p>
+      </div>
+
+      <p>Il simulatore qui sotto risolve numericamente l'equazione <em>esatta</em> e, accanto, quella
+        approssimata. A piccole ampiezze le due curve si sovrappongono; alzando l'ampiezza si separano, e
+        ricompare esattamente la correzione che avete incontrato nella lezione 3.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="lg-t">ampiezza iniziale: <span class="val-badge" id="lg-tv">20</span>°</label>
+          <input type="range" id="lg-t" min="2" max="150" step="1" value="20">
+          <label for="lg-l">lunghezza: <span class="val-badge" id="lg-lv">1,00</span> m</label>
+          <input type="range" id="lg-l" min="0.2" max="2" step="0.05" value="1">
+          <label class="toggle-row"><input type="checkbox" id="lg-lock" checked> 🔒 blocca la scala</label>
+        </div>
+        <svg id="lg-svg" viewBox="0 0 660 320" aria-label="Confronto fra il pendolo esatto e quello armonico"></svg>
+        <div class="sp-cols">
+          <div>Periodo armonico: <span class="val-badge" id="lg-t0">—</span></div>
+          <div>Periodo vero: <span class="val-badge" id="lg-tex">—</span></div>
+          <div>Scarto: <span class="val-badge" id="lg-scarto">—</span></div>
+          <div>Previsto dallo sviluppo: <span class="val-badge" id="lg-serie">—</span></div>
+        </div>
+        <p class="eq-out" id="lg-out"></p>
+      </div>
+
+      <div class="curiosita"><strong>Perché questa strada ha vinto.</strong> La formulazione lagrangiana non è
+        una curiosità per matematici: è il linguaggio in cui è scritta la fisica moderna.
+        <ul>
+          <li>Si estende senza modifiche ai <strong>campi</strong>: elettromagnetismo, relatività generale e
+            tutto il Modello Standard delle particelle si scrivono dando una lagrangiana e girando la manovella.
+            Quando un fisico dice «la lagrangiana del Modello Standard» intende una formula che sta su una
+            maglietta.</li>
+          <li>Rende trasparente il legame fra <strong>simmetrie e leggi di conservazione</strong>: se la
+            lagrangiana non cambia traslando nel tempo, si conserva l'energia; se non cambia traslando nello
+            spazio, la quantità di moto; se non cambia ruotando, il momento angolare. È il <strong>teorema di
+            Noether</strong>, e lo incontrerete nella prossima lezione.</li>
+          <li>In meccanica quantistica, Feynman ha riformulato tutto proprio a partire dall'azione: una
+            particella non sceglie il cammino di azione minima, li percorre <em>tutti</em>, e quelli lontani
+            dal minimo si cancellano a vicenda. Il principio di minima azione diventa così un risultato, non
+            un postulato.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 10 — QUIZ -->
+    <section id="quiz">
+      <h2>10. Quiz finale</h2>
+      <p>Dodici domande a risposta multipla e due aperte, sulle idee di tutta la lezione.</p>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Lezione 4 — L'energia · Fisica · Quarto anno</p>
+    <p style="margin-top:0.4rem; opacity:0.7;">Realizzata con KaTeX.</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/quiz.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var G = 9.81;
+      var CV = 735.5;            // watt in un cavallo vapore
+      var RESA = 0.20;           // rendimento del muscolo
+
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      function frec(x1, y1, x2, y2, col, sp) {
+        var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy);
+        if (L < 0.8) { return ''; }
+        var s = Math.min(L * 0.38, 9);
+        var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+        var bx = x2 - ux * s, by = y2 - uy * s;
+        return '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) +
+          '" stroke="' + col + '" stroke-width="' + sp + '" stroke-linecap="round"/>' +
+          '<polygon points="' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' ' +
+          (bx + px * s * 0.5).toFixed(1) + ',' + (by + py * s * 0.5).toFixed(1) + ' ' +
+          (bx - px * s * 0.5).toFixed(1) + ',' + (by - py * s * 0.5).toFixed(1) + '" fill="' + col + '"/>';
+      }
+
+      /* ==================== 1 — IL LAVORO ==================== */
+      (function () {
+        var svg = document.getElementById('lw-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var F = parseFloat(document.getElementById('lw-f').value);
+          var s = parseFloat(document.getElementById('lw-s').value);
+          var a = parseFloat(document.getElementById('lw-a').value);
+          var r = a * Math.PI / 180;
+          var Fu = F * Math.cos(r), W = Fu * s;
+          var X0 = 90, Y0 = 175, SC = 46;
+          var g = '';
+          g += '<line x1="30" y1="' + (Y0 + 22) + '" x2="630" y2="' + (Y0 + 22) + '" stroke="var(--text-soft)" stroke-width="2.5"/>';
+          // lo spostamento
+          g += frec(X0, Y0 + 8, X0 + s * SC, Y0 + 8, 'var(--green)', 3);
+          g += '<text x="' + (X0 + s * SC / 2) + '" y="' + (Y0 + 34) + '" text-anchor="middle" style="fill:var(--green); font-size:13px; font-weight:700;">s = ' + nf(s, 1) + ' m</text>';
+          // la cassa
+          g += '<rect x="' + (X0 - 26) + '" y="' + (Y0 - 26) + '" width="52" height="48" rx="4" fill="var(--accent)" opacity="0.45" stroke="var(--accent)" stroke-width="2"/>';
+          // la forza e la sua componente utile
+          var LF = F * 1.5;
+          g += frec(X0, Y0, X0 + LF * Math.cos(r), Y0 - LF * Math.sin(r), 'var(--magenta)', 3.4);
+          g += '<text x="' + (X0 + LF * Math.cos(r) + 8).toFixed(1) + '" y="' + (Y0 - LF * Math.sin(r) - 6).toFixed(1) + '" class="em">F = ' + Math.round(F) + ' N</text>';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + (X0 + LF * Math.cos(r)).toFixed(1) + '" y2="' + Y0 + '" stroke="var(--gold)" stroke-width="3"/>';
+          g += '<line x1="' + (X0 + LF * Math.cos(r)).toFixed(1) + '" y1="' + Y0 + '" x2="' + (X0 + LF * Math.cos(r)).toFixed(1) +
+            '" y2="' + (Y0 - LF * Math.sin(r)).toFixed(1) + '" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="4 4"/>';
+          g += '<text x="' + (X0 + LF * Math.cos(r) / 2).toFixed(1) + '" y="' + (Y0 - 8) + '" text-anchor="middle" style="fill:var(--gold); font-size:12px; font-weight:700;">F cos θ</text>';
+          // l'angolo
+          g += '<path d="M' + (X0 + 34) + ',' + Y0 + ' A34,34 0 0 ' + (a > 90 ? '1' : '0') + ' ' +
+            (X0 + 34 * Math.cos(r)).toFixed(1) + ',' + (Y0 - 34 * Math.sin(r)).toFixed(1) + '" fill="none" stroke="var(--muted)" stroke-width="1.8"/>';
+          g += '<text x="' + (X0 + 44) + '" y="' + (Y0 - 12) + '" class="lbl-s">θ = ' + Math.round(a) + '°</text>';
+          g += '<text x="24" y="30" class="lbl">' + (W > 0.01 ? 'lavoro positivo: la forza cede energia' :
+            (W < -0.01 ? 'lavoro negativo: la forza toglie energia' : 'lavoro nullo: forza perpendicolare allo spostamento')) + '</text>';
+          svg.innerHTML = g;
+          document.getElementById('lw-fv').textContent = Math.round(F);
+          document.getElementById('lw-sv').textContent = nf(s, 1);
+          document.getElementById('lw-av').textContent = Math.round(a);
+          document.getElementById('lw-fu').textContent = nf(Fu, 1) + ' N';
+          document.getElementById('lw-w').textContent = nf(W, 1) + ' J';
+          var el = document.getElementById('lw-out');
+          el.innerHTML = '$W = F s \\cos\\theta = ' + Math.round(F) + ' \\cdot ' + nf(s, 1).replace(',', '{,}') +
+            ' \\cdot ' + nf(Math.cos(r), 3).replace(',', '{,}') + ' = ' + nf(W, 1).replace(',', '{,}') + '$ J. ' +
+            (Math.abs(a - 90) < 0.5
+              ? 'A novanta gradi il coseno vale zero: <strong>per quanto grande sia la forza, il lavoro è nullo</strong>.'
+              : (a > 90 ? 'Oltre i novanta gradi il coseno è negativo: la forza <strong>frena</strong>, come fa sempre l\'attrito.'
+                        : 'Solo la componente <strong>parallela</strong> allo spostamento lavora; quella perpendicolare non conta nulla.'));
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['lw-f', 'lw-s', 'lw-a'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        disegna();
+      })();
+
+      /* ==================== 2 — LA POTENZA ==================== */
+      (function () {
+        var svg = document.getElementById('pw-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var m = parseFloat(document.getElementById('pw-m').value);
+          var vkm = parseFloat(document.getElementById('pw-v').value);
+          var c = parseFloat(document.getElementById('pw-c').value);
+          var lock = document.getElementById('pw-lock').checked;
+          // resistenza al rotolamento (costante) piu' resistenza dell'aria (quadratica)
+          var k = 0.30;                                  // coefficiente aerodinamico complessivo
+          var F = function (v) { return c * m * G + k * v * v; };
+          var P = function (v) { return F(v) * v; };
+          var v = vkm / 3.6;
+          var X0 = 70, X1 = 610, Y0 = 250, Y1 = 34, VM = 200 / 3.6;
+          var PM = lock ? 120000 : Math.max(P(VM) * 1.1, 1000);
+          var px = function (u) { return X0 + (X1 - X0) * u / VM; };
+          var py = function (p) { return Y0 - (Y0 - Y1) * Math.min(1, p / PM); };
+          var g = '', i;
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 4; i++) {
+            g += '<text x="' + px(VM * i / 4).toFixed(1) + '" y="' + (Y0 + 19) + '" text-anchor="middle" class="lbl-s">' + Math.round(VM * i / 4 * 3.6) + '</text>';
+            var pv = PM * i / 4;
+            g += '<line x1="' + X0 + '" y1="' + py(pv).toFixed(1) + '" x2="' + X1 + '" y2="' + py(pv).toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + (X0 - 8) + '" y="' + (py(pv) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(pv / 1000, 0) + '</text>';
+          }
+          g += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">velocità (km/h)</text>';
+          g += '<text x="' + (X0 - 6) + '" y="' + (Y1 - 8) + '" class="lbl-s">potenza (kW)</text>';
+          var pts = [];
+          for (i = 0; i <= 200; i++) {
+            var u = VM * i / 200;
+            pts.push(px(u).toFixed(1) + ',' + py(P(u)).toFixed(1));
+          }
+          g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+          g += '<circle cx="' + px(v).toFixed(1) + '" cy="' + py(P(v)).toFixed(1) + '" r="6.5" fill="var(--magenta)"/>';
+          svg.innerHTML = g;
+          document.getElementById('pw-mv').textContent = Math.round(m);
+          document.getElementById('pw-vv').textContent = Math.round(vkm);
+          document.getElementById('pw-cv').textContent = nf(c, 3);
+          document.getElementById('pw-f').textContent = nf(F(v), 0) + ' N';
+          document.getElementById('pw-p').textContent = nf(P(v) / 1000, 2) + ' kW';
+          document.getElementById('pw-cvv').textContent = nf(P(v) / CV, 1) + ' CV';
+          var el = document.getElementById('pw-out');
+          el.innerHTML = 'A $' + Math.round(vkm) + '$ km/h la resistenza vale ' + nf(F(v), 0) + ' N, quindi ' +
+            '$P = Fv = ' + nf(P(v) / 1000, 2).replace(',', '{,}') + '$ kW, cioè ' + nf(P(v) / CV, 1) + ' cavalli. ' +
+            'La curva <strong>non</strong> è una retta: a bassa velocità domina il rotolamento e la potenza cresce ' +
+            'quasi in proporzione, ad alta velocità domina l\'aria e la potenza cresce come il <strong>cubo</strong> ' +
+            'della velocità. Ecco perché raddoppiare la velocità massima di un\'auto richiede otto volte il motore.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['pw-m', 'pw-v', 'pw-c'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('pw-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ==================== 5 — ENERGIA CINETICA E FRENATA ==================== */
+      (function () {
+        var svg = document.getElementById('ek-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var m = parseFloat(document.getElementById('ek-m').value);
+          var mu = parseFloat(document.getElementById('ek-mu').value);
+          var vkm = parseFloat(document.getElementById('ek-v').value);
+          var lock = document.getElementById('ek-lock').checked;
+          var v = vkm / 3.6;
+          var K = function (u) { return 0.5 * m * u * u; };
+          var D = function (u) { return u * u / (2 * mu * G); };
+          var VM = 150 / 3.6;
+          var X0 = 74, X1 = 610, Y0 = 250, Y1 = 34;
+          var KM = lock ? 0.5 * 2000 * VM * VM : Math.max(K(VM) * 1.1, 1000);
+          var px = function (u) { return X0 + (X1 - X0) * u / VM; };
+          var py = function (e) { return Y0 - (Y0 - Y1) * Math.min(1, e / KM); };
+          var g = '', i;
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X1 + '" y2="' + Y0 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<line x1="' + X0 + '" y1="' + Y0 + '" x2="' + X0 + '" y2="' + Y1 + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          for (i = 0; i <= 5; i++) {
+            g += '<text x="' + px(VM * i / 5).toFixed(1) + '" y="' + (Y0 + 19) + '" text-anchor="middle" class="lbl-s">' + Math.round(VM * i / 5 * 3.6) + '</text>';
+          }
+          for (i = 0; i <= 4; i++) {
+            var ev = KM * i / 4;
+            g += '<line x1="' + X0 + '" y1="' + py(ev).toFixed(1) + '" x2="' + X1 + '" y2="' + py(ev).toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + (X0 - 8) + '" y="' + (py(ev) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + nf(ev / 1000, 0) + '</text>';
+          }
+          g += '<text x="' + X1 + '" y="' + (Y0 + 36) + '" text-anchor="end" class="lbl-s">velocità (km/h)</text>';
+          g += '<text x="' + (X0 - 6) + '" y="' + (Y1 - 8) + '" class="lbl-s">energia cinetica (kJ)</text>';
+          var pts = [];
+          for (i = 0; i <= 200; i++) { var u = VM * i / 200; pts.push(px(u).toFixed(1) + ',' + py(K(u)).toFixed(1)); }
+          g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+          // i due punti: v e 2v
+          g += '<circle cx="' + px(v).toFixed(1) + '" cy="' + py(K(v)).toFixed(1) + '" r="6.5" fill="var(--magenta)"/>';
+          if (2 * v <= VM) {
+            g += '<circle cx="' + px(2 * v).toFixed(1) + '" cy="' + py(K(2 * v)).toFixed(1) + '" r="6.5" fill="var(--gold)"/>';
+            g += '<line x1="' + px(v).toFixed(1) + '" y1="' + py(K(v)).toFixed(1) + '" x2="' + px(2 * v).toFixed(1) +
+              '" y2="' + py(K(v)).toFixed(1) + '" stroke="var(--gold)" stroke-width="1.4" stroke-dasharray="4 4"/>';
+            g += '<line x1="' + px(2 * v).toFixed(1) + '" y1="' + py(K(v)).toFixed(1) + '" x2="' + px(2 * v).toFixed(1) +
+              '" y2="' + py(K(2 * v)).toFixed(1) + '" stroke="var(--gold)" stroke-width="1.4" stroke-dasharray="4 4"/>';
+            g += '<text x="' + (px(2 * v) + 8).toFixed(1) + '" y="' + ((py(K(v)) + py(K(2 * v))) / 2).toFixed(1) + '" style="fill:var(--gold); font-size:12px; font-weight:700;">×4</text>';
+          }
+          // la barra dello spazio di frenata
+          g += '<text x="' + X0 + '" y="285" class="lbl-s">spazio di frenata a ' + Math.round(vkm) + ' km/h: ' + nf(D(v), 1) + ' m</text>';
+          g += '<rect x="' + X0 + '" y="292" width="' + Math.min(X1 - X0, D(v) * 3.2).toFixed(1) + '" height="8" rx="4" fill="var(--magenta)" opacity="0.7"/>';
+          svg.innerHTML = g;
+          document.getElementById('ek-mv').textContent = Math.round(m);
+          document.getElementById('ek-muv').textContent = nf(mu, 2);
+          document.getElementById('ek-vv').textContent = Math.round(vkm);
+          document.getElementById('ek-k').textContent = nf(K(v) / 1000, 1) + ' kJ';
+          document.getElementById('ek-d').textContent = nf(D(v), 1) + ' m';
+          document.getElementById('ek-d2').textContent = nf(D(2 * v), 1) + ' m';
+          var el = document.getElementById('ek-out');
+          el.innerHTML = 'A $' + Math.round(vkm) + '$ km/h servono <strong>' + nf(D(v), 1) + ' m</strong> per fermarsi, ' +
+            'a $' + Math.round(2 * vkm) + '$ km/h ne servono <strong>' + nf(D(2 * v), 1) + '</strong>: esattamente ' +
+            '<strong>quattro volte tanti</strong>. La massa non compare in $d = v^2/(2\\mu g)$ — un camion e ' +
+            'un\'utilitaria con gli stessi pneumatici si fermano nello stesso spazio — ma compare eccome ' +
+            'nell\'energia da smaltire, ed è per questo che i freni di un camion sono un\'altra cosa.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        ['ek-m', 'ek-mu', 'ek-v'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        document.getElementById('ek-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ==================== 5.1 — IL MUSCOLO ==================== */
+      (function () {
+        var svg = document.getElementById('ms-svg');
+        if (!svg) { return; }
+        function disegna() {
+          var m = parseFloat(document.getElementById('ms-m').value);
+          var h = parseFloat(document.getElementById('ms-h').value);
+          var t = parseFloat(document.getElementById('ms-t').value);
+          var W = m * G * h, P = W / t, E = W / RESA;
+          var kcal = E / 4184.0;
+          var X0 = 70, LARG = 520, Y = 60, ALT = 40;
+          var g = '';
+          // la barra dell'energia spesa, divisa fra lavoro e calore
+          g += '<text x="' + X0 + '" y="' + (Y - 12) + '" class="lbl">dove va l\'energia che il corpo consuma</text>';
+          g += '<rect x="' + X0 + '" y="' + Y + '" width="' + (LARG * RESA).toFixed(1) + '" height="' + ALT +
+            '" fill="var(--accent)" opacity="0.65" stroke="var(--accent)" stroke-width="2"/>';
+          g += '<rect x="' + (X0 + LARG * RESA).toFixed(1) + '" y="' + Y + '" width="' + (LARG * (1 - RESA)).toFixed(1) +
+            '" height="' + ALT + '" fill="var(--red)" opacity="0.35" stroke="var(--red)" stroke-width="2"/>';
+          g += '<text x="' + (X0 + LARG * RESA / 2).toFixed(1) + '" y="' + (Y + 26) + '" text-anchor="middle" class="lbl">' + Math.round(RESA * 100) + '%</text>';
+          g += '<text x="' + (X0 + LARG * (1 + RESA) / 2).toFixed(1) + '" y="' + (Y + 26) + '" text-anchor="middle" class="lbl">' + Math.round((1 - RESA) * 100) + '% in calore</text>';
+          g += '<text x="' + (X0 + LARG * RESA / 2).toFixed(1) + '" y="' + (Y + ALT + 18) + '" text-anchor="middle" class="lbl-s">lavoro utile</text>';
+          // il confronto delle potenze
+          var RIF = [['una persona, a lungo', 75], ['un ciclista da corsa', 400], ['un cavallo', 735.5], ['questo sollevamento', P]];
+          var PMAX = Math.max(2500, P * 1.15);
+          for (var i = 0; i < RIF.length; i++) {
+            var y = 160 + i * 30;
+            var w = LARG * RIF[i][1] / PMAX;
+            var ultimo = (i === RIF.length - 1);
+            g += '<rect x="' + X0 + '" y="' + y + '" width="' + Math.max(1, w).toFixed(1) + '" height="18" rx="4" fill="' +
+              (ultimo ? 'var(--magenta)' : 'var(--muted)') + '" opacity="' + (ultimo ? '0.85' : '0.45') + '"/>';
+            g += '<text x="' + (X0 + Math.max(w, 1) + 8).toFixed(1) + '" y="' + (y + 14) + '" class="lbl-s">' +
+              RIF[i][0] + ' — ' + nf(RIF[i][1], 0) + ' W</text>';
+          }
+          svg.innerHTML = g;
+          document.getElementById('ms-mv').textContent = Math.round(m);
+          document.getElementById('ms-hv').textContent = nf(h, 1);
+          document.getElementById('ms-tv').textContent = nf(t, 1);
+          document.getElementById('ms-w').textContent = nf(W, 0) + ' J';
+          document.getElementById('ms-p').textContent = nf(P, 0) + ' W (' + nf(P / CV, 1) + ' CV)';
+          document.getElementById('ms-e').textContent = nf(E, 0) + ' J';
+          document.getElementById('ms-cib').textContent = nf(kcal, 1) + ' kcal';
+          var el = document.getElementById('ms-out');
+          el.innerHTML = 'Il lavoro meccanico è appena <strong>' + nf(W / 1000, 1) + ' kJ</strong>, ma va erogato in ' +
+            nf(t, 1) + ' secondi: la potenza sale a <strong>' + nf(P, 0) + ' W</strong>, cioè ' + nf(P / CV, 1) +
+            ' cavalli. Col rendimento del ' + Math.round(RESA * 100) + '% il corpo ne consuma ' + nf(E / 1000, 1) +
+            ' kJ, pari a <strong>' + nf(kcal, 1) + ' kcal</strong>: un cornetto ne ha trecento. ' +
+            'La fatica sta nella <em>potenza</em>, non nell\'energia.';
+        }
+        ['ms-m', 'ms-h', 'ms-t'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
+        disegna();
+      })();
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var G = 9.81;
+      var STOP = [];
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { STOP.forEach(function (f) { f(); }); }
+      });
+      window.addEventListener('pagehide', function () { STOP.forEach(function (f) { f(); }); });
+
+      function nf(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+      /* ==================== 8 — LA PISTA E LE BARRE DI ENERGIA ==================== */
+      (function () {
+        var svg = document.getElementById('cv-svg');
+        if (!svg) { return; }
+
+        var MASSA = 1.0;          // kg
+        var HB = 1.2;             // quota del dosso, in metri
+        var XFIN = 20;            // lunghezza della pista, in metri
+        var H0 = 4, MU = 0;
+        var st = null, raf = null;
+
+        // profilo della pista: discesa liscia, dosso, tratto piano
+        function quota(x) {
+          if (x < 0) { return H0; }
+          if (x <= 6) { return H0 * (1 - Math.sin(Math.PI * x / 12)); }
+          if (x <= 12) { return HB / 2 * (1 - Math.cos(Math.PI * (x - 6) / 3)); }
+          return 0;
+        }
+        function pend(x) {
+          if (x < 0 || x >= 12) { return 0; }
+          if (x <= 6) { return -H0 * Math.PI / 12 * Math.cos(Math.PI * x / 12); }
+          return HB * Math.PI / 6 * Math.sin(Math.PI * (x - 6) / 3);
+        }
+        // derivate dello stato: x avanza con la componente orizzontale, v e' la velocita' lungo la pista
+        function der(x, v) {
+          var p = pend(x), c = 1 / Math.sqrt(1 + p * p), s = p * c;
+          var sg = (v > 0) ? 1 : ((v < 0) ? -1 : 0);
+          return [v * c, -G * s - MU * G * c * sg];
+        }
+        function passo(dt) {
+          var x = st.x, v = st.v;
+          var a1 = der(x, v);
+          var a2 = der(x + a1[0] * dt / 2, v + a1[1] * dt / 2);
+          var a3 = der(x + a2[0] * dt / 2, v + a2[1] * dt / 2);
+          var a4 = der(x + a3[0] * dt, v + a3[1] * dt);
+          var nx = x + dt / 6 * (a1[0] + 2 * a2[0] + 2 * a3[0] + a4[0]);
+          var nv = v + dt / 6 * (a1[1] + 2 * a2[1] + 2 * a3[1] + a4[1]);
+          st.diss += MU * G * MASSA * Math.abs(nx - x);
+          st.x = nx; st.v = nv; st.t += dt;
+          // condizione di arresto: fermo su un tratto poco inclinato
+          if (Math.abs(st.v) < 0.02 && Math.abs(pend(st.x)) <= MU) { st.fermo = true; }
+          if (st.x >= XFIN) { st.x = XFIN; st.fermo = true; }
+          if (st.x < 0) { st.x = 0; st.v = 0; }
+        }
+
+        function reset() {
+          if (raf) { cancelAnimationFrame(raf); raf = null; }
+          H0 = parseFloat(document.getElementById('cv-h').value);
+          MU = parseFloat(document.getElementById('cv-mu').value);
+          st = { x: 0, v: 0, t: 0, diss: 0, fermo: false, vmax: 0, part: false };
+          disegna();
+        }
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+        STOP.push(ferma);
+
+        function tick() {
+          var i;
+          for (i = 0; i < 8 && !st.fermo; i++) { passo(0.002); }
+          if (Math.abs(st.v) > st.vmax) { st.vmax = Math.abs(st.v); }
+          disegna();
+          if (!st.fermo) { raf = requestAnimationFrame(tick); } else { raf = null; }
+        }
+
+        var X0 = 34, PXM = 20.2, YS = 252;
+        function sx(x) { return X0 + x * PXM; }
+        function sy(y) { return YS - y * 30; }
+
+        function disegna() {
+          var g = '', i, x, U, K, E0, pts = [];
+          U = MASSA * G * quota(st.x);
+          K = 0.5 * MASSA * st.v * st.v;
+          E0 = MASSA * G * H0;
+          for (i = 0; i <= 240; i++) { x = XFIN * i / 240; pts.push(sx(x).toFixed(1) + ',' + sy(quota(x)).toFixed(1)); }
+          g += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--text-soft)" stroke-width="3.5" stroke-linejoin="round"/>';
+          // riferimenti: quota di partenza e cima del dosso
+          g += '<line x1="' + sx(0) + '" y1="' + sy(H0).toFixed(1) + '" x2="' + sx(XFIN) + '" y2="' + sy(H0).toFixed(1) +
+            '" stroke="var(--gold)" stroke-width="1.2" stroke-dasharray="5 5"/>';
+          g += '<text x="' + (sx(XFIN) - 4) + '" y="' + (sy(H0) - 6).toFixed(1) + '" text-anchor="end" class="lbl-s">quota di partenza</text>';
+          g += '<text x="' + sx(9) + '" y="' + (sy(HB) - 8).toFixed(1) + '" text-anchor="middle" class="lbl-s">dosso ' + nf(HB, 1) + ' m</text>';
+          // la pallina
+          g += '<circle cx="' + sx(st.x).toFixed(1) + '" cy="' + (sy(quota(st.x)) - 7).toFixed(1) + '" r="7" fill="var(--magenta)"/>';
+          // le barre di energia
+          var BX = 470, BW = 62, BY = 62, BH = 186;
+          var tot = Math.max(E0, 1e-6);
+          var hU = BH * U / tot, hK = BH * K / tot, hD = BH * st.diss / tot;
+          g += '<text x="' + (BX + BW / 2) + '" y="' + (BY - 26) + '" text-anchor="middle" class="lbl">il bilancio</text>';
+          g += '<text x="' + (BX + BW / 2) + '" y="' + (BY - 10) + '" text-anchor="middle" class="lbl-s">totale ' + nf(E0, 1) + ' J</text>';
+          g += '<rect x="' + BX + '" y="' + BY + '" width="' + BW + '" height="' + BH + '" fill="none" stroke="var(--border)" stroke-width="1.5"/>';
+          var yb = BY + BH;
+          g += '<rect x="' + BX + '" y="' + (yb - hU).toFixed(1) + '" width="' + BW + '" height="' + hU.toFixed(1) + '" fill="var(--accent)" opacity="0.75"/>';
+          yb -= hU;
+          g += '<rect x="' + BX + '" y="' + (yb - hK).toFixed(1) + '" width="' + BW + '" height="' + hK.toFixed(1) + '" fill="var(--magenta)" opacity="0.75"/>';
+          yb -= hK;
+          g += '<rect x="' + BX + '" y="' + (yb - hD).toFixed(1) + '" width="' + BW + '" height="' + hD.toFixed(1) + '" fill="var(--red)" opacity="0.5"/>';
+          var LEG = [['potenziale', 'var(--accent)'], ['cinetica', 'var(--magenta)'], ['dissipata', 'var(--red)']];
+          for (i = 0; i < 3; i++) {
+            g += '<rect x="' + (BX + BW + 16) + '" y="' + (BY + 6 + i * 24) + '" width="13" height="13" fill="' + LEG[i][1] + '" opacity="0.75"/>';
+            g += '<text x="' + (BX + BW + 35) + '" y="' + (BY + 17 + i * 24) + '" class="lbl-s">' + LEG[i][0] + '</text>';
+          }
+          g += '<text x="' + X0 + '" y="24" class="lbl">' + (st.fermo
+            ? (st.x >= XFIN - 0.01 ? 'arrivata in fondo' : 'la pallina si e\' fermata: l\'attrito ha mangiato tutto')
+            : (st.part ? 'in corsa' : 'pronta a partire')) + '</text>';
+          g += '<text x="' + X0 + '" y="' + (YS + 30) + '" class="lbl-s">velocita\' attuale: ' + nf(Math.abs(st.v), 2) +
+            ' m/s · massima raggiunta: ' + nf(st.vmax, 2) + ' m/s</text>';
+          svg.innerHTML = g;
+
+          document.getElementById('cv-hv').textContent = nf(H0, 1);
+          document.getElementById('cv-muv').textContent = nf(MU, 2);
+          document.getElementById('cv-u').textContent = nf(U, 2) + ' J';
+          document.getElementById('cv-k').textContent = nf(K, 2) + ' J';
+          document.getElementById('cv-d').textContent = nf(st.diss, 2) + ' J';
+          document.getElementById('cv-e').textContent = nf(U + K, 2) + ' J';
+          var el = document.getElementById('cv-out');
+          if (MU === 0) {
+            el.innerHTML = 'Con la pista liscia la somma $K+U$ resta inchiodata a ' + nf(E0, 2).replace(',', '{,}') +
+              ' J: le due barre si scambiano continuamente altezza, ma il totale non si muove di un millimetro. ' +
+              'La velocita\' in ogni punto vale $v=\\sqrt{2g(h_0-y)}$, e <strong>non dipende dalla forma della pista</strong>.';
+          } else {
+            el.innerHTML = 'Con l\'attrito la barra rossa cresce e non torna piu\' indietro: ha gia\' mangiato ' +
+              nf(st.diss, 2).replace(',', '{,}') + ' J degli ' + nf(E0, 2).replace(',', '{,}') +
+              ' J di partenza. La somma delle <em>tre</em> barre resta costante — l\'energia si conserva sempre, ' +
+              'e\' l\'energia <strong>meccanica</strong> che non si conserva piu\'.';
+          }
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        document.getElementById('cv-h').addEventListener('input', reset);
+        document.getElementById('cv-mu').addEventListener('input', reset);
+        document.getElementById('cv-reset').addEventListener('click', reset);
+        document.getElementById('cv-via').addEventListener('click', function () {
+          if (raf) { return; }
+          if (st.fermo) { reset(); }
+          st.part = true;
+          raf = requestAnimationFrame(tick);
+        });
+        reset();
+      })();
+
+      /* ==================== 8.1 — IL PENDOLO BALISTICO ==================== */
+      (function () {
+        var svg = document.getElementById('pb-svg');
+        if (!svg) { return; }
+        var L = 1.2;                 // lunghezza del filo, in metri
+        var fase = 'pronto', th = 0, om = 0, thmax = 0, raf = null, xp = 0;
+
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+        STOP.push(ferma);
+
+        function dati() {
+          var m = parseFloat(document.getElementById('pb-m').value) / 1000;
+          var M = parseFloat(document.getElementById('pb-M').value);
+          var v = parseFloat(document.getElementById('pb-v').value);
+          var V = m * v / (m + M);
+          var h = V * V / (2 * G);
+          var K1 = 0.5 * m * v * v, K2 = 0.5 * (m + M) * V * V;
+          return { m: m, M: M, v: v, V: V, h: h, K1: K1, K2: K2, giro: (h >= 2 * L) };
+        }
+
+        function tick() {
+          var d = dati(), i;
+          if (fase === 'volo') {
+            xp += 9;
+            if (xp >= 250) { xp = 250; fase = 'oscilla'; th = 0; om = d.V / L; }
+          } else if (fase === 'oscilla') {
+            for (i = 0; i < 6; i++) {
+              var a1 = -G / L * Math.sin(th);
+              var nth = th + om * 0.004 + 0.5 * a1 * 0.004 * 0.004;
+              var a2 = -G / L * Math.sin(nth);
+              om = om + 0.5 * (a1 + a2) * 0.004;
+              th = nth;
+            }
+            if (th > thmax) { thmax = th; }
+            if (om <= 0 && th <= 0) { th = 0; fase = 'fine'; }
+            if (th >= Math.PI) { th = Math.PI; fase = 'fine'; }
+          }
+          disegna();
+          if (fase === 'volo' || fase === 'oscilla') { raf = requestAnimationFrame(tick); } else { raf = null; }
+        }
+
+        function disegna() {
+          var d = dati();
+          var PX = 300, PY = 40, RAG = 170;      // perno e lunghezza del filo in pixel
+          var g = '';
+          var bx = PX + RAG * Math.sin(th), by = PY + RAG * Math.cos(th);
+          // il soffitto e il perno
+          g += '<line x1="' + (PX - 90) + '" y1="' + (PY - 8) + '" x2="' + (PX + 90) + '" y2="' + (PY - 8) + '" stroke="var(--text-soft)" stroke-width="4"/>';
+          // la quota massima raggiunta
+          var hmaxPx = PY + RAG - (PY + RAG * Math.cos(thmax));
+          if (thmax > 0.001) {
+            g += '<line x1="80" y1="' + (PY + RAG - hmaxPx).toFixed(1) + '" x2="580" y2="' + (PY + RAG - hmaxPx).toFixed(1) +
+              '" stroke="var(--gold)" stroke-width="1.3" stroke-dasharray="5 5"/>';
+            g += '<text x="584" y="' + (PY + RAG - hmaxPx + 4).toFixed(1) + '" class="lbl-s">salita</text>';
+          }
+          g += '<line x1="80" y1="' + (PY + RAG) + '" x2="580" y2="' + (PY + RAG) + '" stroke="var(--border)" stroke-width="1.3" stroke-dasharray="3 4"/>';
+          g += '<line x1="' + PX + '" y1="' + PY + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<circle cx="' + PX + '" cy="' + PY + '" r="4" fill="var(--text-soft)"/>';
+          g += '<rect x="' + (bx - 26).toFixed(1) + '" y="' + (by - 20).toFixed(1) + '" width="52" height="40" rx="4" fill="var(--gold)" opacity="0.45" stroke="var(--gold)" stroke-width="2"/>';
+          // il proiettile
+          if (fase === 'volo') {
+            g += '<circle cx="' + (30 + xp).toFixed(1) + '" cy="' + (PY + RAG).toFixed(1) + '" r="5" fill="var(--magenta)"/>';
+            g += '<line x1="' + (30 + xp - 26).toFixed(1) + '" y1="' + (PY + RAG) + '" x2="' + (30 + xp - 8).toFixed(1) +
+              '" y2="' + (PY + RAG) + '" stroke="var(--magenta)" stroke-width="2" opacity="0.5"/>';
+          } else if (fase === 'pronto') {
+            g += '<circle cx="30" cy="' + (PY + RAG) + '" r="5" fill="var(--magenta)"/>';
+            g += '<text x="42" y="' + (PY + RAG + 5) + '" class="lbl-s">premi «Spara»</text>';
+          }
+          g += '<text x="20" y="24" class="lbl">' + (d.giro
+            ? 'attenzione: con questi numeri il blocco supererebbe la verticale'
+            : 'pendolo balistico — filo di ' + nf(L, 1) + ' m') + '</text>';
+          svg.innerHTML = g;
+
+          document.getElementById('pb-mv').textContent = Math.round(d.m * 1000);
+          document.getElementById('pb-Mv').textContent = nf(d.M, 1);
+          document.getElementById('pb-vv').textContent = Math.round(d.v);
+          document.getElementById('pb-V').textContent = nf(d.V, 2) + ' m/s';
+          document.getElementById('pb-h').textContent = nf(d.h * 100, 1) + ' cm';
+          document.getElementById('pb-en').textContent = nf(d.K1, 0) + ' J · ' + nf(d.K2, 2) + ' J';
+          document.getElementById('pb-perc').textContent = nf(100 * d.K2 / d.K1, 2) + ' %';
+          var el = document.getElementById('pb-out');
+          el.innerHTML = 'Nell\'urto si conserva la quantita\' di moto: $V = \\dfrac{m}{m+M}v = ' +
+            nf(d.V, 2).replace(',', '{,}') + '$ m/s. Nella salita si conserva l\'energia: ' +
+            '$h = V^2/(2g) = ' + nf(d.h * 100, 1).replace(',', '{,}') + '$ cm. ' +
+            'L\'energia cinetica passa da ' + nf(d.K1, 0) + ' J a ' + nf(d.K2, 2) + ' J: ne sopravvive il <strong>' +
+            nf(100 * d.K2 / d.K1, 2) + '%</strong>. Il rapporto vale esattamente $\\dfrac{m}{m+M}$ — provate a ' +
+            'verificarlo: piu\' il blocco e\' pesante rispetto al proiettile, piu\' energia sparisce nell\'urto, ' +
+            'e piu\' lo strumento e\' preciso.';
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        ['pb-m', 'pb-M', 'pb-v'].forEach(function (id) {
+          document.getElementById(id).addEventListener('input', function () {
+            ferma(); fase = 'pronto'; th = 0; om = 0; thmax = 0; xp = 0; disegna();
+          });
+        });
+        document.getElementById('pb-spara').addEventListener('click', function () {
+          ferma(); fase = 'volo'; xp = 0; th = 0; om = 0; thmax = 0;
+          raf = requestAnimationFrame(tick);
+        });
+        disegna();
+      })();
+
+      /* ==================== 9 — PENDOLO ESATTO CONTRO PENDOLO ARMONICO ==================== */
+      (function () {
+        var svg = document.getElementById('lg-svg');
+        if (!svg) { return; }
+
+        // integrale ellittico completo di prima specie, con la media aritmetico-geometrica
+        function agm(a, b) {
+          var i, na;
+          for (i = 0; i < 60; i++) { na = (a + b) / 2; b = Math.sqrt(a * b); a = na; }
+          return a;
+        }
+        function periodoVero(T0, th0) { return T0 / agm(1, Math.cos(th0 / 2)); }
+
+        function disegna() {
+          var gr = parseFloat(document.getElementById('lg-t').value);
+          var L = parseFloat(document.getElementById('lg-l').value);
+          var lock = document.getElementById('lg-lock').checked;
+          var th0 = gr * Math.PI / 180;
+          var T0 = 2 * Math.PI * Math.sqrt(L / G);
+          var TV = periodoVero(T0, th0);
+          var scarto = 100 * (TV - T0) / T0;
+          var serie = 100 * (th0 * th0 / 16 + 11 * Math.pow(th0, 4) / 3072);
+
+          var TMAX = lock ? 3.2 : Math.max(2.2 * TV, 0.6);
+          var AMAX = lock ? 150 : Math.max(gr * 1.15, 5);
+          var X0 = 56, X1 = 628, YC = 170, AY = 122;
+          var px = function (t) { return X0 + (X1 - X0) * t / TMAX; };
+          var py = function (a) { return YC - AY * a / AMAX; };
+          var g = '', i;
+          g += '<line x1="' + X0 + '" y1="' + YC + '" x2="' + X1 + '" y2="' + YC + '" stroke="var(--text-soft)" stroke-width="1.8"/>';
+          g += '<line x1="' + X0 + '" y1="' + (YC - AY - 12) + '" x2="' + X0 + '" y2="' + (YC + AY + 12) + '" stroke="var(--text-soft)" stroke-width="1.8"/>';
+          for (i = 0; i <= 4; i++) {
+            var tv = TMAX * i / 4;
+            g += '<line x1="' + px(tv).toFixed(1) + '" y1="' + (YC - AY - 6) + '" x2="' + px(tv).toFixed(1) + '" y2="' + (YC + AY + 6) + '" stroke="var(--border)" stroke-width="1"/>';
+            g += '<text x="' + px(tv).toFixed(1) + '" y="' + (YC + AY + 26) + '" text-anchor="middle" class="lbl-s">' + nf(tv, 1) + '</text>';
+          }
+          g += '<text x="' + X1 + '" y="' + (YC + AY + 44) + '" text-anchor="end" class="lbl-s">tempo (s)</text>';
+          g += '<text x="' + (X0 - 6) + '" y="' + (YC - AY - 20) + '" class="lbl-s">angolo (gradi)</text>';
+          g += '<text x="' + (X0 - 8) + '" y="' + (py(AMAX) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">' + Math.round(AMAX) + '</text>';
+          g += '<text x="' + (X0 - 8) + '" y="' + (py(-AMAX) + 4).toFixed(1) + '" text-anchor="end" class="lbl-s">-' + Math.round(AMAX) + '</text>';
+
+          // curva armonica
+          var pa = [], pe = [], N = 700, dt = TMAX / N;
+          for (i = 0; i <= N; i++) {
+            pa.push(px(dt * i).toFixed(1) + ',' + py(gr * Math.cos(2 * Math.PI * dt * i / T0)).toFixed(1));
+          }
+          // curva esatta, integrata con Verlet in velocita'
+          var th = th0, om = 0, sub = 12, h = dt / sub, k;
+          pe.push(px(0).toFixed(1) + ',' + py(gr).toFixed(1));
+          for (i = 1; i <= N; i++) {
+            for (k = 0; k < sub; k++) {
+              var a1 = -G / L * Math.sin(th);
+              var nt = th + om * h + 0.5 * a1 * h * h;
+              var a2 = -G / L * Math.sin(nt);
+              om = om + 0.5 * (a1 + a2) * h;
+              th = nt;
+            }
+            pe.push(px(dt * i).toFixed(1) + ',' + py(th * 180 / Math.PI).toFixed(1));
+          }
+          g += '<polyline points="' + pa.join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-dasharray="6 4"/>';
+          g += '<polyline points="' + pe.join(' ') + '" fill="none" stroke="#a855f7" stroke-width="2.6"/>';
+          g += '<rect x="' + (X0 + 10) + '" y="' + (YC - AY - 4) + '" width="13" height="4" fill="var(--accent)"/>';
+          g += '<text x="' + (X0 + 30) + '" y="' + (YC - AY) + '" class="lbl-s">armonico (sin θ ≈ θ)</text>';
+          g += '<rect x="' + (X0 + 190) + '" y="' + (YC - AY - 4) + '" width="13" height="4" fill="#a855f7"/>';
+          g += '<text x="' + (X0 + 210) + '" y="' + (YC - AY) + '" class="lbl-s">esatto (Eulero-Lagrange)</text>';
+          svg.innerHTML = g;
+
+          document.getElementById('lg-tv').textContent = Math.round(gr);
+          document.getElementById('lg-lv').textContent = nf(L, 2);
+          document.getElementById('lg-t0').textContent = nf(T0, 4) + ' s';
+          document.getElementById('lg-tex').textContent = nf(TV, 4) + ' s';
+          document.getElementById('lg-scarto').textContent = '+' + nf(scarto, 2) + ' %';
+          document.getElementById('lg-serie').textContent = '+' + nf(serie, 2) + ' %';
+          var el = document.getElementById('lg-out');
+          el.innerHTML = 'Il periodo vero e\' $T = T_0/\\mathrm{agm}(1,\\cos(\\theta_0/2)) = ' + nf(TV, 4).replace(',', '{,}') +
+            '$ s contro i ' + nf(T0, 4).replace(',', '{,}') + ' s dell\'approssimazione armonica: <strong>+' +
+            nf(scarto, 2) + '%</strong>. Lo sviluppo in serie $T \\simeq T_0\\left(1+\\frac{\\theta_0^2}{16}+' +
+            '\\frac{11\\,\\theta_0^4}{3072}\\right)$ ne prevede +' + nf(serie, 2) + '%. ' +
+            (gr <= 20
+              ? 'Sotto i venti gradi le due curve sono indistinguibili a occhio: ecco perche\' l\'isocronismo di Galileo regge.'
+              : 'Sopra i venti gradi la curva viola resta indietro: il pendolo vero e\' <strong>piu\' lento</strong>, ' +
+                'perche\' $\\sin\\theta \\lt \\theta$ e la forza di richiamo e\' minore di quella dell\'oscillatore armonico.');
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+        document.getElementById('lg-t').addEventListener('input', disegna);
+        document.getElementById('lg-l').addEventListener('input', disegna);
+        document.getElementById('lg-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+    });
+  </script>
+
+
+  <script>
+    window.quizData = [
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Spingete un carrello con una forza di $80$ N inclinata di $60°$ rispetto allo spostamento, e lo spostate di $5$ m. Quanto lavoro compie la forza?',
+        options: ['$400$ J', '$200$ J', '$346$ J', '$0$ J'],
+        correct: 1,
+        explain: '$W = Fs\\cos\\theta = 80 \\cdot 5 \\cdot \\cos 60° = 400 \\cdot 0{,}5 = 200$ J. Il coseno di $60°$ vale esattamente un mezzo: metà della forza «lavora», l\'altra metà preme inutilmente contro il pavimento.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Un satellite percorre un\'orbita circolare attorno alla Terra. Quanto lavoro compie la forza gravitazionale in un giro completo?',
+        options: ['Positivo, perché la forza è attrattiva', 'Negativo, perché frena il satellite', 'Zero, perché la forza è in ogni istante perpendicolare allo spostamento', 'Dipende dal raggio dell\'orbita'],
+        correct: 2,
+        explain: 'La forza centripeta punta sempre verso il centro, la velocità è sempre tangente: $\\theta = 90°$ in ogni istante, quindi $\\cos\\theta = 0$ e il lavoro è nullo. È il motivo per cui un satellite mantiene la sua velocità per sempre senza motore.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Che cosa distingue la potenza dal lavoro?',
+        options: ['La potenza è una grandezza vettoriale, il lavoro no', 'La potenza dice quanto lavoro si compie <em>nell\'unità di tempo</em>', 'La potenza si misura in joule, il lavoro in watt', 'Sono la stessa grandezza, cambia solo l\'unità di misura'],
+        correct: 1,
+        explain: '$P = W/\\Delta t$. Portare cento mattoni al terzo piano richiede sempre lo stesso lavoro, in un\'ora o in un giorno: quello che cambia è la potenza. Il lavoro si misura in joule, la potenza in watt ($1$ W $= 1$ J/s); entrambe sono scalari.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Un\'automobile passa da $50$ a $100$ km/h. Come cambia il suo spazio di frenata, a parità di pneumatici e di asfalto?',
+        options: ['Raddoppia', 'Triplica', 'Resta lo stesso, perché la massa non è cambiata', 'Diventa quattro volte tanto'],
+        correct: 3,
+        explain: '$d = \\dfrac{v^2}{2\\mu_d\\,g}$: lo spazio va con il <strong>quadrato</strong> della velocità, quindi raddoppiando $v$ la distanza si moltiplica per quattro. È la conseguenza più pratica del quadrato che compare in $K = \\frac12 mv^2$.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Reggete uno zaino da $15$ kg camminando in piano per $100$ m. Quanto lavoro compie la forza con cui lo sostenete?',
+        options: ['Zero: la forza è verticale e lo spostamento orizzontale', 'Circa $14\\,700$ J', 'Circa $1500$ J', 'Non si può dire senza conoscere la velocità'],
+        correct: 0,
+        explain: 'Forza verticale, spostamento orizzontale: $\\theta = 90°$ e il lavoro è nullo. La stanchezza che sentite è reale, ma è energia chimica consumata dai muscoli per restare contratti, che finisce in calore: non è lavoro meccanico sullo zaino. La fisica sta misurando una cosa diversa dalla fatica.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Perché per l\'attrito non si può definire un\'energia potenziale?',
+        options: ['Perché il suo lavoro dipende dal percorso seguito, non solo dagli estremi', 'Perché l\'attrito è troppo piccolo per essere contato', 'Perché l\'attrito non compie mai lavoro', 'Perché agisce soltanto sui corpi in quiete'],
+        correct: 0,
+        explain: 'Un\'energia potenziale è un numero associato a ogni <em>punto</em>: perché abbia senso, il lavoro deve dipendere solo dal punto di partenza e da quello di arrivo. L\'attrito invece lavora tanto quanto è lunga la strada percorsa, e su un percorso chiuso il suo lavoro è negativo, non nullo.'
+      },
+      {
+        type: 'mc', diff: 'medium',
+        text: 'Una pallina scende senza attrito lungo tre piste di forma diversa, tutte dalla stessa quota $h$ fino allo stesso punto in basso. Che cosa possiamo dire delle velocità di arrivo?',
+        options: ['Arriva più veloce sulla pista più ripida', 'Arriva più veloce sulla pista più lunga', 'Sono tutte uguali e valgono $v = \\sqrt{2gh}$', 'Dipende dalla massa della pallina'],
+        correct: 2,
+        explain: 'La gravità è conservativa: il suo lavoro dipende solo dal dislivello. La conservazione dell\'energia dà $mgh = \\frac12 mv^2$, cioè $v = \\sqrt{2gh}$, che non dipende né dalla forma della pista né dalla massa. Cambia il <em>tempo</em> di percorrenza, non la velocità finale.'
+      },
+      {
+        type: 'mc', diff: 'easy',
+        text: 'Una molla di costante $k$ viene compressa di $x$; poi la si comprime di $2x$. Come cambia l\'energia immagazzinata?',
+        options: ['Diventa il doppio', 'Diventa quattro volte tanto', 'Diventa otto volte tanto', 'Non cambia, perché $k$ è la stessa'],
+        correct: 1,
+        explain: '$U_{\\text{el}} = \\frac12 k x^2$: raddoppiando la deformazione l\'energia si moltiplica per quattro. Il fattore $\\frac12$ nasce dal fatto che la forza cresce linearmente e il lavoro è l\'<em>area</em> del triangolo sotto il grafico, cioè metà del rettangolo.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Qual è la quota minima da cui deve partire un carrello, su pista liscia, per completare un giro della morte di raggio $R$?',
+        options: ['$h = R$', '$h = 2R$', '$h = 4R$', '$h = 2{,}5\\,R$'],
+        correct: 3,
+        explain: 'In cima al giro serve almeno $v^2 = gR$, perché la gravità basti da sola a fare da forza centripeta. La conservazione dell\'energia dà $gh = g(2R) + \\frac12 gR$, cioè $h = \\frac52 R$. Non basta partire dall\'altezza del giro: serve quel mezzo raggio in più.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Nel pendolo balistico, perché nella fase dell\'urto <em>non</em> si può usare la conservazione dell\'energia cinetica?',
+        options: ['Perché l\'urto è completamente anelastico: gran parte dell\'energia va in deformazione e calore', 'Perché la quantità di moto non si conserva mai negli urti', 'Perché il filo del pendolo compie lavoro durante l\'urto', 'Perché l\'energia cinetica non è una grandezza conservata in nessuna circostanza'],
+        correct: 0,
+        explain: 'Il proiettile resta conficcato nel blocco: l\'urto è completamente anelastico e l\'energia cinetica <em>non</em> si conserva — nell\'esempio della lezione ne sopravvive lo $0{,}5\\%$. Si conserva invece la quantità di moto, perché l\'urto è istantaneo. L\'energia torna utile solo nella fase successiva, la salita.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Nella meccanica lagrangiana, che cos\'è la funzione $\\mathcal{L}$?',
+        options: ['La somma di energia cinetica e potenziale, cioè l\'energia totale', 'Il lavoro compiuto dalle forze vincolari', 'La <em>differenza</em> fra energia cinetica ed energia potenziale, $T - V$', 'La derivata dell\'energia totale rispetto al tempo'],
+        correct: 2,
+        explain: '$\\mathcal{L} = T - V$, con il segno meno: non è l\'energia totale, che invece è $T+V$. Il suo integrale nel tempo è l\'<strong>azione</strong>, e la natura sceglie il cammino che la rende stazionaria: un principio equivalente a $\\vec F = m\\vec a$, ma scritto con soli scalari.'
+      },
+      {
+        type: 'mc', diff: 'hard',
+        text: 'Quale vantaggio pratico offre il metodo lagrangiano rispetto a quello newtoniano nel caso del pendolo?',
+        options: ['Dà una risposta diversa e più accurata', 'Permette di trattare anche le forze dissipative', 'Non richiede di conoscere il valore di $g$', 'Le forze vincolari — la tensione del filo — non compaiono mai nei conti'],
+        correct: 3,
+        explain: 'La tensione del filo è un\'incognita che nel metodo newtoniano bisogna introdurre e poi eliminare. Con Lagrange si sceglie la coordinata $\\theta$, che già «contiene» il vincolo, e la tensione non entra mai in gioco: si arriva a $\\ddot\\theta = -(g/\\ell)\\sin\\theta$ in sei passaggi. Il risultato fisico, naturalmente, è identico.'
+      },
+      {
+        type: 'open',
+        text: 'Un sollevatore compie appena $3$ kJ di lavoro meccanico in un\'alzata — meno dell\'energia contenuta in un grammo di zucchero — eppure lo sforzo è estremo. Spiega perché la fatica non è misurata dal lavoro, citando almeno due dei tre motivi visti nella lezione.',
+        keywords: ['potenza', 'rendimento', 'calore', 'leve', 'secondo', 'muscol'],
+        requiredMatches: 3,
+        explain: 'Tre motivi, tutti veri insieme. <strong>La potenza</strong>: quei $3$ kJ vanno erogati in circa un secondo e mezzo, cioè $P \\approx 2000$ W, quasi tre cavalli — è la rapidità a essere proibitiva. <strong>Il rendimento</strong>: il muscolo converte in lavoro meccanico solo il $20$-$25\\%$ dell\'energia chimica che consuma, quindi al corpo servono $12$-$15$ kJ per farne $3$; il resto diventa calore, ed è per questo che ci si scalda. <strong>Le leve svantaggiose</strong>: i muscoli si inseriscono vicinissimi alle articolazioni, quindi devono esercitare forze molte volte maggiori del carico, e il lavoro interno supera di molto quello esterno. Si aggiunga che il muscolo consuma energia anche solo per restare contratto, senza compiere alcun lavoro meccanico.'
+      },
+      {
+        type: 'open',
+        text: 'Feynman scrisse che «nella fisica di oggi non sappiamo che cosa sia l\'energia». Spiega che cosa intendeva, usando la parabola dei mattoncini, e collega la vicenda del neutrino di Pauli.',
+        keywords: ['mattoncin', 'somma', 'conserva', 'formula', 'neutrino', 'pauli', 'decadimento'],
+        requiredMatches: 3,
+        explain: 'Feynman immagina un bambino con $28$ mattoncini indistruttibili: la madre li conta ogni sera e ne trova sempre $28$. Quando ne mancano li ritrova sotto il tappeto; quando la scatola è chiusa ne deduce il numero dal peso; quando sono nella vasca, dal livello dell\'acqua. Ogni volta inventa una <em>nuova formula</em>, e la somma di tutte le formule dà sempre $28$. L\'energia funziona così: non esiste da qualche parte un «fluido energetico», esistono varie espressioni ($\\frac12 mv^2$, $mgh$, $\\frac12 kx^2$, $mc^2$…) la cui somma, in un sistema isolato, non cambia mai. Sappiamo <em>calcolare</em> un numero che si conserva; non sappiamo dire che cosa sia. La vicenda del neutrino mostra quanto sia produttivo prendere sul serio questo atteggiamento: attorno al 1930, nel decadimento beta, l\'energia dell\'elettrone risultava sempre minore del previsto, e Bohr propose di abbandonare la conservazione dell\'energia. Pauli scelse invece di cercare il mattoncino sotto il tappeto e postulò una particella neutra e quasi invisibile che portava via l\'energia mancante. Il neutrino fu osservato ventisei anni dopo, nel 1956.'
+      }
+    ];
+  </script>
+
+</body>
+
+</html>
