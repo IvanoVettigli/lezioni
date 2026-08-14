@@ -1079,6 +1079,186 @@
         dice la formula: con l'attrito basso il picco diventa così alto che perfino l'energia di una voce
         umana, accumulata per qualche secondo, supera quello che il vetro può reggere.
       </div>
+
+      <!-- 6.1 — RISONANZA BENEFICA -->
+      <h3>6.1 — La risonanza non fa solo danni: la musica</h3>
+
+      <p>Fino a qui abbiamo parlato di risonanza come di qualcosa di pericoloso, e in certi casi lo
+        è davvero. Ma la stessa fisica — una frequenza che si adatta esattamente a un sistema, e
+        l'ampiezza che cresce senza bisogno di molta energia — è anche il meccanismo con cui
+        <strong>tutta la musica funziona</strong>.</p>
+
+      <p>Prendete una <strong>corda di chitarra</strong>. È fissata alle due estremità: non può
+        oscillare in modo qualunque. Può solo assumere forme d'onda per cui ai due estremi si trova
+        un nodo (cioè un punto fermo). Questo vincolo obbliga la corda a oscillare solo a
+        <em>certe frequenze determinate</em>: le sue <strong>frequenze proprie</strong>, o
+        <strong>armoniche</strong>.</p>
+
+      <div class="rule">
+        <p class="formula-title">Frequenze proprie di una corda</p>
+        <p>Una corda di lunghezza <span>$L$</span>, tensione <span>$F_T$</span> e densità lineare
+          <span>$\mu$</span> (massa per unità di lunghezza) può oscillare solo a frequenze:</p>
+        <p style="text-align:center; font-size:1.15rem;">$$f_n = \frac{n}{2L}\sqrt{\frac{F_T}{\mu}}
+          \qquad n = 1, 2, 3, \ldots$$</p>
+        <p class="formula-note">Il valore <span>$n = 1$</span> è la <strong>frequenza
+          fondamentale</strong> (la nota che sentiamo); i valori superiori sono le
+          <strong>armoniche</strong>, che danno alla nota il suo timbro unico. Fissata la lunghezza,
+          c'è una e una sola frequenza fondamentale: è quella che emette quella nota specifica.</p>
+      </div>
+
+      <p>Lo stesso principio vale per le <strong>canne dell'organo</strong>: la colonna d'aria
+        dentro la canna ha le sue frequenze proprie, che dipendono dalla lunghezza della canna.
+        Canna corta → frequenza alta → nota acuta. Canna lunga → frequenza bassa → nota grave.
+        L'organaro non fa altro che <em>costruire canne della lunghezza giusta</em> per ottenere
+        le note volute.</p>
+
+      <div class="curiosita">
+        <strong>🎸 Perché toccando il tasto si alza la nota.</strong> Premendo un tasto sulla
+        tastiera della chitarra si accorcia la parte vibrante della corda: la lunghezza <em>L</em>
+        diminuisce, la frequenza fondamentale aumenta (sale di un'ottava ogni volta che si dimezza
+        la lunghezza), e la nota diventa più acuta. I liutai di Cremona — Stradivari, Guarneri —
+        sapevano tutto questo con secoli di anticipo sui fisici che lo formalizzarono: lo
+        sapevano perché <em>funzionava</em>.
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="rm-L">lunghezza corda L = <span id="rm-Lv">0,65</span> m</label>
+          <input type="range" id="rm-L" min="0.3" max="1.0" step="0.05" value="0.65">
+          <label for="rm-T">tensione (relativa) = <span id="rm-Tv">1,0</span></label>
+          <input type="range" id="rm-T" min="0.5" max="3.0" step="0.1" value="1.0">
+          <label for="rm-n">armonica n = <span id="rm-nv">1</span></label>
+          <input type="range" id="rm-n" min="1" max="6" step="1" value="1">
+        </div>
+        <svg viewBox="0 0 660 240" id="rm-svg" role="img"
+          aria-label="Armoniche di una corda vibrante: forma dell'onda e frequenza"></svg>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="rm-f0">—</div><div class="l">fondamentale f₁ (Hz)</div></div>
+          <div class="stat"><div class="n" id="rm-fn">—</div><div class="l">armonica fₙ (Hz)</div></div>
+          <div class="stat"><div class="n" id="rm-nota">—</div><div class="l">nota approssimativa</div></div>
+          <div class="stat"><div class="n" id="rm-lambda">—</div><div class="l">λₙ (m)</div></div>
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="rm-anim">▶ Anima</button>
+          <button class="btn btn-secondary" id="rm-stop">⏸ Ferma</button>
+        </div>
+        <p class="cap">La corda (blu) oscillates nella sua <em>n</em>-esima armonica. I nodi (punti fissi)
+          dividono la corda in <em>n</em> ventri. Cambiate lunghezza, tensione e numero di armonica per
+          vedere come cambia la frequenza — e la nota emessa.</p>
+      </div>
+
+      <p>La bellezza di questo meccanismo è che la risonanza non è una <em>difetto</em> della
+        struttura: è la sua <strong>firma acustica</strong>. Ogni strumento ha le proprie frequenze
+        proprie, e la combinazione di fondamentale e armoniche in un dato rapporto è ciò che fa
+        sembrare un violino un violino e non un flauto, anche se suonano la stessa nota. La
+        risonanza, insomma, è il principio fisico su cui si fonda tutta l'espressione musicale
+        dell'umanità — non c'è da averne paura, c'è da ringraziarla.</p>
+
+      <script>
+      (function(){
+        var mu0 = 0.003; // densità lineare di riferimento (kg/m)
+        var L = 0.65, Trel = 1.0, n = 1;
+        var FT0 = 100; // tensione base (N) per Trel=1
+        var animating = false, raf = null, phase = 0;
+
+        // Nota musicale da frequenza
+        var NOTES = ['Do','Do#','Re','Re#','Mi','Fa','Fa#','Sol','Sol#','La','La#','Si'];
+        function freqToNote(f) {
+          if (f <= 0) return '—';
+          var semitones = Math.round(12 * Math.log2(f / 440));
+          var idx = ((semitones % 12) + 12) % 12;
+          var oct = Math.floor(Math.log2(f / 261.63)) + 4;
+          return NOTES[idx] + oct;
+        }
+
+        function nf(x, d) { return (Math.round(x*Math.pow(10,d))/Math.pow(10,d)).toFixed(d).replace('.', ','); }
+
+        var svg = document.getElementById('rm-svg');
+        var elF0 = document.getElementById('rm-f0'), elFn = document.getElementById('rm-fn');
+        var elNota = document.getElementById('rm-nota'), elLambda = document.getElementById('rm-lambda');
+        var btnAnim = document.getElementById('rm-anim'), btnStop = document.getElementById('rm-stop');
+        var inpL = document.getElementById('rm-L'), inpT = document.getElementById('rm-T'), inpN = document.getElementById('rm-n');
+        var lblL = document.getElementById('rm-Lv'), lblT = document.getElementById('rm-Tv'), lblN = document.getElementById('rm-nv');
+
+        function computeF() {
+          var FT = FT0 * Trel;
+          var v = Math.sqrt(FT / mu0);
+          var f1 = v / (2 * L);
+          var fn = n * f1;
+          return { f1: f1, fn: fn, lambda: 2 * L / n };
+        }
+
+        function draw(ph) {
+          var W = 660, H = 240;
+          var x0 = 40, x1 = W - 40, y0 = H / 2;
+          var amp = 55;
+          var res = computeF();
+
+          var out = '';
+          // baseline
+          out += '<line x1="' + x0 + '" y1="' + y0 + '" x2="' + x1 + '" y2="' + y0 + '" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="5 4"/>';
+
+          // nodi (punti fissi)
+          for (var k = 0; k <= n; k++) {
+            var nx = x0 + k * (x1 - x0) / n;
+            out += '<circle cx="' + nx.toFixed(1) + '" cy="' + y0 + '" r="5" fill="var(--magenta)" opacity="0.85"/>';
+          }
+
+          // forma d'onda
+          var pts = '';
+          var steps = 300;
+          var A = amp * Math.sin(ph);
+          for (var i = 0; i <= steps; i++) {
+            var xp = x0 + i * (x1 - x0) / steps;
+            var yp = y0 - A * Math.sin(n * Math.PI * i / steps);
+            pts += (i === 0 ? 'M' : 'L') + xp.toFixed(1) + ',' + yp.toFixed(1) + ' ';
+          }
+          out += '<path d="' + pts + '" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/>';
+          // fissa
+          var pts2 = '';
+          for (var i = 0; i <= steps; i++) {
+            var xp = x0 + i * (x1 - x0) / steps;
+            var yp = y0 - amp * 0.25 * Math.sin(n * Math.PI * i / steps);
+            pts2 += (i === 0 ? 'M' : 'L') + xp.toFixed(1) + ',' + yp.toFixed(1) + ' ';
+          }
+          out += '<path d="' + pts2 + '" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0.3"/>';
+
+          // etichette
+          out += '<text x="' + x0 + '" y="' + (H - 8) + '" font-size="11" fill="var(--muted)">0</text>';
+          out += '<text x="' + x1 + '" y="' + (H - 8) + '" text-anchor="end" font-size="11" fill="var(--muted)">L = ' + nf(L,2) + ' m</text>';
+          out += '<text x="' + ((x0+x1)/2) + '" y="18" text-anchor="middle" font-size="12" fill="var(--accent)" font-weight="700">n = ' + n + '  ·  f = ' + nf(res.fn,1) + ' Hz  ≈  ' + freqToNote(res.fn) + '</text>';
+
+          svg.innerHTML = out;
+
+          elF0.textContent = nf(res.f1, 1) + ' Hz';
+          elFn.textContent = nf(res.fn, 1) + ' Hz';
+          elNota.textContent = freqToNote(res.fn);
+          elLambda.textContent = nf(res.lambda, 3) + ' m';
+        }
+
+        function tick(ts) {
+          phase += 0.06;
+          draw(phase);
+          if (animating) raf = requestAnimationFrame(tick);
+        }
+
+        btnAnim.addEventListener('click', function() {
+          animating = true;
+          raf = requestAnimationFrame(tick);
+        });
+        btnStop.addEventListener('click', function() {
+          animating = false;
+          if (raf) cancelAnimationFrame(raf);
+          draw(Math.PI / 2);
+        });
+        inpL.addEventListener('input', function() { L = parseFloat(this.value); lblL.textContent = nf(L,2); draw(Math.PI/2); });
+        inpT.addEventListener('input', function() { Trel = parseFloat(this.value); lblT.textContent = nf(Trel,1); draw(Math.PI/2); });
+        inpN.addEventListener('input', function() { n = parseInt(this.value); lblN.textContent = n; draw(Math.PI/2); });
+
+        draw(Math.PI / 2);
+      })();
+      </script>
+
     </section>
 
     <!-- 7 — L'EFFETTO DOPPLER -->

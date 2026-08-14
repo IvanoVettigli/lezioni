@@ -518,9 +518,213 @@
       </div>
     </section>
 
-    <!-- 8 — QUIZ -->
+    <!-- 8 — RIDONDANZA -->
+    <section id="sec8">
+      <h2>8. La ridondanza: quando ripetere conviene (e quando no)</h2>
+
+      <p>In tutti i database che abbiamo incontrato finora abbiamo cercato di <strong>non
+        ripetere i dati</strong>: ogni informazione deve stare in un posto solo, e le tabelle si
+        collegano tramite chiavi esterne. Questo principio si chiama
+        <strong>normalizzazione</strong>. Ma nella pratica le cose non sono sempre così semplici,
+        e spesso si sceglie di <em>violare</em> intenzionalmente questa regola, accettando di
+        salvare la stessa informazione in più posti. Questa scelta si chiama
+        <strong>ridondanza</strong>.</p>
+
+      <div class="definition">
+        Un database è <strong>ridondante</strong> quando la stessa informazione è memorizzata
+        in più di un posto. La ridondanza non è sempre un errore: può essere una
+        <strong>scelta progettuale</strong> consapevole, con vantaggi e svantaggi precisi.
+      </div>
+
+      <h3>8.1 — Un esempio concreto: il catalogo di un negozio</h3>
+
+      <p>Immaginate un negozio con due tabelle: <strong>ordini</strong> e
+        <strong>prodotti</strong>. La versione normalizzata salva il nome del prodotto
+        una volta sola nella tabella <em>prodotti</em>, e nella tabella <em>ordini</em>
+        mette solo il codice del prodotto (<em>id_prodotto</em>):</p>
+
+      <div class="ckt"><svg viewBox="0 0 640 200" aria-label="schema normalizzato vs ridondante">
+        <!-- normalizzato -->
+        <rect x="10" y="20" width="200" height="160" rx="8" fill="var(--surface-2)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="110" y="14" text-anchor="middle" font-size="12" fill="var(--accent)" font-weight="700">ordini (norm.)</text>
+        <text x="30" y="45" font-size="11" fill="var(--muted)">id_ordine</text><text x="170" y="45" text-anchor="end" font-size="11" fill="var(--text)">1001</text>
+        <text x="30" y="65" font-size="11" fill="var(--muted)">id_prodotto</text><text x="170" y="65" text-anchor="end" font-size="11" fill="var(--accent)">P42</text>
+        <text x="30" y="85" font-size="11" fill="var(--muted)">quantità</text><text x="170" y="85" text-anchor="end" font-size="11" fill="var(--text)">3</text>
+        <text x="30" y="120" font-size="11" fill="var(--muted)">id_ordine</text><text x="170" y="120" text-anchor="end" font-size="11" fill="var(--text)">1002</text>
+        <text x="30" y="140" font-size="11" fill="var(--muted)">id_prodotto</text><text x="170" y="140" text-anchor="end" font-size="11" fill="var(--accent)">P42</text>
+        <text x="30" y="160" font-size="11" fill="var(--muted)">quantità</text><text x="170" y="160" text-anchor="end" font-size="11" fill="var(--text)">1</text>
+        <!-- freccia -->
+        <line x1="215" y1="100" x2="255" y2="100" stroke="var(--accent)" stroke-width="2" marker-end="url(#arr2)"/>
+        <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="var(--accent)"/></marker></defs>
+        <!-- prodotti -->
+        <rect x="260" y="60" width="160" height="80" rx="8" fill="var(--surface-2)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="340" y="54" text-anchor="middle" font-size="12" fill="var(--accent)" font-weight="700">prodotti</text>
+        <text x="275" y="85" font-size="11" fill="var(--muted)">id_prodotto</text><text x="410" y="85" text-anchor="end" font-size="11" fill="var(--accent)">P42</text>
+        <text x="275" y="110" font-size="11" fill="var(--muted)">nome</text><text x="410" y="110" text-anchor="end" font-size="11" fill="var(--text)">Matita HB</text>
+        <text x="275" y="130" font-size="11" fill="var(--muted)">prezzo</text><text x="410" y="130" text-anchor="end" font-size="11" fill="var(--text)">0,80 €</text>
+        <!-- ridondante -->
+        <rect x="440" y="20" width="190" height="160" rx="8" fill="color-mix(in srgb, var(--gold) 10%, var(--surface-2))" stroke="var(--gold)" stroke-width="1.5"/>
+        <text x="535" y="14" text-anchor="middle" font-size="12" fill="var(--gold)" font-weight="700">ordini (ridond.)</text>
+        <text x="455" y="45" font-size="11" fill="var(--muted)">id_ordine</text><text x="620" y="45" text-anchor="end" font-size="11" fill="var(--text)">1001</text>
+        <text x="455" y="65" font-size="11" fill="var(--muted)">nome_prodotto</text><text x="620" y="65" text-anchor="end" font-size="11" fill="var(--gold)">Matita HB</text>
+        <text x="455" y="85" font-size="11" fill="var(--muted)">prezzo</text><text x="620" y="85" text-anchor="end" font-size="11" fill="var(--gold)">0,80 €</text>
+        <text x="455" y="105" font-size="11" fill="var(--muted)">quantità</text><text x="620" y="105" text-anchor="end" font-size="11" fill="var(--text)">3</text>
+        <text x="455" y="130" font-size="11" fill="var(--muted)">id_ordine</text><text x="620" y="130" text-anchor="end" font-size="11" fill="var(--text)">1002</text>
+        <text x="455" y="150" font-size="11" fill="var(--muted)">nome_prodotto</text><text x="620" y="150" text-anchor="end" font-size="11" fill="var(--gold)">Matita HB</text>
+        <text x="455" y="170" font-size="11" fill="var(--muted)">prezzo</text><text x="620" y="170" text-anchor="end" font-size="11" fill="var(--gold)">0,80 €</text>
+      </svg></div>
+
+      <p>A sinistra: il nome e il prezzo sono salvati <em>una volta</em> nella tabella prodotti.
+        A destra (in giallo): il nome e il prezzo sono ripetuti in ogni riga della tabella ordini.
+        Il secondo schema è <strong>ridondante</strong>.</p>
+
+      <h3>8.2 — Pregi della ridondanza</h3>
+      <ul>
+        <li><strong>Velocità di lettura.</strong> Se i dati che servono sono già nella stessa
+          tabella non occorre fare un JOIN (cioè incrociare due tabelle): la query è più semplice
+          e spesso molto più rapida. Nei grandi database analitici con miliardi di righe questo
+          fa una differenza enorme.</li>
+        <li><strong>Disponibilità e resilienza.</strong> Se un server o un pezzo di database va
+          offline, i dati copiati altrove garantiscono che il sistema continui a funzionare.
+          Tutti i grandi servizi (Google, Amazon, Netflix) replicano i dati su datacenter diversi
+          proprio per questo motivo.</li>
+        <li><strong>Semplicità di accesso.</strong> Avere tutto «già pronto» in un'unica tabella
+          semplifica il codice che legge i dati, riducendo la probabilità di errori nella
+          costruzione delle query.</li>
+      </ul>
+
+      <h3>8.3 — Difetti della ridondanza</h3>
+      <ul>
+        <li><strong>Rischio di inconsistenza.</strong> Se cambia un'informazione — il prezzo della
+          matita sale a 0,90 € — bisogna aggiornare <em>tutte</em> le copie. Se se ne dimentica
+          anche una sola, il database contiene dati contraddittori: in una riga il prezzo è 0,80 €,
+          nell'altra 0,90 €. Chi ha ragione? Nessuno lo sa con certezza.</li>
+        <li><strong>Spreco di spazio.</strong> Salvare lo stesso dato centinaia o milioni di volte
+          occupa memoria e disco in modo proporzionale. Per piccoli database non è un problema; a
+          scala di miliardi di record lo è.</li>
+        <li><strong>Manutenzione complessa.</strong> Chi aggiorna il database deve ricordarsi dove
+          sono tutte le copie. Più copie, più possibilità di errore.</li>
+      </ul>
+
+      <div class="warnbox">
+        <strong>⚠ Il caso più pericoloso: l'anomalia di aggiornamento.</strong> Supponiamo che un
+        prodotto cambierà nome. In un database normalizzato basta cambiare <strong>una riga</strong>
+        nella tabella prodotti e tutto si aggiorna automaticamente, perché tutti gli ordini puntano
+        a quella riga tramite il codice. In un database ridondante bisogna trovare e aggiornare
+        <em>ogni singola riga</em> che contenga il vecchio nome — e se un'operazione va a metà
+        (ad esempio il server si spegne), il database resta in uno stato incoerente, con alcune
+        righe aggiornate e altre no. Questo si chiama <strong>anomalia di aggiornamento</strong>
+        ed è uno dei motivi per cui la normalizzazione è stata inventata.
+      </div>
+
+      <h3>8.4 — Simulazione: cosa succede quando si aggiorna un dato ridondante</h3>
+
+      <div class="ckt" style="padding:1rem;">
+        <p style="margin:0 0 0.7rem; font-size:0.95rem;">Cliccate su «Aggiorna prezzo» per
+          simulare una modifica del prezzo della Matita HB. Nel database normalizzato si aggiorna
+          una riga sola; in quello ridondante si devono aggiornare tutte le righe — e a volte
+          si dimentica qualcuna.</p>
+        <div class="sim-btns">
+          <button class="btn" id="rd-update">✏️ Aggiorna prezzo (0,80 → 0,95 €)</button>
+          <button class="btn btn-secondary" id="rd-reset">↺ Ripristina</button>
+          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.9rem;">
+            <input type="checkbox" id="rd-bug" style="width:auto;"> Simula errore (dimentica una riga)
+          </label>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:0.8rem;">
+          <div>
+            <div style="font-weight:700; color:var(--accent); margin-bottom:0.4rem; font-size:0.9rem;">📋 Database normalizzato</div>
+            <table class="tabf" id="rd-norm">
+              <thead><tr><th>id_ordine</th><th>id_prod</th><th>qtà</th></tr></thead>
+              <tbody>
+                <tr><td>1001</td><td>P42</td><td>3</td></tr>
+                <tr><td>1002</td><td>P42</td><td>1</td></tr>
+                <tr><td>1003</td><td>P42</td><td>5</td></tr>
+              </tbody>
+            </table>
+            <div style="margin-top:0.3rem; font-size:0.85rem; color:var(--muted);">
+              Tabella prodotti: P42 = «Matita HB» — prezzo: <strong id="rd-price-norm">0,80 €</strong>
+            </div>
+          </div>
+          <div>
+            <div style="font-weight:700; color:var(--gold); margin-bottom:0.4rem; font-size:0.9rem;">⚠ Database ridondante</div>
+            <table class="tabf" id="rd-red">
+              <thead><tr><th>id_ordine</th><th>prodotto</th><th>prezzo</th><th>qtà</th></tr></thead>
+              <tbody>
+                <tr id="rd-r1"><td>1001</td><td>Matita HB</td><td id="rd-p1">0,80 €</td><td>3</td></tr>
+                <tr id="rd-r2"><td>1002</td><td>Matita HB</td><td id="rd-p2">0,80 €</td><td>1</td></tr>
+                <tr id="rd-r3"><td>1003</td><td>Matita HB</td><td id="rd-p3">0,80 €</td><td>5</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="rd-msg" style="margin-top:0.7rem; font-size:0.92rem; min-height:1.5em;"></div>
+      </div>
+
+      <script>
+      (function(){
+        var updated = false;
+        var btnU = document.getElementById('rd-update');
+        var btnR = document.getElementById('rd-reset');
+        var chkBug = document.getElementById('rd-bug');
+        var priceNorm = document.getElementById('rd-price-norm');
+        var p1 = document.getElementById('rd-p1');
+        var p2 = document.getElementById('rd-p2');
+        var p3 = document.getElementById('rd-p3');
+        var r1 = document.getElementById('rd-r1');
+        var r2 = document.getElementById('rd-r2');
+        var r3 = document.getElementById('rd-r3');
+        var msg = document.getElementById('rd-msg');
+
+        function highlight(el, color) {
+          el.style.background = 'color-mix(in srgb, ' + color + ' 22%, transparent)';
+          el.style.transition = 'background 0.6s';
+        }
+        function clear(el) { el.style.background = ''; }
+
+        btnU.addEventListener('click', function() {
+          if (updated) return;
+          updated = true;
+          var hasBug = chkBug.checked;
+          // normalizzato: una sola modifica
+          priceNorm.textContent = '0,95 €';
+          highlight(priceNorm.parentElement, 'var(--green)');
+          // ridondante: tutte le righe — ma con bug potrebbe dimenticare l'ultima
+          p1.textContent = '0,95 €'; highlight(r1, 'var(--green)');
+          p2.textContent = '0,95 €'; highlight(r2, 'var(--green)');
+          if (!hasBug) {
+            p3.textContent = '0,95 €'; highlight(r3, 'var(--green)');
+            msg.innerHTML = '<span style="color:var(--green)">✅ Aggiornamento completato. Nel database normalizzato: 1 modifica. In quello ridondante: 3 modifiche. Tutti i prezzi ora concordano.</span>';
+          } else {
+            // dimentica la riga 3
+            highlight(r3, '#ef4444');
+            msg.innerHTML = '<span style="color:#ef4444">❌ Anomalia di aggiornamento! La riga 1003 è stata dimenticata: mostra ancora 0,80 € mentre le altre mostrano 0,95 €. Il database ridondante è ora <strong>incoerente</strong>. Il database normalizzato è invece perfettamente coerente con una sola modifica.</span>';
+          }
+        });
+
+        btnR.addEventListener('click', function() {
+          updated = false;
+          priceNorm.textContent = '0,80 €';
+          clear(priceNorm.parentElement);
+          p1.textContent = '0,80 €'; clear(r1);
+          p2.textContent = '0,80 €'; clear(r2);
+          p3.textContent = '0,80 €'; clear(r3);
+          msg.textContent = '';
+        });
+      })();
+      </script>
+
+      <p>Come si vede dalla simulazione, la ridondanza è un'<em>arma a doppio taglio</em>:
+        può rendere il sistema più veloce e robusto, ma rende anche ogni aggiornamento più rischioso.
+        La scelta tra normalizzazione e ridondanza — tra correttezza e prestazione — è uno dei
+        problemi centrali della progettazione di database, e non ha una risposta unica valida per
+        tutti i casi.</p>
+
+    </section>
+
+    <!-- 9 — QUIZ -->
     <section id="quiz">
-      <h2>8. Quiz finale</h2>
+      <h2>9. Quiz finale</h2>
       <p>Dieci domande su database, tabelle, SQL e relazioni. Difficoltà crescente.</p>
       <div id="quiz-app"></div>
     </section>
