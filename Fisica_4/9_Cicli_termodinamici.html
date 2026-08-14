@@ -433,6 +433,58 @@
         candela</strong>, solo comprimendo l'aria fino a farla arrivare a seicento gradi. Sono tutte la stessa
         equazione.</div>
 
+      <!-- SIMULAZIONE INTERATTIVA: LA BOMBOLETTA SPRAY -->
+      <div class="figbox" id="spray-sim-box">
+        <h3 style="text-align:center; color:var(--accent); margin:0.2rem 0 0.5rem;">🧴 La bomboletta spray — l'adiabatica in cucina</h3>
+
+        <p style="font-size:0.93rem; color:var(--text-soft); margin:0 0 0.8rem; line-height:1.55;">
+          Una bomboletta di deodorante contiene gas propellente <strong>liquefatto sotto pressione</strong>
+          (tipicamente butano o propano, a circa 3–5 atm). Quando premi la valvola succede questo:
+          il gas liquido evapora, e il gas soprastante si espande nell'aria esterna passando da alta pressione
+          a pressione atmosferica <strong>in una frazione di secondo</strong> — troppo poco perché il calore
+          dell'ambiente faccia in tempo a entrare. È un'<strong>espansione adiabatica</strong>: $Q \approx 0$,
+          quindi $\Delta U = -L$, e il gas <strong>si raffredda</strong>.</p>
+
+        <p style="font-size:0.93rem; color:var(--text-soft); margin:0 0 0.8rem; line-height:1.55;">
+          <strong>Perché l'aria esce fredda?</strong> Il gas che esce dalla valvola compie lavoro per espandersi
+          contro l'atmosfera. Quell'energia la prende dalla propria energia interna: le molecole rallentano,
+          e «rallentare» per un gas significa raffreddarsi. È lo stesso $\Delta U = -L$ di prima. Se avvicini
+          la mano senti aria fredda: è termodinamica che ti soffia addosso.</p>
+
+        <p style="font-size:0.93rem; color:var(--text-soft); margin:0 0 0.8rem; line-height:1.55;">
+          <strong>Perché verso la fine la bomboletta è fredda al tatto?</strong> Man mano che il gas esce,
+          altro liquido deve evaporare per rimpiazzarlo. L'evaporazione richiede <strong>calore latente</strong>,
+          e lo prende dalle pareti della bomboletta e dal liquido residuo. Risultato: tutto si raffredda —
+          il gas, il liquido, il metallo. Verso la fine, con poco liquido rimasto e pareti già fredde,
+          la temperatura scende vistosamente: la bomboletta si appanna di condensa,
+          e toccarla è come toccare una lattina appena uscita dal frigorifero.</p>
+
+        <div class="ctrl" style="justify-content:center;">
+          <button class="btn" id="spray-btn" type="button" style="font-size:1rem; padding:0.5rem 1.4rem;">
+            🔽 Premi la valvola — spruzza!
+          </button>
+          <button class="btn btn-secondary" id="spray-reset" type="button" style="font-size:0.88rem; padding:0.4rem 1rem;">
+            🔄 Ricarica
+          </button>
+        </div>
+
+        <canvas id="spray-canvas" width="760" height="420"
+                style="display:block; width:100%; max-width:760px; margin:0.5rem auto; border-radius:10px; background:var(--surface-2);"
+                role="img" aria-label="Simulazione interattiva di una bomboletta spray con espansione adiabatica"></canvas>
+
+        <div class="sp-cols" style="margin-top:0.5rem;">
+          <div>gas rimasto: <span class="val-badge" id="spray-gas">100 %</span></div>
+          <div>pressione interna: <span class="val-badge" id="spray-press">4,0 atm</span></div>
+          <div>temperatura gas: <span class="val-badge" id="spray-temp">20 °C</span></div>
+          <div>temperatura bomboletta: <span class="val-badge" id="spray-tcan">20 °C</span></div>
+        </div>
+
+        <div class="eq-out" id="spray-out" style="margin-top:0.6rem; font-size:0.92rem;"></div>
+
+        <p class="cap">Premi il pulsante per far uscire il gas e osserva come cambiano temperatura e pressione.
+          La bomboletta si raffredda ad ogni spruzzo, e il gas esce più freddo dell'ambiente.</p>
+      </div>
+
       <div class="example">
         <p><strong>③ Esercizio.</strong> In una pompa da bicicletta l'aria a $20\ °$C viene compressa
           rapidamente a un quinto del volume iniziale. A che temperatura arriva, e a che pressione? E perché
@@ -1363,8 +1415,514 @@
         document.getElementById('ad-lock').addEventListener('change', disegna);
         disegna();
       })();
+
+      /* ============ 4b — SIMULAZIONE BOMBOLETTA SPRAY ============ */
+      (function () {
+        var canvas = document.getElementById('spray-canvas');
+        if (!canvas) { return; }
+        var ctx = canvas.getContext('2d');
+        var W = canvas.width, H = canvas.height;
+
+        var gasRimasto = 1.0;
+        var pInt = 4.0;
+        var tGas = 20;
+        var tCan = 20;
+        var GAMMA = 1.15;
+        var P0 = 4.0;
+        var T0 = 293.15;
+        var spraying = false;
+        var sprayFrame = 0;
+        var sprayParticles = [];
+        var gasParticles = [];
+
+        function initGasParticles() {
+          gasParticles = [];
+          for (var i = 0; i < 60; i++) {
+            gasParticles.push({
+              x: 240 + Math.random() * 120,
+              y: 60 + Math.random() * 140,
+              vx: (Math.random() - 0.5) * 2.5,
+              vy: (Math.random() - 0.5) * 2.5,
+              r: 2.5 + Math.random() * 1.5
+            });
+          }
+        }
+        initGasParticles();
+
+        function nc2(x, d) { return (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d).replace('.', ','); }
+
+        function getCanColor() {
+          var f = Math.max(0, Math.min(1, (20 - tCan) / 30));
+          var r = Math.round(200 - f * 80);
+          var g = Math.round(210 - f * 20);
+          var b = Math.round(220 + f * 35);
+          return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+
+        function getGasColor() {
+          var f = Math.max(0, Math.min(1, (20 - tGas) / 40));
+          return 'rgba(' + Math.round(100 - f * 60) + ',' + Math.round(180 + f * 50) + ',' +
+                 Math.round(220 + f * 35) + ',';
+        }
+
+        function getLiquidColor() {
+          var f = Math.max(0, Math.min(1, (20 - tCan) / 25));
+          return 'rgba(' + Math.round(80 - f * 30) + ',' + Math.round(160 + f * 40) + ',' +
+                 Math.round(255) + ',0.55)';
+        }
+
+        function roundRect(c, x, y, w, h, r) {
+          c.beginPath();
+          c.moveTo(x + r, y);
+          c.lineTo(x + w - r, y);
+          c.quadraticCurveTo(x + w, y, x + w, y + r);
+          c.lineTo(x + w, y + h - r);
+          c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+          c.lineTo(x + r, y + h);
+          c.quadraticCurveTo(x, y + h, x, y + h - r);
+          c.lineTo(x, y + r);
+          c.quadraticCurveTo(x, y, x + r, y);
+          c.closePath();
+        }
+
+        function drawCan() {
+          var cx = 300, cy = 210, cw = 130, ch = 260;
+          var x0 = cx - cw / 2, y0 = cy - ch / 2;
+
+          ctx.save();
+          ctx.shadowColor = 'rgba(0,0,0,0.18)';
+          ctx.shadowBlur = 18;
+          ctx.shadowOffsetX = 4;
+          ctx.shadowOffsetY = 6;
+
+          var canCol = getCanColor();
+          ctx.beginPath();
+          ctx.moveTo(x0 + 12, y0 + 30);
+          ctx.lineTo(x0 + 12, y0 + ch - 12);
+          ctx.quadraticCurveTo(x0 + 12, y0 + ch, x0 + 24, y0 + ch);
+          ctx.lineTo(x0 + cw - 24, y0 + ch);
+          ctx.quadraticCurveTo(x0 + cw - 12, y0 + ch, x0 + cw - 12, y0 + ch - 12);
+          ctx.lineTo(x0 + cw - 12, y0 + 30);
+          ctx.quadraticCurveTo(x0 + cw - 12, y0 + 10, x0 + cw / 2 + 8, y0 + 8);
+          ctx.lineTo(x0 + cw / 2 - 8, y0 + 8);
+          ctx.quadraticCurveTo(x0 + 12, y0 + 10, x0 + 12, y0 + 30);
+          ctx.closePath();
+
+          var grad = ctx.createLinearGradient(x0, y0, x0 + cw, y0);
+          grad.addColorStop(0, canCol);
+          grad.addColorStop(0.3, '#e8eef5');
+          grad.addColorStop(0.5, '#f8fafc');
+          grad.addColorStop(0.7, canCol);
+          grad.addColorStop(1, 'rgb(160,170,185)');
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.strokeStyle = '#8899aa';
+          ctx.lineWidth = 1.8;
+          ctx.stroke();
+          ctx.restore();
+
+          // Etichetta decorativa
+          var labelGrad = ctx.createLinearGradient(x0 + 20, y0 + 55, x0 + 20, y0 + 165);
+          labelGrad.addColorStop(0, '#2563eb');
+          labelGrad.addColorStop(1, '#7c3aed');
+          ctx.fillStyle = labelGrad;
+          roundRect(ctx, x0 + 20, y0 + 55, cw - 40, 110, 6);
+          ctx.fill();
+
+          ctx.fillStyle = '#fff';
+          ctx.font = 'bold 13px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('DEODORANTE', cx, y0 + 90);
+          ctx.font = '10px Inter, sans-serif';
+          ctx.fillText('Butano/Propano', cx, y0 + 108);
+          ctx.fillText('sotto pressione', cx, y0 + 122);
+          ctx.font = 'bold 11px Inter, sans-serif';
+          ctx.fillText(nc2(pInt, 1) + ' atm', cx, y0 + 145);
+
+          // Livello liquido
+          var liqH = Math.max(0, (ch - 80) * gasRimasto * 0.7);
+          if (liqH > 2) {
+            ctx.fillStyle = getLiquidColor();
+            ctx.beginPath();
+            ctx.moveTo(x0 + 14, y0 + ch - 13);
+            ctx.lineTo(x0 + 14, y0 + ch - 13 - liqH);
+            for (var wx = x0 + 14; wx <= x0 + cw - 14; wx += 4) {
+              var wave = Math.sin((wx - x0) * 0.12 + sprayFrame * 0.3) * (spraying ? 4 : 1.5);
+              ctx.lineTo(wx, y0 + ch - 13 - liqH + wave);
+            }
+            ctx.lineTo(x0 + cw - 14, y0 + ch - 13);
+            ctx.closePath();
+            ctx.fill();
+          }
+
+          // Valvola
+          ctx.fillStyle = '#555';
+          roundRect(ctx, cx - 6, y0 - 4, 12, 14, 3);
+          ctx.fill();
+          ctx.fillStyle = '#888';
+          ctx.beginPath();
+          ctx.arc(cx, y0 - 4, 6, 0, Math.PI, true);
+          ctx.fill();
+
+          // Condensa se fredda
+          if (tCan < 8) {
+            var cond = Math.min(1, (8 - tCan) / 15);
+            ctx.globalAlpha = cond * 0.35;
+            for (var di = 0; di < 20; di++) {
+              var ddx = x0 + 18 + (di % 5) * 22 + (di * 7) % 13;
+              var ddy = y0 + 50 + (di * 17) % (ch - 70);
+              ctx.fillStyle = 'rgba(180,220,255,0.7)';
+              ctx.beginPath();
+              ctx.ellipse(ddx, ddy, 2 + di % 3, 3 + di % 4, 0, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+          }
+        }
+
+        function drawThermometer() {
+          var tx = 500, ty = 60, tw = 28, th = 280;
+          ctx.fillStyle = 'rgba(0,0,0,0.06)';
+          roundRect(ctx, tx - 2, ty - 2, tw + 4, th + 4, 14);
+          ctx.fill();
+          ctx.fillStyle = '#f1f5f9';
+          roundRect(ctx, tx, ty, tw, th, 12);
+          ctx.fill();
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 1.5;
+          roundRect(ctx, tx, ty, tw, th, 12);
+          ctx.stroke();
+
+          var tMin = -20, tMax = 35;
+          var yBot = ty + th - 35, yTop = ty + 20;
+          var textCol = getComputedStyle(document.documentElement).getPropertyValue('--text-soft') || '#666';
+          for (var t = -20; t <= 30; t += 10) {
+            var yy = yBot - (yBot - yTop) * (t - tMin) / (tMax - tMin);
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(tx + tw, yy);
+            ctx.lineTo(tx + tw + 8, yy);
+            ctx.stroke();
+            ctx.fillStyle = textCol;
+            ctx.font = '11px Inter, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(t + '\u00b0', tx + tw + 12, yy + 4);
+          }
+
+          var tClamp = Math.max(tMin, Math.min(tMax, tGas));
+          var hMerc = (yBot - yTop) * (tClamp - tMin) / (tMax - tMin);
+          var mercGrad = ctx.createLinearGradient(tx + 6, yBot, tx + 6, yBot - hMerc);
+          if (tGas < 5) {
+            mercGrad.addColorStop(0, '#3b82f6');
+            mercGrad.addColorStop(1, '#60a5fa');
+          } else {
+            mercGrad.addColorStop(0, '#ef4444');
+            mercGrad.addColorStop(1, '#f97316');
+          }
+          ctx.fillStyle = mercGrad;
+          roundRect(ctx, tx + 7, yBot - hMerc, tw - 14, hMerc, 5);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(tx + tw / 2, yBot + 10, 12, 0, Math.PI * 2);
+          ctx.fillStyle = tGas < 5 ? '#3b82f6' : '#ef4444';
+          ctx.fill();
+
+          var accentCol = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#3b82f6';
+          ctx.fillStyle = accentCol;
+          ctx.font = 'bold 13px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('T gas', tx + tw / 2, ty - 10);
+          ctx.fillText(nc2(tGas, 1) + ' \u00b0C', tx + tw / 2 + 4, yBot + 48);
+        }
+
+        function drawPressureGauge() {
+          var gx = 630, gy = 100, gr = 60;
+          ctx.beginPath();
+          ctx.arc(gx, gy, gr + 5, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0,0,0,0.06)';
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(gx, gy, gr, 0, Math.PI * 2);
+          ctx.fillStyle = '#f8fafc';
+          ctx.fill();
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          var textCol = getComputedStyle(document.documentElement).getPropertyValue('--text-soft') || '#666';
+          ctx.fillStyle = textCol;
+          ctx.font = '10px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          for (var a = 0; a <= 5; a++) {
+            var angle = Math.PI * 0.8 + (Math.PI * 1.4) * a / 5;
+            var xn = gx + Math.cos(angle) * (gr - 14);
+            var yn = gy + Math.sin(angle) * (gr - 14);
+            ctx.fillText(a, xn, yn + 4);
+            ctx.beginPath();
+            ctx.moveTo(gx + Math.cos(angle) * (gr - 5), gy + Math.sin(angle) * (gr - 5));
+            ctx.lineTo(gx + Math.cos(angle) * (gr - 1), gy + Math.sin(angle) * (gr - 1));
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+
+          var pClamp = Math.max(0, Math.min(5, pInt));
+          var needleAngle = Math.PI * 0.8 + (Math.PI * 1.4) * pClamp / 5;
+          ctx.beginPath();
+          ctx.moveTo(gx, gy);
+          ctx.lineTo(gx + Math.cos(needleAngle) * (gr - 20), gy + Math.sin(needleAngle) * (gr - 20));
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(gx, gy, 5, 0, Math.PI * 2);
+          ctx.fillStyle = '#333';
+          ctx.fill();
+
+          var accentCol = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#3b82f6';
+          ctx.fillStyle = accentCol;
+          ctx.font = 'bold 11px Inter, sans-serif';
+          ctx.fillText('Pressione (atm)', gx, gy + gr + 20);
+        }
+
+        function drawCanThermometer() {
+          var bx = 590, by = 220, bw = 130, bh = 26;
+          ctx.fillStyle = 'rgba(0,0,0,0.06)';
+          roundRect(ctx, bx - 2, by - 2, bw + 4, bh + 4, 8);
+          ctx.fill();
+          ctx.fillStyle = '#f1f5f9';
+          roundRect(ctx, bx, by, bw, bh, 6);
+          ctx.fill();
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 1.2;
+          roundRect(ctx, bx, by, bw, bh, 6);
+          ctx.stroke();
+
+          var frac = Math.max(0, Math.min(1, (tCan + 20) / 50));
+          var fillW = bw * frac;
+          var barGrad = ctx.createLinearGradient(bx, by, bx + bw, by);
+          barGrad.addColorStop(0, '#3b82f6');
+          barGrad.addColorStop(0.5, '#a855f7');
+          barGrad.addColorStop(1, '#ef4444');
+          ctx.fillStyle = barGrad;
+          roundRect(ctx, bx, by, Math.max(0, fillW), bh, 6);
+          ctx.fill();
+
+          var textCol = getComputedStyle(document.documentElement).getPropertyValue('--text-soft') || '#666';
+          ctx.fillStyle = textCol;
+          ctx.font = 'bold 11px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('T bomboletta', bx + bw / 2, by - 8);
+          ctx.fillText(nc2(tCan, 1) + ' \u00b0C', bx + bw / 2, by + bh + 16);
+        }
+
+        function drawGasLevel() {
+          var bx = 590, by = 290, bw = 130, bh = 20;
+          ctx.fillStyle = 'rgba(0,0,0,0.06)';
+          roundRect(ctx, bx - 2, by - 2, bw + 4, bh + 4, 8);
+          ctx.fill();
+          ctx.fillStyle = '#f1f5f9';
+          roundRect(ctx, bx, by, bw, bh, 6);
+          ctx.fill();
+          ctx.strokeStyle = '#94a3b8';
+          ctx.lineWidth = 1.2;
+          roundRect(ctx, bx, by, bw, bh, 6);
+          ctx.stroke();
+
+          var fillW = bw * gasRimasto;
+          var lvGrad = ctx.createLinearGradient(bx, by, bx + bw, by);
+          lvGrad.addColorStop(0, '#22c55e');
+          lvGrad.addColorStop(1, '#16a34a');
+          ctx.fillStyle = lvGrad;
+          roundRect(ctx, bx, by, Math.max(0, fillW), bh, 6);
+          ctx.fill();
+
+          var textCol = getComputedStyle(document.documentElement).getPropertyValue('--text-soft') || '#666';
+          ctx.fillStyle = textCol;
+          ctx.font = 'bold 11px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('Gas rimasto', bx + bw / 2, by - 6);
+          ctx.fillText(Math.round(gasRimasto * 100) + ' %', bx + bw / 2, by + bh + 14);
+        }
+
+        function drawInternalParticles() {
+          var cx = 300, cy = 210, cw = 130, ch = 260;
+          var x0 = cx - cw / 2, y0 = cy - ch / 2;
+          var numVisible = Math.round(gasParticles.length * gasRimasto);
+          var gasCol = getGasColor();
+          var speed = Math.max(0.3, (tGas + 273.15) / T0);
+
+          for (var i = 0; i < numVisible; i++) {
+            var p = gasParticles[i];
+            p.x += p.vx * speed;
+            p.y += p.vy * speed;
+            if (p.x < x0 + 16) { p.x = x0 + 16; p.vx = Math.abs(p.vx); }
+            if (p.x > x0 + cw - 16) { p.x = x0 + cw - 16; p.vx = -Math.abs(p.vx); }
+            if (p.y < y0 + 14) { p.y = y0 + 14; p.vy = Math.abs(p.vy); }
+            if (p.y > y0 + ch - 16) { p.y = y0 + ch - 16; p.vy = -Math.abs(p.vy); }
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = gasCol + (0.6 + Math.random() * 0.3).toFixed(2) + ')';
+            ctx.fill();
+          }
+        }
+
+        function drawSprayParticles() {
+          for (var i = sprayParticles.length - 1; i >= 0; i--) {
+            var p = sprayParticles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.06;
+            p.life -= 0.02;
+            if (p.life <= 0) { sprayParticles.splice(i, 1); continue; }
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(180,210,240,' + (p.life * 0.5).toFixed(2) + ')';
+            ctx.fill();
+          }
+        }
+
+        function emitSpray() {
+          var cx = 300, cy = 210 - 130;
+          for (var i = 0; i < 8; i++) {
+            sprayParticles.push({
+              x: cx + (Math.random() - 0.5) * 8,
+              y: cy - 4 + Math.random() * 4,
+              vx: (Math.random() - 0.5) * 3,
+              vy: -2.5 - Math.random() * 3,
+              r: 2 + Math.random() * 3,
+              life: 1.0
+            });
+          }
+        }
+
+        function draw() {
+          var bgColor = getComputedStyle(canvas).backgroundColor || '#f1f5f9';
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(0, 0, W, H);
+
+          var textCol = getComputedStyle(document.documentElement).getPropertyValue('--text-soft') || '#666';
+          ctx.fillStyle = textCol;
+          ctx.font = '12px Inter, sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText('Ogni clic = uno spruzzo. Osserva T e p scendere.', 20, 20);
+
+          drawCan();
+          drawInternalParticles();
+          drawSprayParticles();
+          drawThermometer();
+          drawPressureGauge();
+          drawCanThermometer();
+          drawGasLevel();
+
+          if (spraying && sprayFrame > 0) {
+            sprayFrame--;
+            emitSpray();
+            if (sprayFrame <= 0) { spraying = false; }
+          }
+
+          requestAnimationFrame(draw);
+        }
+
+        function spruzzo() {
+          if (gasRimasto <= 0.02) { return; }
+          var dGas = 0.06;
+          gasRimasto = Math.max(0, gasRimasto - dGas);
+
+          var Tk = tGas + 273.15;
+          var ratio = pInt;
+          var dT_espansione = Tk * (1 - Math.pow(1 / Math.max(1.01, ratio), GAMMA - 1));
+          tGas -= dT_espansione * 0.15;
+
+          var dT_latente = 3.5 * (1.2 - gasRimasto);
+          tCan -= dT_latente * 0.3;
+          tGas = tGas * 0.7 + tCan * 0.3;
+
+          pInt = P0 * gasRimasto * ((tGas + 273.15) / T0);
+          pInt = Math.max(0, pInt);
+
+          tCan += 0.15;
+          tGas += 0.1;
+
+          tGas = Math.max(-25, tGas);
+          tCan = Math.max(-20, tCan);
+
+          spraying = true;
+          sprayFrame = 25;
+
+          aggiornaBadge();
+          aggiornaCommento();
+        }
+
+        function reset() {
+          gasRimasto = 1.0;
+          pInt = P0;
+          tGas = 20;
+          tCan = 20;
+          sprayParticles = [];
+          spraying = false;
+          sprayFrame = 0;
+          initGasParticles();
+          aggiornaBadge();
+          aggiornaCommento();
+        }
+
+        function aggiornaBadge() {
+          document.getElementById('spray-gas').textContent = Math.round(gasRimasto * 100) + ' %';
+          document.getElementById('spray-press').textContent = nc2(pInt, 1) + ' atm';
+          document.getElementById('spray-temp').textContent = nc2(tGas, 1) + ' \u00b0C';
+          document.getElementById('spray-tcan').textContent = nc2(tCan, 1) + ' \u00b0C';
+        }
+
+        function aggiornaCommento() {
+          var el = document.getElementById('spray-out');
+          if (!el) { return; }
+          var msgs = [];
+          if (gasRimasto > 0.85) {
+            msgs.push('La bomboletta \u00e8 quasi piena. Il gas \u00e8 a ' + nc2(pInt, 1) +
+              ' atm e ' + nc2(tGas, 1) + ' \u00b0C \u2014 tutto come appena comprato.');
+          } else if (gasRimasto > 0.5) {
+            msgs.push('Hai usato un po\' di deodorante. La pressione \u00e8 scesa a ' + nc2(pInt, 1) +
+              ' atm e la temperatura del gas a ' + nc2(tGas, 1) + ' \u00b0C.');
+            if (tCan < 18) {
+              msgs.push(' La bomboletta comincia a sentirsi fresca al tatto (' + nc2(tCan, 1) +
+                ' \u00b0C): l\'evaporazione del liquido sottrae calore al metallo.');
+            }
+          } else if (gasRimasto > 0.15) {
+            msgs.push('Meno della met\u00e0 del gas. La pressione \u00e8 ' + nc2(pInt, 1) +
+              ' atm, il gas esce a ' + nc2(tGas, 1) + ' \u00b0C.');
+            msgs.push(' La bomboletta \u00e8 decisamente fredda (' + nc2(tCan, 1) +
+              ' \u00b0C): \u00e8 l\'effetto combinato dell\'<strong>espansione adiabatica</strong> e del ' +
+              '<strong>calore latente di evaporazione</strong>.');
+          } else if (gasRimasto > 0.02) {
+            msgs.push('Quasi vuota! Pressione residua: ' + nc2(pInt, 1) +
+              ' atm. Il gas esce debolmente e molto freddo (' + nc2(tGas, 1) + ' \u00b0C).');
+            msgs.push(' La bomboletta \u00e8 gelida al tatto (' + nc2(tCan, 1) +
+              ' \u00b0C) \u2014 se la vedessi si sarebbe appannata di condensa. ' +
+              '\u00c8 la stessa equazione: $\\Delta U = -L$, tutta l\'energia se ne va in lavoro.');
+          } else {
+            msgs.push('La bomboletta \u00e8 <strong>vuota</strong>. Pressione atmosferica. ' +
+              'Se la tocchi \u00e8 fredda come una lattina dal frigo. Premi \u00abRicarica\u00bb per ricominciare.');
+          }
+          el.innerHTML = msgs.join('');
+          if (typeof renderMathIn === 'function') { renderMathIn(el); }
+        }
+
+        document.getElementById('spray-btn').addEventListener('click', spruzzo);
+        document.getElementById('spray-reset').addEventListener('click', reset);
+
+        aggiornaBadge();
+        aggiornaCommento();
+        draw();
+      })();
+
     });
   </script>
+
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
