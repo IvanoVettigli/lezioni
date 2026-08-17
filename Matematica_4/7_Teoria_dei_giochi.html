@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 7 — La teoria dei giochi</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .storia { border-left: 4px solid var(--magenta); background: color-mix(in srgb, var(--magenta) 7%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 680px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.l { text-align: left; }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabwrap { overflow-x: auto; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .ric { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .ric > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                 padding: 0.8rem 0.9rem; background: var(--surface); }
+    .ric h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quarto anno · Lezione 7</div>
+    <h1>La teoria dei giochi</h1>
+    <p>La matematica delle decisioni, quando il risultato
+      dipende anche da quello che fanno gli altri</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quarto anno</a>
+    <span class="sep">/</span> La teoria dei giochi
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>L'idea in una riga.</strong> Fino a qui la matematica ha descritto <em>cose</em>: triangoli,
+      onde, nuclei che decadono. Adesso descrive <em>scelte</em> — e con una complicazione che cambia tutto.
+      Se sto risolvendo un problema di fisica, la palla non cambia traiettoria per dispetto; ma se sto
+      decidendo un prezzo, o una mossa a scacchi, o se fidarmi di qualcuno, il risultato dipende <strong>anche
+      da quello che decide l'altro</strong>, che a sua volta sta cercando di indovinare che cosa deciderò io.
+      La teoria dei giochi è la matematica di questa situazione, e la sua scoperta più famosa è
+      scomoda: <strong>ci sono situazioni in cui, se tutti fanno la scelta migliore per sé, il risultato è
+      peggiore per tutti</strong>.
+    </div>
+
+    <!-- 1 — L'OPERATORE RAZIONALE -->
+    <section id="sec1">
+      <h2>1. L'operatore razionale: un modello, non una persona</h2>
+
+      <p>Per fare matematica sulle decisioni bisogna prima decidere <em>chi</em> decide. La teoria dei giochi
+        parte da una figura ideale che si chiama <strong>operatore razionale</strong> (o <em>agente
+        razionale</em>), definita da tre proprietà.</p>
+
+      <div class="ric">
+        <div><h4>1 · Ha preferenze coerenti</h4><p>Sa dire, per ogni coppia di risultati, quale preferisce o
+          se gli sono indifferenti. E le sue preferenze sono <strong>transitive</strong>: se preferisce $A$ a
+          $B$ e $B$ a $C$, allora preferisce $A$ a $C$.</p></div>
+        <div><h4>2 · Massimizza</h4><p>Fra le azioni disponibili sceglie sempre quella che porta al risultato
+          che preferisce. Non si distrae, non si stanca, non cambia idea a metà.</p></div>
+        <div><h4>3 · Sa che gli altri sono come lui</h4><p>Sa che anche l'avversario è razionale, e sa che
+          l'avversario sa che lui lo sa. Questa <em>conoscenza comune</em> è ciò che permette di
+          ragionare sulle mosse altrui.</p></div>
+      </div>
+
+      <div class="warnbox"><strong>Nessuno di noi è un operatore razionale, e la teoria lo sa.</strong> È un
+        <strong>modello</strong>, esattamente come il <em>punto materiale</em> e il <em>corpo rigido</em> della
+        fisica. Un punto materiale non esiste — nessun oggetto ha massa e non ha dimensioni — eppure con quel
+        modello si calcolano le orbite dei pianeti con una precisione impressionante. Allo stesso modo
+        l'operatore razionale non esiste, ma serve a capire che cosa <em>tenderebbe</em> a succedere se tutti
+        ragionassero con freddezza. Dove le previsioni sbagliano, e sbagliano spesso, si impara qualcosa di
+        prezioso sugli esseri umani veri: è nato così un intero settore, l'<em>economia comportamentale</em>,
+        che studia proprio gli scarti sistematici fra noi e l'operatore razionale.</div>
+
+      <h3>1.1 — La funzione di utilità</h3>
+
+      <p>Per fare i conti servono numeri, non preferenze. La mossa è associare a ogni possibile risultato un
+        numero che ne misuri la desiderabilità: si chiama <strong>utilità</strong>.</p>
+
+      <div class="definition">
+        <div class="formula-title">Funzione di utilità</div>
+        <p>Una funzione $u$ che a ogni risultato $x$ associa un numero $u(x)$, in modo che</p>
+        <div class="formula">$$x \text{ è preferito a } y \iff u(x) \gt u(y)$$</div>
+        <p class="formula-note">Attenzione: <strong>solo l'ordine conta</strong>. Se $u$ descrive le
+          preferenze di qualcuno, anche $2u$, $u + 100$ e $u^3$ le descrivono ugualmente bene. Dire «per me
+          questo gelato vale 7» non significa niente in assoluto: significa qualcosa solo confrontato con il
+          valore che do a qualcos'altro.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="ut-btns">
+          <button class="btn btn-sm active" data-f="rad">$u = \sqrt{x}$ (avverso al rischio)</button>
+          <button class="btn btn-sm" data-f="lin">$u = x$ (neutrale)</button>
+          <button class="btn btn-sm" data-f="qua">$u = x^2$ (propenso al rischio)</button>
+          <button class="btn btn-sm" data-f="log">$u = \ln(1+x)$</button>
+        </div>
+        <div class="ctrl">
+          <label>quantità di denaro <span class="val-badge" id="ut-xv">40</span></label>
+          <input type="range" id="ut-x" min="0" max="100" step="1" value="40" style="flex:1;min-width:220px">
+        </div>
+        <svg id="ut-svg" viewBox="0 0 680 330" role="img" aria-label="Funzioni di utilità e utilità marginale"></svg>
+        <p class="cap" id="ut-cap"></p>
+        <p class="formula-note">Il pannello mostra anche l'<strong>utilità marginale</strong>, cioè quanto
+          aumenta l'utilità aggiungendo un'unità: è il rapporto incrementale della lezione 5, applicato qui.
+          Con $u = \sqrt x$ l'utilità marginale <em>cala</em>, ed è il caso realistico: mille euro cambiano la
+          vita a chi non ne ha, quasi niente a chi ne ha un milione.</p>
+      </div>
+
+      <div class="curiosita"><strong>Il paradosso di San Pietroburgo.</strong> Nel 1738 Daniel Bernoulli
+        propose questo gioco: si lancia una moneta finché non esce testa; se esce al lancio $n$, si vincono
+        $2^n$ ducati. Il guadagno <em>medio</em> è
+        $\frac12 \cdot 2 + \frac14 \cdot 4 + \frac18 \cdot 8 + \dots = 1 + 1 + 1 + \dots = \infty$: dunque un
+        giocatore razionale dovrebbe essere disposto a pagare <em>qualunque</em> cifra per giocare. Ma
+        nessuno pagherebbe più di una ventina di ducati, e infatti la teoria della probabilità pura qui
+        sbaglia clamorosamente. La soluzione di Bernoulli — geniale e in anticipo di due secoli — fu di dire
+        che non si massimizza il denaro ma l'<strong>utilità</strong> del denaro, e che questa cresce come un
+        <em>logaritmo</em>. Con $u = \ln x$ la somma converge, e il prezzo giusto diventa un numero
+        ragionevole. È la prima comparsa della funzione di utilità nella storia, ed è nata da un
+        paradosso.</div>
+    </section>
+
+    <!-- 2 — CHE COS'È UN GIOCO -->
+    <section id="sec2">
+      <h2>2. Che cos'è un gioco, e come si classificano</h2>
+
+      <div class="definition">
+        <div class="formula-title">Gioco</div>
+        <p>Un <strong>gioco</strong> è definito da tre ingredienti:</p>
+        <p><span class="step-num">1</span> un insieme di <strong>giocatori</strong>;
+          <span class="step-num">2</span> per ciascuno, un insieme di <strong>strategie</strong> fra cui
+          scegliere; <span class="step-num">3</span> una <strong>funzione di utilità</strong> che, per ogni
+          combinazione di scelte, dice quanto guadagna ciascuno.</p>
+        <p class="formula-note">Nel caso di due giocatori con poche strategie, tutto si scrive in una
+          <strong>matrice dei pagamenti</strong>: le righe sono le mosse del primo, le colonne quelle del
+          secondo, e in ogni casella ci sono due numeri — prima l'utilità di chi sceglie la riga, poi quella
+          di chi sceglie la colonna.</p>
+      </div>
+
+      <div class="tabwrap">
+      <table class="tabf">
+        <tr><th>criterio</th><th>tipi</th><th>esempi</th></tr>
+        <tr><td class="lab">somma</td><td class="l"><strong>a somma zero</strong>: quello che vince uno lo perde l'altro. <strong>A somma non zero</strong>: si può guadagnare o perdere insieme</td><td class="l">scacchi, poker fra due / commercio, alleanze</td></tr>
+        <tr><td class="lab">informazione</td><td class="l"><strong>completa</strong>: tutti conoscono le regole e i pagamenti. <strong>Incompleta</strong>: qualcosa è nascosto</td><td class="l">scacchi, dama / poker, aste</td></tr>
+        <tr><td class="lab">mosse</td><td class="l"><strong>simultanee</strong>: si sceglie senza sapere l'altro. <strong>Sequenziali</strong>: a turno, vedendo le mosse precedenti</td><td class="l">morra cinese / scacchi, negoziati</td></tr>
+        <tr><td class="lab">ripetizione</td><td class="l"><strong>one-shot</strong>: si gioca una volta sola. <strong>Ripetuto</strong>: ci si rincontra</td><td class="l">un'asta / la convivenza fra vicini</td></tr>
+        <tr><td class="lab">accordi</td><td class="l"><strong>non cooperativo</strong>: non ci sono patti vincolanti. <strong>Cooperativo</strong>: si possono fare accordi che si <em>devono</em> rispettare</td><td class="l">concorrenza fra imprese / contratti, coalizioni</td></tr>
+      </table>
+      </div>
+
+      <p class="formula-note">Quasi tutto quello che vedremo riguarda giochi <strong>non cooperativi, a due
+        giocatori, con mosse simultanee e informazione completa</strong>: la categoria più semplice, e già
+        abbastanza ricca da contenere il dilemma del prigioniero.</p>
+
+      <div class="curiosita"><strong>Somma zero non vuol dire «cattivo».</strong> È solo un vincolo
+        matematico: $u_1 + u_2 = 0$ per ogni esito. Gli scacchi lo sono (vittoria $+1$, sconfitta $-1$,
+        patta $0$), e questo li rende <em>puramente</em> competitivi: non c'è nessun esito che convenga a
+        entrambi. La cosa notevole è che <strong>quasi nessuna situazione reale è a somma zero</strong>: nel
+        commercio, in una trattativa, in un'amicizia, esiste quasi sempre un esito migliore per tutti di
+        quello che si otterrebbe litigando. Trattare la vita come un gioco a somma zero — «se lui guadagna,
+        io perdo» — è un errore <em>matematico</em>, prima ancora che morale.</div>
+    </section>
+
+    <!-- 3 — L'EQUILIBRIO DI NASH -->
+    <section id="sec3">
+      <h2>3. L'equilibrio di Nash</h2>
+
+      <div class="storia">
+        <p><strong>John Forbes Nash Jr. (1928-2015).</strong> Nel 1950, a ventidue anni, presenta a Princeton
+          una tesi di dottorato di <strong>ventisette pagine</strong>, con due sole citazioni bibliografiche.
+          Contiene la definizione di quello che oggi si chiama <em>equilibrio di Nash</em> e la dimostrazione
+          che in ogni gioco finito ne esiste almeno uno. È uno dei documenti più influenti del Novecento nelle
+          scienze sociali.</p>
+        <p>Nel 1959, mentre insegna al MIT, si manifesta una <strong>schizofrenia paranoide</strong> che lo
+          allontana dalla ricerca per quasi trent'anni. Continua a frequentare i corridoi di Princeton, dove
+          gli studenti lo chiamano «il fantasma della Fine Hall» e lo vedono riempire lavagne di formule
+          incomprensibili. Poi, negli anni Novanta, una remissione lenta e in gran parte spontanea. Nel
+          <strong>1994</strong> riceve il Nobel per l'economia; nel <strong>2015</strong>, il premio Abel per
+          la matematica — per lavori sulle equazioni differenziali che considerava più importanti di quelli
+          sui giochi. Muore in un incidente d'auto pochi giorni dopo, tornando dalla cerimonia, insieme alla
+          moglie Alicia. La sua storia è raccontata nel libro di Sylvia Nasar <em>A Beautiful Mind</em> (1998)
+          e nel film omonimo del 2001.</p>
+      </div>
+
+      <div class="curiosita"><strong>Prima di Nash: von Neumann.</strong> La teoria dei giochi nasce
+        ufficialmente nel <strong>1944</strong> con <em>Theory of Games and Economic Behavior</em> di John von
+        Neumann e Oskar Morgenstern, che riprende il <em>teorema del minimax</em> dimostrato da von Neumann nel
+        1928: in ogni gioco a somma zero a due giocatori esiste una strategia ottima, e il valore del gioco è
+        univocamente determinato. Il limite era proprio quello: valeva solo a <em>somma zero</em>, cioè per la
+        pura competizione. Il contributo di Nash fu estendere il risultato a <strong>qualunque</strong> gioco
+        finito, competitivo o no. Von Neumann, quando il giovane Nash gli espose l'idea, la liquidò con un
+        «è banale, è solo un teorema di punto fisso». Aveva ragione sulla tecnica e torto su tutto il
+        resto.</div>
+
+      <div class="definition">
+        <div class="formula-title">Equilibrio di Nash</div>
+        <p>Una combinazione di strategie è un <strong>equilibrio di Nash</strong> se
+          <strong>nessun giocatore può migliorare il proprio risultato cambiando idea da solo</strong>, dato
+          che gli altri restano fermi.</p>
+        <p class="formula-note">Attenzione a ogni parola. «Migliorare»: rispetto alla propria funzione di
+          utilità, non a quella comune. «<strong>Da solo</strong>»: si considerano soltanto le deviazioni
+          <em>unilaterali</em>. È questa clausola a rendere l'equilibrio di Nash una condizione
+          <em>locale</em> — e a permettere che esista un esito migliore per tutti, irraggiungibile perché
+          nessuno può arrivarci muovendosi da solo.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Ottimo di Pareto</div>
+        <p>Un esito è <strong>Pareto-ottimale</strong> se non ne esiste un altro che migliori la situazione di
+          <em>almeno uno</em> senza peggiorare quella di nessuno.</p>
+        <p class="formula-note">Sono due nozioni <strong>indipendenti</strong>: un equilibrio di Nash può non
+          essere Pareto-ottimale (ed è esattamente il dramma del dilemma del prigioniero), e un ottimo di
+          Pareto può non essere un equilibrio di Nash — cioè può essere instabile, perché qualcuno ha
+          interesse a tradirlo.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Il teorema di Nash (1950)</div>
+        <p>Ogni gioco finito — con un numero finito di giocatori e di strategie — ammette <strong>almeno un
+          equilibrio di Nash</strong>, eventualmente in <em>strategie miste</em> (cioè scegliendo a caso, con
+          probabilità assegnate).</p>
+        <p class="formula-note">La dimostrazione usa un <em>teorema di punto fisso</em>, uno di quei risultati
+          che garantiscono l'esistenza di una soluzione senza dirti come trovarla. È lo stesso genere di
+          teorema che assicura che, mescolando bene una tazza di caffè, almeno un punto del liquido torna
+          esattamente dov'era.</p>
+      </div>
+
+      <h3>3.1 — «Io penso a quello che pensi tu, che pensi a quello che penso io…»</h3>
+
+      <p>C'è una cosa che chiunque abbia giocato a scacchi, a dama o a carte ha sperimentato di persona, e che
+        vale la pena guardare da vicino, perché è il motore di tutta la teoria dei giochi.</p>
+
+      <p>Sto per muovere. Prima di farlo mi chiedo: <em>che cosa risponderebbe il mio avversario?</em> Per
+        rispondere mi metto nei suoi panni — ma lui, a sua volta, sta pensando a quello che farei io dopo la sua
+        risposta. Quindi devo mettermi nei suoi panni <em>mentre lui si mette nei miei</em>. E lui sta facendo la
+        stessa identica cosa con me. La cosa non finisce mai:</p>
+
+      <p style="text-align:center; font-size:1.12rem; font-style:italic; color:var(--accent); margin:1rem 0;">
+        «So che tu sai che io so che tu sai…»</p>
+
+      <div class="note">
+        <strong>I livelli di ragionamento.</strong> Gli economisti li numerano, e l'esperienza dice che le
+        persone si fermano prestissimo.
+        <ul>
+          <li><strong>livello 0</strong> — gioco senza pensare all'avversario, o a caso;</li>
+          <li><strong>livello 1</strong> — penso a che cosa farà lui, supponendo che sia di livello 0;</li>
+          <li><strong>livello 2</strong> — penso che lui pensi a me, e mi regolo di conseguenza;</li>
+          <li><strong>livello 3, 4, …</strong> — e così via, in linea di principio all'infinito.</li>
+        </ul>
+        Negli esperimenti la stragrande maggioranza delle persone si ferma fra il <strong>livello 1 e il
+        livello 2</strong>: non perché sia poco intelligente, ma perché salire di un livello serve solo se
+        l'avversario sale con te — e nessuno sa quanto in alto arriverà l'altro.
+      </div>
+
+      <div class="curiosita">
+        <strong>🎯 Un gioco che si può fare in classe: i due terzi della media.</strong> Ognuno scrive un numero
+        fra $0$ e $100$. Vince chi si avvicina di più ai <strong>due terzi della media</strong> di tutti i numeri
+        scritti.
+        <p style="margin:0.5rem 0 0;">Il ragionamento parte: se tutti scrivessero a caso la media sarebbe circa
+          $50$, quindi conviene scrivere $33$ (livello 1). Ma se tutti pensano così, la media è $33$ e conviene
+          scrivere $22$ (livello 2). E poi $15$, e poi $10$… L'unico equilibrio di Nash è che <strong>tutti
+          scrivano $0$</strong>: è il punto in cui nessuno guadagna niente a fare un giro di pensiero in più.</p>
+        <p style="margin:0.5rem 0 0;">Quando l'esperimento si fa davvero, però, quasi nessuno scrive $0$. Il
+          <em>Financial Times</em> lo propose ai suoi lettori nel 1997: vinse il numero <strong>13</strong>. In
+          classe, con giocatori alle prime armi, la media è più alta e vince un numero fra $15$ e $25$. A vincere
+          non è chi calcola l'equilibrio, ma chi <strong>indovina quanti giri di ragionamento faranno gli
+          altri</strong> — e ne fa uno solo in più. Provateci: giocare «troppo bene» in un gruppo di principianti
+          è il modo più sicuro di perdere.</p>
+      </div>
+
+      <p>Questa regressione all'infinito non è un difetto del ragionamento: è <strong>il problema</strong> che
+        l'equilibrio di Nash risolve. Un equilibrio è precisamente il punto in cui <em>fare un altro giro di
+        pensiero non cambia più la risposta</em> — un <strong>punto fisso</strong>, come quello del teorema
+        citato qui sopra. Per questo la definizione è formulata al contrario di come verrebbe naturale: non dice
+        «la mossa migliore», dice «nessuno ha motivo di cambiare».</p>
+
+      <div class="warnbox">
+        <strong>Dove la ricorsione si ferma e dove no.</strong>
+        <ul>
+          <li>Negli <strong>scacchi</strong> e nella <strong>dama</strong> — informazione completa, nessun caso —
+            la ricorsione <em>in teoria</em> finisce: si può risalire dalla fine della partita all'inizio
+            (<em>induzione a ritroso</em>) e stabilire chi vince con gioco perfetto. Lo dimostrò
+            <strong>Ernst Zermelo</strong> nel 1913. In pratica no: le partite di scacchi possibili sono circa
+            $10^{120}$, molte più degli atomi dell'universo osservabile, e nessun calcolatore le esplorerà mai
+            tutte. La dama invece è stata <strong>risolta davvero</strong>, nel 2007, dopo diciotto anni di
+            calcoli: con gioco perfetto finisce sempre in parità.</li>
+          <li>Nei giochi con <strong>informazione nascosta</strong> o con un elemento di <strong>caso</strong> —
+            il poker, la scopa, la morra cinese — la ricorsione non finisce affatto, perché non esiste una mossa
+            «giusta» da scoprire: se giocassi sempre la stessa cosa, l'avversario se ne accorgerebbe. La
+            soluzione, e non è una battuta, è <strong>giocare a caso</strong> con le probabilità giuste: sono le
+            <em>strategie miste</em> del teorema di Nash. È anche il motivo matematico per cui nel poker si
+            bluffa — non ogni tanto per carattere, ma con una frequenza precisa.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4 — IL DILEMMA DEL PRIGIONIERO -->
+    <section id="sec4">
+      <h2>4. Il dilemma del prigioniero</h2>
+
+      <div class="storia">
+        <p>Il gioco fu costruito nel <strong>1950</strong> da Merrill Flood e Melvin Dresher alla RAND
+          Corporation; la storiella che lo rese famoso la inventò poco dopo il matematico
+          <strong>Albert Tucker</strong>, per spiegarlo a un pubblico di psicologi.</p>
+        <p>Due complici vengono arrestati e interrogati in <em>stanze separate</em>. A ciascuno viene detto:
+          «se confessi e il tuo complice tace, tu esci libero e lui si prende dieci anni; se tacete entrambi,
+          vi becchiamo un anno a testa per un reato minore; se confessate entrambi, cinque anni ciascuno».</p>
+      </div>
+
+      <p>Traduciamo in utilità: più anni di carcere, meno utilità. Usiamo dei punti in cui il numero più alto
+        è il risultato migliore.</p>
+
+      <div class="tabwrap">
+      <table class="tabf">
+        <tr><th></th><th>B tace (coopera)</th><th>B confessa (tradisce)</th></tr>
+        <tr><td class="lab">A tace (coopera)</td><td><strong>3 ; 3</strong></td><td>0 ; 5</td></tr>
+        <tr><td class="lab">A confessa (tradisce)</td><td>5 ; 0</td><td><strong>1 ; 1</strong></td></tr>
+      </table>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Il ragionamento, dalla parte di A</div>
+        <p><span class="step-num">1</span> <em>Se B tace</em>, io guadagno $3$ tacendo e $5$ confessando:
+          conviene <strong>confessare</strong>.</p>
+        <p><span class="step-num">2</span> <em>Se B confessa</em>, io guadagno $0$ tacendo e $1$ confessando:
+          conviene ancora <strong>confessare</strong>.</p>
+        <p><span class="step-num">3</span> Quindi confessare è meglio <strong>qualunque cosa faccia B</strong>.
+          Si dice che tradire è una <strong>strategia dominante</strong>.</p>
+        <p class="formula-note">B fa lo stesso ragionamento. Entrambi confessano e ottengono $(1;1)$. Ma se
+          avessero taciuto entrambi avrebbero ottenuto $(3;3)$: <strong>meglio per tutti e due</strong>. Il
+          risultato del ragionamento razionale è peggiore del risultato che si otterrebbe fidandosi.</p>
+      </div>
+
+      <div class="warnbox"><strong>Ed è qui il punto che sconvolse gli economisti nel 1950.</strong>
+        L'esito $(1;1)$ è l'unico <strong>equilibrio di Nash</strong>: nessuno dei due può migliorare
+        cambiando idea <em>da solo</em> (chi passasse da confessare a tacere scenderebbe da $1$ a $0$).
+        L'esito $(3;3)$ è invece l'<strong>ottimo di Pareto</strong>, ma è instabile: chiunque ci si trovi ha
+        interesse a tradire. Per arrivare al risultato migliore bisognerebbe muoversi <strong>insieme</strong>,
+        e la struttura del gioco non lo permette. Non è un problema di cattiveria: è un problema di
+        <em>geometria delle scelte</em>.</div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="dp-btns">
+          <button class="btn btn-sm active" data-p="0">dilemma del prigioniero</button>
+          <button class="btn btn-sm" data-p="1">caccia al cervo</button>
+          <button class="btn btn-sm" data-p="2">gioco del pollo</button>
+          <button class="btn btn-sm" data-p="3">coordinamento</button>
+          <button class="btn btn-sm" data-p="4">testa o croce (somma zero)</button>
+        </div>
+        <div class="ctrl">
+          <label>tentazione di tradire <span class="val-badge" id="dp-tv">5</span></label>
+          <input type="range" id="dp-t" min="0" max="8" step="1" value="5" style="flex:1;min-width:190px">
+          <label>premio della cooperazione <span class="val-badge" id="dp-rv">3</span></label>
+          <input type="range" id="dp-r" min="0" max="8" step="1" value="3" style="flex:1;min-width:190px">
+        </div>
+        <svg id="dp-svg" viewBox="0 0 680 340" role="img" aria-label="Matrice dei pagamenti, equilibri di Nash e ottimi di Pareto"></svg>
+        <p class="cap" id="dp-cap"></p>
+        <p class="formula-note">Le celle con il bordo <strong>magenta</strong> sono equilibri di Nash, quelle
+          con il pallino <strong>verde</strong> sono Pareto-ottimali. Nel dilemma del prigioniero i due non
+          coincidono mai; nella <em>caccia al cervo</em> ci sono <strong>due</strong> equilibri, uno dei quali
+          è anche l'ottimo — e allora il problema non è la sfiducia ma il <em>coordinamento</em>. Provate ad
+          abbassare la tentazione sotto il premio: il dilemma <strong>sparisce</strong>, e cooperare diventa
+          la scelta dominante.</p>
+      </div>
+
+      <div class="curiosita"><strong>Dilemmi del prigioniero nella vita vera.</strong> Due aziende che
+        potrebbero tenere alti i prezzi e invece si fanno la guerra al ribasso, danneggiandosi entrambe. Due
+        Stati che potrebbero disarmarsi e invece continuano a spendere in armamenti — era esattamente il
+        problema che la RAND studiava nel 1950, in piena guerra fredda. Gli spettatori di un concerto che si
+        alzano in piedi per vedere meglio: se lo fanno tutti, nessuno vede meglio e tutti stanno scomodi. Il
+        traffico, dove ognuno prende l'auto perché è più comodo <em>per sé</em>. La pesca eccessiva, il
+        doping, l'evasione fiscale. In tutti questi casi il singolo agisce razionalmente e il risultato
+        collettivo è pessimo: è per questo che esistono le <strong>regole</strong>, che cambiano i pagamenti
+        e trasformano il dilemma in un gioco diverso.</div>
+
+      <div class="exercise">
+        <p><strong>① Esercizio.</strong> Nella matrice del dilemma, verifica che $(1;1)$ è un equilibrio di
+          Nash e che $(3;3)$ non lo è. Poi spiega perché $(3;3)$ è Pareto-ottimale mentre $(1;1)$ non lo è.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#h1s">Mostra la soluzione</button>
+        <div class="solution" id="h1s">
+          <p><strong>$(1;1)$ è di Nash.</strong> Se A passasse da «confessa» a «tace», restando B su
+            «confessa», il suo pagamento andrebbe da $1$ a $0$: peggiora. Lo stesso vale per B, per simmetria.
+            Nessuna deviazione unilaterale conviene ✓</p>
+          <p><strong>$(3;3)$ non è di Nash.</strong> Se A passasse da «tace» a «confessa», restando B su
+            «tace», andrebbe da $3$ a $5$: migliora. Quindi la deviazione conviene, e l'esito non è un
+            equilibrio ✗</p>
+          <p><strong>$(3;3)$ è Pareto-ottimale.</strong> Per migliorare A bisognerebbe portarlo a $5$, ma
+            allora B scenderebbe a $0$: non si può migliorare qualcuno senza peggiorare l'altro ✓</p>
+          <p><strong>$(1;1)$ non è Pareto-ottimale</strong>, perché $(3;3)$ migliora <em>entrambi</em>.</p>
+          <p class="formula-note">Ecco perché le due nozioni non vanno confuse: Nash guarda la
+            <strong>stabilità</strong> (nessuno vuole muoversi da solo), Pareto guarda l'<strong>efficienza</strong>
+            (non si spreca niente). Il dilemma del prigioniero è famoso proprio perché è il caso in cui le due
+            cose si separano nel modo più netto.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>② Esercizio.</strong> Nella <em>caccia al cervo</em> due cacciatori possono inseguire un
+          cervo (che si prende solo in due, e vale $4$ a testa) oppure una lepre (che si prende da soli e vale
+          $3$). Chi insegue il cervo da solo non prende niente. Scrivi la matrice e trova gli equilibri.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#h2s">Mostra la soluzione</button>
+        <div class="solution" id="h2s">
+          <div class="tabwrap">
+          <table class="tabf">
+            <tr><th></th><th>B: cervo</th><th>B: lepre</th></tr>
+            <tr><td class="lab">A: cervo</td><td><strong>4 ; 4</strong></td><td>0 ; 3</td></tr>
+            <tr><td class="lab">A: lepre</td><td>3 ; 0</td><td><strong>3 ; 3</strong></td></tr>
+          </table>
+          </div>
+          <p><strong>Due</strong> equilibri di Nash: $(\text{cervo}, \text{cervo}) = (4;4)$ e
+            $(\text{lepre}, \text{lepre}) = (3;3)$. Nel primo, chi si spostasse sulla lepre scenderebbe da $4$
+            a $3$; nel secondo, chi si spostasse sul cervo scenderebbe da $3$ a $0$.</p>
+          <p>L'ottimo di Pareto è $(4;4)$, che <em>è</em> anche un equilibrio: qui il problema non è la
+            tentazione di tradire, è la <strong>fiducia</strong>. Se sono sicuro che l'altro va a caccia di
+            cervo, ci vado anch'io; se ho il minimo dubbio, la lepre è la scelta prudente.</p>
+          <p class="formula-note">È un modello molto usato per descrivere accordi internazionali, cambiamenti
+            di standard tecnologici, riforme collettive: situazioni in cui tutti starebbero meglio muovendosi
+            insieme, ma nessuno vuole essere il primo. La differenza con il dilemma del prigioniero è enorme:
+            lì cooperare non conviene <em>mai</em>, qui conviene <em>se anche l'altro coopera</em>. E questo
+            rende il problema risolvibile con la <strong>comunicazione</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — FALCO E COLOMBA -->
+    <section id="sec5">
+      <h2>5. Falco e colomba</h2>
+
+      <p>Nel 1973 il biologo John Maynard Smith e il matematico George Price portarono la teoria dei giochi in
+        biologia, per rispondere a una domanda vera: <em>perché gli animali della stessa specie, quando si
+        contendono un territorio o una femmina, quasi sempre si limitano a ritualizzare lo scontro invece di
+        combattere fino alla morte?</em></p>
+
+      <div class="definition">
+        <div class="formula-title">Il modello</div>
+        <p>Due individui si contendono una risorsa di valore $V$. Ciascuno può comportarsi da
+          <strong>falco</strong> (combatte fino in fondo) o da <strong>colomba</strong> (minaccia, ma se
+          l'altro attacca si ritira). Un combattimento vero costa $C$ in ferite.</p>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th></th><th>colomba</th><th>falco</th></tr>
+          <tr><td class="lab">colomba</td><td>$\frac{V}{2}$ ; $\frac{V}{2}$</td><td>$0$ ; $V$</td></tr>
+          <tr><td class="lab">falco</td><td>$V$ ; $0$</td><td>$\frac{V-C}{2}$ ; $\frac{V-C}{2}$</td></tr>
+        </table>
+        </div>
+        <p class="formula-note">Due colombe si dividono la risorsa; un falco contro una colomba prende tutto
+          senza combattere; due falchi combattono, e in media uno vince ($V$) e uno si ferisce ($-C$), da cui
+          il valore medio $\frac{V-C}{2}$.</p>
+      </div>
+
+      <div class="warnbox"><strong>Nessuna delle due strategie «pure» vince sempre.</strong> Se tutti sono
+        colombe, un falco che compare prende $V$ invece di $V/2$: gli conviene, e i falchi si diffondono. Ma
+        se tutti sono falchi (e $V \lt C$), ciascuno guadagna $\frac{V-C}{2} \lt 0$, mentre una colomba
+        guadagnerebbe $0$: allora conviene essere colombe. La popolazione non può stabilizzarsi né tutta
+        aggressiva né tutta pacifica: si assesta su una <strong>miscela</strong>.</div>
+
+      <div class="definition">
+        <div class="formula-title">La frazione di equilibrio</div>
+        <p>Se $V \lt C$, la popolazione si stabilizza quando le due strategie rendono <em>esattamente lo
+          stesso</em>. Detta $p$ la frazione di falchi:</p>
+        <div class="formula">$$p\,\frac{V-C}{2} + (1-p)\,V \;=\; (1-p)\,\frac{V}{2}
+          \qquad\Longrightarrow\qquad \boxed{p = \frac{V}{C}}$$</div>
+        <p class="formula-note">Un risultato pulitissimo: la frazione di individui aggressivi è il rapporto
+          fra il <strong>valore della posta</strong> e il <strong>costo dello scontro</strong>. Se la risorsa
+          vale poco rispetto al rischio di farsi male, quasi tutti sono colombe; se vale molto — o se lo
+          scontro costa poco — l'aggressività dilaga. Si chiama <em>strategia evolutivamente stabile</em>, e
+          il fatto notevole è che <strong>nessuno la calcola</strong>: ci si arriva per selezione naturale,
+          perché la strategia più rara è sempre avvantaggiata finché non raggiunge quella
+          proporzione.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>valore della risorsa $V$ <span class="val-badge" id="fc-vv">4</span></label>
+          <input type="range" id="fc-v" min="1" max="10" step="0.5" value="4" style="flex:1;min-width:190px">
+          <label>costo dello scontro $C$ <span class="val-badge" id="fc-cv">10</span></label>
+          <input type="range" id="fc-c" min="1" max="16" step="0.5" value="10" style="flex:1;min-width:190px">
+        </div>
+        <div class="ctrl">
+          <label>frazione iniziale di falchi <span class="val-badge" id="fc-pv">0,10</span></label>
+          <input type="range" id="fc-p" min="0.01" max="0.99" step="0.01" value="0.1" style="flex:1;min-width:230px">
+        </div>
+        <svg id="fc-svg" viewBox="0 0 680 340" role="img" aria-label="Falco e colomba: dinamica della popolazione"></svg>
+        <p class="cap" id="fc-cap"></p>
+        <p class="formula-note">Il grafico a destra mostra la <strong>dinamica</strong>: da qualunque
+          composizione iniziale la popolazione converge alla stessa frazione $V/C$. Provate a portare $V$
+          sopra $C$: l'equilibrio scompare e i falchi conquistano tutto — perché se la posta vale più del
+          rischio, combattere conviene sempre.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>③ Esercizio.</strong> In una specie il territorio conteso vale $V = 3$ e una ferita costa
+          $C = 12$. Quale frazione di individui aggressivi ci si aspetta all'equilibrio? E se una malattia
+          rendesse le ferite molto più pericolose, portando $C$ a $30$?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#h3s">Mostra la soluzione</button>
+        <div class="solution" id="h3s">
+          <p>$p = \dfrac{V}{C} = \dfrac{3}{12} = 0{,}25$: un quarto di falchi, tre quarti di colombe.</p>
+          <p>Con $C = 30$: $p = \dfrac{3}{30} = 0{,}10$, cioè solo il $10\%$ di aggressivi.</p>
+          <p class="formula-note">Aumentando il costo del conflitto, la popolazione diventa
+            <strong>spontaneamente più pacifica</strong> — senza che nessuno decida niente, senza morale e
+            senza leggi. È una delle previsioni più eleganti del modello, e trova riscontro nei dati: le
+            specie con armi capaci di uccidere (corna, zanne, artigli) hanno in genere rituali di
+            combattimento <em>più</em> elaborati e scontri letali <em>più</em> rari di quelle inermi. Konrad
+            Lorenz lo aveva osservato molto prima che qualcuno lo calcolasse.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — IL GIOCO RIPETUTO -->
+    <section id="sec6">
+      <h2>6. Se ci si rincontra: perché collaborare conviene</h2>
+
+      <p>Il dilemma del prigioniero è cupo, ma nasconde un'ipotesi fortissima: <strong>si gioca una volta
+        sola</strong>. Nella vita quasi mai è così — con i compagni di classe, i vicini, i fornitori, i
+        colleghi ci si rincontra. E cambiando quell'ipotesi cambia tutto.</p>
+
+      <div class="storia">
+        <p><strong>Il torneo di Axelrod, 1980.</strong> Il politologo Robert Axelrod invitò studiosi di tutto
+          il mondo a inviare un <em>programma</em> che giocasse il dilemma del prigioniero ripetuto contro
+          tutti gli altri, per duecento turni ciascuno. Arrivarono strategie sofisticatissime, alcune lunghe
+          decine di righe.</p>
+        <p>Vinse la più corta di tutte, quattro righe di codice, inviata dallo psicologo
+          <strong>Anatol Rapoport</strong>: si chiamava <strong>TIT FOR TAT</strong> — «pan per focaccia» —
+          e la sua regola era: <em>al primo turno collabora; da lì in poi, fai quello che ha fatto l'altro
+          l'ultima volta</em>.</p>
+        <p>Axelrod rifece il torneo l'anno dopo, con sessantadue partecipanti che <em>sapevano</em> come era
+          andata la prima volta. Vinse di nuovo TIT FOR TAT.</p>
+      </div>
+
+      <div class="ric">
+        <div><h4>Gentile</h4><p>Non tradisce mai per prima. Axelrod scoprì che <strong>tutte</strong> le
+          strategie nella metà alta della classifica erano gentili, e tutte quelle nella metà bassa non lo
+          erano.</p></div>
+        <div><h4>Reattiva</h4><p>Non si fa sfruttare: se l'altro tradisce, ricambia <em>subito</em>. Le
+          strategie troppo buone venivano divorate dalle sfruttatrici.</p></div>
+        <div><h4>Indulgente</h4><p>Basta un gesto di collaborazione per riconciliarsi. Le strategie
+          rancorose (chi tradisce una volta è tradito per sempre) restavano intrappolate in guerre
+          infinite.</p></div>
+        <div><h4>Trasparente</h4><p>È semplicissima da capire. L'avversario impara in due mosse che conviene
+          collaborare — mentre contro una strategia imprevedibile non c'è niente da imparare.</p></div>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="ax-btns">
+          <button class="btn btn-sm active" data-s="tit">TIT FOR TAT</button>
+          <button class="btn btn-sm" data-s="coop">sempre gentile</button>
+          <button class="btn btn-sm" data-s="def">sempre traditore</button>
+          <button class="btn btn-sm" data-s="rand">a caso</button>
+          <button class="btn btn-sm" data-s="grim">rancorosa</button>
+        </div>
+        <div class="ctrl">
+          <label>turni <span class="val-badge" id="ax-nv">30</span></label>
+          <input type="range" id="ax-n" min="5" max="60" step="1" value="30" style="flex:1;min-width:180px">
+          <label>probabilità di errore <span class="val-badge" id="ax-ev">0%</span></label>
+          <input type="range" id="ax-e" min="0" max="30" step="1" value="0" style="flex:1;min-width:180px">
+        </div>
+        <svg id="ax-svg" viewBox="0 0 680 350" role="img" aria-label="Torneo del dilemma del prigioniero ripetuto"></svg>
+        <p class="cap" id="ax-cap"></p>
+        <p class="formula-note">La tabella mostra il punteggio di ogni strategia contro tutte le altre.
+          «Sempre traditore» <strong>batte</strong> TIT FOR TAT nello scontro diretto, ma crolla contro sé
+          stessa: è il risultato controintuitivo di Axelrod, <em>per vincere il torneo non serve battere gli
+          avversari, serve far bene con tutti</em>. Guardate poi la <strong>diagonale</strong>, cioè ogni
+          strategia contro una copia di sé stessa: senza errori TIT FOR TAT e la rancorosa fanno lo stesso
+          punteggio pieno, perché collaborano dall'inizio alla fine.</p>
+      </div>
+
+      <div class="warnbox"><strong>Adesso alzate la probabilità di errore e riguardate la diagonale.</strong>
+        Basta un $2\%$ — un gesto frainteso ogni cinquanta — perché due <em>rancorose</em> crollino da $180$
+        a poco più di $60$ punti su sessanta turni, mentre due TIT FOR TAT restano attorno a $140$. La ragione
+        è tutta nell'indulgenza: alla rancorosa basta <strong>un solo</strong> errore per condannare il
+        rapporto al tradimento reciproco fino alla fine, mentre TIT FOR TAT si riconcilia appena l'altro
+        torna a collaborare. <em>Nel mondo reale, dove si sbaglia, perdonare non è buonismo: è
+        aritmetica.</em>
+        <br><br>Onestà intellettuale: nemmeno TIT FOR TAT è perfetta sotto rumore — due copie entrano in una
+        ritorsione alternata che costa comunque un quarto del punteggio. È per questo che negli anni successivi
+        si sono studiate varianti più indulgenti (perdonare ogni tanto, o punire solo dopo <em>due</em>
+        tradimenti), che sotto rumore fanno ancora meglio.</div>
+
+      <div class="warnbox"><strong>Attenzione a un dettaglio che il simulatore rende evidente.</strong> In
+        questo torneo ridotto a <em>cinque</em> strategie, «sempre traditore» può arrivare primo — perché ha
+        di fronte «sempre gentile», che per lui è un pasto gratis: gli regala $5$ punti a turno per tutta la
+        partita. Provate a confrontare le colonne: <strong>tutto</strong> il vantaggio del traditore viene da
+        lì. Nel torneo vero di Axelrod le strategie erano quattordici, in gran maggioranza gentili e capaci di
+        difendersi, e in quell'ambiente vinse TIT FOR TAT.
+        <br><br>Non è un difetto della simulazione: è <strong>il punto</strong>. Il successo di una strategia
+        non è una sua proprietà assoluta, <em>dipende dall'ambiente in cui gioca</em>. Axelrod lo verificò
+        rifacendo il torneo in versione «ecologica», facendo cioè crescere di generazione in generazione la
+        quota delle strategie che avevano ottenuto di più: le sfruttatrici prosperano finché ci sono ingenui
+        da sfruttare, poi restano senza prede e crollano, mentre le gentili — che con le proprie simili fanno
+        il pieno — si diffondono. Provate a togliere mentalmente «sempre gentile» dalla tabella e rifate le
+        somme: TIT FOR TAT stacca tutti.</div>
+
+      <div class="definition">
+        <div class="formula-title">Perché la ripetizione cambia i conti</div>
+        <p>In un gioco ripetuto la scelta non è più «tradire o cooperare <em>adesso</em>», ma «tradire adesso
+          e perdere la collaborazione <em>per tutti i turni futuri</em>». Con $n$ turni ancora da giocare, un
+          tradimento frutta $5 - 3 = 2$ punti in più oggi e costa $(3-1) = 2$ punti in ogni turno successivo:
+          conviene solo se il gioco sta per finire.</p>
+        <p class="formula-note">Da qui un fatto sgradevole ma istruttivo: se il numero di turni è
+          <strong>noto in anticipo</strong>, il ragionamento all'indietro distrugge la cooperazione —
+          all'ultimo turno conviene tradire, e quindi anche al penultimo, e così via fino al primo. La
+          collaborazione regge quando <strong>non si sa quando si finisce</strong>. È una delle ragioni per
+          cui i rapporti «una tantum» — il turista in una città che non rivedrà mai, l'ultimo giorno di
+          lavoro prima delle dimissioni — sono strutturalmente più fragili.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>④ Esercizio.</strong> Due giocatori si affrontano per $10$ turni con i pagamenti del
+          dilemma ($T=5$, $R=3$, $P=1$, $S=0$). Quanto totalizza ciascuno se collaborano sempre? E se
+          tradiscono sempre? E se uno usa TIT FOR TAT e l'altro tradisce sempre?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#h4s">Mostra la soluzione</button>
+        <div class="solution" id="h4s">
+          <p><strong>Cooperazione reciproca:</strong> $10 \times 3 = 30$ punti a testa.</p>
+          <p><strong>Tradimento reciproco:</strong> $10 \times 1 = 10$ punti a testa.</p>
+          <p><strong>TIT FOR TAT contro traditore:</strong> al primo turno TIT FOR TAT collabora e prende $0$
+            (l'altro prende $5$); dal secondo in poi ricambia il tradimento, quindi $9$ turni a $1$ punto.
+            Totale: $0 + 9 = 9$ per TIT FOR TAT, $5 + 9 = 14$ per il traditore.</p>
+          <p class="formula-note">Il traditore <em>vince</em> lo scontro diretto ($14$ contro $9$), ma
+            guardate i numeri assoluti: due che collaborano fanno $30$ a testa. Nel torneo di Axelrod ogni
+            strategia gioca contro tutte, e allora il traditore raccoglie briciole ($10$ contro sé stesso,
+            $14$ contro TIT FOR TAT) mentre TIT FOR TAT accumula $30$ ogni volta che incontra un'altra
+            strategia gentile. <strong>Vince chi crea valore, non chi vince i duelli.</strong></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — IL TORNEO DI AXELROD PER ESTESO -->
+    <section id="sec7">
+      <h2>7. Il torneo di Axelrod, per esteso</h2>
+
+      <p>Nella sezione precedente abbiamo raccontato il torneo in due righe. Vale la pena guardarlo da vicino,
+        perché il modo in cui fu organizzato è un esempio bellissimo di come si fa scienza su una domanda che
+        sembra filosofica.</p>
+
+      <div class="storia">
+        <p><strong>L'invito (1979).</strong> Robert Axelrod, politologo dell'Università del Michigan, non
+          voleva <em>ragionare</em> su quale strategia fosse la migliore: voleva <em>misurarlo</em>. Spedì un
+          invito a studiosi di teoria dei giochi in tutto il mondo — economisti, psicologi, sociologi,
+          matematici, scienziati politici — chiedendo di inviargli un <strong>programma per calcolatore</strong>
+          che giocasse il dilemma del prigioniero ripetuto. Le regole erano pubbliche: pagamenti
+          $T=5$, $R=3$, $P=1$, $S=0$; ogni programma avrebbe affrontato <em>tutti</em> gli altri, sé stesso
+          compreso, e anche un programma che giocava a caso; duecento mosse per incontro; cinque ripetizioni
+          per ridurre il rumore. Vinceva chi accumulava più punti in totale.</p>
+        <p><strong>Il primo torneo (1980).</strong> Arrivarono <strong>quattordici</strong> programmi, alcuni
+          lunghi decine di righe, con memoria delle mosse passate e modelli statistici dell'avversario. Vinse
+          il più corto: <strong>TIT FOR TAT</strong>, <em>quattro righe</em> di BASIC inviate dallo psicologo
+          Anatol Rapoport.</p>
+        <p><strong>Il secondo torneo.</strong> Axelrod pubblicò l'analisi completa del primo — chi aveva
+          vinto, perché, quali errori avevano fatto i perdenti — e invitò tutti a riprovare. Arrivarono
+          <strong>sessantadue</strong> programmi da sei paesi, scritti da gente che <em>sapeva già</em> che
+          TIT FOR TAT aveva vinto e mirava a batterla. Questa volta la lunghezza degli incontri non era nota
+          in anticipo, per evitare il ragionamento all'indietro: dopo ogni mossa il gioco continuava con
+          probabilità $0{,}99654$, che dà una durata media di circa duecento turni.</p>
+        <p>Vinse di nuovo TIT FOR TAT. E la cosa notevole è <em>come</em>: fra i sessantadue programmi ce
+          n'erano diversi che la battevano nello scontro diretto, ma nessuno che facesse altrettanto bene
+          <strong>con tutti</strong>.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">La simulazione ecologica</div>
+        <p>Axelrod fece poi una terza cosa, la più interessante. Invece di sommare i punti una volta sola,
+          immaginò le strategie come <strong>popolazioni</strong>: si parte con quote uguali, si fa giocare
+          tutti contro tutti, e nella generazione successiva <em>ogni strategia si riproduce in proporzione al
+          punteggio ottenuto</em>.</p>
+        <div class="formula">$$q_i' = q_i\,\frac{\bar u_i}{\bar u}, \qquad
+          \bar u_i = \sum_j q_j\,u(i,j)$$</div>
+        <p class="formula-note">$q_i$ è la quota della strategia $i$, $\bar u_i$ il suo punteggio medio contro
+          la popolazione attuale, $\bar u$ il punteggio medio generale. È la stessa <em>dinamica del
+          replicatore</em> del modello falco-colomba, applicata a otto strategie invece che a due. Chi rende
+          più della media cresce, chi rende meno si estingue.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="tz-btns">
+          <button class="btn btn-sm active" data-v="eco">simulazione ecologica</button>
+          <button class="btn btn-sm" data-v="cls">classifica del torneo</button>
+          <button class="btn btn-sm" data-v="mat">tutti contro tutti</button>
+        </div>
+        <div class="ctrl">
+          <label>probabilità di errore <span class="val-badge" id="tz-ev">0%</span></label>
+          <input type="range" id="tz-e" min="0" max="20" step="1" value="0" style="flex:1;min-width:200px">
+          <label>generazioni <span class="val-badge" id="tz-gv">120</span></label>
+          <input type="range" id="tz-g" min="10" max="200" step="10" value="120" style="flex:1;min-width:180px">
+        </div>
+        <svg id="tz-svg" viewBox="0 0 680 380" role="img" aria-label="Il torneo di Axelrod con otto strategie e la simulazione ecologica"></svg>
+        <p class="cap" id="tz-cap"></p>
+      </div>
+
+      <div class="tabwrap">
+      <table class="tabf">
+        <tr><th>strategia</th><th>che cosa fa</th><th>gentile?</th></tr>
+        <tr><td class="lab">TIT FOR TAT</td><td class="l">collabora, poi ripete l'ultima mossa dell'altro</td><td>sì</td></tr>
+        <tr><td class="lab">TIT FOR TWO TATS</td><td class="l">tradisce solo dopo <strong>due</strong> tradimenti di fila: più indulgente</td><td>sì</td></tr>
+        <tr><td class="lab">TIT FOR TAT generosa</td><td class="l">come TIT FOR TAT, ma nel $10\%$ dei casi perdona un tradimento</td><td>sì</td></tr>
+        <tr><td class="lab">Pavlov</td><td class="l">«vinci e resta, perdi e cambia»: ripete la mossa se ha guadagnato $5$ o $3$, la cambia se ha preso $1$ o $0$</td><td>sì</td></tr>
+        <tr><td class="lab">sempre gentile</td><td class="l">collabora sempre, qualunque cosa accada</td><td>sì</td></tr>
+        <tr><td class="lab">rancorosa</td><td class="l">collabora finché l'altro non tradisce; poi tradisce per sempre</td><td>sì</td></tr>
+        <tr><td class="lab">a caso</td><td class="l">testa o croce a ogni turno</td><td>no</td></tr>
+        <tr><td class="lab">sempre traditore</td><td class="l">tradisce sempre</td><td>no</td></tr>
+      </table>
+      </div>
+
+      <div class="warnbox"><strong>I due risultati, e sono diversi.</strong>
+        <br><br><strong>① Senza errori</strong> la simulazione ecologica riproduce esattamente ciò che trovò
+        Axelrod: «sempre traditore» e «a caso» <strong>si estinguono</strong> entro poche decine di
+        generazioni, mentre <em>tutte</em> le strategie gentili sopravvivono e si spartiscono la popolazione,
+        con la rancorosa e TIT FOR TAT in testa attorno al $19\%$ ciascuna. Il motivo è quello di sempre: il
+        traditore prospera finché ci sono ingenui da sfruttare, poi resta senza prede e si ritrova a
+        raccogliere $1$ punto a turno contro sé stesso, mentre le gentili ne fanno $3$ fra loro.
+        <br><br><strong>② Con il $5\%$ di errori</strong> il quadro cambia del tutto, e in un modo che
+        Axelrod non aveva previsto: vince <strong>Pavlov</strong>, che arriva a occupare quasi tutta la
+        popolazione. La ragione è che dopo un errore Pavlov <em>ripara da sola</em> — due Pavlov che finiscono
+        in tradimento reciproco prendono $1$ punto, «perdono», e quindi cambiano <em>entrambe</em> mossa,
+        tornando a collaborare. TIT FOR TAT, invece, entra in ritorsione alternata. Questo risultato fu
+        pubblicato su <em>Nature</em> nel 1993 da <strong>Martin Nowak e Karl Sigmund</strong>, ed è uno dei
+        casi in cui una simulazione ha corretto una conclusione che sembrava assodata.</div>
+
+      <div class="curiosita"><strong>Che cosa se ne fece Axelrod.</strong> Nel 1981 pubblicò con il biologo
+        <strong>William Hamilton</strong> un articolo su <em>Science</em> che applicava questi risultati
+        all'evoluzione della cooperazione fra organismi privi di cervello — batteri, piante, pesci pulitori —
+        e nel 1984 il libro <em>The Evolution of Cooperation</em>, che è diventato un classico letto da
+        biologi, economisti e diplomatici. Uno degli esempi più citati che vi si trovano è il sistema
+        «<em>vivi e lascia vivere</em>» nato spontaneamente nelle trincee della prima guerra mondiale: reparti
+        che si fronteggiavano per mesi smettevano di sparare sul serio, sparavano alto a orari prevedibili, e
+        punivano immediatamente chi rompeva la tregua. Era TIT FOR TAT, applicata da uomini che non avevano
+        mai sentito nominare la teoria dei giochi — e i comandi la spezzarono nell'unico modo possibile:
+        <em>ruotando continuamente i reparti</em>, cioè impedendo che il gioco fosse ripetuto.</div>
+
+      <div class="exercise">
+        <p><strong>⑥ Esercizio.</strong> Due Pavlov si trovano per errore in tradimento reciproco. Che cosa
+          succede al turno successivo? E due TIT FOR TAT nella stessa situazione?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#h6s">Mostra la soluzione</button>
+        <div class="solution" id="h6s">
+          <p><strong>Pavlov.</strong> Entrambe hanno preso $P = 1$ punto, che è un risultato «perdente»:
+            la regola <em>vinci e resta, perdi e cambia</em> le fa cambiare mossa a <strong>tutte e due</strong>.
+            Al turno dopo collaborano entrambe e prendono $3$: il rapporto si è <strong>riparato da
+            solo</strong> in un turno.</p>
+          <p><strong>TIT FOR TAT.</strong> Ciascuna ripete l'ultima mossa dell'altra, che era «tradisci»:
+            continuano a tradirsi <em>per sempre</em>, esattamente come la rancorosa. (Se invece l'errore è
+            <em>unilaterale</em> le due non finiscono in tradimento reciproco ma in una <strong>ritorsione
+            alternata</strong>: uno tradisce mentre l'altro collabora, poi si scambiano i ruoli, e così via.
+            Ciascuna incassa $5$ e $0$ a turni alterni, cioè una media di $2{,}5$ invece di $3$: si perde
+            meno che nel tradimento reciproco, ma il rapporto non si ripara più da solo.)</p>
+          <p class="formula-note">È tutta qui la superiorità di Pavlov sotto rumore. In compenso Pavlov ha un
+            difetto che TIT FOR TAT non ha: se incontra «sempre gentile» scopre che tradire <em>funziona</em>
+            (prende $5$, che è un risultato «vincente», quindi resta) e la sfrutta senza pietà. Non è una
+            strategia gentile per convinzione: lo è per calcolo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — IL DILEMMA A N PERSONE -->
+    <section id="sec8">
+      <h2>8. Il dilemma del prigioniero a $N$ persone</h2>
+
+      <p>Finora i giocatori erano due. Ma i problemi che contano davvero — l'inquinamento, la pesca, i
+        vaccini, le tasse, il traffico — coinvolgono <em>milioni</em> di persone. La versione a molti
+        giocatori si chiama <strong>dilemma del prigioniero a $N$ persone</strong>, o <em>gioco dei beni
+        pubblici</em>, e non è un semplice ingrandimento: cambia qualitativamente.</p>
+
+      <div class="definition">
+        <div class="formula-title">Le regole</div>
+        <p>$N$ giocatori. Ciascuno ha in tasca una moneta e decide se <strong>metterla nel fondo comune</strong>
+          (cooperare) o <strong>tenersela</strong> (tradire). Il fondo comune viene poi moltiplicato per un
+          fattore $r$ — perché la collaborazione crea valore — e <strong>diviso in parti uguali fra tutti</strong>,
+          anche fra chi non ha versato nulla.</p>
+        <p>Se $k$ giocatori su $N$ cooperano, i guadagni sono:</p>
+        <div class="formula">$$u_{\text{cooperatore}} = \frac{r\,k}{N} - 1, \qquad\qquad
+          u_{\text{traditore}} = \frac{r\,k}{N}$$</div>
+        <p class="formula-note">Perché sia un vero dilemma serve $1 \lt r \lt N$. La prima disuguaglianza dice
+          che cooperare <em>insieme</em> conviene; la seconda che, individualmente, la propria moneta rende
+          $r/N \lt 1$ e quindi conviene tenersela.</p>
+      </div>
+
+      <div class="warnbox"><strong>Tradire conviene sempre, e conviene della stessa quantità.</strong>
+        Ci sono due conti da tenere distinti, e insieme dicono tutto.
+        <br><br><strong>1) Confrontando due persone nello stesso giro</strong> — cioè a $k$ fissato — la
+        differenza fra le due formule è $u_{\text{traditore}} - u_{\text{cooperatore}} = 1$, <em>qualunque</em>
+        sia $k$: chi si è tenuto la moneta ha esattamente una moneta in più di chi l'ha versata.
+        <br><br><strong>2) Confrontando le mie due scelte</strong> — che è la domanda vera — devo ricordare che
+        versando la moneta faccio salire $k$ di uno, e quindi ne recupero $r/N$: il mio guadagno netto nel
+        tradire è $1 - \dfrac{r}{N} \gt 0$, perché $r \lt N$. È positivo <em>qualunque cosa facciano gli
+        altri</em>, e non dipende da $k$.
+        <br><br>Tradire è dunque una <strong>strategia dominante</strong>, e l'unico equilibrio di Nash è
+        <em>nessuno coopera</em>, con guadagno $0$ per tutti — mentre se tutti avessero cooperato avrebbero
+        preso $r - 1 \gt 0$ ciascuno. È il dilemma del prigioniero, identico, ma con $N$ giocatori.</div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>giocatori $N$ <span class="val-badge" id="np-nv">5</span></label>
+          <input type="range" id="np-n" min="2" max="40" step="1" value="5" style="flex:1;min-width:170px">
+          <label>moltiplicatore $r$ <span class="val-badge" id="np-rv">1,6</span></label>
+          <input type="range" id="np-r" min="1" max="6" step="0.1" value="1.6" style="flex:1;min-width:170px">
+        </div>
+        <div class="ctrl">
+          <label>severità della punizione <span class="val-badge" id="np-dv">0,00</span></label>
+          <input type="range" id="np-d" min="0" max="1.2" step="0.05" value="0" style="flex:1;min-width:190px">
+          <label>costo del punire <span class="val-badge" id="np-pv">0,10</span></label>
+          <input type="range" id="np-p" min="0" max="0.6" step="0.05" value="0.1" style="flex:1;min-width:170px">
+        </div>
+        <svg id="np-svg" viewBox="0 0 680 370" role="img" aria-label="Il gioco dei beni pubblici a N persone, con e senza punizione"></svg>
+        <p class="cap" id="np-cap"></p>
+        <p class="formula-note">A sinistra i guadagni al variare del numero di cooperatori: la retta del
+          traditore sta <strong>sempre una moneta sopra</strong> quella del cooperatore, ed è per questo che
+          il dilemma non si scioglie da solo. A destra la <em>dinamica della popolazione</em> con tre tipi:
+          cooperatori, traditori e <strong>punitori</strong> — cooperatori disposti a pagare di tasca propria
+          per danneggiare chi non versa. Portate la severità sopra la soglia e guardate i traditori
+          sparire.</p>
+      </div>
+
+      <h3>8.1 — Perché con $N$ grande è molto più difficile</h3>
+
+      <div class="ric">
+        <div><h4>Il tradimento è anonimo</h4><p>In due si sa <em>sempre</em> chi ha tradito. In mille no: il
+          risultato collettivo è cattivo, ma non si può risalire ai responsabili. E senza identificazione non
+          c'è nessun TIT FOR TAT possibile.</p></div>
+        <div><h4>La ritorsione colpisce gli innocenti</h4><p>L'unica ritorsione disponibile è smettere di
+          cooperare, che danneggia <em>tutti</em>, compresi i cooperatori onesti. È una punizione che non
+          discrimina, e per questo innesca spirali.</p></div>
+        <div><h4>Il singolo si sente irrilevante</h4><p>Con $N$ grande il contributo di uno vale $r/N$, cioè
+          quasi zero. «Tanto la mia macchina non cambia il clima» è matematicamente vero — ed è esattamente
+          il punto: lo è per <em>tutti</em>.</p></div>
+        <div><h4>Il valore si diluisce</h4><p>Il guadagno della cooperazione, $r-1$, resta lo stesso, ma va
+          diviso fra sempre più persone mentre la tentazione resta di una moneta piena. Il rapporto
+          fra premio e tentazione peggiora.</p></div>
+      </div>
+
+      <div class="curiosita"><strong>La tragedia dei beni comuni.</strong> Nel 1968 l'ecologo
+        <strong>Garrett Hardin</strong> pubblicò su <em>Science</em> un articolo con questo titolo, usando
+        l'immagine di un pascolo aperto a tutti: a ogni pastore conviene aggiungere una vacca in più, perché
+        il guadagno è tutto suo mentre il danno del sovrapascolo è diviso fra tutti; e alla fine il pascolo
+        muore. È il gioco a $N$ persone, raccontato senza formule. Hardin ne traeva una conclusione cupa —
+        servono coercizione o proprietà privata — ed è proprio lì che si sbagliava.</div>
+
+      <div class="storia">
+        <p><strong>Elinor Ostrom e le comunità che ce la fanno.</strong> Per trent'anni la politologa
+          americana Elinor Ostrom fece una cosa che nessuno aveva fatto: <em>andò a guardare</em>. Studiò
+          centinaia di casi reali — i pascoli alpini svizzeri, i sistemi di irrigazione spagnoli e
+          filippini, le zone di pesca del Maine e dello Sri Lanka, le foreste del Giappone — e trovò
+          moltissime comunità che gestiscono da secoli un bene comune <strong>senza</strong> né statalizzarlo
+          né privatizzarlo.</p>
+        <p>Ne ricavò otto principi ricorrenti, che assomigliano tantissimo a quello che la teoria dei giochi
+          suggerisce: confini chiari su <em>chi</em> ha diritto di attingere (così il gioco non è più
+          anonimo); regole adattate alle condizioni locali; chi è coinvolto partecipa a scrivere le regole;
+          <strong>controllo reciproco</strong>; <strong>sanzioni graduate</strong>, lievi alla prima
+          violazione (indulgenza!); meccanismi di risoluzione dei conflitti rapidi ed economici;
+          riconoscimento del diritto di auto-organizzarsi; e per i sistemi grandi, una struttura
+          <em>a più livelli annidati</em> — cioè trasformare un gioco a mille persone in tanti giochi a
+          dieci.</p>
+        <p>Nel <strong>2009</strong> ricevette il Nobel per l'economia, prima donna a ottenerlo. La sua
+          lezione è che il dilemma non si risolve con la buona volontà né con la sola coercizione, ma
+          <strong>cambiando la struttura del gioco</strong>: rendendolo ripetuto, identificabile e
+          punibile.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑦ Esercizio.</strong> In un gruppo di $N = 5$ persone con moltiplicatore $r = 1{,}6$,
+          calcola il guadagno di ciascuno se cooperano tutti, se non coopera nessuno, e se quattro cooperano
+          e uno tradisce. Chi sta meglio in quest'ultimo caso?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#h7s">Mostra la soluzione</button>
+        <div class="solution" id="h7s">
+          <p><strong>Tutti cooperano</strong> ($k = 5$): ciascuno ottiene
+            $\dfrac{1{,}6 \cdot 5}{5} - 1 = 1{,}6 - 1 = 0{,}6$.</p>
+          <p><strong>Nessuno coopera</strong> ($k = 0$): ciascuno ottiene $0$.</p>
+          <p><strong>Quattro cooperano, uno tradisce</strong> ($k = 4$):</p>
+          <p>i quattro cooperatori: $\dfrac{1{,}6 \cdot 4}{5} - 1 = 1{,}28 - 1 = 0{,}28$;</p>
+          <p>il traditore: $\dfrac{1{,}6 \cdot 4}{5} = 1{,}28$.</p>
+          <p>Il traditore sta meglio <strong>di tutti</strong>, e più del doppio di quanto avrebbe preso se
+            avessero cooperato tutti quanti.</p>
+          <p class="formula-note">Notate i due fatti insieme: il traditore guadagna $1$ esatto in più di un
+            cooperatore (è la differenza fissa), <em>e</em> il gruppo nel suo insieme peggiora, passando da
+            $5 \times 0{,}6 = 3$ a $4 \times 0{,}28 + 1{,}28 = 2{,}4$ punti totali. Ogni tradimento distrugge
+            $r - 1 = 0{,}6$ punti di valore comune per intascarne $1$: è esattamente il conto che rende
+            razionale la scelta e disastroso il risultato.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑧ Esercizio.</strong> Nello stesso gruppo, metà dei partecipanti è disposta a
+          <strong>punire</strong> chi non versa, infliggendogli un danno $d$ per ogni punitore presente.
+          Quanto deve valere $d$ perché tradire smetta di convenire?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#h8s">Mostra la soluzione</button>
+        <div class="solution" id="h8s">
+          <p>Senza punizione il traditore guadagna esattamente $1$ in più di un cooperatore. In un gruppo di
+            $N = 5$, oltre a sé stesso ci sono $N - 1 = 4$ altri giocatori, e se metà della popolazione è
+            fatta di punitori se ne aspettano $4 \times 0{,}5 = 2$.</p>
+          <p>Il traditore subisce dunque un danno atteso di $2d$. Perché tradire non convenga più:</p>
+          <div class="formula">$$1 - 2d \lt 0 \qquad\Longrightarrow\qquad d \gt 0{,}5$$</div>
+          <p class="formula-note">In generale la condizione è $d\,(N-1)\,x_P \gt 1$, dove $x_P$ è la frazione
+            di punitori. Due conseguenze importanti. <strong>Prima:</strong> più il gruppo è grande, meno
+            punitori servono <em>in proporzione</em>… ma solo se ogni punitore sorveglia tutti, cosa che in
+            mille persone non accade — ed è il motivo per cui i sistemi che funzionano sono
+            <em>annidati</em>, come aveva visto Ostrom. <strong>Seconda:</strong> punire ha un
+            <em>costo</em> per chi punisce, quindi i punitori guadagnano meno dei cooperatori pacifici, e
+            rischiano a loro volta di estinguersi. È il cosiddetto <em>dilemma di secondo livello</em>: la
+            punizione è essa stessa un bene pubblico. Provate nel simulatore ad alzare il costo del punire
+            tenendo bassa la severità, e guardate i punitori sparire per primi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 — LA MANO INVISIBILE -->
+    <section id="sec9">
+      <h2>9. La mano invisibile di Adam Smith, e perché non contraddice Nash</h2>
+
+      <div class="storia">
+        <p>Nel <strong>1776</strong>, nella <em>Ricchezza delle nazioni</em>, Adam Smith scrive una delle frasi
+          più citate della storia del pensiero economico: ciascuno «<em>persegue soltanto il proprio
+          guadagno, ed è condotto da una mano invisibile a promuovere un fine che non rientrava nelle sue
+          intenzioni</em>». Il macellaio non ci vende la carne per generosità, ma per interesse; e nel farlo
+          ci nutre.</p>
+        <p>Curiosità: l'espressione «mano invisibile» compare <strong>una volta sola</strong> in tutta l'opera,
+          e Smith — che era un professore di filosofia morale — non ne fece mai il pilastro che i posteri
+          hanno costruito.</p>
+      </div>
+
+      <p>A prima vista Nash sembra smentire Smith: nel dilemma del prigioniero ognuno persegue il proprio
+        interesse e il risultato collettivo è <em>pessimo</em>. Ma le due cose non si contraddicono. Dicono
+        due cose diverse, e la differenza si capisce meglio con un'immagine matematica che conosciamo già.</p>
+
+      <div class="definition">
+        <div class="formula-title">Massimo locale e massimo globale</div>
+        <p>Immaginate un paesaggio in cui l'altezza rappresenta il benessere collettivo, e ogni giocatore
+          controlla una coordinata: A si muove lungo l'asse $x$, B lungo l'asse $y$.</p>
+        <p>Un <strong>equilibrio di Nash</strong> è un punto da cui nessuno riesce a salire muovendosi
+          <em>lungo il proprio asse soltanto</em>. È un massimo rispetto alle <strong>mosse individuali</strong>:
+          in matematica lo chiameremmo un massimo <em>locale, e per giunta vincolato alle direzioni degli
+          assi</em>.</p>
+        <p>L'<strong>ottimo collettivo</strong> è invece il punto più alto del paesaggio: per raggiungerlo
+          spesso bisogna muoversi <strong>in diagonale</strong>, cioè cambiare <em>insieme</em>.</p>
+        <p class="formula-note">La «mano invisibile» descrive dunque un meccanismo che porta a un punto in cui
+          nessuno vuole più muoversi <em>da solo</em>. Che quel punto sia anche il migliore possibile
+          <strong>non è garantito</strong>: dipende dalla forma del paesaggio, cioè dalla struttura dei
+          pagamenti. In molti mercati concorrenziali lo è davvero — ed è la grande intuizione di Smith. In
+          altre situazioni, come il dilemma del prigioniero, l'inquinamento o la pesca eccessiva, non lo è
+          affatto.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="mi-btns">
+          <button class="btn btn-sm active" data-p="0">mercato concorrenziale</button>
+          <button class="btn btn-sm" data-p="1">dilemma del prigioniero</button>
+          <button class="btn btn-sm" data-p="2">caccia al cervo</button>
+        </div>
+        <svg id="mi-svg" viewBox="0 0 680 330" role="img" aria-label="Massimo locale e massimo globale nel paesaggio delle scelte"></svg>
+        <p class="cap" id="mi-cap"></p>
+        <p class="formula-note">Le frecce mostrano dove porta la spinta individuale: ognuno si muove
+          <em>orizzontalmente</em> o <em>verticalmente</em> verso l'alto. Il punto magenta è dove ci si ferma
+          (Nash); la stella verde è il punto più alto del paesaggio. Nel primo caso coincidono — e la mano
+          invisibile funziona; negli altri no.</p>
+      </div>
+
+      <div class="warnbox"><strong>La lezione politica, e va detta con precisione.</strong> Non è che «il
+        mercato non funziona» né che «l'egoismo è sempre controproducente». È che <em>dipende dalla struttura
+        del gioco</em>, e la struttura del gioco si può <strong>cambiare</strong>. Una multa per chi inquina,
+        un contratto che rende vincolante una promessa, una legge antitrust, un sistema di reputazione online
+        che fa incontrare di nuovo venditore e compratore: sono tutti modi di modificare i <em>pagamenti</em>
+        in modo che l'equilibrio di Nash coincida con l'ottimo collettivo. È esattamente questo il mestiere
+        della cosiddetta <em>progettazione dei meccanismi</em>, che è valsa il Nobel per l'economia nel 2007.
+        La matematica non dice che cosa sia giusto; dice <strong>quali regole rendono conveniente ciò che
+        abbiamo deciso essere giusto</strong>.</div>
+
+      <div class="exercise">
+        <p><strong>⑤ Esercizio.</strong> Nel dilemma del prigioniero si introduce una regola: chi tradisce
+          paga una multa di $3$ punti. Riscrivi la matrice e trova il nuovo equilibrio.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#h5s">Mostra la soluzione</button>
+        <div class="solution" id="h5s">
+          <p>Ogni pagamento di chi tradisce cala di $3$: la tentazione passa da $5$ a $2$, e il tradimento
+            reciproco da $1$ a $-2$.</p>
+          <div class="tabwrap">
+          <table class="tabf">
+            <tr><th></th><th>B coopera</th><th>B tradisce</th></tr>
+            <tr><td class="lab">A coopera</td><td><strong>3 ; 3</strong></td><td>0 ; 2</td></tr>
+            <tr><td class="lab">A tradisce</td><td>2 ; 0</td><td>−2 ; −2</td></tr>
+          </table>
+          </div>
+          <p>Adesso, <em>se B coopera</em>, ad A conviene cooperare ($3 \gt 2$); <em>se B tradisce</em>, ad A
+            conviene ancora cooperare ($0 \gt -2$). <strong>Cooperare è diventata la strategia
+            dominante</strong>, e l'unico equilibrio di Nash è $(3;3)$ — che è anche l'ottimo di Pareto.</p>
+          <p class="formula-note">Il dilemma è <strong>sparito</strong>, e non perché i giocatori siano
+            diventati buoni: perché è cambiata la matrice. Bastava una multa maggiore della tentazione
+            ($3 \gt 5 - 3 = 2$). È il modello matematico di che cosa fanno, quando funzionano, le sanzioni:
+            non convincono nessuno, spostano un numero.</p>
+        </div>
+      </div>
+
+      <div class="note"><strong>Il filo della lezione.</strong> Abbiamo costruito un modello — l'operatore
+        razionale con la sua funzione di utilità — e lo abbiamo messo a giocare. Ne sono usciti tre risultati
+        che vale la pena portarsi via. Primo: <strong>esiste sempre un equilibrio</strong> (Nash, 1950), cioè
+        una situazione in cui nessuno vuole muoversi da solo. Secondo: <strong>quell'equilibrio può essere
+        pessimo per tutti</strong>, ed è il dilemma del prigioniero. Terzo: <strong>la ripetizione e le regole
+        cambiano i conti</strong>, e possono far coincidere l'interesse individuale con quello collettivo.
+        Nella <strong>lezione 8</strong> useremo gli stessi strumenti per guardare come si formano i prezzi e
+        come si scambiano i beni: comincia la microeconomia.</div>
+    </section>
+
+    <section id="quiz">
+      <h2>Verifica quello che hai capito</h2>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> — Prof. Vettigli</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script src="../Style/interactive.js"></script>
+  <script src="../Style/toc.js"></script>
+  <script src="../Style/quiz.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var SVGNS = 'http://www.w3.org/2000/svg';
+
+    function el(tag, attrs, txt) {
+      var n = document.createElementNS(SVGNS, tag);
+      for (var k in attrs) { if (attrs.hasOwnProperty(k)) { n.setAttribute(k, attrs[k]); } }
+      if (txt !== undefined) { n.textContent = txt; }
+      return n;
+    }
+    function clear(s) { while (s.firstChild) { s.removeChild(s.firstChild); } }
+    function L(s, x1, y1, x2, y2, col, w, dash) {
+      var a = { x1: x1, y1: y1, x2: x2, y2: y2, stroke: col, 'stroke-width': w || 1.5,
+                'stroke-linecap': 'round' };
+      if (dash) { a['stroke-dasharray'] = dash; }
+      s.appendChild(el('line', a));
+    }
+    function T(s, x, y, t, cls, anchor, size) {
+      var a = { x: x, y: y, class: cls || 'lbl' };
+      if (anchor) { a['text-anchor'] = anchor; }
+      if (size) { a['font-size'] = size; }
+      s.appendChild(el('text', a, t));
+    }
+    function C(s, cx, cy, r, fill, stroke, w) {
+      s.appendChild(el('circle', { cx: cx, cy: cy, r: r, fill: fill || 'none',
+        stroke: stroke || 'none', 'stroke-width': w || 1.5 }));
+    }
+    function P(s, d, stroke, w, fill, dash) {
+      if (!d) { return; }
+      var a = { d: d, fill: fill || 'none', stroke: stroke || 'none', 'stroke-width': w || 1.5,
+                'stroke-linejoin': 'round' };
+      if (dash) { a['stroke-dasharray'] = dash; }
+      s.appendChild(el('path', a));
+    }
+    function R(s, x, y, w, h, fill, stroke, sw, rx) {
+      s.appendChild(el('rect', { x: x, y: y, width: w, height: h, fill: fill || 'none',
+        stroke: stroke || 'none', 'stroke-width': sw === undefined ? 1.2 : sw,
+        rx: rx === undefined ? 4 : rx }));
+    }
+    function num(v, d) { return v.toFixed(d === undefined ? 2 : d).replace('.', ','); }
+    function css(name, fb) {
+      var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+      return (v && v.trim()) ? v.trim() : fb;
+    }
+    var COL = {};
+    function colori() {
+      COL.ax = css('--border', '#888');
+      COL.tx = css('--text', '#222');
+      COL.mu = css('--muted', '#777');
+      COL.ac = css('--accent', '#2563eb');
+      COL.mg = css('--magenta', '#c026d3');
+      COL.gd = css('--gold', '#d97706');
+      COL.gr = '#16a34a';
+      COL.rd = '#dc2626';
+      COL.s2 = css('--surface-2', '#f4f4f5');
+      COL.sf = css('--surface', '#fff');
+    }
+    colori();
+
+    /* Ogni widget e' una IIFE a se': se lancia un'eccezione muore solo quello e
+       resta un riquadro vuoto. avvia() lo protegge, scrive l'errore dentro il
+       disegno invece di sparire, e lo registra per ridisegnarlo al cambio tema
+       (altrimenti resterebbe con i colori del tema precedente). */
+    var DISEGNI = [];
+    function avvia(draw, svg) {
+      function protetto() {
+        try {
+          draw();
+        } catch (err) {
+          clear(svg);
+          T(svg, 20, 40, 'Simulazione non disponibile', 'em', 'start', 15);
+          T(svg, 20, 66, String(err && err.message ? err.message : err), 'lbl-s');
+          T(svg, 20, 88, 'Segnalatelo al professore indicando questo messaggio.', 'lbl-s');
+        }
+      }
+      DISEGNI.push(protetto);
+      protetto();
+      return protetto;
+    }
+    document.addEventListener('themechange', function () {
+      colori();
+      for (var i = 0; i < DISEGNI.length; i++) { DISEGNI[i](); }
+    });
+    function activate(box, btn) {
+      var b = box.querySelectorAll('button');
+      for (var i = 0; i < b.length; i++) { b[i].classList.remove('active'); }
+      if (btn) { btn.classList.add('active'); }
+    }
+    function grab(id) { return document.getElementById(id); }
+
+    function piano(svg, x0, y0, w, h, xmin, xmax, ymin, ymax) {
+      R(svg, x0, y0, w, h, COL.s2, COL.ax);
+      function GX(v) { return x0 + (v - xmin) / (xmax - xmin) * w; }
+      function GY(v) { return y0 + h - (v - ymin) / (ymax - ymin) * h; }
+      if (ymin < 0 && ymax > 0) { L(svg, x0, GY(0), x0 + w, GY(0), COL.ax, 1.2); }
+      return { X: GX, Y: GY, x0: x0, y0: y0, w: w, h: h,
+               xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax };
+    }
+    function traccia(svg, pl, f, col, w, dash, n) {
+      n = n || 500;
+      var d = '', primo = true, i, vx, vy;
+      for (i = 0; i <= n; i++) {
+        vx = pl.xmin + (pl.xmax - pl.xmin) * i / n;
+        vy = f(vx);
+        if (vy === null || !isFinite(vy) || vy < pl.ymin || vy > pl.ymax) { primo = true; continue; }
+        d += (primo ? 'M' : 'L') + pl.X(vx).toFixed(1) + ' ' + pl.Y(vy).toFixed(1);
+        primo = false;
+      }
+      P(svg, d, col, w, 'none', dash);
+    }
+
+    /* ==================================================================
+       1 — LA FUNZIONE DI UTILITA
+       ================================================================== */
+    (function () {
+      var svg = grab('ut-svg'); if (!svg) { return; }
+      var sx = grab('ut-x'), cap = grab('ut-cap');
+      var fn = 'rad';
+      var F = {
+        rad: [function (x) { return Math.sqrt(x); }, 'u = √x', 10],
+        lin: [function (x) { return x / 10; }, 'u = x  (scalata)', 10],
+        qua: [function (x) { return x * x / 1000; }, 'u = x²  (scalata)', 10],
+        log: [function (x) { return Math.log(1 + x); }, 'u = ln(1+x)', 4.7]
+      };
+
+      function draw() {
+        var x = +sx.value;
+        grab('ut-xv').textContent = x;
+        clear(svg);
+        var f = F[fn][0], top = F[fn][2];
+        var pl = piano(svg, 55, 30, 400, 240, 0, 100, 0, top * 1.08);
+        traccia(svg, pl, f, COL.mg, 2.8, null, 500);
+        C(svg, pl.X(x), pl.Y(f(x)), 6, COL.ac, 'none');
+        L(svg, pl.X(x), pl.y0 + pl.h, pl.X(x), pl.Y(f(x)), COL.ac, 1.4, '4 3');
+        L(svg, pl.x0, pl.Y(f(x)), pl.X(x), pl.Y(f(x)), COL.ac, 1.4, '4 3');
+        /* l'incremento per una unita' in piu' */
+        var marg = f(Math.min(100, x + 10)) - f(x);
+        if (x <= 90) {
+          L(svg, pl.X(x), pl.Y(f(x)), pl.X(x + 10), pl.Y(f(x)), COL.gr, 2.2);
+          L(svg, pl.X(x + 10), pl.Y(f(x)), pl.X(x + 10), pl.Y(f(x + 10)), COL.gd, 2.6);
+        }
+        T(svg, 255, 24, F[fn][1], 'lbl', 'middle');
+        T(svg, 55, 292, 'denaro (in decine di euro)', 'lbl-s');
+
+        var px = 485;
+        R(svg, px - 15, 40, 180, 215, COL.s2, COL.ax);
+        T(svg, px, 68, 'quantità x', 'lbl-s');
+        T(svg, px + 150, 68, '' + x, 'lbl', 'end');
+        T(svg, px, 96, 'utilità u(x)', 'lbl-s');
+        T(svg, px + 150, 96, num(f(x), 4), 'em', 'end');
+        T(svg, px, 130, 'aggiungendo 10', 'lbl-s');
+        T(svg, px + 150, 130, '+' + num(marg, 4), 'em', 'end');
+        T(svg, px, 158, 'utilità marginale', 'lbl-s');
+        T(svg, px + 150, 158, num(marg / 10, 5), 'lbl', 'end');
+        T(svg, px, 190, 'la stessa aggiunta a x = 5', 'lbl-s');
+        T(svg, px + 150, 190, '+' + num(f(15) - f(5), 4), 'lbl', 'end');
+        T(svg, px, 222, fn === 'qua' ? 'marginale crescente:' : (fn === 'lin' ?
+          'marginale costante:' : 'marginale decrescente:'), 'lbl-s');
+        T(svg, px, 244, fn === 'qua' ? 'propenso al rischio' : (fn === 'lin' ?
+          'neutrale al rischio' : 'avverso al rischio'), 'lbl-s');
+
+        cap.textContent = F[fn][1] + ': con x = ' + x + ' l’utilità vale ' + num(f(x), 4) +
+          ', e dieci unità in più ne aggiungono ' + num(marg, 4) +
+          ' (a x = 5 ne aggiungerebbero ' + num(f(15) - f(5), 4) + ').';
+      }
+      sx.addEventListener('input', draw);
+      var bts = grab('ut-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); fn = b.dataset.f; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       2 — LA MATRICE DEI PAGAMENTI
+       ================================================================== */
+    (function () {
+      var svg = grab('dp-svg'); if (!svg) { return; }
+      var stT = grab('dp-t'), stR = grab('dp-r'), cap = grab('dp-cap');
+      var sel = 0;
+      /* ogni gioco: nome, etichette righe, etichette colonne, matrice 2x2 di [u1,u2] */
+      function matrice(sel, T, Rr) {
+        if (sel === 0) {
+          return ['dilemma del prigioniero', ['tace', 'confessa'], ['tace', 'confessa'],
+                  [[[Rr, Rr], [0, T]], [[T, 0], [1, 1]]]];
+        }
+        if (sel === 1) {
+          return ['caccia al cervo', ['cervo', 'lepre'], ['cervo', 'lepre'],
+                  [[[4, 4], [0, 3]], [[3, 0], [3, 3]]]];
+        }
+        if (sel === 2) {
+          return ['gioco del pollo', ['sterza', 'tira dritto'], ['sterza', 'tira dritto'],
+                  [[[3, 3], [2, 4]], [[4, 2], [0, 0]]]];
+        }
+        if (sel === 3) {
+          return ['coordinamento', ['sinistra', 'destra'], ['sinistra', 'destra'],
+                  [[[2, 2], [0, 0]], [[0, 0], [1, 1]]]];
+        }
+        return ['testa o croce (somma zero)', ['testa', 'croce'], ['testa', 'croce'],
+                [[[1, -1], [-1, 1]], [[-1, 1], [1, -1]]]];
+      }
+      function nash(M) {
+        var out = [];
+        for (var i = 0; i < 2; i++) {
+          for (var j = 0; j < 2; j++) {
+            var meglio1 = M[1 - i][j][0] > M[i][j][0];
+            var meglio2 = M[i][1 - j][1] > M[i][j][1];
+            if (!meglio1 && !meglio2) { out.push([i, j]); }
+          }
+        }
+        return out;
+      }
+      function pareto(M) {
+        var out = [];
+        for (var i = 0; i < 2; i++) {
+          for (var j = 0; j < 2; j++) {
+            var dominato = false;
+            for (var a = 0; a < 2; a++) {
+              for (var b = 0; b < 2; b++) {
+                if (a === i && b === j) { continue; }
+                if (M[a][b][0] >= M[i][j][0] && M[a][b][1] >= M[i][j][1] &&
+                    (M[a][b][0] > M[i][j][0] || M[a][b][1] > M[i][j][1])) { dominato = true; }
+              }
+            }
+            if (!dominato) { out.push([i, j]); }
+          }
+        }
+        return out;
+      }
+
+      function draw() {
+        var T = +stT.value, Rr = +stR.value;
+        grab('dp-tv').textContent = T;
+        grab('dp-rv').textContent = Rr;
+        clear(svg);
+        var g = matrice(sel, T, Rr);
+        var M = g[3];
+        var NE = nash(M), PO = pareto(M);
+
+        var x0 = 100, y0 = 80, cw = 150, chh = 78;
+        T(svg, x0 + cw, 36, g[0], 'lbl', 'middle');
+        T(svg, x0 + cw, 58, 'giocatore B', 'lbl-s', 'middle');
+        T(svg, 40, y0 + chh, 'giocatore A', 'lbl-s', 'middle');
+        for (var j = 0; j < 2; j++) {
+          T(svg, x0 + cw / 2 + j * cw, y0 - 8, g[2][j], 'lbl', 'middle');
+        }
+        for (var i = 0; i < 2; i++) {
+          T(svg, x0 - 8, y0 + chh / 2 + i * chh + 5, g[1][i], 'lbl', 'end');
+          for (var k = 0; k < 2; k++) {
+            var isNE = NE.some(function (p) { return p[0] === i && p[1] === k; });
+            var isPO = PO.some(function (p) { return p[0] === i && p[1] === k; });
+            R(svg, x0 + k * cw, y0 + i * chh, cw, chh,
+              isNE ? 'color-mix(in srgb, ' + COL.mg + ' 12%, transparent)' : COL.s2,
+              isNE ? COL.mg : COL.ax, isNE ? 3 : 1.2, 6);
+            T(svg, x0 + k * cw + cw / 2, y0 + i * chh + chh / 2 + 6,
+              M[i][k][0] + ' ; ' + M[i][k][1], 'em', 'middle', 19);
+            if (isPO) { C(svg, x0 + k * cw + 18, y0 + i * chh + 18, 6, COL.gr, 'none'); }
+          }
+        }
+
+        var px = 425;
+        R(svg, px - 15, 70, 240, 190, COL.s2, COL.ax);
+        T(svg, px, 98, 'equilibri di Nash', 'lbl-s');
+        T(svg, px + 210, 98, '' + NE.length, 'em', 'end');
+        var yy = 122;
+        for (var q = 0; q < NE.length; q++) {
+          T(svg, px, yy, '(' + g[1][NE[q][0]] + ' ; ' + g[2][NE[q][1]] + ')', 'lbl-s');
+          T(svg, px + 210, yy, M[NE[q][0]][NE[q][1]][0] + ' ; ' + M[NE[q][0]][NE[q][1]][1],
+            'lbl', 'end');
+          yy += 22;
+        }
+        if (NE.length === 0) { T(svg, px, yy, 'nessuno in strategie pure', 'lbl-s'); yy += 22; }
+        yy = Math.max(yy, 170);
+        T(svg, px, yy + 8, 'ottimi di Pareto', 'lbl-s');
+        T(svg, px + 210, yy + 8, '' + PO.length, 'em', 'end');
+        var coincide = NE.length > 0 && NE.every(function (p) {
+          return PO.some(function (o) { return o[0] === p[0] && o[1] === p[1]; });
+        });
+        T(svg, px, yy + 36, NE.length === 0 ? 'serve una strategia mista' :
+          (coincide ? 'l’equilibrio è anche efficiente' : 'l’equilibrio NON è efficiente'),
+          coincide ? 'lbl' : 'em');
+        T(svg, px, yy + 58, NE.length === 0 ? '(nessun equilibrio puro)' :
+          (coincide ? '' : 'ecco il dilemma'), 'lbl-s');
+        T(svg, 100, 300, 'bordo magenta = equilibrio di Nash   ·   pallino verde = ottimo di Pareto',
+          'lbl-s');
+        T(svg, 100, 322, 'gli slider agiscono solo sul dilemma del prigioniero', 'lbl-s');
+
+        cap.textContent = g[0] + ': ' + NE.length + ' equilibri di Nash, ' + PO.length +
+          ' esiti Pareto-ottimali' + (coincide ? ', e coincidono.' : '.');
+      }
+      stT.addEventListener('input', draw);
+      stR.addEventListener('input', draw);
+      var bts = grab('dp-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); sel = +b.dataset.p; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       3 — FALCO E COLOMBA
+       ================================================================== */
+    (function () {
+      var svg = grab('fc-svg'); if (!svg) { return; }
+      var sv = grab('fc-v'), sc = grab('fc-c'), sp = grab('fc-p'), cap = grab('fc-cap');
+
+      function draw() {
+        var V = +sv.value, Cc = +sc.value, p0 = +sp.value;
+        grab('fc-vv').textContent = num(V, 1);
+        grab('fc-cv').textContent = num(Cc, 1);
+        grab('fc-pv').textContent = num(p0, 2);
+        clear(svg);
+        function uF(p) { return p * (V - Cc) / 2 + (1 - p) * V; }
+        function uC(p) { return (1 - p) * V / 2; }
+        var pEq = (V < Cc) ? V / Cc : 1.0;
+
+        /* i due guadagni in funzione della frazione di falchi */
+        var lo = Math.min(uF(1), uC(0), 0) - 0.5;
+        var hi = Math.max(uF(0), uC(0)) + 0.5;
+        var pl = piano(svg, 55, 30, 290, 230, 0, 1, lo, hi);
+        traccia(svg, pl, uF, COL.rd, 2.8, null, 300);
+        traccia(svg, pl, uC, COL.ac, 2.8, null, 300);
+        if (V < Cc) {
+          L(svg, pl.X(pEq), pl.y0, pl.X(pEq), pl.y0 + pl.h, COL.gr, 2, '5 4');
+          C(svg, pl.X(pEq), pl.Y(uF(pEq)), 6, COL.gr, 'none');
+          T(svg, pl.X(pEq) + 8, pl.y0 + 18, 'p = V/C', 'em');
+        }
+        T(svg, 200, 24, 'guadagno medio', 'lbl', 'middle');
+        T(svg, 55, 288, 'frazione di falchi nella popolazione', 'lbl-s');
+        T(svg, 60, 50, 'falco', 'em');
+        T(svg, 60, 70, 'colomba', 'lbl-s');
+
+        /* la dinamica nel tempo */
+        var pl2 = piano(svg, 395, 30, 250, 230, 0, 60, 0, 1);
+        var p = p0, storia = [p];
+        for (var t = 1; t <= 60; t++) {
+          /* dinamica del replicatore in forma additiva: regge anche con guadagni
+             negativi, dove la forma moltiplicativa si romperebbe */
+          var passo = 0.12 * p * (1 - p) * (uF(p) - uC(p));
+          p = Math.max(0, Math.min(1, p + passo));
+          storia.push(p);
+        }
+        var d = '';
+        for (var i2 = 0; i2 < storia.length; i2++) {
+          d += (i2 ? 'L' : 'M') + pl2.X(i2) + ' ' + pl2.Y(storia[i2]);
+        }
+        P(svg, d, COL.mg, 2.6);
+        if (V < Cc) {
+          L(svg, pl2.x0, pl2.Y(pEq), pl2.x0 + pl2.w, pl2.Y(pEq), COL.gr, 1.6, '5 4');
+        }
+        T(svg, 520, 24, 'evoluzione della popolazione', 'lbl', 'middle');
+        T(svg, 395, 288, 'generazioni', 'lbl-s');
+
+        var yy = 312;
+        T(svg, 55, yy, 'V = ' + num(V, 1) + '   C = ' + num(Cc, 1) +
+          '   →   frazione di falchi all’equilibrio: ' +
+          (V < Cc ? num(pEq, 3) : 'tutti falchi'), 'lbl');
+        T(svg, 55, yy + 20, V < Cc ?
+          ('guadagno comune all’equilibrio: ' + num(uF(pEq), 3) +
+           '   ·   se fossero tutte colombe: ' + num(uC(0), 3)) :
+          'con V ≥ C combattere conviene sempre: l’aggressività dilaga', 'lbl-s');
+
+        cap.textContent = 'Con V = ' + num(V, 1) + ' e C = ' + num(Cc, 1) + ' la popolazione ' +
+          (V < Cc ? ('si stabilizza al ' + num(pEq * 100, 1) + '% di falchi.') :
+           'diventa tutta di falchi.');
+      }
+      [sv, sc, sp].forEach(function (s) { s.addEventListener('input', draw); });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       4 — IL TORNEO DEL DILEMMA RIPETUTO
+       ================================================================== */
+    (function () {
+      var svg = grab('ax-svg'); if (!svg) { return; }
+      var sn = grab('ax-n'), se = grab('ax-e'), cap = grab('ax-cap');
+      var sel = 'tit';
+      var NOMI = { tit: 'TIT FOR TAT', coop: 'sempre gentile', def: 'sempre traditore',
+                   rand: 'a caso', grim: 'rancorosa' };
+      var ORD = ['tit', 'coop', 'def', 'rand', 'grim'];
+      var PAY = { CC: [3, 3], CD: [0, 5], DC: [5, 0], DD: [1, 1] };
+
+      function mossa(str, mieMosse, sueMosse, rnd) {
+        if (str === 'coop') { return 'C'; }
+        if (str === 'def') { return 'D'; }
+        if (str === 'rand') { return rnd() < 0.5 ? 'C' : 'D'; }
+        if (str === 'tit') { return sueMosse.length === 0 ? 'C' : sueMosse[sueMosse.length - 1]; }
+        return sueMosse.indexOf('D') >= 0 ? 'D' : 'C';   /* rancorosa */
+      }
+
+      function partita(s1, s2, n, err, seme) {
+        var s = seme;
+        function rnd() { s = (s * 16807) % 2147483647; return s / 2147483647; }
+        var m1 = [], m2 = [], p1 = 0, p2 = 0;
+        for (var t = 0; t < n; t++) {
+          var a = mossa(s1, m1, m2, rnd);
+          var b = mossa(s2, m2, m1, rnd);
+          if (rnd() < err) { a = (a === 'C') ? 'D' : 'C'; }
+          if (rnd() < err) { b = (b === 'C') ? 'D' : 'C'; }
+          var key = a + b;
+          p1 += PAY[key][0];
+          p2 += PAY[key][1];
+          m1.push(a);
+          m2.push(b);
+        }
+        return [p1, p2];
+      }
+
+      function draw() {
+        var n = +sn.value, err = +se.value / 100;
+        grab('ax-nv').textContent = n;
+        grab('ax-ev').textContent = (+se.value) + '%';
+        clear(svg);
+        var x0 = 130, y0 = 70, cw = 88, chh = 40;
+        T(svg, 40, 34, 'punteggio della riga contro la colonna (su ' + n + ' turni)', 'lbl');
+        for (var j = 0; j < 5; j++) {
+          T(svg, x0 + cw / 2 + j * cw, y0 - 10, NOMI[ORD[j]].split(' ')[0], 'lbl-s', 'middle');
+        }
+        T(svg, x0 + 5 * cw + 44, y0 - 10, 'totale', 'lbl', 'middle');
+        var tot = {}, i, j2;
+        for (i = 0; i < 5; i++) {
+          tot[ORD[i]] = 0;
+          for (j2 = 0; j2 < 5; j2++) {
+            tot[ORD[i]] += partita(ORD[i], ORD[j2], n, err, 7919 + i * 101 + j2 * 13)[0];
+          }
+        }
+        var max = 0;
+        for (i = 0; i < 5; i++) { max = Math.max(max, tot[ORD[i]]); }
+        for (i = 0; i < 5; i++) {
+          var mia = ORD[i] === sel;
+          T(svg, x0 - 8, y0 + chh / 2 + i * chh + 5, NOMI[ORD[i]], mia ? 'em' : 'lbl-s', 'end');
+          for (j2 = 0; j2 < 5; j2++) {
+            var r = partita(ORD[i], ORD[j2], n, err, 7919 + i * 101 + j2 * 13);
+            R(svg, x0 + j2 * cw, y0 + i * chh, cw - 3, chh - 3,
+              mia ? 'color-mix(in srgb, ' + COL.mg + ' 12%, transparent)' : COL.s2,
+              mia ? COL.mg : COL.ax, mia ? 2 : 1, 4);
+            T(svg, x0 + j2 * cw + (cw - 3) / 2, y0 + i * chh + chh / 2 + 3, '' + r[0],
+              'lbl', 'middle', 13);
+          }
+          R(svg, x0 + 5 * cw + 6, y0 + i * chh, 76, chh - 3,
+            tot[ORD[i]] === max ? 'color-mix(in srgb, ' + COL.gr + ' 18%, transparent)' : COL.s2,
+            tot[ORD[i]] === max ? COL.gr : COL.ax, tot[ORD[i]] === max ? 2 : 1, 4);
+          T(svg, x0 + 5 * cw + 44, y0 + i * chh + chh / 2 + 3, '' + tot[ORD[i]],
+            tot[ORD[i]] === max ? 'em' : 'lbl', 'middle', 13);
+        }
+        var vinc = ORD[0];
+        for (i = 0; i < 5; i++) { if (tot[ORD[i]] > tot[vinc]) { vinc = ORD[i]; } }
+        var yy = y0 + 5 * chh + 34;
+        T(svg, 40, yy, 'vince il torneo: ' + NOMI[vinc] + '  con ' + tot[vinc] + ' punti', 'em');
+        var dir = partita('tit', 'def', n, err, 7919 + 0 * 101 + 2 * 13);
+        T(svg, 40, yy + 22, 'nello scontro diretto TIT FOR TAT contro il traditore: ' +
+          dir[0] + ' a ' + dir[1] +
+          (dir[0] < dir[1] ? '  (perde il duello, ma vince il torneo)' : ''), 'lbl-s');
+        T(svg, 40, yy + 42, 'due gentili che si incontrano fanno ' + (3 * n) +
+          ' punti a testa: è lì che si crea il valore', 'lbl-s');
+
+        cap.textContent = 'Su ' + n + ' turni con ' + (+se.value) +
+          '% di errore vince ' + NOMI[vinc] + ' con ' + tot[vinc] + ' punti.';
+      }
+      sn.addEventListener('input', draw);
+      se.addEventListener('input', draw);
+      var bts = grab('ax-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); sel = b.dataset.s; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       5 — MASSIMO LOCALE E MASSIMO GLOBALE
+       ================================================================== */
+    (function () {
+      var svg = grab('mi-svg'); if (!svg) { return; }
+      var cap = grab('mi-cap');
+      var sel = 0;
+      var GIOCHI = [
+        ['mercato concorrenziale (nessuna esternalità)',
+         function (x, y) { return -Math.pow(x - 0.7, 2); },
+         function (x, y) { return -Math.pow(y - 0.7, 2); }],
+        ['dilemma del prigioniero',
+         function (x, y) { return 3 * x * y + 0 * x * (1 - y) + 5 * (1 - x) * y + 1 * (1 - x) * (1 - y); },
+         function (x, y) { return 3 * x * y + 5 * x * (1 - y) + 0 * (1 - x) * y + 1 * (1 - x) * (1 - y); }],
+        ['caccia al cervo',
+         function (x, y) { return 4 * x * y + 0 * x * (1 - y) + 3 * (1 - x) * y + 3 * (1 - x) * (1 - y); },
+         function (x, y) { return 4 * x * y + 3 * x * (1 - y) + 0 * (1 - x) * y + 3 * (1 - x) * (1 - y); }]
+      ];
+      var Ng = 11;
+
+      function draw() {
+        clear(svg);
+        var g = GIOCHI[sel], u1 = g[1], u2 = g[2];
+        var x0 = 90, y0 = 40, w = 240, h = 240, cw = w / Ng, chh = h / Ng;
+        var i, j, tot, minT = 1e9, maxT = -1e9;
+        for (i = 0; i < Ng; i++) {
+          for (j = 0; j < Ng; j++) {
+            tot = u1(i / (Ng - 1), j / (Ng - 1)) + u2(i / (Ng - 1), j / (Ng - 1));
+            minT = Math.min(minT, tot);
+            maxT = Math.max(maxT, tot);
+          }
+        }
+        var best = [], NE = [];
+        for (i = 0; i < Ng; i++) {
+          for (j = 0; j < Ng; j++) {
+            var x = i / (Ng - 1), y = j / (Ng - 1);
+            tot = u1(x, y) + u2(x, y);
+            var f = (tot - minT) / Math.max(1e-9, maxT - minT);
+            R(svg, x0 + i * cw, y0 + h - (j + 1) * chh, cw, chh,
+              'color-mix(in srgb, ' + COL.gr + ' ' + Math.round(6 + 52 * f) + '%, transparent)',
+              'none', 0, 0);
+            if (Math.abs(tot - maxT) < 1e-9) { best.push([x, y]); }
+            /* equilibrio di Nash sulla griglia */
+            var m1 = -1e9, m2 = -1e9, k;
+            for (k = 0; k < Ng; k++) {
+              m1 = Math.max(m1, u1(k / (Ng - 1), y));
+              m2 = Math.max(m2, u2(x, k / (Ng - 1)));
+            }
+            if (u1(x, y) >= m1 - 1e-9 && u2(x, y) >= m2 - 1e-9) { NE.push([x, y]); }
+          }
+        }
+        R(svg, x0, y0, w, h, 'none', COL.ax, 1.4, 0);
+        /* le frecce della spinta individuale */
+        for (i = 0; i < Ng; i += 2) {
+          for (j = 0; j < Ng; j += 2) {
+            var xx = i / (Ng - 1), yy2 = j / (Ng - 1);
+            var cx = x0 + (i + 0.5) * cw, cy = y0 + h - (j + 0.5) * chh;
+            var d1 = u1(Math.min(1, xx + 0.1), yy2) - u1(Math.max(0, xx - 0.1), yy2);
+            var d2 = u2(xx, Math.min(1, yy2 + 0.1)) - u2(xx, Math.max(0, yy2 - 0.1));
+            var lx = Math.abs(d1) < 1e-9 ? 0 : (d1 > 0 ? 9 : -9);
+            var ly = Math.abs(d2) < 1e-9 ? 0 : (d2 > 0 ? -9 : 9);
+            if (lx !== 0) { L(svg, cx, cy, cx + lx, cy, COL.mu, 1.4); }
+            if (ly !== 0) { L(svg, cx, cy, cx, cy + ly, COL.mu, 1.4); }
+          }
+        }
+        for (i = 0; i < NE.length; i++) {
+          C(svg, x0 + NE[i][0] * w, y0 + h - NE[i][1] * h, 7, COL.mg, COL.sf, 2);
+        }
+        for (i = 0; i < best.length; i++) {
+          var bx = x0 + best[i][0] * w, by = y0 + h - best[i][1] * h;
+          var d = '';
+          for (var s = 0; s < 10; s++) {
+            var ang = -Math.PI / 2 + s * Math.PI / 5;
+            var rr = (s % 2 === 0) ? 10 : 4.5;
+            d += (s ? 'L' : 'M') + (bx + rr * Math.cos(ang)) + ' ' + (by + rr * Math.sin(ang));
+          }
+          P(svg, d + 'Z', COL.gr, 1.6, COL.gr);
+        }
+        T(svg, x0 + w / 2, 28, g[0], 'lbl', 'middle');
+        T(svg, x0 + w / 2, y0 + h + 22, 'scelta di A (0 = tradisce, 1 = coopera)', 'lbl-s', 'middle');
+        T(svg, x0 - 14, y0 + h / 2, 'scelta di B', 'lbl-s', 'end');
+
+        var px = 375;
+        R(svg, px - 15, 50, 280, 210, COL.s2, COL.ax);
+        T(svg, px, 78, 'equilibri di Nash (pallino magenta)', 'lbl-s');
+        T(svg, px + 250, 78, '' + NE.length, 'em', 'end');
+        T(svg, px, 106, 'massimo collettivo (stella verde)', 'lbl-s');
+        T(svg, px + 250, 106, num(maxT, 2), 'em', 'end');
+        var uNE = NE.length ? (u1(NE[0][0], NE[0][1]) + u2(NE[0][0], NE[0][1])) : 0;
+        T(svg, px, 134, 'valore collettivo all’equilibrio', 'lbl-s');
+        T(svg, px + 250, 134, num(uNE, 2), 'lbl', 'end');
+        var coincide = NE.some(function (p) {
+          return best.some(function (b) {
+            return Math.abs(p[0] - b[0]) < 1e-9 && Math.abs(p[1] - b[1]) < 1e-9;
+          });
+        });
+        T(svg, px, 168, coincide ? 'la mano invisibile funziona:' : 'la mano invisibile fallisce:',
+          coincide ? 'lbl' : 'em');
+        T(svg, px, 190, coincide ? 'le mosse individuali portano al' : 'le mosse individuali si fermano',
+          'lbl-s');
+        T(svg, px, 210, coincide ? 'punto più alto del paesaggio' : 'prima del punto più alto',
+          'lbl-s');
+        T(svg, px, 240, 'per arrivarci servirebbe muoversi', 'lbl-s');
+        T(svg, px, 258, coincide ? 'e infatti non serve.' : 'insieme, in diagonale.', 'lbl-s');
+
+        cap.textContent = g[0] + ': ' + NE.length + ' equilibri di Nash; il massimo collettivo vale ' +
+          num(maxT, 2) + ' e all’equilibrio si ottiene ' + num(uNE, 2) + '.';
+      }
+      var bts = grab('mi-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); sel = +b.dataset.p; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       6 — IL TORNEO DI AXELROD CON OTTO STRATEGIE
+       ================================================================== */
+    (function () {
+      var svg = grab('tz-svg'); if (!svg) { return; }
+      var se = grab('tz-e'), sg = grab('tz-g'), cap = grab('tz-cap');
+      var vista = 'eco';
+      var STR = ['tit', 'tf2t', 'gtft', 'pav', 'coop', 'grim', 'rand', 'def'];
+      var NOME = { tit: 'TIT FOR TAT', tf2t: 'TIT FOR TWO TATS', gtft: 'TFT generosa',
+                   pav: 'Pavlov', coop: 'sempre gentile', grim: 'rancorosa',
+                   rand: 'a caso', def: 'sempre traditore' };
+      var BREVE = { tit: 'TFT', tf2t: 'TF2T', gtft: 'gTFT', pav: 'Pavlov',
+                    coop: 'gentile', grim: 'rancor.', rand: 'caso', def: 'tradit.' };
+      var TINTA = { tit: COL.mg, tf2t: COL.ac, gtft: '#0ea5e9', pav: COL.gr,
+                    coop: '#84cc16', grim: COL.gd, rand: COL.mu, def: COL.rd };
+      var PAG = { CC: [3, 3], CD: [0, 5], DC: [5, 0], DD: [1, 1] };
+
+      function mossa(s, mie, sue, rnd) {
+        if (s === 'coop') { return 'C'; }
+        if (s === 'def') { return 'D'; }
+        if (s === 'rand') { return rnd() < 0.5 ? 'C' : 'D'; }
+        if (s === 'tit') { return sue.length === 0 ? 'C' : sue[sue.length - 1]; }
+        if (s === 'grim') { return sue.indexOf('D') >= 0 ? 'D' : 'C'; }
+        if (s === 'tf2t') {
+          return (sue.length >= 2 && sue[sue.length - 1] === 'D' &&
+                  sue[sue.length - 2] === 'D') ? 'D' : 'C';
+        }
+        if (s === 'gtft') {
+          if (sue.length === 0) { return 'C'; }
+          if (sue[sue.length - 1] === 'D') { return rnd() < 0.10 ? 'C' : 'D'; }
+          return 'C';
+        }
+        /* Pavlov: vinci e resta, perdi e cambia */
+        if (mie.length === 0) { return 'C'; }
+        var ult = mie[mie.length - 1] + sue[sue.length - 1];
+        if (PAG[ult][0] >= 3) { return ult.charAt(0); }
+        return ult.charAt(0) === 'C' ? 'D' : 'C';
+      }
+
+      function partita(s1, s2, n, err, seme) {
+        var s = seme;
+        function rnd() { s = (s * 16807) % 2147483647; return s / 2147483647; }
+        var m1 = [], m2 = [], p1 = 0, p2 = 0, t, a, b;
+        for (t = 0; t < n; t++) {
+          a = mossa(s1, m1, m2, rnd);
+          b = mossa(s2, m2, m1, rnd);
+          if (rnd() < err) { a = (a === 'C') ? 'D' : 'C'; }
+          if (rnd() < err) { b = (b === 'C') ? 'D' : 'C'; }
+          p1 += PAG[a + b][0];
+          p2 += PAG[a + b][1];
+          m1.push(a);
+          m2.push(b);
+        }
+        return [p1, p2];
+      }
+
+      function matrice(err) {
+        var M = {}, i, j;
+        for (i = 0; i < STR.length; i++) {
+          for (j = 0; j < STR.length; j++) {
+            M[STR[i] + '|' + STR[j]] =
+              partita(STR[i], STR[j], 60, err, 7919 + i * 101 + j * 13)[0] / 60;
+          }
+        }
+        return M;
+      }
+
+      function draw() {
+        var err = +se.value / 100, G = +sg.value;
+        grab('tz-ev').textContent = (+se.value) + '%';
+        grab('tz-gv').textContent = G;
+        clear(svg);
+        var M = matrice(err), i, j, a, b;
+
+        if (vista === 'mat') {
+          var x0 = 118, y0 = 78, cw = 62, ch = 30;
+          T(svg, 40, 34, 'punteggio medio per turno della riga contro la colonna', 'lbl');
+          for (j = 0; j < 8; j++) {
+            T(svg, x0 + cw / 2 + j * cw, y0 - 10, BREVE[STR[j]], 'lbl-s', 'middle', 10);
+          }
+          T(svg, x0 + 8 * cw + 32, y0 - 10, 'media', 'lbl', 'middle', 11);
+          for (i = 0; i < 8; i++) {
+            T(svg, x0 - 8, y0 + ch / 2 + i * ch + 4, NOME[STR[i]], 'lbl-s', 'end', 10);
+            var med = 0;
+            for (j = 0; j < 8; j++) {
+              var v = M[STR[i] + '|' + STR[j]];
+              med += v / 8;
+              var f = Math.max(0, Math.min(1, (v - 1) / 2.2));
+              R(svg, x0 + j * cw, y0 + i * ch, cw - 2, ch - 2,
+                'color-mix(in srgb, ' + COL.gr + ' ' + Math.round(4 + 42 * f) +
+                '%, transparent)', COL.ax, 0.6, 3);
+              T(svg, x0 + j * cw + (cw - 2) / 2, y0 + i * ch + ch / 2 + 4,
+                num(v, 2), 'lbl', 'middle', 10);
+            }
+            R(svg, x0 + 8 * cw + 4, y0 + i * ch, 56, ch - 2, COL.s2, COL.ax, 1, 3);
+            T(svg, x0 + 8 * cw + 32, y0 + i * ch + ch / 2 + 4, num(med, 3),
+              'em', 'middle', 11);
+          }
+          T(svg, 40, y0 + 8 * ch + 34,
+            'più verde = punteggio più alto; la diagonale è ogni strategia contro sé stessa',
+            'lbl-s');
+          cap.textContent = 'Matrice completa degli otto programmi, con ' + (+se.value) +
+            '% di errore.';
+          return;
+        }
+
+        /* medie del torneo tutti-contro-tutti */
+        var media = {};
+        for (i = 0; i < 8; i++) {
+          media[STR[i]] = 0;
+          for (j = 0; j < 8; j++) { media[STR[i]] += M[STR[i] + '|' + STR[j]] / 8; }
+        }
+
+        if (vista === 'cls') {
+          var ord = STR.slice().sort(function (p, q) { return media[q] - media[p]; });
+          T(svg, 40, 34, 'classifica del torneo (punteggio medio per turno, tutti contro tutti)',
+            'lbl');
+          var bx = 190, bw = 400;
+          for (i = 0; i < 8; i++) {
+            var yy = 70 + i * 36;
+            T(svg, bx - 10, yy + 5, NOME[ord[i]], 'lbl-s', 'end');
+            var q = (media[ord[i]] - 1.8) / 1.4;
+            q = Math.max(0.02, Math.min(1, q));
+            R(svg, bx, yy - 11, bw * q, 24,
+              'color-mix(in srgb, ' + TINTA[ord[i]] + ' 55%, transparent)',
+              TINTA[ord[i]], 1.4, 4);
+            T(svg, bx + bw * q + 8, yy + 5, num(media[ord[i]], 3), 'em');
+          }
+          T(svg, 40, 372, 'vince ' + NOME[ord[0]] + ' con ' + num(media[ord[0]], 3) +
+            ' punti a turno; ultimo ' + NOME[ord[7]] + ' con ' + num(media[ord[7]], 3), 'lbl-s');
+          cap.textContent = 'Con ' + (+se.value) + '% di errore vince ' + NOME[ord[0]] +
+            ' (' + num(media[ord[0]], 3) + ' punti a turno).';
+          return;
+        }
+
+        /* simulazione ecologica */
+        var q0 = {}, storia = [];
+        for (i = 0; i < 8; i++) { q0[STR[i]] = 1 / 8; }
+        storia.push(q0);
+        var q = q0;
+        for (var g = 1; g <= G; g++) {
+          var sc = {}, med2 = 0;
+          for (i = 0; i < 8; i++) {
+            sc[STR[i]] = 0;
+            for (j = 0; j < 8; j++) { sc[STR[i]] += q[STR[j]] * M[STR[i] + '|' + STR[j]]; }
+            med2 += q[STR[i]] * sc[STR[i]];
+          }
+          var nq = {};
+          for (i = 0; i < 8; i++) {
+            nq[STR[i]] = (med2 > 0) ? q[STR[i]] * sc[STR[i]] / med2 : q[STR[i]];
+          }
+          q = nq;
+          storia.push(q);
+        }
+        var pl = piano(svg, 60, 40, 420, 250, 0, G, 0, 0.45);
+        for (i = 0; i < 8; i++) {
+          (function (nome) {
+            var d = '';
+            for (var g2 = 0; g2 < storia.length; g2++) {
+              var vv = Math.min(0.45, storia[g2][nome]);
+              d += (g2 ? 'L' : 'M') + pl.X(g2).toFixed(1) + ' ' + pl.Y(vv).toFixed(1);
+            }
+            P(svg, d, TINTA[nome], q[nome] > 0.01 ? 2.6 : 1.4);
+          }(STR[i]));
+        }
+        for (var k = 0; k <= 4; k++) {
+          L(svg, pl.x0, pl.Y(k * 0.1), pl.x0 + pl.w, pl.Y(k * 0.1), COL.ax, 0.8, '2 4');
+          T(svg, pl.x0 - 6, pl.Y(k * 0.1) + 4, (k * 10) + '%', 'lbl-s', 'end');
+        }
+        T(svg, 270, 32, 'quota di popolazione, generazione dopo generazione', 'lbl', 'middle');
+        T(svg, 60, 308, 'generazioni', 'lbl-s');
+
+        var ordf = STR.slice().sort(function (p2, q2) { return q[q2] - q[p2]; });
+        var px = 500;
+        R(svg, px - 15, 45, 170, 245, COL.s2, COL.ax);
+        T(svg, px, 70, 'dopo ' + G + ' generazioni', 'lbl-s');
+        for (i = 0; i < 8; i++) {
+          var yy2 = 96 + i * 24;
+          C(svg, px + 4, yy2 - 4, 4.5, TINTA[ordf[i]], 'none');
+          T(svg, px + 16, yy2, BREVE[ordf[i]], q[ordf[i]] > 0.01 ? 'lbl' : 'lbl-s', 'start', 11);
+          T(svg, px + 140, yy2, num(q[ordf[i]] * 100, 1) + '%',
+            q[ordf[i]] > 0.01 ? 'em' : 'lbl-s', 'end', 11);
+        }
+        var estinte = [];
+        for (i = 0; i < 8; i++) { if (q[STR[i]] < 0.005) { estinte.push(BREVE[STR[i]]); } }
+        T(svg, 60, 336, estinte.length ? ('si estinguono: ' + estinte.join(', ')) :
+          'nessuna strategia si estingue', 'em');
+        T(svg, 60, 358, err === 0 ?
+          'senza errori sopravvivono tutte le strategie gentili' :
+          'con gli errori vince chi sa riparare i malintesi', 'lbl-s');
+
+        cap.textContent = 'Con ' + (+se.value) + '% di errore, dopo ' + G +
+          ' generazioni domina ' + NOME[ordf[0]] + ' con il ' + num(q[ordf[0]] * 100, 1) + '%.';
+      }
+      se.addEventListener('input', draw);
+      sg.addEventListener('input', draw);
+      var bts = grab('tz-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       7 — IL DILEMMA A N PERSONE
+       ================================================================== */
+    (function () {
+      var svg = grab('np-svg'); if (!svg) { return; }
+      var sn = grab('np-n'), sr = grab('np-r'), sd = grab('np-d'), sp = grab('np-p');
+      var cap = grab('np-cap');
+
+      function draw() {
+        var Nn = +sn.value, r = +sr.value, d = +sd.value, p = +sp.value;
+        grab('np-nv').textContent = Nn;
+        grab('np-rv').textContent = num(r, 1);
+        grab('np-dv').textContent = num(d, 2);
+        grab('np-pv').textContent = num(p, 2);
+        clear(svg);
+
+        /* a sinistra: i guadagni al variare di k */
+        var uc = function (k) { return r * k / Nn - 1; };
+        var ud = function (k) { return r * k / Nn; };
+        var lo = Math.min(uc(0), 0) - 0.3, hi = Math.max(ud(Nn), r - 1) + 0.3;
+        var pl = piano(svg, 60, 40, 270, 240, 0, Nn, lo, hi);
+        traccia(svg, pl, ud, COL.rd, 2.8, null, 200);
+        traccia(svg, pl, uc, COL.ac, 2.8, null, 200);
+        L(svg, pl.x0, pl.Y(0), pl.x0 + pl.w, pl.Y(0), COL.ax, 1.2);
+        C(svg, pl.X(Nn), pl.Y(r - 1), 5.5, COL.ac, 'none');
+        T(svg, pl.X(Nn) - 6, pl.Y(r - 1) - 10, 'tutti cooperano', 'lbl-s', 'end');
+        C(svg, pl.X(0), pl.Y(0), 5.5, COL.rd, 'none');
+        T(svg, pl.X(0) + 8, pl.Y(0) - 10, 'nessuno coopera', 'lbl-s');
+        T(svg, 195, 32, 'guadagno secondo quanti cooperano', 'lbl', 'middle');
+        T(svg, 60, 298, 'numero k di cooperatori', 'lbl-s');
+        T(svg, 70, 58, 'traditore', 'em');
+        T(svg, 70, 78, 'cooperatore', 'lbl-s');
+
+        /* a destra: la dinamica con i punitori */
+        var xC = 0.33, xD = 0.33, xP = 0.34, G = 80;
+        var st = [[xC, xD, xP]];
+        for (var g = 0; g < G; g++) {
+          var altriC = (Nn - 1) * (xC + xP);
+          var baseC = r * (1 + altriC) / Nn - 1;
+          var baseD = r * altriC / Nn - d * (Nn - 1) * xP;
+          var baseP = baseC - p * (Nn - 1) * xD;
+          var med = xC * baseC + xD * baseD + xP * baseP;
+          var nC = Math.max(0, xC + 0.15 * xC * (baseC - med));
+          var nD = Math.max(0, xD + 0.15 * xD * (baseD - med));
+          var nP = Math.max(0, xP + 0.15 * xP * (baseP - med));
+          var s = nC + nD + nP;
+          if (s <= 0) { break; }
+          xC = nC / s; xD = nD / s; xP = nP / s;
+          st.push([xC, xD, xP]);
+        }
+        var pl2 = piano(svg, 400, 40, 250, 240, 0, G, 0, 1);
+        var TIN = [COL.ac, COL.rd, COL.gr], ETI = ['cooperatori', 'traditori', 'punitori'];
+        for (var t = 0; t < 3; t++) {
+          (function (idx) {
+            var dd = '';
+            for (var i = 0; i < st.length; i++) {
+              dd += (i ? 'L' : 'M') + pl2.X(i).toFixed(1) + ' ' + pl2.Y(st[i][idx]).toFixed(1);
+            }
+            P(svg, dd, TIN[idx], 2.8);
+          }(t));
+        }
+        for (var k2 = 0; k2 <= 4; k2++) {
+          L(svg, pl2.x0, pl2.Y(k2 / 4), pl2.x0 + pl2.w, pl2.Y(k2 / 4), COL.ax, 0.8, '2 4');
+          T(svg, pl2.x0 - 6, pl2.Y(k2 / 4) + 4, (k2 * 25) + '%', 'lbl-s', 'end');
+        }
+        T(svg, 525, 32, 'composizione della popolazione', 'lbl', 'middle');
+        T(svg, 400, 298, 'generazioni', 'lbl-s');
+        var fin = st[st.length - 1];
+        for (var z = 0; z < 3; z++) {
+          C(svg, 405, 322 + z * 18, 4.5, TIN[z], 'none');
+          T(svg, 416, 326 + z * 18, ETI[z] + ': ' + num(fin[z] * 100, 1) + '%', 'lbl-s');
+        }
+
+        var soglia = (Nn > 1) ? 1 / ((Nn - 1) * Math.max(1e-9, xP)) : 0;
+        T(svg, 60, 322, 'il traditore guadagna sempre 1 in più di un cooperatore', 'lbl-s');
+        T(svg, 60, 342, 'la punizione lo annulla se  d·(N−1)·x_P > 1', 'lbl-s');
+        T(svg, 60, 362, d * (Nn - 1) * 0.34 > 1 ?
+          'con questi valori, all’inizio, la punizione basta' :
+          'con questi valori, all’inizio, la punizione NON basta', 'em');
+
+        cap.textContent = 'N = ' + Nn + ', r = ' + num(r, 1) + ': cooperando tutti si prende ' +
+          num(r - 1, 2) + ' a testa, tradendo tutti 0. Dopo ' + G + ' generazioni restano ' +
+          num(fin[0] * 100, 0) + '% cooperatori, ' + num(fin[1] * 100, 0) + '% traditori, ' +
+          num(fin[2] * 100, 0) + '% punitori.';
+      }
+      [sn, sr, sd, sp].forEach(function (s) { s.addEventListener('input', draw); });
+      avvia(draw, svg);
+    }());
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  }());
+  </script>
+
+  <script>
+  window.quizData = [
+
+    { type: 'mc', diff: 'easy',
+      text: 'Che cos\'è l\'«operatore razionale» della teoria dei giochi?',
+      options: ['un modello ideale — come il punto materiale in fisica — di chi ha preferenze coerenti, massimizza sempre e sa che anche gli altri fanno lo stesso',
+                'una descrizione realistica del comportamento umano medio',
+                'un giocatore che vince sempre',
+                'chi calcola le probabilità prima di scegliere'],
+      correct: 0,
+      explain: 'È un\'<strong>idealizzazione</strong>, non un ritratto: nessuno di noi è un operatore razionale, così come nessun oggetto reale è un punto materiale. Serve a capire che cosa <em>tenderebbe</em> a succedere se tutti ragionassero con freddezza; dove le previsioni sbagliano — e sbagliano spesso — nasce l\'economia comportamentale.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Che cosa significa che una combinazione di scelte è un <strong>equilibrio di Nash</strong>?',
+      options: ['che tutti ottengono lo stesso punteggio',
+                'che nessun giocatore può migliorare il proprio risultato cambiando idea <em>da solo</em>',
+                'che è il risultato migliore possibile per la collettività',
+                'che il gioco è a somma zero'],
+      correct: 1,
+      explain: 'La parola decisiva è «<strong>da solo</strong>»: si considerano soltanto le deviazioni <em>unilaterali</em>. È questa clausola a rendere l\'equilibrio una condizione <em>locale</em>, e a permettere che esista un esito migliore per tutti ma irraggiungibile, perché nessuno può arrivarci muovendosi da solo.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Nel dilemma del prigioniero (con pagamenti $3$ per la cooperazione reciproca, $5$ per chi tradisce da solo, $0$ per chi viene tradito, $1$ per il tradimento reciproco), qual è l\'equilibrio di Nash?',
+      options: ['cooperare entrambi, $(3;3)$', 'uno tradisce e l\'altro coopera, $(5;0)$',
+                'tradire entrambi, $(1;1)$', 'non esiste un equilibrio'],
+      correct: 2,
+      explain: 'Tradire è una <strong>strategia dominante</strong>: conviene sia se l\'altro coopera ($5 \\gt 3$) sia se tradisce ($1 \\gt 0$). Quindi entrambi tradiscono e nessuno può migliorare da solo. L\'esito $(3;3)$ sarebbe migliore per entrambi — è l\'ottimo di Pareto — ma non è stabile: chiunque ci si trovi ha interesse a tradire.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Un gioco «a somma zero» è un gioco in cui:',
+      options: ['nessuno guadagna niente',
+                'i pagamenti sono tutti positivi',
+                'esiste sempre un accordo conveniente per tutti',
+                'quello che vince uno lo perde esattamente l\'altro'],
+      correct: 3,
+      explain: 'La condizione è $u_1 + u_2 = 0$ per ogni esito: gli scacchi lo sono, il commercio no. La cosa importante da ricordare è che <strong>quasi nessuna situazione reale è a somma zero</strong>: trattare la vita come se lo fosse — «se lui guadagna, io perdo» — è un errore <em>matematico</em>, prima ancora che morale.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Nel modello falco-colomba, con valore della risorsa $V$ e costo dello scontro $C$ (con $V \\lt C$), quale frazione di falchi si stabilizza nella popolazione?',
+      options: ['$\\dfrac{C}{V}$', '$\\dfrac{V}{C}$', '$\\dfrac{V}{2}$', '$\\dfrac{V-C}{2}$'],
+      correct: 1,
+      explain: 'Si impone che le due strategie rendano lo stesso: $p\\frac{V-C}{2} + (1-p)V = (1-p)\\frac V2$, da cui $p = V/C$. Un risultato pulitissimo: l\'aggressività è il rapporto fra <em>quanto vale la posta</em> e <em>quanto costa lo scontro</em>. E nessuno lo calcola: ci si arriva per selezione naturale, perché la strategia più rara è sempre avvantaggiata.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Che differenza c\'è fra un equilibrio di Nash e un ottimo di Pareto?',
+      options: ['sono la stessa cosa con due nomi diversi',
+                'Nash riguarda i giochi a somma zero, Pareto gli altri',
+                'Nash guarda la <em>stabilità</em> (nessuno vuole muoversi da solo), Pareto l\'<em>efficienza</em> (non si può migliorare qualcuno senza peggiorare qualcun altro): sono nozioni indipendenti',
+                'l\'ottimo di Pareto è sempre anche un equilibrio di Nash'],
+      correct: 2,
+      explain: 'Sono davvero indipendenti: nel dilemma del prigioniero l\'equilibrio $(1;1)$ non è Pareto-ottimale, e l\'ottimo $(3;3)$ non è un equilibrio. Nella caccia al cervo, invece, l\'esito $(4;4)$ è entrambe le cose — e allora il problema non è la tentazione di tradire ma il <strong>coordinamento</strong>.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Nel torneo di Axelrod del 1980 vinse TIT FOR TAT, che collabora al primo turno e poi ripete l\'ultima mossa dell\'avversario. Quali caratteristiche la resero vincente?',
+      options: ['essere imprevedibile e aggressiva',
+                'tradire sempre per prima, per non farsi sfruttare',
+                'essere complicata abbastanza da confondere gli avversari',
+                'essere gentile (non tradisce mai per prima), reattiva, indulgente e trasparente'],
+      correct: 3,
+      explain: 'Axelrod scoprì che <strong>tutte</strong> le strategie nella metà alta della classifica erano gentili. TIT FOR TAT è anche <em>reattiva</em> (non si fa sfruttare), <em>indulgente</em> (basta un gesto per riconciliarsi, il che evita le guerre infinite) e <em>trasparente</em> (l\'avversario capisce subito che conviene collaborare). Ed è lunga quattro righe di codice.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Perché una funzione di utilità come $u = \\sqrt{x}$ è considerata realistica per il denaro?',
+      options: ['perché l\'utilità marginale <strong>decresce</strong>: mille euro cambiano la vita a chi non ne ha e quasi niente a chi ne ha un milione',
+                'perché il denaro cresce come una radice quadrata',
+                'perché è l\'unica funzione crescente disponibile',
+                'perché rende il gioco a somma zero'],
+      correct: 0,
+      explain: 'La radice cresce sempre più piano: ogni euro aggiuntivo vale meno del precedente. È la stessa proprietà che risolve il <em>paradosso di San Pietroburgo</em>, dove il guadagno medio è infinito ma nessuno pagherebbe più di poche decine di ducati per giocare: Daniel Bernoulli capì nel 1738 che non si massimizza il denaro, ma la sua utilità.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Nel dilemma del prigioniero si introduce una multa di $3$ punti per chi tradisce. Che cosa succede?',
+      options: ['niente: i giocatori tradiscono comunque, perché è la strategia dominante',
+                'il gioco diventa a somma zero',
+                'cooperare diventa la strategia dominante e l\'unico equilibrio di Nash diventa $(3;3)$, che è anche l\'ottimo di Pareto',
+                'l\'equilibrio scompare del tutto'],
+      correct: 2,
+      explain: 'I pagamenti di chi tradisce calano di $3$: la tentazione passa da $5$ a $2$ e il tradimento reciproco da $1$ a $-2$. Ora, se l\'altro coopera conviene cooperare ($3 \\gt 2$), e se tradisce conviene ancora cooperare ($0 \\gt -2$). <strong>Il dilemma è sparito</strong> — non perché i giocatori siano diventati buoni, ma perché è cambiata la matrice. È il modello matematico di che cosa fanno le sanzioni: non convincono nessuno, spostano un numero.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Nel gioco ripetuto, perché la cooperazione crolla se il numero di turni è <strong>noto in anticipo</strong>?',
+      options: ['perché con molti turni ci si stanca di cooperare',
+                'per il ragionamento all\'indietro: all\'ultimo turno non c\'è futuro da perdere e conviene tradire; ma allora anche al penultimo, e così via fino al primo',
+                'perché le strategie gentili non esistono nei giochi lunghi',
+                'perché la probabilità di errore cresce con il numero di turni'],
+      correct: 1,
+      explain: 'È il classico <em>ragionamento all\'indietro</em>: sapendo che l\'ultimo turno è un dilemma one-shot, lì si tradisce; e allora il penultimo diventa di fatto l\'ultimo, e così via. La cooperazione regge quando <strong>non si sa quando si finisce</strong>, ed è una delle ragioni per cui i rapporti «una tantum» sono strutturalmente più fragili di quelli destinati a durare.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'In che senso la «mano invisibile» di Adam Smith non contraddice il risultato di Nash?',
+      options: ['perché Smith parlava di mercati e Nash di scacchi',
+                'perché Nash ha dimostrato che Smith aveva torto',
+                'perché entrambi parlano di giochi a somma zero',
+                'perché la mano invisibile porta a un punto stabile rispetto alle mosse <em>individuali</em> — un massimo «locale» lungo gli assi —, che coincide con l\'ottimo collettivo solo se la struttura dei pagamenti lo consente'],
+      correct: 3,
+      explain: 'Immaginate un paesaggio in cui ognuno controlla una coordinata. L\'equilibrio di Nash è un punto da cui nessuno sale muovendosi <em>lungo il proprio asse</em>; il massimo collettivo può richiedere di muoversi <strong>in diagonale</strong>, cioè insieme. In molti mercati concorrenziali i due punti coincidono davvero — ed è l\'intuizione di Smith; nel dilemma del prigioniero, nell\'inquinamento o nella pesca eccessiva, no. E la struttura del gioco si può <em>cambiare</em>: è il mestiere della progettazione dei meccanismi.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Il teorema di Nash del 1950 afferma che:',
+      options: ['in ogni gioco finito esiste almeno un equilibrio, eventualmente in strategie miste (cioè scegliendo a caso con certe probabilità)',
+                'in ogni gioco esiste un unico equilibrio',
+                'l\'equilibrio esiste solo nei giochi a somma zero',
+                'l\'equilibrio coincide sempre con l\'ottimo di Pareto'],
+      correct: 0,
+      explain: 'La generalità è il punto: von Neumann nel 1928 aveva dimostrato l\'esistenza di una soluzione solo per i giochi <em>a somma zero</em>; Nash estese il risultato a <strong>qualunque</strong> gioco finito, competitivo o no. L\'unicità <em>non</em> è garantita — la caccia al cervo ha due equilibri — e nemmeno l\'efficienza. La dimostrazione usa un teorema di punto fisso, che garantisce l\'esistenza senza dire come trovare la soluzione.' },
+
+    { type: 'open',
+      text: 'Spiega perché nel dilemma del prigioniero il ragionamento razionale porta a un risultato peggiore per entrambi, e che cosa può cambiare la situazione nella vita reale.',
+      keywords: ['dominante', 'unilateral', 'da solo', 'Nash', 'Pareto', 'insieme', 'ripetut', 'regole', 'multa', 'reputazione', 'fiducia'],
+      requiredMatches: 4,
+      explain: 'Il meccanismo è questo: tradire conviene <strong>qualunque cosa faccia l\'altro</strong> (è una strategia <em>dominante</em>), quindi entrambi tradiscono e ottengono $(1;1)$; ma cooperando avrebbero ottenuto $(3;3)$. L\'esito $(1;1)$ è l\'unico <strong>equilibrio di Nash</strong> perché nessuno può migliorare cambiando idea <em>da solo</em>: per arrivare a $(3;3)$ bisognerebbe muoversi <strong>insieme</strong>, e la struttura del gioco non lo permette. Non è un problema di cattiveria, è di geometria delle scelte. Che cosa lo cambia nella realtà: (a) la <strong>ripetizione</strong> — se ci si rincontra, tradire costa la collaborazione futura, e strategie come TIT FOR TAT rendono la cooperazione conveniente; (b) le <strong>regole e le sanzioni</strong> — una multa maggiore della tentazione trasforma la matrice e rende cooperare la scelta dominante; (c) la <strong>reputazione</strong>, che è un modo di rendere ripetuto un gioco che sembrava one-shot; (d) i <strong>contratti vincolanti</strong>, che permettono di muoversi insieme.' },
+
+    { type: 'open',
+      text: 'Il modello falco-colomba prevede che, aumentando il costo dello scontro, una popolazione diventi spontaneamente più pacifica. Spiega perché, e che cosa c\'è di notevole in questa previsione.',
+      keywords: ['V/C', 'rara', 'vantaggi', 'equilibrio', 'selezione', 'nessuno decide', 'ritual', 'armi', 'aggressiv'],
+      requiredMatches: 3,
+      explain: 'All\'equilibrio la frazione di falchi vale $p = V/C$: se il costo $C$ di una ferita cresce, la frazione cala. Il meccanismo è che <strong>la strategia più rara è sempre avvantaggiata</strong>: in una popolazione di sole colombe un falco prende tutto senza combattere e si diffonde; in una popolazione di soli falchi ognuno guadagna $\\frac{V-C}{2} \\lt 0$ mentre una colomba guadagnerebbe $0$, e le colombe si diffondono. La popolazione si assesta esattamente dove le due strategie rendono lo stesso. Ciò che è notevole è che <strong>nessuno calcola niente</strong>: non c\'è morale, non ci sono leggi, non c\'è nemmeno un cervello che decida. Ci si arriva per pura selezione naturale, ed è il motivo per cui una previsione matematica di questo tipo si può <em>verificare sul campo</em>: le specie con armi capaci di uccidere — corna, zanne, artigli — hanno rituali di combattimento <em>più</em> elaborati e scontri letali <em>più</em> rari di quelle inermi.' }
+  ];
+  </script>
+
+</body>
+
+</html>

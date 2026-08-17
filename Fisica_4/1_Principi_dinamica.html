@@ -711,6 +711,63 @@
         solo lanciare qualcosa in una direzione per rinculare nell'altra, come gli astronauti. Ed è ancora
         l'attrito statico — <em>statico</em>, perché la ruota che non slitta non striscia — a far accelerare
         e frenare qualunque automobile.</div>
+
+      <h3>6.3 — L'attrito viscoso e la velocità limite</h3>
+
+      <p>Quando un corpo si muove all'interno di un fluido (come aria, acqua o olio), non incontra un attrito costante come quello radente. Il fluido lo frena con una forza che <strong>aumenta con la velocità</strong>: più vai veloce, più il fluido resiste.</p>
+      
+      <div class="definition">
+        <strong>Forza di attrito viscoso (Legge di Stokes).</strong> Per un corpo sferico che si muove a bassa velocità in un fluido (regime laminare), la forza di attrito è direttamente proporzionale alla velocità $v$:
+        $$F_\text{visc} = 6\pi\eta r v$$
+        dove $r$ è il raggio della sfera e $\eta$ (eta) è la <strong>viscosità</strong> del fluido.
+      </div>
+      
+      <p>Per oggetti grandi o veloci, come un'automobile o un paracadutista, il fluido diventa turbolento e la forza cresce col <em>quadrato</em> della velocità ($F \propto v^2$), ma il principio fisico rimane lo stesso.</p>
+
+      <table class="tabf">
+        <thead><tr><th>Fluido</th><th>Densità $\rho$ (kg/m³)</th><th>Viscosità $\eta$ (Pa·s)</th></tr></thead>
+        <tbody>
+          <tr><td class="lab">Aria</td><td>$1{,}2$</td><td>$1{,}8 \times 10^{-5}$</td></tr>
+          <tr><td class="lab">Acqua</td><td>$1000$</td><td>$1{,}0 \times 10^{-3}$</td></tr>
+          <tr><td class="lab">Olio d'oliva</td><td>$920$</td><td>$0{,}08$</td></tr>
+        </tbody>
+      </table>
+
+      <div class="warnbox"><strong>La velocità limite: un trionfo del primo principio.</strong> Quando un corpo cade, la gravità lo accelera e la sua velocità aumenta. Ma aumentando la velocità, aumenta anche l'attrito viscoso. Arriverà un momento in cui l'attrito pareggia esattamente il peso apparente (gravità meno spinta di Archimede). In quell'istante, la risultante delle forze diventa zero: l'accelerazione si annulla e il corpo <strong>smette di accelerare</strong>. Continuerà a cadere con una velocità costante, detta <strong>velocità limite</strong> ($v_\text{limite}$). Questo è un esempio perfetto di moto rettilineo uniforme in natura.
+      </div>
+
+      <p>Uguagliando la forza motrice all'attrito viscoso di Stokes, si ottiene la formula della velocità limite per una sfera:</p>
+      <p style="text-align:center; font-size:1.15rem;">$$v_\text{limite} = \frac{2(\rho_s - \rho_f)gr^2}{9\eta}$$</p>
+      <p>dove $\rho_s$ è la densità della sfera e $\rho_f$ la densità del fluido. Notate come la velocità limite dipenda dal quadrato del raggio: sfere più grandi (come i chicchi di grandine) cadono molto più veloci delle goccioline sottili di nebbia.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="visc-fluidi">
+          <button class="btn btn-secondary" data-f="aria">Aria</button>
+          <button class="btn btn-secondary" data-f="acqua">Acqua</button>
+          <button class="btn active" data-f="olio">Olio</button>
+        </div>
+        <div class="ctrl">
+          <label for="visc-r">raggio sfera: <span class="val-badge" id="visc-rv">5</span> mm</label>
+          <input type="range" id="visc-r" min="1" max="50" step="1" value="5">
+          <label for="visc-rho">densità sfera: <span class="val-badge" id="visc-rhov">2500</span> kg/m³ (vetro/alluminio)</label>
+          <input type="range" id="visc-rho" min="500" max="11500" step="100" value="2500">
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="visc-btn">Lascia cadere</button>
+          <button class="btn btn-secondary" id="visc-reset">Reset</button>
+        </div>
+        
+        <svg id="visc-svg" viewBox="0 0 660 350" aria-label="Simulazione di caduta in un fluido viscoso"></svg>
+        <p class="cap" id="visc-cap">Imposta il raggio e il materiale della sfera, scegli il fluido e premi il pulsante per farla cadere. Osserva come la velocità (grafico a destra) tende al valore limite.</p>
+      </div>
+
+      <div class="sp-cols">
+        <div>Velocità istantanea: <span class="val-badge" id="visc-vi">0,00</span> m/s</div>
+        <div>Velocità limite: <span class="val-badge" id="visc-vl">—</span> m/s</div>
+      </div>
+      <p class="eq-out" id="visc-out" style="min-height: 2.5em;"></p>
+
+      <div class="curiosita"><strong>L'effetto del fondo e delle pareti.</strong> In un contenitore reale (e non simulato nel grafico qui sopra), c'è un ulteriore effetto frenante: quando la sfera si avvicina al fondo o alle pareti, l'acqua che sposta non trova vie di fuga agevoli e genera onde fluidodinamiche che "rimbalzano" indietro. Questo fenomeno "strizza" il fluido nei piccoli spazi rimasti, aumentando bruscamente la resistenza. Tale effetto, noto in idrodinamica come fattore di correzione di parete/fondo, decelera ulteriormente la sfera ma diventa significativo solo quando essa è ormai molto vicina al fondo.</div>
     </section>
 
     <!-- 7 — IL PIANO INCLINATO -->
@@ -2299,6 +2356,188 @@
         }
         ['at-m', 'at-ms', 'at-md', 'at-f'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
         document.getElementById('at-lock').addEventListener('change', disegna);
+        disegna();
+      })();
+
+      /* ==================== 6.3 — L'ATTRITO VISCOSO ==================== */
+      (function () {
+        var svg = document.getElementById('visc-svg');
+        if (!svg) { return; }
+        
+        var fluido = 'olio';
+        var fluidi = {
+          'aria': { rho: 1.2, eta: 1.8e-5, col: 'color-mix(in srgb, var(--accent) 5%, transparent)', maxT: 5 },
+          'acqua': { rho: 1000, eta: 1.0e-3, col: 'color-mix(in srgb, #3b82f6 20%, transparent)', maxT: 2 },
+          'olio': { rho: 920, eta: 0.08, col: 'color-mix(in srgb, var(--gold) 20%, transparent)', maxT: 0.5 }
+        };
+        
+        var raf = null, tprec = 0;
+        var y = 0, v = 0, t = 0; // y in metri, v in m/s, t in secondi
+        var inCaduta = false;
+        var scia = [];
+        var maxProf = 2.0; // Il contenitore è profondo 2 metri
+        
+        function ferma() { if (raf) { cancelAnimationFrame(raf); raf = null; } tprec = 0; }
+        VIVI.push(ferma);
+        
+        function getParams() {
+          var r_mm = parseFloat(document.getElementById('visc-r').value);
+          var r = r_mm / 1000;
+          var rho_s = parseFloat(document.getElementById('visc-rho').value);
+          var V = (4/3) * Math.PI * r * r * r;
+          var m = rho_s * V;
+          var fData = fluidi[fluido];
+          var rho_f = fData.rho;
+          var eta = fData.eta;
+          
+          // Forza peso netta (Peso - Archimede)
+          var Fg_netta = (rho_s - rho_f) * V * G;
+          var v_lim = Fg_netta > 0 ? Fg_netta / (6 * Math.PI * eta * r) : 0;
+          
+          // Calcola etichetta materiale per la densità
+          var labelMat = "sconosciuto";
+          if (rho_s <= 800) labelMat = "legno";
+          else if (rho_s <= 1500) labelMat = "plastica";
+          else if (rho_s <= 3000) labelMat = "vetro/alluminio";
+          else if (rho_s <= 8500) labelMat = "ferro/acciaio";
+          else labelMat = "piombo/oro";
+          
+          document.getElementById('visc-rhov').textContent = Math.round(rho_s) + " (" + labelMat + ")";
+          document.getElementById('visc-rv').textContent = r_mm.toFixed(0);
+          
+          return { r: r, r_mm: r_mm, m: m, rho_s: rho_s, rho_f: rho_f, eta: eta, v_lim: v_lim, fData: fData };
+        }
+        
+        function disegna() {
+          var p = getParams();
+          
+          // Geometria contenitore SVG
+          var X0 = 60, Y0 = 20, W_C = 80, H_C = 300;
+          var g = '';
+          
+          // Disegna contenitore
+          g += '<rect x="' + X0 + '" y="' + Y0 + '" width="' + W_C + '" height="' + H_C + '" fill="' + p.fData.col + '" stroke="var(--border)" stroke-width="2" rx="4"/>';
+          
+          // Disegna Sfera
+          var sf_y = Y0 + (y / maxProf) * H_C;
+          var px_r = Math.max(3, p.r_mm); // Limite visivo minimo per non sparire
+          g += '<circle cx="' + (X0 + W_C/2) + '" cy="' + sf_y + '" r="' + px_r + '" fill="var(--text-soft)" stroke="var(--border)" stroke-width="1"/>';
+          
+          // Geometria Grafico
+          var GX0 = 220, GY0 = 20, GW = 400, GH = 300;
+          g += '<line x1="' + GX0 + '" y1="' + (GY0 + GH) + '" x2="' + (GX0 + GW) + '" y2="' + (GY0 + GH) + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<line x1="' + GX0 + '" y1="' + GY0 + '" x2="' + GX0 + '" y2="' + (GY0 + GH) + '" stroke="var(--text-soft)" stroke-width="2"/>';
+          g += '<text x="' + (GX0 + GW) + '" y="' + (GY0 + GH + 18) + '" text-anchor="end" class="lbl-s">t (s)</text>';
+          g += '<text x="' + (GX0 + 5) + '" y="' + (GY0 + 12) + '" class="lbl-s">v (m/s)</text>';
+          
+          // Scala asse Y (v)
+          var v_max_asse = Math.max(p.v_lim * 1.2, 0.1);
+          
+          // Disegna asintoto V_lim
+          if (p.v_lim > 0) {
+            var y_lim = GY0 + GH - (p.v_lim / v_max_asse) * GH;
+            g += '<line x1="' + GX0 + '" y1="' + y_lim + '" x2="' + (GX0 + GW) + '" y2="' + y_lim + '" stroke="var(--magenta)" stroke-dasharray="6 4" stroke-width="1.6"/>';
+            g += '<text x="' + (GX0 + GW - 5) + '" y="' + (y_lim - 6) + '" fill="var(--magenta)" text-anchor="end" font-size="12">v limite = ' + nf(p.v_lim, 2) + ' m/s</text>';
+          }
+          
+          // Disegna la curva tracciata finora
+          if (scia.length > 1) {
+             var pts = '';
+             for(var k=0; k<scia.length; k++) {
+                var sx = GX0 + (scia[k].t / p.fData.maxT) * GW;
+                var sy = GY0 + GH - (scia[k].v / v_max_asse) * GH;
+                pts += (k===0 ? 'M' : 'L') + sx.toFixed(1) + ',' + sy.toFixed(1) + ' ';
+             }
+             g += '<path d="' + pts + '" fill="none" stroke="var(--accent)" stroke-width="3"/>';
+             
+             var ult = scia[scia.length-1];
+             var ux = GX0 + (ult.t / p.fData.maxT) * GW;
+             var uy = GY0 + GH - (ult.v / v_max_asse) * GH;
+             if(ux <= GX0 + GW) {
+               g += '<circle cx="' + ux.toFixed(1) + '" cy="' + uy.toFixed(1) + '" r="5" fill="var(--accent)"/>';
+             }
+          }
+          
+          svg.innerHTML = g;
+          
+          document.getElementById('visc-vi').textContent = nf(v, 2);
+          document.getElementById('visc-vl').textContent = nf(p.v_lim, 2);
+          
+          var elOut = document.getElementById('visc-out');
+          if (p.v_lim === 0) {
+            elOut.innerHTML = 'La sfera è meno densa del fluido e galleggerebbe (Archimede vince!). Non scende.';
+          } else if (v > p.v_lim * 0.99 && inCaduta) {
+            elOut.innerHTML = '<strong>Moto rettilineo uniforme!</strong> La sfera ha raggiunto la velocità limite e scende ad accelerazione nulla.';
+          } else {
+             elOut.innerHTML = '';
+          }
+        }
+        
+        function passo(ts) {
+          if (!tprec) tprec = ts;
+          var dt = (ts - tprec) / 1000;
+          tprec = ts;
+          
+          // Limite max per dt per evitare instabilità numeriche
+          if (dt > 0.05) dt = 0.05;
+          
+          if (inCaduta) {
+             var p = getParams();
+             if(p.v_lim > 0) {
+               var Fg_netta = (p.rho_s - p.rho_f) * (4/3) * Math.PI * p.r * p.r * p.r * G;
+               var Fvisc = 6 * Math.PI * p.eta * p.r * v;
+               var a = (Fg_netta - Fvisc) / p.m;
+               
+               v += a * dt;
+               y += v * dt;
+               t += dt;
+               
+               if (t <= p.fData.maxT) {
+                 scia.push({t: t, v: v});
+               }
+               
+               if (y >= maxProf) {
+                 y = maxProf;
+                 ferma();
+                 inCaduta = false;
+               }
+             }
+          }
+          
+          disegna();
+          if (inCaduta) raf = requestAnimationFrame(passo);
+        }
+        
+        document.getElementById('visc-btn').addEventListener('click', function() {
+           if (inCaduta) return; // già in corso
+           inCaduta = true;
+           tprec = 0;
+           // se era in fondo, resetta
+           if (y >= maxProf) {
+             y = 0; v = 0; t = 0; scia = [];
+           }
+
+           raf = requestAnimationFrame(passo);
+        });
+        
+        document.getElementById('visc-reset').addEventListener('click', function() {
+           ferma();
+           inCaduta = false;
+           y = 0; v = 0; t = 0; scia = [];
+           disegna();
+        });
+        
+        document.getElementById('visc-r').addEventListener('input', function() { if(!inCaduta) { y=0; v=0; t=0; scia=[]; disegna(); }});
+        document.getElementById('visc-rho').addEventListener('input', function() { if(!inCaduta) { y=0; v=0; t=0; scia=[]; disegna(); }});
+        
+        tabs(document.getElementById('visc-fluidi'), 'data-f', function(v_sel) {
+          fluido = v_sel;
+          ferma();
+          inCaduta = false;
+          y=0; v=0; t=0; scia=[]; 
+          disegna();
+        });
+        
         disegna();
       })();
 

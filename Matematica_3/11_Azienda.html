@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 11 — Come funziona un'azienda che fa software</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.l { text-align: left; }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .ric { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .ric > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                 padding: 0.8rem 0.9rem; background: var(--surface); }
+    .ric h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+
+    .timeline { border-left: 3px solid var(--accent); margin: 1.1rem 0 1.1rem 0.6rem; padding-left: 1.1rem; }
+    .timeline > div { position: relative; margin-bottom: 0.9rem; }
+    .timeline > div::before { content: ''; position: absolute; left: -1.52rem; top: 0.42rem;
+      width: 0.62rem; height: 0.62rem; border-radius: 50%; background: var(--accent); }
+    .timeline .anno { font-weight: 800; color: var(--accent); margin-right: 0.4rem; }
+
+    .ruolo-box { border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem 1rem;
+      background: var(--surface); margin-top: 0.7rem; min-height: 7rem; }
+    .ruolo-box h4 { margin: 0 0 0.4rem; color: var(--accent); }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Terzo anno · Lezione 11</div>
+    <h1>Come funziona un'azienda che fa software</h1>
+    <p>Ruoli, metodi di lavoro, soldi
+      — e due storie italiane che vale la pena conoscere</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Terzo anno</a>
+    <span class="sep">/</span> Come funziona un'azienda che fa software
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Perché questa lezione sta in un corso di matematica.</strong> Perché molti di voi finiranno a
+      lavorare nel software, e nessuno ve lo spiega mai finché non ci siete dentro. Non parleremo di come si
+      programma — quello è la lezione 12 — ma di <em>come è organizzato il lavoro</em>: chi decide cosa, come
+      si stimano i tempi, da dove arrivano i soldi che finiscono nella vostra busta paga e perché a volte gli
+      interessi di chi vi paga non coincidono con i vostri. È la parte del mestiere che non si impara sui
+      libri di informatica, e sapere in anticipo come funziona vi risparmierà qualche delusione.
+    </div>
+
+    <!-- 1 — CHE COS'E' UN'AZIENDA -->
+    <section id="sec1">
+      <h2>1. Che cos'è un'azienda, in tre righe</h2>
+
+      <p>Un'<strong>azienda</strong> è un'organizzazione che combina persone, mezzi e denaro per produrre beni o
+        servizi e venderli. La differenza fra i ricavi (quello che incassa) e i costi (quello che spende) è
+        l'<strong>utile</strong>, se positivo, o la <strong>perdita</strong> se negativo.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">L'equazione fondamentale</div>
+        $$\text{utile} = \text{ricavi} - \text{costi}$$
+        <p class="formula-note">Semplicissima, e vale per la bottega sotto casa come per una multinazionale.
+          Quello che cambia è la <em>complessità</em> dei due termini: in un'azienda di software i costi sono
+          quasi tutti stipendi, e i ricavi dipendono da quante ore di lavoro si riescono a vendere.</p>
+      </div>
+
+      <p>Le aziende si distinguono per <strong>forma giuridica</strong>, cioè per il modo in cui rispondono dei
+        debiti. Le due che incontrerete più spesso in Italia:</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>sigla</th><th>nome</th><th>chi risponde dei debiti</th><th>tipico per</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">SRL</td><td class="l">Società a responsabilità limitata</td>
+                <td class="l">solo la società, col suo patrimonio</td>
+                <td class="l">piccole e medie imprese, startup</td></tr>
+            <tr><td class="lab">SPA</td><td class="l">Società per azioni</td>
+                <td class="l">solo la società; il capitale è diviso in azioni</td>
+                <td class="l">grandi imprese, quotate in borsa</td></tr>
+            <tr><td class="lab">SNC</td><td class="l">Società in nome collettivo</td>
+                <td class="l">i soci, anche col patrimonio personale</td>
+                <td class="l">attività familiari</td></tr>
+            <tr><td class="lab">—</td><td class="l">ditta individuale / partita IVA</td>
+                <td class="l">la persona, illimitatamente</td>
+                <td class="l">liberi professionisti, freelance</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="curiosita"><strong>Perché la responsabilità limitata è un'invenzione importante.</strong> Se
+        aprite una SRL con $10\,000$ euro e l'azienda fallisce con $500\,000$ euro di debiti, voi perdete i
+        vostri diecimila e basta: la casa e il conto in banca personale non si toccano. Sembra ingiusto verso i
+        creditori, e in parte lo è; ma senza questa regola nessuno rischierebbe mai di aprire un'impresa, e le
+        idee nuove resterebbero nei cassetti. È un compromesso deliberato fra il diritto dei creditori e
+        l'interesse collettivo a che qualcuno provi cose nuove.</div>
+    </section>
+
+    <!-- 2 — L'AZIENDA INTERNAZIONALE -->
+    <section id="sec2">
+      <h2>2. L'azienda che lavora in più paesi</h2>
+
+      <p>Il software si vende ovunque: basta una connessione. Ma <strong>un'azienda non si può teletrasportare</strong>.
+        Se vuole vendere e assumere in Francia, in Francia deve avere una presenza legale — una filiale, una
+        controllata, o almeno una rappresentanza fiscale.</p>
+
+      <div class="ric">
+        <div><h4>Le tasse si pagano dove si produce il reddito</h4>
+          <p>Ogni paese tassa gli utili generati sul proprio territorio. Un'azienda con sedi in cinque paesi
+            presenta cinque dichiarazioni e segue cinque legislazioni diverse.</p></div>
+        <div><h4>I contratti di lavoro cambiano</h4>
+          <p>Ferie, preavviso, licenziamento, orario, contributi: sono regolati dalla legge <em>del paese in
+            cui si lavora</em>, non da quello della sede centrale.</p></div>
+        <div><h4>Anche i dati hanno un domicilio</h4>
+          <p>Il <strong>GDPR</strong> europeo impone regole precise su dove e come si conservano i dati
+            personali. Vale per chiunque tratti dati di cittadini europei, anche se l'azienda è americana.</p></div>
+      </div>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>paese</th><th>ferie minime di legge</th><th>preavviso tipico</th>
+            <th>cuneo fiscale sul lavoro*</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">Italia</td><td>4 settimane</td><td class="l">1-4 mesi (per contratto)</td>
+                <td>fra i più alti d'Europa</td></tr>
+            <tr><td class="lab">Francia</td><td>5 settimane</td><td class="l">1-3 mesi</td><td>alto</td></tr>
+            <tr><td class="lab">Germania</td><td>4 settimane</td><td class="l">1-7 mesi (per anzianità)</td>
+                <td>medio-alto</td></tr>
+            <tr><td class="lab">Stati Uniti</td><td class="l"><strong>nessuna per legge federale</strong></td>
+                <td class="l">spesso <em>at will</em>: zero</td><td>basso</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="formula-note">* Il <strong>cuneo fiscale</strong> è la differenza fra quanto l'azienda spende
+        per un dipendente e quanto il dipendente riceve in busta: contributi e imposte. In Italia è alto, ed è
+        il motivo per cui un aumento di stipendio «costa» all'azienda molto più di quanto arriva a voi — lo
+        vedremo con i numeri nella sezione 7.</p>
+
+      <div class="warnbox"><strong>Il lato scomodo.</strong> Alcune multinazionali sfruttano queste differenze
+        di proposito: fatturano i ricavi europei in paesi a bassa tassazione, pur avendo clienti e dipendenti
+        altrove. Non sempre è illegale — spesso è «elusione», cioè si sta dentro la lettera della legge
+        aggirandone lo spirito — ma è uno dei motivi per cui negli ultimi anni si è discusso a lungo di una
+        <em>aliquota minima globale</em> sulle multinazionali. È un problema che vi riguarderà da cittadini
+        prima ancora che da lavoratori.</div>
+    </section>
+
+    <!-- 3 — I RUOLI -->
+    <section id="sec3">
+      <h2>3. Chi fa che cosa: il team</h2>
+
+      <p>Il luogo comune vuole che il software lo facciano «i programmatori». In realtà in un progetto di una
+        certa dimensione chi scrive codice è meno della metà delle persone coinvolte, e il resto non sta lì
+        per caso: ogni ruolo esiste perché qualcuno, in passato, ha fatto un disastro per mancanza di quel
+        ruolo.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="ru-pre"></div>
+        <svg id="ru-svg" viewBox="0 0 680 300" role="img"
+             aria-label="Organigramma di un team di sviluppo software"></svg>
+        <div class="ruolo-box" id="ru-box">—</div>
+      </div>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>ruolo</th><th>domanda a cui risponde</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">Project manager</td>
+                <td class="l">«Quando è pronto, quanto costa, e chi ci lavora?»</td></tr>
+            <tr><td class="lab">Analista funzionale</td>
+                <td class="l">«Che cosa deve fare esattamente questo software?»</td></tr>
+            <tr><td class="lab">Architetto software</td>
+                <td class="l">«Come lo costruiamo, in modo che regga anche fra tre anni?»</td></tr>
+            <tr><td class="lab">Sviluppatore</td><td class="l">«Come lo scrivo?»</td></tr>
+            <tr><td class="lab">Tester / QA</td><td class="l">«In quali casi si rompe?»</td></tr>
+            <tr><td class="lab">Sistemista / DevOps</td>
+                <td class="l">«Come lo mettiamo in produzione senza che vada giù?»</td></tr>
+            <tr><td class="lab">UX designer</td><td class="l">«Una persona vera riesce a usarlo?»</td></tr>
+            <tr><td class="lab">Product owner</td><td class="l">«Fra tutte le cose da fare, quale prima?»</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="curiosita"><strong>Il ruolo che gli studenti sottovalutano di più è il tester.</strong>
+        Sembra il lavoro meno creativo, e invece richiede una mentalità rarissima: <em>immaginare come le cose
+        possono andare storte</em>. Uno sviluppatore prova il proprio codice con i dati che si aspetta; un
+        buon tester lo prova con la data del 29 febbraio, con un nome che contiene un apostrofo, con la
+        connessione che cade a metà, con un numero negativo dove nessuno se lo aspetterebbe. Nel 1996 il razzo
+        europeo <strong>Ariane 5</strong> esplose meno di quaranta secondi dopo il lancio, distruggendo mezzo miliardo di
+        dollari di satelliti, per un numero troppo grande da mettere in una variabile — codice riciclato da
+        Ariane 4 e mai testato nelle nuove condizioni. Il costo di un test è sempre minore del costo di un
+        errore.</div>
+    </section>
+
+    <!-- 4 — WATERFALL -->
+    <section id="sec4">
+      <h2>4. Il modello a cascata</h2>
+
+      <p>Il primo modo organizzato di fare software, e per trent'anni l'unico. Si chiama
+        <strong>waterfall</strong>, «a cascata», perché si procede per fasi che scendono una nell'altra e non
+        si torna indietro. L'idea viene dall'ingegneria civile, e ha una logica ineccepibile: prima si
+        progetta il ponte, poi lo si costruisce.</p>
+
+      <div class="method">
+        <p><span class="step-num">1</span><strong>Analisi dei requisiti.</strong> Si parla col cliente e si
+          scrive un documento che dice <em>tutto</em> quello che il software dovrà fare. Il cliente lo firma.</p>
+        <p><span class="step-num">2</span><strong>Progettazione.</strong> Si definisce l'architettura: quali
+          componenti, quali basi di dati, come comunicano. Anche questo diventa un documento.</p>
+        <p><span class="step-num">3</span><strong>Implementazione.</strong> Si scrive il codice, seguendo il
+          progetto.</p>
+        <p><span class="step-num">4</span><strong>Test.</strong> Si verifica che il software faccia quello che
+          c'era scritto al passo 1.</p>
+        <p><span class="step-num">5</span><strong>Rilascio.</strong> Si consegna al cliente.</p>
+        <p><span class="step-num">6</span><strong>Manutenzione.</strong> Si correggono i problemi che
+          emergono.</p>
+      </div>
+
+      <div class="ric">
+        <div><h4>I vantaggi, che sono veri</h4>
+          <p>Si sa in anticipo <strong>quanto costa e quando finisce</strong>: indispensabile per una gara
+            d'appalto pubblica. La documentazione è completa. Ognuno sa esattamente cosa deve fare. E se il
+            software è un sistema di controllo di una centrale nucleare, cambiare i requisiti a metà non è
+            un'opzione.</p></div>
+        <div><h4>Il problema, che è enorme</h4>
+          <p>Presuppone che il cliente <strong>sappia in partenza</strong> quello che vuole, e che non cambi
+            idea. Nel software non succede quasi mai: il cliente capisce cosa gli serve <em>vedendo</em> il
+            software, cioè alla fine, quando cambiare costa carissimo.</p></div>
+      </div>
+
+      <div class="curiosita"><strong>Una beffa storica.</strong> Il documento in cui il modello a cascata viene
+        descritto per la prima volta è un articolo di <strong>Winston Royce</strong> del 1970. Royce lo
+        presenta come <em>l'esempio di come non si dovrebbe fare</em>: scrive testualmente che «è rischioso e
+        invita al fallimento», e propone di iterare almeno due volte. La cascata è stata adottata in tutto il
+        mondo leggendo la prima figura del suo articolo e ignorando il testo che la commentava. È forse il
+        fraintendimento più costoso della storia dell'informatica.</div>
+    </section>
+
+    <!-- 5 — AGILE -->
+    <section id="sec5">
+      <h2>5. Agile: iterare invece che pianificare</h2>
+
+      <p>Nel <strong>2001</strong> diciassette sviluppatori si riuniscono in una località sciistica dello Utah
+        e scrivono quattro righe che cambiano il mestiere. Si chiama <strong>Manifesto Agile</strong> ed è
+        volutamente asciutto.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il Manifesto Agile (2001)</div>
+        <p>«Stiamo scoprendo modi migliori di creare software. Abbiamo imparato a dare valore a:</p>
+        <ul>
+          <li>gli <strong>individui e le interazioni</strong> più che i processi e gli strumenti;</li>
+          <li>il <strong>software funzionante</strong> più che la documentazione esaustiva;</li>
+          <li>la <strong>collaborazione col cliente</strong> più che la negoziazione dei contratti;</li>
+          <li>il <strong>rispondere al cambiamento</strong> più che seguire un piano.</li>
+        </ul>
+        <p class="formula-note">«Ovvero, fermo restando il valore delle voci a destra, consideriamo più
+          importanti quelle a sinistra». Quest'ultima frase la citano in pochi, ed è quella che fa la
+          differenza fra usare agile e usarlo come scusa per non documentare niente.</p>
+      </div>
+
+      <h3>5.1 — Come funziona in pratica: Scrum</h3>
+
+      <p>Il metodo agile più diffuso si chiama <strong>Scrum</strong> — il nome viene dalla mischia del rugby.
+        Il lavoro si divide in cicli brevi e uguali, gli <em>sprint</em>, tipicamente di due settimane.</p>
+
+      <div class="method">
+        <p><span class="step-num">1</span><strong>Backlog.</strong> Tutte le cose da fare, in una lista
+          ordinata per priorità dal <em>product owner</em>.</p>
+        <p><span class="step-num">2</span><strong>Sprint planning.</strong> All'inizio di ogni ciclo il team
+          sceglie quante voci riesce a completare, e si impegna su quelle.</p>
+        <p><span class="step-num">3</span><strong>Daily standup.</strong> Ogni mattina, dieci minuti in piedi:
+          che cosa ho fatto ieri, che cosa faccio oggi, cosa mi blocca.</p>
+        <p><span class="step-num">4</span><strong>Fine sprint: la demo.</strong> Si mostra al cliente
+          <em>software funzionante</em>, non slide. Il cliente vede, prova, cambia idea — ed è
+          <strong>proprio quello che si voleva</strong>.</p>
+        <p><span class="step-num">5</span><strong>Retrospettiva.</strong> Il team discute che cosa ha
+          funzionato e che cosa no <em>nel modo di lavorare</em>, e cambia qualcosa per il ciclo successivo.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="wf-modo"></div>
+        <div class="ctrl">
+          <label>il cliente cambia idea al mese: <span class="val-badge" id="wf-mv">—</span></label>
+          <input type="range" id="wf-m" min="1" max="11" step="1" value="8">
+          <label>durata del progetto (mesi): <span class="val-badge" id="wf-dv">—</span></label>
+          <input type="range" id="wf-d" min="6" max="18" step="1" value="12">
+        </div>
+        <svg id="wf-svg" viewBox="0 0 680 400" role="img"
+             aria-label="Confronto fra il modello a cascata e il modello agile"></svg>
+        <div class="sp-cols">
+          <div>lavoro da rifare: <span class="val-badge" id="wf-rif">—</span></div>
+          <div>quando il cliente vede qualcosa: <span class="val-badge" id="wf-vede">—</span></div>
+          <div>rilasci al cliente: <span class="val-badge" id="wf-rel">—</span></div>
+          <div>documentazione prodotta: <span class="val-badge" id="wf-doc">—</span></div>
+        </div>
+        <div class="eq-out" id="wf-out"></div>
+      </div>
+
+      <div class="warnbox"><strong>Agile non è «senza regole».</strong> È l'equivoco più diffuso, e produce i
+        progetti peggiori: niente documentazione, niente stime, niente architettura, e la parola «agile» usata
+        per giustificare l'improvvisazione. Un team agile serio ha <em>più</em> disciplina di uno a cascata —
+        solo distribuita diversamente: riunioni brevi ma tutti i giorni, test automatici che girano a ogni
+        modifica, un rilascio funzionante ogni due settimane senza eccezioni.</div>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th></th><th>a cascata</th><th>agile</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">i requisiti</td><td class="l">fissati all'inizio</td>
+                <td class="l">evolvono in corsa</td></tr>
+            <tr><td class="lab">il cliente</td><td class="l">firma e riappare alla fine</td>
+                <td class="l">presente a ogni ciclo</td></tr>
+            <tr><td class="lab">la consegna</td><td class="l">una sola, finale</td>
+                <td class="l">tante, incrementali</td></tr>
+            <tr><td class="lab">costo del cambiamento</td><td class="l">altissimo se tardivo</td>
+                <td class="l">basso e previsto</td></tr>
+            <tr><td class="lab">quando conviene</td>
+                <td class="l">requisiti stabili e noti, vincoli normativi, appalti a prezzo fisso</td>
+                <td class="l">prodotti nuovi, mercati che cambiano, requisiti incerti</td></tr>
+            <tr><td class="lab">il rischio</td><td class="l">scoprire alla fine di aver fatto la cosa
+              sbagliata</td><td class="l">perdere la visione d'insieme, un pezzo per volta</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note"><strong>Nessuno dei due è «quello giusto».</strong> Un software di controllo per un
+        aereo di linea si fa a cascata, perché i requisiti li scrive un ente certificatore e non cambiano, e
+        perché «rilasciamo e vediamo come va» non è accettabile. Un'applicazione per un servizio nuovo, di cui
+        nessuno sa ancora se piacerà, si fa agile. La domanda giusta non è «quale metodo è migliore» ma
+        <strong>«quanto è incerto quello che devo costruire»</strong>.</div>
+    </section>
+
+    <!-- 6 — IL SOFTWARE CHE SI AGGIORNA -->
+    <section id="sec6">
+      <h2>6. Il software che si aggiorna da solo</h2>
+
+      <p>C'è un cambiamento che ha reso possibile tutto quello che avete letto finora, ed è così ovvio da
+        essere invisibile: <strong>oggi il software si può aggiornare via internet</strong>.</p>
+
+      <div class="timeline">
+        <div><span class="anno">anni '80-'90</span> — il software si vende su <strong>floppy disk</strong> e
+          poi su CD, in una scatola di cartone. Se c'è un errore, resta lì: correggerlo significa stampare
+          nuovi dischi, spedirli, convincere i clienti a installarli. Le aziende testavano per mesi, perché
+          una versione sbagliata era un disastro economico.</div>
+        <div><span class="anno">anni 2000</span> — arriva la connessione permanente, e con essa gli
+          <strong>aggiornamenti automatici</strong>. Un errore si corregge in ore.</div>
+        <div><span class="anno">oggi</span> — molte aziende rilasciano <strong>decine di volte al giorno</strong>.
+          Il software non è più un prodotto che si compra: è un servizio che si affitta, e che cambia sotto i
+          piedi degli utenti.</div>
+      </div>
+
+      <div class="ric">
+        <div><h4>Il vantaggio</h4>
+          <p>Un errore critico si corregge in poche ore invece che in mesi. E si possono costruire sistemi
+            enormi, che nessuno potrebbe mai finire «tutto insieme»: si rilascia un pezzo, si guarda come va,
+            si continua.</p></div>
+        <div><h4>Il rovescio</h4>
+          <p>Sapendo di poter correggere dopo, si testa meno prima. Il numero di errori che arrivano
+            all'utente è cresciuto, e con esso l'abitudine — anche da parte nostra — a considerare normale che
+            le cose si rompano.</p></div>
+      </div>
+
+      <div class="warnbox"><strong>Quando l'aggiornamento è il problema.</strong> Il 19 luglio 2024 un
+        aggiornamento difettoso del software di sicurezza <strong>CrowdStrike</strong> ha mandato in crash
+        circa otto milioni e mezzo di computer Windows in tutto il mondo, contemporaneamente. Aeroporti fermi,
+        ospedali bloccati, banche offline: fu il più grande blackout informatico della storia, e non fu
+        causato da un attacco ma da un file di configurazione sbagliato, distribuito automaticamente a tutti.
+        La stessa infrastruttura che permette di correggere un errore in un'ora permette anche di
+        <em>diffonderlo</em> in un'ora.</div>
+
+      <div class="note"><strong>Il bilancio onesto.</strong> Senza aggiornamento continuo non esisterebbero i
+        servizi che usate ogni giorno: sono troppo grandi e cambiano troppo in fretta perché qualcuno possa
+        progettarli in anticipo e consegnarli finiti. Il prezzo è un software mediamente meno solido, e la
+        responsabilità di chi lo scrive è aumentata, non diminuita: potendo rilasciare in mezz'ora, la
+        disciplina non può più venire dal processo — deve venire da chi lavora.</div>
+    </section>
+
+    <!-- 7 — I SOLDI -->
+    <section id="sec7">
+      <h2>7. I soldi della consulenza: chi devi far contento?</h2>
+
+      <p>Molte aziende informatiche italiane non vendono un prodotto: vendono <strong>persone a giornata</strong>.
+        Si chiama consulenza, o <em>body rental</em> nella sua forma più cruda, e funziona così: il cliente ha
+        bisogno di sviluppatori, la vostra azienda glieli fornisce e fattura una tariffa giornaliera per
+        ciascuno.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>tariffa giornaliera al cliente: <span class="val-badge" id="cs-tv">—</span></label>
+          <input type="range" id="cs-t" min="250" max="800" step="10" value="450">
+          <label>la tua RAL (stipendio lordo annuo): <span class="val-badge" id="cs-rv">—</span></label>
+          <input type="range" id="cs-r" min="22000" max="70000" step="1000" value="32000">
+        </div>
+        <svg id="cs-svg" viewBox="0 0 680 380" role="img"
+             aria-label="Come si distribuisce il denaro nella consulenza informatica"></svg>
+        <div class="sp-cols">
+          <div>fattura al cliente (annua): <span class="val-badge" id="cs-fat">—</span></div>
+          <div>costo azienda per te: <span class="val-badge" id="cs-cost">—</span></div>
+          <div>margine dell'azienda: <span class="val-badge" id="cs-marg">—</span></div>
+          <div>quello che arriva in busta: <span class="val-badge" id="cs-netto">—</span></div>
+        </div>
+        <div class="eq-out" id="cs-out"></div>
+      </div>
+
+      <p>Muovete i due cursori e guardate i tre numeri. Il primo è quello che il cliente paga; il terzo è
+        quello che voi ricevete. Fra i due c'è di tutto: i contributi previdenziali, le imposte, la struttura
+        aziendale, i commerciali, i periodi in cui non siete su nessun progetto — e naturalmente l'utile.</p>
+
+      <div class="curiosita"><strong>Perché costate all'azienda molto più della vostra RAL.</strong> Sulla
+        vostra retribuzione lorda l'azienda versa i <em>contributi a suo carico</em> (circa il 30%) e accantona
+        il <strong>TFR</strong> (un altro 7,4% circa, che vi verrà dato quando lascerete l'azienda). Il costo
+        aziendale è quindi circa $1{,}4$ volte la RAL. E la RAL, a sua volta, è più di quello che vedete: da
+        lì escono i vostri contributi (circa il 9,2%) e l'IRPEF. Fra quello che l'azienda spende e quello che
+        arrivate a spendere voi c'è, in Italia, quasi un fattore due. È il famoso <strong>cuneo fiscale</strong>,
+        e capire dove va quel denaro — pensioni, sanità, scuola — è materia della lezione di economia del
+        prossimo anno.</div>
+
+      <div class="curiosita"><strong>Un dettaglio che quasi nessuno conosce, e che è pura matematica.</strong>
+        Le aliquote IRPEF sono tre — $23\%$, $35\%$, $43\%$ — e verrebbe da pensare che l'aliquota
+        <em>marginale</em>, cioè quella che si paga sull'ultimo euro guadagnato, cresca con lo stipendio. Non
+        è così, per un motivo nascosto: la <strong>detrazione da lavoro dipendente cala</strong> man mano che
+        il reddito sale, e in una fascia lo fa linearmente, perdendo circa $1.910$ euro su $22.000$ di
+        reddito. Quella discesa è, di fatto, un'imposta in più di $\frac{1910}{22000} \approx 8{,}7$ punti:
+        nella fascia centrale l'aliquota marginale <em>effettiva</em> è quindi attorno al
+        $\mathbf{43{,}7\%}$, <strong>più alta</strong> del $43\%$ nominale della fascia successiva.</p>
+        <p>Muovete il cursore della RAL nel simulatore e guardate quanto cresce il netto: fra i 30 e i 50 mila
+          euro ogni euro lordo in più ne porta a casa meno di quanto ci si aspetterebbe. Non è un errore del
+          simulatore, è come è fatta la legge — ed è un ottimo esempio di quanto sia utile saper leggere una
+          formula a tratti come quelle della lezione 3.</div>
+
+      <h3>7.1 — La domanda scomoda</h3>
+
+      <p>Nella consulenza voi lavorate <em>fisicamente</em> per il cliente, spesso nei suoi uffici, con i suoi
+        strumenti e sotto la direzione dei suoi responsabili. Ma lo stipendio ve lo paga la vostra azienda, che
+        a sua volta viene pagata dal cliente. Quindi: <strong>chi dovete far contento?</strong></p>
+
+      <div class="formula-box">
+        <div class="formula-title">La risposta, brutale e utile</div>
+        <p>La catena è: <strong>il cliente è contento → rinnova il contratto → la tua azienda incassa → la tua
+          azienda ti paga</strong>. Quindi la risposta immediata è: il cliente. Ma la valutazione, la
+          promozione e l'aumento li decide la <em>tua</em> azienda, che vi guarda con altri occhi. Dovete
+          tenere insieme due giudizi, e non sempre puntano nella stessa direzione.</p>
+      </div>
+
+      <div class="warnbox"><strong>Dove i due interessi divergono davvero.</strong> Ecco tre situazioni che
+        incontrerete, raccontate senza edulcorare.</p>
+        <ul>
+          <li><strong>Il progetto finisce troppo presto.</strong> Al cliente conviene; alla vostra azienda
+            no, perché quella persona torna «in panchina» e smette di generare fatturato. Non è cinismo, è
+            aritmetica: un consulente non allocato è un costo puro.</li>
+          <li><strong>La soluzione più semplice.</strong> A volte la cosa giusta per il cliente è
+            <em>non</em> fare il progetto, o farne una versione ridotta. Dirglielo è professionalmente
+            corretto e commercialmente sfavorevole.</li>
+          <li><strong>Il cliente vi vuole assumere.</strong> Succede spesso, ed è quasi sempre un buon affare
+            per voi e per lui. Per la vostra azienda è una perdita secca, ed è il motivo per cui in molti
+            contratti c'è una clausola che la vieta per un certo periodo.</li>
+        </ul>
+        <p>Non c'è una regola che scioglie questi nodi. C'è però un criterio che funziona nel lungo periodo:
+          <strong>la vostra reputazione professionale è vostra</strong>, non dell'azienda in cui siete adesso,
+          e vi seguirà per trent'anni. Chi si è costruito la fama di dire la verità tecnica anche quando è
+          scomoda viene cercato; chi ha fatto il contrario, dopo un po', anche.</div>
+
+      <div class="curiosita"><strong>Non tutte le aziende sono così.</strong> Accanto alla consulenza a
+        giornata esistono le <em>software house</em> che sviluppano un prodotto proprio, le aziende
+        <em>product</em> che vendono un servizio in abbonamento, le società che lavorano «a progetto» con un
+        prezzo concordato per il risultato invece che per le giornate. Cambia tutto: gli incentivi, i ritmi,
+        che cosa si valuta di voi. Quando cercherete lavoro, la prima domanda da fare non è «quanto pagate»,
+        è <strong>«da dove arrivano i vostri ricavi»</strong>: la risposta spiega in anticipo che vita ci
+        farete dentro.</div>
+    </section>
+
+    <!-- 8 — LE SOFT SKILL -->
+    <section id="sec8">
+      <h2>8. Le soft skill, e perché contano tanto</h2>
+
+      <p>C'è un fatto che sorprende chi entra nel mestiere convinto che conti solo saper programmare: a parità
+        di competenza tecnica, <strong>fa carriera chi comunica meglio</strong>. Non è un'ingiustizia da
+        denunciare: ha una spiegazione, e conviene capirla.</p>
+
+      <div class="ric">
+        <div><h4>Comunicare</h4><p>Spiegare un problema tecnico a chi tecnico non è, in modo che possa
+          decidere. È la competenza più rara e più pagata dell'intero settore.</p></div>
+        <div><h4>Ascoltare</h4><p>Capire che cosa serve davvero al cliente, che quasi mai coincide con quello
+          che chiede. «Voglio un pulsante qui» spesso significa «non trovo questa funzione».</p></div>
+        <div><h4>Stimare e dire di no</h4><p>Sapere quanto tempo serve, e avere il coraggio di dirlo quando la
+          risposta non piace. Chi promette sempre sì diventa in fretta chi non consegna mai.</p></div>
+        <div><h4>Lavorare con gli altri</h4><p>Rivedere il codice altrui senza umiliare nessuno, accettare che
+          il proprio venga rivisto, documentare per chi verrà dopo.</p></div>
+      </div>
+
+      <div class="note"><strong>Perché contano così tanto: una spiegazione strutturale.</strong> Un software
+        di una certa dimensione non lo scrive una persona. Il collo di bottiglia non è quanto codice sapete
+        scrivere all'ora — è quanto bene <em>si incastra</em> il lavoro di venti persone. Ogni malinteso fra
+        due sviluppatori costa più ore di quante ne farebbe risparmiare il migliore dei due lavorando il
+        doppio. Ecco perché un programmatore mediocre che comunica benissimo produce spesso più valore di un
+        fuoriclasse che lavora da solo e non spiega niente a nessuno.</p>
+        <p>Questo <em>non</em> significa che la tecnica non serva: senza quella non si entra nemmeno. Significa
+          che la tecnica è il biglietto d'ingresso, non il criterio di selezione fra chi è già entrato. E
+          significa anche una cosa incoraggiante: le soft skill si imparano, esattamente come si impara a
+          scomporre un polinomio. Nessuno nasce sapendo spiegare.</div>
+
+      <div class="curiosita"><strong>Un esercizio che potete fare da subito.</strong> La prossima volta che
+        risolvete un esercizio difficile, provate a spiegarlo a un compagno che non lo ha capito — senza
+        leggergli i passaggi, ma facendogli capire <em>perché</em> quella strada funziona. Se ci riuscite,
+        avete appena esercitato la competenza professionale più preziosa che esista in questo mestiere. Ed è
+        anche il modo più efficace per accorgersi se avete capito davvero: quello che non si sa spiegare, di
+        solito, non si è capito.</div>
+    </section>
+
+    <!-- 9 — ARDUINO -->
+    <section id="sec9">
+      <h2>9. Primo orgoglio italiano: Arduino</h2>
+
+      <p>Nel 2005 in una piccola città del Piemonte nasce un oggetto che oggi si trova nei laboratori
+        scolastici di mezzo mondo, nei prototipi delle startup e dentro parecchi impianti industriali. La città
+        è <strong>Ivrea</strong> — e non è un caso, come vedrete fra un attimo.</p>
+
+      <div class="timeline">
+        <div><span class="anno">2005</span> — all'<strong>Interaction Design Institute Ivrea</strong>, una
+          scuola di design dell'interazione, gli studenti hanno un problema pratico: le schede per far
+          «muovere» i loro prototipi costano centinaia di euro e sono difficili da programmare. Un gruppo di
+          docenti e collaboratori — <strong>Massimo Banzi</strong>, David Cuartielles, Tom Igoe, Gianluca
+          Martino, David Mellis — ne progetta una che costi una trentina di euro e si programmi in poche righe.
+          La chiamano <strong>Arduino</strong>, dal nome del bar dove si riunivano, che a sua volta prende il
+          nome da Arduino d'Ivrea, re d'Italia attorno all'anno Mille.</div>
+        <div><span class="anno">la scelta decisiva</span> — pubblicano <strong>tutti gli schemi</strong>: il
+          progetto elettronico, il software, la documentazione. Chiunque può costruirsi un Arduino, migliorarlo
+          o venderne una versione propria. È <em>hardware open source</em>, allora una rarità assoluta.</div>
+        <div><span class="anno">2013</span> — oltre <strong>700 000</strong> schede ufficiali vendute, e un
+          numero imprecisato di cloni. Attorno alla scheda è nata una comunità mondiale che condivide progetti,
+          librerie e tutorial: è quella, più della scheda, il vero prodotto.</div>
+        <div><span class="anno">2015-2017</span> — una lite societaria fra i fondatori spacca il progetto in
+          due: per due anni esistono due siti, <em>arduino.cc</em> e <em>arduino.org</em>, e due schede
+          «ufficiali». La vicenda si chiude nel 2017 con la riunificazione. È un promemoria utile: le idee
+          aperte non sono immuni dai problemi di proprietà.</div>
+        <div><span class="anno">ottobre 2025</span> — Arduino viene <strong>acquisita da Qualcomm</strong>, una
+          delle maggiori aziende di microchip al mondo. L'azienda ha dichiarato che manterrà l'ecosistema
+          aperto e la comunità; molti nella comunità hanno espresso preoccupazione. È una storia in corso, e
+          vale la pena seguirla: dirà molto su che cosa succede a un progetto aperto quando entra in
+          un'azienda molto grande.</div>
+      </div>
+
+      <h3>9.1 — Che cos'è, tecnicamente</h3>
+
+      <p>Una scheda con sopra un <strong>microcontrollore</strong>: un computer completo grande come
+        un'unghia, con processore, memoria e — questa è la differenza col vostro portatile — dei
+        <strong>piedini</strong> collegabili direttamente al mondo fisico. Su quei piedini si attaccano sensori
+        (temperatura, luce, distanza, movimento) e attuatori (motori, luci, altoparlanti).</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il programma minimo di Arduino</div>
+        <p>Ogni programma ha due funzioni. <code>setup()</code> viene eseguita una volta all'accensione;
+          <code>loop()</code> viene ripetuta all'infinito, migliaia di volte al secondo.</p>
+        <p class="formula-note">È una struttura elementare, e proprio per questo si impara in un pomeriggio.
+          La rivoluzione di Arduino non è stata tecnologica — quei microcontrollori esistevano già — ma
+          <strong>didattica</strong>: ha reso accessibile a un designer, a un artista o a uno studente di
+          liceo qualcosa che prima richiedeva una laurea in ingegneria elettronica.</p>
+      </div>
+
+      <div class="curiosita"><strong>Perché conta più di quanto sembri.</strong> Arduino ha reso normale
+        un'idea che oggi diamo per scontata: che <em>chiunque</em> possa costruire un oggetto che interagisce
+        col mondo. Da lì è passata buona parte del movimento dei <em>maker</em>, delle stampanti 3D
+        (RepRap usava schede Arduino), dell'internet delle cose, e di innumerevoli progetti scolastici. E ha
+        dimostrato una cosa controintuitiva: <strong>regalare il progetto ha fatto vendere più schede</strong>,
+        perché ha creato una comunità enorme di persone che sapevano usarlo e ne avevano bisogno.</div>
+    </section>
+
+    <!-- 10 — OLIVETTI -->
+    <section id="sec10">
+      <h2>10. Secondo orgoglio italiano: Olivetti</h2>
+
+      <p>Torniamo a Ivrea, cinquant'anni prima. Perché lì? Perché quella città, per mezzo secolo, è stata
+        forse il posto più avanzato d'Europa in cui lavorare — e la storia di come ci è arrivata merita di
+        essere conosciuta da chiunque pensi di andare a lavorare in un'azienda.</p>
+
+      <div class="timeline">
+        <div><span class="anno">1908</span> — <strong>Camillo Olivetti</strong> fonda a Ivrea la prima fabbrica
+          italiana di macchine per scrivere. La prima, la M1, esce nel 1911.</div>
+        <div><span class="anno">1938</span> — il figlio <strong>Adriano Olivetti</strong> (1901-1960) diventa
+          presidente e comincia a trasformare l'azienda in qualcosa che non era mai esistito.</div>
+        <div><span class="anno">1950</span> — esce la <strong>Lettera 22</strong>, disegnata da Marcello
+          Nizzoli: la macchina per scrivere portatile che sarà usata da mezzo giornalismo italiano. Nel 1959
+          una giuria di cento designer la vota <em>miglior prodotto di design degli ultimi cento anni</em>; una
+          è esposta al MoMA di New York.</div>
+        <div><span class="anno">1959</span> — l'<strong>Elea 9003</strong>, progettato dal giovane ingegnere
+          <strong>Mario Tchou</strong>, è il primo calcolatore elettronico commerciale interamente a
+          <em>transistor</em> — prima ancora di quelli americani, che usavano ancora le valvole. Il design è di
+          Ettore Sottsass.</div>
+        <div><span class="anno">1965</span> — la <strong>Programma 101</strong>, progettata da Pier Giorgio
+          Perotto, viene presentata all'Esposizione universale di New York. È programmabile, sta su una
+          scrivania e costa quanto un'automobile: viene considerata da molti <strong>il primo personal
+          computer della storia</strong>. La NASA ne comprò diverse, e furono usate per calcoli legati alle
+          missioni Apollo.</div>
+        <div><span class="anno">1960-1964</span> — Adriano muore improvvisamente in treno nel 1960; Mario Tchou
+          in un incidente d'auto nel 1961. Nel 1964 la divisione elettronica viene ceduta alla General
+          Electric. L'Italia esce dalla corsa dei computer proprio mentre la stava vincendo.</div>
+        <div><span class="anno">2018</span> — Ivrea, «città industriale del XX secolo», entra nella lista del
+          <strong>patrimonio mondiale dell'UNESCO</strong>: non per un monumento antico, ma per il modo in cui
+          fabbrica, case, scuole e servizi erano stati pensati insieme.</div>
+      </div>
+
+      <h3>10.1 — L'idea di Adriano Olivetti</h3>
+
+      <p>La parte che rende questa storia diversa da tutte le altre non è tecnologica. Adriano Olivetti
+        pensava che una fabbrica dovesse avere un fine <em>oltre</em> il profitto, e — cosa più rara —
+        organizzò l'azienda di conseguenza.</p>
+
+      <div class="ric">
+        <div><h4>Salari e orari</h4><p>Retribuzioni sensibilmente più alte della media del settore, e riduzione
+          dell'orario di lavoro con il sabato libero già dal 1957 — quando in Italia si lavorava sei giorni su
+          sette.</p></div>
+        <div><h4>Servizi ai dipendenti</h4><p>Asili nido, biblioteche aziendali aperte a tutti, mensa,
+          assistenza sanitaria, colonie estive per i figli, case costruite dall'azienda nei quartieri
+          attorno.</p></div>
+        <div><h4>Cultura dentro la fabbrica</h4><p>Assunse scrittori, filosofi, sociologi, psicologi. La
+          biblioteca aziendale arrivò a decine di migliaia di volumi; l'azienda pubblicava una rivista di
+          cultura politica, <em>Comunità</em>.</p></div>
+        <div><h4>Architettura</h4><p>Le fabbriche furono progettate da architetti importanti, con enormi
+          vetrate, luce naturale e vista sul paesaggio: l'opposto del capannone cieco.</p></div>
+      </div>
+
+      <div class="curiosita"><strong>Pozzuoli, 23 aprile 1955.</strong> Adriano Olivetti decide di aprire uno
+        stabilimento nel Mezzogiorno, in un'area con pochissima industria, e lo fa costruire
+        <strong>affacciato sul golfo</strong> dall'architetto Luigi Cosenza: terrazze, giardini, e le finestre
+        rivolte verso il mare invece che verso un muro. Nel discorso di inaugurazione spiegò che la fabbrica
+        era stata concepita «alla misura dell'uomo, perché questi trovasse nel suo ordinato posto di lavoro uno
+        strumento di riscatto e non un congegno di sofferenza». Il complesso di Pozzuoli <strong>esiste
+        ancora</strong>, ha cambiato più volte proprietà e oggi ospita diverse aziende: se passate da quelle
+        parti, andate a vederlo. È la dimostrazione fisica che si può fare diversamente.</div>
+
+      <div class="warnbox"><strong>Non era filantropia.</strong> Va detto con precisione, altrimenti la storia
+        diventa una favola. Olivetti sosteneva che quel modello fosse anche <em>più efficiente</em>: gente
+        pagata bene, in un posto bello, con i figli all'asilo aziendale, lavora meglio, resta più a lungo e
+        porta più idee. E i numeri gli davano ragione — negli anni Cinquanta l'Olivetti cresceva più dei
+        concorrenti. La domanda che la sua storia lascia aperta è perché quel modello, che funzionava, non sia
+        stato imitato quasi da nessuno.</div>
+
+      <div class="note"><strong>Perché ve ne parlo alla fine di questa lezione.</strong> Le prime otto sezioni
+        vi hanno raccontato come funzionano le cose: ruoli, metodi, tariffe, cunei fiscali, interessi che
+        divergono. Sono descrizioni, non leggi di natura. Arduino ha dimostrato che regalare un progetto può
+        essere una strategia vincente; Olivetti ha dimostrato che trattare bene le persone può essere una
+        strategia vincente. Tutte e due le storie sono nate in Italia, in una città di trentamila abitanti, e
+        tutte e due hanno cambiato qualcosa nel mondo. Quando entrerete in un'azienda vi diranno che «si fa
+        così»: ricordatevi che qualcuno ha fatto diversamente, e ha funzionato.</div>
+    </section>
+
+    <section id="quiz">
+      <h2>Verifica quello che hai capito</h2>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> — Prof. Vettigli</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script src="../Style/interactive.js"></script>
+  <script src="../Style/toc.js"></script>
+  <script src="../Style/quiz.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var SVGNS = 'http://www.w3.org/2000/svg';
+    function el(tag, attrs, txt) {
+      var n = document.createElementNS(SVGNS, tag);
+      for (var k in attrs) { if (attrs.hasOwnProperty(k)) { n.setAttribute(k, attrs[k]); } }
+      if (txt !== undefined) { n.textContent = txt; }
+      return n;
+    }
+    function fmt(v, d) {
+      if (d === undefined) { d = 2; }
+      if (!isFinite(v)) { return '—'; }
+      var s = (Math.abs(v) < 5e-11 ? 0 : v).toFixed(d);
+      return s.replace('.', ',');
+    }
+    function euro(v) {
+      var s = Math.round(v).toString();
+      var out = '', i, k = 0;
+      for (i = s.length - 1; i >= 0; i--) {
+        out = s.charAt(i) + out;
+        k++;
+        if (k % 3 === 0 && i > 0) { out = '.' + out; }
+      }
+      return out + ' €';
+    }
+    function clear(svg) { while (svg.firstChild) { svg.removeChild(svg.firstChild); } }
+    function css(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#888';
+    }
+    function bottoni(box, voci, onPick, start) {
+      var bs = [];
+      voci.forEach(function (v, i) {
+        var b = document.createElement('button');
+        b.className = 'btn btn-secondary' + (i === start ? ' active' : '');
+        b.type = 'button';
+        b.textContent = v;
+        b.addEventListener('click', function () {
+          bs.forEach(function (o) { o.classList.remove('active'); });
+          b.classList.add('active');
+          onPick(i);
+        });
+        box.appendChild(b);
+        bs.push(b);
+      });
+      return bs;
+    }
+    function mathIn(node) { if (window.renderMathIn) { window.renderMathIn(node); } }
+
+    // =========================================================
+    // 1) L'ORGANIGRAMMA DEL TEAM
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('ru-svg');
+      if (!svg) { return; }
+      var RUOLI = [
+        { n: 'Project manager', x: 340, y: 55,
+          d: 'Tiene insieme tempi, costi e persone. Non decide <em>che cosa</em> si fa (quello è il product owner) né <em>come</em> (quello è l\'architetto): decide chi lavora su cosa e quando, e risponde al cliente e alla direzione se le date slittano. È il ruolo con più riunioni e meno codice.',
+          k: 'Quando è pronto, quanto costa, chi ci lavora?' },
+        { n: 'Product owner', x: 120, y: 140,
+          d: 'Decide le <strong>priorità</strong>: fra cento cose da fare, quale prima. Rappresenta gli interessi del cliente e degli utenti dentro il team, e ha il potere di dire «questa funzione non la facciamo». Nei metodi agili è la figura più delicata: se non c\'è, il team costruisce cose che nessuno userà.',
+          k: 'Fra tutte le cose da fare, quale prima?' },
+        { n: 'Analista funzionale', x: 340, y: 140,
+          d: 'Traduce il linguaggio del cliente in specifiche che uno sviluppatore possa usare. «Voglio vedere gli ordini in ritardo» diventa una definizione precisa di che cos\'è un ordine, quando è in ritardo, chi può vederlo. Metà del suo lavoro è fare domande che nessuno si era posto.',
+          k: 'Che cosa deve fare esattamente?' },
+        { n: 'Architetto software', x: 560, y: 140,
+          d: 'Decide la <strong>struttura</strong>: quali componenti, quali tecnologie, come comunicano, dove stanno i dati. È il ruolo con le conseguenze più lunghe: un errore di architettura si paga per anni, mentre una funzione scritta male si riscrive in un pomeriggio.',
+          k: 'Come lo costruiamo perché regga nel tempo?' },
+        { n: 'Sviluppatore', x: 120, y: 235,
+          d: 'Scrive il codice — e, se lavora bene, scrive anche i test del proprio codice e la documentazione minima perché un collega possa capirlo fra sei mesi. È il ruolo più numeroso, e quello in cui si entra: quasi tutti gli altri ruoli si raggiungono partendo da qui.',
+          k: 'Come lo scrivo?' },
+        { n: 'Tester / QA', x: 340, y: 235,
+          d: 'Cerca sistematicamente i modi in cui il software si rompe: dati assurdi, sequenze impreviste, connessioni che cadono. Richiede una mentalità opposta a quella dello sviluppatore, ed è per questo che far testare a chi ha scritto il codice funziona male: chi ha costruito una cosa la prova come se la immagina.',
+          k: 'In quali casi si rompe?' },
+        { n: 'DevOps / sistemista', x: 560, y: 235,
+          d: 'Si occupa di far arrivare il software dai computer degli sviluppatori a quelli che gli utenti usano davvero, e di tenerlo in piedi: server, reti, backup, monitoraggio, rilasci automatici. Quando fa bene il suo lavoro nessuno si accorge che esiste.',
+          k: 'Come lo mettiamo in produzione senza che vada giù?' }
+      ];
+      var sel = 0;
+      bottoni(document.getElementById('ru-pre'), RUOLI.map(function (r) { return r.n; }),
+        function (i) { sel = i; disegna(); }, 0);
+
+      function disegna() {
+        clear(svg);
+        var g = css('--border'), t = css('--text'), ac = css('--accent');
+        // collegamenti
+        [[0, 1], [0, 2], [0, 3], [1, 4], [2, 5], [3, 6]].forEach(function (L) {
+          var A = RUOLI[L[0]], B = RUOLI[L[1]];
+          svg.appendChild(el('path', {
+            d: 'M ' + A.x + ' ' + (A.y + 18) + ' C ' + A.x + ' ' + (A.y + 50) + ', ' +
+               B.x + ' ' + (B.y - 50) + ', ' + B.x + ' ' + (B.y - 18),
+            fill: 'none', stroke: g, 'stroke-width': 2
+          }));
+        });
+        RUOLI.forEach(function (r, i) {
+          var att = (i === sel);
+          svg.appendChild(el('rect', {
+            x: r.x - 100, y: r.y - 18, width: 200, height: 36, rx: 9,
+            fill: att ? ac : css('--surface'), 'fill-opacity': att ? 0.25 : 1,
+            stroke: att ? ac : g, 'stroke-width': att ? 2.8 : 1.4
+          }));
+          svg.appendChild(el('text', {
+            x: r.x, y: r.y + 5, class: att ? 'em' : 'lbl', 'text-anchor': 'middle'
+          }, r.n));
+        });
+        var R = RUOLI[sel];
+        document.getElementById('ru-box').innerHTML =
+          '<h4>' + R.n + '</h4><p><em>«' + R.k + '»</em></p><p>' + R.d + '</p>';
+      }
+      disegna();
+    }());
+
+    // =========================================================
+    // 2) CASCATA CONTRO AGILE
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('wf-svg');
+      if (!svg) { return; }
+      var sm = document.getElementById('wf-m'), sd = document.getElementById('wf-d');
+      var modo = 2;
+      bottoni(document.getElementById('wf-modo'), ['solo cascata', 'solo agile', 'confronto'],
+        function (i) { modo = i; disegna(); }, 2);
+      var X0 = 60, W = 570;
+
+      function disegna() {
+        var m = parseFloat(sm.value), D = parseFloat(sd.value), i;
+        if (m > D - 0.5) { m = D - 0.5; }
+        document.getElementById('wf-mv').textContent = fmt(m, 0);
+        document.getElementById('wf-dv').textContent = fmt(D, 0);
+        function px(t) { return X0 + t / D * W; }
+
+        // modello: nella cascata i requisiti si congelano a fine analisi (20% del tempo);
+        // un cambiamento al mese m obbliga a rifare tutto il lavoro fatto da allora.
+        var congela = 0.2 * D;
+        var rifCasc = Math.max(0, m - congela);
+        // in agile il ciclo dura mezzo mese: si rifa' al massimo lo sprint in corso
+        var rifAgile = Math.min(0.5, m);
+        var sprint = Math.floor(D / 0.5);
+
+        clear(svg);
+        var g = css('--border'), t = css('--text'), ac = css('--accent');
+        var FASI = [['analisi', 0.20, '#3b82f6'], ['progettazione', 0.15, '#8b5cf6'],
+                    ['sviluppo', 0.40, '#10b981'], ['test', 0.15, '#f59e0b'],
+                    ['rilascio', 0.10, '#e11d48']];
+
+        function barraCascata(y) {
+          var acc = 0;
+          FASI.forEach(function (F) {
+            var x1 = px(acc * D), x2 = px((acc + F[1]) * D);
+            svg.appendChild(el('rect', { x: x1, y: y, width: x2 - x1, height: 34, fill: F[2], 'fill-opacity': 0.55, stroke: F[2], 'stroke-width': 1.4 }));
+            if (x2 - x1 > 52) {
+              svg.appendChild(el('text', { x: (x1 + x2) / 2, y: y + 22, class: 'lbl-s', 'text-anchor': 'middle' }, F[0]));
+            }
+            acc += F[1];
+          });
+          // il lavoro da rifare
+          if (rifCasc > 0) {
+            svg.appendChild(el('rect', {
+              x: px(congela), y: y, width: px(m) - px(congela), height: 34,
+              fill: 'none', stroke: '#dc2626', 'stroke-width': 3, 'stroke-dasharray': '6 4'
+            }));
+          }
+          svg.appendChild(el('text', { x: X0 - 8, y: y + 22, class: 'lbl', 'text-anchor': 'end' }, 'cascata'));
+        }
+        function barraAgile(y) {
+          for (i = 0; i < sprint; i++) {
+            var x1 = px(i * 0.5), x2 = px((i + 1) * 0.5) - 2;
+            var dentro = (m >= i * 0.5 && m < (i + 1) * 0.5);
+            svg.appendChild(el('rect', {
+              x: x1, y: y, width: Math.max(2, x2 - x1), height: 34,
+              fill: dentro ? '#dc2626' : '#10b981', 'fill-opacity': dentro ? 0.5 : 0.45,
+              stroke: dentro ? '#dc2626' : '#10b981', 'stroke-width': dentro ? 2.4 : 1
+            }));
+          }
+          svg.appendChild(el('text', { x: X0 - 8, y: y + 22, class: 'lbl', 'text-anchor': 'end' }, 'agile'));
+          svg.appendChild(el('text', { x: X0, y: y + 52, class: 'lbl-s' },
+            sprint + ' sprint da due settimane, ognuno con una consegna funzionante'));
+        }
+
+        var yc = modo === 1 ? -100 : 90, ya = modo === 0 ? -100 : (modo === 1 ? 90 : 200);
+        if (modo !== 1) { barraCascata(yc); }
+        if (modo !== 0) { barraAgile(ya); }
+
+        // asse dei mesi e la linea del cambiamento
+        var yax = 300;
+        svg.appendChild(el('line', { x1: X0, y1: yax, x2: X0 + W, y2: yax, stroke: t, 'stroke-width': 2 }));
+        for (i = 0; i <= D; i++) {
+          svg.appendChild(el('line', { x1: px(i), y1: yax - 4, x2: px(i), y2: yax + 4, stroke: t, 'stroke-width': 1 }));
+          if (i % 2 === 0) {
+            svg.appendChild(el('text', { x: px(i), y: yax + 19, class: 'lbl-s', 'text-anchor': 'middle' }, String(i)));
+          }
+        }
+        svg.appendChild(el('text', { x: X0 + W, y: yax + 36, class: 'lbl-s', 'text-anchor': 'end' }, 'mesi'));
+        svg.appendChild(el('line', { x1: px(m), y1: 40, x2: px(m), y2: yax, stroke: '#dc2626', 'stroke-width': 2.4, 'stroke-dasharray': '7 5' }));
+        svg.appendChild(el('text', { x: px(m) + 7, y: 55, class: 'em', fill: '#dc2626' }, 'il cliente cambia idea'));
+        svg.appendChild(el('text', { x: X0, y: 28, class: 'em' }, 'progetto di ' + fmt(D, 0) + ' mesi'));
+
+        document.getElementById('wf-rif').textContent =
+          'cascata ' + fmt(rifCasc, 1) + ' mesi · agile ' + fmt(rifAgile, 1);
+        document.getElementById('wf-vede').textContent =
+          'cascata al mese ' + fmt(D, 0) + ' · agile al mese 0,5';
+        document.getElementById('wf-rel').textContent = 'cascata 1 · agile ' + sprint;
+        document.getElementById('wf-doc').textContent = 'cascata completa · agile essenziale';
+        var o = document.getElementById('wf-out');
+        o.innerHTML = 'Nel modello a cascata i requisiti si congelano a fine analisi (mese ' +
+          fmt(congela, 1) + '): un cambiamento al mese ' + fmt(m, 0) + ' obbliga a rifare <strong>' +
+          fmt(rifCasc, 1) + ' mesi</strong> di lavoro. In agile il ciclo dura due settimane, quindi si rifà ' +
+          'al massimo <strong>' + fmt(rifAgile, 1) + ' mesi</strong>. ' +
+          '<br>Ma attenzione: la cascata produce documentazione completa e una data certa fin dall\'inizio, ' +
+          'che per un appalto pubblico o per un sistema certificato possono valere più della flessibilità.';
+        mathIn(o);
+      }
+      [sm, sd].forEach(function (s) { s.addEventListener('input', disegna); });
+      disegna();
+    }());
+
+    // =========================================================
+    // 3) I SOLDI DELLA CONSULENZA
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('cs-svg');
+      if (!svg) { return; }
+      var st = document.getElementById('cs-t'), sr = document.getElementById('cs-r');
+      var GIORNI = 210;             // giornate fatturabili in un anno, al netto di ferie e panchina
+
+      // stima semplificata del netto annuo a partire dalla RAL (Italia, 3 scaglioni)
+      function netto(ral) {
+        var contr = 0.0919 * ral;
+        var imp = ral - contr;
+        var irpef;
+        if (imp <= 28000) { irpef = 0.23 * imp; }
+        else if (imp <= 50000) { irpef = 0.23 * 28000 + 0.35 * (imp - 28000); }
+        else { irpef = 0.23 * 28000 + 0.35 * 22000 + 0.43 * (imp - 50000); }
+        var detr;
+        if (imp <= 15000) { detr = 1955; }
+        else if (imp <= 28000) { detr = 1910 + 1190 * (28000 - imp) / 13000; }
+        else if (imp <= 50000) { detr = 1910 * (50000 - imp) / 22000; }
+        else { detr = 0; }
+        var addiz = 0.02 * imp;
+        return imp - Math.max(0, irpef - detr) - addiz;
+      }
+
+      function disegna() {
+        var tar = parseFloat(st.value), ral = parseFloat(sr.value);
+        document.getElementById('cs-tv').textContent = euro(tar) + '/giorno';
+        document.getElementById('cs-rv').textContent = euro(ral);
+        var fat = tar * GIORNI, costo = ral * 1.4, marg = fat - costo, net = netto(ral);
+
+        clear(svg);
+        var t = css('--text'), g = css('--border');
+        var BX = 70, BW = 520, H = 46;
+        var righe = [
+          ['il cliente paga', fat, '#3b82f6', 'per ' + GIORNI + ' giornate a ' + euro(tar)],
+          ['costo per l\'azienda', costo, '#8b5cf6', 'RAL × 1,4: contributi e TFR a suo carico'],
+          ['la tua RAL', ral, '#10b981', 'lo stipendio lordo annuo'],
+          ['quello che ricevi', net, '#f59e0b', 'stima: contributi, IRPEF e addizionali']
+        ];
+        svg.appendChild(el('text', { x: BX, y: 26, class: 'em' }, 'dove va il denaro, in un anno'));
+        righe.forEach(function (r, i) {
+          var y = 46 + i * 74;
+          var w = BW * r[1] / Math.max(fat, 1);
+          svg.appendChild(el('rect', { x: BX, y: y, width: Math.max(3, w), height: H, fill: r[2], 'fill-opacity': 0.6, stroke: r[2], 'stroke-width': 1.6 }));
+          svg.appendChild(el('text', { x: BX + 10, y: y + 20, class: 'lbl' }, r[0]));
+          svg.appendChild(el('text', { x: BX + 10, y: y + 38, class: 'em' }, euro(r[1])));
+          svg.appendChild(el('text', { x: BX + Math.max(3, w) + 10, y: y + 28, class: 'lbl-s' }, r[3]));
+          if (i > 0) {
+            var wprec = BW * righe[i - 1][1] / Math.max(fat, 1);
+            svg.appendChild(el('line', {
+              x1: BX + w, y1: y, x2: BX + wprec, y2: y - 28,
+              stroke: '#dc2626', 'stroke-width': 1.4, 'stroke-dasharray': '4 3'
+            }));
+          }
+        });
+        svg.appendChild(el('text', { x: BX, y: 352, class: 'lbl-s' },
+          'La differenza fra la prima barra e l\'ultima è il costo del lavoro in Italia più il margine dell\'azienda.'));
+
+        document.getElementById('cs-fat').textContent = euro(fat);
+        document.getElementById('cs-cost').textContent = euro(costo);
+        document.getElementById('cs-marg').textContent = euro(marg) + '  (' + fmt(marg / fat * 100, 0) + '%)';
+        document.getElementById('cs-netto').textContent = euro(net) + '  (' + fmt(net / ral * 100, 0) + '% della RAL)';
+        var o = document.getElementById('cs-out');
+        o.innerHTML = 'Il cliente paga <strong>' + euro(fat) + '</strong>, tu ne vedi <strong>' + euro(net) +
+          '</strong>: il <strong>' + fmt(net / fat * 100, 0) + '%</strong>. ' +
+          'Il margine lordo dell\'azienda (' + fmt(marg / fat * 100, 0) + '%) <em>non</em> è tutto utile: ' +
+          'da lì escono commerciali, amministrazione, sedi, formazione e i periodi in cui non sei su nessun ' +
+          'progetto. <br><span style="opacity:.8">Stima semplificata: 3 scaglioni IRPEF, detrazione da lavoro ' +
+          'dipendente e addizionali al 2%. Le cifre reali variano per regione, comune e situazione familiare.</span>';
+        mathIn(o);
+      }
+      [st, sr].forEach(function (s) { s.addEventListener('input', disegna); });
+      disegna();
+    }());
+
+    var y = document.getElementById('year');
+    if (y) { y.textContent = new Date().getFullYear(); }
+  }());
+  </script>
+
+  <script>
+  window.quizData = [
+    { type: 'mc', diff: 'easy',
+      text: 'In una <strong>SRL</strong>, chi risponde dei debiti della società?',
+      options: ['la società, col suo patrimonio', 'i soci, anche col patrimonio personale',
+                'i dipendenti', 'lo Stato'],
+      correct: 0,
+      explain: 'È il senso della «responsabilità limitata»: se l\'azienda fallisce, i soci perdono quello che hanno investito e non un euro di più. È un compromesso deliberato: toglie qualcosa ai creditori, ma senza di esso quasi nessuno rischierebbe di aprire un\'impresa.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Nel modello a cascata, quando il cliente vede il software per la prima volta?',
+      options: ['ogni due settimane', 'a metà progetto', 'alla fine, al rilascio', 'mai'],
+      correct: 2,
+      explain: 'È il difetto strutturale del modello: il cliente firma un documento all\'inizio e rivede il progetto solo alla consegna, quando cambiare costa moltissimo. Nei metodi agili invece vede software funzionante alla fine di ogni sprint, tipicamente ogni due settimane.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Che cosa fa un <strong>tester</strong>?',
+      options: ['scrive il codice più difficile', 'cerca sistematicamente i casi in cui il software si rompe',
+                'decide le priorità', 'installa il software sui server'],
+      correct: 1,
+      explain: 'Richiede una mentalità opposta a quella dello sviluppatore, ed è per questo che far provare il codice a chi lo ha scritto funziona male: chi costruisce una cosa la prova come se l\'è immaginata, non come la userà un utente distratto.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Dove e quando è nato Arduino?',
+      options: ['a Milano nel 2010', 'in California nel 1999', 'a Torino nel 1995', 'a Ivrea nel 2005'],
+      correct: 3,
+      explain: 'All\'Interaction Design Institute di Ivrea, per risolvere un problema pratico: gli studenti di design avevano bisogno di una scheda economica e facile da programmare. Il nome viene dal bar dove si riunivano, intitolato ad Arduino d\'Ivrea, re d\'Italia attorno all\'anno Mille.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Il Manifesto Agile del 2001 dice di preferire:',
+      options: ['il software funzionante alla documentazione esaustiva, fermo restando il valore di entrambi',
+                'nessuna documentazione a una documentazione qualunque',
+                'i processi alle persone', 'il piano al cambiamento'],
+      correct: 0,
+      explain: 'La frase finale del Manifesto — «fermo restando il valore delle voci a destra» — è quella che quasi nessuno cita, ed è quella che distingue un team agile serio da chi usa la parola «agile» per giustificare l\'improvvisazione. Agile non significa senza regole: significa regole diverse, e spesso più disciplina.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Perché il costo aziendale di un dipendente è circa $1{,}4$ volte la sua RAL?',
+      options: ['perché comprende l\'IRPEF', 'perché comprende i contributi a carico dell\'azienda e il TFR',
+                'perché comprende il computer e la scrivania', 'è una regola arbitraria'],
+      correct: 1,
+      explain: 'Sulla retribuzione lorda l\'azienda versa circa il 30% di contributi previdenziali a proprio carico e accantona circa il 7,4% di TFR. L\'IRPEF invece è a carico del dipendente e si sottrae <em>dalla</em> RAL. Fra quello che l\'azienda spende e quello che il dipendente porta a casa c\'è quasi un fattore due: è il cuneo fiscale.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Un progetto di 12 mesi a cascata congela i requisiti dopo l\'analisi (circa il 20% del tempo). Se il cliente cambia idea al mese 8, quanto lavoro va rifatto?',
+      options: ['nessuno', 'circa 2 mesi', 'circa 5,6 mesi', 'tutti i 12 mesi'],
+      correct: 2,
+      explain: 'I requisiti si congelano al mese $0{,}2 \\times 12 = 2{,}4$; dal mese 2,4 al mese 8 sono passati circa 5,6 mesi di lavoro fatto sulla base di specifiche ora superate. Con cicli agili di due settimane, invece, si perde al massimo mezzo mese: è tutto il vantaggio del metodo, in un numero.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Perché Arduino ha pubblicato tutti i suoi schemi invece di tenerli segreti?',
+      options: ['perché erano obbligati per legge',
+                'perché non avevano valore commerciale',
+                'perché l\'apertura ha creato una comunità enorme di persone capaci di usarlo, e questo ha fatto vendere più schede',
+                'perché volevano venderlo a un\'altra azienda'],
+      correct: 2,
+      explain: 'È il risultato controintuitivo della storia di Arduino: regalare il progetto ha aumentato le vendite, perché il vero prodotto non era la scheda ma l\'ecosistema di librerie, tutorial e progetti condivisi nato attorno a essa. Da quel movimento sono passate le stampanti 3D, il movimento dei maker e buona parte dell\'internet delle cose.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Nella consulenza informatica, chi paga materialmente il tuo stipendio e per chi lavori fisicamente?',
+      options: ['ti paga il cliente e lavori per la tua azienda',
+                'ti pagano entrambi in parti uguali',
+                'ti paga lo Stato',
+                'ti paga la tua azienda, che è pagata dal cliente presso cui lavori'],
+      correct: 3,
+      explain: 'La catena è: il cliente è contento → rinnova il contratto → la tua azienda incassa → la tua azienda ti paga. Ne segue che devi soddisfare due giudizi diversi — quello del cliente, che decide il rinnovo, e quello della tua azienda, che decide la tua carriera — e non sempre puntano nella stessa direzione.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Il modello a cascata fu descritto per la prima volta da Winston Royce nel 1970. Che cosa c\'è di ironico in questo?',
+      options: ['Royce lo presentava come un esempio di come <em>non</em> si dovrebbe fare, definendolo rischioso',
+                'Royce non era un informatico',
+                'l\'articolo fu pubblicato dopo la sua morte',
+                'il modello era già usato da vent\'anni'],
+      correct: 0,
+      explain: 'Royce scriveva testualmente che quel modo di procedere «è rischioso e invita al fallimento», e proponeva di iterare almeno due volte. Il mondo ha adottato la prima figura del suo articolo ignorando il testo che la commentava: è probabilmente il fraintendimento più costoso della storia dell\'informatica.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Che cosa distingueva l\'Olivetti di Adriano dalle altre aziende del suo tempo?',
+      options: ['pagava meno per essere competitiva',
+                'produceva solo per l\'estero',
+                'era interamente automatizzata',
+                'salari sopra la media, sabato libero dal 1957, asili, biblioteche e case per i dipendenti — sostenendo che così l\'azienda rendesse di più'],
+      correct: 3,
+      explain: 'E non era filantropia: Olivetti sosteneva che quel modello fosse anche più <em>efficiente</em>, e negli anni Cinquanta l\'azienda cresceva più dei concorrenti. Lo stabilimento di Pozzuoli del 1955, affacciato sul golfo, esiste ancora: fu progettato «alla misura dell\'uomo», con le finestre verso il mare invece che verso un muro.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'A parità di competenza tecnica, perché in un\'azienda di software fa carriera chi comunica meglio?',
+      options: ['perché la tecnica non serve davvero',
+                'perché un software di una certa dimensione lo scrivono in molti, e il collo di bottiglia è quanto bene si incastra il lavoro delle persone',
+                'perché i capi non capiscono di tecnica',
+                'perché le riunioni contano più del codice'],
+      correct: 1,
+      explain: 'Ogni malinteso fra due sviluppatori costa più ore di quante ne farebbe risparmiare il migliore dei due lavorando il doppio. La tecnica resta il biglietto d\'ingresso — senza non si entra — ma non è il criterio di selezione fra chi è già entrato. E la buona notizia è che le soft skill si imparano, come si impara a scomporre un polinomio.' },
+
+    { type: 'open',
+      text: 'Spiega in quali situazioni conviene il modello a cascata e in quali il modello agile, e qual è la domanda giusta da farsi per scegliere.',
+      keywords: ['requisiti', 'incert', 'cambia', 'certificat', 'appalto', 'data certa', 'documentazione', 'prodotto nuovo', 'rifare'],
+      requiredMatches: 3,
+      explain: 'La <strong>cascata</strong> conviene quando i requisiti sono stabili e noti in anticipo: sistemi certificati (un software di controllo per un aereo di linea), appalti pubblici a prezzo fisso, contesti in cui servono una data certa e una documentazione completa fin dall\'inizio. L\'<strong>agile</strong> conviene quando quello che si deve costruire è incerto: prodotti nuovi, mercati che cambiano, clienti che capiranno cosa vogliono solo vedendo il software. La domanda giusta non è «quale metodo è migliore» ma <strong>«quanto è incerto quello che devo costruire»</strong>: se un cambiamento tardivo costa mesi di lavoro rifatto, meglio cicli brevi; se il cambiamento non è previsto e serve una data, meglio pianificare.' },
+
+    { type: 'open',
+      text: 'Descrivi il percorso del denaro nella consulenza informatica, dalla tariffa pagata dal cliente a quello che arriva in busta paga, e spiega dove possono divergere gli interessi.',
+      keywords: ['tariffa', 'giornat', 'margine', 'contributi', 'TFR', 'IRPEF', 'cuneo', 'rinnov', 'panchina', 'struttura'],
+      requiredMatches: 4,
+      explain: 'Il cliente paga una <strong>tariffa giornaliera</strong> per ogni consulente; moltiplicata per le giornate fatturabili in un anno dà il ricavo. Da lì l\'azienda toglie il <strong>costo del lavoro</strong>, che è circa $1{,}4$ volte la RAL perché comprende i contributi a suo carico e il TFR; quello che resta è il <strong>margine lordo</strong>, da cui escono commerciali, amministrazione, sedi, formazione e i periodi «in panchina». Dalla RAL, a sua volta, si sottraggono i contributi del dipendente e l\'IRPEF: il netto in busta è circa il 70% della RAL. È il <strong>cuneo fiscale</strong>.<br>Gli interessi divergono in almeno tre casi: se il progetto finisce presto il cliente risparmia ma il consulente torna a costo puro per la sua azienda; se la cosa giusta per il cliente è fare meno, dirglielo è corretto ma commercialmente sfavorevole; se il cliente vuole assumere il consulente è un buon affare per entrambi ma una perdita per l\'azienda fornitrice — ed è il motivo per cui molti contratti lo vietano per un certo periodo.' }
+  ];
+  </script>
+
+</body>
+
+</html>

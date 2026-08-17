@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 12 — La programmazione a oggetti</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .txt-in { width: 7rem; padding: 0.25rem 0.45rem; border: 1px solid var(--border);
+      border-radius: 6px; background: var(--surface); color: var(--text); }
+    .num-in { width: 4.5rem; padding: 0.25rem 0.45rem; border: 1px solid var(--border);
+      border-radius: 6px; background: var(--surface); color: var(--text); font-variant-numeric: tabular-nums; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.l { text-align: left; }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .ric { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .ric > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                 padding: 0.8rem 0.9rem; background: var(--surface); }
+    .ric h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+
+    pre.code { background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 0.9rem 1.1rem;
+               overflow-x: auto; font-size: 0.86rem; line-height: 1.55; margin: 0.9rem 0;
+               font-family: Consolas, 'Courier New', monospace; }
+    pre.code .kw { color: #c084fc; font-weight: 600; }
+    pre.code .ty { color: #7dd3fc; }
+    pre.code .st { color: #86efac; }
+    pre.code .cm { color: #94a3b8; font-style: italic; }
+    pre.code .nu { color: #fbbf24; }
+    pre.code .an { color: #fb923c; }
+    .term { background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 0.85rem 1.1rem;
+            font-family: Consolas, monospace; font-size: 0.88rem; white-space: pre-wrap;
+            min-height: 5rem; margin: 0.6rem 0; border-left: 4px solid #10b981; }
+    .term .prompt { color: #64748b; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Terzo anno · Lezione 12</div>
+    <h1>La programmazione a oggetti</h1>
+    <p>Costruire modelli del mondo e farli funzionare dentro un computer —
+      con Java, in laboratorio</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Terzo anno</a>
+    <span class="sep">/</span> La programmazione a oggetti
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Una lezione da fare col computer acceso.</strong> Qui non si tratta di imparare la sintassi di
+      un linguaggio a memoria — quella si dimentica e si ricerca — ma di capire un <em>modo di pensare</em>
+      che negli ultimi quarant'anni ha cambiato il software. In tutta la lezione trovate laboratori in cui
+      potete modificare il codice e vedere l'output: usateli, e provate a prevedere il risultato
+      <strong>prima</strong> di premere «esegui». Se ci azzeccate, avete capito; se no, avete imparato
+      qualcosa.
+    </div>
+
+    <!-- 1 — MODELLARE IL MONDO -->
+    <section id="sec1">
+      <h2>1. Modellare il mondo</h2>
+
+      <p>Un programma serve quasi sempre a occuparsi di qualcosa che esiste fuori dal computer: studenti e
+        voti, conti correnti, ordini di un negozio, prenotazioni di un albergo. Il primo problema di chi
+        programma non è tecnico — è <strong>rappresentativo</strong>: come si mette «uno studente» dentro una
+        macchina che sa solo manipolare numeri?</p>
+
+      <h3>1.1 — Il modo vecchio, e perché non bastava</h3>
+
+      <p>Prima degli anni Ottanta si programmava così: da una parte i <strong>dati</strong>, dall'altra le
+        <strong>funzioni</strong> che li manipolano. Per gestire cento studenti si tenevano tre elenchi
+        paralleli — uno di nomi, uno di voti, uno di classi — e delle procedure che li leggevano.</p>
+
+      <div class="warnbox"><strong>Il problema dei tre elenchi paralleli.</strong> Se cancellate uno studente
+        dal primo elenco e dimenticate il secondo, da quel momento in poi <em>tutti</em> i voti sono attribuiti
+        alla persona sbagliata. Il programma non se ne accorge: per lui sono solo numeri in una lista. E più il
+        programma cresce, più aumentano i punti in cui quella coerenza si può rompere. È il motivo per cui i
+        progetti grandi diventavano ingestibili: non c'era niente che <em>tenesse insieme</em> i dati che
+        appartengono alla stessa cosa.</div>
+
+      <h3>1.2 — L'idea: tenere insieme quello che sta insieme</h3>
+
+      <div class="definition">
+        <div class="formula-title">Oggetto</div>
+        <p>Un <strong>oggetto</strong> è un'entità che contiene insieme:</p>
+        <ul>
+          <li>i suoi <strong>dati</strong> (detti <em>attributi</em> o <em>campi</em>): che cosa <em>è</em>;</li>
+          <li>le sue <strong>operazioni</strong> (dette <em>metodi</em>): che cosa <em>sa fare</em>.</li>
+        </ul>
+        <p class="formula-note">Uno studente non è «un nome in una lista e un voto in un'altra»: è un oggetto
+          che <em>ha</em> un nome e un voto e che <em>sa</em> calcolare la propria media. Cancellandolo,
+          spariscono insieme tutte le sue parti — perché sono una cosa sola.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Classe</div>
+        <p>Una <strong>classe</strong> è lo <strong>stampo</strong>: descrive quali attributi e quali metodi
+          avranno gli oggetti di quel tipo. Gli oggetti veri e propri si chiamano <em>istanze</em> della
+          classe.</p>
+        <p class="formula-note">La classe <code>Studente</code> è una sola e sta scritta nel programma; di
+          studenti concreti ne potete creare mille, ognuno coi suoi valori. È la stessa differenza che c'è fra
+          la <em>definizione</em> di parabola e le infinite parabole che avete disegnato nella lezione 3.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="oo-pre"></div>
+        <svg id="oo-svg" viewBox="0 0 680 340" role="img"
+             aria-label="Come una cosa del mondo reale diventa una classe"></svg>
+        <p class="cap" id="oo-cap">—</p>
+        <div class="eq-out" id="oo-out"></div>
+      </div>
+
+      <h3>1.3 — Fino a che punto è «una teoria del tutto»?</h3>
+
+      <p>Quando si comincia a ragionare per oggetti, la tentazione è forte: <em>ogni</em> cosa del mondo sembra
+        rappresentabile così. Un'automobile ha attributi (colore, velocità) e metodi (accelera, frena); un
+        conto corrente ha un saldo e sa versare e prelevare; perfino un'idea astratta come «un ordine» ha una
+        data, un cliente e sa calcolare il proprio totale. Viene da pensare di avere fra le mani un linguaggio
+        universale per descrivere la realtà.</p>
+
+      <div class="warnbox"><strong>È un'illusione utile, e conviene conoscerne i limiti.</strong> Un modello a
+        oggetti è, appunto, un <em>modello</em> — come il punto materiale in fisica o il corpo rigido: tiene
+        alcune cose e ne butta via altre, e la scelta di che cosa buttare dipende da <strong>a che cosa serve
+        il programma</strong>. Nel software di una scuola uno studente ha nome, classe e voti; nel software
+        della mensa lo stesso studente ha allergie e un credito residuo. Non esiste «lo Studente giusto»:
+        esiste lo studente giusto <em>per quel programma</em>.</p>
+        <p>E ci sono interi domini in cui gli oggetti non sono la rappresentazione migliore: un calcolo
+          numerico, una trasformazione di dati, un compilatore si descrivono molto meglio con delle
+          <em>funzioni</em> che trasformano valori — è la <strong>programmazione funzionale</strong>, un altro
+          paradigma che oggi convive con quello a oggetti anche dentro lo stesso linguaggio.</div>
+
+      <div class="curiosita"><strong>Da dove viene l'idea.</strong> Nasce in Norvegia, negli anni Sessanta, e
+        non da un informatico teorico: <strong>Ole-Johan Dahl</strong> e <strong>Kristen Nygaard</strong>
+        stavano scrivendo programmi di <em>simulazione</em> — navi in un porto, code agli sportelli — e
+        avevano bisogno di rappresentare «cose» che esistono nel tempo e interagiscono. Il linguaggio che
+        inventarono si chiama <strong>Simula</strong> (1967) e conteneva già classi, oggetti ed ereditarietà.
+        Il nome «programmazione orientata agli oggetti» lo conia poi <strong>Alan Kay</strong> negli anni
+        Settanta allo Xerox PARC, con il linguaggio Smalltalk. È significativo che l'idea sia nata per
+        <em>simulare il mondo</em>: gli oggetti sono, letteralmente, un modo di fare modelli.</div>
+    </section>
+
+    <!-- 2 — JAVA -->
+    <section id="sec2">
+      <h2>2. Java, e perché lo usiamo qui</h2>
+
+      <p>La programmazione a oggetti non è un linguaggio: è un <em>paradigma</em>, un modo di organizzare il
+        codice. Python la supporta, C++ la supporta, JavaScript la supporta a modo suo. Ma noi useremo
+        <strong>Java</strong>, per un motivo preciso: è nato con gli oggetti al centro, e vi
+        <em>obbliga</em> a usarli. In Python potete scrivere un programma di mille righe senza mai definire
+        una classe; in Java non potete: anche il programma più banale sta dentro una classe. Per imparare il
+        paradigma è un vantaggio, perché non lascia scappatoie.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>linguaggio</th><th>anno</th><th>rapporto con gli oggetti</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">Simula 67</td><td>1967</td>
+                <td class="l">il primo: classi, oggetti, ereditarietà</td></tr>
+            <tr><td class="lab">Smalltalk</td><td>1972</td>
+                <td class="l">tutto è un oggetto, anche i numeri</td></tr>
+            <tr><td class="lab">C++</td><td>1985</td>
+                <td class="l">oggetti aggiunti al C: potentissimo e complicato</td></tr>
+            <tr><td class="lab">Java</td><td>1995</td>
+                <td class="l">progettato attorno agli oggetti, più semplice del C++</td></tr>
+            <tr><td class="lab">Python</td><td>1991</td>
+                <td class="l">supporta gli oggetti ma non li impone</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="curiosita"><strong>«Scrivi una volta, esegui ovunque».</strong> Era lo slogan di Java, e
+        descriveva una vera novità. Un programma C compilato per Windows non gira su Mac: il compilatore
+        produce istruzioni per un processore preciso. Java invece compila in un formato intermedio, il
+        <em>bytecode</em>, che viene poi eseguito da una <strong>macchina virtuale</strong> (la JVM) presente
+        su ogni sistema. Si paga qualcosa in velocità e si guadagna la portabilità — e nel 1995, con
+        l'esplosione di internet e dei sistemi diversi collegati fra loro, era esattamente quello che
+        serviva.</div>
+
+      <h3>2.1 — Hello world, riga per riga</h3>
+
+      <pre class="code"><span class="kw">public class</span> <span class="ty">Ciao</span> {
+    <span class="kw">public static void</span> main(<span class="ty">String</span>[] args) {
+        <span class="ty">System</span>.out.println(<span class="st">"Ciao, mondo!"</span>);
+    }
+}</pre>
+
+      <div class="method">
+        <p><span class="step-num">1</span><code>public class Ciao</code> — dichiara una <strong>classe</strong>
+          di nome <code>Ciao</code>. In Java il file deve chiamarsi <code>Ciao.java</code>: nome del file e
+          nome della classe pubblica devono coincidere.</p>
+        <p><span class="step-num">2</span><code>public static void main(String[] args)</code> — è il
+          <strong>punto di partenza</strong>: quando lanciate il programma, la macchina virtuale cerca questo
+          metodo e lo esegue. <code>static</code> significa che appartiene alla classe e non a un oggetto (non
+          serve creare un <code>Ciao</code> per eseguirlo); <code>void</code> che non restituisce niente;
+          <code>String[] args</code> sono gli eventuali argomenti passati da riga di comando.</p>
+        <p><span class="step-num">3</span><code>System.out.println(...)</code> — stampa sulla console e va a
+          capo. <code>System</code> è una classe, <code>out</code> un suo oggetto, <code>println</code> un
+          metodo di quell'oggetto: state già usando tre oggetti senza saperlo.</p>
+        <p><span class="step-num">4</span>Le <strong>graffe</strong> delimitano i blocchi e il
+          <strong>punto e virgola</strong> chiude ogni istruzione. Dimenticarne uno è il primo errore di
+          compilazione della vita di chiunque.</p>
+      </div>
+
+      <div class="warnbox"><strong>Java è un linguaggio <em>tipizzato staticamente</em>.</strong> Ogni
+        variabile ha un tipo dichiarato, e il compilatore controlla <em>prima</em> di eseguire che i tipi
+        siano coerenti: <code>int voto = "otto";</code> non compila nemmeno. In Python quel controllo avviene
+        durante l'esecuzione, e l'errore salta fuori quando il programma è già in mano all'utente. Più
+        rigidità in scrittura, meno sorprese in produzione: è un compromesso, e i due mondi lo risolvono in
+        modo opposto.</div>
+    </section>
+
+    <!-- 3 — IL LABORATORIO -->
+    <section id="sec3">
+      <h2>3. Il laboratorio</h2>
+
+      <p>Qui sotto trovate sei programmi Java, uno per ogni concetto. Potete modificare i valori nei campi,
+        premere <strong>esegui</strong> e vedere esattamente quello che stamperebbe Java. Provate a prevedere
+        l'output prima di premere.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="jv-pre"></div>
+        <pre class="code" id="jv-code">—</pre>
+        <div class="ctrl" id="jv-par"></div>
+        <div class="sim-btns"><button class="btn" type="button" id="jv-run">▶ esegui</button></div>
+        <div class="term" id="jv-term"><span class="prompt">premi «esegui»…</span></div>
+        <div class="eq-out" id="jv-out"></div>
+      </div>
+
+      <div class="warnbox"><strong>Come funziona questo simulatore, detto onestamente.</strong> Non c'è una
+        macchina virtuale Java dentro la pagina: l'output è calcolato dal JavaScript della pagina,
+        riproducendo fedelmente quello che Java stamperebbe — compresi i dettagli che sorprendono, come il
+        fatto che un <code>double</code> di valore 100 venga stampato <code>100.0</code>. Serve a farvi vedere
+        il comportamento; per programmare davvero vi serve un vero ambiente Java, e nella sezione 8 vi dico
+        come installarlo.</div>
+    </section>
+
+    <!-- 4 — INCAPSULAMENTO -->
+    <section id="sec4">
+      <h2>4. Incapsulamento: nascondere per proteggere</h2>
+
+      <div class="definition">
+        <div class="formula-title">Incapsulamento</div>
+        <p>Un oggetto <strong>nasconde i propri dati</strong> e li rende accessibili solo attraverso i propri
+          metodi. Chi usa l'oggetto non tocca lo stato interno: chiede all'oggetto di fare qualcosa.</p>
+      </div>
+
+      <p>In Java si realizza con i <strong>modificatori di visibilità</strong>:</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>modificatore</th><th>chi può accedere</th><th>uso tipico</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">public</td><td class="l">chiunque</td>
+                <td class="l">i metodi che formano l'interfaccia dell'oggetto</td></tr>
+            <tr><td class="lab">private</td><td class="l">solo la classe stessa</td>
+                <td class="l">quasi tutti gli attributi</td></tr>
+            <tr><td class="lab">protected</td><td class="l">la classe e le sue sottoclassi</td>
+                <td class="l">quello che serve a chi eredita</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Guardate l'esempio ③ nel laboratorio: il saldo del conto è <code>private</code>. Un programma esterno
+        <em>non può</em> scrivere <code>conto.saldo = 1000000;</code> — il compilatore lo rifiuta. Può solo
+        chiamare <code>versa()</code> e <code>preleva()</code>, che contengono i controlli.</p>
+
+      <div class="ric">
+        <div><h4>Protegge la coerenza</h4><p>Se il saldo si può cambiare solo passando per
+          <code>preleva()</code>, non può mai diventare negativo per sbaglio: il controllo sta in un unico
+          punto e non si può aggirare.</p></div>
+        <div><h4>Permette di cambiare idea</h4><p>Se domani il saldo va tenuto in centesimi interi invece che
+          in euro decimali, si cambia dentro la classe e <strong>nessun altro file va toccato</strong>: chi
+          sta fuori vede sempre gli stessi metodi.</p></div>
+        <div><h4>Riduce quello che bisogna sapere</h4><p>Per usare un conto corrente basta conoscere due
+          metodi, non i dieci attributi interni. È lo stesso motivo per cui guidate un'auto senza sapere come
+          funziona l'iniezione.</p></div>
+      </div>
+
+      <div class="curiosita"><strong>Il principio generale si chiama <em>information hiding</em></strong> e lo
+        formulò <strong>David Parnas</strong> nel 1972, in un articolo che è ancora oggi fra i più citati
+        dell'ingegneria del software. La sua tesi: un programma va diviso in moduli non in base ai
+        <em>passi</em> dell'elaborazione, ma in base alle <strong>decisioni che possono cambiare</strong> —
+        ogni modulo ne nasconde una. Così, quando quella decisione cambia, si tocca un solo modulo. È la
+        stessa idea che troverete nella sezione 7 parlando di architettura.</div>
+    </section>
+
+    <!-- 5 — EREDITARIETA' -->
+    <section id="sec5">
+      <h2>5. Ereditarietà: dire una volta quello che vale per tutti</h2>
+
+      <div class="definition">
+        <div class="formula-title">Ereditarietà</div>
+        <p>Una classe può <strong>estendere</strong> un'altra, ereditandone attributi e metodi e
+          aggiungendone o ridefinendone alcuni. In Java: <code>class Cane extends Animale</code>.</p>
+        <p class="formula-note">Si legge come una relazione «<strong>è un</strong>»: un cane <em>è un</em>
+          animale. Se questa frase non suona bene in italiano, quasi sicuramente l'ereditarietà è la scelta
+          sbagliata.</p>
+      </div>
+
+      <p>La classe che estende si chiama <strong>sottoclasse</strong> (o classe figlia), quella estesa
+        <strong>superclasse</strong>. La parola chiave <code>super</code> serve per richiamare il costruttore
+        o i metodi della superclasse, e l'annotazione <code>@Override</code> dice esplicitamente al
+        compilatore «sto ridefinendo un metodo del genitore» — se sbagliate il nome, ve lo segnala invece di
+        creare silenziosamente un metodo nuovo.</p>
+
+      <div class="warnbox"><strong>L'ereditarietà si usa molto meno di quanto sembri.</strong> È il concetto
+        che gli studenti trovano più affascinante e che i professionisti usano con più cautela, per una
+        ragione precisa: crea un legame <em>rigidissimo</em>. La sottoclasse dipende dai dettagli interni del
+        genitore, e un cambiamento nel genitore può rompere tutte le sottoclassi in una volta. Il consiglio
+        che troverete in ogni libro serio è: «<strong>preferisci la composizione all'ereditarietà</strong>» —
+        cioè, invece di dire «un'auto <em>è un</em> veicolo con motore», dire «un'auto <em>ha un</em> motore».
+        Un oggetto che ne contiene un altro è molto più facile da cambiare di un oggetto che ne eredita.</div>
+
+      <div class="curiosita"><strong>Il problema del quadrato e del rettangolo.</strong> È l'esempio classico
+        di quanto sia insidiosa. Un quadrato <em>è un</em> rettangolo: sembra il caso ideale per
+        l'ereditarietà. Ma un rettangolo ha metodi <code>setLarghezza()</code> e <code>setAltezza()</code>
+        indipendenti, e un quadrato no — cambiando la larghezza deve cambiare anche l'altezza. Chiunque scriva
+        codice che funziona coi rettangoli si troverà quel codice rotto quando gli passate un quadrato. La
+        regola che formalizza questa trappola si chiama <strong>principio di sostituzione di Liskov</strong>
+        (Barbara Liskov, 1987): una sottoclasse deve poter sostituire la superclasse <em>ovunque</em>, senza
+        che nulla si accorga della differenza. Se non è così, la gerarchia è sbagliata anche se in italiano
+        suona bene.</div>
+    </section>
+
+    <!-- 6 — POLIMORFISMO E ASTRAZIONE -->
+    <section id="sec6">
+      <h2>6. Polimorfismo: la stessa richiesta, risposte diverse</h2>
+
+      <div class="definition">
+        <div class="formula-title">Polimorfismo</div>
+        <p>Oggetti di classi diverse possono rispondere alla <strong>stessa chiamata</strong> in modi diversi.
+          Chi chiama non ha bisogno di sapere di che tipo sia l'oggetto: chiede, e ciascuno risponde a modo
+          suo.</p>
+        <p class="formula-note">Dal greco: «molte forme». È il concetto più potente della programmazione a
+          oggetti, e il più difficile da apprezzare finché non se ne vede il vantaggio pratico.</p>
+      </div>
+
+      <p>Provate l'esempio ⑤ nel laboratorio: c'è un elenco di animali diversi e un ciclo che scorre l'elenco
+        chiamando <code>verso()</code> su ciascuno. Il ciclo è <strong>uno solo</strong>, ma stampa cose
+        diverse a seconda di che cosa c'è dentro l'elenco.</p>
+
+      <pre class="code"><span class="kw">for</span> (<span class="ty">Animale</span> a : zoo) {
+    a.verso();          <span class="cm">// nessun if, nessun switch: decide l'oggetto</span>
+}</pre>
+
+      <div class="formula-box">
+        <div class="formula-title">Perché conta davvero</div>
+        <p>Senza polimorfismo quel ciclo sarebbe pieno di condizioni: «se è un cane fai bau, se è un gatto fai
+          miao, se è un uccello…». E ogni volta che aggiungete un animale nuovo dovete <strong>tornare a
+          modificare quel ciclo</strong> — e tutti gli altri punti del programma che fanno un controllo
+          analogo.</p>
+        <p class="formula-note">Col polimorfismo aggiungete una classe nuova e <strong>non toccate niente
+          altro</strong>: il ciclo funziona già. È il principio «aperto alle estensioni, chiuso alle
+          modifiche», e in un programma grande è la differenza fra poter crescere e non poterlo fare.</p>
+      </div>
+
+      <h3>6.1 — Astrazione: classi astratte e interfacce</h3>
+
+      <p>C'è un'ultima mossa. A volte la superclasse non ha senso da sola: che verso fa «un animale generico»?
+        Java permette di dichiarare che un metodo <strong>esiste ma non è implementato qui</strong>, e che
+        toccherà alle sottoclassi definirlo.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th></th><th>classe astratta</th><th>interfaccia</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">si dichiara</td><td><code>abstract class</code></td><td><code>interface</code></td></tr>
+            <tr><td class="lab">può avere attributi</td><td>sì</td><td>solo costanti</td></tr>
+            <tr><td class="lab">può avere codice</td><td>sì, metodi già implementati</td>
+                <td class="l">solo firme (e, dal Java 8, metodi <em>default</em>)</td></tr>
+            <tr><td class="lab">quante se ne ereditano</td><td><strong>una sola</strong></td>
+                <td><strong>quante se ne vuole</strong></td></tr>
+            <tr><td class="lab">risponde alla domanda</td><td class="l">«che cosa <em>è</em>?»</td>
+                <td class="l">«che cosa <em>sa fare</em>?»</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>L'ultima riga è la chiave. <code>Uccello extends Animale implements Volante</code> si legge: un
+        uccello <em>è</em> un animale e <em>sa</em> volare. E la cosa notevole è che anche un aeroplano sa
+        volare, pur non essendo per niente un animale: l'interfaccia <code>Volante</code> li accomuna senza
+        costringerli nella stessa gerarchia.</p>
+
+      <div class="curiosita"><strong>Perché in Java l'ereditarietà multipla non c'è.</strong> In C++ una classe
+        può estenderne due, e nasce il «problema del diamante»: se <code>A</code> ha un metodo, e
+        <code>B</code> e <code>C</code> lo ridefiniscono entrambi ereditando da <code>A</code>, quale versione
+        eredita <code>D</code> che estende sia <code>B</code> sia <code>C</code>? Java ha risolto il nodo
+        tagliandolo: una sola superclasse, ma quante interfacce si vuole. Siccome le interfacce non portavano
+        codice, non c'era ambiguità da risolvere. È un buon esempio di come, in progettazione, togliere una
+        possibilità sia a volte la scelta migliore.</div>
+    </section>
+
+    <!-- 7 — L'ARCHITETTURA -->
+    <section id="sec7">
+      <h2>7. L'architettura del software</h2>
+
+      <p>Le quattro idee delle sezioni precedenti servono a scrivere <em>una classe</em>. Ma un programma vero
+        ne ha centinaia, e la domanda diventa: <strong>come si organizzano fra loro?</strong> La risposta si
+        chiama architettura.</p>
+
+      <div class="definition">
+        <div class="formula-title">Architettura software</div>
+        <p>È l'insieme delle <strong>decisioni strutturali</strong> di un sistema: quali componenti esistono,
+          quali responsabilità ha ciascuno, come comunicano, dove stanno i dati.</p>
+        <p class="formula-note">Una definizione operativa, molto usata: l'architettura è
+          <strong>l'insieme delle decisioni difficili da cambiare dopo</strong>. Tutto ciò che si può cambiare
+          in un pomeriggio non è architettura.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="ar-pre"></div>
+        <svg id="ar-svg" viewBox="0 0 680 340" role="img"
+             aria-label="Architettura a livelli di un'applicazione"></svg>
+        <div class="eq-out" id="ar-out"></div>
+      </div>
+
+      <p>L'architettura più diffusa è quella <strong>a livelli</strong>: ogni livello parla solo con quello
+        immediatamente sotto, e non salta. Sembra una limitazione gratuita, e invece è quello che permette di
+        sostituire un pezzo senza toccare gli altri.</p>
+
+      <div class="warnbox"><strong>Perché va decisa prima.</strong> Nel software moltissime cose si aggiustano
+        strada facendo: un metodo scritto male si riscrive in un pomeriggio, un nome sbagliato si cambia con
+        una funzione dell'editor, una funzione lenta si ottimizza quando serve. <em>Un'architettura sbagliata
+        no.</em> Se avete costruito duecento classi che accedono direttamente al database da ogni punto del
+        programma, il giorno in cui dovete cambiare database — o solo aggiungere un controllo di permessi —
+        avete duecento posti da modificare, e ne dimenticherete qualcuno.</p>
+        <p>Ecco perché anche i team più agili, che rimandano volentieri quasi ogni decisione, l'architettura
+          la definiscono presto: non nel dettaglio, ma nelle scelte che poi non si possono disfare.</div>
+
+      <div class="curiosita"><strong>Il «debito tecnico».</strong> La metafora è di <strong>Ward
+        Cunningham</strong>, uno dei firmatari del Manifesto Agile. Scrivere codice affrettato per consegnare
+        prima è come <em>accendere un prestito</em>: si ottiene subito qualcosa, ma da quel momento si pagano
+        <em>interessi</em>, sotto forma di lavoro in più a ogni modifica successiva. Non è di per sé
+        sbagliato — a volte indebitarsi è la scelta giusta — ma bisogna sapere di averlo fatto e, prima o poi,
+        restituire il capitale. Un progetto che accumula debito e non lo ripaga mai finisce per pagare solo
+        interessi: ogni piccola modifica costa settimane, e nessuno capisce più perché.</div>
+
+      <div class="ric">
+        <div><h4>Monolite</h4><p>Tutto in un unico programma. Semplice da sviluppare e da mettere online: è
+          la scelta giusta per iniziare, quasi sempre.</p></div>
+        <div><h4>Microservizi</h4><p>Tanti programmi piccoli e indipendenti che si parlano via rete. Ogni
+          pezzo si aggiorna da solo, ma la complessità si sposta <em>fra</em> i pezzi — e cresce.</p></div>
+        <div><h4>Client-server</h4><p>Un programma sul dispositivo dell'utente, uno sul server. È
+          l'architettura di quasi tutto ciò che usate ogni giorno.</p></div>
+      </div>
+
+      <div class="note"><strong>La regola pratica più utile.</strong> «Scegli l'architettura più semplice che
+        possa funzionare, e complicala solo quando un problema reale te lo impone.» Molti progetti nascono con
+        venti microservizi perché «è moderno» e muoiono sotto il peso della loro stessa infrastruttura, quando
+        un monolite ben scritto avrebbe fatto lo stesso lavoro con un decimo della fatica. La complessità non
+        è gratis: si paga tutti i giorni.</div>
+    </section>
+
+    <!-- 8 — PROVARE DAVVERO -->
+    <section id="sec8">
+      <h2>8. Provare davvero, sul vostro computer</h2>
+
+      <p>Il simulatore di questa pagina serve a capire; per programmare vi serve un ambiente vero. Ecco il
+        percorso più breve.</p>
+
+      <div class="method">
+        <p><span class="step-num">1</span><strong>Il JDK.</strong> Serve il <em>Java Development Kit</em>, che
+          contiene il compilatore e la macchina virtuale. Le distribuzioni gratuite più usate sono
+          <strong>Eclipse Temurin</strong> (Adoptium) e <strong>OpenJDK</strong>. Installatene una versione
+          <em>LTS</em>, cioè con supporto a lungo termine.</p>
+        <p><span class="step-num">2</span><strong>Un editor.</strong> Per cominciare basta un editor di testo
+          qualsiasi; quando il progetto cresce conviene un ambiente integrato — <strong>IntelliJ IDEA</strong>
+          nella versione Community, o <strong>VS Code</strong> con l'estensione per Java, entrambi
+          gratuiti.</p>
+        <p><span class="step-num">3</span><strong>Compilare ed eseguire</strong>, da terminale:</p>
+      </div>
+
+      <pre class="code"><span class="cm"># compila: produce il file Ciao.class col bytecode</span>
+javac Ciao.java
+
+<span class="cm"># esegue: la macchina virtuale carica il bytecode</span>
+java Ciao</pre>
+
+      <p><span class="step-num">4</span>Dalle versioni recenti di Java potete anche saltare la compilazione
+        esplicita per i programmi di un solo file, lanciando direttamente <code>java Ciao.java</code>: comodo
+        per gli esperimenti.</p>
+
+      <div class="warnbox"><strong>Il primo errore che incontrerete.</strong>
+        <code>Error: Could not find or load main class Ciao</code>. Nove volte su dieci significa che state
+        eseguendo <code>java Ciao.class</code> invece di <code>java Ciao</code> — al comando <code>java</code>
+        si passa il <em>nome della classe</em>, non il nome del file — oppure che siete nella cartella
+        sbagliata. Le altre volte è perché il nome del file e quello della classe non coincidono.</div>
+
+      <h3>8.1 — Un esercizio da fare</h3>
+
+      <div class="example">
+        <p><strong>① Esercizio.</strong> Progettate (su carta, prima di scrivere codice) le classi per gestire
+          la <strong>biblioteca della scuola</strong>. Devono essere possibili: prestare un libro a uno
+          studente, restituirlo, sapere quali libri sono disponibili, sapere chi ha in prestito un certo
+          libro.</p>
+        <button class="btn btn-toggle" data-target="#sol-b1">Mostra una soluzione possibile</button>
+        <div class="solution" id="sol-b1" hidden>
+          <p><span class="step-num">1</span><strong>Individuo i sostantivi</strong> del problema: libro,
+            studente, prestito, biblioteca. È una regola pratica sorprendentemente efficace: i sostantivi
+            diventano classi, i verbi diventano metodi.</p>
+          <p><span class="step-num">2</span><strong>Decido gli attributi</strong> — solo quelli che servono a
+            <em>questo</em> programma. Un libro ha titolo, autore e codice; non ha il numero di pagine, perché
+            a nessuna delle quattro operazioni richieste serve.</p>
+          <pre class="code"><span class="kw">class</span> <span class="ty">Libro</span> {
+    <span class="kw">private</span> <span class="ty">String</span> codice, titolo, autore;
+    <span class="kw">private boolean</span> disponibile = <span class="kw">true</span>;
+
+    <span class="kw">public boolean</span> isDisponibile() { <span class="kw">return</span> disponibile; }
+    <span class="kw">void</span> segnaPrestato() { disponibile = <span class="kw">false</span>; }
+    <span class="kw">void</span> segnaRestituito() { disponibile = <span class="kw">true</span>; }
+}
+
+<span class="kw">class</span> <span class="ty">Studente</span> {
+    <span class="kw">private</span> <span class="ty">String</span> matricola, nome;
+}
+
+<span class="kw">class</span> <span class="ty">Prestito</span> {
+    <span class="kw">private</span> <span class="ty">Libro</span> libro;
+    <span class="kw">private</span> <span class="ty">Studente</span> studente;
+    <span class="kw">private</span> <span class="ty">LocalDate</span> dataInizio, dataScadenza;
+
+    <span class="kw">boolean</span> inRitardo() { ... }
+}</pre>
+          <p><span class="step-num">3</span><strong>La classe che sorprende è <code>Prestito</code>.</strong>
+            Non è un oggetto «fisico» — non lo si può prendere in mano — eppure è la classe più importante
+            delle tre: è lei che tiene insieme chi ha preso cosa e quando. Chi non la mette finisce per
+            infilare un campo <code>chiLoHa</code> dentro <code>Libro</code>, e poi non sa più dove mettere la
+            data di scadenza, e poi non riesce a tenere lo storico dei prestiti passati.</p>
+          <p><span class="step-num">4</span><strong>Notate l'incapsulamento:</strong> <code>disponibile</code>
+            è privato, e si cambia solo attraverso <code>segnaPrestato()</code> e
+            <code>segnaRestituito()</code>. Così è impossibile che un libro risulti disponibile mentre esiste
+            un prestito aperto su di lui.</p>
+          <p class="formula-note">Non esiste <em>la</em> soluzione giusta: se il programma dovesse anche
+            calcolare le multe, servirebbe altro; se dovesse gestire più copie dello stesso titolo,
+            servirebbe distinguere fra <em>titolo</em> e <em>copia</em>. Il modello dipende sempre da ciò che
+            il programma deve fare — è quello che dicevamo nella sezione 1.</p>
+        </div>
+      </div>
+
+      <div class="note"><strong>Il filo dell'anno, e la chiusura.</strong> Questa lezione ha in comune con
+        tutte le altre una cosa sola, che è poi il senso di tutto l'anno: <strong>prendere qualcosa del mondo
+        e tradurlo in una struttura formale</strong>. L'abbiamo fatto con la geometria analitica —
+        «distanza costante da un punto» è diventata un'equazione — e con i problemi in italiano che diventavano
+        equazioni di secondo grado. Qui prendiamo «una biblioteca» e la traduciamo in classi. Il linguaggio
+        cambia, il mestiere no: si guarda una situazione, si decide che cosa tenere e che cosa buttare, e si
+        scrive un modello che funziona. Quello che avete imparato quest'anno non è come si risolve
+        un'equazione: è come si costruisce un modello.</div>
+    </section>
+
+    <section id="quiz">
+      <h2>Verifica quello che hai capito</h2>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> — Prof. Vettigli</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script src="../Style/interactive.js"></script>
+  <script src="../Style/toc.js"></script>
+  <script src="../Style/quiz.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var SVGNS = 'http://www.w3.org/2000/svg';
+    function el(tag, attrs, txt) {
+      var n = document.createElementNS(SVGNS, tag);
+      for (var k in attrs) { if (attrs.hasOwnProperty(k)) { n.setAttribute(k, attrs[k]); } }
+      if (txt !== undefined) { n.textContent = txt; }
+      return n;
+    }
+    function clear(svg) { while (svg.firstChild) { svg.removeChild(svg.firstChild); } }
+    function css(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#888';
+    }
+    function bottoni(box, voci, onPick, start) {
+      var bs = [];
+      voci.forEach(function (v, i) {
+        var b = document.createElement('button');
+        b.className = 'btn btn-secondary' + (i === start ? ' active' : '');
+        b.type = 'button';
+        b.textContent = v;
+        b.addEventListener('click', function () {
+          bs.forEach(function (o) { o.classList.remove('active'); });
+          b.classList.add('active');
+          onPick(i);
+        });
+        box.appendChild(b);
+        bs.push(b);
+      });
+      return bs;
+    }
+    function mathIn(node) { if (window.renderMathIn) { window.renderMathIn(node); } }
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+    // riproduce Double.toString di Java per i valori semplici
+    function javaDouble(v) {
+      if (v === Math.floor(v) && Math.abs(v) < 1e7) { return v.toFixed(1); }
+      return String(v);
+    }
+
+    // =========================================================
+    // 1) DAL MONDO REALE ALLA CLASSE
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('oo-svg');
+      if (!svg) { return; }
+      var CASI = [
+        { cosa: 'uno studente', cls: 'Studente',
+          att: ['String nome', 'String classe', 'int[] voti'],
+          met: ['double media()', 'void aggiungiVoto(int v)', 'boolean promosso()'],
+          nota: 'Nel software della <em>mensa</em> lo stesso studente avrebbe attributi diversi: allergie, credito residuo. Non esiste «lo Studente giusto», esiste quello giusto per il programma che state scrivendo.' },
+        { cosa: 'un conto corrente', cls: 'ContoCorrente',
+          att: ['String iban', 'double saldo', 'Cliente titolare'],
+          met: ['void versa(double i)', 'void preleva(double i)', 'double getSaldo()'],
+          nota: 'Il <code>saldo</code> è <strong>private</strong>: si può cambiare solo passando per <code>versa</code> e <code>preleva</code>, che contengono i controlli. È incapsulamento.' },
+        { cosa: 'un\'automobile', cls: 'Automobile',
+          att: ['String targa', 'double velocita', 'Motore motore'],
+          met: ['void accelera(double a)', 'void frena()', 'void avvia()'],
+          nota: 'Notate <code>Motore motore</code>: un\'auto <strong>ha un</strong> motore, non <em>è</em> un motore. È <strong>composizione</strong>, e nella pratica si usa molto più dell\'ereditarietà.' },
+        { cosa: 'un ordine di un negozio', cls: 'Ordine',
+          att: ['int numero', 'LocalDate data', 'Cliente cliente', 'List righe'],
+          met: ['double totale()', 'void aggiungi(Prodotto p, int q)', 'boolean spedito()'],
+          nota: 'Un ordine non è un oggetto «fisico», eppure è una delle classi più importanti del sistema: tiene insieme chi ha comprato, che cosa e quando. Le classi più utili spesso rappresentano <em>relazioni</em>, non cose.' }
+      ];
+      var k = 0;
+      bottoni(document.getElementById('oo-pre'), CASI.map(function (c) { return c.cosa; }),
+        function (i) { k = i; disegna(); }, 0);
+
+      function disegna() {
+        var C = CASI[k], i;
+        clear(svg);
+        var t = css('--text'), g = css('--border'), ac = css('--accent');
+        // il mondo reale, a sinistra
+        svg.appendChild(el('rect', { x: 40, y: 90, width: 210, height: 110, rx: 55,
+          fill: css('--surface'), stroke: g, 'stroke-width': 2, 'stroke-dasharray': '7 5' }));
+        svg.appendChild(el('text', { x: 145, y: 140, class: 'em', 'text-anchor': 'middle' }, 'il mondo reale'));
+        svg.appendChild(el('text', { x: 145, y: 163, class: 'lbl', 'text-anchor': 'middle' }, C.cosa));
+        // freccia
+        svg.appendChild(el('path', { d: 'M 262 145 L 322 145', stroke: ac, 'stroke-width': 3 }));
+        svg.appendChild(el('path', { d: 'M 312 137 L 324 145 L 312 153 Z', fill: ac }));
+        svg.appendChild(el('text', { x: 292, y: 132, class: 'lbl-s', 'text-anchor': 'middle' }, 'modello'));
+        // la classe, a destra, in stile UML
+        var BX = 340, BW = 300, H1 = 34, HR = 22;
+        var HT = H1 + (C.att.length + C.met.length) * HR + 16;
+        svg.appendChild(el('rect', { x: BX, y: 40, width: BW, height: HT, fill: css('--surface'), stroke: ac, 'stroke-width': 2.4 }));
+        svg.appendChild(el('rect', { x: BX, y: 40, width: BW, height: H1, fill: ac, 'fill-opacity': 0.22 }));
+        svg.appendChild(el('text', { x: BX + BW / 2, y: 63, class: 'em', 'text-anchor': 'middle' }, 'class ' + C.cls));
+        var y = 40 + H1;
+        C.att.forEach(function (a) {
+          y += HR;
+          svg.appendChild(el('text', { x: BX + 14, y: y, class: 'lbl-s' }, '− ' + a));
+        });
+        y += 8;
+        svg.appendChild(el('line', { x1: BX, y1: y, x2: BX + BW, y2: y, stroke: ac, 'stroke-width': 1.4 }));
+        C.met.forEach(function (m) {
+          y += HR;
+          svg.appendChild(el('text', { x: BX + 14, y: y, class: 'lbl-s' }, '+ ' + m));
+        });
+        svg.appendChild(el('text', { x: BX, y: 40 + HT + 22, class: 'lbl-s' }, 'sopra gli attributi (−, privati), sotto i metodi (+, pubblici)'));
+
+        document.getElementById('oo-cap').textContent =
+          'Il diagramma è in notazione UML: il nome della classe, poi gli attributi, poi i metodi.';
+        var o = document.getElementById('oo-out');
+        o.innerHTML = C.nota;
+        mathIn(o);
+      }
+      disegna();
+    }());
+
+    // =========================================================
+    // 2) IL LABORATORIO JAVA
+    // =========================================================
+    (function () {
+      var pre = document.getElementById('jv-code');
+      if (!pre) { return; }
+      var term = document.getElementById('jv-term'), par = document.getElementById('jv-par');
+
+      var ES = [
+        {
+          nome: '① hello world',
+          par: [],
+          code: function () {
+            return '<span class="kw">public class</span> <span class="ty">Ciao</span> {\n' +
+              '    <span class="kw">public static void</span> main(<span class="ty">String</span>[] args) {\n' +
+              '        <span class="ty">System</span>.out.println(<span class="st">"Ciao, mondo!"</span>);\n' +
+              '    }\n}';
+          },
+          run: function () { return ['Ciao, mondo!']; },
+          nota: 'Il programma più corto che Java permette di scrivere: e già contiene una classe, un metodo e tre oggetti (<code>System</code>, <code>out</code> e la stringa).'
+        },
+        {
+          nome: '② classe e oggetto',
+          par: [{ id: 'nome', tipo: 'testo', et: 'nome', val: 'Anna' },
+                { id: 'voto', tipo: 'num', et: 'voto', val: 8 }],
+          code: function (p) {
+            return '<span class="kw">public class</span> <span class="ty">Studente</span> {\n' +
+              '    <span class="ty">String</span> nome;\n    <span class="kw">int</span> voto;\n\n' +
+              '    <span class="ty">Studente</span>(<span class="ty">String</span> nome, <span class="kw">int</span> voto) {\n' +
+              '        <span class="kw">this</span>.nome = nome;\n        <span class="kw">this</span>.voto = voto;\n    }\n\n' +
+              '    <span class="kw">void</span> saluta() {\n' +
+              '        <span class="ty">System</span>.out.println(<span class="st">"Sono "</span> + nome + <span class="st">" e ho preso "</span> + voto);\n' +
+              '    }\n\n' +
+              '    <span class="kw">public static void</span> main(<span class="ty">String</span>[] args) {\n' +
+              '        <span class="ty">Studente</span> s = <span class="kw">new</span> <span class="ty">Studente</span>(<span class="st">"' + esc(p.nome) + '"</span>, <span class="nu">' + p.voto + '</span>);\n' +
+              '        s.saluta();\n    }\n}';
+          },
+          run: function (p) { return ['Sono ' + p.nome + ' e ho preso ' + p.voto]; },
+          nota: 'La parola <code>new</code> crea l\'oggetto; il <strong>costruttore</strong> (il metodo che ha lo stesso nome della classe) riceve i valori iniziali. <code>this.nome</code> distingue l\'attributo dal parametro che si chiama uguale.'
+        },
+        {
+          nome: '③ incapsulamento',
+          par: [{ id: 'versa', tipo: 'num', et: 'versa', val: 100 },
+                { id: 'preleva', tipo: 'num', et: 'preleva', val: 30 }],
+          code: function (p) {
+            return '<span class="kw">public class</span> <span class="ty">ContoCorrente</span> {\n' +
+              '    <span class="kw">private double</span> saldo = <span class="nu">0</span>;   <span class="cm">// nessuno lo tocca da fuori</span>\n\n' +
+              '    <span class="kw">public void</span> versa(<span class="kw">double</span> importo) {\n' +
+              '        <span class="kw">if</span> (importo &lt;= <span class="nu">0</span>) {\n' +
+              '            <span class="ty">System</span>.out.println(<span class="st">"Importo non valido"</span>);\n            <span class="kw">return</span>;\n        }\n' +
+              '        saldo += importo;\n' +
+              '        <span class="ty">System</span>.out.println(<span class="st">"Versati "</span> + importo + <span class="st">" euro. Saldo: "</span> + saldo);\n    }\n\n' +
+              '    <span class="kw">public void</span> preleva(<span class="kw">double</span> importo) {\n' +
+              '        <span class="kw">if</span> (importo &gt; saldo) {\n' +
+              '            <span class="ty">System</span>.out.println(<span class="st">"Fondi insufficienti"</span>);\n            <span class="kw">return</span>;\n        }\n' +
+              '        saldo -= importo;\n' +
+              '        <span class="ty">System</span>.out.println(<span class="st">"Prelevati "</span> + importo + <span class="st">" euro. Saldo: "</span> + saldo);\n    }\n\n' +
+              '    <span class="kw">public static void</span> main(<span class="ty">String</span>[] args) {\n' +
+              '        <span class="ty">ContoCorrente</span> c = <span class="kw">new</span> <span class="ty">ContoCorrente</span>();\n' +
+              '        c.versa(<span class="nu">' + p.versa + '</span>);\n' +
+              '        c.preleva(<span class="nu">' + p.preleva + '</span>);\n' +
+              '        <span class="cm">// c.saldo = 1000000;  &lt;- NON COMPILA: saldo e\' private</span>\n    }\n}';
+          },
+          run: function (p) {
+            var out = [], saldo = 0;
+            if (p.versa <= 0) { out.push('Importo non valido'); }
+            else {
+              saldo += p.versa;
+              out.push('Versati ' + javaDouble(p.versa) + ' euro. Saldo: ' + javaDouble(saldo));
+            }
+            if (p.preleva > saldo) { out.push('Fondi insufficienti'); }
+            else {
+              saldo -= p.preleva;
+              out.push('Prelevati ' + javaDouble(p.preleva) + ' euro. Saldo: ' + javaDouble(saldo));
+            }
+            return out;
+          },
+          nota: 'Provate a versare zero o a prelevare più di quanto c\'è: i controlli stanno <strong>dentro</strong> l\'oggetto, quindi nessuno può aggirarli. E notate che Java stampa un <code>double</code> di valore 100 come <code>100.0</code>.'
+        },
+        {
+          nome: '④ ereditarietà',
+          par: [{ id: 'nome', tipo: 'testo', et: 'nome del cane', val: 'Fido' }],
+          code: function (p) {
+            return '<span class="kw">class</span> <span class="ty">Animale</span> {\n' +
+              '    <span class="kw">protected</span> <span class="ty">String</span> nome;\n' +
+              '    <span class="ty">Animale</span>(<span class="ty">String</span> nome) { <span class="kw">this</span>.nome = nome; }\n' +
+              '    <span class="kw">void</span> verso() { <span class="ty">System</span>.out.println(nome + <span class="st">" fa un verso"</span>); }\n}\n\n' +
+              '<span class="kw">class</span> <span class="ty">Cane</span> <span class="kw">extends</span> <span class="ty">Animale</span> {\n' +
+              '    <span class="ty">Cane</span>(<span class="ty">String</span> nome) { <span class="kw">super</span>(nome); }\n' +
+              '    <span class="an">@Override</span>\n' +
+              '    <span class="kw">void</span> verso() { <span class="ty">System</span>.out.println(nome + <span class="st">" fa: bau!"</span>); }\n}\n\n' +
+              '<span class="cm">// nel main:</span>\n' +
+              '<span class="ty">Animale</span> a = <span class="kw">new</span> <span class="ty">Animale</span>(<span class="st">"Bestia"</span>);\n' +
+              '<span class="ty">Cane</span> c = <span class="kw">new</span> <span class="ty">Cane</span>(<span class="st">"' + esc(p.nome) + '"</span>);\n' +
+              'a.verso();\nc.verso();';
+          },
+          run: function (p) { return ['Bestia fa un verso', p.nome + ' fa: bau!']; },
+          nota: '<code>Cane</code> eredita l\'attributo <code>nome</code> e il costruttore lo passa al genitore con <code>super</code>. Poi <strong>ridefinisce</strong> <code>verso()</code>: l\'annotazione <code>@Override</code> chiede al compilatore di controllare che stia davvero sovrascrivendo qualcosa.'
+        },
+        {
+          nome: '⑤ polimorfismo',
+          par: [{ id: 'n1', tipo: 'testo', et: 'il cane', val: 'Fido' },
+                { id: 'n2', tipo: 'testo', et: 'il gatto', val: 'Micio' },
+                { id: 'n3', tipo: 'testo', et: 'l\'animale', val: 'Bestia' }],
+          code: function (p) {
+            return '<span class="cm">// Cane e Gatto estendono Animale e ridefiniscono verso()</span>\n\n' +
+              '<span class="ty">Animale</span>[] zoo = {\n' +
+              '    <span class="kw">new</span> <span class="ty">Cane</span>(<span class="st">"' + esc(p.n1) + '"</span>),\n' +
+              '    <span class="kw">new</span> <span class="ty">Gatto</span>(<span class="st">"' + esc(p.n2) + '"</span>),\n' +
+              '    <span class="kw">new</span> <span class="ty">Animale</span>(<span class="st">"' + esc(p.n3) + '"</span>)\n};\n\n' +
+              '<span class="kw">for</span> (<span class="ty">Animale</span> a : zoo) {\n' +
+              '    a.verso();      <span class="cm">// un solo ciclo, tre comportamenti</span>\n}';
+          },
+          run: function (p) {
+            return [p.n1 + ' fa: bau!', p.n2 + ' fa: miao!', p.n3 + ' fa un verso'];
+          },
+          nota: 'Il ciclo non contiene <strong>nessun <code>if</code></strong>: è l\'oggetto a sapere che verso fare. Aggiungendo domani una classe <code>Mucca</code>, questo ciclo funziona già — e non va toccato. È il vantaggio pratico del polimorfismo.'
+        },
+        {
+          nome: '⑥ interfaccia',
+          par: [{ id: 'nome', tipo: 'testo', et: 'nome dell\'uccello', val: 'Pino' }],
+          code: function (p) {
+            return '<span class="kw">interface</span> <span class="ty">Volante</span> {\n' +
+              '    <span class="kw">void</span> vola();      <span class="cm">// solo la firma: nessun codice</span>\n}\n\n' +
+              '<span class="kw">class</span> <span class="ty">Uccello</span> <span class="kw">extends</span> <span class="ty">Animale</span> <span class="kw">implements</span> <span class="ty">Volante</span> {\n' +
+              '    <span class="ty">Uccello</span>(<span class="ty">String</span> nome) { <span class="kw">super</span>(nome); }\n' +
+              '    <span class="an">@Override</span>\n' +
+              '    <span class="kw">void</span> verso() { <span class="ty">System</span>.out.println(nome + <span class="st">" fa: cip!"</span>); }\n' +
+              '    <span class="kw">public void</span> vola() { <span class="ty">System</span>.out.println(nome + <span class="st">" vola via"</span>); }\n}\n\n' +
+              '<span class="cm">// nel main:</span>\n' +
+              '<span class="ty">Uccello</span> u = <span class="kw">new</span> <span class="ty">Uccello</span>(<span class="st">"' + esc(p.nome) + '"</span>);\n' +
+              'u.verso();\nu.vola();';
+          },
+          run: function (p) { return [p.nome + ' fa: cip!', p.nome + ' vola via']; },
+          nota: 'Si legge: un uccello <strong>è</strong> un animale e <strong>sa</strong> volare. E la cosa notevole è che anche un aeroplano sa volare pur non essendo un animale: l\'interfaccia li accomuna senza metterli nella stessa gerarchia.'
+        }
+      ];
+      var k = 0, valori = {};
+
+      bottoni(document.getElementById('jv-pre'), ES.map(function (e) { return e.nome; }),
+        function (i) { k = i; costruisci(); }, 0);
+
+      function costruisci() {
+        var E = ES[k];
+        valori = {};
+        par.innerHTML = '';
+        E.par.forEach(function (P) {
+          valori[P.id] = P.val;
+          var lab = document.createElement('label');
+          lab.textContent = P.et + ' = ';
+          var inp = document.createElement('input');
+          inp.className = P.tipo === 'num' ? 'num-in' : 'txt-in';
+          inp.type = P.tipo === 'num' ? 'number' : 'text';
+          inp.value = P.val;
+          inp.addEventListener('input', function () {
+            valori[P.id] = P.tipo === 'num' ? (parseFloat(inp.value) || 0) : inp.value;
+            mostraCodice();
+          });
+          lab.appendChild(inp);
+          par.appendChild(lab);
+        });
+        mostraCodice();
+        term.innerHTML = '<span class="prompt">premi «esegui»…</span>';
+        var o = document.getElementById('jv-out');
+        o.innerHTML = E.nota;
+        mathIn(o);
+      }
+      function mostraCodice() { pre.innerHTML = ES[k].code(valori); }
+      function esegui() {
+        var righe = ES[k].run(valori);
+        term.innerHTML = '<span class="prompt">$ java Programma</span>\n' +
+          righe.map(esc).join('\n');
+      }
+      document.getElementById('jv-run').addEventListener('click', esegui);
+      costruisci();
+    }());
+
+    // =========================================================
+    // 3) L'ARCHITETTURA A LIVELLI
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('ar-svg');
+      if (!svg) { return; }
+      var LIV = [
+        { n: 'Presentazione', c: '#3b82f6',
+          d: 'Quello che l\'utente vede e tocca: pagine, pulsanti, schermate. <strong>Non contiene regole</strong>: se qui c\'è scritto «lo sconto è del 10%», quella regola è nel posto sbagliato e non la troverete più.' },
+        { n: 'Logica di business', c: '#10b981',
+          d: 'Le regole vere del problema: come si calcola uno sconto, quando un ordine è spedibile, chi può cancellare cosa. È il <strong>cuore</strong> del sistema, ed è l\'unico livello che parla il linguaggio del cliente.' },
+        { n: 'Accesso ai dati', c: '#f59e0b',
+          d: 'Traduce fra gli oggetti del programma e il modo in cui i dati sono salvati. Sta qui <em>proprio</em> perché domani si possa cambiare database toccando un solo livello.' },
+        { n: 'Database', c: '#8b5cf6',
+          d: 'Dove i dati restano quando il programma è spento. Non è codice vostro, ma le sue caratteristiche condizionano tutto quello che sta sopra.' }
+      ];
+      var sel = 1;
+      bottoni(document.getElementById('ar-pre'), LIV.map(function (l) { return l.n; }),
+        function (i) { sel = i; disegna(); }, 1);
+
+      function disegna() {
+        clear(svg);
+        var t = css('--text'), g = css('--border');
+        var BX = 120, BW = 440, BH = 58;
+        LIV.forEach(function (L, i) {
+          var y = 30 + i * 74, att = (i === sel);
+          svg.appendChild(el('rect', {
+            x: BX, y: y, width: BW, height: BH, rx: 10,
+            fill: L.c, 'fill-opacity': att ? 0.55 : 0.18,
+            stroke: L.c, 'stroke-width': att ? 3 : 1.6
+          }));
+          svg.appendChild(el('text', { x: BX + BW / 2, y: y + 35, class: att ? 'em' : 'lbl', 'text-anchor': 'middle' }, L.n));
+          if (i < LIV.length - 1) {
+            svg.appendChild(el('path', {
+              d: 'M ' + (BX + BW / 2) + ' ' + (y + BH) + ' L ' + (BX + BW / 2) + ' ' + (y + 74),
+              stroke: t, 'stroke-width': 2
+            }));
+            svg.appendChild(el('path', {
+              d: 'M ' + (BX + BW / 2 - 6) + ' ' + (y + 66) + ' L ' + (BX + BW / 2) + ' ' + (y + 75) +
+                 ' L ' + (BX + BW / 2 + 6) + ' ' + (y + 66) + ' Z', fill: t
+            }));
+          }
+        });
+        svg.appendChild(el('text', { x: 20, y: 20, class: 'lbl-s' }, 'ogni livello parla solo con quello sotto'));
+        svg.appendChild(el('path', {
+          d: 'M ' + (BX + BW + 20) + ' 60 C ' + (BX + BW + 90) + ' 60, ' + (BX + BW + 90) + ' 250, ' +
+             (BX + BW + 20) + ' 250',
+          fill: 'none', stroke: '#dc2626', 'stroke-width': 2.4, 'stroke-dasharray': '7 5'
+        }));
+        svg.appendChild(el('text', { x: BX + BW + 30, y: 160, class: 'lbl-s', fill: '#dc2626' }, 'saltare i livelli:'));
+        svg.appendChild(el('text', { x: BX + BW + 30, y: 178, class: 'lbl-s', fill: '#dc2626' }, 'è il debito tecnico'));
+        var o = document.getElementById('ar-out');
+        o.innerHTML = '<strong>' + LIV[sel].n + '</strong> — ' + LIV[sel].d;
+        mathIn(o);
+      }
+      disegna();
+    }());
+
+    var y = document.getElementById('year');
+    if (y) { y.textContent = new Date().getFullYear(); }
+  }());
+  </script>
+
+  <script>
+  window.quizData = [
+    { type: 'mc', diff: 'easy',
+      text: 'Qual è la differenza fra una <strong>classe</strong> e un <strong>oggetto</strong>?',
+      options: ['la classe è lo stampo, l\'oggetto è un esemplare concreto creato da quello stampo',
+                'sono la stessa cosa con due nomi diversi',
+                'la classe contiene solo dati, l\'oggetto solo metodi',
+                'l\'oggetto è più grande della classe'],
+      correct: 0,
+      explain: 'La classe <code>Studente</code> è una sola e sta scritta nel programma; di studenti concreti (<em>istanze</em>) se ne possono creare mille, ognuno coi suoi valori. È la stessa differenza fra la <em>definizione</em> di parabola e le infinite parabole che si possono disegnare.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Che cosa contiene un oggetto?',
+      options: ['solo dati', 'solo funzioni', 'i propri dati (attributi) e le proprie operazioni (metodi) insieme',
+                'una copia del programma'],
+      correct: 2,
+      explain: 'È l\'idea centrale: <em>tenere insieme quello che sta insieme</em>. Prima si tenevano elenchi paralleli di nomi, voti e classi, e bastava dimenticarne uno per attribuire i voti alla persona sbagliata.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Che cosa significa <code>private</code> davanti a un attributo?',
+      options: ['che è nascosto all\'utente finale', 'che non si può cambiare mai più',
+                'che vi possono accedere solo le sottoclassi',
+                'che vi può accedere solo la classe stessa, non altro codice'],
+      correct: 3,
+      explain: 'È l\'<strong>incapsulamento</strong>: il saldo di un conto è privato, e si modifica solo passando per <code>versa()</code> e <code>preleva()</code>, che contengono i controlli. <code>protected</code> è invece quello che estende l\'accesso alle sottoclassi.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'In Java, che cos\'è <code>main</code>?',
+      options: ['il metodo da cui parte l\'esecuzione del programma', 'il nome del file',
+                'una parola riservata del linguaggio', 'il costruttore della classe'],
+      correct: 0,
+      explain: 'Quando lanciate il programma, la macchina virtuale cerca <code>public static void main(String[] args)</code> e lo esegue. È <code>static</code> perché appartiene alla classe e non a un oggetto: non serve crearne uno per partire.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Nel laboratorio, versando $100$ euro su un conto vuoto Java stampa «Saldo: 100.0» e non «Saldo: 100». Perché?',
+      options: ['è un errore del simulatore', 'perché il saldo è dichiarato <code>double</code>, e Java stampa i decimali sempre con almeno una cifra dopo il punto',
+                'perché è in inglese', 'perché il conto è vuoto'],
+      correct: 1,
+      explain: 'È il comportamento reale di <code>Double.toString</code>: un valore decimale intero viene stampato con <code>.0</code>. Sembra un dettaglio, ma è il tipo di cosa che fa fallire un test automatico che si aspettava «100», ed è per questo che il simulatore lo riproduce fedelmente.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'La relazione di ereditarietà si legge come:',
+      options: ['«ha un»', '«usa un»', '«è un»', '«contiene un»'],
+      correct: 2,
+      explain: 'Un cane <em>è un</em> animale. Se la frase non suona bene, l\'ereditarietà è la scelta sbagliata: «un\'auto <em>è un</em> motore» è falso, mentre «un\'auto <em>ha un</em> motore» è giusto — e quella è <strong>composizione</strong>, che nella pratica si usa molto di più.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Nel ciclo <code>for (Animale a : zoo) { a.verso(); }</code> non c\'è nessun <code>if</code>. Perché funziona lo stesso con animali diversi?',
+      options: ['perché tutti gli animali fanno lo stesso verso',
+                'perché il compilatore aggiunge gli <code>if</code> automaticamente',
+                'per il <strong>polimorfismo</strong>: ogni oggetto sa quale versione del metodo eseguire',
+                'perché l\'array contiene solo cani'],
+      correct: 2,
+      explain: 'È il vantaggio pratico più grande della programmazione a oggetti: aggiungendo domani una classe <code>Mucca</code>, quel ciclo funziona già e non va toccato. Senza polimorfismo bisognerebbe tornare a modificare tutti i punti del programma che fanno un controllo sul tipo.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Qual è la differenza principale fra una classe astratta e un\'interfaccia in Java?',
+      options: ['l\'interfaccia è più veloce', 'di classi astratte se ne può estendere una sola, di interfacce se ne possono implementare quante si vuole',
+                'la classe astratta non può avere metodi', 'non c\'è differenza'],
+      correct: 1,
+      explain: 'La classe astratta risponde alla domanda «che cosa <em>è</em>?», l\'interfaccia a «che cosa <em>sa fare</em>?». Un uccello <em>è</em> un animale (una sola superclasse) e <em>sa</em> volare, nuotare, cantare (quante interfacce servono). Java ha vietato l\'ereditarietà multipla di classi per evitare il «problema del diamante» del C++.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Perché il classico esempio «Quadrato estende Rettangolo» è considerato una trappola?',
+      options: ['perché un quadrato non è un rettangolo',
+                'perché i quadrati sono più piccoli',
+                'perché in Java non si possono estendere le figure geometriche',
+                'perché il rettangolo ha larghezza e altezza indipendenti, mentre nel quadrato cambiarne una deve cambiare l\'altra: il codice scritto per i rettangoli si rompe se gli si passa un quadrato'],
+      correct: 3,
+      explain: 'È il <strong>principio di sostituzione di Liskov</strong> (1987): una sottoclasse deve poter sostituire la superclasse ovunque senza che nulla se ne accorga. Qui non è così, e quindi la gerarchia è sbagliata <em>anche se in italiano la frase «un quadrato è un rettangolo» suona benissimo</em>.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Che cos\'è l\'architettura di un software, in pratica?',
+      options: ['l\'insieme delle decisioni difficili da cambiare dopo',
+                'il diagramma delle classi',
+                'il linguaggio di programmazione scelto',
+                'la struttura delle cartelle del progetto'],
+      correct: 0,
+      explain: 'È una definizione operativa e utilissima: tutto ciò che si può cambiare in un pomeriggio non è architettura. È il motivo per cui anche i team più agili definiscono presto le scelte strutturali, pur rimandando volentieri quasi tutto il resto.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Che cosa si intende con «debito tecnico»?',
+      options: ['i soldi che l\'azienda deve ai fornitori di software',
+                'il costo delle licenze',
+                'il tempo perso in riunioni',
+                'gli interessi che si pagano, in lavoro aggiuntivo a ogni modifica futura, per aver scritto codice affrettato'],
+      correct: 3,
+      explain: 'La metafora è di Ward Cunningham: scrivere in fretta è come accendere un prestito — si ottiene subito qualcosa, ma da lì in poi si pagano interessi. Non è di per sé sbagliato, purché si sappia di averlo fatto e prima o poi si restituisca il capitale. Un progetto che accumula debito e non lo ripaga finisce per pagare solo interessi.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Progettando il software di una biblioteca, perché serve una classe <code>Prestito</code> anche se un prestito non è un oggetto fisico?',
+      options: ['non serve: basta un campo nel libro',
+                'perché tiene insieme chi ha preso cosa e quando, informazioni che non appartengono né al libro né allo studente',
+                'perché Java lo richiede',
+                'perché così ci sono più classi'],
+      correct: 1,
+      explain: 'Le classi più utili spesso rappresentano <strong>relazioni</strong>, non cose. Chi infila un campo <code>chiLoHa</code> dentro <code>Libro</code> poi non sa dove mettere la data di scadenza, e non riesce a tenere lo storico dei prestiti passati. E il modello dipende sempre dallo scopo: se servisse gestire più copie dello stesso titolo, occorrerebbe distinguere fra <em>titolo</em> e <em>copia</em>.' },
+
+    { type: 'open',
+      text: 'Spiega che cos\'è l\'incapsulamento e dài due ragioni concrete per cui conviene rendere privati gli attributi di una classe.',
+      keywords: ['private', 'metodi', 'controlli', 'coerenza', 'cambiare', 'interno', 'nascond', 'aggirare', 'un solo punto'],
+      requiredMatches: 3,
+      explain: 'L\'incapsulamento consiste nel <strong>nascondere i dati</strong> di un oggetto rendendoli accessibili solo attraverso i suoi metodi. Le due ragioni: <strong>(1) protegge la coerenza</strong> — se il saldo si può cambiare solo passando per <code>preleva()</code>, il controllo «non scendere sotto zero» sta in un unico punto e non si può aggirare da nessuna parte del programma; <strong>(2) permette di cambiare idea</strong> — se domani il saldo va tenuto in centesimi interi invece che in euro decimali, si modifica dentro la classe e nessun altro file va toccato, perché chi sta fuori continua a vedere gli stessi metodi. In più riduce quello che bisogna sapere per usare l\'oggetto: due metodi invece di dieci attributi.' },
+
+    { type: 'open',
+      text: 'Perché si dice che un modello a oggetti è «un modello» e non la descrizione vera della realtà? Fai un esempio.',
+      keywords: ['scopo', 'programma', 'serve', 'buttare', 'tenere', 'punto materiale', 'dipende', 'diverso', 'astra'],
+      requiredMatches: 3,
+      explain: 'Perché come ogni modello — il punto materiale in fisica, il corpo rigido — <strong>tiene alcune cose e ne butta via altre</strong>, e la scelta dipende da <em>a che cosa serve il programma</em>. Nel software di una scuola uno studente ha nome, classe e voti; nel software della mensa lo stesso studente ha allergie e credito residuo, e i voti non c\'entrano niente. Non esiste «lo Studente giusto»: esiste quello giusto per quel programma. È lo stesso motivo per cui, progettando una biblioteca, un libro ha titolo e codice ma non il numero di pagine — a nessuna delle operazioni richieste serve. E ci sono interi domini (calcolo numerico, trasformazioni di dati, compilatori) in cui gli oggetti <em>non</em> sono la rappresentazione migliore, e si lavora meglio con le funzioni.' }
+  ];
+  </script>
+
+</body>
+
+</html>

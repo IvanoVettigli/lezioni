@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 4 — Esponenziali e logaritmi</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .storia { border-left: 4px solid var(--magenta); background: color-mix(in srgb, var(--magenta) 7%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 680px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.l { text-align: left; }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabwrap { overflow-x: auto; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .ric { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .ric > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                 padding: 0.8rem 0.9rem; background: var(--surface); }
+    .ric h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+
+    .sub-es { margin: 0.3rem 0 0.3rem 0.2rem; }
+    .sub-es li { margin: 0.25rem 0; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quarto anno · Lezione 4</div>
+    <h1>Esponenziali e logaritmi</h1>
+    <p>L'incognita sale all'esponente, e per tirarla giù
+      serve un'operazione nuova</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quarto anno</a>
+    <span class="sep">/</span> Esponenziali e logaritmi
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>L'idea in una riga.</strong> Ogni operazione, in matematica, si porta dietro la sua
+      <em>inversa</em>: l'addizione la sottrazione, la moltiplicazione la divisione, l'elevamento a potenza
+      la radice. Ma l'elevamento a potenza ha due «ingressi» diversi — la base e l'esponente — e quindi ha
+      <strong>due</strong> inverse. Se non conosco la base, la trovo con la <em>radice</em>: da $x^3 = 8$
+      ricavo $x = \sqrt[3]{8}$. Se invece non conosco l'<strong>esponente</strong>, da $2^x = 8$, la radice
+      non serve a niente: serve un'operazione nuova, e quell'operazione si chiama
+      <strong>logaritmo</strong>. Tutta questa lezione nasce da qui.
+    </div>
+
+    <!-- 1 — LE POTENZE -->
+    <section id="sec1">
+      <h2>1. Ripasso: le potenze e le loro regole</h2>
+
+      <p>Prima di salire all'esponente conviene mettere in ordine quello che già sappiamo fare con le potenze,
+        perché <strong>tutte</strong> le proprietà dei logaritmi nasceranno da queste. Non sono formule nuove:
+        sono le stesse cinque regole del biennio, guardate con più attenzione.</p>
+
+      <div class="definition">
+        <div class="formula-title">Le cinque regole delle potenze (con $a, b \gt 0$)</div>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th>nome</th><th>regola</th><th>perché</th></tr>
+          <tr><td class="lab">P1 · prodotto</td><td>$a^m \cdot a^n = a^{m+n}$</td><td class="l">si contano quanti fattori uguali ci sono in tutto</td></tr>
+          <tr><td class="lab">P2 · quoziente</td><td>$\dfrac{a^m}{a^n} = a^{m-n}$</td><td class="l">i fattori del denominatore si semplificano</td></tr>
+          <tr><td class="lab">P3 · potenza di potenza</td><td>$(a^m)^n = a^{m \cdot n}$</td><td class="l">$n$ gruppi da $m$ fattori ciascuno</td></tr>
+          <tr><td class="lab">P4 · distributiva</td><td>$(ab)^n = a^n b^n$, &nbsp; $\left(\dfrac{a}{b}\right)^n = \dfrac{a^n}{b^n}$</td><td class="l">si riordinano i fattori</td></tr>
+          <tr><td class="lab">P5 · esponenti speciali</td><td>$a^0 = 1$, &nbsp; $a^{-n} = \dfrac{1}{a^n}$, &nbsp; $a^{m/n} = \sqrt[n]{a^m}$</td><td class="l">sono <em>definizioni</em>, scelte perché P1-P4 continuino a valere</td></tr>
+        </table>
+        </div>
+      </div>
+
+      <div class="warnbox"><strong>P5 non si dimostra: si sceglie.</strong> Che senso ha moltiplicare un numero
+        per sé stesso «zero volte», o «meno tre volte», o «due terzi di volta»? Nessuno, se si resta
+        all'immagine dei fattori ripetuti. Quelle scritture sono <em>definizioni</em>, e sono state scelte
+        nell'unico modo che <strong>non rompe le regole precedenti</strong>. Per esempio: se P2 deve valere
+        anche per $m = n$, allora $\frac{a^m}{a^m} = a^0$; ma quel rapporto vale $1$, quindi $a^0$
+        <em>deve</em> valere $1$. Allo stesso modo, se $a^{1/2}$ deve rispettare P3, allora
+        $(a^{1/2})^2 = a^1 = a$, cioè $a^{1/2}$ è il numero che elevato al quadrato dà $a$: è $\sqrt a$. È un
+        modo di ragionare che in matematica si incontra spesso — si estende una definizione <em>obbligando</em>
+        le proprietà a sopravvivere.</div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="pt-btns">
+          <button class="btn btn-sm active" data-p="p1">P1 · $a^m a^n$</button>
+          <button class="btn btn-sm" data-p="p2">P2 · $a^m / a^n$</button>
+          <button class="btn btn-sm" data-p="p3">P3 · $(a^m)^n$</button>
+          <button class="btn btn-sm" data-p="p5">P5 · esponenti negativi e frazionari</button>
+        </div>
+        <div class="ctrl">
+          <label>base $a$ <span class="val-badge" id="pt-av">2</span></label>
+          <input type="range" id="pt-a" min="2" max="10" step="1" value="2" style="flex:1;min-width:130px">
+          <label>$m$ <span class="val-badge" id="pt-mv">3</span></label>
+          <input type="range" id="pt-m" min="-4" max="6" step="1" value="3" style="flex:1;min-width:130px">
+          <label>$n$ <span class="val-badge" id="pt-nv">2</span></label>
+          <input type="range" id="pt-n" min="-4" max="6" step="1" value="2" style="flex:1;min-width:130px">
+        </div>
+        <svg id="pt-svg" viewBox="0 0 680 280" role="img" aria-label="Le regole delle potenze verificate sui numeri"></svg>
+        <p class="cap" id="pt-cap"></p>
+        <p class="formula-note">Il pannello confronta i <strong>due membri</strong> della regola calcolati
+          separatamente: sono sempre lo stesso numero, anche con esponenti negativi. Provate $m = 3$ e
+          $n = -3$ nella prima regola e guardate che cosa succede.</p>
+      </div>
+
+      <h3>1.1 — Tre esercizi per ogni regola</h3>
+
+      <div class="exercise">
+        <p><strong>① Esercizio (P1 · prodotto).</strong> Semplifica:</p>
+        <ol class="sub-es" type="a">
+          <li>$3^4 \cdot 3^7$</li>
+          <li>$x^{5} \cdot x^{-2} \cdot x$</li>
+          <li>$2^{n+1} \cdot 2^{n-3}$</li>
+        </ol>
+        <button class="btn btn-toggle btn-solution" data-target="#e1s">Mostra la soluzione</button>
+        <div class="solution" id="e1s">
+          <p>(a) $3^{4+7} = 3^{11} = 177\,147$.</p>
+          <p>(b) $x^{5-2+1} = x^4$ (ricordando che $x = x^1$).</p>
+          <p>(c) $2^{(n+1)+(n-3)} = 2^{2n-2}$.</p>
+          <p class="formula-note">Gli esponenti si <strong>sommano</strong>, le basi restano. L'errore tipico
+            è scrivere $9^{11}$ in (a): la base non si tocca mai.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>② Esercizio (P2 · quoziente).</strong> Semplifica:</p>
+        <ol class="sub-es" type="a">
+          <li>$\dfrac{5^9}{5^6}$</li>
+          <li>$\dfrac{a^3}{a^7}$</li>
+          <li>$\dfrac{10^{-2}}{10^{-5}}$</li>
+        </ol>
+        <button class="btn btn-toggle btn-solution" data-target="#e2s">Mostra la soluzione</button>
+        <div class="solution" id="e2s">
+          <p>(a) $5^{9-6} = 5^3 = 125$.</p>
+          <p>(b) $a^{3-7} = a^{-4} = \dfrac{1}{a^4}$.</p>
+          <p>(c) $10^{-2-(-5)} = 10^{3} = 1000$.</p>
+          <p class="formula-note">In (c) l'errore frequente è dimenticare che sottrarre un numero negativo
+            equivale ad aggiungerlo. Il controllo: $10^{-2} = 0{,}01$ e $10^{-5} = 0{,}00001$, e infatti
+            $0{,}01 / 0{,}00001 = 1000$ ✓.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>③ Esercizio (P3 · potenza di potenza).</strong> Semplifica:</p>
+        <ol class="sub-es" type="a">
+          <li>$(2^3)^4$</li>
+          <li>$\left(x^{-2}\right)^{-3}$</li>
+          <li>$\left(3^{1/2}\right)^{6}$</li>
+        </ol>
+        <button class="btn btn-toggle btn-solution" data-target="#e3s">Mostra la soluzione</button>
+        <div class="solution" id="e3s">
+          <p>(a) $2^{12} = 4096$.</p>
+          <p>(b) $x^{(-2)(-3)} = x^{6}$.</p>
+          <p>(c) $3^{3} = 27$.</p>
+          <p class="warnbox" style="margin:0.6rem 0 0;"><strong>Da non confondere:</strong> $(2^3)^4 = 2^{12}$,
+            ma $2^{3^4} = 2^{81}$, che è un numero di venticinque cifre. Senza parentesi, la potenza di potenza
+            si calcola <strong>dall'alto verso il basso</strong>. Non è una convenzione arbitraria: se si
+            calcolasse dal basso, $2^{3^4}$ significherebbe $(2^3)^4 = 2^{12}$, e quella scrittura sarebbe
+            inutile perché si può già scrivere come $2^{12}$.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>④ Esercizio (P4 · distributiva).</strong> Semplifica:</p>
+        <ol class="sub-es" type="a">
+          <li>$(2x)^5$</li>
+          <li>$\left(\dfrac{3}{a}\right)^{4}$</li>
+          <li>$\dfrac{6^8}{3^8}$</li>
+        </ol>
+        <button class="btn btn-toggle btn-solution" data-target="#e4s">Mostra la soluzione</button>
+        <div class="solution" id="e4s">
+          <p>(a) $2^5 x^5 = 32x^5$.</p>
+          <p>(b) $\dfrac{3^4}{a^4} = \dfrac{81}{a^4}$.</p>
+          <p>(c) Qui la regola si usa <em>al contrario</em>: $\dfrac{6^8}{3^8} = \left(\dfrac63\right)^8 = 2^8 = 256$.</p>
+          <p class="warnbox" style="margin:0.6rem 0 0;"><strong>Attenzione:</strong> P4 vale per prodotti e
+            quozienti, <strong>non per somme</strong>. $(a+b)^2 \ne a^2 + b^2$: c'è il doppio prodotto, come
+            insegna il prodotto notevole del terzo anno. È l'errore più diffuso di tutta la matematica del
+            biennio, e sopravvive fino all'università.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑤ Esercizio (P5 · esponenti speciali).</strong> Calcola:</p>
+        <ol class="sub-es" type="a">
+          <li>$\left(\dfrac{2}{3}\right)^{-3}$</li>
+          <li>$8^{2/3}$</li>
+          <li>$16^{-3/4}$</li>
+        </ol>
+        <button class="btn btn-toggle btn-solution" data-target="#e5s">Mostra la soluzione</button>
+        <div class="solution" id="e5s">
+          <p>(a) Esponente negativo = reciproco: $\left(\dfrac32\right)^{3} = \dfrac{27}{8}$.</p>
+          <p>(b) $8^{2/3} = \sqrt[3]{8^2} = \sqrt[3]{64} = 4$. Oppure, più furbo,
+            $\left(\sqrt[3]{8}\right)^2 = 2^2 = 4$: conviene <strong>fare prima la radice</strong>, i numeri
+            restano piccoli.</p>
+          <p>(c) $16^{-3/4} = \dfrac{1}{16^{3/4}} = \dfrac{1}{\left(\sqrt[4]{16}\right)^3} = \dfrac{1}{2^3} = \dfrac18$.</p>
+          <p class="formula-note">Riassunto delle tre mosse: il <strong>segno</strong> dell'esponente dice se
+            fare il reciproco; il <strong>denominatore</strong> dice che radice estrarre; il
+            <strong>numeratore</strong> dice a che potenza elevare.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 — LA FUNZIONE ESPONENZIALE -->
+    <section id="sec2">
+      <h2>2. Dalla potenza alla funzione esponenziale</h2>
+
+      <p>Finora l'esponente è stato un numero <em>intero</em>, poi <em>razionale</em>. La mossa nuova è
+        lasciarlo diventare un numero reale qualunque e considerare la <strong>funzione</strong></p>
+
+      <div class="formula">$$y = a^x, \qquad \text{con } a \gt 0,\ a \ne 1$$</div>
+
+      <div class="ric">
+        <div><h4>Perché $a \gt 0$</h4><p>Con base negativa la funzione si sbriciola: $(-4)^{1/2}$ non esiste
+          nei reali, $(-4)^{1/3} = -\sqrt[3]{4}$ esiste, $(-4)^{1/4}$ no. Il grafico sarebbe un pulviscolo di
+          punti sconnessi, inutilizzabile.</p></div>
+        <div><h4>Perché $a \ne 1$</h4><p>Perché $1^x = 1$ per ogni $x$: sarebbe una retta orizzontale, e
+          soprattutto non sarebbe invertibile — a un solo valore di $y$ corrisponderebbero infiniti $x$, e il
+          logaritmo non potrebbe esistere.</p></div>
+        <div><h4>Che cosa vuol dire $2^{\sqrt2}$</h4><p>Si prende una successione di razionali che si
+          avvicinano a $\sqrt2 = 1{,}41421\ldots$ — cioè $2^{1{,}4}$, $2^{1{,}41}$, $2^{1{,}414}$… — e si
+          osserva che i risultati si avvicinano a un numero preciso, $2{,}66514\ldots$ Quel numero
+          <em>è</em> $2^{\sqrt2}$.</p></div>
+      </div>
+
+      <p class="formula-note">Il terzo riquadro è il punto delicato: la definizione «per continuità» si
+        formalizza davvero solo con i limiti, al quinto anno. Per adesso basta sapere che <strong>si
+        può</strong> farlo, e che tutte le regole P1-P5 continuano a valere anche con esponenti irrazionali —
+        è proprio questa la ragione per cui l'estensione è quella giusta.</p>
+
+      <div class="definition">
+        <div class="formula-title">Le due proprietà che useremo sempre</div>
+        <p><span class="step-num">1</span> $a^x$ è <strong>sempre positivo</strong>, qualunque sia $x$: una
+          potenza di base positiva non può dare zero né un numero negativo. In particolare l'equazione
+          $2^x = -5$ è impossibile, e non serve calcolare niente per dirlo.</p>
+        <p><span class="step-num">2</span> $a^x$ è <strong>strettamente monotona</strong>: crescente se
+          $a \gt 1$, decrescente se $0 \lt a \lt 1$. Quindi è <strong>invertibile</strong>: valori diversi di
+          $x$ danno sempre risultati diversi.</p>
+        <p class="formula-note">Dalla seconda discende la regola d'oro per le equazioni:
+          $a^{f(x)} = a^{g(x)} \iff f(x) = g(x)$. Se le basi sono uguali, si possono «togliere».</p>
+      </div>
+
+      <div class="curiosita"><strong>Quanto cresce in fretta un esponenziale.</strong> Un foglio di carta è
+        spesso circa $0{,}1$ mm. Piegandolo a metà $10$ volte si arriva a $0{,}1 \cdot 2^{10} \approx 10$ cm;
+        a $20$ pieghe si supera il centinaio di metri; a $30$ si passano i $100$ km, cioè si esce
+        dall'atmosfera; a $42$ pieghe si arriverebbe alla Luna, e a $103$ si supererebbe il diametro
+        dell'universo osservabile. Nessuna funzione polinomiale fa una cosa del genere: prima o poi
+        <strong>ogni</strong> esponenziale con base maggiore di $1$ supera <strong>ogni</strong> polinomio,
+        per quanto alto sia il suo grado. Lo vedremo con calma nella lezione 5.</div>
+    </section>
+
+    <!-- 3 — IL LOGARITMO -->
+    <section id="sec3">
+      <h2>3. Il logaritmo: l'operazione che tira giù l'esponente</h2>
+
+      <p>Riprendiamo la domanda dell'introduzione. Da $2^x = 8$ si ricava $x = 3$ a occhio, perché $8$ è una
+        potenza di $2$. Ma da $2^x = 10$? La risposta esiste — l'esponenziale è continuo e crescente, quindi
+        passa per il valore $10$ una e una sola volta, da qualche parte fra $3$ e $4$ — ma non è nessun numero
+        che sappiamo scrivere con le operazioni note. Le diamo un nome.</p>
+
+      <div class="definition">
+        <div class="formula-title">Logaritmo</div>
+        <p>Dati $a \gt 0$ con $a \ne 1$ e $b \gt 0$, si chiama <strong>logaritmo in base $a$ di $b$</strong>
+          l'esponente da dare ad $a$ per ottenere $b$:</p>
+        <div class="formula">$$\log_a b = x \iff a^x = b$$</div>
+        <p class="formula-note">Sono due modi di scrivere la stessa cosa. $\log_2 8 = 3$ perché $2^3 = 8$;
+          $\log_{10} 1000 = 3$ perché $10^3 = 1000$; $\log_5 \frac{1}{25} = -2$ perché $5^{-2} = \frac{1}{25}$.
+          Il modo più rapido di leggere la scrittura è: «<em>a</em> elevato a <em>cosa</em> fa <em>b</em>?».</p>
+      </div>
+
+      <div class="warnbox"><strong>Le condizioni non sono un cavillo.</strong> Perché $b \gt 0$? Perché $a^x$
+        è sempre positivo: non esiste nessun esponente che dia un risultato negativo o nullo, quindi
+        $\log_2(-8)$ e $\log_2 0$ <strong>non esistono</strong>. Perché $a \gt 0$ e $a \ne 1$? Perché la base
+        deve essere quella di un esponenziale invertibile: con $a = 1$ si avrebbe $1^x = 1$ sempre, e
+        $\log_1 5$ chiederebbe un esponente che non esiste, mentre $\log_1 1$ ne avrebbe infiniti. Queste
+        condizioni diventeranno le <em>condizioni di esistenza</em> delle equazioni della lezione 6, ed è lì
+        che si perdono i punti se non si sono capite adesso.</div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="lg-btns">
+          <button class="btn btn-sm active" data-b="2">base 2</button>
+          <button class="btn btn-sm" data-b="10">base 10</button>
+          <button class="btn btn-sm" data-b="2.71828">base e</button>
+          <button class="btn btn-sm" data-b="0.5">base 1/2</button>
+        </div>
+        <div class="ctrl">
+          <label>argomento $b$ <span class="val-badge" id="lg-bv">8,00</span></label>
+          <input type="range" id="lg-b" min="0.05" max="64" step="0.05" value="8" style="flex:1;min-width:230px">
+        </div>
+        <svg id="lg-svg" viewBox="0 0 680 300" role="img" aria-label="Il logaritmo come lettura inversa dell'esponenziale"></svg>
+        <p class="cap" id="lg-cap"></p>
+        <p class="formula-note">La curva è l'esponenziale $y = a^x$; il logaritmo si legge
+          <strong>al contrario</strong>: si entra dall'asse verticale con il valore $b$, si va a incontrare la
+          curva, si scende sull'asse orizzontale e si trova l'esponente. È la stessa tabella letta in
+          direzione opposta — esattamente come l'arcoseno nella lezione 1.</p>
+      </div>
+
+      <div class="curiosita"><strong>Le tre basi che si incontrano davvero.</strong> La base <strong>10</strong>
+        è quella dei <em>logaritmi decimali</em>, scritti $\log b$ o $\text{Log}\,b$: comodissima con il nostro
+        sistema di numerazione, perché $\log 1000 = 3$ conta le cifre. La base <strong>2</strong> domina
+        l'informatica: $\log_2 n$ è il numero di bit che servono per distinguere $n$ cose, ed è il numero di
+        dimezzamenti in una ricerca binaria. La base <strong>$e = 2{,}71828\ldots$</strong> — il
+        <em>numero di Nepero</em> — dà i <em>logaritmi naturali</em>, scritti $\ln b$: sembra la più strana
+        delle tre ed è invece quella che semplifica tutte le formule dell'analisi. Perché, lo capirete al
+        quinto anno; per adesso accettatela come una scelta che si rivelerà felice.</div>
+
+      <div class="definition">
+        <div class="formula-title">Le due identità fondamentali</div>
+        <div class="formula">$$a^{\log_a b} = b \qquad\qquad \log_a(a^x) = x$$</div>
+        <p class="formula-note">Dicono che esponenziale e logaritmo si <strong>annullano a vicenda</strong>:
+          sono l'una l'inversa dell'altra. La prima è la definizione riscritta; la seconda dice che «l'esponente
+          da dare ad $a$ per ottenere $a^x$» è, ovviamente, $x$. Sembrano banali, e sono i due attrezzi più
+          usati di tutto il capitolo.</p>
+      </div>
+    </section>
+
+    <!-- 4 — LE PROPRIETÀ DEI LOGARITMI -->
+    <section id="sec4">
+      <h2>4. Le proprietà dei logaritmi</h2>
+
+      <p>Ecco il punto in cui tutto si tiene: <strong>ogni proprietà dei logaritmi è una proprietà delle
+        potenze, tradotta</strong>. Non c'è niente di nuovo da imparare, c'è solo da rileggere la tabella
+        della sezione 1 dall'altra parte.</p>
+
+      <div class="tabwrap">
+      <table class="tabf">
+        <tr><th>proprietà delle potenze</th><th>diventa, per i logaritmi</th><th>a parole</th></tr>
+        <tr><td>P1 &nbsp; $a^m a^n = a^{m+n}$</td><td>L1 &nbsp; $\log_a(xy) = \log_a x + \log_a y$</td><td class="l">il prodotto diventa <strong>somma</strong></td></tr>
+        <tr><td>P2 &nbsp; $a^m / a^n = a^{m-n}$</td><td>L2 &nbsp; $\log_a\dfrac{x}{y} = \log_a x - \log_a y$</td><td class="l">il quoziente diventa <strong>differenza</strong></td></tr>
+        <tr><td>P3 &nbsp; $(a^m)^n = a^{mn}$</td><td>L3 &nbsp; $\log_a(x^k) = k\log_a x$</td><td class="l">la potenza diventa <strong>prodotto</strong></td></tr>
+        <tr><td>P5 &nbsp; $a^0 = 1$, $a^1 = a$</td><td>L5 &nbsp; $\log_a 1 = 0$, &nbsp; $\log_a a = 1$</td><td class="l">i due valori da sapere a memoria</td></tr>
+        <tr><td>—</td><td>L4 &nbsp; $\log_a x = \dfrac{\log_b x}{\log_b a}$</td><td class="l"><strong>cambio di base</strong></td></tr>
+      </table>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Dimostrazione di L1 (le altre sono identiche)</div>
+        <p>Pongo $m = \log_a x$ e $n = \log_a y$, cioè $x = a^m$ e $y = a^n$. Allora</p>
+        <div class="formula">$$xy = a^m \cdot a^n = a^{m+n}$$</div>
+        <p>e quindi, per definizione di logaritmo, $\log_a(xy) = m + n = \log_a x + \log_a y$. ∎</p>
+        <p class="formula-note">Tutta la dimostrazione sta nella riga centrale, che è P1. Il resto è
+          traduzione. Provate a rifare da soli L2 e L3 partendo da P2 e P3: sono tre righe ciascuna, e farle
+          una volta vale più che rileggerle dieci.</p>
+      </div>
+
+      <div class="warnbox"><strong>Le tre scritture che non esistono.</strong> Sono gli errori più frequenti,
+        e valgono la pena di essere scritti esplicitamente per riconoscerli:
+        <div class="formula">$$\log_a(x+y) \ne \log_a x + \log_a y \qquad
+          \log_a(xy) \ne \log_a x \cdot \log_a y \qquad
+          \frac{\log_a x}{\log_a y} \ne \log_a\frac{x}{y}$$</div>
+        Il logaritmo trasforma il <em>prodotto</em> in somma, non la somma in qualcosa. Controprova numerica
+        della prima: $\log_{10}(10 + 90) = \log_{10} 100 = 2$, mentre
+        $\log_{10} 10 + \log_{10} 90 = 1 + 1{,}954 = 2{,}954$. Diversi.</div>
+
+      <div class="definition">
+        <div class="formula-title">Il cambio di base, e perché serve</div>
+        <div class="formula">$$\log_a x = \frac{\log_b x}{\log_b a}$$</div>
+        <p class="formula-note"><strong>Dimostrazione:</strong> pongo $t = \log_a x$, cioè $a^t = x$.
+          Applico $\log_b$ a entrambi i membri e uso L3: $t\log_b a = \log_b x$, da cui la tesi.</p>
+        <p class="formula-note">Serve per una ragione molto pratica: la calcolatrice ha solo i tasti
+          <em>log</em> (base 10) e <em>ln</em> (base $e$). Per calcolare $\log_2 10$ si scrive
+          $\dfrac{\log 10}{\log 2} = \dfrac{1}{0{,}30103} = 3{,}3219$. Un caso particolare utile:
+          $\log_a b = \dfrac{1}{\log_b a}$.</p>
+      </div>
+
+      <h3>4.1 — Tre esercizi per ogni proprietà</h3>
+
+      <div class="exercise">
+        <p><strong>⑥ Esercizio (L1 · prodotto).</strong> Calcola senza calcolatrice:</p>
+        <ol class="sub-es" type="a">
+          <li>$\log_2(8 \cdot 4)$</li>
+          <li>$\log 2 + \log 50$</li>
+          <li>$\log_3 6 + \log_3 4{,}5$</li>
+        </ol>
+        <button class="btn btn-toggle btn-solution" data-target="#e6s">Mostra la soluzione</button>
+        <div class="solution" id="e6s">
+          <p>(a) $\log_2 32 = 5$; oppure $\log_2 8 + \log_2 4 = 3 + 2 = 5$. Stesso risultato per due
+            strade.</p>
+          <p>(b) $\log(2 \cdot 50) = \log 100 = 2$.</p>
+          <p>(c) $\log_3(6 \cdot 4{,}5) = \log_3 27 = 3$.</p>
+          <p class="formula-note">La regola si usa quasi sempre <strong>al contrario</strong>: si sommano due
+            logaritmi «brutti» per ottenerne uno «bello». In (c) né $\log_3 6$ né $\log_3 4{,}5$ sono numeri
+            semplici, ma il loro prodotto sì.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑦ Esercizio (L2 · quoziente).</strong> Calcola:</p>
+        <ol class="sub-es" type="a">
+          <li>$\log_2 32 - \log_2 8$</li>
+          <li>$\log 500 - \log 5$</li>
+          <li>$\log_5 \dfrac{1}{25}$</li>
+        </ol>
+        <button class="btn btn-toggle btn-solution" data-target="#e7s">Mostra la soluzione</button>
+        <div class="solution" id="e7s">
+          <p>(a) $\log_2\dfrac{32}{8} = \log_2 4 = 2$.</p>
+          <p>(b) $\log\dfrac{500}{5} = \log 100 = 2$.</p>
+          <p>(c) $\log_5 1 - \log_5 25 = 0 - 2 = -2$. Verifica: $5^{-2} = \frac{1}{25}$ ✓.</p>
+          <p class="formula-note">Il punto (c) mostra un fatto generale: il logaritmo di un numero
+            <strong>compreso fra 0 e 1</strong> è negativo (se la base è maggiore di $1$). Un logaritmo
+            negativo non è un errore: significa solo che il numero è più piccolo di $1$.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑧ Esercizio (L3 · potenza).</strong> Calcola:</p>
+        <ol class="sub-es" type="a">
+          <li>$\log_2 8^3$</li>
+          <li>$\log 10^{-4}$</li>
+          <li>$\log_3 \sqrt3$</li>
+        </ol>
+        <button class="btn btn-toggle btn-solution" data-target="#e8s">Mostra la soluzione</button>
+        <div class="solution" id="e8s">
+          <p>(a) $3\log_2 8 = 3 \cdot 3 = 9$. Controllo: $8^3 = 512 = 2^9$ ✓.</p>
+          <p>(b) $-4\log 10 = -4$.</p>
+          <p>(c) $\sqrt3 = 3^{1/2}$, quindi $\log_3 3^{1/2} = \dfrac12$.</p>
+          <p class="formula-note">L3 è la proprietà che rende i logaritmi <em>utili</em>: trasforma un
+            esponente in un fattore, e quindi tira giù l'incognita quando sta in alto. È la mossa su cui si
+            regge tutta la lezione 6.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑨ Esercizio (L4 · cambio di base).</strong> Calcola:</p>
+        <ol class="sub-es" type="a">
+          <li>$\log_8 32$</li>
+          <li>$\log_9 27$</li>
+          <li>$\log_2 10$ con la calcolatrice</li>
+        </ol>
+        <button class="btn btn-toggle btn-solution" data-target="#e9s">Mostra la soluzione</button>
+        <div class="solution" id="e9s">
+          <p>(a) Passo in base $2$, dove tutto è semplice:
+            $\log_8 32 = \dfrac{\log_2 32}{\log_2 8} = \dfrac{5}{3}$.</p>
+          <p>Verifica: $8^{5/3} = \left(\sqrt[3]{8}\right)^5 = 2^5 = 32$ ✓.</p>
+          <p>(b) $\log_9 27 = \dfrac{\log_3 27}{\log_3 9} = \dfrac{3}{2}$.</p>
+          <p>(c) $\log_2 10 = \dfrac{\log 10}{\log 2} = \dfrac{1}{0{,}301030} = 3{,}32193$.</p>
+          <p class="formula-note">La strategia di (a) e (b) è sempre la stessa: <strong>scegliere una base in
+            cui entrambi i numeri siano potenze intere</strong>. Con $8$ e $32$ la base giusta è $2$; con $9$
+            e $27$ è $3$. Il valore di (c) è da tenere a mente: dice che servono poco più di
+            <em>tre bit e un terzo</em> per rappresentare una cifra decimale.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑩ Esercizio (L5 · valori notevoli e identità).</strong> Calcola:</p>
+        <ol class="sub-es" type="a">
+          <li>$\log_7 1$</li>
+          <li>$\log_5 5 + \log_{100} 100$</li>
+          <li>$3^{\log_3 7}$</li>
+        </ol>
+        <button class="btn btn-toggle btn-solution" data-target="#e10s">Mostra la soluzione</button>
+        <div class="solution" id="e10s">
+          <p>(a) $0$: qualunque base elevata a zero dà $1$.</p>
+          <p>(b) $1 + 1 = 2$: il logaritmo della base è sempre $1$.</p>
+          <p>(c) $7$, per l'identità fondamentale $a^{\log_a b} = b$ — le due operazioni si annullano.</p>
+          <p class="formula-note">Il punto (c) sembra un gioco di prestigio e invece è la definizione stessa
+            letta al contrario: $\log_3 7$ è «l'esponente da dare a $3$ per ottenere $7$», quindi dandolo a
+            $3$ si ottiene $7$. Questa identità è la chiave per risolvere le equazioni esponenziali della
+            lezione 6.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — A CHE SERVONO -->
+    <section id="sec5">
+      <h2>5. A che cosa servivano davvero: trasformare moltiplicazioni in addizioni</h2>
+
+      <p>Oggi i logaritmi si studiano perché servono a risolvere equazioni e a descrivere fenomeni. Ma non
+        sono nati per questo. Sono nati per un motivo molto più terreno: <strong>moltiplicare due numeri di
+        otto cifre a mano è un incubo, sommarli no</strong>.</p>
+
+      <div class="storia">
+        <p><strong>John Napier, 1614.</strong> Il barone scozzese di Merchiston pubblica la
+          <em>Mirifici Logarithmorum Canonis Descriptio</em>, frutto di vent'anni di calcoli. L'idea: costruire
+          una tabella che associ a ogni numero un «esponente», in modo che il prodotto di due numeri
+          corrisponda alla <em>somma</em> dei loro esponenti. Il nome che inventa unisce il greco
+          <em>lógos</em> (rapporto, proporzione) e <em>arithmós</em> (numero): <em>logaritmo</em>, «numero
+          della proporzione».</p>
+        <p><strong>Henry Briggs, 1617-1624.</strong> Il professore di geometria a Oxford va a trovare Napier in
+          Scozia — quattro giorni di viaggio — e i due concordano un miglioramento decisivo: usare la
+          <strong>base 10</strong>, così che $\log 1 = 0$ e $\log 10 = 1$. Briggs calcola a mano i logaritmi
+          decimali di $30\,000$ numeri con <strong>quattordici cifre decimali</strong>. È uno degli sforzi di
+          calcolo più impressionanti della storia, e le sue tavole restano in uso, con correzioni marginali,
+          per oltre tre secoli.</p>
+        <p><strong>Keplero</strong> le adotta subito per calcolare le orbite planetarie, e Laplace scriverà che
+          l'invenzione dei logaritmi «<em>raddoppiando la vita degli astronomi, li risparmia dagli errori e
+          dal disgusto inseparabili dai lunghi calcoli</em>».</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Come si moltiplicava con le tavole</div>
+        <p>Per calcolare $3\,748 \times 2\,159$:</p>
+        <p><span class="step-num">1</span> Sulle tavole: $\log 3748 = 3{,}57380$ e $\log 2159 = 3{,}33425$.</p>
+        <p><span class="step-num">2</span> Si <strong>sommano</strong>: $3{,}57380 + 3{,}33425 = 6{,}90805$.</p>
+        <p><span class="step-num">3</span> Si cerca all'indietro sulle tavole (l'<em>antilogaritmo</em>):
+          $10^{6{,}90805} \approx 8\,092\,000$.</p>
+        <p class="formula-note">Il valore esatto è $8\,091\,932$: l'errore è dello $0{,}0008\%$, del tutto
+          irrilevante in astronomia o in navigazione. Una moltiplicazione di quattro cifre per quattro cifre
+          richiede sedici prodotti parziali e tre incolonnamenti; con le tavole servono due letture e
+          un'addizione. <strong>Ecco perché contavano.</strong></p>
+      </div>
+
+      <div class="curiosita"><strong>La parte intera e la parte decimale hanno due nomi.</strong> Nelle tavole,
+        la parte intera del logaritmo decimale si chiama <em>caratteristica</em> e dice solo l'ordine di
+        grandezza; la parte decimale si chiama <em>mantissa</em> e contiene l'informazione vera. Il vantaggio
+        è che $\log 3748$, $\log 37{,}48$ e $\log 0{,}3748$ hanno la <strong>stessa mantissa</strong>
+        ($0{,}57381$) e cambiano solo la caratteristica ($3$, $1$, $-1$): la tabella doveva quindi contenere
+        solo i numeri fra $1$ e $10$. È la stessa idea della <em>notazione scientifica</em>, e la parola
+        «mantissa» è sopravvissuta fino a oggi: è il nome della parte frazionaria nei numeri in virgola mobile
+        di ogni computer.</div>
+    </section>
+
+    <!-- 6 — IL REGOLO CALCOLATORE -->
+    <section id="sec6">
+      <h2>6. Il regolo calcolatore</h2>
+
+      <p>Le tavole logaritmiche erano precise ma lente: due letture su un libro di seicento pagine per ogni
+        moltiplicazione. Nel 1620 Edmund Gunter ebbe l'idea di incidere la scala dei logaritmi su un
+        <strong>righello</strong>, e due anni dopo William Oughtred capì che facendo scorrere due righelli
+        così incisi si poteva <em>sommare graficamente</em> due logaritmi. Era nato il
+        <strong>regolo calcolatore</strong>.</p>
+
+      <div class="definition">
+        <div class="formula-title">Il principio, in una riga</div>
+        <p>Su una scala logaritmica, la <strong>distanza</strong> dall'inizio fino al numero $x$ è
+          proporzionale a $\log x$. Quindi <strong>accostare due distanze</strong> significa sommare due
+          logaritmi, cioè <strong>moltiplicare i numeri</strong>.</p>
+        <div class="formula">$$\log a + \log b = \log(ab)$$</div>
+        <p class="formula-note">Il regolo non «calcola»: <em>misura</em>. È una macchina analogica che
+          trasforma un'operazione aritmetica in un'operazione geometrica — esattamente come il pantografo del
+          secondo anno trasforma un ingrandimento in un movimento.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>primo fattore $a$ <span class="val-badge" id="rg-av">2,00</span></label>
+          <input type="range" id="rg-a" min="1" max="10" step="0.01" value="2" style="flex:1;min-width:190px">
+          <label>secondo fattore $b$ <span class="val-badge" id="rg-bv">3,00</span></label>
+          <input type="range" id="rg-b" min="1" max="10" step="0.01" value="3" style="flex:1;min-width:190px">
+        </div>
+        <div class="sim-btns" id="rg-btns">
+          <button class="btn btn-sm" data-v="2,3">2 × 3</button>
+          <button class="btn btn-sm" data-v="2.5,4">2,5 × 4</button>
+          <button class="btn btn-sm" data-v="3.14,2">π × 2</button>
+          <button class="btn btn-sm" data-v="7,8">7 × 8 (esce dalla scala)</button>
+        </div>
+        <svg id="rg-svg" viewBox="0 0 680 300" role="img" aria-label="Regolo calcolatore: due scale logaritmiche che scorrono"></svg>
+        <p class="cap" id="rg-cap"></p>
+        <p class="formula-note">Notate che i numeri sulle scale <strong>non sono equispaziati</strong>: da $1$
+          a $2$ c'è più spazio che da $9$ a $10$, perché le distanze sono logaritmi. È questa non-uniformità
+          che fa funzionare il trucco. Provate $7 \times 8$: il risultato esce dal righello, e bisogna
+          «rientrare» dall'altro capo ricordandosi di moltiplicare per $10$ — il regolo dà le
+          <em>cifre</em>, l'ordine di grandezza lo mette l'operatore.</p>
+      </div>
+
+      <div class="curiosita"><strong>Il regolo è andato sulla Luna.</strong> Fino agli anni Settanta ogni
+        ingegnere ne portava uno alla cintura, e chi entrava a ingegneria lo comprava insieme ai libri. Con
+        tre cifre significative di precisione bastava per progettare ponti, aerei e razzi: la
+        <strong>missione Apollo 11</strong> aveva a bordo un Pickett N600-ES, che Buzz Aldrin usò per i calcoli
+        di riserva. Poi, nel 1972, arrivò la HP-35 — la prima calcolatrice tascabile scientifica — e in cinque
+        anni il regolo sparì dal mercato: la Keuffel &amp; Esser, che ne aveva prodotti milioni, chiuse la
+        linea nel 1976. È uno dei casi più netti di tecnologia estinta in un decennio dopo tre secoli e mezzo
+        di onorato servizio.</div>
+
+      <div class="warnbox"><strong>Che cosa il regolo non sa fare.</strong> Non fa addizioni e sottrazioni —
+        proprio le operazioni «facili» — perché è costruito sui logaritmi, e per i logaritmi la somma è
+        l'operazione difficile. E non dà l'ordine di grandezza: chi lo usa deve sapere in anticipo se il
+        risultato è $56$, $560$ o $0{,}56$, e lo stima a mente. Questa, dicevano i vecchi ingegneri, era la
+        vera scuola: costringeva a <strong>sapere sempre più o meno quanto deve venire</strong>, cosa che con
+        la calcolatrice si è persa.</div>
+    </section>
+
+    <!-- 7 — LE SCALE LOGARITMICHE -->
+    <section id="sec7">
+      <h2>7. Perché tante scale del mondo sono logaritmiche</h2>
+
+      <p>pH, decibel, magnitudo dei terremoti, magnitudine delle stelle, ottave musicali: sono tutte scale
+        logaritmiche. Non è una moda: è che <strong>i nostri sensi e molti fenomeni naturali rispondono ai
+        rapporti, non alle differenze</strong>. Un suono «doppio» non è uno che ha il doppio dell'energia, ma
+        uno che ne ha dieci volte tanta. Il logaritmo è precisamente lo strumento che trasforma i rapporti in
+        differenze.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="sc-btns">
+          <button class="btn btn-sm active" data-s="ph">pH</button>
+          <button class="btn btn-sm" data-s="db">decibel</button>
+          <button class="btn btn-sm" data-s="ric">magnitudo</button>
+        </div>
+        <div class="ctrl">
+          <label>valore sulla scala <span class="val-badge" id="sc-vv">7,0</span></label>
+          <input type="range" id="sc-v" min="0" max="14" step="0.1" value="7" style="flex:1;min-width:240px">
+        </div>
+        <svg id="sc-svg" viewBox="0 0 680 300" role="img" aria-label="Scale logaritmiche: pH, decibel, magnitudo"></svg>
+        <p class="cap" id="sc-cap"></p>
+      </div>
+
+      <div class="ric">
+        <div><h4>pH</h4>
+          <p>$\text{pH} = -\log_{10}[\text{H}^+]$, con la concentrazione di ioni idrogeno in mol/L.</p>
+          <p>Il segno meno c'è perché le concentrazioni sono numeri piccolissimi ($10^{-7}$ nell'acqua pura) e
+            si preferisce lavorare con numeri positivi. <strong>Un'unità di pH in meno = dieci volte più
+            acido.</strong> Il succo di limone (pH $2$) è centomila volte più acido dell'acqua pura (pH $7$),
+            non «cinque volte».</p></div>
+        <div><h4>Decibel</h4>
+          <p>$L = 10\log_{10}\dfrac{I}{I_0}$, con $I_0 = 10^{-12}$ W/m², la soglia dell'udibile.</p>
+          <p><strong>$+10$ dB = intensità per dieci</strong>; $+3$ dB ≈ intensità raddoppiata (perché
+            $\log 2 \approx 0{,}301$). L'orecchio umano copre da $0$ a $130$ dB, cioè un rapporto di
+            <em>diecimila miliardi</em> fra il suono più debole e il più forte: senza logaritmi servirebbe una
+            scala da $1$ a $10^{13}$.</p></div>
+        <div><h4>Magnitudo dei terremoti</h4>
+          <p>Nella scala Richter, $M = \log_{10}\dfrac{A}{A_0}$, con $A$ l'ampiezza registrata dal
+            sismografo.</p>
+          <p><strong>$+1$ di magnitudo = ampiezza per dieci</strong>, ma <strong>energia per circa
+            $31{,}6$</strong> (cioè $10^{1{,}5}$). Fra un terremoto di magnitudo $5$ e uno di magnitudo $7$
+            c'è un fattore $1000$ in energia: ecco perché l'aggettivo «doppio» non ha senso con i
+            terremoti.</p></div>
+      </div>
+
+      <div class="curiosita"><strong>Il caso più antico: le stelle.</strong> Ipparco, nel II secolo a.C.,
+        classificò le stelle in sei «grandezze», dalla prima (le più luminose) alla sesta (quelle appena
+        visibili). Duemila anni dopo si scoprì che quella scala, costruita a occhio, era
+        <strong>logaritmica</strong>: cinque gradi di magnitudine corrispondono esattamente a un fattore $100$
+        in luminosità, cioè ogni grado vale $\sqrt[5]{100} \approx 2{,}512$. Ipparco non lo sapeva, ma il suo
+        occhio sì: la <em>legge di Weber-Fechner</em> dice che la sensazione percepita cresce come il
+        logaritmo dello stimolo. I nostri sensi sono strumenti logaritmici, ed è per questo che le scale
+        logaritmiche ci sembrano naturali.</div>
+
+      <div class="exercise">
+        <p><strong>⑪ Esercizio.</strong> Una soluzione ha concentrazione di ioni idrogeno
+          $[\text{H}^+] = 4 \cdot 10^{-5}$ mol/L. Qual è il suo pH? È acida o basica?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#e11s">Mostra la soluzione</button>
+        <div class="solution" id="e11s">
+          <p>$\text{pH} = -\log(4 \cdot 10^{-5}) = -\left(\log 4 + \log 10^{-5}\right) = -(0{,}60206 - 5) = 4{,}398$.</p>
+          <p>È <strong>acida</strong>: il pH è minore di $7$.</p>
+          <p class="formula-note">Notate come L1 e L3 abbiano spezzato il conto in due pezzi banali. E notate
+            il controllo di plausibilità: $4 \cdot 10^{-5}$ sta fra $10^{-5}$ e $10^{-4}$, quindi il pH deve
+            stare fra $4$ e $5$ ✓. È circa l'acidità del succo di pomodoro.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑫ Esercizio.</strong> Il rumore di una conversazione è di $60$ dB, quello di un martello
+          pneumatico di $90$ dB. Quante volte è più intenso il secondo?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#e12s">Mostra la soluzione</button>
+        <div class="solution" id="e12s">
+          <p>$90 - 60 = 30$ dB di differenza. Da $L = 10\log\dfrac{I}{I_0}$ segue
+            $\dfrac{I_2}{I_1} = 10^{\Delta L/10} = 10^3 = 1000$.</p>
+          <p>Il martello pneumatico è <strong>mille volte</strong> più intenso, non «una volta e mezza».</p>
+          <p class="formula-note">Questo è il motivo per cui i decibel ingannano chi non li conosce: una
+            differenza che sembra piccola sulla scala è enorme nella realtà fisica. E spiega anche perché i
+            tappi antirumore che «tolgono $30$ dB» sono così efficaci: tolgono il $99{,}9\%$ dell'energia
+            sonora.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑬ Esercizio.</strong> Un terremoto di magnitudo $7{,}0$ rispetto a uno di magnitudo $5{,}0$:
+          quante volte è maggiore l'ampiezza registrata? E l'energia liberata?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#e13s">Mostra la soluzione</button>
+        <div class="solution" id="e13s">
+          <p><strong>Ampiezza:</strong> $10^{7-5} = 10^2 = 100$ volte.</p>
+          <p><strong>Energia:</strong> ogni grado di magnitudo corrisponde a $10^{1{,}5} \approx 31{,}6$ volte
+            l'energia, quindi $10^{1{,}5 \cdot 2} = 10^3 = 1000$ volte.</p>
+          <p class="formula-note">Il terremoto dell'Irpinia del 1980 ebbe magnitudo $6{,}9$; quello dell'Aquila
+            del 2009 magnitudo $6{,}3$. Sembrano vicini, ma $10^{1{,}5 \cdot 0{,}6} \approx 8$: il primo
+            liberò circa <strong>otto volte</strong> l'energia del secondo. È il genere di conto che i
+            giornali sbagliano quasi sempre.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — IL CARBONIO 14 -->
+    <section id="sec8">
+      <h2>8. La datazione al carbonio-14</h2>
+
+      <p>L'applicazione più famosa degli esponenziali, e vale la pena raccontarla per intero, perché è un caso
+        raro in cui la chimica, la fisica nucleare e la matematica si incastrano perfettamente.</p>
+
+      <h3>8.1 — Da dove viene il carbonio-14</h3>
+
+      <p>Il carbonio ha tre isotopi naturali: il <strong>¹²C</strong> (il $98{,}9\%$), il <strong>¹³C</strong>
+        (l'$1{,}1\%$) — entrambi stabili — e il <strong>¹⁴C</strong>, che è radioattivo e presente in tracce
+        infinitesime, circa una parte su mille miliardi.</p>
+
+      <p>Il ¹⁴C non è un residuo della formazione della Terra: se lo fosse, sarebbe sparito da un pezzo. Viene
+        <strong>prodotto continuamente</strong> negli strati alti dell'atmosfera. I raggi cosmici, arrivando
+        dallo spazio, colpiscono i nuclei dell'aria e liberano <em>neutroni</em>; questi urtano l'azoto, che
+        è il gas più abbondante, e avviene la reazione</p>
+
+      <div class="formula">$$^{14}_{\ 7}\text{N} + n \longrightarrow {}^{14}_{\ 6}\text{C} + p$$</div>
+
+      <p>Il neutro entra, il protone esce: il numero di massa resta $14$, il numero atomico scende da $7$ a
+        $6$, e l'azoto è diventato carbonio. Questo ¹⁴C si ossida rapidamente a <strong>anidride
+        carbonica</strong> ¹⁴CO₂, si mescola all'atmosfera, viene assorbito dalle piante con la fotosintesi e
+        risale tutta la catena alimentare. Il risultato è che <strong>ogni essere vivente ha, nel proprio
+        carbonio, la stessa piccolissima frazione di ¹⁴C dell'atmosfera</strong> — circa $1{,}3 \cdot 10^{-12}$
+        rispetto al ¹²C — perché continua a scambiare carbonio con l'ambiente.</p>
+
+      <h3>8.2 — L'orologio parte alla morte</h3>
+
+      <p>Quando l'organismo muore, lo scambio si ferma: non entra più carbonio nuovo. Quello che c'è dentro
+        comincia a decadere e basta. Il ¹⁴C si trasforma in azoto per <strong>decadimento beta meno</strong>:
+        un neutrone del nucleo diventa un protone, emettendo un elettrone e un antineutrino.</p>
+
+      <div class="formula">$$^{14}_{\ 6}\text{C} \longrightarrow {}^{14}_{\ 7}\text{N} + e^- + \bar{\nu}_e$$</div>
+
+      <div class="definition">
+        <div class="formula-title">La legge del decadimento</div>
+        <p>Ogni nucleo ha la stessa probabilità di decadere in un dato intervallo, indipendentemente da quanto
+          tempo esiste già. Da questo fatto — e solo da questo — segue che il numero di nuclei rimasti è</p>
+        <div class="formula">$$N(t) = N_0 \left(\frac12\right)^{t/T_{1/2}} = N_0\, e^{-\lambda t},
+          \qquad \lambda = \frac{\ln 2}{T_{1/2}}$$</div>
+        <p>Per il ¹⁴C il <strong>tempo di dimezzamento</strong> è $T_{1/2} = 5730$ anni.</p>
+        <p class="formula-note">Le due scritture sono la stessa cosa: si passa dall'una all'altra col cambio di
+          base. La prima è più intuitiva («ogni $5730$ anni resta la metà»), la seconda è più comoda nei
+          conti, e $\lambda = \ln2 / 5730 = 1{,}21 \cdot 10^{-4}$ all'anno è la
+          <em>costante di decadimento</em>.</p>
+      </div>
+
+      <p>Per <strong>datare</strong> un reperto si misura quanto ¹⁴C è rimasto rispetto a quello che doveva
+        esserci, e si inverte la formula. Ed è qui che serve il logaritmo:</p>
+
+      <div class="formula">$$\frac{N}{N_0} = \left(\frac12\right)^{t/T_{1/2}}
+        \quad\Longrightarrow\quad t = T_{1/2}\cdot\log_2\!\left(\frac{N_0}{N}\right)
+        = \frac{T_{1/2}}{\ln 2}\ln\!\left(\frac{N_0}{N}\right)$$</div>
+
+      <p class="formula-note">Senza logaritmi l'incognita resterebbe intrappolata all'esponente e la formula
+        non sarebbe invertibile. È esattamente il problema da cui siamo partiti nell'introduzione.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>frazione di ¹⁴C rimasta <span class="val-badge" id="c14-fv">50,0%</span></label>
+          <input type="range" id="c14-f" min="0.5" max="100" step="0.1" value="50" style="flex:1;min-width:230px">
+          <span class="toggle-row"><input type="checkbox" id="c14-log">
+            <label for="c14-log">asse verticale logaritmico</label></span>
+        </div>
+        <div class="sim-btns" id="c14-btns">
+          <button class="btn btn-sm" data-t="5300">Ötzi (~5300 anni)</button>
+          <button class="btn btn-sm" data-t="700">Sindone (~700 anni)</button>
+          <button class="btn btn-sm" data-t="17000">Lascaux (~17 000 anni)</button>
+          <button class="btn btn-sm" data-t="50000">limite del metodo</button>
+        </div>
+        <svg id="c14-svg" viewBox="0 0 680 320" role="img" aria-label="Decadimento del carbonio-14"></svg>
+        <p class="cap" id="c14-cap"></p>
+        <p class="formula-note">Con l'asse verticale <strong>logaritmico</strong> la curva del decadimento
+          diventa una <strong>retta</strong>. Non è un trucco grafico: è la traduzione visiva del fatto che il
+          logaritmo di un esponenziale è una funzione lineare. Ogni volta che in un giornale scientifico vedete
+          un grafico che «diventa dritto» in scala logaritmica, state guardando un esponenziale.</p>
+      </div>
+
+      <div class="storia"><strong>Willard Libby, 1949.</strong> Il chimico americano — che aveva lavorato al
+        progetto Manhattan sulla separazione dell'uranio — mette a punto il metodo e lo verifica su campioni
+        di età nota: legno di una barca funeraria egizia, pane carbonizzato di Pompei. Funziona. Riceve il
+        Nobel per la chimica nel 1960, e l'archeologia cambia mestiere: prima le datazioni si facevano per
+        confronto stilistico e sequenze relative, dopo si misurano in laboratorio. Libby usò come tempo di
+        dimezzamento $5568$ anni; il valore corretto, $5730$, fu determinato nel 1962, e per compatibilità con
+        la letteratura precedente le date «convenzionali» si pubblicano ancora oggi con il valore di
+        Libby, per poi essere calibrate.</div>
+
+      <div class="warnbox"><strong>Le tre cose che il metodo <em>non</em> può fare.</strong>
+        <br>① <strong>Non funziona sui minerali.</strong> Data solo materiale che è stato vivo: legno, ossa,
+        semi, tessuti, carbone. Una pietra scolpita non si può datare, si data semmai il carbone del focolare
+        accanto.
+        <br>② <strong>Non arriva oltre i 50 000 anni circa.</strong> Dopo otto o nove dimezzamenti resta meno
+        dello $0{,}2\%$ del ¹⁴C iniziale, e il segnale sparisce nel rumore di fondo. Per i dinosauri servono
+        altri orologi — potassio-argon, uranio-piombo — con tempi di dimezzamento di miliardi di anni.
+        <br>③ <strong>Non è esatto senza calibrazione.</strong> La produzione di ¹⁴C non è stata costante nei
+        millenni: dipende dall'attività solare e dal campo magnetico terrestre. Si corregge con la
+        <em>curva di calibrazione</em> IntCal, costruita confrontando le date radiocarboniche con gli
+        <strong>anelli degli alberi</strong> (dendrocronologia), che si contano uno per uno e non sbagliano.
+        Dal 1950 in poi, poi, i test nucleari atmosferici hanno <em>raddoppiato</em> il ¹⁴C in aria: quel
+        «picco della bomba», paradossalmente, permette oggi di datare al singolo anno i reperti recentissimi.</div>
+
+      <div class="exercise">
+        <p><strong>⑭ Esercizio.</strong> Un frammento di legno contiene il $22\%$ del carbonio-14 che avrebbe
+          se fosse vivo. Quanti anni ha?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#e14s">Mostra la soluzione</button>
+        <div class="solution" id="e14s">
+          <p>$\dfrac{N}{N_0} = 0{,}22$, quindi $\dfrac{N_0}{N} = \dfrac{1}{0{,}22} = 4{,}545$.</p>
+          <p>$t = 5730 \cdot \log_2 4{,}545 = 5730 \cdot \dfrac{\ln 4{,}545}{\ln 2} = 5730 \cdot \dfrac{1{,}5141}{0{,}6931} = 5730 \cdot 2{,}1844 \approx 12\,520$ anni.</p>
+          <p class="formula-note">Controllo di plausibilità: $0{,}22$ sta fra $\frac14$ (due dimezzamenti) e
+            $\frac18$ (tre), quindi l'età deve stare fra $11\,460$ e $17\,190$ anni, più vicina al primo
+            estremo ✓. Fare sempre questo controllo con le potenze di $2$: costa cinque secondi e smaschera
+            gli errori di calcolatrice.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑮ Esercizio.</strong> Quanti anni devono passare perché resti solo l'$1\%$ del carbonio-14
+          iniziale? E perché si dice che il metodo «non arriva» oltre i $50\,000$ anni?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#e15s">Mostra la soluzione</button>
+        <div class="solution" id="e15s">
+          <p>$t = 5730 \cdot \log_2 100 = 5730 \cdot \dfrac{\ln 100}{\ln 2} = 5730 \cdot 6{,}644 \approx 38\,070$ anni.</p>
+          <p>A $50\,000$ anni: $\dfrac{N}{N_0} = \left(\dfrac12\right)^{50000/5730} = \left(\dfrac12\right)^{8{,}726} = 0{,}0024$, cioè lo $0{,}24\%$.</p>
+          <p><strong>Perché è un limite:</strong> a quel punto il ¹⁴C residuo è così poco che i pochi
+            decadimenti al minuto misurati non si distinguono più dal <em>fondo</em> — la radioattività
+            naturale dell'ambiente, dei materiali dello strumento, dei raggi cosmici. Non è un limite della
+            matematica ma della <strong>misura</strong>: l'incertezza sul conteggio diventa più grande del
+            segnale. Le tecniche moderne a spettrometria di massa con acceleratore (AMS), che contano
+            direttamente gli atomi invece di aspettarne il decadimento, spingono il limite a circa
+            $55\,000$-$60\,000$ anni, ma non oltre.</p>
+        </div>
+      </div>
+
+      <div class="note"><strong>Il filo della lezione.</strong> Siamo partiti da una domanda tecnica — come si
+        tira giù un'incognita che sta all'esponente — e siamo arrivati a datare la preistoria. Il filo è che
+        l'esponenziale descrive tutto ciò che cresce o decresce <em>in proporzione a quanto già c'è</em>: i
+        nuclei che decadono, i batteri che si dividono, gli interessi che maturano. E il logaritmo è l'unico
+        modo di leggere quella storia al contrario, cioè di risalire dal <em>quanto</em> al <em>quando</em>.
+        Nella <strong>lezione 5</strong> guarderemo i grafici di queste funzioni e scopriremo perché sono così
+        speciali; nella <strong>lezione 6</strong> impareremo a risolvere sistematicamente le equazioni in cui
+        compaiono.</div>
+    </section>
+
+    <section id="quiz">
+      <h2>Verifica quello che hai capito</h2>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> — Prof. Vettigli</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script src="../Style/interactive.js"></script>
+  <script src="../Style/toc.js"></script>
+  <script src="../Style/quiz.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var SVGNS = 'http://www.w3.org/2000/svg';
+
+    function el(tag, attrs, txt) {
+      var n = document.createElementNS(SVGNS, tag);
+      for (var k in attrs) { if (attrs.hasOwnProperty(k)) { n.setAttribute(k, attrs[k]); } }
+      if (txt !== undefined) { n.textContent = txt; }
+      return n;
+    }
+    function clear(s) { while (s.firstChild) { s.removeChild(s.firstChild); } }
+    function L(s, x1, y1, x2, y2, col, w, dash) {
+      var a = { x1: x1, y1: y1, x2: x2, y2: y2, stroke: col, 'stroke-width': w || 1.5,
+                'stroke-linecap': 'round' };
+      if (dash) { a['stroke-dasharray'] = dash; }
+      s.appendChild(el('line', a));
+    }
+    function T(s, x, y, t, cls, anchor, size) {
+      var a = { x: x, y: y, class: cls || 'lbl' };
+      if (anchor) { a['text-anchor'] = anchor; }
+      if (size) { a['font-size'] = size; }
+      s.appendChild(el('text', a, t));
+    }
+    function C(s, cx, cy, r, fill, stroke, w) {
+      s.appendChild(el('circle', { cx: cx, cy: cy, r: r, fill: fill || 'none',
+        stroke: stroke || 'none', 'stroke-width': w || 1.5 }));
+    }
+    function P(s, d, stroke, w, fill, dash) {
+      if (!d) { return; }
+      var a = { d: d, fill: fill || 'none', stroke: stroke || 'none', 'stroke-width': w || 1.5,
+                'stroke-linejoin': 'round' };
+      if (dash) { a['stroke-dasharray'] = dash; }
+      s.appendChild(el('path', a));
+    }
+    function R(s, x, y, w, h, fill, stroke, rx) {
+      s.appendChild(el('rect', { x: x, y: y, width: w, height: h, fill: fill || 'none',
+        stroke: stroke || 'none', 'stroke-width': 1.2, rx: rx === undefined ? 4 : rx }));
+    }
+    function num(v, d) { return v.toFixed(d === undefined ? 2 : d).replace('.', ','); }
+    function sep(v) {
+      var s = Math.round(v).toString(), out = '', c = 0, i;
+      for (i = s.length - 1; i >= 0; i--) {
+        out = s.charAt(i) + out;
+        c++;
+        if (c % 3 === 0 && i > 0) { out = ' ' + out; }
+      }
+      return out;
+    }
+    function css(name, fb) {
+      var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+      return (v && v.trim()) ? v.trim() : fb;
+    }
+    var COL = {};
+    function colori() {
+      COL.ax = css('--border', '#888');
+      COL.tx = css('--text', '#222');
+      COL.mu = css('--muted', '#777');
+      COL.ac = css('--accent', '#2563eb');
+      COL.mg = css('--magenta', '#c026d3');
+      COL.gd = css('--gold', '#d97706');
+      COL.gr = '#16a34a';
+      COL.rd = '#dc2626';
+      COL.s2 = css('--surface-2', '#f4f4f5');
+      COL.sf = css('--surface', '#fff');
+    }
+    colori();
+
+    /* Ogni widget e' una IIFE a se': se lancia un'eccezione muore solo quello e
+       resta un riquadro vuoto. avvia() lo protegge, scrive l'errore dentro il
+       disegno invece di sparire, e lo registra per ridisegnarlo al cambio tema
+       (altrimenti resterebbe con i colori del tema precedente). */
+    var DISEGNI = [];
+    function avvia(draw, svg) {
+      function protetto() {
+        try {
+          draw();
+        } catch (err) {
+          clear(svg);
+          T(svg, 20, 40, 'Simulazione non disponibile', 'em', 'start', 15);
+          T(svg, 20, 66, String(err && err.message ? err.message : err), 'lbl-s');
+          T(svg, 20, 88, 'Segnalatelo al professore indicando questo messaggio.', 'lbl-s');
+        }
+      }
+      DISEGNI.push(protetto);
+      protetto();
+      return protetto;
+    }
+    document.addEventListener('themechange', function () {
+      colori();
+      for (var i = 0; i < DISEGNI.length; i++) { DISEGNI[i](); }
+    });
+    function activate(box, btn) {
+      var b = box.querySelectorAll('button');
+      for (var i = 0; i < b.length; i++) { b[i].classList.remove('active'); }
+      if (btn) { btn.classList.add('active'); }
+    }
+    function grab(id) { return document.getElementById(id); }
+
+    function piano(svg, x0, y0, w, h, xmin, xmax, ymin, ymax) {
+      R(svg, x0, y0, w, h, COL.s2, COL.ax);
+      function GX(v) { return x0 + (v - xmin) / (xmax - xmin) * w; }
+      function GY(v) { return y0 + h - (v - ymin) / (ymax - ymin) * h; }
+      if (ymin < 0 && ymax > 0) { L(svg, x0, GY(0), x0 + w, GY(0), COL.ax, 1.2); }
+      if (xmin < 0 && xmax > 0) { L(svg, GX(0), y0, GX(0), y0 + h, COL.ax, 1.2); }
+      return { X: GX, Y: GY, x0: x0, y0: y0, w: w, h: h,
+               xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax };
+    }
+    function traccia(svg, pl, f, col, w, dash, n) {
+      n = n || 600;
+      var d = '', primo = true, i, vx, vy;
+      for (i = 0; i <= n; i++) {
+        vx = pl.xmin + (pl.xmax - pl.xmin) * i / n;
+        vy = f(vx);
+        if (vy === null || !isFinite(vy) || vy < pl.ymin || vy > pl.ymax) { primo = true; continue; }
+        d += (primo ? 'M' : 'L') + pl.X(vx).toFixed(1) + ' ' + pl.Y(vy).toFixed(1);
+        primo = false;
+      }
+      P(svg, d, col, w, 'none', dash);
+    }
+
+    /* ==================================================================
+       1 — LE REGOLE DELLE POTENZE
+       ================================================================== */
+    (function () {
+      var svg = grab('pt-svg'); if (!svg) { return; }
+      var sa = grab('pt-a'), sm = grab('pt-m'), sn = grab('pt-n'), cap = grab('pt-cap');
+      var reg = 'p1';
+
+      function pot(a, e) { return Math.pow(a, e); }
+      function testo(v) {
+        if (Math.abs(v) >= 1e6 || (Math.abs(v) < 1e-4 && v !== 0)) { return v.toExponential(4); }
+        if (Math.abs(v - Math.round(v)) < 1e-9) { return sep(v); }
+        return num(v, 6);
+      }
+
+      function draw() {
+        var a = +sa.value, m = +sm.value, n = +sn.value;
+        grab('pt-av').textContent = a;
+        grab('pt-mv').textContent = m;
+        grab('pt-nv').textContent = n;
+        clear(svg);
+        var sx, dx, sinistra, destra, titolo;
+
+        if (reg === 'p1') {
+          titolo = 'a^m · a^n = a^(m+n)';
+          sinistra = pot(a, m) * pot(a, n);
+          destra = pot(a, m + n);
+          sx = a + '^' + m + ' · ' + a + '^' + n;
+          dx = a + '^' + (m + n);
+        } else if (reg === 'p2') {
+          titolo = 'a^m : a^n = a^(m−n)';
+          sinistra = pot(a, m) / pot(a, n);
+          destra = pot(a, m - n);
+          sx = a + '^' + m + ' : ' + a + '^' + n;
+          dx = a + '^' + (m - n);
+        } else if (reg === 'p3') {
+          titolo = '(a^m)^n = a^(m·n)';
+          sinistra = Math.pow(pot(a, m), n);
+          destra = pot(a, m * n);
+          sx = '(' + a + '^' + m + ')^' + n;
+          dx = a + '^' + (m * n);
+        } else {
+          titolo = 'esponenti speciali';
+          sinistra = pot(a, -Math.abs(m));
+          destra = 1 / pot(a, Math.abs(m));
+          sx = a + '^−' + Math.abs(m);
+          dx = '1 / ' + a + '^' + Math.abs(m);
+        }
+
+        /* la striscia dei fattori, quando gli esponenti sono piccoli e positivi */
+        var y0 = 55;
+        if (reg !== 'p5' && m >= 0 && n >= 0 && m + n <= 12 && reg !== 'p3') {
+          var bx = 45, bw = 26;
+          for (var i = 0; i < m; i++) {
+            R(svg, bx + i * (bw + 4), y0, bw, bw, 'color-mix(in srgb, ' + COL.ac +
+              ' 25%, transparent)', COL.ac, 5);
+            T(svg, bx + i * (bw + 4) + bw / 2, y0 + bw / 2 + 5, '' + a, 'lbl', 'middle');
+          }
+          for (var j = 0; j < n; j++) {
+            var xx = bx + (m + j) * (bw + 4);
+            R(svg, xx, y0, bw, bw, 'color-mix(in srgb, ' + COL.mg + ' 25%, transparent)',
+              COL.mg, 5);
+            T(svg, xx + bw / 2, y0 + bw / 2 + 5, '' + a, 'lbl', 'middle');
+          }
+          T(svg, 45, y0 - 10, m + ' fattori + ' + n + ' fattori = ' + (m + n) + ' fattori',
+            'lbl-s');
+        } else if (reg === 'p5') {
+          T(svg, 45, y0 + 6, 'esponente negativo = reciproco della potenza', 'lbl-s');
+          T(svg, 45, y0 + 28, a + '^0 = 1   ·   ' + a + '^(1/2) = √' + a + ' = ' +
+            num(Math.sqrt(a), 5), 'lbl-s');
+          T(svg, 45, y0 + 50, a + '^(3/2) = (√' + a + ')³ = ' + num(Math.pow(a, 1.5), 5), 'lbl-s');
+        } else {
+          T(svg, 45, y0 + 20, 'con questi esponenti la striscia dei fattori non basta:', 'lbl-s');
+          T(svg, 45, y0 + 42, 'il confronto numerico però vale lo stesso', 'lbl-s');
+        }
+
+        T(svg, 45, 32, titolo, 'lbl');
+
+        /* pannello del confronto */
+        var py = 140;
+        R(svg, 40, py, 600, 120, COL.s2, COL.ax);
+        T(svg, 60, py + 32, 'primo membro', 'lbl-s');
+        T(svg, 60, py + 58, sx, 'lbl');
+        T(svg, 60, py + 88, testo(sinistra), 'em');
+        T(svg, 340, py + 60, '=', 'lbl', 'middle', 22);
+        T(svg, 400, py + 32, 'secondo membro', 'lbl-s');
+        T(svg, 400, py + 58, dx, 'lbl');
+        T(svg, 400, py + 88, testo(destra), 'em');
+        var uguali = (sinistra === destra) ||
+          (Math.abs(sinistra - destra) <= 1e-9 * Math.max(1, Math.abs(sinistra)));
+        T(svg, 340, py + 108, uguali ? '✓ coincidono' : 'differenza ' +
+          Math.abs(sinistra - destra).toExponential(2), uguali ? 'lbl' : 'em', 'middle');
+
+        cap.textContent = sx + ' = ' + testo(sinistra) + '   e   ' + dx + ' = ' + testo(destra) +
+          (uguali ? ': la regola regge.' : ': ATTENZIONE.');
+      }
+      [sa, sm, sn].forEach(function (s) { s.addEventListener('input', draw); });
+      var bts = grab('pt-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); reg = b.dataset.p; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       2 — IL LOGARITMO COME LETTURA INVERSA
+       ================================================================== */
+    (function () {
+      var svg = grab('lg-svg'); if (!svg) { return; }
+      var sb = grab('lg-b'), cap = grab('lg-cap');
+      var base = 2;
+      var NOMI = { '2': '2', '10': '10', '2.71828': 'e', '0.5': '1/2' };
+
+      function draw() {
+        var b = +sb.value;
+        grab('lg-bv').textContent = num(b, 2);
+        clear(svg);
+        var xl = (base === 10) ? 2.2 : (base === 0.5 ? 6.5 : 6.5);
+        var pl = piano(svg, 45, 30, 400, 230, -xl, xl, -3, 68);
+        traccia(svg, pl, function (x) { return Math.pow(base, x); }, COL.ac, 2.6, null, 800);
+        L(svg, pl.x0, pl.Y(1), pl.x0 + pl.w, pl.Y(1), COL.ax, 1, '3 3');
+
+        var lb = Math.log(b) / Math.log(base);
+        if (b > 0 && lb >= pl.xmin && lb <= pl.xmax && b <= pl.ymax) {
+          L(svg, pl.x0, pl.Y(b), pl.X(lb), pl.Y(b), COL.gd, 2.2, '5 4');
+          L(svg, pl.X(lb), pl.Y(b), pl.X(lb), pl.Y(0), COL.mg, 2.2, '5 4');
+          C(svg, pl.X(lb), pl.Y(b), 6, COL.mg, 'none');
+          T(svg, pl.x0 + 6, pl.Y(b) - 7, 'b = ' + num(b, 2), 'lbl-s');
+          T(svg, pl.X(lb), pl.Y(0) + 18, 'x = ' + num(lb, 3), 'em', 'middle');
+        }
+        T(svg, 245, 24, 'y = ' + NOMI['' + base] + '^x', 'lbl', 'middle');
+
+        var px = 475;
+        R(svg, px - 15, 40, 190, 195, COL.s2, COL.ax);
+        T(svg, px, 68, 'base a', 'lbl-s');
+        T(svg, px + 160, 68, NOMI['' + base], 'lbl', 'end');
+        T(svg, px, 96, 'argomento b', 'lbl-s');
+        T(svg, px + 160, 96, num(b, 2), 'lbl', 'end');
+        T(svg, px, 128, 'log_a b', 'lbl-s');
+        T(svg, px + 160, 128, num(lb, 5), 'em', 'end');
+        T(svg, px, 158, 'verifica: a^(log)', 'lbl-s');
+        T(svg, px + 160, 158, num(Math.pow(base, lb), 4), 'lbl', 'end');
+        T(svg, px, 190, b < 1 ? 'b < 1: il logaritmo' : (Math.abs(b - 1) < 1e-9 ?
+          'log della base... no:' : 'b > 1: il logaritmo'), 'lbl-s');
+        T(svg, px, 210, b < 1 ? (base > 1 ? 'è negativo' : 'è positivo') :
+          (Math.abs(b - 1) < 1e-9 ? 'log_a 1 = 0 sempre' :
+          (base > 1 ? 'è positivo' : 'è negativo')), 'lbl-s');
+        T(svg, px, 232, 'log_a a = 1, log_a 1 = 0', 'lbl-s');
+
+        cap.textContent = 'log in base ' + NOMI['' + base] + ' di ' + num(b, 2) + ' = ' +
+          num(lb, 5) + ', perché ' + NOMI['' + base] + ' elevato a ' + num(lb, 3) + ' fa ' +
+          num(Math.pow(base, lb), 3) + '.';
+      }
+      sb.addEventListener('input', draw);
+      var bts = grab('lg-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); base = +b.dataset.b; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       3 — IL REGOLO CALCOLATORE
+       ================================================================== */
+    (function () {
+      var svg = grab('rg-svg'); if (!svg) { return; }
+      var sa = grab('rg-a'), sb = grab('rg-b'), cap = grab('rg-cap');
+      var X0 = 45, W = 590;
+
+      function px(v) { return X0 + W * (Math.log(v) / Math.LN10); }
+
+      function scala(y, offset, col, nome) {
+        L(svg, X0 + offset, y, X0 + W + offset, y, col, 2);
+        var tacche = [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2, 2.5, 3, 3.5, 4, 4.5,
+                      5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10];
+        for (var i = 0; i < tacche.length; i++) {
+          var v = tacche[i];
+          var x = px(v) + offset;
+          var intero = Math.abs(v - Math.round(v)) < 1e-9;
+          L(svg, x, y, x, y - (intero ? 14 : 7), col, intero ? 1.6 : 1);
+          if (intero) { T(svg, x, y - 18, '' + v, 'lbl-s', 'middle'); }
+        }
+        T(svg, X0 + offset - 24, y + 5, nome, 'lbl');
+      }
+
+      function draw() {
+        var a = +sa.value, b = +sb.value;
+        grab('rg-av').textContent = num(a, 2);
+        grab('rg-bv').textContent = num(b, 2);
+        clear(svg);
+        var off = px(a) - X0;
+        var prod = a * b;
+        var fuori = prod > 10.0000001;
+        var lettura = fuori ? prod / 10 : prod;
+
+        /* scala fissa D in basso, scala mobile C in alto */
+        scala(150, off, COL.mg, 'C');
+        scala(215, 0, COL.ac, 'D');
+
+        /* l'indice 1 della scala C sopra il valore a della scala D */
+        L(svg, px(a), 118, px(a), 228, COL.gd, 1.6, '4 4');
+        T(svg, px(a), 112, 'a = ' + num(a, 2), 'em', 'middle');
+
+        /* il valore b sulla scala C e la lettura sotto */
+        var xb = px(b) + off;
+        if (xb <= X0 + W + 8) {
+          L(svg, xb, 118, xb, 228, COL.gr, 2.2);
+          T(svg, xb, 108, 'b = ' + num(b, 2), 'em', 'middle');
+          T(svg, Math.min(xb, X0 + W - 40), 250, 'si legge ' + num(lettura, 3), 'lbl', 'middle');
+        } else {
+          T(svg, X0 + W / 2, 250, 'b esce dal righello: bisogna far scorrere l’altro indice',
+            'em', 'middle');
+        }
+
+        R(svg, 45, 262, 590, 30, COL.s2, COL.ax);
+        T(svg, 60, 282, 'log a = ' + num(Math.log(a) / Math.LN10, 4) +
+          '   +   log b = ' + num(Math.log(b) / Math.LN10, 4) +
+          '   =   ' + num(Math.log(prod) / Math.LN10, 4) +
+          '   →   a·b = ' + num(prod, 4), 'lbl');
+        T(svg, 45, 40, 'Le distanze si sommano, quindi i numeri si moltiplicano', 'lbl');
+        T(svg, 45, 62, fuori ? 'il prodotto supera 10: il regolo mostra ' + num(lettura, 3) +
+          ', l’ordine di grandezza lo mette chi calcola (×10)' :
+          'il prodotto sta dentro la scala', 'lbl-s');
+
+        cap.textContent = num(a, 2) + ' × ' + num(b, 2) + ' = ' + num(prod, 4) +
+          (fuori ? ' (sul righello si legge ' + num(lettura, 3) + ', da moltiplicare per 10).' : '.');
+      }
+      sa.addEventListener('input', function () { activate(grab('rg-btns'), null); draw(); });
+      sb.addEventListener('input', function () { activate(grab('rg-btns'), null); draw(); });
+      var bts = grab('rg-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b);
+        var v = b.dataset.v.split(',');
+        sa.value = v[0]; sb.value = v[1]; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       4 — LE SCALE LOGARITMICHE
+       ================================================================== */
+    (function () {
+      var svg = grab('sc-svg'); if (!svg) { return; }
+      var sv = grab('sc-v'), cap = grab('sc-cap');
+      var tipo = 'ph';
+      var RIF = {
+        ph: [[0, 'acido da batteria'], [2, 'succo di limone'], [4.5, 'pomodoro'],
+             [7, 'acqua pura'], [8.1, 'acqua di mare'], [11, 'ammoniaca'], [14, 'soda caustica']],
+        db: [[0, 'soglia dell’udibile'], [30, 'sussurro'], [60, 'conversazione'],
+             [90, 'martello pneumatico'], [120, 'concerto rock'], [130, 'soglia del dolore']],
+        ric: [[2, 'non avvertito'], [4, 'oscillazione dei lampadari'],
+              [5.5, 'danni leggeri'], [6.3, 'L’Aquila 2009'], [6.9, 'Irpinia 1980'],
+              [9.1, 'Sumatra 2004']]
+      };
+
+      function draw() {
+        var v = +sv.value;
+        grab('sc-vv').textContent = num(v, 1);
+        clear(svg);
+        var lim = tipo === 'ph' ? [0, 14] : (tipo === 'db' ? [0, 130] : [0, 10]);
+        var titolo, fisica, rapporto, unita;
+        if (tipo === 'ph') {
+          titolo = 'pH = −log₁₀[H⁺]';
+          fisica = Math.pow(10, -v);
+          unita = 'mol/L di H⁺';
+          rapporto = Math.pow(10, 7 - v);
+        } else if (tipo === 'db') {
+          titolo = 'L = 10·log₁₀(I / I₀),  I₀ = 10⁻¹² W/m²';
+          fisica = Math.pow(10, -12 + v / 10);
+          unita = 'W/m²';
+          rapporto = Math.pow(10, v / 10);
+        } else {
+          titolo = 'M = log₁₀(A / A₀)';
+          fisica = Math.pow(10, v);
+          unita = 'volte l’ampiezza di riferimento';
+          rapporto = Math.pow(10, 1.5 * v);
+        }
+
+        /* il righello della scala */
+        var X0 = 55, W = 560, Y = 110;
+        L(svg, X0, Y, X0 + W, Y, COL.ax, 2);
+        var passo = tipo === 'db' ? 10 : 1;
+        for (var t = lim[0]; t <= lim[1] + 1e-9; t += passo) {
+          var x = X0 + (t - lim[0]) / (lim[1] - lim[0]) * W;
+          L(svg, x, Y, x, Y - 9, COL.ax, 1.2);
+          T(svg, x, Y + 18, '' + Math.round(t), 'lbl-s', 'middle');
+        }
+        var xv = X0 + (v - lim[0]) / (lim[1] - lim[0]) * W;
+        L(svg, xv, Y - 34, xv, Y + 6, COL.mg, 3);
+        C(svg, xv, Y - 34, 6, COL.mg, 'none');
+        T(svg, xv, Y - 44, num(v, 1), 'em', 'middle');
+        T(svg, X0, Y + 44, titolo, 'lbl');
+
+        /* i riferimenti */
+        var rif = RIF[tipo], yy = 178;
+        for (var i = 0; i < rif.length; i++) {
+          var xr = X0 + (rif[i][0] - lim[0]) / (lim[1] - lim[0]) * W;
+          L(svg, xr, Y, xr, Y + 6, COL.gd, 2);
+          C(svg, xr, Y, 3.5, COL.gd, 'none');
+        }
+        var vicino = rif[0];
+        for (var j = 0; j < rif.length; j++) {
+          if (Math.abs(rif[j][0] - v) < Math.abs(vicino[0] - v)) { vicino = rif[j]; }
+        }
+        T(svg, X0, yy, 'riferimento più vicino: ' + vicino[1] + '  (' + num(vicino[0], 1) + ')',
+          'lbl');
+
+        R(svg, X0, yy + 16, W, 96, COL.s2, COL.ax);
+        T(svg, X0 + 18, yy + 44, 'grandezza fisica', 'lbl-s');
+        T(svg, X0 + 250, yy + 44, fisica.toExponential(3) + '  ' + unita, 'em');
+        T(svg, X0 + 18, yy + 72, tipo === 'ph' ? 'rispetto all’acqua pura (pH 7)' :
+          (tipo === 'db' ? 'rispetto alla soglia dell’udibile' :
+           'energia rispetto a M = 0'), 'lbl-s');
+        T(svg, X0 + 250, yy + 72, '× ' + rapporto.toExponential(3), 'em');
+        T(svg, X0 + 18, yy + 96, tipo === 'ph' ? 'una unità in meno = dieci volte più acido' :
+          (tipo === 'db' ? '+10 dB = intensità × 10; +3 dB ≈ × 2' :
+           '+1 di magnitudo = ampiezza × 10, energia × 31,6'), 'lbl-s');
+
+        cap.textContent = titolo + ' — al valore ' + num(v, 1) + ' corrisponde ' +
+          fisica.toExponential(3) + ' ' + unita + '.';
+      }
+      function cambia(t) {
+        tipo = t;
+        if (t === 'ph') { sv.min = 0; sv.max = 14; sv.step = 0.1; sv.value = 7; }
+        else if (t === 'db') { sv.min = 0; sv.max = 130; sv.step = 1; sv.value = 60; }
+        else { sv.min = 0; sv.max = 10; sv.step = 0.1; sv.value = 6; }
+        draw();
+      }
+      sv.addEventListener('input', draw);
+      var bts = grab('sc-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); cambia(b.dataset.s);
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       5 — IL CARBONIO 14
+       ================================================================== */
+    (function () {
+      var svg = grab('c14-svg'); if (!svg) { return; }
+      var sf = grab('c14-f'), lg = grab('c14-log'), cap = grab('c14-cap');
+      var TM = 5730;
+
+      function eta(frac) { return TM * Math.log(100 / frac) / Math.LN2; }
+      function resta(t) { return 100 * Math.pow(0.5, t / TM); }
+
+      function draw() {
+        var f = +sf.value;
+        grab('c14-fv').textContent = num(f, 1) + '%';
+        clear(svg);
+        var t = eta(f);
+        var TMAX = 60000;
+        var pl;
+        if (lg.checked) {
+          pl = piano(svg, 60, 30, 400, 210, 0, TMAX, Math.log(0.1) / Math.LN10, 2.05);
+          traccia(svg, pl, function (x) {
+            return Math.log(resta(x)) / Math.LN10;
+          }, COL.mg, 2.8, null, 700);
+          for (var k = -1; k <= 2; k++) {
+            L(svg, pl.x0, pl.Y(k), pl.x0 + pl.w, pl.Y(k), COL.ax, 1, '3 3');
+            T(svg, pl.x0 - 6, pl.Y(k) + 4,
+              (k === 2 ? '100%' : (k === 1 ? '10%' : (k === 0 ? '1%' : '0,1%'))),
+              'lbl-s', 'end');
+          }
+          if (t <= TMAX) {
+            C(svg, pl.X(t), pl.Y(Math.log(f) / Math.LN10), 6, COL.ac, 'none');
+            L(svg, pl.X(t), pl.y0 + pl.h, pl.X(t), pl.Y(Math.log(f) / Math.LN10), COL.ac, 1.4, '4 3');
+          }
+        } else {
+          pl = piano(svg, 60, 30, 400, 210, 0, TMAX, 0, 105);
+          traccia(svg, pl, resta, COL.mg, 2.8, null, 700);
+          for (var q = 0; q <= 100; q += 25) {
+            L(svg, pl.x0, pl.Y(q), pl.x0 + pl.w, pl.Y(q), COL.ax, 1, '3 3');
+            T(svg, pl.x0 - 6, pl.Y(q) + 4, q + '%', 'lbl-s', 'end');
+          }
+          if (t <= TMAX) {
+            C(svg, pl.X(t), pl.Y(f), 6, COL.ac, 'none');
+            L(svg, pl.X(t), pl.y0 + pl.h, pl.X(t), pl.Y(f), COL.ac, 1.4, '4 3');
+          }
+        }
+        /* i dimezzamenti */
+        for (var i = 1; i <= 10; i++) {
+          var xd = i * TM;
+          if (xd > TMAX) { break; }
+          L(svg, pl.X(xd), pl.y0 + pl.h, pl.X(xd), pl.y0 + pl.h - 6, COL.gd, 1.6);
+          if (i % 2 === 0) {
+            T(svg, pl.X(xd), pl.y0 + pl.h + 16, sep(xd), 'lbl-s', 'middle');
+          }
+        }
+        T(svg, 260, 24, 'N/N₀ = (1/2)^(t / 5730)', 'lbl', 'middle');
+        T(svg, 60, 275, 'anni trascorsi dalla morte dell’organismo', 'lbl-s');
+
+        var px = 490;
+        R(svg, px - 15, 35, 180, 210, COL.s2, COL.ax);
+        T(svg, px, 62, 'resta', 'lbl-s');
+        T(svg, px + 150, 62, num(f, 2) + '%', 'lbl', 'end');
+        T(svg, px, 90, 'dimezzamenti', 'lbl-s');
+        T(svg, px + 150, 90, num(t / TM, 3), 'lbl', 'end');
+        T(svg, px, 122, 'età stimata', 'lbl-s');
+        T(svg, px + 150, 122, sep(t) + ' anni', 'em', 'end');
+        T(svg, px, 152, 'λ = ln2 / 5730', 'lbl-s');
+        T(svg, px + 150, 152, (Math.LN2 / TM).toExponential(3), 'lbl', 'end');
+        T(svg, px, 180, 'per anno', 'lbl-s');
+        T(svg, px, 210, t > 50000 ? 'oltre il limite del' : 'dentro il limite del', 'lbl-s');
+        T(svg, px, 230, t > 50000 ? 'metodo (≈50 000 anni)' : 'metodo', 'lbl-s');
+
+        cap.textContent = 'Con il ' + num(f, 1) + '% di ¹⁴C residuo l’età è ' + sep(t) +
+          ' anni, cioè ' + num(t / TM, 2) + ' tempi di dimezzamento.';
+      }
+      sf.addEventListener('input', function () { activate(grab('c14-btns'), null); draw(); });
+      lg.addEventListener('change', draw);
+      var bts = grab('c14-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b);
+        sf.value = resta(+b.dataset.t).toFixed(2);
+        draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  }());
+  </script>
+
+  <script>
+  window.quizData = [
+
+    { type: 'mc', diff: 'easy',
+      text: 'Quanto vale $\\log_2 32$?',
+      options: ['$5$', '$16$', '$6$', '$2{,}5$'],
+      correct: 0,
+      explain: 'Il logaritmo è l\'<strong>esponente</strong>: $\\log_2 32$ chiede «$2$ elevato a cosa fa $32$?», e la risposta è $5$, perché $2^5 = 32$. Il valore $16$ è $32/2$, e $2{,}5$ è $\\sqrt{32}/\\ldots$ — entrambi nascono dal confondere il logaritmo con una divisione o una radice.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Perché si pone $a^0 = 1$ per ogni $a \\ne 0$?',
+      options: ['perché moltiplicare zero volte dà zero',
+                'perché è l\'unica scelta che lascia valere la regola $a^m : a^n = a^{m-n}$, che per $m = n$ dà $a^m/a^m = a^0$, cioè $1$',
+                'perché è una convenzione arbitraria, si poteva scegliere qualunque valore',
+                'perché $0$ è l\'elemento neutro dell\'addizione'],
+      correct: 1,
+      explain: 'Non è un teorema e non è un capriccio: è l\'<strong>unica definizione compatibile</strong> con le regole già stabilite. È lo stesso ragionamento che porta a $a^{-n} = 1/a^n$ e a $a^{m/n} = \\sqrt[n]{a^m}$: si estende la definizione <em>obbligando</em> le proprietà a sopravvivere.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Quale di queste uguaglianze è vera?',
+      options: ['$\\log(x+y) = \\log x + \\log y$',
+                '$\\log(xy) = \\log x \\cdot \\log y$',
+                '$\\log(xy) = \\log x + \\log y$',
+                '$\\dfrac{\\log x}{\\log y} = \\log\\dfrac{x}{y}$'],
+      correct: 2,
+      explain: 'Il logaritmo trasforma il <strong>prodotto</strong> in somma — è la proprietà L1, che discende direttamente da $a^m a^n = a^{m+n}$. Le altre tre sono i tre errori classici. Controprova della prima: $\\log(10+90) = \\log 100 = 2$, mentre $\\log 10 + \\log 90 = 1 + 1{,}954 = 2{,}954$.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Quanto vale $8^{2/3}$?',
+      options: ['$\\dfrac{16}{3}$', '$16$', '$\\dfrac{8}{3}$', '$4$'],
+      correct: 3,
+      explain: 'Il denominatore dell\'esponente indica la radice, il numeratore la potenza: $8^{2/3} = \\left(\\sqrt[3]{8}\\right)^2 = 2^2 = 4$. Conviene <strong>fare prima la radice</strong>, così i numeri restano piccoli: l\'altra strada, $\\sqrt[3]{8^2} = \\sqrt[3]{64}$, dà lo stesso risultato ma con conti più grossi.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Quanto vale $\\log_5 \\dfrac{1}{25}$?',
+      options: ['$\\dfrac{1}{2}$', 'non esiste', '$2$', '$-2$'],
+      correct: 3,
+      explain: '$\\dfrac{1}{25} = 5^{-2}$, quindi il logaritmo è $-2$. Un logaritmo <strong>negativo</strong> non è un errore: segnala solo che l\'argomento è compreso fra $0$ e $1$ (con base maggiore di $1$). Quello che non esiste è il logaritmo di un numero <em>negativo</em> o di zero, perché nessuna potenza di base positiva li raggiunge.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Quanto vale $\\log_8 32$?',
+      options: ['$\\dfrac{5}{3}$', '$4$', '$\\dfrac{3}{5}$', '$24$'],
+      correct: 0,
+      explain: 'Conviene passare a una base in cui entrambi i numeri siano potenze intere, cioè la base $2$: $\\log_8 32 = \\dfrac{\\log_2 32}{\\log_2 8} = \\dfrac53$. Verifica: $8^{5/3} = \\left(\\sqrt[3]{8}\\right)^5 = 2^5 = 32$ ✓. La risposta $\\frac35$ è il cambio di base fatto al contrario.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Una soluzione ha pH $4$, un\'altra pH $7$. Quante volte è più acida la prima?',
+      options: ['$3$ volte', '$1000$ volte', '$1{,}75$ volte', '$10\\,000$ volte'],
+      correct: 1,
+      explain: 'Il pH è $-\\log_{10}[\\text{H}^+]$: tre unità di differenza significano un fattore $10^3 = 1000$ nella concentrazione di ioni idrogeno. Le scale logaritmiche comprimono rapporti enormi in numeri piccoli, ed è proprio per questo che ingannano chi legge le differenze come se fossero proporzionali.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Quanto valgono, rispettivamente, $\\left(2^3\\right)^2$ e $2^{3^2}$?',
+      options: ['$64$ e $64$', '$64$ e $512$', '$512$ e $64$', '$36$ e $512$'],
+      correct: 2,
+      explain: '$\\left(2^3\\right)^2 = 2^{3 \\cdot 2} = 2^6 = 64$, per la regola P3. Senza parentesi, invece, la potenza di potenza si calcola <strong>dall\'alto verso il basso</strong>: $2^{3^2} = 2^9 = 512$. La convenzione non è arbitraria: se si calcolasse dal basso, quella scrittura sarebbe inutile, perché il risultato si potrebbe già scrivere come $2^6$.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Sapendo che $\\log 2 \\approx 0{,}301$, quanto vale $\\log 5$?',
+      options: ['$0{,}602$', '$0{,}150$', '$0{,}699$', '$1{,}301$'],
+      correct: 2,
+      explain: 'Il trucco è scrivere $5 = \\dfrac{10}{2}$ e usare L2: $\\log 5 = \\log 10 - \\log 2 = 1 - 0{,}301 = 0{,}699$. Il valore $0{,}602$ è $\\log 4 = 2\\log 2$; $1{,}301$ è $\\log 20$. Questo è esattamente il genere di manipolazione con cui si usavano le tavole logaritmiche: pochi valori memorizzati, e tutto il resto ricostruito con le proprietà.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Un suono passa da $60$ dB a $90$ dB. Di quanto è aumentata l\'intensità?',
+      options: ['di una volta e mezza', 'di $30$ volte', 'di $100$ volte', 'di $1000$ volte'],
+      correct: 3,
+      explain: 'Da $L = 10\\log_{10}(I/I_0)$ segue $\\dfrac{I_2}{I_1} = 10^{\\Delta L/10} = 10^{30/10} = 10^3 = 1000$. Regola pratica da ricordare: <strong>$+10$ dB significa intensità per dieci</strong>, e $+3$ dB significa intensità circa raddoppiata, perché $\\log 2 \\approx 0{,}3$.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Un reperto contiene il $25\\%$ del carbonio-14 iniziale. Sapendo che il tempo di dimezzamento è $5730$ anni, quanti anni ha?',
+      options: ['circa $11\\,460$ anni', 'circa $5730$ anni', 'circa $22\\,920$ anni',
+                'circa $1430$ anni'],
+      correct: 0,
+      explain: 'Il $25\\%$ è un quarto, cioè <strong>due dimezzamenti</strong>: $2 \\times 5730 = 11\\,460$ anni. In generale $t = T_{1/2}\\log_2(N_0/N)$, e qui $\\log_2 4 = 2$. Il controllo con le potenze di $2$ è sempre il modo più rapido di verificare una datazione: metà, un quarto, un ottavo, un sedicesimo…' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Perché sulle scale di un regolo calcolatore i numeri <strong>non</strong> sono equispaziati, e perché il regolo non sa fare addizioni?',
+      options: ['perché la scala è costruita sulle radici quadrate, e l\'addizione non ha una regola per le radici',
+                'perché la distanza dall\'inizio è proporzionale al <em>logaritmo</em> del numero, così accostare due distanze somma i logaritmi e quindi moltiplica i numeri; per l\'addizione servirebbe una scala lineare, che il regolo non ha',
+                'per un limite meccanico dei righelli, che non riescono a scorrere abbastanza',
+                'perché i numeri grandi occupano più cifre e quindi più spazio'],
+      correct: 1,
+      explain: 'La distanza fino a $x$ vale $\\log x$: accostare due distanze significa calcolare $\\log a + \\log b = \\log(ab)$. Il regolo non «calcola», <strong>misura</strong>: trasforma un\'operazione aritmetica in una geometrica. Per la stessa ragione le operazioni «facili» — somma e differenza — gli sono precluse, perché il logaritmo non ha nessuna proprietà semplice rispetto alla somma.' },
+
+    { type: 'open',
+      text: 'Spiega perché le scritture $a^0$, $a^{-n}$ e $a^{m/n}$ sono <em>definizioni</em> e non teoremi, e come si sceglie il loro valore.',
+      keywords: ['fattori ripetuti', 'non ha senso', 'definizion', 'convenz', 'regole', 'coerente', 'sopravviv', 'estend', 'P2', 'P3'],
+      requiredMatches: 3,
+      explain: 'L\'immagine di partenza — «moltiplicare $a$ per sé stesso $n$ volte» — funziona solo per $n$ intero positivo: non ha alcun senso moltiplicare qualcosa «zero volte», «meno tre volte» o «due terzi di volta». Quelle scritture vanno dunque <strong>definite</strong>, e si sceglie l\'unico valore che <em>non rompe le regole già stabilite</em>. Da P2 con $m = n$: $\\frac{a^m}{a^m} = a^0$, ma quel rapporto vale $1$, quindi $a^0 = 1$. Da P2 con $m = 0$: $\\frac{a^0}{a^n} = a^{-n}$, cioè $a^{-n} = \\frac{1}{a^n}$. Da P3: $\\left(a^{1/n}\\right)^n = a^1 = a$, quindi $a^{1/n}$ è il numero che elevato alla $n$ dà $a$, cioè $\\sqrt[n]{a}$. È un modo di ragionare tipico della matematica — si estende una definizione obbligando le proprietà a sopravvivere — e lo stesso metodo ha prodotto i numeri negativi, le frazioni e i numeri complessi.' },
+
+    { type: 'open',
+      text: 'Spiega come funziona la datazione al carbonio-14 e indica almeno due dei suoi limiti.',
+      keywords: ['raggi cosmici', 'azoto', 'atmosfera', 'vivo', 'scambio', 'morte', 'dimezzamento', '5730', 'logaritmo', 'calibrazione', '50', 'minerali'],
+      requiredMatches: 4,
+      explain: 'I <strong>raggi cosmici</strong> producono neutroni negli strati alti dell\'atmosfera; questi colpiscono l\'azoto e lo trasformano in ¹⁴C ($^{14}\\text{N} + n \\to {}^{14}\\text{C} + p$), che si ossida a CO₂ ed entra nella catena alimentare. Finché un organismo è <strong>vivo</strong> scambia carbonio con l\'ambiente e mantiene la stessa piccolissima frazione di ¹⁴C dell\'atmosfera; alla <strong>morte</strong> lo scambio si ferma e il ¹⁴C rimasto decade in azoto con tempo di dimezzamento di <strong>5730 anni</strong>. Misurando quanto ne resta si ricava l\'età invertendo la legge del decadimento, e per invertirla serve il <strong>logaritmo</strong>: $t = T_{1/2}\\log_2(N_0/N)$. <strong>Limiti:</strong> (1) funziona solo su materiale che è stato vivo, non su pietre o metalli; (2) non arriva oltre i $50\\,000$ anni circa, perché il segnale residuo sprofonda nel rumore di fondo; (3) richiede una <strong>calibrazione</strong>, perché la produzione di ¹⁴C non è stata costante nei millenni — si corregge confrontando con gli anelli degli alberi.' }
+  ];
+  </script>
+
+</body>
+
+</html>

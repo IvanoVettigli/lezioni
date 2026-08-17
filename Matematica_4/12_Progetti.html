@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 12 — Progetti: dal file alla rete</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .storia { border-left: 4px solid var(--magenta); background: color-mix(in srgb, var(--magenta) 7%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 680px; margin: 0.3rem auto; }
+    .figbox canvas { display: block; width: 100%; height: auto; max-width: 680px; margin: 0.3rem auto;
+                     border-radius: 8px; background: #0d1117; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .figbox .mono { font-family: Consolas, monospace; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.l { text-align: left; }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.mono, .tabf th.mono { font-family: Consolas, monospace; text-align: left; }
+    .tabwrap { overflow-x: auto; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .ric { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .ric > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                 padding: 0.8rem 0.9rem; background: var(--surface); }
+    .ric h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+
+    .codebox { background: #0d1117; color: #e6edf3; border: 1px solid var(--border); border-radius: 10px;
+               padding: 0.8rem 1rem; margin: 0.9rem 0; font-family: Consolas, monospace; font-size: 0.86rem;
+               overflow-x: auto; line-height: 1.55; white-space: pre; }
+    .codebox .kw { color: #ff7b72; }
+    .codebox .st { color: #a5d6ff; }
+    .codebox .cm { color: #8b949e; font-style: italic; }
+    .codebox .fn { color: #d2a8ff; }
+    .codebox .nu { color: #79c0ff; }
+    .codebox .tg { color: #7ee787; }
+    .codebox .at { color: #ffa657; }
+    .codefile { display: block; background: var(--surface-2); color: var(--accent); border: 1px solid var(--border);
+                border-bottom: 0; border-radius: 10px 10px 0 0; padding: 0.35rem 0.9rem; margin: 0.9rem 0 -0.9rem;
+                font-family: Consolas, monospace; font-size: 0.82rem; font-weight: 700; }
+    .codefile + .codebox { border-radius: 0 0 10px 10px; }
+
+    .albero { font-family: Consolas, monospace; font-size: 0.9rem; background: var(--surface-2);
+              border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem 1rem; margin: 0.9rem 0;
+              white-space: pre; overflow-x: auto; }
+
+    /* la calcolatrice */
+    .calc { max-width: 320px; margin: 0.8rem auto; background: var(--surface-2); border: 1px solid var(--border);
+            border-radius: 14px; padding: 0.8rem; }
+    .calc-display { background: #0d1117; color: #e6edf3; border-radius: 8px; padding: 0.7rem 0.9rem;
+                    font-family: Consolas, monospace; font-size: 1.7rem; text-align: right;
+                    overflow-x: auto; white-space: nowrap; margin-bottom: 0.6rem; }
+    .calc-mem { font-size: 0.72rem; color: #8b949e; text-align: right; min-height: 1em;
+                font-family: Consolas, monospace; }
+    .calc-tasti { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem; }
+    .calc-tasti button { padding: 0.65rem 0; font-size: 1.05rem; font-weight: 700; cursor: pointer;
+                         border-radius: 8px; border: 1px solid var(--border); background: var(--surface);
+                         color: var(--text); font-family: inherit; }
+    .calc-tasti button:hover { background: color-mix(in srgb, var(--accent) 18%, var(--surface)); }
+    .calc-tasti button.op { color: var(--accent); }
+    .calc-tasti button.eq { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .calc-tasti button.canc { color: #ef4444; }
+
+    .osbox { display: none; }
+    .osbox.attivo { display: block; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quarto anno · Lezione 12</div>
+    <h1>Progetti: dal file alla rete</h1>
+    <p>Una calcolatrice, un gioco e un sito pubblicato: tutto quello che serve
+      per far vedere agli altri quello che avete costruito</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quarto anno</a>
+    <span class="sep">/</span> Progetti
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>L'idea in una riga.</strong> È l'ultima lezione dell'anno, e non introduce teoria nuova: si
+      costruisce. Alla fine avrete <strong>una calcolatrice che funziona</strong>, <strong>un gioco giocabile
+      in due</strong> e — se volete — <strong>un indirizzo su internet</strong> da mandare a chi vi pare. Il
+      punto non è imparare a memoria delle istruzioni: è capire che un sito web non è una cosa magica, sono
+      <em>tre file di testo in una cartella</em>.
+      <br><br><strong>Come si legge questa lezione.</strong> Con un computer davanti. Ogni riquadro di codice
+      va copiato e provato: leggere il codice senza eseguirlo è come leggere uno spartito senza mai suonarlo.
+      Le istruzioni per creare cartelle e file cambiano fra Windows, Linux e macOS: nella sezione 2 c'è un
+      bottone che seleziona il vostro sistema.
+    </div>
+
+    <!-- 1 — CHE COS'È UNA PAGINA WEB -->
+    <section id="sec1">
+      <h2>1. Che cos'è una pagina web</h2>
+
+      <p>Una pagina web è fatta di <strong>tre linguaggi diversi</strong>, ciascuno con un mestiere preciso.
+        Confonderli è l'errore che rende illeggibile un progetto, e tenerli separati è la prima regola
+        professionale che imparerete.</p>
+
+      <div class="ric">
+        <div><h4>HTML — la struttura</h4><p><em>HyperText Markup Language.</em> Dice <strong>che cosa
+          c'è</strong>: un titolo, un paragrafo, un bottone, un'immagine. È il muro portante. Non dice come
+          appare né che cosa succede quando lo si clicca.</p></div>
+        <div><h4>CSS — l'aspetto</h4><p><em>Cascading Style Sheets.</em> Dice <strong>com'è fatto</strong>:
+          colori, dimensioni, posizioni, spaziature, animazioni. È l'intonaco e l'arredamento. Se lo si
+          toglie, la pagina resta leggibile ma bruttissima.</p></div>
+        <div><h4>JavaScript — il comportamento</h4><p>Dice <strong>che cosa succede</strong>: quando premi
+          questo bottone, calcola e mostra il risultato. È l'impianto elettrico. Se lo si toglie, la pagina
+          è bella ma non reagisce.</p></div>
+      </div>
+
+      <div class="warnbox"><strong>Java non è JavaScript.</strong> Sono due linguaggi completamente diversi,
+        nati nello stesso anno (1995) e con nomi simili solo per una <em>operazione di marketing</em>: il
+        linguaggio si chiamava LiveScript, e Netscape lo ribattezzò per sfruttare la popolarità di Java. La
+        frase che gira fra i programmatori è che «Java sta a JavaScript come il prosciutto sta al
+        prosciutto crudo»… no, meglio: come <em>car</em> sta a <em>carpet</em>. Java l'avete visto in
+        Matematica_3, lezione 12: è compilato, fortemente tipizzato, gira su una macchina virtuale.
+        JavaScript è interpretato, dinamico, e gira nel browser. Non confondeteli mai a un colloquio.</div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="pg-btns">
+          <button class="btn btn-sm active" data-v="html">solo HTML</button>
+          <button class="btn btn-sm" data-v="css">HTML + CSS</button>
+          <button class="btn btn-sm" data-v="js">HTML + CSS + JavaScript</button>
+        </div>
+        <svg id="pg-svg" viewBox="0 0 680 400" role="img" aria-label="I tre strati di una pagina web: struttura, aspetto e comportamento"></svg>
+        <p class="cap" id="pg-cap"></p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">La struttura minima di un documento HTML</div>
+        <span class="codefile">index.html</span>
+        <div class="codebox"><span class="cm">&lt;!-- dice al browser: questo e' HTML moderno --&gt;</span>
+<span class="tg">&lt;!DOCTYPE html&gt;</span>
+<span class="tg">&lt;html</span> <span class="at">lang</span>=<span class="st">"it"</span><span class="tg">&gt;</span>
+<span class="tg">&lt;head&gt;</span>
+  <span class="tg">&lt;meta</span> <span class="at">charset</span>=<span class="st">"UTF-8"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;title&gt;</span>La mia calcolatrice<span class="tg">&lt;/title&gt;</span>
+  <span class="tg">&lt;link</span> <span class="at">rel</span>=<span class="st">"stylesheet"</span> <span class="at">href</span>=<span class="st">"stile.css"</span><span class="tg">&gt;</span>
+<span class="tg">&lt;/head&gt;</span>
+<span class="tg">&lt;body&gt;</span>
+  <span class="tg">&lt;h1&gt;</span>Calcolatrice<span class="tg">&lt;/h1&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">id</span>=<span class="st">"schermo"</span><span class="tg">&gt;</span>0<span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;button</span> <span class="at">id</span>=<span class="st">"b7"</span><span class="tg">&gt;</span>7<span class="tg">&lt;/button&gt;</span>
+
+  <span class="cm">&lt;!-- il JavaScript va in fondo: quando parte, l'HTML c'e' gia' --&gt;</span>
+  <span class="tg">&lt;script</span> <span class="at">src</span>=<span class="st">"script.js"</span><span class="tg">&gt;&lt;/script&gt;</span>
+<span class="tg">&lt;/body&gt;</span>
+<span class="tg">&lt;/html&gt;</span></div>
+        <p class="formula-note">Quattro cose da notare. <strong>(1)</strong> Ogni elemento si apre con
+          <code>&lt;tag&gt;</code> e si chiude con <code>&lt;/tag&gt;</code>: le etichette vanno annidate
+          come le parentesi in matematica, e <em>non si incrociano mai</em>. <strong>(2)</strong> L'attributo
+          <code>id</code> è il nome con cui il JavaScript troverà quell'elemento: dev'essere unico nella
+          pagina. <strong>(3)</strong> Il <code>&lt;link&gt;</code> nella testa e lo
+          <code>&lt;script&gt;</code> in fondo sono le due «chiamate» agli altri due file.
+          <strong>(4)</strong> Il <code>charset="UTF-8"</code> non è un dettaglio: senza, le lettere
+          accentate diventano geroglifici.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Come si collegano i tre file</div>
+        <p>Il browser legge l'HTML dall'alto verso il basso. Quando incontra il <code>&lt;link&gt;</code> va
+          a prendere il CSS; quando incontra lo <code>&lt;script&gt;</code> va a prendere il JavaScript e lo
+          <strong>esegue subito</strong>. È per questo che lo script si mette <em>in fondo</em>: se stesse
+          nella testa, cercherebbe elementi che il browser non ha ancora costruito e non troverebbe nulla.</p>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th>dove</th><th>che cosa succede</th><th>quando usarlo</th></tr>
+          <tr><td class="mono">&lt;script&gt; nel head</td><td class="l">blocca il caricamento e gira prima dell'HTML</td><td class="l">quasi mai</td></tr>
+          <tr><td class="mono">&lt;script&gt; a fine body</td><td class="l">gira quando l'HTML è già pronto</td><td class="l">sempre, per iniziare</td></tr>
+          <tr><td class="mono">&lt;script defer&gt;</td><td class="l">si scarica in parallelo, gira alla fine</td><td class="l">la scelta moderna</td></tr>
+        </table>
+        </div>
+        <p class="formula-note">Il collegamento avviene per <strong>percorso relativo</strong>: se scrivete
+          <code>href="stile.css"</code>, il browser cerca il file <em>nella stessa cartella</em> della
+          pagina. Se lo mettete in una sottocartella, diventa <code>href="css/stile.css"</code>. Il
+          novantanove per cento dei «non funziona niente» delle prime settimane è un percorso sbagliato o un
+          nome di file con una maiuscola di troppo — e su Linux, a differenza di Windows,
+          <code>Stile.css</code> e <code>stile.css</code> sono <strong>due file diversi</strong>.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>① Esercizio.</strong> Trova i quattro errori in questo frammento di HTML:</p>
+        <div class="codebox"><span class="tg">&lt;div</span> <span class="at">id</span>=<span class="st">"schermo"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;p&gt;&lt;strong&gt;</span>Risultato:<span class="tg">&lt;/p&gt;&lt;/strong&gt;</span>
+  <span class="tg">&lt;button</span> <span class="at">id</span>=<span class="st">"ok"</span><span class="tg">&gt;</span>Calcola<span class="tg">&lt;/button&gt;</span>
+  <span class="tg">&lt;button</span> <span class="at">id</span>=<span class="st">"ok"</span><span class="tg">&gt;</span>Azzera
+<span class="tg">&lt;/div&gt;</span></div>
+        <button class="btn btn-toggle btn-solution" data-target="#p1s">Mostra la soluzione</button>
+        <div class="solution" id="p1s">
+          <p><strong>(1) Etichette incrociate.</strong> Si apre <code>&lt;p&gt;</code> poi
+            <code>&lt;strong&gt;</code>, ma si chiude prima <code>&lt;/p&gt;</code> e poi
+            <code>&lt;/strong&gt;</code>. L'annidamento va rispettato: <em>l'ultima aperta è la prima
+            chiusa</em>, esattamente come le parentesi in un'espressione.</p>
+          <p><strong>(2) Due elementi con lo stesso <code>id</code>.</strong> L'identificatore dev'essere
+            <em>unico</em> nella pagina: <code>document.getElementById("ok")</code> restituirebbe solo il
+            primo, e il secondo bottone non funzionerebbe mai. Per un gruppo di elementi simili si usa
+            <code>class</code>, che invece può ripetersi.</p>
+          <p><strong>(3) Il secondo bottone non è chiuso:</strong> manca
+            <code>&lt;/button&gt;</code>.</p>
+          <p><strong>(4) Manca il testo dopo «Risultato:»</strong> — o meglio, il vero problema è che il
+            <code>&lt;div id=&quot;schermo&quot;&gt;</code> contiene sia l'etichetta sia il risultato: mettere il
+            valore in un elemento proprio (per esempio <code>&lt;span id="valore"&gt;0&lt;/span&gt;</code>)
+            rende il codice molto più semplice, perché il JavaScript potrà cambiare <em>solo</em> quello.</p>
+          <p class="formula-note">Il consiglio pratico: nel browser, <strong>F12</strong> apre gli strumenti
+            per sviluppatori, e la scheda «Elementi» mostra l'HTML <em>come il browser lo ha capito</em>. Se
+            le etichette sono incrociate lo vedete subito, perché il browser le raddrizza a modo suo — quasi
+            sempre non nel modo che volevate.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 — IL LABORATORIO -->
+    <section id="sec2">
+      <h2>2. Laboratorio: costruiamo una calcolatrice</h2>
+
+      <p>Si comincia dalla cosa che nessuna guida spiega mai: <strong>dove si mettono i file</strong>.</p>
+
+      <div class="definition">
+        <div class="formula-title">La cartella del progetto</div>
+        <div class="albero">calcolatrice/
+├── index.html      la struttura
+├── stile.css       l'aspetto
+└── script.js       il comportamento</div>
+        <p class="formula-note">Tre file, una cartella, nient'altro. Nessun programma da installare, nessun
+          account, nessuna connessione: <strong>si apre <code>index.html</code> col doppio clic</strong> e il
+          browser lo mostra. Questa è la ragione per cui il web è diventato la piattaforma più diffusa del
+          mondo, e per cui conviene cominciare da qui e non da un ambiente di sviluppo da tre gigabyte.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="os-btns">
+          <button class="btn btn-sm active" data-v="win">Windows</button>
+          <button class="btn btn-sm" data-v="lin">Linux</button>
+          <button class="btn btn-sm" data-v="mac">macOS</button>
+        </div>
+        <div id="os-win" class="osbox attivo">
+          <p><strong>Con il mouse:</strong> tasto destro sul Desktop → <em>Nuovo</em> → <em>Cartella</em>,
+            chiamatela <code>calcolatrice</code>. Dentro, tasto destro → <em>Nuovo</em> → <em>Documento di
+            testo</em>, e rinominatelo <code>index.html</code>.</p>
+          <div class="codebox"><span class="cm">REM col terminale (PowerShell): apritelo con Win+X</span>
+cd Desktop
+mkdir calcolatrice
+cd calcolatrice
+<span class="cm">REM crea i tre file vuoti</span>
+ni index.html, stile.css, script.js -ItemType File
+<span class="cm">REM apre la cartella in VS Code (se installato)</span>
+code .</div>
+          <p class="formula-note"><strong>Attenzione a Esplora risorse:</strong> per impostazione predefinita
+            Windows <em>nasconde le estensioni</em>, così rinominando «Nuovo documento di testo.txt» in
+            «index.html» ottenete in realtà <code>index.html.txt</code>, che il browser non riconosce. Andate
+            in <em>Visualizza</em> → <em>Mostra</em> → <em>Estensioni nomi file</em> e spuntatela. È il primo
+            ostacolo su cui inciampano tutti.</p>
+        </div>
+        <div id="os-lin" class="osbox">
+          <p><strong>Col terminale</strong> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>T</kbd> quasi ovunque):</p>
+          <div class="codebox"><span class="cm"># crea la cartella e i tre file in un colpo solo</span>
+cd ~/Scrivania          <span class="cm"># oppure ~/Desktop, dipende dalla lingua</span>
+mkdir calcolatrice
+cd calcolatrice
+touch index.html stile.css script.js
+<span class="cm"># apre la cartella nell'editor</span>
+code .                  <span class="cm"># VS Code; oppure: gedit index.html</span></div>
+          <p class="formula-note"><strong>Attenzione alle maiuscole:</strong> su Linux il filesystem
+            distingue <code>Stile.css</code> da <code>stile.css</code>. È la causa numero uno dei siti che
+            «funzionavano sul mio computer» e si rompono una volta pubblicati, perché i server sono quasi
+            tutti Linux mentre il computer di casa è quasi sempre Windows. Regola pratica: <strong>nomi di
+            file sempre minuscoli, senza spazi e senza accenti.</strong></p>
+        </div>
+        <div id="os-mac" class="osbox">
+          <p><strong>Col Terminale</strong> (<kbd>⌘</kbd>+<kbd>spazio</kbd> → «Terminale»):</p>
+          <div class="codebox"><span class="cm"># crea la cartella e i tre file</span>
+cd ~/Desktop
+mkdir calcolatrice
+cd calcolatrice
+touch index.html stile.css script.js
+open -a "Visual Studio Code" .   <span class="cm"># oppure: open -e index.html</span></div>
+          <p class="formula-note">macOS è un Unix, quindi i comandi sono gli stessi di Linux. Una differenza
+            che sorprende: il filesystem predefinito <strong>non</strong> distingue le maiuscole, come
+            Windows — quindi anche qui vale l'avvertenza sui nomi minuscoli, perché il server su cui
+            pubblicherete quasi certamente le distinguerà. In Finder, per vedere le estensioni:
+            <em>Preferenze</em> → <em>Avanzate</em> → <em>Mostra tutte le estensioni dei nomi</em>.</p>
+        </div>
+        <p class="cap">Le istruzioni cambiano col sistema operativo: scegliete il vostro qui sopra.</p>
+      </div>
+
+      <div class="curiosita"><strong>Quale editor.</strong> Va bene qualunque cosa scriva testo semplice —
+        perfino il Blocco note. Ma un editor per programmatori vi fa risparmiare ore: colora la sintassi,
+        chiude le parentesi, segnala gli errori mentre scrivete. I più usati oggi sono <strong>Visual Studio
+        Code</strong> (gratuito, su tutti i sistemi), <strong>Sublime Text</strong> e i vari
+        <strong>JetBrains</strong>. Quello che <em>non</em> va bene è Word: salva formattazione invisibile e
+        virgolette «intelligenti» che il browser non capisce, e il codice non funziona senza che si riesca a
+        capire perché.</div>
+
+      <h3>2.1 — Il codice della calcolatrice</h3>
+
+      <p>Ecco i tre file per intero. Copiateli, salvate, aprite <code>index.html</code>.</p>
+
+      <span class="codefile">index.html</span>
+      <div class="codebox"><span class="tg">&lt;!DOCTYPE html&gt;</span>
+<span class="tg">&lt;html</span> <span class="at">lang</span>=<span class="st">"it"</span><span class="tg">&gt;</span>
+<span class="tg">&lt;head&gt;</span>
+  <span class="tg">&lt;meta</span> <span class="at">charset</span>=<span class="st">"UTF-8"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;title&gt;</span>Calcolatrice<span class="tg">&lt;/title&gt;</span>
+  <span class="tg">&lt;link</span> <span class="at">rel</span>=<span class="st">"stylesheet"</span> <span class="at">href</span>=<span class="st">"stile.css"</span><span class="tg">&gt;</span>
+<span class="tg">&lt;/head&gt;</span>
+<span class="tg">&lt;body&gt;</span>
+  <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="st">"calcolatrice"</span><span class="tg">&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">id</span>=<span class="st">"schermo"</span><span class="tg">&gt;</span>0<span class="tg">&lt;/div&gt;</span>
+    <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="st">"tasti"</span><span class="tg">&gt;</span>
+      <span class="tg">&lt;button</span> <span class="at">data-tasto</span>=<span class="st">"C"</span><span class="tg">&gt;</span>C<span class="tg">&lt;/button&gt;</span>
+      <span class="tg">&lt;button</span> <span class="at">data-tasto</span>=<span class="st">"7"</span><span class="tg">&gt;</span>7<span class="tg">&lt;/button&gt;</span>
+      <span class="cm">&lt;!-- ... gli altri tasti, tutti uguali ... --&gt;</span>
+      <span class="tg">&lt;button</span> <span class="at">data-tasto</span>=<span class="st">"="</span><span class="tg">&gt;</span>=<span class="tg">&lt;/button&gt;</span>
+    <span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;/div&gt;</span>
+  <span class="tg">&lt;script</span> <span class="at">src</span>=<span class="st">"script.js"</span><span class="tg">&gt;&lt;/script&gt;</span>
+<span class="tg">&lt;/body&gt;</span>
+<span class="tg">&lt;/html&gt;</span></div>
+
+      <span class="codefile">stile.css</span>
+      <div class="codebox"><span class="cm">/* selettore { proprieta': valore; } — e' tutta la sintassi del CSS */</span>
+<span class="fn">.calcolatrice</span> {
+  <span class="at">max-width</span>: <span class="nu">300px</span>;
+  <span class="at">margin</span>: <span class="nu">2rem</span> auto;      <span class="cm">/* auto ai lati = centrato */</span>
+  <span class="at">font-family</span>: sans-serif;
+}
+<span class="fn">#schermo</span> {                    <span class="cm">/* il cancelletto seleziona per id */</span>
+  <span class="at">background</span>: <span class="nu">#111</span>;
+  <span class="at">color</span>: <span class="nu">#eee</span>;
+  <span class="at">font-size</span>: <span class="nu">2rem</span>;
+  <span class="at">text-align</span>: right;
+  <span class="at">padding</span>: <span class="nu">0.6rem</span>;
+  <span class="at">border-radius</span>: <span class="nu">8px</span>;
+}
+<span class="fn">.tasti</span> {
+  <span class="at">display</span>: grid;              <span class="cm">/* griglia a 4 colonne uguali */</span>
+  <span class="at">grid-template-columns</span>: <span class="fn">repeat</span>(<span class="nu">4</span>, <span class="nu">1fr</span>);
+  <span class="at">gap</span>: <span class="nu">6px</span>;
+  <span class="at">margin-top</span>: <span class="nu">8px</span>;
+}
+<span class="fn">.tasti button</span> {
+  <span class="at">padding</span>: <span class="nu">14px 0</span>;
+  <span class="at">font-size</span>: <span class="nu">1.1rem</span>;
+  <span class="at">cursor</span>: pointer;
+}</div>
+
+      <span class="codefile">script.js</span>
+      <div class="codebox"><span class="cm">// --- lo stato della calcolatrice: quattro variabili, niente di piu' ---</span>
+<span class="kw">let</span> corrente = <span class="st">"0"</span>;      <span class="cm">// il numero che si sta scrivendo</span>
+<span class="kw">let</span> memoria  = <span class="kw">null</span>;     <span class="cm">// il primo operando, gia' inserito</span>
+<span class="kw">let</span> operazione = <span class="kw">null</span>;  <span class="cm">// "+", "-", "*" oppure "/"</span>
+<span class="kw">let</span> nuovoNumero = <span class="kw">false</span>; <span class="cm">// la prossima cifra ricomincia da capo</span>
+
+<span class="kw">const</span> schermo = document.<span class="fn">getElementById</span>(<span class="st">"schermo"</span>);
+
+<span class="kw">function</span> <span class="fn">mostra</span>() { schermo.textContent = corrente; }
+
+<span class="kw">function</span> <span class="fn">calcola</span>(a, op, b) {
+  <span class="kw">if</span> (op === <span class="st">"+"</span>) <span class="kw">return</span> a + b;
+  <span class="kw">if</span> (op === <span class="st">"-"</span>) <span class="kw">return</span> a - b;
+  <span class="kw">if</span> (op === <span class="st">"*"</span>) <span class="kw">return</span> a * b;
+  <span class="kw">if</span> (op === <span class="st">"/"</span>) <span class="kw">return</span> b === <span class="nu">0</span> ? <span class="st">"errore"</span> : a / b;
+  <span class="kw">return</span> b;
+}
+
+<span class="kw">function</span> <span class="fn">premi</span>(t) {
+  <span class="kw">if</span> (t &gt;= <span class="st">"0"</span> &amp;&amp; t &lt;= <span class="st">"9"</span>) {
+    corrente = (corrente === <span class="st">"0"</span> || nuovoNumero) ? t : corrente + t;
+    nuovoNumero = <span class="kw">false</span>;
+  } <span class="kw">else if</span> (t === <span class="st">"."</span>) {
+    <span class="kw">if</span> (nuovoNumero) { corrente = <span class="st">"0"</span>; nuovoNumero = <span class="kw">false</span>; }
+    <span class="kw">if</span> (!corrente.<span class="fn">includes</span>(<span class="st">"."</span>)) corrente += <span class="st">"."</span>;
+  } <span class="kw">else if</span> (t === <span class="st">"C"</span>) {
+    corrente = <span class="st">"0"</span>; memoria = <span class="kw">null</span>; operazione = <span class="kw">null</span>; nuovoNumero = <span class="kw">false</span>;
+  } <span class="kw">else if</span> (t === <span class="st">"="</span>) {
+    <span class="kw">if</span> (operazione !== <span class="kw">null</span>) {
+      corrente = <span class="fn">String</span>(<span class="fn">calcola</span>(memoria, operazione, <span class="fn">Number</span>(corrente)));
+      memoria = <span class="kw">null</span>; operazione = <span class="kw">null</span>; nuovoNumero = <span class="kw">true</span>;
+    }
+  } <span class="kw">else</span> {                        <span class="cm">// e' un'operazione</span>
+    <span class="kw">if</span> (operazione !== <span class="kw">null</span>) {    <span class="cm">// incatena: 2 + 3 + -&gt; mostra 5</span>
+      corrente = <span class="fn">String</span>(<span class="fn">calcola</span>(memoria, operazione, <span class="fn">Number</span>(corrente)));
+    }
+    memoria = <span class="fn">Number</span>(corrente);
+    operazione = t;
+    nuovoNumero = <span class="kw">true</span>;         <span class="cm">// lo schermo continua a mostrare il risultato</span>
+  }
+  <span class="fn">mostra</span>();
+}
+
+<span class="cm">// --- collega ogni bottone alla funzione, in tre righe ---</span>
+document.<span class="fn">querySelectorAll</span>(<span class="st">".tasti button"</span>).<span class="fn">forEach</span>(b =&gt; {
+  b.<span class="fn">addEventListener</span>(<span class="st">"click"</span>, () =&gt; <span class="fn">premi</span>(b.dataset.tasto));
+});</div>
+
+      <div class="warnbox"><strong>Perché non abbiamo usato <code>eval()</code>.</strong> Molte guide
+        risolvono la calcolatrice in una riga: si accumula la stringa «2+3*4» e la si passa a
+        <code>eval()</code>, che la valuta come codice JavaScript. Funziona, ed è una <strong>pessima
+        idea</strong>. <code>eval()</code> esegue <em>qualunque</em> cosa gli si dia: se un domani quella
+        stringa arrivasse da un utente o da un indirizzo, avreste dato a uno sconosciuto il permesso di far
+        girare codice sul dispositivo di chi visita il sito. È una delle vulnerabilità più classiche
+        (<em>code injection</em>), e la regola vale ben oltre JavaScript: <strong>non trattare mai come
+        codice qualcosa che arriva da fuori</strong>. Scrivere venti righe in più costa poco e chiude la
+        porta.</div>
+
+      <div class="figbox">
+        <p style="text-align:center;margin:0 0 0.3rem;color:var(--muted);font-size:0.88rem;">
+          La calcolatrice qui sotto è <strong>esattamente</strong> quel codice, in funzione.
+          Provatela — funziona anche con la tastiera.</p>
+        <div class="calc">
+          <div class="calc-mem" id="ca-mem"></div>
+          <div class="calc-display" id="ca-schermo">0</div>
+          <div class="calc-tasti" id="ca-tasti">
+            <button class="canc" data-tasto="C">C</button>
+            <button data-tasto="7">7</button>
+            <button data-tasto="8">8</button>
+            <button class="op" data-tasto="/">÷</button>
+            <button data-tasto="4">4</button>
+            <button data-tasto="5">5</button>
+            <button data-tasto="6">6</button>
+            <button class="op" data-tasto="*">×</button>
+            <button data-tasto="1">1</button>
+            <button data-tasto="2">2</button>
+            <button data-tasto="3">3</button>
+            <button class="op" data-tasto="-">−</button>
+            <button data-tasto="9">9</button>
+            <button data-tasto="0">0</button>
+            <button data-tasto=".">,</button>
+            <button class="op" data-tasto="+">+</button>
+            <button class="eq" data-tasto="=" style="grid-column: span 4;">=</button>
+          </div>
+        </div>
+        <p class="cap" id="ca-cap">Premi i tasti, oppure usa la tastiera: cifre, + − * /, Invio, Esc.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>② Esercizio.</strong> Nella calcolatrice qui sopra, premi in sequenza
+          <code>2</code> <code>+</code> <code>3</code> <code>+</code>. Che cosa compare sullo schermo, e
+          perché? E che cosa succede premendo <code>8</code> <code>/</code> <code>0</code> <code>=</code>?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p2s">Mostra la soluzione</button>
+        <div class="solution" id="p2s">
+          <p><strong>Primo caso: compare $5$.</strong> Seguiamo lo stato passo per passo:</p>
+          <div class="tabwrap">
+          <table class="tabf">
+            <tr><th>tasto</th><th class="mono">corrente</th><th class="mono">memoria</th><th class="mono">operazione</th><th>schermo</th></tr>
+            <tr><td class="lab">2</td><td class="mono">"2"</td><td class="mono">null</td><td class="mono">null</td><td>2</td></tr>
+            <tr><td class="lab">+</td><td class="mono">"2"</td><td class="mono">2</td><td class="mono">"+"</td><td>2</td></tr>
+            <tr><td class="lab">3</td><td class="mono">"3"</td><td class="mono">2</td><td class="mono">"+"</td><td>3</td></tr>
+            <tr><td class="lab">+</td><td class="mono">"5"</td><td class="mono">5</td><td class="mono">"+"</td><td>5</td></tr>
+          </table>
+          </div>
+          <p>Al secondo <code>+</code> il programma entra nel ramo «è un'operazione», trova
+            <code>operazione</code> già impostata e <strong>chiude il conto in sospeso</strong> prima di
+            aprirne uno nuovo. Notate il ruolo di <code>nuovoNumero</code>: non si azzera
+            <code>corrente</code>, così lo schermo continua a mostrare il risultato parziale $5$ finché non
+            si preme una cifra, che allora ricomincia da capo. È il comportamento delle calcolatrici vere,
+            e costa una variabile booleana.</p>
+          <p><strong>Secondo caso: compare <code>errore</code>.</strong> La funzione <code>calcola</code>
+            controlla esplicitamente <code>b === 0</code> prima di dividere. Senza quel controllo JavaScript
+            non protesterebbe affatto: restituirebbe <code>Infinity</code>, che è un valore legittimo del
+            linguaggio e comparirebbe sullo schermo, lasciando l'utente perplesso.</p>
+          <p class="formula-note">Provate anche <code>0</code> <code>/</code> <code>0</code>
+            <code>=</code>: senza il controllo darebbe <code>NaN</code> («not a number»), un valore con la
+            proprietà sconcertante che <code>NaN === NaN</code> è <strong>falso</strong>. Sono i dettagli per
+            cui vale la pena scrivere i controlli invece di sperare.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>③ Esercizio.</strong> Il codice ha un difetto: premendo <code>C</code> lo schermo torna a
+          <code>0</code>, ma se prima si era premuto <code>5</code> <code>+</code> e poi si preme
+          <code>=</code>, che cosa succede? E come faresti ad aggiungere il tasto <code>±</code> che cambia
+          segno?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p3s">Mostra la soluzione</button>
+        <div class="solution" id="p3s">
+          <p><strong>Premendo <code>5</code> <code>+</code> <code>=</code></strong> il programma trova
+            <code>operazione = "+"</code> e <code>corrente</code> ancora uguale a <code>"5"</code>, perché
+            il tasto <code>+</code> non lo azzera ma alza solo il flag <code>nuovoNumero</code>. Calcola
+            quindi <code>calcola(5, "+", 5)</code> e mostra <strong>$10$</strong>: ha
+            <em>ripetuto l'ultimo operando</em>, esattamente come fanno le calcolatrici da tavolo. Con la
+            variante che azzera <code>corrente</code> a ogni operazione mostrerebbe invece $5$. Nessuna
+            delle due è sbagliata: la differenza è che una è stata <strong>decisa</strong> e l'altra
+            capita per caso, ed è questa la distanza fra scrivere codice e farlo funzionare.</p>
+          <p><strong>Il tasto ±.</strong> Basta un ramo in più nella funzione <code>premi</code>:</p>
+          <div class="codebox"><span class="kw">} else if</span> (t === <span class="st">"±"</span>) {
+  corrente = corrente.<span class="fn">startsWith</span>(<span class="st">"-"</span>)
+           ? corrente.<span class="fn">slice</span>(<span class="nu">1</span>)      <span class="cm">// toglie il meno</span>
+           : <span class="st">"-"</span> + corrente;     <span class="cm">// oppure lo aggiunge</span>
+}</div>
+          <p>e un bottone <code>&lt;button data-tasto="±"&gt;±&lt;/button&gt;</code> nell'HTML. Nient'altro:
+            il collegamento fra bottoni e funzione è già scritto una volta per tutte con
+            <code>querySelectorAll</code>, e vale automaticamente anche per i bottoni nuovi.</p>
+          <p class="formula-note">È il vantaggio di aver separato <em>i dati</em> (l'attributo
+            <code>data-tasto</code>) dal <em>comportamento</em> (la funzione <code>premi</code>). Se avessimo
+            scritto diciotto <code>onclick</code> diversi nell'HTML, ogni tasto nuovo avrebbe richiesto una
+            riga nuova in due posti — ed è così che i progetti diventano ingestibili.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — METTERE IN RETE -->
+    <section id="sec3">
+      <h2>3. Metterlo in rete: server e hosting</h2>
+
+      <p>La calcolatrice funziona, ma esiste solo sul vostro computer. Per farla vedere a qualcun altro serve
+        che i tre file stiano su una macchina <strong>sempre accesa e sempre raggiungibile</strong>. Quella
+        macchina si chiama <em>server</em>.</p>
+
+      <div class="definition">
+        <div class="formula-title">Che cos'è un server</div>
+        <p>Non è un tipo speciale di computer: è un <strong>ruolo</strong>. Un server è un programma che sta
+          in ascolto su una porta e, quando arriva una richiesta, risponde. Il vostro portatile può fare da
+          server in dieci secondi — quello che gli manca non è la potenza, sono <em>tre cose</em>:</p>
+        <p><span class="step-num">1</span> deve restare <strong>acceso</strong> ventiquattro ore su
+          ventiquattro; <span class="step-num">2</span> deve avere un <strong>indirizzo IP pubblico e
+          stabile</strong>, mentre quello di casa cambia e sta dietro al router;
+          <span class="step-num">3</span> deve avere un <strong>nome</strong> leggibile, cioè un dominio
+          registrato nel DNS.</p>
+        <p class="formula-note">Un <strong>servizio di hosting</strong> è semplicemente qualcuno che si
+          occupa di queste tre cose al posto vostro. Per un sito fatto di soli file — HTML, CSS, JavaScript,
+          immagini — esistono servizi gratuiti e ottimi: <strong>GitHub Pages</strong>, GitLab Pages,
+          Netlify, Cloudflare Pages. Si chiamano siti <em>statici</em>, e sono statici nel senso che il
+          server non calcola niente: consegna i file così come sono, e tutto il lavoro lo fa il browser di
+          chi guarda. Il sito che state leggendo è esattamente così.</p>
+      </div>
+
+      <div class="curiosita"><strong>Il vostro computer come server, subito.</strong> Aprite il terminale
+        nella cartella del progetto e scrivete <code>python -m http.server 8000</code> (Python è già
+        installato su Linux e macOS). Poi andate su <code>http://localhost:8000</code>: state parlando col
+        vostro stesso computer, che ora è un server web. Serve davvero, e non solo per gioco: alcune cose —
+        i moduli JavaScript, le richieste di rete — <em>non funzionano</em> aprendo il file col doppio clic,
+        perché il browser applica regole di sicurezza diverse ai file locali. Se un progetto «funziona
+        online ma non in locale» (o viceversa), quasi sempre è questo.</div>
+
+      <div class="storia">
+        <p><strong>Come è nato git, in dieci giorni.</strong> Fino al 2005 lo sviluppo del kernel Linux usava
+          <em>BitKeeper</em>, un programma commerciale concesso gratuitamente alla comunità. Quell'anno
+          l'accordo saltò, e migliaia di sviluppatori si trovarono senza strumento. <strong>Linus Torvalds</strong> smise di lavorare al kernel e in poco più di una settimana scrisse da zero un
+          sistema nuovo, con tre requisiti: doveva essere <em>velocissimo</em>, <em>completamente
+          distribuito</em> e <em>impossibile da corrompere senza accorgersene</em>.</p>
+        <p>Lo chiamò <strong>git</strong> — parola dell'inglese britannico che significa press'a poco
+          «stupido, testa di legno» — dichiarando: «<em>chiamo tutti i miei progetti come me stesso</em>».
+          Oggi lo usa praticamente chiunque scriva software.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Distribuito, e perché conta</div>
+        <p>Nei sistemi precedenti (CVS, Subversion) esisteva <strong>un</strong> server con la storia del
+          progetto: senza connessione non si poteva fare nulla, e se il server si perdeva si perdeva tutto.
+          In git <strong>ogni copia contiene l'intera storia</strong>: si lavora offline, si fanno commit sul
+          treno, e ci si sincronizza dopo.</p>
+        <p>La struttura interna è quella della lezione 10: ogni <em>commit</em> è identificato
+          dall'<strong>impronta SHA-1 (oggi SHA-256)</strong> del suo contenuto, che include l'impronta del
+          commit precedente. Vi ricorda qualcosa?</p>
+        <div class="formula">$$\text{id}_k = \text{hash}\big(\text{id}_{k-1},\ \text{albero dei file},\
+          \text{autore},\ \text{data},\ \text{messaggio}\big)$$</div>
+        <p class="formula-note">È <strong>esattamente</strong> la struttura di una blockchain, e precede
+          Bitcoin di tre anni. La conseguenza è la stessa: modificare un commit vecchio cambia il suo
+          identificatore, e quindi quello di tutti i commit successivi — la manomissione silenziosa è
+          impossibile. Quello che git <em>non</em> ha è la prova di lavoro, perché non serve: non c'è nessuno
+          da cui difendersi in una copia che è già vostra.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="gt-btns">
+          <button class="btn btn-sm active" data-v="lineare">storia lineare</button>
+          <button class="btn btn-sm" data-v="ramo">un ramo di sviluppo</button>
+          <button class="btn btn-sm" data-v="fusione">la fusione</button>
+          <button class="btn btn-sm" data-v="conflitto">un conflitto</button>
+        </div>
+        <svg id="gt-svg" viewBox="0 0 680 400" role="img" aria-label="Il grafo dei commit: storia lineare, ramo, fusione e conflitto"></svg>
+        <p class="cap" id="gt-cap"></p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>④ Esercizio.</strong> Perché in git modificare il messaggio di un commit di un mese fa
+          cambia l'identificatore di <em>tutti</em> i commit successivi? E che cosa c'entra con la lezione
+          sulla blockchain?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p4s">Mostra la soluzione</button>
+        <div class="solution" id="p4s">
+          <p>Perché l'identificatore di un commit è l'<strong>impronta del suo contenuto</strong>, e in quel
+            contenuto è incluso l'identificatore del commit padre. Cambiando il messaggio cambia l'impronta
+            di quel commit; ma quell'impronta è dentro il commit successivo, che quindi cambia a sua volta; e
+            così via <strong>a cascata fino alla fine</strong>. Per l'effetto valanga della funzione di hash,
+            i nuovi identificatori non somigliano per niente ai vecchi.</p>
+          <p><strong>Il legame con la blockchain</strong> è che si tratta della stessa identica idea: una
+            catena di impronte in cui ogni anello contiene quello prima. Git è del <strong>2005</strong>,
+            Bitcoin del <strong>2008</strong>: la struttura dati non è un'invenzione di Nakamoto.</p>
+          <p><strong>La differenza sostanziale</strong> è che git <em>non</em> ha la prova di lavoro, e
+            infatti riscrivere la storia in git è facilissimo (<code>git rebase</code> lo fa in un secondo).
+            Il punto è che non serve difendersi: la vostra copia è vostra. La prova di lavoro serve solo
+            quando la storia dev'essere condivisa fra <strong>sconosciuti che non si fidano</strong>. È un
+            bell'esempio del fatto che una struttura dati non è né sicura né insicura di per sé: dipende dal
+            problema che deve risolvere.</p>
+          <p class="formula-note">Corollario pratico che vi eviterà molti guai: <strong>non riscrivete mai la
+            storia di un ramo che avete già condiviso</strong>. Chi l'ha scaricata ha i vecchi
+            identificatori, e la sua copia e la vostra diventano incompatibili.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — IL FLUSSO DI LAVORO -->
+    <section id="sec4">
+      <h2>4. Il flusso di lavoro: dal file al sito pubblicato</h2>
+
+      <div class="definition">
+        <div class="formula-title">I tre luoghi in cui vive un file</div>
+        <p>È il concetto che confonde tutti all'inizio, e una volta capito il resto viene da sé.</p>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th>luogo</th><th>che cos'è</th><th>come ci si arriva</th></tr>
+          <tr><td class="lab">cartella di lavoro</td><td class="l">i file come li vedete in Esplora risorse</td><td class="mono">— (li modificate voi)</td></tr>
+          <tr><td class="lab">area di staging</td><td class="l">le modifiche <em>scelte</em> per il prossimo commit</td><td class="mono">git add</td></tr>
+          <tr><td class="lab">repository locale</td><td class="l">la storia completa, sul vostro computer</td><td class="mono">git commit</td></tr>
+          <tr><td class="lab">repository remoto</td><td class="l">la copia condivisa (GitHub &amp; co.)</td><td class="mono">git push</td></tr>
+        </table>
+        </div>
+        <p class="formula-note">L'<strong>area di staging</strong> sembra un passaggio inutile ed è invece la
+          cosa più utile di git: permette di dire «di tutte le venti modifiche che ho fatto, queste tre vanno
+          insieme in un commit che riguarda una cosa sola». Un commit dovrebbe essere una
+          <em>unità di senso</em>, non un salvataggio periodico.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">I comandi che servono davvero</div>
+        <div class="codebox"><span class="cm"># --- una volta sola, il primo giorno ---</span>
+git config --global user.name  <span class="st">"Nome Cognome"</span>
+git config --global user.email <span class="st">"io@esempio.it"</span>
+
+<span class="cm"># --- iniziare un progetto ---</span>
+git init                     <span class="cm"># crea il repository nella cartella corrente</span>
+git clone &lt;indirizzo&gt;        <span class="cm"># oppure: scarica un progetto esistente</span>
+
+<span class="cm"># --- il ciclo di ogni giorno ---</span>
+git status                   <span class="cm"># che cosa e' cambiato? USATELO SEMPRE</span>
+git add index.html           <span class="cm"># scegli che cosa va nel commit</span>
+git add .                    <span class="cm"># ...oppure tutto quanto</span>
+git commit -m <span class="st">"Aggiunto il tasto cambia segno"</span>
+git push                     <span class="cm"># manda al remoto</span>
+git pull                     <span class="cm"># prendi le modifiche degli altri</span>
+
+<span class="cm"># --- lavorare su una cosa nuova senza rompere quella che funziona ---</span>
+git switch -c tasto-percentuale   <span class="cm"># crea un ramo e ci si sposta</span>
+<span class="cm"># ...si lavora, si fanno commit...</span>
+git switch main                   <span class="cm"># si torna al ramo principale</span>
+git merge tasto-percentuale       <span class="cm"># si porta dentro il lavoro</span>
+
+<span class="cm"># --- quando qualcosa va storto ---</span>
+git log --oneline --graph    <span class="cm"># guarda la storia</span>
+git diff                     <span class="cm"># che cosa ho cambiato esattamente?</span>
+git restore index.html       <span class="cm"># butta via le modifiche non salvate</span></div>
+        <p class="formula-note">Sono quindici comandi, e con questi si copre il novantacinque per cento del
+          lavoro reale. <code>git status</code> merita una menzione a parte: eseguitelo <em>prima e dopo</em>
+          ogni altro comando finché non avete l'immagine mentale chiara. Vi dice sempre in che stato siete e
+          spesso suggerisce il comando successivo.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Pubblicare con GitHub Pages, in sei passi</div>
+        <p><span class="step-num">1</span> Create un account su <code>github.com</code> e un
+          <em>repository</em> nuovo, per esempio <code>calcolatrice</code>, pubblico.</p>
+        <p><span class="step-num">2</span> Nella cartella del progetto:
+          <code>git init</code>, <code>git add .</code>,
+          <code>git commit -m "Prima versione"</code>.</p>
+        <p><span class="step-num">3</span> Collegate il remoto:
+          <code>git remote add origin https://github.com/&lt;utente&gt;/calcolatrice.git</code>.</p>
+        <p><span class="step-num">4</span> <code>git branch -M main</code> e poi
+          <code>git push -u origin main</code>.</p>
+        <p><span class="step-num">5</span> Sul sito: <em>Settings</em> → <em>Pages</em> → <em>Source: Deploy
+          from a branch</em> → ramo <code>main</code>, cartella <code>/ (root)</code>.</p>
+        <p><span class="step-num">6</span> Dopo un minuto il sito è online su
+          <code>https://&lt;utente&gt;.github.io/calcolatrice/</code>.</p>
+        <p class="formula-note">Da quel momento ogni <code>git push</code> aggiorna il sito
+          automaticamente. Due avvertenze pratiche: il file principale <strong>deve</strong> chiamarsi
+          <code>index.html</code>, ed è quello che il server consegna quando si chiede la cartella; e tutto
+          quello che caricate è <strong>pubblico e permanente</strong> — anche se lo cancellate dopo, resta
+          nella storia dei commit, che chiunque può leggere. Non mettete mai password, chiavi o dati
+          personali in un repository.</p>
+      </div>
+
+      <div class="warnbox"><strong>Le alternative hanno la stessa base logica.</strong> GitHub non è git:
+        è <em>un sito</em> che ospita repository git e ci aggiunge sopra dei servizi — le <em>issue</em> per
+        segnalare problemi, le <em>pull request</em> per proporre modifiche, l'esecuzione automatica dei
+        test. GitLab, Bitbucket, Codeberg, Gitea fanno le stesse cose con nomi diversi, e il repository sotto
+        è identico: potete spostare un progetto da uno all'altro con un comando. Il consiglio è quello di
+        sempre: <strong>imparate lo strumento sottostante, non l'interfaccia</strong>. I siti cambiano,
+        vengono comprati e cambiano politica; git è dal 2005 che funziona allo stesso modo.</div>
+
+      <div class="curiosita"><strong>Si usa anche per i videogiochi — e per molto altro.</strong> Git nasce
+        per il codice, ma gestisce qualunque file di testo: tesi in LaTeX, contratti, leggi. Il
+        <em>Bundestag</em> tedesco pubblica le leggi federali in un repository git, così chiunque può vedere
+        <em>chi</em> ha cambiato <em>quale parola</em> e <em>quando</em>. Per i videogiochi c'è una
+        complicazione: texture, modelli 3D e audio sono file binari enormi, che git gestisce male perché non
+        sa calcolarne le differenze. Per questo esiste <strong>Git LFS</strong> (<em>Large File
+        Storage</em>), che tiene nel repository solo un segnaposto e i file veri altrove. È il motivo per cui
+        alcuni studi usano ancora sistemi centralizzati come Perforce.</div>
+
+      <div class="exercise">
+        <p><strong>⑤ Esercizio.</strong> Hai modificato <code>stile.css</code> e <code>script.js</code>, ma
+          vuoi fare due commit separati, uno per file. Scrivi la sequenza di comandi. Poi: che cosa succede
+          se fai <code>git commit</code> senza aver fatto <code>git add</code>?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p5s">Mostra la soluzione</button>
+        <div class="solution" id="p5s">
+          <div class="codebox">git status                    <span class="cm"># vedo entrambi come "modified"</span>
+git add stile.css             <span class="cm"># metto in staging SOLO il CSS</span>
+git commit -m <span class="st">"Bottoni piu' grandi su schermi piccoli"</span>
+git add script.js             <span class="cm"># adesso l'altro</span>
+git commit -m <span class="st">"Corretta la divisione per zero"</span>
+git push                      <span class="cm"># li mando entrambi</span></div>
+          <p><strong>Ed è esattamente a questo che serve l'area di staging:</strong> senza, ogni commit
+            conterrebbe per forza tutto quello che avete toccato, e la storia diventerebbe una serie di
+            «modifiche varie» inutili da leggere. Con due commit separati, fra sei mesi potrete tornare
+            indietro <em>solo</em> sulla correzione della divisione senza perdere il lavoro sul CSS.</p>
+          <p><strong>Senza <code>git add</code></strong>, il comando <code>git commit</code> non ha niente da
+            registrare e vi risponde <em>«no changes added to commit»</em>: non crea nulla. Le modifiche
+            restano nella cartella di lavoro, al sicuro ma non salvate nella storia. È il tipo di messaggio
+            che conviene leggere invece di chiudere in fretta: git è insolitamente bravo a dire che cosa sta
+            succedendo, se glielo si lascia fare.</p>
+          <p class="formula-note">Esiste la scorciatoia <code>git commit -am "messaggio"</code>, che mette in
+            staging e registra in un colpo solo — comoda, ma prende tutti i file già tracciati. Da usare
+            quando si sa <em>esattamente</em> che cosa si è toccato, cioè dopo aver letto
+            <code>git status</code>.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑥ Esercizio.</strong> Due persone modificano la stessa riga dello stesso file, ciascuna
+          sul proprio computer, e poi provano a fare <code>push</code>. Che cosa succede alla seconda? E
+          perché git non sceglie da solo la versione «giusta»?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p6s">Mostra la soluzione</button>
+        <div class="solution" id="p6s">
+          <p>La prima <code>push</code> va a buon fine. La seconda viene <strong>rifiutata</strong>, con un
+            messaggio del tipo «<em>updates were rejected because the remote contains work that you do not
+            have locally</em>»: il remoto è andato avanti, e git non lascia sovrascrivere il lavoro
+            altrui.</p>
+          <p>La seconda persona deve allora fare <code>git pull</code>, che scarica e prova a
+            <strong>fondere</strong>. Se le due modifiche fossero su righe diverse, git le unirebbe da solo
+            senza dire niente. Ma qui sono <em>sulla stessa riga</em>, e allora si ferma e scrive nel file:</p>
+          <div class="codebox">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+  background: #2c3e50;        <span class="cm">// la mia versione</span>
+=======
+  background: #34495e;        <span class="cm">// quella arrivata dal remoto</span>
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; origin/main</div>
+          <p>Il <strong>conflitto</strong> si risolve a mano: si apre il file, si sceglie (o si scrive una
+            terza versione), si cancellano le righe di marcatura, poi <code>git add</code> e
+            <code>git commit</code>.</p>
+          <p><strong>Perché git non decide da solo.</strong> Perché <em>non può saperlo</em>. Le due
+            modifiche sono entrambe sintatticamente valide e git non ha idea di quale sia corretta: solo chi
+            ha scritto il codice conosce l'intenzione. Un sistema che scegliesse a caso — o «la più recente»
+            — distruggerebbe silenziosamente il lavoro di qualcuno, che è molto peggio di fermarsi e
+            chiedere. <strong>Fermarsi e chiedere all'essere umano è la scelta di progetto giusta</strong>
+            ogni volta che la macchina non ha l'informazione per decidere, e vale ben oltre git.</p>
+          <p class="formula-note">Il modo pratico di avere pochi conflitti non è tecnico ma organizzativo:
+            commit piccoli e frequenti, <code>git pull</code> spesso, e persone diverse che lavorano su file
+            diversi. È la stessa lezione della teoria dei giochi: molte piccole interazioni frequenti
+            producono meno danni di poche interazioni rare e grosse.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — PONG -->
+    <section id="sec5">
+      <h2>5. Pong: il primo videogioco, e come si costruisce</h2>
+
+      <div class="storia">
+        <p><strong>Pong</strong> esce nel <strong>1972</strong>, prodotto da Atari, e fu il primo videogioco
+          arcade a diventare un fenomeno di massa. Fu scritto da <strong>Allan Alcorn</strong>, appena
+          assunto, a cui Nolan Bushnell aveva assegnato il progetto come <em>esercizio di addestramento</em>
+          — senza dirgli che non c'era nessun cliente. Il prototipo fu messo in un bar di Sunnyvale e dopo
+          pochi giorni smise di funzionare: era stato installato un televisore da $75$ dollari e il
+          contenitore delle monete era talmente pieno da bloccare il meccanismo.</p>
+        <p>Non c'era nessun processore: il gioco era fatto di logica digitale cablata, transistor e porte
+          logiche. Oggi si scrive in una sessantina di righe, ed è il migliore esercizio possibile per capire
+          come funziona <em>qualunque</em> videogioco.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Il ciclo di gioco: tre passi, sessanta volte al secondo</div>
+        <p>Ogni videogioco esistente, dal Pong a un simulatore di volo, è questo ciclo:</p>
+        <p><span class="step-num">1</span> <strong>Leggi gli ingressi</strong> — quali tasti sono premuti
+          adesso. <span class="step-num">2</span> <strong>Aggiorna lo stato</strong> — muovi la palla, muovi
+          le racchette, controlla le collisioni, aggiorna il punteggio.
+          <span class="step-num">3</span> <strong>Disegna</strong> — cancella tutto e ridisegna la scena
+          nella nuova posizione.</p>
+        <div class="codebox"><span class="kw">function</span> <span class="fn">ciclo</span>() {
+  <span class="fn">aggiorna</span>();                      <span class="cm">// la fisica</span>
+  <span class="fn">disegna</span>();                       <span class="cm">// la grafica</span>
+  <span class="fn">requestAnimationFrame</span>(ciclo);    <span class="cm">// richiamami al prossimo fotogramma</span>
+}
+<span class="fn">requestAnimationFrame</span>(ciclo);</div>
+        <p class="formula-note"><code>requestAnimationFrame</code> chiede al browser di richiamare la
+          funzione <em>appena prima del prossimo aggiornamento dello schermo</em>: tipicamente $60$ volte al
+          secondo, ma su uno schermo a $144$ Hz saranno $144$. Non usate <code>setInterval</code> per i
+          giochi: non è sincronizzato con lo schermo e produce scatti. Un dettaglio importante: se il gioco
+          si muove «di tanti pixel per fotogramma», su un monitor veloce andrà più veloce. La soluzione
+          professionale è moltiplicare per il tempo trascorso ($\Delta t$), esattamente come nel moto
+          uniforme di fisica: $s = v\,\Delta t$.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Lo stato del gioco, e la fisica</div>
+        <div class="codebox"><span class="kw">const</span> stato = {
+  palla:  { x: <span class="nu">340</span>, y: <span class="nu">190</span>, vx: <span class="nu">4</span>, vy: <span class="nu">2.5</span>, r: <span class="nu">7</span> },
+  sx:     { y: <span class="nu">150</span>, punti: <span class="nu">0</span> },   <span class="cm">// racchetta di sinistra</span>
+  dx:     { y: <span class="nu">150</span>, punti: <span class="nu">0</span> },   <span class="cm">// racchetta di destra</span>
+  altezzaRacchetta: <span class="nu">80</span>, larghezzaRacchetta: <span class="nu">10</span>
+};
+
+<span class="kw">function</span> <span class="fn">aggiorna</span>() {
+  <span class="kw">const</span> p = stato.palla;
+  p.x += p.vx;  p.y += p.vy;              <span class="cm">// moto rettilineo uniforme</span>
+
+  <span class="cm">// rimbalzo su soffitto e pavimento: si inverte SOLO la componente y</span>
+  <span class="kw">if</span> (p.y - p.r &lt; <span class="nu">0</span> || p.y + p.r &gt; H) p.vy = -p.vy;
+
+  <span class="cm">// rimbalzo sulla racchetta di sinistra</span>
+  <span class="kw">if</span> (p.x - p.r &lt; <span class="nu">20</span> &amp;&amp; <span class="fn">colpisce</span>(stato.sx, p) &amp;&amp; p.vx &lt; <span class="nu">0</span>) {
+    p.vx = -p.vx * <span class="nu">1.03</span>;                <span class="cm">// rimbalza e accelera un po'</span>
+    p.vy += <span class="fn">scarto</span>(stato.sx, p) * <span class="nu">0.08</span>;  <span class="cm">// l'angolo dipende da DOVE colpisce</span>
+  }
+  <span class="cm">// ... simmetrico a destra ...</span>
+
+  <span class="cm">// punto: la palla e' uscita da un lato</span>
+  <span class="kw">if</span> (p.x &lt; <span class="nu">0</span>)  { stato.dx.punti++; <span class="fn">rimetti</span>(<span class="nu">1</span>); }
+  <span class="kw">if</span> (p.x &gt; W) { stato.sx.punti++; <span class="fn">rimetti</span>(-<span class="nu">1</span>); }
+}</div>
+        <p class="formula-note">Il dettaglio che fa la differenza fra un Pong noioso e uno giocabile è
+          <code>scarto()</code>: la <strong>distanza fra il punto d'impatto e il centro della
+          racchetta</strong>. Colpire di punta manda la palla verso l'alto o verso il basso, colpire al
+          centro la rimanda dritta. Senza questa riga la palla ripeterebbe sempre lo stesso percorso e il
+          gioco finirebbe dopo trenta secondi. Con questa riga, il giocatore ha il <em>controllo</em>
+          dell'angolo — ed è quello che rende il Pong un gioco e non un'animazione.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="pn-btns">
+          <button class="btn btn-sm" id="pn-avvia">▶ gioca</button>
+          <button class="btn btn-sm" id="pn-pausa">⏸ pausa</button>
+          <button class="btn btn-sm" id="pn-nuovo">↺ ricomincia</button>
+        </div>
+        <div class="ctrl">
+          <label>velocità <span class="val-badge" id="pn-vv">4,0</span></label>
+          <input type="range" id="pn-v" min="2" max="9" step="0.5" value="4" style="flex:1;min-width:170px">
+          <label>racchetta <span class="val-badge" id="pn-hv">80</span></label>
+          <input type="range" id="pn-h" min="40" max="140" step="10" value="80" style="flex:1;min-width:170px">
+          <label class="toggle-row"><input type="checkbox" id="pn-cpu"> il destro lo muove il computer</label>
+        </div>
+        <canvas id="pn-cv" width="680" height="380" tabindex="0"
+                aria-label="Pong giocabile in due: W e S per il giocatore di sinistra, frecce su e giù per quello di destra"></canvas>
+        <p class="cap" id="pn-cap">Sinistra: <strong>W</strong> e <strong>S</strong> · Destra:
+          <strong>↑</strong> e <strong>↓</strong> · Barra spaziatrice per mettere in pausa.
+          Clicca sul campo per dargli il fuoco della tastiera.</p>
+      </div>
+
+      <div class="curiosita"><strong>Perché il campo è nero con la riga tratteggiata.</strong> Non è una
+        scelta estetica: nel 1972 il gioco disegnava direttamente il segnale video, e ogni elemento in più
+        costava componenti fisici. Nero significava «non accendere il pennello», cioè
+        <strong>gratis</strong>. La rete a metà campo è tratteggiata perché una riga continua avrebbe
+        richiesto un circuito in più: bastava riusare lo stesso contatore delle linee di scansione. Metà
+        dell'estetica dei videogiochi anni Settanta è, in realtà, l'aspetto che avevano i vincoli
+        hardware.</div>
+
+      <div class="exercise">
+        <p><strong>⑦ Esercizio.</strong> Nel codice il rimbalzo su soffitto e pavimento è
+          <code>p.vy = -p.vy</code>. (a) Perché non si tocca <code>vx</code>? (b) Che cosa succederebbe
+          scrivendo <code>p.vy = -Math.abs(p.vy)</code>? (c) C'è un difetto noto in
+          <code>if (p.y - p.r &lt; 0 || p.y + p.r &gt; H) p.vy = -p.vy;</code>: quale, e come si
+          corregge?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p7s">Mostra la soluzione</button>
+        <div class="solution" id="p7s">
+          <p><strong>(a)</strong> Perché il muro è <em>orizzontale</em>: la riflessione inverte solo la
+            componente <strong>perpendicolare</strong> alla superficie, e lascia intatta quella parallela. È
+            la legge della riflessione dell'ottica geometrica, la stessa di Fisica_3: angolo di incidenza
+            uguale ad angolo di riflessione. Toccare anche <code>vx</code> farebbe tornare indietro la palla
+            come se avesse colpito uno spigolo.</p>
+          <p><strong>(b)</strong> <code>-Math.abs(p.vy)</code> forza la velocità verticale a essere sempre
+            <em>negativa</em>, cioè verso l'alto: la palla resterebbe incollata al soffitto. Sarebbe però la
+            scrittura giusta se usata <em>solo</em> nel controllo del pavimento — ed è anzi il modo standard
+            per risolvere il punto (c).</p>
+          <p><strong>(c) Il difetto è l'incollamento.</strong> Se in un fotogramma la palla finisce
+            <em>dentro</em> il muro (perché va veloce e il passo è grande), l'istruzione inverte
+            <code>vy</code>; ma se al fotogramma dopo è ancora dentro — non è riuscita a uscire — la
+            condizione è di nuovo vera e <code>vy</code> si inverte un'altra volta, riportandola dentro. La
+            palla vibra bloccata sul bordo.</p>
+          <div class="codebox"><span class="cm">// versione corretta: si forza il VERSO, non lo si inverte</span>
+<span class="kw">if</span> (p.y - p.r &lt; <span class="nu">0</span>) { p.y = p.r;     p.vy = <span class="fn">Math.abs</span>(p.vy);  }
+<span class="kw">if</span> (p.y + p.r &gt; H) { p.y = H - p.r; p.vy = -<span class="fn">Math.abs</span>(p.vy); }</div>
+          <p>Due accorgimenti insieme: si <strong>rimette la palla sul bordo</strong> (invece di lasciarla
+            dentro) e si <strong>impone il verso giusto</strong> invece di invertire. Così la condizione non
+            può ripetersi. È il primo bug di fisica che incontra chiunque scriva un gioco, e vale la pena
+            averlo visto una volta prima di perderci un pomeriggio.</p>
+          <p class="formula-note">Il simulatore qui sopra usa la versione corretta: alzate la velocità al
+            massimo e vedrete che la palla non si incolla mai.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑧ Esercizio.</strong> La palla si muove di <code>vx = 4</code> pixel per fotogramma a
+          $60$ fotogrammi al secondo. (a) Quanti pixel al secondo? (b) Su un monitor a $144$ Hz, che cosa
+          succede? (c) Come si scrive il codice perché la velocità sia la stessa su qualunque monitor?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p8s">Mostra la soluzione</button>
+        <div class="solution" id="p8s">
+          <p><strong>(a)</strong> $4 \times 60 = \mathbf{240}$ pixel al secondo. Su un campo largo $680$
+            pixel, la palla lo attraversa in $680/240 = 2{,}83$ secondi.</p>
+          <p><strong>(b)</strong> A $144$ Hz il ciclo viene chiamato $144$ volte al secondo, quindi la palla
+            fa $4 \times 144 = 576$ pixel al secondo: il gioco va <strong>due volte e mezzo più
+            veloce</strong> e diventa ingiocabile. È un bug reale e famoso: diversi giochi degli anni Duemila
+            diventano inaffrontabili sui computer moderni proprio per questo, e alcuni titoli si rompono
+            letteralmente (la fisica «esplode») sopra una certa frequenza.</p>
+          <p><strong>(c)</strong> Si misura il tempo trascorso fra un fotogramma e l'altro e lo si usa come
+            $\Delta t$:</p>
+          <div class="codebox"><span class="kw">let</span> ultimo = <span class="fn">performance.now</span>();
+
+<span class="kw">function</span> <span class="fn">ciclo</span>(ora) {
+  <span class="kw">const</span> dt = (ora - ultimo) / <span class="nu">1000</span>;   <span class="cm">// in secondi</span>
+  ultimo = ora;
+  p.x += p.vx * dt;                <span class="cm">// vx ora e' in pixel AL SECONDO</span>
+  p.y += p.vy * dt;
+  <span class="fn">disegna</span>();
+  <span class="fn">requestAnimationFrame</span>(ciclo);
+}</div>
+          <p>Con <code>vx = 240</code> (pixel al secondo) il gioco si comporta allo stesso modo a $30$, $60$
+            o $144$ Hz. È <em>esattamente</em> la legge oraria del moto rettilineo uniforme:
+            $s = s_0 + v\,\Delta t$. La fisica del biennio, applicata.</p>
+          <p class="formula-note">Un'avvertenza che i professionisti conoscono bene: con $\Delta t$ variabile
+            la simulazione diventa <em>non deterministica</em> — due esecuzioni non danno mai gli stessi
+            numeri — e questo è un guaio nei giochi in rete, dove tutti devono vedere la stessa cosa. La
+            soluzione standard è il <em>fixed timestep</em>: si aggiorna la fisica a passi fissi (per esempio
+            $1/120$ di secondo) tante volte quante ne servono, e si disegna quando capita.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — I MOTORI GRAFICI -->
+    <section id="sec6">
+      <h2>6. I motori grafici</h2>
+
+      <p>Il Pong sta in sessanta righe. Un gioco vero richiede modelli tridimensionali, luci, ombre, fisica
+        dei corpi rigidi, audio posizionale, animazioni, salvataggi, rete, e la stessa cosa su cinque
+        piattaforme diverse. Nessuno riscrive tutto questo ogni volta: si usa un <strong>motore</strong>.</p>
+
+      <div class="definition">
+        <div class="formula-title">Che cosa c'è dentro un motore</div>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th>componente</th><th>di che cosa si occupa</th></tr>
+          <tr><td class="lab">renderer</td><td class="l">trasformare la scena 3D in pixel: proiezioni, luci, materiali, ombre</td></tr>
+          <tr><td class="lab">motore fisico</td><td class="l">gravità, collisioni, attrito, corpi rigidi e articolati</td></tr>
+          <tr><td class="lab">scene graph</td><td class="l">l'albero degli oggetti e delle loro trasformazioni relative</td></tr>
+          <tr><td class="lab">audio</td><td class="l">suono posizionale, riverbero, mixaggio</td></tr>
+          <tr><td class="lab">asset pipeline</td><td class="l">importare modelli, texture e suoni e convertirli nei formati giusti</td></tr>
+          <tr><td class="lab">editor</td><td class="l">l'ambiente visuale in cui si costruiscono i livelli</td></tr>
+        </table>
+        </div>
+        <p class="formula-note">La matematica che ci sta sotto la conoscete quasi tutta: le
+          <strong>trasformazioni</strong> del secondo anno (traslazioni, rotazioni, scalature, scritte come
+          matrici), i <strong>vettori</strong> di Fisica_3, il <strong>prodotto scalare</strong> per capire
+          quanta luce colpisce una superficie, la <strong>trigonometria</strong> di quest'anno per le
+          telecamere. Un motore grafico è, in fondo, un enorme programma di geometria analitica che gira
+          sessanta volte al secondo.</p>
+      </div>
+
+      <div class="ric">
+        <div><h4>Unity</h4><p>Il più diffuso, soprattutto per mobile e indie. Si programma in
+          <strong>C#</strong>, ha un enorme archivio di componenti pronti e una comunità sterminata.
+          Gratuito sotto una certa soglia di fatturato — soglia che nel 2023 è cambiata unilateralmente,
+          scatenando una rivolta: un buon promemoria sul costo di dipendere da uno strumento
+          proprietario.</p></div>
+        <div><h4>Unreal Engine</h4><p>Lo standard per i giochi ad alto budget e, sempre più, per cinema e
+          televisione. Si programma in <strong>C++</strong> o con i <em>Blueprint</em>, una
+          programmazione visuale a blocchi. Qualità grafica di riferimento; in cambio è pesante e ha una
+          curva di apprendimento ripida.</p></div>
+        <div><h4>Godot</h4><p><strong>Libero e open source</strong>, leggero, si scarica in cento megabyte e
+          parte subito. Linguaggio proprio (GDScript, molto simile a Python) oppure C#. È cresciuto
+          moltissimo, anche grazie agli sviluppatori usciti da Unity nel 2023. <em>Il consiglio per chi
+          comincia oggi.</em></p></div>
+        <div><h4>Il browser</h4><p>Non serve nessun motore per cominciare: <strong>Canvas 2D</strong> è
+          quello che avete appena usato, e per il 3D ci sono <strong>WebGL</strong> e il più recente
+          <strong>WebGPU</strong>, con librerie come Three.js. Vantaggio impareggiabile: si condivide con un
+          link, senza installare niente.</p></div>
+      </div>
+
+      <div class="warnbox"><strong>Il consiglio che nessuno dà.</strong> Il motore non è il problema. Il
+        problema è <em>finire</em> qualcosa. Il progetto tipico dell'aspirante sviluppatore è un gioco di
+        ruolo open world con multigiocatore, e non viene finito mai. Il consiglio serio: fate un gioco
+        <strong>piccolo</strong> e <strong>completo</strong> — menu, gioco, schermata finale, un suono
+        quando si vince — e pubblicatelo. Dieci giochi piccoli finiti insegnano incomparabilmente di più di
+        un capolavoro mai terminato, ed è anche l'unica cosa che si possa mostrare a qualcuno. Vale per i
+        giochi come per tutto il resto: <em>finito è meglio che perfetto</em>.</div>
+
+      <div class="exercise">
+        <p><strong>⑨ Esercizio.</strong> Vuoi fare un gioco 2D a scorrimento da pubblicare sul web, da solo,
+          con poca esperienza di programmazione. Quali strumenti scegli e perché? E che cosa cambierebbe se
+          il gioco dovesse uscire su PlayStation con un team di quaranta persone?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p9s">Mostra la soluzione</button>
+        <div class="solution" id="p9s">
+          <p><strong>Da solo, sul web:</strong> <em>Godot</em> con GDScript, oppure direttamente Canvas 2D e
+            JavaScript. Le ragioni sono tre: (1) <strong>tempo di partenza</strong> — si scarica e si è
+            operativi in mezz'ora; (2) <strong>pubblicazione</strong> — Godot esporta in HTML5, quindi il
+            gioco finisce sulle GitHub Pages come la calcolatrice, e si condivide con un link; (3)
+            <strong>nessun costo e nessun vincolo di licenza</strong>. Per la parte non tecnica: git per il
+            versionamento, e un archivio di grafica libera (Kenney, OpenGameArt) invece di disegnare tutto
+            da soli.</p>
+          <p><strong>Con quaranta persone, su PlayStation:</strong> cambia quasi tutto, e la ragione non è la
+            grafica. (1) Serve un motore con <strong>supporto ufficiale delle console</strong>, cioè Unreal o
+            Unity: pubblicare su PlayStation richiede strumenti sotto accordo di riservatezza che Godot non
+            ha. (2) Serve un <strong>editor visuale robusto</strong>, perché in quaranta non sono
+            programmatori: ci sono artisti, level designer, sound designer, e devono poter lavorare senza
+            toccare codice. (3) Serve gestire <strong>file binari enormi</strong>: git da solo non basta,
+            servono Git LFS o Perforce. (4) Servono <strong>build automatiche notturne</strong> e una vera
+            infrastruttura di test.</p>
+          <p class="formula-note">La morale è quella della lezione 11 di Matematica_3 sull'azienda: la
+            scelta tecnica giusta dipende dal <em>contesto</em>, non da quale strumento è «migliore» in
+            assoluto. Uno strumento potentissimo usato da una persona sola è un peso; uno strumento agile
+            usato da quaranta persone diventa il caos.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — ★ CHE COSA SUCCEDE QUANDO PREMI INVIO -->
+    <section id="sec7" class="optional">
+      <h2>7. Che cosa succede davvero quando premi Invio</h2>
+
+      <p>Chiudiamo l'anno con una domanda che sembra banale e che tiene insieme metà del programma: scrivete
+        un indirizzo nella barra, premete Invio, e in due decimi di secondo compare una pagina. Che cosa è
+        successo, esattamente?</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="rq-btns">
+          <button class="btn btn-sm active" data-v="viaggio">il viaggio della richiesta</button>
+          <button class="btn btn-sm" data-v="tempi">quanto dura ogni fase</button>
+        </div>
+        <svg id="rq-svg" viewBox="0 0 680 400" role="img" aria-label="Le fasi di una richiesta web, dal DNS al rendering"></svg>
+        <p class="cap" id="rq-cap"></p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Le sei fasi</div>
+        <p><span class="step-num">1</span> <strong>DNS.</strong> Il nome <code>esempio.it</code> non serve a
+          niente alla rete: serve un indirizzo IP. Il computer chiede a un <em>resolver</em>, che risale
+          l'albero dei server dei nomi fino a ottenere qualcosa come <code>93.184.216.34</code>. Se
+          l'indirizzo è già nella cache, questa fase costa zero.</p>
+        <p><span class="step-num">2</span> <strong>TCP.</strong> Si apre una connessione con quell'indirizzo
+          sulla porta $443$, con la stretta di mano in tre passi (SYN, SYN-ACK, ACK). Costa un giro completo
+          di andata e ritorno.</p>
+        <p><span class="step-num">3</span> <strong>TLS.</strong> È la lezione 10: il server manda il suo
+          <em>certificato</em>, cioè la sua chiave pubblica firmata da un'autorità di cui il browser si fida;
+          il browser verifica la firma e concorda una <strong>chiave simmetrica usa e getta</strong>. Da qui
+          in poi tutto viaggia cifrato. È il momento in cui compare il lucchetto.</p>
+        <p><span class="step-num">4</span> <strong>HTTP.</strong> Il browser manda una richiesta di tre
+          righe: <code>GET /calcolatrice/ HTTP/2</code>, l'indirizzo del sito e qualche intestazione. Il
+          server risponde con un codice — <code>200</code> se va bene, <code>404</code> se il file non
+          esiste, <code>301</code> se si è spostato — e il contenuto.</p>
+        <p><span class="step-num">5</span> <strong>Analisi e richieste secondarie.</strong> Il browser legge
+          l'HTML e scopre che servono anche <code>stile.css</code> e <code>script.js</code>: li chiede, in
+          parallelo. Ogni file in più è un viaggio in più, ed è per questo che i siti veloci ne hanno
+          pochi.</p>
+        <p><span class="step-num">6</span> <strong>Rendering.</strong> Il browser costruisce l'albero degli
+          elementi (il <em>DOM</em>), gli applica il CSS, calcola dove va ogni cosa (<em>layout</em>), la
+          disegna (<em>paint</em>) e infine esegue il JavaScript.</p>
+        <p class="formula-note">Tutto questo, per una pagina piccola, in un decimo di secondo. La parte più
+          lenta quasi sempre <strong>non</strong> è il server: sono i viaggi di andata e ritorno. Un pacchetto
+          fra Roma e la California impiega circa $80$ ms in fibra, e nessuna ottimizzazione del codice può
+          batterlo — la velocità della luce nella fibra è circa $200\,000$ km/s, ed è un limite fisico. Per
+          questo esistono le <em>CDN</em>, che tengono copie del sito vicino a chi le chiede: non rendono il
+          server più veloce, accorciano la <strong>distanza</strong>.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑩ Esercizio.</strong> Un server sta a $6000$ km di distanza e la luce nella fibra viaggia
+          a $200\,000$ km/s. (a) Quanto dura un viaggio di andata e ritorno? (b) Se caricare la pagina
+          richiede DNS + TCP + TLS + HTTP, cioè quattro viaggi, quanto si aspetta come minimo?
+          (c) Che cosa cambia mettendo una copia del sito a $300$ km?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p10s">Mostra la soluzione</button>
+        <div class="solution" id="p10s">
+          <p><strong>(a)</strong> Andata e ritorno sono $12\,000$ km:</p>
+          <div class="formula">$$t = \frac{12\,000\ \text{km}}{200\,000\ \text{km/s}} = 0{,}06\ \text{s}
+            = \mathbf{60}\ \text{ms}$$</div>
+          <p><strong>(b)</strong> Quattro viaggi: $4 \times 60 = \mathbf{240}$ ms, cioè quasi un quarto di
+            secondo <em>prima ancora</em> che arrivi il primo byte della pagina — e senza contare il tempo di
+            elaborazione del server, che nel conto non c'è. La differenza fra un sito che «risponde subito» e
+            uno che «ci mette un attimo» sta quasi tutta qui.</p>
+          <p><strong>(c)</strong> A $300$ km il viaggio dura $600/200\,000 = 0{,}003$ s $= 3$ ms, e quattro
+            viaggi fanno <strong>$12$ ms</strong> invece di $240$: <strong>venti volte meno</strong>. È
+            esattamente quello che fa una CDN, ed è il motivo per cui conviene molto più avvicinare i dati
+            che ottimizzare il codice.</p>
+          <p class="formula-note">Nella realtà i numeri sono un po' peggiori: i pacchetti non viaggiano in
+            linea retta, attraversano router che aggiungono ritardo, e la velocità nella fibra è circa due
+            terzi di quella nel vuoto (da cui i $200\,000$ km/s del testo). Ma l'ordine di grandezza è
+            questo, ed è utile saperlo stimare: <strong>la latenza non si compra, si accorcia</strong>. È
+            anche la ragione per cui HTTP/3 riduce il numero di viaggi necessari, invece di cercare di
+            renderli più rapidi.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="note"><strong>Il filo della lezione — e dell'anno.</strong> Questa lezione non ha aggiunto
+      teoria: ha chiuso il cerchio. La calcolatrice è la <em>funzione</em> del primo anno che diventa un
+      bottone; il grafo dei commit è la stessa catena di impronte della lezione 10; il rimbalzo della palla
+      è la riflessione dell'ottica e il moto uniforme della fisica; il conto sulla latenza è una divisione
+      di terza media che decide come si progetta un sito. Se dovessi lasciarvi una sola cosa dell'anno
+      sarebbe questa: <strong>gli strumenti che vi sembrano magici sono fatti di cose che sapete già</strong>,
+      messe insieme da qualcuno che ha avuto la pazienza di provare. Adesso avete una cartella con tre file
+      e un indirizzo da mandare a chi volete. È un buon punto da cui ripartire — buone vacanze, e fate
+      qualcosa di brutto e finito invece di qualcosa di bello e immaginario.</div>
+
+    <section id="quiz">
+      <h2>Verifica quello che hai capito</h2>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> — Prof. Vettigli</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script src="../Style/interactive.js"></script>
+  <script src="../Style/toc.js"></script>
+  <script src="../Style/quiz.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var SVGNS = 'http://www.w3.org/2000/svg';
+
+    function el(tag, attrs, txt) {
+      var n = document.createElementNS(SVGNS, tag);
+      for (var k in attrs) { if (attrs.hasOwnProperty(k)) { n.setAttribute(k, attrs[k]); } }
+      if (txt !== undefined) { n.textContent = txt; }
+      return n;
+    }
+    function clear(s) { while (s.firstChild) { s.removeChild(s.firstChild); } }
+    function L(s, x1, y1, x2, y2, col, w, dash) {
+      var a = { x1: x1, y1: y1, x2: x2, y2: y2, stroke: col, 'stroke-width': w || 1.5,
+                'stroke-linecap': 'round' };
+      if (dash) { a['stroke-dasharray'] = dash; }
+      s.appendChild(el('line', a));
+    }
+    function T(s, x, y, t, cls, anchor, size) {
+      var a = { x: x, y: y, class: cls || 'lbl' };
+      if (anchor) { a['text-anchor'] = anchor; }
+      if (size) { a['font-size'] = size; }
+      s.appendChild(el('text', a, t));
+    }
+    function C(s, cx, cy, r, fill, stroke, w) {
+      s.appendChild(el('circle', { cx: cx, cy: cy, r: r, fill: fill || 'none',
+        stroke: stroke || 'none', 'stroke-width': w || 1.5 }));
+    }
+    function P(s, d, stroke, w, fill, dash) {
+      if (!d) { return; }
+      var a = { d: d, fill: fill || 'none', stroke: stroke || 'none', 'stroke-width': w || 1.5,
+                'stroke-linejoin': 'round' };
+      if (dash) { a['stroke-dasharray'] = dash; }
+      s.appendChild(el('path', a));
+    }
+    function R(s, x, y, w, h, fill, stroke, sw, rx) {
+      s.appendChild(el('rect', { x: x, y: y, width: w, height: h, fill: fill || 'none',
+        stroke: stroke || 'none', 'stroke-width': sw === undefined ? 1.2 : sw,
+        rx: rx === undefined ? 4 : rx }));
+    }
+    function num(v, d) { return v.toFixed(d === undefined ? 2 : d).replace('.', ','); }
+    function css(name, fb) {
+      var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+      return (v && v.trim()) ? v.trim() : fb;
+    }
+    var COL = {};
+    function colori() {
+      COL.ax = css('--border', '#888');
+      COL.tx = css('--text', '#222');
+      COL.mu = css('--muted', '#777');
+      COL.ac = css('--accent', '#2563eb');
+      COL.mg = css('--magenta', '#c026d3');
+      COL.gd = css('--gold', '#d97706');
+      COL.gr = '#16a34a';
+      COL.rd = '#dc2626';
+      COL.s2 = css('--surface-2', '#f4f4f5');
+      COL.sf = css('--surface', '#fff');
+    }
+    colori();
+
+    var DISEGNI = [];
+    function avvia(draw, target) {
+      function protetto() {
+        try {
+          draw();
+        } catch (err) {
+          var msg = String(err && err.message ? err.message : err);
+          if (target && target.getContext) {
+            var g = target.getContext('2d');
+            g.setTransform(1, 0, 0, 1, 0, 0);
+            g.fillStyle = '#0d1117';
+            g.fillRect(0, 0, target.width, target.height);
+            g.fillStyle = '#e6edf3';
+            g.font = '15px Inter, sans-serif';
+            g.fillText('Simulazione non disponibile', 20, 40);
+            g.font = '12px Inter, sans-serif';
+            g.fillText(msg, 20, 66);
+            g.fillText('Segnalatelo al professore indicando questo messaggio.', 20, 88);
+          } else if (target) {
+            clear(target);
+            T(target, 20, 40, 'Simulazione non disponibile', 'em', 'start', 15);
+            T(target, 20, 66, msg, 'lbl-s');
+            T(target, 20, 88, 'Segnalatelo al professore indicando questo messaggio.', 'lbl-s');
+          }
+        }
+      }
+      DISEGNI.push(protetto);
+      protetto();
+      return protetto;
+    }
+    document.addEventListener('themechange', function () {
+      colori();
+      for (var i = 0; i < DISEGNI.length; i++) { DISEGNI[i](); }
+    });
+
+    function activate(box, btn) {
+      var b = box.querySelectorAll('button');
+      for (var i = 0; i < b.length; i++) { b[i].classList.remove('active'); }
+      if (btn) { btn.classList.add('active'); }
+    }
+    function grab(id) { return document.getElementById(id); }
+
+    /* ==================================================================
+       1 — I TRE STRATI DI UNA PAGINA WEB
+       ================================================================== */
+    (function () {
+      var svg = grab('pg-svg'); if (!svg) { return; }
+      var cap = grab('pg-cap');
+      var vista = 'html';
+
+      function draw() {
+        clear(svg);
+        var conCss = (vista !== 'html'), conJs = (vista === 'js');
+
+        /* il codice, a sinistra */
+        T(svg, 40, 28, 'i tre file…', 'lbl');
+        var righe = [
+          ['index.html', COL.gr, ['<h1>Calcolatrice</h1>', "<div id='schermo'>0</div>",
+                                  '<button id="b7">7</button>']],
+          ['stile.css', conCss ? COL.ac : COL.mu,
+           ['#schermo { background: #111;', '  color: #eee; font-size: 2rem; }',
+            'button { padding: 14px; }']],
+          ['script.js', conJs ? COL.gd : COL.mu,
+           ['b7.onclick = () => {', '  schermo.textContent = "7";', '};']]
+        ];
+        var y = 52, i, j;
+        for (i = 0; i < righe.length; i++) {
+          var attivo = (i === 0) || (i === 1 && conCss) || (i === 2 && conJs);
+          R(svg, 40, y, 320, 88,
+            attivo ? 'color-mix(in srgb, ' + righe[i][1] + ' 10%, transparent)' : COL.s2,
+            righe[i][1], attivo ? 1.8 : 1);
+          T(svg, 54, y + 20, righe[i][0], 'em mono', 'start', 12);
+          T(svg, 348, y + 20, attivo ? 'attivo' : 'spento', 'lbl-s', 'end', 10.5);
+          for (j = 0; j < righe[i][2].length; j++) {
+            T(svg, 54, y + 40 + j * 16, righe[i][2][j],
+              attivo ? 'lbl-s mono' : 'lbl-s mono', 'start', 10);
+          }
+          y += 100;
+        }
+
+        /* l'anteprima, a destra */
+        T(svg, 400, 28, '…e il risultato nel browser', 'lbl');
+        R(svg, 400, 52, 244, 288, conCss ? '#0d1117' : COL.sf, COL.ax, 1.4, 8);
+        R(svg, 400, 52, 244, 22, COL.s2, COL.ax, 1, 8);
+        C(svg, 414, 63, 4, COL.rd, 'none');
+        C(svg, 428, 63, 4, COL.gd, 'none');
+        C(svg, 442, 63, 4, COL.gr, 'none');
+        T(svg, 460, 67, 'index.html', 'lbl-s', 'start', 9.5);
+
+        T(svg, 416, 104, 'Calcolatrice', conCss ? 'lbl' : 'lbl', 'start', conCss ? 19 : 15);
+        if (conCss) {
+          R(svg, 416, 118, 212, 46, '#111', 'none', 0, 6);
+          T(svg, 618, 150, conJs ? '7' : '0', 'em', 'end', 26);
+          R(svg, 416, 178, 60, 40, COL.s2, COL.ax, 1, 6);
+          T(svg, 446, 204, '7', 'lbl', 'middle', 17);
+        } else {
+          T(svg, 416, 138, '0', 'lbl', 'start', 14);
+          R(svg, 416, 152, 34, 22, COL.s2, COL.ax, 1, 3);
+          T(svg, 433, 168, '7', 'lbl-s', 'middle', 11);
+        }
+
+        var msg = [
+          ['solo HTML', 'c’e’ tutto, ed e’ bruttissimo:', 'nessun colore, nessuna dimensione,',
+           'i bottoni sono quelli grigi del sistema'],
+          ['HTML + CSS', 'adesso e’ presentabile, ma', 'premendo il tasto non succede niente:',
+           'e’ una fotografia'],
+          ['HTML + CSS + JS', 'il bottone reagisce e lo schermo', 'cambia: e’ diventata un’applicazione',
+           '']
+        ][vista === 'html' ? 0 : (vista === 'css' ? 1 : 2)];
+        T(svg, 400, 262, msg[0], 'em', 'start', 13);
+        for (i = 1; i < msg.length; i++) {
+          if (msg[i]) { T(svg, 400, 282 + (i - 1) * 18, msg[i], 'lbl-s', 'start', 11); }
+        }
+
+        T(svg, 40, 366, 'la regola: struttura, aspetto e comportamento vanno in tre file diversi.',
+          'lbl-s');
+        T(svg, 40, 388, 'Mescolarli funziona per dieci righe e diventa ingestibile a cento.',
+          'lbl-s');
+        cap.textContent = 'Togliendo il CSS la pagina resta leggibile; togliendo il JavaScript ' +
+          'resta bella ma inerte. Sono tre mestieri diversi.';
+      }
+      var bts = grab('pg-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       2 — LA GUIDA PER SISTEMA OPERATIVO
+       ================================================================== */
+    (function () {
+      var bts = grab('os-btns'); if (!bts) { return; }
+      var box = { win: grab('os-win'), lin: grab('os-lin'), mac: grab('os-mac') };
+      /* si prova a indovinare il sistema, ma la scelta resta dell'utente */
+      var ua = ((navigator.userAgent || '') + ' ' +
+                (navigator.platform || '')).toLowerCase();
+      /* niente espressioni regolari: bastano tre ricerche di sottostringa */
+      function contiene(elenco) {
+        for (var i = 0; i < elenco.length; i++) {
+          if (ua.indexOf(elenco[i]) >= 0) { return true; }
+        }
+        return false;
+      }
+      var iniziale = 'win';
+      if (contiene(['mac', 'iphone', 'ipad'])) { iniziale = 'mac'; }
+      else if (contiene(['linux', 'x11', 'android'])) { iniziale = 'lin'; }
+      function mostra(k) {
+        for (var q in box) {
+          if (box.hasOwnProperty(q) && box[q]) { box[q].classList.toggle('attivo', q === k); }
+        }
+        var b = bts.querySelectorAll('button');
+        for (var i = 0; i < b.length; i++) {
+          b[i].classList.toggle('active', b[i].dataset.v === k);
+        }
+      }
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        mostra(b.dataset.v);
+      });
+      mostra(iniziale);
+    }());
+
+    /* ==================================================================
+       3 — LA CALCOLATRICE  (lo stesso codice mostrato nel testo)
+       ================================================================== */
+    (function () {
+      var tasti = grab('ca-tasti'); if (!tasti) { return; }
+      var schermo = grab('ca-schermo'), mem = grab('ca-mem');
+      var corrente = '0', memoria = null, operazione = null, nuovoNumero = false;
+
+      function calcola(a, op, b) {
+        if (op === '+') { return a + b; }
+        if (op === '-') { return a - b; }
+        if (op === '*') { return a * b; }
+        if (op === '/') { return b === 0 ? 'errore' : a / b; }
+        return b;
+      }
+      function pulisci(v) {
+        /* toglie le code di cifre dovute alla virgola mobile: 0,1+0,2 deve dare 0,3 */
+        if (typeof v !== 'number') { return String(v); }
+        if (!isFinite(v)) { return 'errore'; }
+        var s = String(Math.round(v * 1e10) / 1e10);
+        return s;
+      }
+      function mostra() {
+        schermo.textContent = corrente.replace('.', ',');
+        mem.textContent = (operazione === null)
+          ? ' '
+          : (String(memoria).replace('.', ',') + ' ' +
+             { '+': '+', '-': '−', '*': '×', '/': '÷' }[operazione]);
+      }
+      function premi(t) {
+        /* una volta in errore si esce SOLO con C: e' il comportamento delle
+           calcolatrici vere, e impedisce che uno sbaglio passi inosservato */
+        if (corrente === 'errore' && t !== 'C') { return; }
+        if (t >= '0' && t <= '9') {
+          corrente = (corrente === '0' || nuovoNumero) ? t : corrente + t;
+          nuovoNumero = false;
+        } else if (t === '.') {
+          if (nuovoNumero) { corrente = '0'; nuovoNumero = false; }
+          if (corrente.indexOf('.') < 0) { corrente += '.'; }
+        } else if (t === 'C') {
+          corrente = '0'; memoria = null; operazione = null; nuovoNumero = false;
+        } else if (t === '=') {
+          if (operazione !== null) {
+            corrente = pulisci(calcola(memoria, operazione, Number(corrente)));
+            memoria = null; operazione = null; nuovoNumero = true;
+          }
+        } else {
+          if (operazione !== null) {
+            corrente = pulisci(calcola(memoria, operazione, Number(corrente)));
+            if (corrente === 'errore') { memoria = null; operazione = null; mostra(); return; }
+          }
+          memoria = Number(corrente);
+          operazione = t;
+          nuovoNumero = true;
+        }
+        mostra();
+      }
+      tasti.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        premi(b.dataset.tasto);
+      });
+      document.addEventListener('keydown', function (e) {
+        var r = tasti.getBoundingClientRect();
+        var visibile = r.top < window.innerHeight && r.bottom > 0;
+        if (!visibile) { return; }
+        var k = e.key;
+        if (k >= '0' && k <= '9') { premi(k); }
+        else if (k === '.' || k === ',') { premi('.'); }
+        else if (k === '+' || k === '-' || k === '*' || k === '/') { premi(k); }
+        else if (k === 'Enter' || k === '=') { premi('='); }
+        else if (k === 'Escape' || k === 'c' || k === 'C') { premi('C'); }
+        else { return; }
+        e.preventDefault();
+      });
+      mostra();
+    }());
+
+    /* ==================================================================
+       4 — IL GRAFO DEI COMMIT
+       ================================================================== */
+    (function () {
+      var svg = grab('gt-svg'); if (!svg) { return; }
+      var cap = grab('gt-cap');
+      var vista = 'lineare';
+
+      function nodo(x, y, testo, col, etichetta) {
+        C(svg, x, y, 15, 'color-mix(in srgb, ' + col + ' 22%, transparent)', col, 2.2);
+        T(svg, x, y + 4, testo, 'lbl', 'middle', 11);
+        if (etichetta) { T(svg, x, y - 26, etichetta, 'lbl-s', 'middle', 10); }
+      }
+
+      function draw() {
+        clear(svg);
+        var y0 = 130, x0 = 70, dx = 90, i;
+
+        if (vista === 'lineare') {
+          var msg = ['prima versione', 'aggiunto il CSS', 'tasti funzionanti',
+                     'corretta la divisione', 'pubblicato'];
+          for (i = 0; i < 5; i++) {
+            if (i) { L(svg, x0 + (i - 1) * dx + 16, y0, x0 + i * dx - 16, y0, COL.mu, 2); }
+            nodo(x0 + i * dx, y0, 'c' + (i + 1), COL.ac, i === 4 ? 'main' : '');
+            T(svg, x0 + i * dx, y0 + 44, msg[i].split(' ')[0], 'lbl-s', 'middle', 9.5);
+            T(svg, x0 + i * dx, y0 + 58, msg[i].split(' ').slice(1).join(' '),
+              'lbl-s', 'middle', 9.5);
+          }
+          T(svg, 40, 34, 'la storia lineare: un commit dopo l’altro', 'lbl');
+          T(svg, 40, 52, 'ogni commit contiene l’impronta del precedente', 'lbl-s');
+          T(svg, 40, 250, 'git log --oneline', 'em mono');
+          var log = ['a3f9e21 (HEAD -> main) pubblicato', 'b71c0d4 corretta la divisione',
+                     '9e2f88a tasti funzionanti', '4c1d5b0 aggiunto il CSS',
+                     '0f8a913 prima versione'];
+          for (i = 0; i < log.length; i++) {
+            T(svg, 40, 276 + i * 22, log[i], 'lbl-s mono', 'start', 11);
+          }
+          cap.textContent = 'Cinque commit in fila: HEAD indica dove siete, main è il nome del ' +
+            'ramo principale.';
+          return;
+        }
+
+        if (vista === 'ramo') {
+          for (i = 0; i < 3; i++) {
+            if (i) { L(svg, x0 + (i - 1) * dx + 16, y0, x0 + i * dx - 16, y0, COL.mu, 2); }
+            nodo(x0 + i * dx, y0, 'c' + (i + 1), COL.ac, i === 2 ? 'main' : '');
+          }
+          /* il ramo */
+          P(svg, 'M' + (x0 + 2 * dx) + ' ' + (y0 - 15) + 'C' + (x0 + 2 * dx) + ' ' + (y0 - 50) +
+            ',' + (x0 + 3 * dx - 20) + ' ' + (y0 - 60) + ',' + (x0 + 3 * dx) + ' ' + (y0 - 60),
+            COL.gd, 2);
+          for (i = 3; i < 5; i++) {
+            if (i > 3) {
+              L(svg, x0 + (i - 1) * dx + 16, y0 - 60, x0 + i * dx - 16, y0 - 60, COL.gd, 2);
+            }
+            nodo(x0 + i * dx, y0 - 60, 'r' + (i - 2), COL.gd,
+                 i === 4 ? 'tasto-percentuale' : '');
+          }
+          T(svg, 40, 34, 'un ramo: si lavora senza rompere quello che funziona', 'lbl');
+          T(svg, 40, 232, 'git switch -c tasto-percentuale', 'em mono');
+          T(svg, 40, 256, '# ...si lavora, si fanno due commit...', 'lbl-s mono', 'start', 11);
+          T(svg, 40, 284, 'Il ramo main resta com’era: chi scarica il progetto continua a ' +
+            'vedere', 'lbl-s');
+          T(svg, 40, 306, 'la versione funzionante. Il lavoro nuovo vive accanto, non sopra.',
+            'lbl-s');
+          T(svg, 40, 342, 'È il motivo per cui in git «creare un ramo» costa zero: non copia ' +
+            'i file,', 'lbl-s');
+          T(svg, 40, 364, 'scrive solo un nome che punta a un commit.', 'lbl-s');
+          cap.textContent = 'Un ramo è soltanto un nome che punta a un commit: crearlo costa ' +
+            'un file di 41 byte.';
+          return;
+        }
+
+        if (vista === 'fusione') {
+          for (i = 0; i < 3; i++) {
+            if (i) { L(svg, x0 + (i - 1) * dx + 16, y0, x0 + i * dx - 16, y0, COL.mu, 2); }
+            nodo(x0 + i * dx, y0, 'c' + (i + 1), COL.ac);
+          }
+          P(svg, 'M' + (x0 + 2 * dx) + ' ' + (y0 - 15) + 'C' + (x0 + 2 * dx) + ' ' + (y0 - 50) +
+            ',' + (x0 + 3 * dx - 20) + ' ' + (y0 - 60) + ',' + (x0 + 3 * dx) + ' ' + (y0 - 60),
+            COL.gd, 2);
+          nodo(x0 + 3 * dx, y0 - 60, 'r1', COL.gd);
+          L(svg, x0 + 3 * dx + 16, y0 - 60, x0 + 4 * dx - 16, y0 - 60, COL.gd, 2);
+          nodo(x0 + 4 * dx, y0 - 60, 'r2', COL.gd);
+          /* il commit di fusione */
+          L(svg, x0 + 2 * dx + 16, y0, x0 + 5 * dx - 16, y0, COL.mu, 2);
+          P(svg, 'M' + (x0 + 4 * dx) + ' ' + (y0 - 45) + 'C' + (x0 + 4 * dx) + ' ' + (y0 - 10) +
+            ',' + (x0 + 5 * dx - 20) + ' ' + y0 + ',' + (x0 + 5 * dx - 16) + ' ' + y0,
+            COL.gd, 2);
+          nodo(x0 + 5 * dx, y0, 'M', COL.gr, 'main');
+          T(svg, 40, 34, 'la fusione: il lavoro del ramo entra nel principale', 'lbl');
+          T(svg, 40, 232, 'git switch main', 'em mono');
+          T(svg, 40, 256, 'git merge tasto-percentuale', 'em mono');
+          T(svg, 40, 290, 'Il commit di fusione M è l’unico che ha DUE genitori: è il segno che',
+            'lbl-s');
+          T(svg, 40, 312, 'due storie separate sono tornate una sola. Il grafo dei commit è',
+            'lbl-s');
+          T(svg, 40, 334, 'un grafo orientato aciclico — la stessa struttura del DB a grafo',
+            'lbl-s');
+          T(svg, 40, 356, 'visto in Matematica_2, lezione 3.', 'lbl-s');
+          cap.textContent = 'Il commit di fusione ha due genitori: è l’unico punto in cui la ' +
+            'storia si richiude.';
+          return;
+        }
+
+        /* conflitto */
+        T(svg, 40, 34, 'un conflitto: due modifiche sulla stessa riga', 'lbl');
+        for (i = 0; i < 2; i++) {
+          if (i) { L(svg, x0 + (i - 1) * dx + 16, y0, x0 + i * dx - 16, y0, COL.mu, 2); }
+          nodo(x0 + i * dx, y0, 'c' + (i + 1), COL.ac);
+        }
+        P(svg, 'M' + (x0 + dx) + ' ' + (y0 - 15) + 'C' + (x0 + dx) + ' ' + (y0 - 46) + ',' +
+          (x0 + 2 * dx - 20) + ' ' + (y0 - 56) + ',' + (x0 + 2 * dx) + ' ' + (y0 - 56),
+          COL.ac, 2);
+        nodo(x0 + 2 * dx, y0 - 56, 'A', COL.ac, 'Anna');
+        P(svg, 'M' + (x0 + dx) + ' ' + (y0 + 15) + 'C' + (x0 + dx) + ' ' + (y0 + 46) + ',' +
+          (x0 + 2 * dx - 20) + ' ' + (y0 + 56) + ',' + (x0 + 2 * dx) + ' ' + (y0 + 56),
+          COL.rd, 2);
+        nodo(x0 + 2 * dx, y0 + 56, 'B', COL.rd);
+        T(svg, x0 + 2 * dx, y0 + 96, 'Bruno', 'lbl-s', 'middle', 10);
+        T(svg, x0 + 3 * dx + 10, y0, '?', 'em', 'middle', 30);
+        L(svg, x0 + 2 * dx + 18, y0 - 56, x0 + 3 * dx - 6, y0 - 12, COL.mu, 1.4, '4 3');
+        L(svg, x0 + 2 * dx + 18, y0 + 56, x0 + 3 * dx - 6, y0 + 12, COL.mu, 1.4, '4 3');
+
+        var testo = ['<<<<<<< HEAD', '  background: #2c3e50;', '=======',
+                     '  background: #34495e;', '>>>>>>> origin/main'];
+        R(svg, 390, 78, 250, 116, '#0d1117', COL.ax, 1.2, 6);
+        for (i = 0; i < testo.length; i++) {
+          svg.appendChild(el('text', { x: 404, y: 100 + i * 20, 'font-size': 11,
+            'font-family': 'Consolas, monospace',
+            fill: (i === 1 ? '#7ee787' : (i === 3 ? '#ff7b72' : '#8b949e')) }, testo[i]));
+        }
+        T(svg, 40, 254, 'git non sceglie: non può sapere quale sia giusta. Si ferma, scrive',
+          'lbl-s');
+        T(svg, 40, 276, 'entrambe le versioni nel file e chiede a un essere umano.', 'lbl-s');
+        T(svg, 40, 310, 'Si apre il file, si sceglie, si tolgono le righe di marcatura, poi:',
+          'lbl-s');
+        T(svg, 40, 340, 'git add stile.css', 'em mono');
+        T(svg, 40, 364, 'git commit', 'em mono');
+        cap.textContent = 'Un conflitto non è un errore: è git che si rifiuta di indovinare ' +
+          'al posto vostro.';
+      }
+      var bts = grab('gt-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       5 — PONG
+       ================================================================== */
+    (function () {
+      var cv = grab('pn-cv'); if (!cv) { return; }
+      var sv = grab('pn-v'), sh = grab('pn-h'), cpu = grab('pn-cpu'), cap = grab('pn-cap');
+      var W = cv.width, Hh = cv.height;
+      var g = cv.getContext('2d');
+      var tasti = {};
+      var attivo = false, animando = false;
+      var st = null;
+
+      function nuovo() {
+        st = {
+          palla: { x: W / 2, y: Hh / 2, vx: +sv.value, vy: +sv.value * 0.55, r: 7 },
+          sx: { y: Hh / 2, punti: 0 },
+          dx: { y: Hh / 2, punti: 0 },
+          hR: +sh.value, wR: 10, vR: 6
+        };
+      }
+      function rimetti(verso) {
+        st.palla.x = W / 2;
+        st.palla.y = Hh / 2;
+        st.palla.vx = verso * Math.abs(+sv.value);
+        st.palla.vy = (+sv.value) * 0.55 * (Math.random() < 0.5 ? 1 : -1);
+      }
+      function colpisce(rac, p) {
+        return p.y > rac.y - st.hR / 2 - p.r && p.y < rac.y + st.hR / 2 + p.r;
+      }
+      function scarto(rac, p) { return (p.y - rac.y) / (st.hR / 2); }
+
+      function aggiorna() {
+        var p = st.palla;
+        /* racchette */
+        if (tasti['w']) { st.sx.y -= st.vR; }
+        if (tasti['s']) { st.sx.y += st.vR; }
+        if (cpu.checked) {
+          var bersaglio = p.y;
+          if (Math.abs(bersaglio - st.dx.y) > st.vR * 0.7) {
+            st.dx.y += (bersaglio > st.dx.y ? 1 : -1) * st.vR * 0.78;
+          }
+        } else {
+          if (tasti['arrowup']) { st.dx.y -= st.vR; }
+          if (tasti['arrowdown']) { st.dx.y += st.vR; }
+        }
+        var lim = st.hR / 2;
+        st.sx.y = Math.max(lim, Math.min(Hh - lim, st.sx.y));
+        st.dx.y = Math.max(lim, Math.min(Hh - lim, st.dx.y));
+
+        /* palla */
+        p.x += p.vx;
+        p.y += p.vy;
+        /* rimbalzo su soffitto e pavimento, versione corretta dell'esercizio 7 */
+        if (p.y - p.r < 0) { p.y = p.r; p.vy = Math.abs(p.vy); }
+        if (p.y + p.r > Hh) { p.y = Hh - p.r; p.vy = -Math.abs(p.vy); }
+        /* racchetta di sinistra */
+        if (p.x - p.r < 20 + st.wR && p.x > 20 && p.vx < 0 && colpisce(st.sx, p)) {
+          p.x = 20 + st.wR + p.r;
+          p.vx = Math.abs(p.vx) * 1.03;
+          p.vy += scarto(st.sx, p) * 1.6;
+        }
+        /* racchetta di destra */
+        if (p.x + p.r > W - 20 - st.wR && p.x < W - 20 && p.vx > 0 && colpisce(st.dx, p)) {
+          p.x = W - 20 - st.wR - p.r;
+          p.vx = -Math.abs(p.vx) * 1.03;
+          p.vy += scarto(st.dx, p) * 1.6;
+        }
+        /* velocita' massima, per non perdere la palla */
+        var vmax = 14;
+        if (Math.abs(p.vx) > vmax) { p.vx = (p.vx > 0 ? 1 : -1) * vmax; }
+        if (Math.abs(p.vy) > vmax) { p.vy = (p.vy > 0 ? 1 : -1) * vmax; }
+        /* punto */
+        if (p.x < -20) { st.dx.punti++; rimetti(1); }
+        if (p.x > W + 20) { st.sx.punti++; rimetti(-1); }
+      }
+
+      function disegna() {
+        g.fillStyle = '#0d1117';
+        g.fillRect(0, 0, W, Hh);
+        /* la rete tratteggiata */
+        g.strokeStyle = '#30363d';
+        g.lineWidth = 4;
+        g.setLineDash([12, 14]);
+        g.beginPath();
+        g.moveTo(W / 2, 0);
+        g.lineTo(W / 2, Hh);
+        g.stroke();
+        g.setLineDash([]);
+        /* racchette */
+        g.fillStyle = '#e6edf3';
+        g.fillRect(20, st.sx.y - st.hR / 2, st.wR, st.hR);
+        g.fillRect(W - 20 - st.wR, st.dx.y - st.hR / 2, st.wR, st.hR);
+        /* palla */
+        g.beginPath();
+        g.arc(st.palla.x, st.palla.y, st.palla.r, 0, 2 * Math.PI);
+        g.fill();
+        /* punteggio */
+        g.font = 'bold 46px Consolas, monospace';
+        g.fillStyle = '#8b949e';
+        g.textAlign = 'right';
+        g.fillText(String(st.sx.punti), W / 2 - 30, 60);
+        g.textAlign = 'left';
+        g.fillText(String(st.dx.punti), W / 2 + 30, 60);
+        g.textAlign = 'left';
+        g.font = '12px Inter, sans-serif';
+        g.fillStyle = '#8b949e';
+        g.fillText('W / S', 24, Hh - 14);
+        g.textAlign = 'right';
+        g.fillText(cpu.checked ? 'computer' : '↑ / ↓', W - 24, Hh - 14);
+        g.textAlign = 'left';
+        if (!attivo) {
+          g.fillStyle = 'rgba(13,17,23,0.72)';
+          g.fillRect(0, 0, W, Hh);
+          g.fillStyle = '#e6edf3';
+          g.font = 'bold 22px Inter, sans-serif';
+          g.textAlign = 'center';
+          g.fillText('premi «gioca» oppure la barra spaziatrice', W / 2, Hh / 2 - 6);
+          g.font = '13px Inter, sans-serif';
+          g.fillStyle = '#8b949e';
+          g.fillText('sinistra: W e S    ·    destra: frecce su e giù', W / 2, Hh / 2 + 22);
+          g.textAlign = 'left';
+        }
+      }
+
+      function ciclo() {
+        if (attivo) { aggiorna(); }
+        disegna();
+        if (attivo) {
+          requestAnimationFrame(ciclo);
+        } else {
+          animando = false;
+        }
+      }
+      function parti() {
+        if (!attivo) {
+          attivo = true;
+          if (!animando) { animando = true; requestAnimationFrame(ciclo); }
+        }
+      }
+      function ferma() { attivo = false; disegna(); }
+
+      function draw() {
+        grab('pn-vv').textContent = num(+sv.value, 1);
+        grab('pn-hv').textContent = sh.value;
+        if (!st) { nuovo(); }
+        st.hR = +sh.value;
+        disegna();
+      }
+
+      grab('pn-avvia').addEventListener('click', function () { cv.focus(); parti(); });
+      grab('pn-pausa').addEventListener('click', ferma);
+      grab('pn-nuovo').addEventListener('click', function () {
+        nuovo();
+        st.hR = +sh.value;
+        disegna();
+      });
+      sv.addEventListener('input', function () {
+        grab('pn-vv').textContent = num(+sv.value, 1);
+        var p = st.palla, sgn = p.vx >= 0 ? 1 : -1;
+        p.vx = sgn * (+sv.value);
+        disegna();
+      });
+      sh.addEventListener('input', function () {
+        grab('pn-hv').textContent = sh.value;
+        st.hR = +sh.value;
+        disegna();
+      });
+      cpu.addEventListener('change', disegna);
+
+      function giu(e) {
+        var k = e.key.toLowerCase();
+        var r = cv.getBoundingClientRect();
+        var visibile = r.top < window.innerHeight && r.bottom > 0;
+        if (!visibile) { return; }
+        if (k === 'w' || k === 's' || k === 'arrowup' || k === 'arrowdown') {
+          tasti[k] = true;
+          if (attivo) { e.preventDefault(); }
+        } else if (k === ' ') {
+          if (attivo) { ferma(); } else { parti(); }
+          e.preventDefault();
+        }
+      }
+      function su(e) { tasti[e.key.toLowerCase()] = false; }
+      document.addEventListener('keydown', giu);
+      document.addEventListener('keyup', su);
+      cv.addEventListener('click', function () { cv.focus(); parti(); });
+
+      avvia(draw, cv);
+      cap.textContent = 'Sinistra: W e S  ·  Destra: ↑ e ↓  ·  Barra spaziatrice per ' +
+        'avviare e mettere in pausa.';
+    }());
+
+    /* ==================================================================
+       6 — LA RICHIESTA WEB
+       ================================================================== */
+    (function () {
+      var svg = grab('rq-svg'); if (!svg) { return; }
+      var cap = grab('rq-cap');
+      var vista = 'viaggio';
+      /* i tempi tipici, in millisecondi, per un server europeo */
+      var FASI = [['DNS', 20, 'trovare l’indirizzo IP del nome'],
+                  ['TCP', 30, 'aprire la connessione (3 passi)'],
+                  ['TLS', 55, 'certificato, verifica, chiave di sessione'],
+                  ['HTTP', 35, 'richiesta GET e prima risposta'],
+                  ['file', 45, 'CSS, JavaScript, immagini'],
+                  ['rendering', 25, 'DOM, layout, disegno, script']];
+
+      function draw() {
+        clear(svg);
+        var i, tot = 0;
+        for (i = 0; i < FASI.length; i++) { tot += FASI[i][1]; }
+
+        if (vista === 'viaggio') {
+          T(svg, 40, 30, 'dalla barra dell’indirizzo alla pagina disegnata', 'lbl');
+          var x0 = 60, y0 = 74, w = 108, h = 54, gap = 8;
+          for (i = 0; i < FASI.length; i++) {
+            var col = [COL.ac, COL.gd, COL.gr, COL.mg, COL.ac, COL.gr][i];
+            var riga = Math.floor(i / 3), cc = i % 3;
+            var x = x0 + cc * (w + gap + 84), y = y0 + riga * 118;
+            R(svg, x, y, w, h, 'color-mix(in srgb, ' + col + ' 14%, transparent)', col, 1.8);
+            T(svg, x + w / 2, y + 24, FASI[i][0], 'em', 'middle', 13);
+            T(svg, x + w / 2, y + 43, FASI[i][1] + ' ms', 'lbl-s', 'middle', 11);
+            T(svg, x, y + 74, FASI[i][2].slice(0, 26), 'lbl-s', 'start', 9.5);
+            if (FASI[i][2].length > 26) {
+              T(svg, x, y + 88, FASI[i][2].slice(26), 'lbl-s', 'start', 9.5);
+            }
+            if (cc < 2) {
+              L(svg, x + w + 4, y + h / 2, x + w + gap + 76, y + h / 2, COL.mu, 1.6);
+              P(svg, 'M' + (x + w + gap + 70) + ' ' + (y + h / 2 - 5) + 'L' +
+                (x + w + gap + 78) + ' ' + (y + h / 2) + 'L' + (x + w + gap + 70) + ' ' +
+                (y + h / 2 + 5), COL.mu, 1.6);
+            }
+          }
+          R(svg, 55, 316, 570, 66, COL.s2, COL.ax);
+          T(svg, 75, 344, 'tempo totale tipico', 'lbl-s');
+          T(svg, 605, 344, tot + ' ms', 'em', 'end');
+          T(svg, 75, 368, 'la parte piu’ lenta non e’ il server: sono i viaggi di andata e ritorno',
+            'lbl-s');
+          cap.textContent = 'Sei fasi, circa ' + tot + ' millisecondi in tutto: e nessuna di ' +
+            'esse dipende da quanto è veloce il vostro computer.';
+          return;
+        }
+
+        /* tempi */
+        T(svg, 40, 30, 'quanto pesa ogni fase, e che cosa si può ridurre', 'lbl');
+        var bx = 150, bw = 420, y1 = 64, rh = 44;
+        for (i = 0; i < FASI.length; i++) {
+          var yy = y1 + i * rh;
+          var frac = FASI[i][1] / tot;
+          T(svg, bx - 12, yy + 16, FASI[i][0], 'lbl', 'end');
+          R(svg, bx, yy, bw, 22, COL.s2, COL.ax, 0.8, 4);
+          R(svg, bx, yy, bw * frac * 2.2, 22,
+            'color-mix(in srgb, ' + COL.ac + ' 55%, transparent)', COL.ac, 1, 4);
+          T(svg, bx + bw + 12, yy + 16, FASI[i][1] + ' ms', 'em', 'start', 11.5);
+          T(svg, bx, yy + 36, FASI[i][2], 'lbl-s', 'start', 9.5);
+        }
+        var yb = y1 + FASI.length * rh + 6;
+        R(svg, 55, yb, 570, 92, COL.s2, COL.ax);
+        T(svg, 75, yb + 26, 'con una CDN vicina (300 km invece di 6000)', 'lbl-s');
+        T(svg, 605, yb + 26, 'DNS+TCP+TLS+HTTP: da 240 a 12 ms', 'em', 'end');
+        T(svg, 75, yb + 52, 'con meno file da scaricare', 'lbl-s');
+        T(svg, 605, yb + 52, 'sparisce quasi tutta la quinta fase', 'lbl', 'end');
+        T(svg, 75, yb + 78, 'con un computer piu’ potente', 'lbl-s');
+        T(svg, 605, yb + 78, 'cambia solo l’ultima: 25 ms su ' + tot, 'lbl', 'end');
+        cap.textContent = 'Ottimizzare il codice serve poco: il tempo se ne va nei viaggi, e ' +
+          'quelli si accorciano solo avvicinando i dati.';
+      }
+      var bts = grab('rq-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  }());
+  </script>
+
+  <script>
+  window.quizData = [
+
+    { type: 'mc', diff: 'easy',
+      text: 'Di che cosa si occupa il CSS in una pagina web?',
+      options: [
+        'dell\'aspetto: colori, dimensioni, posizioni, spaziature',
+        'della struttura: quali elementi ci sono e come sono annidati',
+        'del comportamento: che cosa succede quando si preme un bottone',
+        'della comunicazione col server'
+      ],
+      correct: 0,
+      explain: 'I tre linguaggi hanno tre mestieri distinti: <strong>HTML</strong> la struttura (che cosa c\'è), <strong>CSS</strong> l\'aspetto (com\'è fatto), <strong>JavaScript</strong> il comportamento (che cosa succede). L\'analogia utile è quella dell\'edificio: muri portanti, intonaco e arredamento, impianto elettrico. Tenerli in tre file separati non è pedanteria: è ciò che permette di cambiare completamente l\'aspetto di un sito senza toccare una riga di contenuto, ed è la prima regola professionale del mestiere.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Che cos\'è git?',
+      options: [
+        'un sito web su cui si caricano i progetti',
+        'un sistema di controllo di versione distribuito: tiene la storia completa di un progetto su ogni copia',
+        'un linguaggio di programmazione per il web',
+        'un servizio di hosting gratuito per siti statici'
+      ],
+      correct: 1,
+      explain: 'Git è un <strong>programma</strong> che gira sul vostro computer e registra la storia delle modifiche. <em>Distribuito</em> significa che ogni copia contiene l\'intera storia: si lavora offline e ci si sincronizza dopo. La prima e la quarta risposta descrivono <strong>GitHub</strong>, che è una cosa diversa — un sito che ospita repository git e ci costruisce sopra dei servizi (issue, pull request, Pages). Confonderli è come confondere «posta elettronica» con «Gmail»: si può cambiare il secondo senza cambiare la prima, e infatti si può spostare un progetto da GitHub a GitLab con un comando.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Che rapporto c\'è fra Java e JavaScript?',
+      options: [
+        'JavaScript è la versione per il web di Java',
+        'Java è la versione compilata di JavaScript',
+        'sono due linguaggi completamente diversi: il nome simile è un\'operazione di marketing del 1995',
+        'sono lo stesso linguaggio con due nomi'
+      ],
+      correct: 2,
+      explain: 'Il linguaggio si chiamava <em>LiveScript</em>; Netscape lo ribattezzò JavaScript per sfruttare la popolarità di Java, che quell\'anno era il linguaggio del momento. Sono profondamente diversi: <strong>Java</strong> è compilato, fortemente tipizzato e gira su una macchina virtuale (l\'avete visto in Matematica_3, lezione 12); <strong>JavaScript</strong> è interpretato, dinamico e nasce per girare nel browser. La battuta che circola fra i programmatori è che «Java sta a JavaScript come <em>car</em> sta a <em>carpet</em>». È una domanda che si sente davvero ai colloqui, e sbagliarla si nota.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Perché il file principale di un sito deve chiamarsi <code>index.html</code>?',
+      options: [
+        'perché altrimenti il browser non riesce ad aprirlo',
+        'perché è l\'unico nome che git accetta',
+        'per una convenzione estetica: si può usare qualunque nome',
+        'perché è il file che il server consegna quando si chiede la cartella senza specificare nulla'
+      ],
+      correct: 3,
+      explain: 'Scrivendo <code>sito.it/calcolatrice/</code> non si è chiesto nessun file: si è chiesta una <em>cartella</em>. Per convenzione ormai universale il server risponde consegnando <code>index.html</code> (in alcune configurazioni anche <code>default.html</code>). Se quel file non c\'è, il server mostra l\'elenco dei file oppure un errore <code>403</code>. Aprendo invece un file col doppio clic il nome può essere qualunque, perché lo state indicando esplicitamente — ed è proprio per questo che «funzionava in locale» e poi il sito pubblicato dà errore.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'A che cosa serve <code>git add</code>, visto che poi c\'è comunque <code>git commit</code>?',
+      options: [
+        'a scegliere quali modifiche entrano nel prossimo commit, così che un commit riguardi una cosa sola',
+        'a caricare i file sul server remoto',
+        'a creare i file nuovi nella cartella',
+        'a scaricare le modifiche fatte dagli altri'
+      ],
+      correct: 0,
+      explain: 'È l\'<strong>area di staging</strong>, il passaggio che all\'inizio sembra inutile ed è la cosa più utile di git: permette di dire «di tutte le venti modifiche che ho fatto, queste tre vanno insieme». Un commit dovrebbe essere una <em>unità di senso</em> — «corretta la divisione per zero» — non un salvataggio periodico. Il vantaggio si vede fra sei mesi, quando si vuole annullare <em>solo</em> quella correzione senza perdere il resto. Le altre risposte descrivono <code>git push</code>, la creazione dei file e <code>git pull</code>.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Perché il tag <code>&lt;script&gt;</code> si mette tradizionalmente in fondo al <code>&lt;body&gt;</code>?',
+      options: [
+        'per far caricare la pagina più in fretta occupando meno banda',
+        'perché quando lo script parte, gli elementi HTML che deve cercare esistono già',
+        'perché il browser esegue solo l\'ultimo script che trova',
+        'perché il CSS deve essere caricato per ultimo'
+      ],
+      correct: 1,
+      explain: 'Il browser legge l\'HTML dall\'alto verso il basso ed <strong>esegue subito</strong> ogni script che incontra. Se lo script stesse nel <code>&lt;head&gt;</code>, <code>document.getElementById("schermo")</code> restituirebbe <code>null</code>, perché quel <code>&lt;div&gt;</code> non è ancora stato costruito — ed è la causa dell\'errore «cannot read property of null» che tutti incontrano la prima settimana. L\'alternativa moderna è <code>&lt;script defer&gt;</code> nella testa: il file si scarica in parallelo (quindi più in fretta) ma viene eseguito solo quando l\'HTML è pronto.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Molte guide risolvono la calcolatrice passando la stringa «2+3*4» alla funzione <code>eval()</code>. Perché è una pessima idea?',
+      options: [
+        'perché <code>eval()</code> è molto lenta e la calcolatrice risulterebbe scattosa',
+        'perché <code>eval()</code> non gestisce la precedenza degli operatori',
+        'perché <code>eval()</code> esegue qualunque codice le si passi: se un domani la stringa arrivasse da fuori, si darebbe a uno sconosciuto il permesso di eseguire codice',
+        'perché <code>eval()</code> non è supportata da tutti i browser'
+      ],
+      correct: 2,
+      explain: 'È la classe di vulnerabilità chiamata <strong>code injection</strong>. <code>eval()</code> non «calcola un\'espressione»: interpreta il testo come <em>programma JavaScript completo</em>, con accesso a tutto. Finché la stringa la scrivete voi non succede nulla, ma il codice sopravvive alle intenzioni di chi l\'ha scritto: basta che un domani quel valore arrivi da un campo di testo o da un indirizzo. La regola generale, valida ben oltre JavaScript: <strong>non trattare mai come codice qualcosa che arriva da fuori</strong>. (È vero anche che <code>eval()</code> è lenta e che la precedenza la gestisce benissimo — ma il problema è la sicurezza.)' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'In un videogioco la palla si muove di <code>4</code> pixel a ogni fotogramma. Che cosa succede su un monitor a $144$ Hz invece che a $60$?',
+      options: [
+        'niente: il browser normalizza automaticamente la velocità',
+        'il gioco rallenta, perché ogni fotogramma dura meno',
+        'il gioco diventa più fluido ma alla stessa velocità',
+        'il gioco va $2{,}4$ volte più veloce, perché il ciclo viene eseguito $144$ volte al secondo invece di $60$'
+      ],
+      correct: 3,
+      explain: '$4 \\times 144 = 576$ pixel al secondo contro i $4 \\times 60 = 240$ di prima: il rapporto è $144/60 = 2{,}4$. È un bug reale e famoso — diversi giochi degli anni Duemila diventano ingiocabili sui computer moderni, e in alcuni la fisica «esplode» sopra una certa frequenza. La soluzione è misurare il tempo trascorso fra un fotogramma e l\'altro e moltiplicare per esso: <code>p.x += p.vx * dt</code>, con <code>vx</code> espressa in pixel <em>al secondo</em>. È la legge oraria del moto rettilineo uniforme, $s = s_0 + v\\,\\Delta t$: la fisica del biennio applicata di peso.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Perché in git modificare il messaggio di un commit vecchio cambia l\'identificatore di tutti i commit successivi?',
+      options: [
+        'perché l\'identificatore di un commit è l\'impronta del suo contenuto, che include l\'impronta del commit precedente: la modifica si propaga a cascata',
+        'perché git rinumera i commit in ordine cronologico a ogni modifica',
+        'perché gli identificatori sono assegnati dal server remoto, che li ricalcola',
+        'non li cambia: solo quel commit viene modificato'
+      ],
+      correct: 0,
+      explain: 'È <strong>esattamente</strong> la struttura della blockchain della lezione 10 — e git è del 2005, Bitcoin del 2008. Ogni commit contiene l\'impronta del padre, quindi cambiarne uno cambia il suo identificatore, che è dentro il figlio, che cambia a sua volta, e così via fino alla fine. Per l\'effetto valanga i nuovi identificatori non somigliano ai vecchi. Da qui la regola pratica più importante del lavoro in gruppo: <strong>non riscrivete mai la storia di un ramo già condiviso</strong>, perché la copia degli altri diventa incompatibile con la vostra.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Due persone modificano la stessa riga dello stesso file. Perché git si ferma e chiede, invece di scegliere da solo?',
+      options: [
+        'perché sceglierebbe sempre la modifica più recente, che spesso è sbagliata',
+        'perché non ha l\'informazione per decidere: entrambe le versioni sono valide e solo chi le ha scritte conosce l\'intenzione',
+        'perché la fusione automatica è disattivata per impostazione predefinita e si può abilitare',
+        'perché non sa confrontare file di testo'
+      ],
+      correct: 1,
+      explain: 'Git fonde da solo, e benissimo, quando le modifiche sono su righe diverse: non è affatto incapace. Si ferma solo quando le modifiche <strong>si sovrappongono</strong>, perché lì qualunque scelta automatica distruggerebbe silenziosamente il lavoro di qualcuno — e un dato perso senza accorgersene è molto peggio di un messaggio d\'errore. Scrive allora nel file entrambe le versioni fra i marcatori <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> ed <code>=======</code>, e lascia decidere a un essere umano. <strong>Fermarsi e chiedere quando la macchina non ha l\'informazione per decidere</strong> è una scelta di progetto che vale ben oltre git.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Un server sta a $6000$ km e nella fibra la luce viaggia a circa $200\\,000$ km/s. Quanto dura, come minimo, un viaggio di andata e ritorno?',
+      options: ['$30$ ms', '$300$ ms', '$60$ ms', '$6$ ms'],
+      correct: 2,
+      explain: 'Andata e ritorno sono $12\\,000$ km, quindi $t = 12\\,000/200\\,000 = 0{,}06$ s $= \\mathbf{60}$ ms. Poiché caricare una pagina richiede almeno quattro viaggi — DNS, TCP, TLS, HTTP — si aspettano $240$ ms <em>prima ancora</em> che arrivi il primo byte, e nessuna ottimizzazione del codice può ridurli: è un limite fisico. Ecco perché esistono le <strong>CDN</strong>, che tengono copie del sito vicino a chi le chiede: a $300$ km i quattro viaggi costano $12$ ms invece di $240$, venti volte meno. <em>La latenza non si compra, si accorcia.</em>' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Nel Pong, quando la palla rimbalza sul soffitto si scrive <code>p.vy = -p.vy</code> e non si tocca <code>vx</code>. Perché?',
+      options: [
+        'per far sembrare il rimbalzo più realistico, anche se fisicamente andrebbero invertite entrambe',
+        'perché <code>vx</code> è costante in tutti i videogiochi',
+        'per un\'ottimizzazione: cambiare due variabili costerebbe il doppio',
+        'perché la riflessione su una superficie inverte solo la componente perpendicolare alla superficie e lascia intatta quella parallela'
+      ],
+      correct: 3,
+      explain: 'È la <strong>legge della riflessione</strong> dell\'ottica geometrica, la stessa di Fisica_3: angolo di incidenza uguale ad angolo di riflessione. Il soffitto è orizzontale, quindi la componente perpendicolare è $v_y$ e quella parallela è $v_x$: solo la prima si inverte. Invertendo anche $v_x$ la palla tornerebbe indietro come se avesse colpito uno spigolo. C\'è però un difetto noto in quella riga: se la palla finisce <em>dentro</em> il muro, la condizione resta vera al fotogramma dopo e <code>vy</code> si inverte di nuovo, lasciandola a vibrare sul bordo. La versione robusta forza il verso invece di invertirlo: <code>p.y = p.r; p.vy = Math.abs(p.vy);</code>' },
+
+    { type: 'open',
+      text: 'Descrivi i tre linguaggi di una pagina web e spiega perché conviene tenerli in file separati. Poi elenca il percorso completo per portare una cartella con tre file su un indirizzo pubblico di internet.',
+      keywords: ['HTML', 'struttura', 'CSS', 'aspetto', 'JavaScript', 'comportamento',
+                 'separati', 'index.html', 'git init', 'commit', 'push', 'Pages', 'remoto',
+                 'server'],
+      requiredMatches: 4,
+      explain: '<strong>I tre linguaggi.</strong> <em>HTML</em> definisce la <strong>struttura</strong>: quali elementi esistono e come sono annidati — un titolo, un paragrafo, un bottone. <em>CSS</em> definisce l\'<strong>aspetto</strong>: colori, dimensioni, posizioni, spaziature. <em>JavaScript</em> definisce il <strong>comportamento</strong>: che cosa accade quando si interagisce. L\'analogia è quella dell\'edificio: muri portanti, intonaco, impianto elettrico.<br><br><strong>Perché separarli.</strong> Perché sono tre mestieri diversi e cambiano con ritmi diversi: si può rifare completamente la grafica di un sito senza toccare una riga di contenuto, e si può correggere un calcolo senza rischiare di rompere l\'impaginazione. Il CSS scritto una volta vale per tutte le pagine; mescolato dentro l\'HTML andrebbe ripetuto ovunque. È lo stesso principio dell\'<em>information hiding</em> visto in Matematica_3: separare ciò che cambia da ciò che resta.<br><br><strong>Il percorso completo.</strong> (1) Una cartella con <code>index.html</code>, <code>stile.css</code> e <code>script.js</code>; il primo <em>deve</em> chiamarsi così, perché è il file che il server consegna quando si chiede la cartella. (2) <code>git init</code> per creare il repository locale. (3) <code>git add .</code> e <code>git commit -m "Prima versione"</code>. (4) Si crea un repository vuoto su GitHub e lo si collega: <code>git remote add origin …</code>. (5) <code>git push -u origin main</code>. (6) Si attiva <em>Settings → Pages</em> scegliendo il ramo <code>main</code>. Dopo un minuto il sito è su <code>https://&lt;utente&gt;.github.io/&lt;progetto&gt;/</code>, e da lì in poi ogni <code>git push</code> lo aggiorna da solo.<br><br><strong>Due avvertenze:</strong> tutto ciò che si carica è <em>pubblico e permanente</em>, anche se cancellato dopo, perché resta nella storia dei commit; e i nomi dei file vanno scritti minuscoli e senza spazi, perché i server sono quasi tutti Linux e distinguono le maiuscole.' },
+
+    { type: 'open',
+      text: 'Che cosa succede, passo per passo, fra il momento in cui premi Invio su un indirizzo e quello in cui la pagina compare? Spiega poi perché ottimizzare il codice del sito serve meno di quanto si creda.',
+      keywords: ['DNS', 'IP', 'TCP', 'connessione', 'TLS', 'certificato', 'HTTP', 'GET',
+                 'DOM', 'rendering', 'latenza', 'andata e ritorno', 'CDN', 'velocità della luce'],
+      requiredMatches: 4,
+      explain: '<strong>Le sei fasi.</strong><br>(1) <strong>DNS</strong>: il nome del sito non serve a nulla alla rete, serve un indirizzo IP. Il computer interroga un resolver, che risale l\'albero dei server dei nomi. Se l\'indirizzo è già in cache questa fase costa zero.<br>(2) <strong>TCP</strong>: si apre la connessione con la stretta di mano in tre passi (SYN, SYN-ACK, ACK). Costa un giro completo.<br>(3) <strong>TLS</strong>: è la lezione 10. Il server manda il <em>certificato</em>, cioè la sua chiave pubblica firmata da un\'autorità di cui il browser si fida; il browser verifica la firma e si concorda una chiave simmetrica usa e getta. È il momento in cui compare il lucchetto.<br>(4) <strong>HTTP</strong>: il browser manda <code>GET /pagina</code>; il server risponde con un codice (<code>200</code>, <code>404</code>, <code>301</code>) e il contenuto.<br>(5) <strong>Richieste secondarie</strong>: leggendo l\'HTML il browser scopre che servono CSS, JavaScript e immagini, e li chiede — ogni file è un viaggio in più.<br>(6) <strong>Rendering</strong>: costruzione del DOM, applicazione del CSS, calcolo del layout, disegno, esecuzione degli script.<br><br><strong>Perché ottimizzare il codice serve poco.</strong> Perché il tempo se ne va quasi tutto nei <strong>viaggi di andata e ritorno</strong>, e quelli sono limitati dalla <em>velocità della luce nella fibra</em>, circa $200\\,000$ km/s. Un server a $6000$ km costa $60$ ms per viaggio, e le prime quattro fasi ne richiedono almeno quattro: $240$ ms prima che arrivi il primo byte. Nessuna riscrittura del codice li recupera. Le cose che funzionano davvero sono <em>geografiche e architetturali</em>: mettere una copia del sito vicino a chi la chiede (una <strong>CDN</strong>: a $300$ km si scende a $12$ ms, venti volte meno), ridurre il <em>numero</em> di file da scaricare, e usare protocolli che richiedono meno viaggi — è esattamente quello che fa HTTP/3. La lezione generale: prima di ottimizzare, <strong>misurate dove va il tempo</strong>, perché quasi mai è dove pensate.' }
+  ];
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,2204 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 10 — Crittografia, blockchain e criptovalute</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .storia { border-left: 4px solid var(--magenta); background: color-mix(in srgb, var(--magenta) 7%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 680px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .figbox .mono { font-family: Consolas, monospace; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .ctrl input[type="text"] { background: var(--surface); color: var(--text); border: 1px solid var(--border);
+                               border-radius: 8px; padding: 0.35rem 0.6rem; font-family: Consolas, monospace;
+                               font-size: 0.95rem; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.l { text-align: left; }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabf td.mono { font-family: Consolas, monospace; }
+    .tabwrap { overflow-x: auto; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .ric { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .ric > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                 padding: 0.8rem 0.9rem; background: var(--surface); }
+    .ric h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+
+    .codebox { background: #0d1117; color: #e6edf3; border: 1px solid var(--border); border-radius: 10px;
+               padding: 0.8rem 1rem; margin: 0.9rem 0; font-family: Consolas, monospace; font-size: 0.88rem;
+               overflow-x: auto; line-height: 1.5; }
+    .codebox .kw { color: #ff7b72; }
+    .codebox .st { color: #a5d6ff; }
+    .codebox .cm { color: #8b949e; font-style: italic; }
+    .codebox .fn { color: #d2a8ff; }
+    .codebox .nu { color: #79c0ff; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quarto anno · Lezione 10</div>
+    <h1>Crittografia, blockchain e criptovalute</h1>
+    <p>Come si fa a fidarsi di uno sconosciuto a diecimila chilometri di distanza:
+      la risposta è aritmetica</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quarto anno</a>
+    <span class="sep">/</span> Crittografia, blockchain e criptovalute
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>L'idea in una riga.</strong> Nella lezione 9 abbiamo visto il denaro come lo conoscono i nostri
+      genitori: cedolini, mutui, IBAN. Questa lezione racconta come il denaro — e più in generale la
+      <em>fiducia</em> — sono stati riscritti da un'idea matematica di cinquant'anni fa: esistono operazioni
+      <strong>facili da fare e difficilissime da disfare</strong>. Da quel singolo fatto discendono i pagamenti
+      con la carta, i messaggi che nessuno può leggere, la firma digitale, la blockchain e le criptovalute.
+      <br><br><strong>Che cosa vi serve sapere già.</strong> Le potenze e i logaritmi delle lezioni 4-6, i
+      numeri primi delle medie e — se volete capire davvero perché RSA funziona — la <em>divisione con
+      resto</em>. Nient'altro. La parte difficile non è la matematica: è resistere alla tentazione di credere
+      che, siccome è complicata, sia magia.
+    </div>
+
+    <!-- 1 — IL PROBLEMA DELLA FIDUCIA -->
+    <section id="sec1">
+      <h2>1. Il problema: fidarsi di uno sconosciuto</h2>
+
+      <p>Avvicinate la carta al POS e in due secondi $47{,}30$ € passano dal vostro conto a quello del
+        negozio. Perché funziona? Il chip della carta dialoga col terminale, il terminale interroga un
+        <em>circuito</em> — Visa, Mastercard, Bancomat — che a sua volta chiede alla vostra banca se il denaro
+        c'è. Se la risposta è sì, l'addebito parte.</p>
+
+      <p>Ora la domanda scomoda: quel dialogo viaggia su cavi e antenne che <strong>non sono vostri</strong>.
+        Chiunque, in linea di principio, può ascoltarlo. Perché allora nessuno copia i dati della carta e
+        svuota il conto? Perché fra voi e il malintenzionato c'è una difesa che non è un lucchetto, non è una
+        guardia e non è una legge. È <strong>la matematica</strong>.</p>
+
+      <div class="definition">
+        <div class="formula-title">Che cosa vuol dire «comunicazione sicura»</div>
+        <p>Tre obiettivi diversi, che vengono spesso confusi:</p>
+        <p><span class="step-num">1</span> <strong>Riservatezza</strong> — chi intercetta il messaggio non
+          deve poterlo leggere.</p>
+        <p><span class="step-num">2</span> <strong>Integrità</strong> — chi intercetta non deve poterlo
+          modificare senza che ci si accorga.</p>
+        <p><span class="step-num">3</span> <strong>Autenticazione</strong> — devo essere sicuro che il
+          messaggio venga davvero da chi dice di essere.</p>
+        <p class="formula-note">Sono problemi <em>indipendenti</em>. Un messaggio può essere illeggibile ma
+          alterato, o perfettamente leggibile e sicuramente autentico. La crittografia moderna risolve tutti
+          e tre, ma con strumenti diversi: cifratura per il primo, funzioni di <em>hash</em> per il secondo,
+          <em>firma digitale</em> per il terzo. Li vedremo in quest'ordine.</p>
+      </div>
+
+      <div class="curiosita"><strong>Il principio di Kerckhoffs (1883).</strong> Un sistema crittografico deve
+        essere sicuro <em>anche se il nemico ne conosce il funzionamento</em>: l'unica cosa segreta deve essere
+        la <strong>chiave</strong>. È il contrario dell'istinto — l'istinto suggerisce di nascondere il metodo —
+        ma è la sola strada praticabile: i metodi prima o poi si scoprono, e un metodo che dipende dalla
+        propria segretezza crolla tutto in una volta. È anche la ragione per cui gli algoritmi che proteggono
+        le vostre password sono <strong>pubblicati</strong>, descritti riga per riga in documenti che chiunque
+        può leggere: sono stati attaccati da migliaia di ricercatori e hanno resistito. Diffidate del
+        contrario — «l'algoritmo è segreto, quindi è sicuro» si chiama <em>security through obscurity</em>, ed
+        è una bandiera rossa.</div>
+    </section>
+
+    <!-- 2 — IL CIFRARIO DI CESARE -->
+    <section id="sec2">
+      <h2>2. La chiave condivisa: il cifrario di Cesare e la sua rovina</h2>
+
+      <div class="storia">
+        <p>Svetonio racconta che <strong>Giulio Cesare</strong>, per i messaggi riservati ai suoi generali,
+          sostituiva ogni lettera con quella tre posizioni più avanti nell'alfabeto. È il più antico sistema
+          di cifratura di cui abbiamo una descrizione precisa, ed è ancora oggi il modo migliore per capire
+          che cos'è una chiave.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Il cifrario a scorrimento, in matematichese</div>
+        <p>Numeriamo le lettere da $0$ a $25$ ($\text{A} = 0$, $\text{B} = 1$, …, $\text{Z} = 25$). Cifrare
+          significa aggiungere la chiave $k$ e ripartire da capo quando si supera la $\text{Z}$:</p>
+        <div class="formula">$$c = (m + k) \bmod 26 \qquad\qquad m = (c - k) \bmod 26$$</div>
+        <p class="formula-note">Il simbolo $\bmod$ («modulo») indica il <strong>resto della divisione</strong>.
+          È l'aritmetica dell'orologio: se sono le $22$ e passano $5$ ore, sono le $3$, perché
+          $27 \bmod 24 = 3$. Su questa operazione si regge tutto il resto della lezione, ed è per questo che
+          la sezione 3 è dedicata solo a lei. Da notare la simmetria: la <strong>stessa chiave</strong> serve
+          per cifrare e per decifrare. Si chiama per questo <em>crittografia simmetrica</em>.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="ce-btns">
+          <button class="btn btn-sm active" data-v="cifra">cifra e decifra</button>
+          <button class="btn btn-sm" data-v="freq">analisi delle frequenze</button>
+          <button class="btn btn-sm" data-v="forza">provale tutte</button>
+        </div>
+        <div class="ctrl">
+          <label>messaggio</label>
+          <input type="text" id="ce-txt" value="TI AMO CIRUZZO" maxlength="46" style="flex:1;min-width:220px">
+          <label>chiave $k$ <span class="val-badge" id="ce-kv">3</span></label>
+          <input type="range" id="ce-k" min="1" max="25" step="1" value="3" style="flex:1;min-width:170px">
+        </div>
+        <svg id="ce-svg" viewBox="0 0 680 400" role="img" aria-label="Cifrario di Cesare, analisi delle frequenze e attacco a forza bruta"></svg>
+        <p class="cap" id="ce-cap"></p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>① Esercizio.</strong> Cifra il messaggio <code>TI AMO CIRUZZO</code> con la chiave $k = 7$.
+          Poi decifra <code>ZLNYLAV</code>, sapendo che la chiave è $7$.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#c1s">Mostra la soluzione</button>
+        <div class="solution" id="c1s">
+          <p><strong>Cifratura.</strong> Si somma $7$ e si riduce modulo $26$:
+            $\text{T}=19 \to 19+7 = 26 \to 26 \bmod 26 = 0 = \text{A}$; &nbsp;
+            $\text{I}=8 \to 15 = \text{P}$; &nbsp; $\text{A}=0 \to 7 = \text{H}$; &nbsp;
+            $\text{M}=12 \to 19 = \text{T}$; &nbsp; $\text{O}=14 \to 21 = \text{V}$; &nbsp;
+            $\text{C}=2 \to 9 = \text{J}$; &nbsp; $\text{R}=17 \to 24 = \text{Y}$; &nbsp;
+            $\text{U}=20 \to 27 \bmod 26 = 1 = \text{B}$; &nbsp;
+            $\text{Z}=25 \to 32 \bmod 26 = 6 = \text{G}$.</p>
+          <div class="result-box"><span class="result-label">Messaggio cifrato</span><span class="result-value"><code>AP HTV JPYBGGV</code></span></div>
+          <p><strong>Decifratura.</strong> Si sottrae $7$:
+            $\text{Z}=25 \to 18 = \text{S}$; &nbsp; $\text{L}=11 \to 4 = \text{E}$; &nbsp;
+            $\text{N}=13 \to 6 = \text{G}$; &nbsp; $\text{Y}=24 \to 17 = \text{R}$; &nbsp;
+            $\text{L}=11 \to 4 = \text{E}$; &nbsp; $\text{A}=0 \to \mathbf{-7}$ &nbsp;(!); &nbsp;
+            $\text{V}=21 \to 14 = \text{O}$.</p>
+          <p><strong>Attenzione al penultimo passo,</strong> che è il vero contenuto dell'esercizio:
+            $-7 \bmod 26$ non fa $-7$. Il modulo restituisce sempre un resto <em>non negativo</em>, quindi si
+            aggiunge $26$: $-7 + 26 = 19 = \text{T}$.</p>
+          <div class="result-box"><span class="result-label">Messaggio in chiaro</span><span class="result-value"><code>SEGRETO</code></span></div>
+          <p class="formula-note">La regola da portarsi via: in aritmetica modulare il risultato si riporta
+            sempre nell'intervallo $[0,\ n-1]$ aggiungendo o togliendo multipli di $n$. È l'errore numero uno
+            di chi programma la prima volta con le congruenze — e in molti linguaggi l'operatore
+            <code>%</code> restituisce davvero un numero negativo, quindi va corretto a mano. In Python no:
+            <code>-7 % 26</code> vale già $19$.</p>
+        </div>
+      </div>
+
+      <div class="warnbox"><strong>Perché il cifrario di Cesare è indifendibile.</strong> Due ragioni,
+        entrambe fatali. <strong>(1) Le chiavi sono venticinque.</strong> Un computer le prova tutte in un
+        milionesimo di secondo; una persona in cinque minuti. È l'attacco a <em>forza bruta</em>, e lo trovate
+        nella terza vista del simulatore. <strong>(2) La struttura della lingua resta intatta.</strong> In
+        italiano la lettera più frequente è la <strong>E</strong> (circa l'$11{,}8\%$ del testo), seguita da
+        <strong>A</strong>, <strong>I</strong> e <strong>O</strong>. Se nel testo cifrato la lettera più
+        frequente è la <strong>H</strong>, la chiave è quasi certamente $3$. Questo secondo attacco funziona
+        <em>anche</em> se le chiavi fossero miliardi, perché non le prova: <strong>conta</strong>.</div>
+
+      <div class="curiosita"><strong>Al-Kindi, nel nono secolo.</strong> L'analisi delle frequenze non è
+        un'invenzione moderna: la descrisse per la prima volta <strong>al-Kindi</strong> a Baghdad intorno
+        all'$850$, nel <em>Manoscritto sulla decifrazione dei messaggi crittografici</em>. Nasce da un contesto
+        inatteso — lo studio filologico del Corano, dove si contavano le occorrenze delle parole per datare i
+        testi. È uno dei più bei esempi di come una tecnica sviluppata per uno scopo si riveli decisiva in un
+        campo che non c'entra niente: la stessa cosa accadrà con i numeri primi, studiati per due millenni
+        come pura curiosità e diventati all'improvviso l'infrastruttura del commercio mondiale.</div>
+
+      <div class="exercise">
+        <p><strong>② Esercizio.</strong> Un messaggio cifrato con un cifrario a scorrimento contiene $200$
+          lettere, di cui $24$ sono <code>M</code>, $19$ sono <code>B</code> e $17$ sono <code>Q</code>.
+          Qual è la chiave più probabile? E che cosa cambierebbe se il messaggio fosse di sole $8$ lettere?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#c2s">Mostra la soluzione</button>
+        <div class="solution" id="c2s">
+          <p>La lettera più frequente, <code>M</code>, corrisponde con ogni probabilità alla <code>E</code>
+            del testo in chiaro. Quindi</p>
+          <p>$k = (\text{M} - \text{E}) \bmod 26 = (12 - 4) \bmod 26 = \mathbf{8}$.</p>
+          <p><strong>Controllo di coerenza,</strong> il passaggio che distingue una risposta da un tiro a
+            indovinare: con $k = 8$ la <code>A</code> diventa <code>I</code>, la <code>I</code> diventa
+            <code>Q</code>, la <code>O</code> diventa <code>W</code>. Fra le nostre lettere frequenti
+            troviamo <code>Q</code> con $17$ occorrenze: coerente con la <code>I</code>, che in italiano è la
+            terza lettera più comune. E <code>B</code>? $(\text{B} - k) = (1 - 8) \bmod 26 = 19 = \text{T}$:
+            anche la <code>T</code> è fra le più frequenti. <strong>Tre indizi concordi</strong>, dunque
+            $k = 8$.</p>
+          <p><strong>Con sole $8$ lettere</strong> l'attacco diventa <em>inaffidabile</em> — e la parola
+            giusta è proprio questa, non «impossibile». Le frequenze sono <em>statistiche</em>: su un campione
+            piccolo le fluttuazioni casuali dominano, ma qualche volta ci azzeccano lo stesso. Ho misurato la
+            cosa, generando testi casuali con le frequenze dell'italiano e facendoli attaccare dal programma
+            del simulatore:</p>
+          <div class="tabwrap">
+          <table class="tabf">
+            <tr><th>lunghezza del testo</th><th>$4$</th><th>$8$</th><th>$15$</th><th>$30$</th><th>$60$</th><th>$250$</th></tr>
+            <tr><td class="lab">chiave individuata</td><td>$44\%$</td><td>$75\%$</td><td>$91\%$</td><td>$99\%$</td><td>$100\%$</td><td>$100\%$</td></tr>
+          </table>
+          </div>
+          <p>Su quattro lettere è poco meglio di un lancio di moneta; su otto ci si azzecca tre volte su
+            quattro, il che <em>non basta</em> per fidarsi; da una trentina di lettere in poi il metodo è
+            praticamente infallibile. È la legge dei grandi numeri della lezione di statistica del secondo
+            anno, vista dal lato dell'attaccante: la statistica non dà certezze, dà <strong>affidabilità
+            crescente col campione</strong>. Con otto lettere conviene quindi combinare i due attacchi: si
+            provano tutte le $25$ chiavi e si sceglie fra le poche candidate quella che dà una parola
+            italiana.</p>
+          <p class="formula-note">Ed è per questo che i messaggi militari veri erano <em>corti</em>: non per
+            risparmiare tempo, ma per non regalare statistica al nemico. La regola vale ancora: ogni bit di
+            testo cifrato che l'avversario raccoglie è informazione che gli regalate.</p>
+        </div>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Il vero problema non è il cifrario: è la chiave</div>
+        <p>Immaginate di aver sostituito Cesare con un sistema moderno, imbattibile, con una chiave di
+          $256$ bit. Resta una domanda: <strong>come la comunicate al destinatario?</strong></p>
+        <p>Se gliela mandate sullo stesso canale che state cifrando, chi vi ascolta la intercetta e ha vinto.
+          Se glielo dite a voce, dovete incontrarvi. Per secoli è stato esattamente così: i capi di Stato si
+          scambiavano i cifrari <em>a mano</em>, tramite corrieri diplomatici, in ambasciate protette. Nella
+          seconda guerra mondiale la Kriegsmarine distribuiva ai sottomarini libri di chiavi stampati con
+          inchiostro solubile, da gettare in acqua in caso di cattura.</p>
+        <p class="formula-note">Con due persone serve una chiave. Con $n$ persone che vogliano tutte parlarsi
+          in privato servono $\dfrac{n(n-1)}{2}$ chiavi: per una scuola di $600$ persone sono
+          $179\,700$. È lo stesso conto combinatorio del baratto nella lezione 8 — e ha la stessa morale:
+          <strong>non scala</strong>. Per il commercio in rete, dove ogni giorno miliardi di sconosciuti si
+          scambiano dati sensibili senza essersi mai visti, la crittografia simmetrica da sola è
+          <em>inutilizzabile</em>.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>③ Esercizio.</strong> Verificate il conto: quante chiavi servirebbero perché tutti gli
+          abitanti di una città di $100\,000$ persone possano parlarsi a coppie in modo riservato? E se ne
+          arrivasse una in più, quante chiavi nuove bisognerebbe creare?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#c3s">Mostra la soluzione</button>
+        <div class="solution" id="c3s">
+          <p>$\dfrac{100\,000 \cdot 99\,999}{2} = \mathbf{4\,999\,950\,000}$ chiavi: quasi
+            <strong>cinque miliardi</strong>.</p>
+          <p>Se arriva una persona in più, deve creare una chiave con <em>ciascuno</em> degli abitanti
+            precedenti: <strong>$100\,000$ chiavi nuove</strong> — e infatti
+            $\frac{100\,001 \cdot 100\,000}{2} - \frac{100\,000\cdot 99\,999}{2} = 100\,000$.</p>
+          <p class="formula-note">Notate la struttura del problema: il numero di chiavi cresce come
+            $n^2/2$, cioè <em>quadraticamente</em>, mentre il numero di persone cresce come $n$. Ogni volta
+            che una quantità cresce col quadrato di un'altra, prima o poi il sistema esplode — è lo stesso
+            argomento della superficie e del volume nella lezione 1 di Matematica_3. La crittografia
+            asimmetrica risolve esattamente questo: con essa servono <strong>$n$</strong> coppie di chiavi,
+            una per persona, e chiunque può scrivere a chiunque senza accordi preventivi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — L'ARITMETICA MODULARE -->
+    <section id="sec3">
+      <h2>3. L'aritmetica dell'orologio</h2>
+
+      <p>Tutto quello che segue — RSA, le firme digitali, la blockchain — vive dentro un'aritmetica che avete
+        già usato mille volte senza chiamarla per nome: quella in cui, dopo un certo numero, si ricomincia da
+        capo.</p>
+
+      <div class="definition">
+        <div class="formula-title">Congruenze</div>
+        <p>Due interi $a$ e $b$ sono <strong>congruenti modulo $n$</strong> se hanno lo stesso resto nella
+          divisione per $n$, cioè se $n$ divide la loro differenza:</p>
+        <div class="formula">$$a \equiv b \pmod{n} \quad\Longleftrightarrow\quad n \mid (a - b)$$</div>
+        <p class="formula-note">Esempi: $27 \equiv 3 \pmod{24}$ (le ore), $17 \equiv 5 \pmod{12}$ (le
+          lancette), $100 \equiv 2 \pmod 7$ (i giorni della settimana). La cosa notevole è che
+          <strong>somma e prodotto si comportano bene</strong>: se $a \equiv a'$ e $b \equiv b'$, allora
+          $a+b \equiv a'+b'$ e $a\,b \equiv a'\,b'$. Questo permette di ridurre <em>durante</em> il calcolo
+          invece che alla fine, ed è ciò che rende possibile lavorare con numeri di seicento cifre senza mai
+          scriverli per intero.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>④ Esercizio.</strong> Calcolate $7^{100} \bmod 10$ senza calcolatrice. (Suggerimento:
+          guardate le prime potenze e cercate una regolarità.)</p>
+        <button class="btn btn-toggle btn-solution" data-target="#c4s">Mostra la soluzione</button>
+        <div class="solution" id="c4s">
+          <p>Si calcolano le prime potenze <em>riducendo ogni volta</em>:</p>
+          <p>$7^1 \equiv 7$, &nbsp; $7^2 = 49 \equiv 9$, &nbsp; $7^3 \equiv 9 \cdot 7 = 63 \equiv 3$,
+            &nbsp; $7^4 \equiv 3 \cdot 7 = 21 \equiv 1 \pmod{10}$.</p>
+          <p>Da $7^4 \equiv 1$ segue che le potenze si ripetono con <strong>periodo 4</strong>. Poiché
+            $100 = 4 \cdot 25$:</p>
+          <div class="formula">$$7^{100} = \left(7^{4}\right)^{25} \equiv 1^{25} = \mathbf{1} \pmod{10}$$</div>
+          <p class="formula-note">Cioè $7^{100}$ finisce per $1$ — e lo sappiamo senza aver scritto un numero
+            di $85$ cifre. Questa <em>periodicità</em> delle potenze modulo $n$ non è un caso fortunato: è un
+            teorema (Eulero, sezione 4) e sarà esattamente il motore di RSA. Notate anche la tecnica: ridurre
+            <em>ad ogni passo</em> tiene i numeri piccoli. Se avessimo calcolato $7^{100}$ per intero e poi
+            preso il resto, avremmo avuto bisogno di aritmetica a precisione arbitraria.</p>
+        </div>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">L'esponenziazione veloce, o «dei quadrati ripetuti»</div>
+        <p>Per calcolare $a^e \bmod n$ non serve moltiplicare $e$ volte. Basta osservare che</p>
+        <div class="formula">$$a^{2k} = \left(a^{k}\right)^2 \qquad\qquad a^{2k+1} = a\cdot\left(a^{k}\right)^2$$</div>
+        <p>e ricorrere: si dimezza l'esponente ad ogni passo. Per $e$ di $600$ cifre bastano circa
+          <strong>$2000$ moltiplicazioni</strong> invece di $10^{600}$.</p>
+        <div class="codebox"><span class="cm"># esponenziazione modulare veloce</span>
+<span class="kw">def</span> <span class="fn">potmod</span>(a, e, n):
+    r <span class="kw">=</span> <span class="nu">1</span>
+    a <span class="kw">=</span> a <span class="kw">%</span> n
+    <span class="kw">while</span> e <span class="kw">&gt;</span> <span class="nu">0</span>:
+        <span class="kw">if</span> e <span class="kw">%</span> <span class="nu">2</span> <span class="kw">==</span> <span class="nu">1</span>:      <span class="cm"># bit acceso: moltiplico</span>
+            r <span class="kw">=</span> (r <span class="kw">*</span> a) <span class="kw">%</span> n
+        a <span class="kw">=</span> (a <span class="kw">*</span> a) <span class="kw">%</span> n     <span class="cm"># quadrato</span>
+        e <span class="kw">=</span> e <span class="kw">//</span> <span class="nu">2</span>          <span class="cm"># dimezzo l'esponente</span>
+    <span class="kw">return</span> r</div>
+        <p class="formula-note">Il numero di passi è $\lceil \log_2 e \rceil$: è un <strong>algoritmo
+          logaritmico</strong>, della stessa famiglia della ricerca binaria. In Python questa funzione è già
+          nel linguaggio, si scrive <code>pow(a, e, n)</code> — ed è la ragione per cui un browser può
+          stabilire una connessione cifrata in pochi millisecondi.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="mo-btns">
+          <button class="btn btn-sm active" data-v="orologio">l'orologio modulare</button>
+          <button class="btn btn-sm" data-v="pot">le potenze e i loro cicli</button>
+          <button class="btn btn-sm" data-v="veloce">l'esponenziazione veloce</button>
+        </div>
+        <div class="ctrl">
+          <label>base $a$ <span class="val-badge" id="mo-av">2</span></label>
+          <input type="range" id="mo-a" min="2" max="30" step="1" value="2" style="flex:1;min-width:160px">
+          <label>modulo $n$ <span class="val-badge" id="mo-nv">33</span></label>
+          <input type="range" id="mo-n" min="5" max="60" step="1" value="33" style="flex:1;min-width:160px">
+          <label>esponente $e$ <span class="val-badge" id="mo-ev">7</span></label>
+          <input type="range" id="mo-e" min="1" max="64" step="1" value="7" style="flex:1;min-width:160px">
+        </div>
+        <svg id="mo-svg" viewBox="0 0 680 400" role="img" aria-label="Aritmetica modulare: orologio, cicli delle potenze ed esponenziazione veloce"></svg>
+        <p class="cap" id="mo-cap"></p>
+      </div>
+
+      <div class="curiosita"><strong>Gauss, di nuovo lui.</strong> La notazione $a \equiv b \pmod n$ e la
+        teoria sistematica delle congruenze compaiono nelle <em>Disquisitiones Arithmeticae</em>, che
+        <strong>Gauss</strong> pubblicò nel $1801$ a ventiquattro anni. Per un secolo e mezzo furono
+        considerate matematica pura nel senso più orgoglioso del termine: nel $1940$ il matematico inglese
+        G. H. Hardy scriveva compiaciuto che la teoria dei numeri non aveva <em>nessuna</em> applicazione
+        pratica, e che questo la rendeva innocente. Trent'anni dopo diventava la base della sicurezza
+        informatica mondiale. È un buon promemoria sulla differenza fra «non serve a niente» e «non serve a
+        niente <em>ancora</em>».</div>
+    </section>
+
+    <!-- 4 — RSA -->
+    <section id="sec4">
+      <h2>4. RSA: la chiave che si può gridare in piazza</h2>
+
+      <p>Nel <strong>1976</strong> Whitfield Diffie e Martin Hellman, con Ralph Merkle, pubblicano un articolo
+        dal titolo modesto — <em>New Directions in Cryptography</em> — che contiene un'idea che a quel punto
+        sembrava impossibile: <strong>due chiavi diverse</strong>, una per chiudere e una per aprire. Una la
+        si può pubblicare sul giornale; l'altra la si tiene per sé. Chiunque può scrivervi un messaggio
+        segreto, <em>nessuno</em> può leggerlo tranne voi, e non vi siete mai incontrati.</p>
+
+      <p>L'anno dopo, al MIT, <strong>Ron Rivest, Adi Shamir e Leonard Adleman</strong> trovano un modo
+        concreto di farlo. Le loro iniziali danno il nome all'algoritmo: <strong>RSA</strong>.</p>
+
+      <div class="storia">
+        <p><strong>Una nota amara e istruttiva.</strong> La stessa idea era stata trovata anni prima, fra il
+          $1969$ e il $1973$, da <strong>James Ellis</strong>, <strong>Clifford Cocks</strong> e
+          <strong>Malcolm Williamson</strong> al GCHQ, il servizio di intelligence britannico. Era coperta da
+          segreto militare e fu declassificata solo nel <strong>1997</strong>. Ellis era morto un mese prima.
+          Nessuno dei tre ha mai potuto rivendicare pubblicamente la scoperta finché contava, e questo è un
+          buon esempio di quanto la scienza dipenda dal fatto di poter essere <em>pubblicata</em>: la
+          conoscenza segreta non fa progredire nessuno tranne chi la detiene.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Le operazioni a senso unico</div>
+        <p>Tutta la crittografia moderna poggia su un'asimmetria di fatica: operazioni <strong>facili da fare
+          e difficilissime da disfare</strong>.</p>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th>facile</th><th>difficile</th></tr>
+          <tr><td class="l">moltiplicare $p \cdot q$ (due primi)</td><td class="l">fattorizzare $n$ nei suoi primi</td></tr>
+          <tr><td class="l">calcolare $a^e \bmod n$</td><td class="l">trovare $e$ dati $a$, $a^e$ e $n$ (logaritmo discreto)</td></tr>
+          <tr><td class="l">rompere un uovo</td><td class="l">ricostruirlo</td></tr>
+        </table>
+        </div>
+        <p class="formula-note">La terza riga non è una battuta: è il modello mentale giusto. Nessuna di
+          queste asimmetrie è stata <em>dimostrata</em> — nessuno ha provato che fattorizzare sia
+          intrinsecamente difficile, si sa solo che da duemilacinquecento anni nessuno ci riesce in fretta.
+          La sicurezza dei vostri dati poggia su una congettura molto ben collaudata, non su un teorema. È
+          onesto saperlo.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Costruire una coppia di chiavi, in sei passi</div>
+        <p><span class="step-num">1</span> Si scelgono due numeri <strong>primi</strong> $p$ e $q$ (nella
+          realtà di trecento cifre ciascuno).</p>
+        <p><span class="step-num">2</span> Si calcola il <strong>modulo</strong> $n = p\,q$.</p>
+        <p><span class="step-num">3</span> Si calcola $\varphi(n) = (p-1)(q-1)$, il numero di interi minori di
+          $n$ che non hanno fattori in comune con $n$ (la <em>funzione di Eulero</em>).</p>
+        <p><span class="step-num">4</span> Si sceglie un <strong>esponente pubblico</strong> $e$ coprimo con
+          $\varphi(n)$, cioè tale che $\text{MCD}(e, \varphi(n)) = 1$.</p>
+        <p><span class="step-num">5</span> Si calcola l'<strong>esponente privato</strong> $d$ come inverso di
+          $e$ modulo $\varphi(n)$: cioè il numero per cui $e\,d \equiv 1 \pmod{\varphi(n)}$.</p>
+        <p><span class="step-num">6</span> Si <strong>pubblica</strong> la coppia $(n, e)$ e si
+          <strong>distrugge</strong> tutto il resto: $p$, $q$ e $\varphi(n)$ non servono più, e se qualcuno li
+          trovasse ricaverebbe subito $d$.</p>
+        <div class="formula">$$\text{cifratura: } c = m^{e} \bmod n \qquad\qquad
+          \text{decifratura: } m = c^{d} \bmod n$$</div>
+        <p class="formula-note">Notate l'eleganza: <strong>la stessa operazione</strong> — elevare a potenza
+          modulo $n$ — fa entrambe le cose, cambia solo l'esponente. E l'esponente privato $d$ non si può
+          ricavare da $(n, e)$ senza conoscere $\varphi(n)$, che richiede di conoscere $p$ e $q$, che
+          richiede di <em>fattorizzare</em> $n$.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Perché funziona: il teorema di Eulero</div>
+        <p>Se $\text{MCD}(m, n) = 1$ allora</p>
+        <div class="formula">$$m^{\varphi(n)} \equiv 1 \pmod{n}$$</div>
+        <p>Poiché $e\,d \equiv 1 \pmod{\varphi(n)}$, esiste un intero $k$ con $e\,d = 1 + k\,\varphi(n)$, e
+          quindi</p>
+        <div class="formula">$$c^{d} = \left(m^{e}\right)^{d} = m^{e d} = m^{1 + k\varphi(n)} =
+          m \cdot \left(m^{\varphi(n)}\right)^{k} \equiv m \cdot 1^{k} = m \pmod{n}$$</div>
+        <p class="formula-note">Il messaggio torna com'era. Il caso $\text{MCD}(m,n) \ne 1$ si tratta a parte
+          e funziona lo stesso, ma per numeri grandi è un evento di probabilità trascurabile — se capitasse,
+          avreste per caso trovato un fattore di $n$, cioè rotto il vostro stesso sistema. Il teorema di
+          Eulero generalizza il <em>piccolo teorema di Fermat</em> ($a^{p-1} \equiv 1 \pmod p$ per $p$ primo),
+          ed è esattamente la <strong>periodicità delle potenze</strong> che avete visto nell'esercizio ④.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="rs-btns">
+          <button class="btn btn-sm active" data-v="chiavi">costruisci le chiavi</button>
+          <button class="btn btn-sm" data-v="msg">cifra e decifra</button>
+          <button class="btn btn-sm" data-v="attacco">l'attacco: fattorizzare</button>
+        </div>
+        <div class="ctrl">
+          <label>primo $p$ <span class="val-badge" id="rs-pv">11</span></label>
+          <input type="range" id="rs-p" min="0" max="24" step="1" value="4" style="flex:1;min-width:150px">
+          <label>primo $q$ <span class="val-badge" id="rs-qv">17</span></label>
+          <input type="range" id="rs-q" min="0" max="24" step="1" value="6" style="flex:1;min-width:150px">
+          <label>messaggio $m$ <span class="val-badge" id="rs-mv">88</span></label>
+          <input type="range" id="rs-m" min="2" max="180" step="1" value="88" style="flex:1;min-width:160px">
+        </div>
+        <svg id="rs-svg" viewBox="0 0 680 410" role="img" aria-label="Costruzione di una coppia di chiavi RSA, cifratura e attacco per fattorizzazione"></svg>
+        <p class="cap" id="rs-cap"></p>
+        <p class="formula-note">Il simulatore sceglie automaticamente il più piccolo $e \ge 3$ coprimo con
+          $\varphi(n)$ e calcola $d$ con l'algoritmo di Euclide esteso. Provate a spostare i primi: il
+          <em>numero di divisioni</em> necessarie a rompere la chiave, nella terza vista, cresce come
+          $\sqrt{n}$ — cioè lentissimamente rispetto a quanto cresce $n$. Ed è tutto lì il problema.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑤ Esercizio.</strong> Costruisci a mano una coppia di chiavi RSA con $p = 3$ e $q = 11$,
+          poi cifra il messaggio $m = 2$ e verifica che la decifratura lo riporti indietro.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#c5s">Mostra la soluzione</button>
+        <div class="solution" id="c5s">
+          <p><span class="step-num">1</span> $n = 3 \cdot 11 = 33$.</p>
+          <p><span class="step-num">2</span> $\varphi(33) = (3-1)(11-1) = 2 \cdot 10 = 20$.</p>
+          <p><span class="step-num">3</span> Serve $e$ coprimo con $20 = 2^2\cdot 5$: non può essere pari né
+            multiplo di $5$. Il primo candidato è $e = 3$, ma per esercizio prendiamo
+            $\mathbf{e = 7}$.</p>
+          <p><span class="step-num">4</span> Serve $d$ con $7\,d \equiv 1 \pmod{20}$. Provando:
+            $7\cdot1=7$, $7\cdot2=14$, <strong>$7\cdot3=21 = 20 + 1$</strong> ✓. Quindi
+            $\mathbf{d = 3}$.</p>
+          <p><strong>Chiave pubblica</strong> $(33,\ 7)$ — si può gridare in piazza.
+            <strong>Chiave privata</strong> $(33,\ 3)$ — non esce di casa.</p>
+          <p><strong>Cifratura di $m = 2$:</strong>
+            $c = 2^{7} \bmod 33 = 128 \bmod 33$. Poiché $128 = 3\cdot 33 + 29$, si ha
+            $c = \mathbf{29}$.</p>
+          <p><strong>Decifratura:</strong> $29^{3} \bmod 33 = 24\,389 \bmod 33$. Poiché
+            $24\,389 = 739 \cdot 33 + 2$, si ottiene $\mathbf{2}$ ✓ — il messaggio di partenza.</p>
+          <p class="formula-note">Con numeri così piccoli il sistema è ridicolo: chiunque fattorizza $33$ a
+            mente e ricava $d$. Ma <em>i passaggi sono esattamente gli stessi</em> che il vostro browser
+            esegue con numeri di seicento cifre, e questo è il senso dell'esercizio. Un consiglio di calcolo:
+            per $29^3$ conviene ridurre subito, $29 \equiv -4 \pmod{33}$, e allora
+            $29^3 \equiv (-4)^3 = -64 \equiv -64 + 66 = 2$ — tre righe invece di una moltiplicazione a
+            cinque cifre.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑥ Esercizio.</strong> Con $p = 11$ e $q = 17$: costruisci le chiavi con $e = 7$, cifra
+          $m = 88$ e verifica. Poi rispondi: perché $e$ deve essere coprimo con $\varphi(n)$?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#c6s">Mostra la soluzione</button>
+        <div class="solution" id="c6s">
+          <p>$n = 11 \cdot 17 = \mathbf{187}$ e $\varphi(187) = 10 \cdot 16 = \mathbf{160}$.</p>
+          <p>Serve $d$ con $7d \equiv 1 \pmod{160}$. Cerchiamo un multiplo di $160$ aumentato di $1$ che sia
+            divisibile per $7$: $161 = 7 \cdot 23$ ✓. Quindi $\mathbf{d = 23}$.</p>
+          <p><strong>Cifratura.</strong> $c = 88^{7} \bmod 187$. Conviene procedere a quadrati ripetuti,
+            riducendo ogni volta:</p>
+          <div class="tabwrap">
+          <table class="tabf">
+            <tr><th>passo</th><th>calcolo</th><th>risultato $\bmod 187$</th></tr>
+            <tr><td class="lab">$88^2$</td><td>$7744 = 41\cdot187 + 77$</td><td>$77$</td></tr>
+            <tr><td class="lab">$88^4$</td><td>$77^2 = 5929 = 31\cdot187 + 132$</td><td>$132$</td></tr>
+            <tr><td class="lab">$88^6$</td><td>$132 \cdot 77 = 10\,164 = 54\cdot187 + 66$</td><td>$66$</td></tr>
+            <tr><td class="lab">$88^7$</td><td>$66 \cdot 88 = 5808 = 31\cdot187 + 11$</td><td>$\mathbf{11}$</td></tr>
+          </table>
+          </div>
+          <p>Il messaggio cifrato è $\mathbf{11}$. Chi ha la chiave privata calcola
+            $11^{23} \bmod 187 = 88$ e recupera l'originale (il simulatore lo verifica per voi).</p>
+          <p><strong>Perché $e$ dev'essere coprimo con $\varphi(n)$.</strong> Perché altrimenti
+            <strong>$d$ non esiste</strong>. L'equazione $e\,d \equiv 1 \pmod{\varphi}$ ha soluzione se e solo
+            se $\text{MCD}(e, \varphi) = 1$: è il teorema di Bézout, cioè lo stesso motivo per cui in
+            $\mathbb{Z}_{n}$ un elemento è invertibile solo se è coprimo con $n$. Se prendessimo $e = 8$ con
+            $\varphi = 160$, avremmo $\text{MCD} = 8$ e nessun $d$ funzionerebbe: la porta si chiuderebbe
+            senza che esista una chiave per riaprirla.</p>
+          <p class="formula-note">Curiosità pratica: nel mondo reale $e$ è quasi sempre
+            $\mathbf{65\,537} = 2^{16}+1$. È primo, ed è fatto di due soli bit accesi — quindi
+            l'esponenziazione veloce richiede pochissime moltiplicazioni. La chiave pubblica di questo sito,
+            come di quasi tutti, ha esponente $65\,537$.</p>
+        </div>
+      </div>
+
+      <div class="warnbox"><strong>Quello che il simulatore semplifica.</strong> L'RSA che avete visto si
+        chiama, non per caso, <em>textbook RSA</em>: nella realtà non si usa mai così.
+        <strong>(a)</strong> Il messaggio non si cifra direttamente: si aggiunge un riempimento casuale
+        (<em>padding</em>, standard OAEP), altrimenti lo stesso messaggio darebbe sempre lo stesso cifrato e
+        si potrebbe costruire un dizionario. <strong>(b)</strong> RSA è <em>lento</em>: nella pratica si usa
+        per scambiare una chiave simmetrica breve, e poi tutta la conversazione viaggia con AES, che è
+        migliaia di volte più veloce. È la <strong>cifratura ibrida</strong>, ed è quello che fa il vostro
+        browser ogni volta che compare il lucchetto. <strong>(c)</strong> Oggi RSA è in ritirata a favore
+        delle <em>curve ellittiche</em>, che offrono la stessa sicurezza con chiavi dieci volte più corte.
+        Il principio, però, è identico a quello di questa sezione.</div>
+    </section>
+
+    <!-- 5 — HASH E FIRMA DIGITALE -->
+    <section id="sec5">
+      <h2>5. L'impronta digitale di un file, e come si firma</h2>
+
+      <p>La cifratura risolve la <em>riservatezza</em>. Restano l'integrità e l'autenticazione, e per
+        entrambe serve uno strumento nuovo: la <strong>funzione di hash</strong>.</p>
+
+      <div class="definition">
+        <div class="formula-title">Che cos'è una funzione di hash</div>
+        <p>È una funzione che prende un input di lunghezza qualunque — tre lettere o un film in alta
+          definizione — e restituisce un'<strong>impronta di lunghezza fissa</strong>. Per essere utile in
+          crittografia deve avere quattro proprietà:</p>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th>proprietà</th><th>che cosa significa</th></tr>
+          <tr><td class="lab">deterministica</td><td class="l">lo stesso input dà sempre la stessa impronta</td></tr>
+          <tr><td class="lab">a senso unico</td><td class="l">dall'impronta è impossibile risalire all'input</td></tr>
+          <tr><td class="lab">effetto valanga</td><td class="l">cambiando <em>un solo bit</em> l'impronta cambia completamente</td></tr>
+          <tr><td class="lab">resistente alle collisioni</td><td class="l">è impraticabile trovare due input con la stessa impronta</td></tr>
+        </table>
+        </div>
+        <p class="formula-note">Attenzione: le collisioni <strong>esistono</strong>, e non possono non
+          esistere. Gli input possibili sono infiniti, le impronte sono $2^{256}$: per il principio dei
+          cassetti due input diversi devono per forza finire nello stesso cassetto. Il punto è che
+          <em>trovarne uno</em> deve essere praticamente impossibile. La differenza fra «non esiste» e «non si
+          riesce a trovare» è tutta la crittografia.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="ha-btns">
+          <button class="btn btn-sm active" data-v="valanga">l'effetto valanga</button>
+          <button class="btn btn-sm" data-v="dentro">che cosa succede dentro</button>
+          <button class="btn btn-sm" data-v="compleanni">collisioni e compleanni</button>
+        </div>
+        <div class="ctrl">
+          <label>testo</label>
+          <input type="text" id="ha-txt" value="Prof. Vettigli" maxlength="40" style="flex:1;min-width:230px">
+        </div>
+        <svg id="ha-svg" viewBox="0 0 680 420" role="img" aria-label="Funzione di hash: effetto valanga, funzionamento interno e paradosso dei compleanni"></svg>
+        <p class="cap" id="ha-cap"></p>
+        <p class="formula-note">La funzione usata qui è <strong>FNV-1a a 32 bit</strong>, scelta perché sta in
+          quattro righe e si può seguire con gli occhi. <em>Non</em> è crittograficamente sicura: le vere
+          funzioni (SHA-256, SHA-3) restituiscono $256$ bit e sono molto più elaborate. Ma l'effetto valanga
+          si vede benissimo lo stesso.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑦ Esercizio.</strong> Una funzione di hash restituisce $32$ bit. Quante impronte diverse
+          esistono? E quanti file bisogna provare, all'incirca, per avere il $50\%$ di probabilità di trovare
+          <em>due</em> file con la stessa impronta?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#c7s">Mostra la soluzione</button>
+        <div class="solution" id="c7s">
+          <p><strong>Impronte diverse:</strong> $2^{32} = \mathbf{4\,294\,967\,296}$, poco più di quattro
+            miliardi.</p>
+          <p><strong>Per la collisione</strong> non servono quattro miliardi di tentativi: è il
+            <em>paradosso dei compleanni</em> della lezione di probabilità del secondo anno. Con $N$
+            impronte possibili, bastano circa</p>
+          <div class="formula">$$k \approx 1{,}177\,\sqrt{N} = 1{,}177\cdot\sqrt{2^{32}} =
+            1{,}177 \cdot 65\,536 \approx \mathbf{77\,000}$$</div>
+          <p>file per avere il $50\%$ di probabilità di una collisione. <strong>Settantasettemila invece di
+            quattro miliardi</strong>: un computer normale ci mette meno di un secondo.</p>
+          <p class="formula-note">È la ragione per cui le funzioni di hash serie hanno $256$ bit e non $128$:
+            la sicurezza contro le collisioni è la <strong>radice quadrata</strong> dello spazio, quindi
+            $256$ bit ne garantiscono $128$ «effettivi». È anche la ragione per cui MD5 ($128$ bit, collisioni
+            trovate nel $2004$) e SHA-1 ($160$ bit, collisione dimostrata da Google nel $2017$ con due PDF
+            diversi e stessa impronta) sono considerati morti. Chi vi chiede ancora una password protetta con
+            MD5 sta usando una serratura che si apre con una graffetta.</p>
+        </div>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">La firma digitale: le chiavi al contrario</div>
+        <p>Ecco il colpo di genio. In RSA le due operazioni si annullano <em>in qualunque ordine</em>:</p>
+        <div class="formula">$$\left(m^{e}\right)^{d} \equiv m \qquad\text{ma anche}\qquad
+          \left(m^{d}\right)^{e} \equiv m \pmod{n}$$</div>
+        <p>Quindi posso <strong>cifrare con la chiave privata</strong>. Il risultato non è segreto — chiunque
+          ha la mia chiave pubblica e può decifrarlo — ma <em>solo io</em> potevo produrlo. Non è più un
+          messaggio riservato: è una <strong>firma</strong>.</p>
+        <p><span class="step-num">1</span> Calcolo l'impronta $h$ del documento.
+          <span class="step-num">2</span> Calcolo $s = h^{d} \bmod n$ con la <em>mia</em> chiave privata e la
+          allego. <span class="step-num">3</span> Chi riceve calcola $s^{e} \bmod n$ con la mia chiave
+          pubblica, ricalcola l'impronta del documento e confronta.</p>
+        <p class="formula-note">Se i due valori coincidono, il destinatario sa <strong>due cose insieme</strong>:
+          che il documento non è stato modificato (integrità) e che l'ho firmato io (autenticazione). Si firma
+          l'<em>impronta</em> e non il documento per due motivi: l'impronta è corta — firmare un file da un
+          gigabyte con RSA richiederebbe ore — e ha lunghezza fissa, mentre RSA può cifrare solo numeri
+          minori di $n$.</p>
+      </div>
+
+      <div class="curiosita"><strong>Il lucchetto del browser, in tre righe.</strong> Quando compare il
+        lucchetto accanto all'indirizzo, è successo questo: il sito ha inviato un <em>certificato</em>, cioè
+        la propria chiave pubblica <strong>firmata</strong> da un'autorità di certificazione di cui il vostro
+        computer si fida già; il browser ha verificato quella firma; poi ha usato la chiave pubblica del sito
+        per concordare una chiave simmetrica usa-e-getta, con cui viaggia tutto il resto. Il lucchetto dice
+        dunque «<em>sto parlando con chi dice di essere, e nessuno può ascoltare</em>». <strong>Non</strong>
+        dice «questo sito è onesto»: anche un sito truffaldino può avere un certificato valido, ed è uno dei
+        malintesi più costosi che circolino.</div>
+
+      <div class="exercise">
+        <p><strong>⑧ Esercizio.</strong> Perché si firma l'impronta del documento e non il documento stesso?
+          E perché la firma digitale, a differenza di quella autografa, <em>non</em> si può ritagliare e
+          incollare su un altro documento?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#c8s">Mostra la soluzione</button>
+        <div class="solution" id="c8s">
+          <p><strong>Perché l'impronta.</strong> Tre ragioni, in ordine di importanza: (1) RSA può operare
+            solo su numeri <em>minori di $n$</em>, mentre un documento può essere lungo a piacere;
+            (2) l'esponenziazione modulare è lenta, e su un file grande richiederebbe un tempo assurdo;
+            (3) l'impronta ha lunghezza fissa, quindi la firma ha sempre le stesse dimensioni.</p>
+          <p><strong>Perché non si può spostare.</strong> Perché la firma <em>dipende dal documento</em>: è
+            $s = h^{d} \bmod n$, e $h$ è l'impronta di <em>quel</em> documento. Incollandola su un altro file,
+            il destinatario calcolerebbe l'impronta del nuovo file, la confronterebbe con $s^{e}$ e troverebbe
+            due numeri completamente diversi — grazie all'effetto valanga, basta una virgola cambiata.</p>
+          <p class="formula-note">È una differenza profonda rispetto alla firma autografa, che è sempre la
+            stessa e quindi si può ricopiare, scansionare, incollare. La firma digitale è <strong>diversa per
+            ogni documento</strong> e legata a esso in modo indissolubile. In compenso ha una debolezza che
+            la firma autografa non ha: chi ruba la chiave privata può firmare <em>qualunque cosa</em>, per
+            sempre, e non c'è perizia calligrafica che lo smentisca. Per questo le chiavi private stanno in
+            dispositivi che non le lasciano mai uscire, e per questo esistono le <em>revoche</em> dei
+            certificati.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — LA BLOCKCHAIN -->
+    <section id="sec6">
+      <h2>6. La blockchain: un registro che nessuno possiede</h2>
+
+      <p>Torniamo al denaro. Un bonifico funziona perché <strong>c'è una banca</strong>: tiene il registro dei
+        conti, toglie da uno e aggiunge all'altro, e tutti si fidano di lei. Il registro è <em>centrale</em>,
+        e la fiducia sta in un'istituzione.</p>
+
+      <p>La domanda che qualcuno si è posto è: <em>si può fare a meno del registro centrale?</em> Cioè: si può
+        tenere un registro condiviso fra migliaia di sconosciuti, di cui nessuno si fida, in modo che nessuno
+        possa barare? Il problema tecnico si chiama <strong>doppia spesa</strong>: un file si copia, quindi se
+        il denaro fosse un file potrei spenderlo due volte. La banca lo impedisce perché tiene il conto. Senza
+        banca, chi lo impedisce?</p>
+
+      <div class="definition">
+        <div class="formula-title">Il primo mattone: legare i blocchi con le impronte</div>
+        <p>Le transazioni si raggruppano in <strong>blocchi</strong>. Ogni blocco contiene, oltre alle proprie
+          transazioni, <strong>l'impronta del blocco precedente</strong>:</p>
+        <div class="formula">$$H_k = \text{hash}\big(\underbrace{H_{k-1}}_{\text{blocco prima}},\
+          \underbrace{\text{dati}_k}_{\text{transazioni}},\ \underbrace{\nu_k}_{\text{nonce}}\big)$$</div>
+        <p class="formula-note">È una <em>catena</em>, e da qui il nome. La conseguenza è potente: se qualcuno
+          modifica una transazione dentro il blocco $k$, l'impronta $H_k$ cambia (effetto valanga), quindi il
+          blocco $k+1$ non torna più, e nemmeno il $k+2$, e così via <strong>fino alla fine</strong>.
+          Manomettere un dato significa dover ricalcolare <em>tutti</em> i blocchi successivi.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="bc-btns">
+          <button class="btn btn-sm active" data-v="catena">la catena intatta</button>
+          <button class="btn btn-sm" data-v="rotta">manometti un blocco</button>
+          <button class="btn btn-sm" data-v="ripara">e prova a ripararla</button>
+        </div>
+        <div class="ctrl">
+          <label>blocco da alterare <span class="val-badge" id="bc-bv">2</span></label>
+          <input type="range" id="bc-b" min="1" max="5" step="1" value="2" style="flex:1;min-width:170px">
+          <label>importo falsificato <span class="val-badge" id="bc-iv">500</span></label>
+          <input type="range" id="bc-i" min="10" max="900" step="10" value="500" style="flex:1;min-width:170px">
+        </div>
+        <svg id="bc-svg" viewBox="0 0 680 380" role="img" aria-label="Catena di blocchi: integrità, manomissione e riparazione"></svg>
+        <p class="cap" id="bc-cap"></p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Il secondo mattone: rendere costoso scrivere</div>
+        <p>La catena da sola non basta: ricalcolare qualche impronta è istantaneo. Serve rendere la scrittura
+          di un blocco <strong>deliberatamente faticosa</strong>. L'idea si chiama <em>proof of work</em>,
+          prova di lavoro: un blocco è valido solo se la sua impronta comincia con un certo numero di
+          <strong>zeri</strong>.</p>
+        <p>Poiché l'impronta è imprevedibile, l'unico modo per ottenerla è provare: si aggiunge al blocco un
+          numero arbitrario detto <strong>nonce</strong> e lo si incrementa finché l'impronta non ha la forma
+          voluta. È una lotteria in cui si comprano biglietti a ripetizione.</p>
+        <div class="formula">$$\text{tentativi attesi} = 16^{z} \quad \text{con } z = \text{numero di zeri
+          esadecimali richiesti}$$</div>
+        <p class="formula-note">Il costo cresce <strong>esponenzialmente</strong> con $z$: un zero richiede
+          $16$ tentativi, quattro zeri $65\,536$, otto zeri più di quattro miliardi. Verificare, invece, costa
+          <em>un solo</em> calcolo. È l'asimmetria di sempre — difficile da fare, facilissimo da controllare —
+          applicata non alla segretezza ma alla <strong>fatica</strong>.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="pw-btns">
+          <button class="btn btn-sm active" data-v="mina">scava un blocco</button>
+          <button class="btn btn-sm" data-v="costo">quanto costa la difficoltà</button>
+        </div>
+        <div class="ctrl">
+          <label>zeri richiesti <span class="val-badge" id="pw-zv">3</span></label>
+          <input type="range" id="pw-z" min="1" max="4" step="1" value="3" style="flex:1;min-width:170px">
+          <label>dati del blocco</label>
+          <input type="text" id="pw-txt" value="Anna paga 50 a Bruno" maxlength="40" style="flex:1;min-width:210px">
+        </div>
+        <svg id="pw-svg" viewBox="0 0 680 380" role="img" aria-label="Proof of work: ricerca del nonce e costo della difficoltà"></svg>
+        <p class="cap" id="pw-cap"></p>
+        <p class="formula-note"><strong>Un'onestà dovuta.</strong> Se confrontate i tentativi
+          <em>fatti</em> con quelli <em>attesi</em> vedrete che non coincidono, e che i primi sono
+          sistematicamente di più. La colpa è del giocattolo: FNV-1a produce impronte molto
+          <strong>correlate fra nonce consecutivi</strong>, quindi i successi arrivano a grappoli invece che
+          sparsi a caso, e in media si scava di più. Su cento blocchi scavati con $z = 3$ ne servono circa
+          $5700$ invece dei $4096$ previsti. Con SHA-256 l'accordo con $16^{z}$ è eccellente — ed è
+          esattamente uno dei motivi per cui una blockchain vera non usa una funzione come questa.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑨ Esercizio.</strong> In una blockchain con impronte esadecimali si richiedono $5$ zeri
+          iniziali. (a) Quanti tentativi servono in media? (b) Se una macchina ne fa un milione al secondo,
+          quanto tempo impiega? (c) E se gli zeri diventassero $8$?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#c9s">Mostra la soluzione</button>
+        <div class="solution" id="c9s">
+          <p><strong>(a)</strong> Ogni cifra esadecimale ha $16$ valori possibili, e serve che le prime $5$
+            siano tutte zero: la probabilità è $\left(\frac{1}{16}\right)^{5}$, quindi i tentativi attesi sono
+            $16^{5} = \mathbf{1\,048\,576}$, circa un milione.</p>
+          <p><strong>(b)</strong> A un milione di tentativi al secondo: circa <strong>un secondo</strong>.</p>
+          <p><strong>(c)</strong> $16^{8} = 4\,294\,967\,296$, cioè oltre quattro miliardi di tentativi:
+            $\frac{4{,}29\cdot10^{9}}{10^{6}} \approx 4295$ secondi, cioè <strong>circa un'ora e
+            un quarto</strong>.</p>
+          <p class="formula-note">Tre zeri in più moltiplicano il lavoro per $16^{3} = 4096$. È
+            <em>esattamente</em> la crescita esponenziale della lezione 5, e qui ha un ruolo di governo: la
+            rete Bitcoin <strong>aggiusta la difficoltà ogni $2016$ blocchi</strong> in modo che un blocco
+            richieda in media dieci minuti, qualunque sia la potenza di calcolo collegata. Se arrivano più
+            macchine, gli zeri aumentano. È un termostato — la stessa idea del controreazione che avete visto
+            in fisica.</p>
+        </div>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Il terzo mattone: la regola della catena più lunga</div>
+        <p>Migliaia di computer (i <em>nodi</em>) tengono ciascuno una copia del registro. Quando due blocchi
+          validi nascono nello stesso momento, la rete si divide temporaneamente; la regola è che
+          <strong>vince la catena su cui è stato speso più lavoro</strong>, cioè in pratica la più lunga.</p>
+        <p>Per riscrivere la storia, dunque, un attaccante deve rifare la prova di lavoro di tutti i blocchi
+          da modificare <em>e</em> superare la catena onesta, che nel frattempo continua a crescere. Gli
+          serve più della <strong>metà</strong> della potenza di calcolo dell'intera rete: è il famoso
+          <em>attacco del 51%</em>.</p>
+        <p class="formula-note">Qui si chiude il cerchio con la lezione 7: la sicurezza della blockchain non è
+          matematica, è <strong>economica</strong>. Non dice «è impossibile barare», dice «barare costa più di
+          quanto renda». È un equilibrio di Nash costruito apposta — e infatti su reti piccole, dove
+          conquistare il $51\%$ costa poco, gli attacchi sono <em>avvenuti davvero</em>.</p>
+      </div>
+    </section>
+
+    <!-- 7 — LE CRIPTOVALUTE -->
+    <section id="sec7">
+      <h2>7. Le criptovalute</h2>
+
+      <div class="storia">
+        <p>Il <strong>31 ottobre 2008</strong>, mentre il mondo usciva a pezzi dal fallimento di Lehman
+          Brothers, su una mailing list di crittografi compare un articolo di nove pagine firmato
+          <strong>Satoshi Nakamoto</strong>: <em>Bitcoin: A Peer-to-Peer Electronic Cash System</em>. Il primo
+          blocco viene generato il <strong>3 gennaio 2009</strong> e contiene, scolpito nei dati, il titolo di
+          quel giorno del <em>Times</em>: «<em>Chancellor on brink of second bailout for banks</em>» — una
+          data di nascita e una dichiarazione di intenti nella stessa riga.</p>
+        <p>Nakamoto scompare nel $2011$ lasciando il progetto agli altri sviluppatori. Non si sa chi sia. I
+          suoi bitcoin — circa un milione — non sono mai stati spostati.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Come si «possiede» un bitcoin</div>
+        <p>Non esiste nessun file «bitcoin». Esiste solo il <strong>registro</strong>, che dice quanto è
+          associato a ciascun indirizzo. Un indirizzo è (in sostanza) l'impronta di una <strong>chiave
+          pubblica</strong>; possedere quel denaro significa possedere la corrispondente <strong>chiave
+          privata</strong>, perché è con essa che si <em>firma</em> la transazione che lo sposta.</p>
+        <p class="formula-note">Tutti i pezzi della lezione sono qui insieme: chiavi asimmetriche per
+          l'identità, firma digitale per l'autorizzazione, hash per l'integrità, prova di lavoro per l'ordine
+          cronologico. <strong>Non c'è niente di nuovo</strong> rispetto alle sezioni precedenti: l'invenzione
+          di Nakamoto è stato il <em>montaggio</em>, non i pezzi.</p>
+      </div>
+
+      <div class="ric">
+        <div><h4>I ventuno milioni</h4><p>Il numero totale di bitcoin che potranno mai esistere è fissato dal
+          codice a $21$ milioni. La ricompensa per ogni blocco <strong>si dimezza ogni quattro anni</strong>
+          (<em>halving</em>): $50$ nel 2009, $25$, $12{,}5$, $6{,}25$, $3{,}125$… La somma di questa
+          progressione geometrica converge — matematica della lezione 5, applicata alla politica
+          monetaria.</p></div>
+        <div><h4>Il consumo</h4><p>La prova di lavoro consuma energia <em>per costruzione</em>: è il suo
+          meccanismo di sicurezza. La rete Bitcoin consuma quanto un paese di media grandezza. È la critica
+          più seria che le viene mossa, e non ha risposte comode.</p></div>
+        <div><h4>Proof of stake</h4><p>L'alternativa: invece di bruciare energia si mette a garanzia del
+          denaro, che si perde se si bara. Ethereum è passato a questo sistema nel <strong>2022</strong>
+          riducendo il consumo di oltre il $99\%$. Cambia la natura della garanzia: da fisica a
+          economica.</p></div>
+        <div><h4>Smart contract</h4><p>Ethereum ($2015$) aggiunge al registro un piccolo linguaggio di
+          programmazione: si possono scrivere contratti che si eseguono da soli al verificarsi di una
+          condizione. Potente e pericoloso — un errore nel codice non si può correggere, e ci sono stati
+          furti da centinaia di milioni.</p></div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑩ Esercizio.</strong> La ricompensa di ogni blocco parte da $50$ bitcoin e si dimezza ogni
+          $210\,000$ blocchi. Calcola il numero totale di bitcoin che verranno mai emessi.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#c10s">Mostra la soluzione</button>
+        <div class="solution" id="c10s">
+          <p>Ogni «era» produce $210\,000$ blocchi con la stessa ricompensa. Le ricompense formano una
+            progressione geometrica di ragione $\frac12$:</p>
+          <div class="formula">$$T = 210\,000\left(50 + 25 + 12{,}5 + \dots\right) =
+            210\,000 \cdot 50 \cdot \sum_{k=0}^{\infty}\left(\tfrac12\right)^{k}$$</div>
+          <p>La somma della serie geometrica di ragione $\frac12$ vale $\dfrac{1}{1 - \frac12} = 2$, quindi</p>
+          <div class="formula">$$T = 210\,000 \cdot 50 \cdot 2 = \mathbf{21\,000\,000}$$</div>
+          <p class="formula-note">I ventuno milioni non sono una cifra scelta per suggestione: sono
+            <em>il risultato</em> di due parametri, $210\,000$ blocchi e $50$ di ricompensa iniziale, più la
+            somma di una serie che avete imparato a fare in prima. Nella realtà il totale sarà leggermente
+            inferiore, perché le ricompense sono numeri interi di <em>satoshi</em> (centomilionesimi) e a un
+            certo punto il dimezzamento le porta a zero: l'ultimo bitcoin sarà emesso intorno al
+            <strong>2140</strong>. Vale la pena notare la scelta di fondo: una moneta a quantità fissa è per
+            costruzione <strong>deflazionistica</strong> — e la lezione 9 ci ha detto che la deflazione ha i
+            suoi problemi, non solo i suoi pregi.</p>
+        </div>
+      </div>
+
+      <div class="warnbox"><strong>È moneta?</strong> Riprendiamo le tre funzioni della lezione 8 e
+        rispondiamo con onestà. <strong>Mezzo di scambio:</strong> in parte — pochi esercizi le accettano, e
+        le commissioni sono spesso alte. <strong>Unità di conto:</strong> praticamente no — nessuno scrive un
+        contratto di lavoro in bitcoin, perché un'unità che oscilla del $10\%$ in un giorno non misura niente.
+        <strong>Riserva di valore:</strong> discusso — c'è chi la chiama «oro digitale», ma l'oro non perde il
+        $70\%$ in un anno, e le criptovalute l'hanno fatto più volte. Oggi, per la maggior parte delle
+        persone che le comprano, sono un <strong>investimento speculativo</strong>, non una moneta. Chiamarle
+        col loro nome è il primo modo per non farsi male.</div>
+
+      <div class="warnbox"><strong>Le cose da sapere prima di perdere dei soldi.</strong>
+        <strong>(1) La volatilità è enorme</strong> e non è un difetto temporaneo: nessuno garantisce il
+        prezzo, non c'è una banca centrale che intervenga. <strong>(2) Se perdete la chiave privata, il
+        denaro è perso per sempre</strong> — si stima che qualche milione di bitcoin sia irrecuperabile;
+        nessun servizio clienti può aiutarvi, ed è il rovescio esatto della decentralizzazione.
+        <strong>(3) Le truffe sono la norma, non l'eccezione:</strong> schemi Ponzi, <em>rug pull</em> in cui
+        i creatori spariscono coi soldi, finti consulenti che promettono rendimenti garantiti — e vale sempre
+        la regola della lezione 9, il problema non è la percentuale, è la parola «garantito».
+        <strong>(4) In Italia le plusvalenze sono tassate</strong> e vanno dichiarate: non è una zona franca.
+        <strong>(5) L'anonimato è un mito:</strong> il registro è <em>pubblico e permanente</em>, e l'analisi
+        delle transazioni ha portato in carcere parecchia gente.</div>
+
+      <div class="curiosita"><strong>E la tecnologia, allora, non serve a niente?</strong> Al contrario, ma
+        va separata dalla speculazione. Un registro condiviso, verificabile da tutti e non modificabile è
+        genuinamente utile ovunque il problema sia «mettersi d'accordo su un fatto senza fidarsi di un
+        arbitro»: tracciabilità di filiere alimentari e farmaceutiche, certificati di studio verificabili,
+        registri fondiari in paesi dove il catasto è inaffidabile o è stato distrutto, marcature temporali di
+        documenti. Sono usi noiosi e senza grafici che salgono, e proprio per questo se ne parla poco. La
+        regola per orientarsi è semplice e vale in tutta l'informatica: <em>se un problema si può risolvere
+        con un database normale e qualcuno di cui ci si fida, la blockchain è la risposta sbagliata</em>.</div>
+    </section>
+
+    <!-- 8 — ★ IL COMPUTER QUANTISTICO -->
+    <section id="sec8" class="optional">
+      <h2>8. Il computer quantistico e la fine di RSA</h2>
+
+      <p>C'è una nuvola all'orizzonte, ed è la stessa che compare nel programma di fisica del quinto anno.</p>
+
+      <div class="definition">
+        <div class="formula-title">L'algoritmo di Shor</div>
+        <p>Nel <strong>1994</strong> Peter Shor dimostra che un calcolatore quantistico può fattorizzare un
+          numero in tempo <strong>polinomiale</strong> nel numero di cifre, invece che esponenziale. Il
+          confronto è brutale:</p>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th></th><th>calcolatore classico</th><th>calcolatore quantistico</th></tr>
+          <tr><td class="lab">fattorizzare $n$</td><td>$e^{\,c\,(\ln n)^{1/3}}$, di fatto esponenziale</td><td>$\sim (\log n)^{3}$, polinomiale</td></tr>
+          <tr><td class="lab">chiave RSA 2048 bit</td><td>più dell'età dell'universo</td><td>ore</td></tr>
+        </table>
+        </div>
+        <p class="formula-note">Il cuore dell'algoritmo, per chi vuole il senso e non i dettagli, è proprio la
+          <strong>periodicità delle potenze</strong> dell'esercizio ④: fattorizzare $n$ si riduce a trovare il
+          periodo della successione $a^{k} \bmod n$, e trovare un periodo è esattamente ciò in cui una
+          sovrapposizione quantistica, con la trasformata di Fourier, è imbattibile. La stessa serie di
+          Fourier della lezione 2 di quest'anno, in un altro vestito.</p>
+      </div>
+
+      <div class="curiosita"><strong>Quanto manca.</strong> Molto, probabilmente. Per fattorizzare una chiave
+        RSA da $2048$ bit servirebbero milioni di qubit <em>corretti dagli errori</em>, mentre le macchine
+        attuali ne hanno qualche centinaio e molto rumorosi. Le stime serie parlano di decenni, e alcuni
+        dubitano che si arrivi mai. Ma c'è un'insidia che rende il problema attuale: si chiama
+        <strong>«harvest now, decrypt later»</strong> — intercetta oggi, decifra domani. Un avversario può
+        registrare <em>adesso</em> il traffico cifrato e conservarlo finché avrà la macchina per aprirlo. Per
+        un segreto che deve durare trent'anni, la minaccia quantistica non è nel futuro: è già oggi.</div>
+
+      <div class="definition">
+        <div class="formula-title">La crittografia post-quantistica</div>
+        <p>La risposta non è aspettare: è cambiare il problema difficile. Si cercano operazioni a senso unico
+          che <em>nemmeno</em> un calcolatore quantistico sappia disfare — basate sui <strong>reticoli</strong>
+          in molte dimensioni, sui codici correttori, sulle isogenie fra curve.</p>
+        <p>Nel <strong>2024</strong> il NIST americano ha standardizzato i primi algoritmi:
+          <strong>ML-KEM</strong> (nato come <em>Kyber</em>) per lo scambio di chiavi e <strong>ML-DSA</strong>
+          (<em>Dilithium</em>) per la firma. La migrazione è già cominciata: i browser più diffusi negoziano
+          già oggi chiavi «ibride», classiche <em>e</em> post-quantistiche insieme.</p>
+        <p class="formula-note">Il messaggio metodologico è più importante dei nomi. La sicurezza informatica
+          non è uno stato raggiunto una volta per tutte: è una <strong>corsa</strong>, in cui difensori e
+          attaccanti si spostano continuamente. Ogni volta che sembra finita, un'idea nuova la riapre — ed è
+          il motivo per cui vale la pena studiare i fondamenti, che restano, invece dei prodotti, che
+          cambiano.</p>
+      </div>
+    </section>
+
+    <div class="note"><strong>Il filo della lezione.</strong> Siamo partiti da una domanda pratica — perché
+      posso pagare col telefono senza che me lo svuotino — e siamo arrivati a un'idea sola, declinata quattro
+      volte: <strong>esistono operazioni facili da fare e difficili da disfare</strong>. Moltiplicare due
+      primi è facile, fattorizzare no: nasce RSA. Calcolare un'impronta è facile, invertirla no: nascono
+      integrità e firma digitale. Trovare un nonce è faticoso, verificarlo no: nasce la blockchain. E ogni
+      volta la matematica non ha fatto miracoli: ha spostato il costo dalla parte giusta. Se dovessi lasciarvi
+      una sola frase sarebbe questa — <em>la sicurezza non è un lucchetto, è un conto economico</em>: rendere
+      l'attacco più costoso di quello che frutta. Nella <strong>lezione 11</strong> cambiamo completamente
+      argomento e andiamo a vedere delle figure che si ripetono a ogni scala: i frattali.</div>
+
+    <section id="quiz">
+      <h2>Verifica quello che hai capito</h2>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> — Prof. Vettigli</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script src="../Style/interactive.js"></script>
+  <script src="../Style/toc.js"></script>
+  <script src="../Style/quiz.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var SVGNS = 'http://www.w3.org/2000/svg';
+
+    function el(tag, attrs, txt) {
+      var n = document.createElementNS(SVGNS, tag);
+      for (var k in attrs) { if (attrs.hasOwnProperty(k)) { n.setAttribute(k, attrs[k]); } }
+      if (txt !== undefined) { n.textContent = txt; }
+      return n;
+    }
+    function clear(s) { while (s.firstChild) { s.removeChild(s.firstChild); } }
+    function L(s, x1, y1, x2, y2, col, w, dash) {
+      var a = { x1: x1, y1: y1, x2: x2, y2: y2, stroke: col, 'stroke-width': w || 1.5,
+                'stroke-linecap': 'round' };
+      if (dash) { a['stroke-dasharray'] = dash; }
+      s.appendChild(el('line', a));
+    }
+    function T(s, x, y, t, cls, anchor, size) {
+      var a = { x: x, y: y, class: cls || 'lbl' };
+      if (anchor) { a['text-anchor'] = anchor; }
+      if (size) { a['font-size'] = size; }
+      s.appendChild(el('text', a, t));
+    }
+    function C(s, cx, cy, r, fill, stroke, w) {
+      s.appendChild(el('circle', { cx: cx, cy: cy, r: r, fill: fill || 'none',
+        stroke: stroke || 'none', 'stroke-width': w || 1.5 }));
+    }
+    function P(s, d, stroke, w, fill, dash) {
+      if (!d) { return; }
+      var a = { d: d, fill: fill || 'none', stroke: stroke || 'none', 'stroke-width': w || 1.5,
+                'stroke-linejoin': 'round' };
+      if (dash) { a['stroke-dasharray'] = dash; }
+      s.appendChild(el('path', a));
+    }
+    function R(s, x, y, w, h, fill, stroke, sw, rx) {
+      s.appendChild(el('rect', { x: x, y: y, width: w, height: h, fill: fill || 'none',
+        stroke: stroke || 'none', 'stroke-width': sw === undefined ? 1.2 : sw,
+        rx: rx === undefined ? 4 : rx }));
+    }
+    function num(v, d) { return v.toFixed(d === undefined ? 2 : d).replace('.', ','); }
+    function grp(v) {
+      var s = String(v), out = '', c = 0;
+      for (var k = s.length - 1; k >= 0; k--) {
+        out = s.charAt(k) + out;
+        c++;
+        if (c % 3 === 0 && k > 0) { out = ' ' + out; }
+      }
+      return out;
+    }
+    function css(name, fb) {
+      var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+      return (v && v.trim()) ? v.trim() : fb;
+    }
+    var COL = {};
+    function colori() {
+      COL.ax = css('--border', '#888');
+      COL.tx = css('--text', '#222');
+      COL.mu = css('--muted', '#777');
+      COL.ac = css('--accent', '#2563eb');
+      COL.mg = css('--magenta', '#c026d3');
+      COL.gd = css('--gold', '#d97706');
+      COL.gr = '#16a34a';
+      COL.rd = '#dc2626';
+      COL.s2 = css('--surface-2', '#f4f4f5');
+      COL.sf = css('--surface', '#fff');
+    }
+    colori();
+
+    var DISEGNI = [];
+    function avvia(draw, svg) {
+      function protetto() {
+        try {
+          draw();
+        } catch (err) {
+          clear(svg);
+          T(svg, 20, 40, 'Simulazione non disponibile', 'em', 'start', 15);
+          T(svg, 20, 66, String(err && err.message ? err.message : err), 'lbl-s');
+          T(svg, 20, 88, 'Segnalatelo al professore indicando questo messaggio.', 'lbl-s');
+        }
+      }
+      DISEGNI.push(protetto);
+      protetto();
+      return protetto;
+    }
+    document.addEventListener('themechange', function () {
+      colori();
+      for (var i = 0; i < DISEGNI.length; i++) { DISEGNI[i](); }
+    });
+
+    function activate(box, btn) {
+      var b = box.querySelectorAll('button');
+      for (var i = 0; i < b.length; i++) { b[i].classList.remove('active'); }
+      if (btn) { btn.classList.add('active'); }
+    }
+    function grab(id) { return document.getElementById(id); }
+
+    function piano(svg, x0, y0, w, h, xmin, xmax, ymin, ymax) {
+      R(svg, x0, y0, w, h, COL.s2, COL.ax);
+      return { X: function (v) { return x0 + (v - xmin) / (xmax - xmin) * w; },
+               Y: function (v) { return y0 + h - (v - ymin) / (ymax - ymin) * h; },
+               x0: x0, y0: y0, w: w, h: h, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax };
+    }
+
+    /* ==================================================================
+       strumenti condivisi: alfabeto, frequenze italiane, hash FNV-1a
+       ================================================================== */
+    var AZ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    /* frequenze percentuali (in %) delle lettere nell italiano scritto */
+    var FIT = [11.74, 0.92, 4.50, 3.73, 11.79, 0.95, 1.64, 1.54, 11.28, 0.00,
+               0.00, 6.51, 2.51, 6.88, 9.83, 3.05, 0.51, 6.37, 4.98, 5.62,
+               3.01, 2.10, 0.00, 0.00, 0.00, 0.49];
+
+    function cifra(txt, k) {
+      var out = '', i, ch, idx;
+      for (i = 0; i < txt.length; i++) {
+        ch = txt.charAt(i).toUpperCase();
+        idx = AZ.indexOf(ch);
+        out += (idx < 0) ? ch : AZ.charAt((idx + k) % 26);
+      }
+      return out;
+    }
+    function decifra(txt, k) { return cifra(txt, (26 - (k % 26)) % 26); }
+    /* tiene solo le lettere dell'alfabeto (e gli spazi, se richiesto):
+       scritta a mano invece che con una espressione regolare */
+    function soloLettere(txt, conSpazi) {
+      var out = '', i, ch;
+      for (i = 0; i < txt.length; i++) {
+        ch = txt.charAt(i).toUpperCase();
+        if (AZ.indexOf(ch) >= 0 || (conSpazi && ch === ' ')) { out += ch; }
+      }
+      return out;
+    }
+
+    function conta(txt) {
+      var c = [], i, idx;
+      for (i = 0; i < 26; i++) { c.push(0); }
+      for (i = 0; i < txt.length; i++) {
+        idx = AZ.indexOf(txt.charAt(i).toUpperCase());
+        if (idx >= 0) { c[idx]++; }
+      }
+      return c;
+    }
+    /* punteggio: prodotto scalare fra le frequenze osservate e quelle italiane */
+    function punteggio(txt) {
+      var c = conta(txt), tot = 0, i, s = 0;
+      for (i = 0; i < 26; i++) { tot += c[i]; }
+      if (tot === 0) { return 0; }
+      for (i = 0; i < 26; i++) { s += (c[i] / tot) * FIT[i]; }
+      return s;
+    }
+
+    /* FNV-1a a 32 bit: h = 2166136261; per ogni byte h = (h XOR b) * 16777619 */
+    function fnv(str) {
+      var h = 2166136261, i;
+      for (i = 0; i < str.length; i++) {
+        h = (h ^ (str.charCodeAt(i) & 0xff)) >>> 0;
+        h = Math.imul(h, 16777619) >>> 0;
+      }
+      return h >>> 0;
+    }
+    function hex8(h) {
+      var s = (h >>> 0).toString(16);
+      while (s.length < 8) { s = '0' + s; }
+      return s;
+    }
+    function zeriIniziali(hx) {
+      var z = 0;
+      while (z < hx.length && hx.charAt(z) === '0') { z++; }
+      return z;
+    }
+    function bitDiversi(a, b) {
+      var x = (a ^ b) >>> 0, n = 0;
+      while (x) { n += x & 1; x >>>= 1; }
+      return n;
+    }
+
+    /* ==================================================================
+       1 — IL CIFRARIO DI CESARE
+       ================================================================== */
+    (function () {
+      var svg = grab('ce-svg'); if (!svg) { return; }
+      var txt = grab('ce-txt'), sk = grab('ce-k'), cap = grab('ce-cap');
+      var vista = 'cifra';
+      var LUNGO = 'NEL MEZZO DEL CAMMIN DI NOSTRA VITA MI RITROVAI PER UNA SELVA ' +
+                  'OSCURA CHE LA DIRITTA VIA ERA SMARRITA AHI QUANTO A DIR QUAL ERA ' +
+                  'E COSA DURA ESTA SELVA SELVAGGIA E ASPRA E FORTE CHE NEL PENSIER ' +
+                  'RINOVA LA PAURA TANT E AMARA CHE POCO E PIU MORTE';
+
+      function draw() {
+        var k = +sk.value, msg = (txt.value || '').toUpperCase();
+        grab('ce-kv').textContent = k;
+        clear(svg);
+
+        if (vista === 'cifra') {
+          T(svg, 40, 30, 'la ruota delle lettere: ogni lettera scivola di ' + k + ' posti', 'lbl');
+          /* la doppia striscia con i due alfabeti */
+          var x0 = 40, w = 23, y1 = 56, y2 = 92, i;
+          for (i = 0; i < 26; i++) {
+            R(svg, x0 + i * w, y1, w - 2, 26, COL.s2, COL.ax, 1, 3);
+            T(svg, x0 + i * w + (w - 2) / 2, y1 + 18, AZ.charAt(i), 'lbl', 'middle', 12);
+            R(svg, x0 + i * w, y2, w - 2, 26,
+              'color-mix(in srgb, ' + COL.ac + ' 22%, transparent)', COL.ac, 1, 3);
+            T(svg, x0 + i * w + (w - 2) / 2, y2 + 18, AZ.charAt((i + k) % 26),
+              'em', 'middle', 12);
+          }
+          T(svg, 40, 50, 'chiaro', 'lbl-s');
+          T(svg, 40, 138, 'cifrato', 'lbl-s');
+          /* il messaggio, lettera per lettera */
+          var cif = cifra(msg, k);
+          var xm = 40, ym = 190, cw = 15, j;
+          T(svg, 40, 172, 'messaggio in chiaro', 'lbl-s');
+          for (j = 0; j < msg.length && j < 42; j++) {
+            T(svg, xm + j * cw, ym, msg.charAt(j), 'lbl mono', 'start', 14);
+          }
+          T(svg, 40, 224, 'messaggio cifrato', 'lbl-s');
+          for (j = 0; j < cif.length && j < 42; j++) {
+            T(svg, xm + j * cw, 242, cif.charAt(j), 'em mono', 'start', 14);
+          }
+          /* la verifica del giro: le lettere che superano la Z */
+          var giro = 0;
+          for (j = 0; j < msg.length; j++) {
+            var idx = AZ.indexOf(msg.charAt(j));
+            if (idx >= 0 && idx + k >= 26) { giro++; }
+          }
+          R(svg, 40, 268, 600, 96, COL.s2, COL.ax);
+          T(svg, 60, 294, 'formula di cifratura', 'lbl-s');
+          T(svg, 620, 294, 'c = (m + ' + k + ') mod 26', 'em', 'end');
+          T(svg, 60, 320, 'lettere che «girano» oltre la Z', 'lbl-s');
+          T(svg, 620, 320, giro + ' su ' + soloLettere(msg, false).length, 'lbl', 'end');
+          T(svg, 60, 346, 'chiavi possibili in tutto', 'lbl-s');
+          T(svg, 620, 346, '25 (la chiave 0 non cifra niente)', 'lbl', 'end');
+          cap.textContent = 'Con k = ' + k + ' il messaggio diventa «' +
+            cif.slice(0, 40) + '».';
+          return;
+        }
+
+        if (vista === 'freq') {
+          var testo = cifra(LUNGO, k);
+          var c = conta(testo), tot = 0, i2;
+          for (i2 = 0; i2 < 26; i2++) { tot += c[i2]; }
+          T(svg, 40, 28, 'analisi delle frequenze su un testo lungo (' + tot + ' lettere)', 'lbl');
+          T(svg, 40, 46, 'in grigio le frequenze dell’italiano, in colore quelle del cifrato',
+            'lbl-s');
+          var bx = 46, bw = 23, base = 210, sc = 11;
+          for (i2 = 0; i2 < 26; i2++) {
+            var fo = c[i2] / tot * 100;
+            R(svg, bx + i2 * bw, base - FIT[i2] * sc, bw - 3, FIT[i2] * sc,
+              'color-mix(in srgb, ' + COL.mu + ' 26%, transparent)', 'none', 0, 2);
+            R(svg, bx + i2 * bw + 4, base - fo * sc, bw - 11, fo * sc,
+              'color-mix(in srgb, ' + COL.ac + ' 65%, transparent)', COL.ac, 1, 2);
+            T(svg, bx + i2 * bw + (bw - 3) / 2, base + 15, AZ.charAt(i2), 'lbl-s', 'middle', 10);
+          }
+          /* la lettera piu frequente, e la chiave che ne segue */
+          var best = 0;
+          for (i2 = 1; i2 < 26; i2++) { if (c[i2] > c[best]) { best = i2; } }
+          var kstim = (best - 4 + 26) % 26;   /* E vale 4 */
+          C(svg, bx + best * bw + (bw - 3) / 2, base - c[best] / tot * 100 * sc - 12,
+            5, COL.rd, 'none');
+          /* il punteggio di ogni chiave */
+          var meglio = 0, pmax = -1, pp = [];
+          for (i2 = 0; i2 < 26; i2++) {
+            var s2 = punteggio(decifra(testo, i2));
+            pp.push(s2);
+            if (s2 > pmax) { pmax = s2; meglio = i2; }
+          }
+          R(svg, 40, 246, 600, 128, COL.s2, COL.ax);
+          T(svg, 60, 272, 'lettera piu’ frequente nel cifrato', 'lbl-s');
+          T(svg, 620, 272, AZ.charAt(best) + '  (' + num(c[best] / tot * 100, 2) + '%)',
+            'em', 'end');
+          T(svg, 60, 298, 'se corrisponde alla E, la chiave e’', 'lbl-s');
+          T(svg, 620, 298, String(kstim), 'em', 'end');
+          T(svg, 60, 324, 'chiave col punteggio statistico migliore', 'lbl-s');
+          T(svg, 620, 324, String(meglio) + '  (punteggio ' + num(pmax, 2) + ')', 'em', 'end');
+          T(svg, 60, 350, 'chiave vera', 'lbl-s');
+          T(svg, 620, 350, String(k) + (meglio === k ? '  — trovata' : '  — mancata'),
+            meglio === k ? 'lbl' : 'em', 'end');
+          T(svg, 60, 368, 'nessuna chiave e’ stata provata: si e’ soltanto contato', 'lbl-s');
+          cap.textContent = 'Su un testo lungo l’analisi delle frequenze individua la chiave ' +
+            meglio + (meglio === k ? ' — quella giusta — senza tentativi.'
+                                   : ' invece della chiave vera ' + k + '.');
+          return;
+        }
+
+        /* forza bruta */
+        var corto = soloLettere(msg, true).slice(0, 26);
+        var cifrato = cifra(corto, k);
+        T(svg, 40, 28, 'tutte le 25 chiavi provate sul messaggio cifrato', 'lbl');
+        T(svg, 40, 46, 'cifrato: ' + cifrato, 'em mono', 'start', 12);
+        var yb = 70, best2 = 0, pm2 = -1, riga, i3;
+        for (i3 = 1; i3 <= 25; i3++) {
+          var s3 = punteggio(decifra(cifrato, i3));
+          if (s3 > pm2) { pm2 = s3; best2 = i3; }
+        }
+        for (i3 = 1; i3 <= 25; i3++) {
+          var col = (i3 % 2 === 1) ? 40 : 358;
+          var yy = yb + Math.floor((i3 - 1) / 2) * 24;
+          riga = decifra(cifrato, i3);
+          var giusta = (i3 === best2);
+          if (giusta) {
+            R(svg, col - 6, yy - 15, 306, 21,
+              'color-mix(in srgb, ' + COL.gr + ' 20%, transparent)', COL.gr, 1.2, 4);
+          }
+          T(svg, col, yy, 'k=' + (i3 < 10 ? ' ' : '') + i3, 'lbl-s mono', 'start', 11);
+          T(svg, col + 46, yy, riga, giusta ? 'em mono' : 'lbl mono', 'start', 11.5);
+        }
+        T(svg, 40, 386, 'venticinque tentativi: un computer li fa in un milionesimo di secondo',
+          'lbl-s');
+        cap.textContent = 'La forza bruta indica la chiave ' + best2 +
+          ' come la piu’ verosimile (quella vera e’ ' + k + ').';
+      }
+      txt.addEventListener('input', draw);
+      sk.addEventListener('input', draw);
+      var bts = grab('ce-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       2 — ARITMETICA MODULARE
+       ================================================================== */
+    (function () {
+      var svg = grab('mo-svg'); if (!svg) { return; }
+      var sa = grab('mo-a'), sn = grab('mo-n'), se = grab('mo-e'), cap = grab('mo-cap');
+      var vista = 'orologio';
+
+      function mcd(a, b) { while (b) { var t = a % b; a = b; b = t; } return a; }
+      function potmod(a, e, n) {
+        var r = 1;
+        a = a % n;
+        while (e > 0) {
+          if (e % 2 === 1) { r = (r * a) % n; }
+          a = (a * a) % n;
+          e = Math.floor(e / 2);
+        }
+        return r;
+      }
+      function phi(n) {
+        var c = 0;
+        for (var i = 1; i <= n; i++) { if (mcd(i, n) === 1) { c++; } }
+        return c;
+      }
+
+      function draw() {
+        var a = +sa.value, n = +sn.value, e = +se.value;
+        grab('mo-av').textContent = a;
+        grab('mo-nv').textContent = n;
+        grab('mo-ev').textContent = e;
+        clear(svg);
+
+        if (vista === 'orologio') {
+          var cx = 230, cy = 205, rr = 150;
+          C(svg, cx, cy, rr, 'none', COL.ax, 1.5);
+          var i, ang, px, py;
+          for (i = 0; i < n; i++) {
+            ang = -Math.PI / 2 + 2 * Math.PI * i / n;
+            px = cx + rr * Math.cos(ang);
+            py = cy + rr * Math.sin(ang);
+            C(svg, px, py, 3, COL.mu, 'none');
+            if (n <= 40 || i % 2 === 0) {
+              T(svg, cx + (rr + 17) * Math.cos(ang), cy + (rr + 17) * Math.sin(ang) + 4,
+                String(i), 'lbl-s', 'middle', n > 40 ? 9 : 10.5);
+            }
+          }
+          /* i multipli di a: 0, a, 2a, 3a, ... */
+          var v = 0, passi = 0, d = '';
+          var visti = {};
+          while (!visti[v] && passi < n + 2) {
+            visti[v] = true;
+            ang = -Math.PI / 2 + 2 * Math.PI * v / n;
+            px = cx + rr * Math.cos(ang);
+            py = cy + rr * Math.sin(ang);
+            d += (passi ? 'L' : 'M') + px.toFixed(1) + ' ' + py.toFixed(1);
+            v = (v + a) % n;
+            passi++;
+          }
+          d += 'Z';
+          P(svg, d, COL.ac, 1.8, 'color-mix(in srgb, ' + COL.ac + ' 8%, transparent)');
+          var g = mcd(a, n), ciclo = n / g;
+          R(svg, 430, 78, 220, 246, COL.s2, COL.ax);
+          T(svg, 450, 108, 'passo a', 'lbl-s');
+          T(svg, 632, 108, String(a), 'em', 'end');
+          T(svg, 450, 136, 'modulo n', 'lbl-s');
+          T(svg, 632, 136, String(n), 'em', 'end');
+          T(svg, 450, 164, 'MCD(a, n)', 'lbl-s');
+          T(svg, 632, 164, String(g), 'lbl', 'end');
+          T(svg, 450, 192, 'caselle toccate', 'lbl-s');
+          T(svg, 632, 192, String(ciclo) + ' su ' + n, 'em', 'end');
+          T(svg, 450, 226, g === 1 ? 'MCD = 1: si toccano' : 'MCD > 1: se ne toccano', 'lbl-s');
+          T(svg, 450, 244, g === 1 ? 'TUTTE le caselle' : 'solo ' + ciclo, 'lbl-s');
+          T(svg, 450, 276, 'e’ lo stesso motivo per', 'lbl-s');
+          T(svg, 450, 294, 'cui in RSA l’esponente', 'lbl-s');
+          T(svg, 450, 312, 'deve essere coprimo', 'lbl-s');
+          T(svg, 40, 30, 'sommare sempre ' + a + ', modulo ' + n, 'lbl');
+          T(svg, 40, 372, 'la spezzata si chiude dopo n / MCD(a,n) passi', 'lbl-s');
+          cap.textContent = 'Sommando ' + a + ' modulo ' + n + ' si toccano ' + ciclo +
+            ' caselle su ' + n + ': tutte se e solo se MCD(' + a + ', ' + n + ') = 1.';
+          return;
+        }
+
+        if (vista === 'pot') {
+          T(svg, 40, 28, 'le potenze di ' + a + ' modulo ' + n, 'lbl');
+          var seq = [], vis = {}, per = 0, x = 1 % n, kk;
+          for (kk = 1; kk <= 60; kk++) {
+            x = (x * a) % n;
+            seq.push(x);
+            if (x === 1 % n && per === 0 && kk >= 1) { per = kk; }
+          }
+          var mx = 0;
+          for (kk = 0; kk < seq.length; kk++) { if (seq[kk] > mx) { mx = seq[kk]; } }
+          var pl = piano(svg, 55, 46, 420, 226, 0, 40, 0, Math.max(mx, 1) * 1.1);
+          for (kk = 0; kk < 40 && kk < seq.length; kk++) {
+            var xx = pl.X(kk + 0.5), yy2 = pl.Y(seq[kk]);
+            R(svg, xx - 4, yy2, 8, pl.y0 + pl.h - yy2,
+              'color-mix(in srgb, ' + (per && ((kk + 1) % per === 0) ? COL.gr : COL.ac) +
+              ' 60%, transparent)', 'none', 0, 1);
+          }
+          T(svg, 265, 292, 'esponente k', 'lbl-s', 'middle');
+          T(svg, 55, 40, 'a^k mod n', 'lbl-s');
+          var ph = phi(n), ok1 = potmod(a, ph, n) === 1 % n, g2 = mcd(a, n);
+          R(svg, 495, 60, 160, 224, COL.s2, COL.ax);
+          T(svg, 512, 90, 'MCD(a, n)', 'lbl-s');
+          T(svg, 640, 90, String(g2), 'lbl', 'end');
+          T(svg, 512, 118, 'φ(n)', 'lbl-s');
+          T(svg, 640, 118, String(ph), 'em', 'end');
+          T(svg, 512, 146, 'periodo trovato', 'lbl-s');
+          T(svg, 640, 146, per ? String(per) : 'nessuno', 'em', 'end');
+          T(svg, 512, 174, 'a^φ(n) mod n', 'lbl-s');
+          T(svg, 640, 174, String(potmod(a, ph, n)), ok1 ? 'em' : 'lbl', 'end');
+          T(svg, 512, 208, ok1 ? 'vale 1: teorema' : 'non vale 1 perche’', 'lbl-s');
+          T(svg, 512, 226, ok1 ? 'di Eulero verificato' : 'MCD(a,n) ≠ 1', 'lbl-s');
+          if (per) {
+            T(svg, 512, 258, 'il periodo divide φ(n):', 'lbl-s');
+            T(svg, 512, 276, ph + ' / ' + per + ' = ' + num(ph / per, 0), 'lbl-s');
+          }
+          T(svg, 55, 320, 'in verde i punti in cui la potenza torna a 1: da li’ tutto si ripete',
+            'lbl-s');
+          T(svg, 55, 342, 'e’ questa periodicita’ a far funzionare RSA — e a permettere',
+            'lbl-s');
+          T(svg, 55, 364, 'all’algoritmo di Shor di romperlo con un calcolatore quantistico',
+            'lbl-s');
+          cap.textContent = 'Le potenze di ' + a + ' modulo ' + n +
+            (per ? ' si ripetono con periodo ' + per + ', che divide φ(' + n + ') = ' + ph
+                 : ' non tornano mai a 1: MCD(' + a + ', ' + n + ') ≠ 1') + '.';
+          return;
+        }
+
+        /* esponenziazione veloce */
+        T(svg, 40, 28, 'calcolo di ' + a + '^' + e + ' mod ' + n + ' per quadrati ripetuti', 'lbl');
+        var r = 1, base = a % n, ee = e, righe = [];
+        while (ee > 0) {
+          righe.push([ee, ee % 2, r, base]);
+          if (ee % 2 === 1) { r = (r * base) % n; }
+          base = (base * base) % n;
+          ee = Math.floor(ee / 2);
+          righe[righe.length - 1].push(r);
+        }
+        var y0 = 62, rh = 26;
+        T(svg, 60, y0, 'e', 'lbl-s');
+        T(svg, 130, y0, 'e dispari?', 'lbl-s');
+        T(svg, 260, y0, 'base', 'lbl-s', 'end');
+        T(svg, 380, y0, 'operazione', 'lbl-s');
+        T(svg, 620, y0, 'risultato', 'lbl-s', 'end');
+        L(svg, 55, y0 + 8, 625, y0 + 8, COL.ax, 1);
+        for (var q = 0; q < righe.length && q < 10; q++) {
+          var yy3 = y0 + 26 + q * rh;
+          T(svg, 60, yy3, String(righe[q][0]), 'lbl mono');
+          T(svg, 130, yy3, righe[q][1] ? 'sì' : 'no', righe[q][1] ? 'em' : 'lbl-s');
+          T(svg, 260, yy3, String(righe[q][3]), 'lbl mono', 'end');
+          T(svg, 380, yy3, righe[q][1] ? ('r × ' + righe[q][3] + ' mod ' + n) : '—',
+            'lbl-s');
+          T(svg, 620, yy3, String(righe[q][4]), 'lbl mono', 'end');
+        }
+        var yfin = y0 + 26 + Math.min(righe.length, 10) * rh + 14;
+        R(svg, 55, yfin, 570, 78, COL.s2, COL.ax);
+        T(svg, 75, yfin + 26, 'moltiplicazioni eseguite', 'lbl-s');
+        T(svg, 605, yfin + 26, String(righe.length * 2) + '  (invece di ' + e + ')', 'em', 'end');
+        T(svg, 75, yfin + 54, a + '^' + e + ' mod ' + n, 'lbl-s');
+        T(svg, 605, yfin + 54, String(r), 'em', 'end');
+        T(svg, 55, yfin + 96,
+          'i passi sono log₂(e): con esponenti di 600 cifre bastano circa 2000 passi', 'lbl-s');
+        cap.textContent = a + '^' + e + ' mod ' + n + ' = ' + r + ', ottenuto in ' +
+          righe.length + ' dimezzamenti invece di ' + e + ' moltiplicazioni.';
+      }
+      [sa, sn, se].forEach(function (s) { s.addEventListener('input', draw); });
+      var bts = grab('mo-btns');
+      bts.addEventListener('click', function (e2) {
+        var b = e2.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       3 — RSA
+       ================================================================== */
+    (function () {
+      var svg = grab('rs-svg'); if (!svg) { return; }
+      var sp = grab('rs-p'), sq = grab('rs-q'), sm = grab('rs-m'), cap = grab('rs-cap');
+      var vista = 'chiavi';
+      var PRIMI = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47,
+                   53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+
+      function mcd(a, b) { while (b) { var t = a % b; a = b; b = t; } return a; }
+      function inverso(e, m) {
+        /* Euclide esteso: trova d con e*d = 1 (mod m) */
+        var t = 0, nt = 1, r = m, nr = e % m, q, tmp;
+        while (nr !== 0) {
+          q = Math.floor(r / nr);
+          tmp = t - q * nt; t = nt; nt = tmp;
+          tmp = r - q * nr; r = nr; nr = tmp;
+        }
+        if (r > 1) { return null; }
+        return ((t % m) + m) % m;
+      }
+      function potmod(a, e, n) {
+        var r = 1;
+        a = a % n;
+        while (e > 0) {
+          if (e % 2 === 1) { r = (r * a) % n; }
+          a = (a * a) % n;
+          e = Math.floor(e / 2);
+        }
+        return r;
+      }
+      function fattorizza(n) {
+        var div = 0, f = 2;
+        while (f * f <= n) {
+          div++;
+          if (n % f === 0) { return { f: f, div: div }; }
+          f++;
+        }
+        return { f: n, div: div };
+      }
+
+      function chiavi() {
+        var p = PRIMI[+sp.value], q = PRIMI[+sq.value];
+        if (p === q) { q = PRIMI[(+sq.value + 1) % PRIMI.length]; }
+        var n = p * q, ph = (p - 1) * (q - 1), e = 3;
+        while (e < ph && mcd(e, ph) !== 1) { e += 2; }
+        var d = inverso(e, ph);
+        return { p: p, q: q, n: n, ph: ph, e: e, d: d };
+      }
+
+      function draw() {
+        var K = chiavi();
+        grab('rs-pv').textContent = K.p;
+        grab('rs-qv').textContent = K.q;
+        var m = Math.min(+sm.value, K.n - 1);
+        grab('rs-mv').textContent = m;
+        clear(svg);
+
+        if (vista === 'chiavi') {
+          T(svg, 40, 30, 'costruzione della coppia di chiavi, passo per passo', 'lbl');
+          var passi = [
+            ['1', 'due primi', 'p = ' + K.p + ',  q = ' + K.q],
+            ['2', 'modulo', 'n = p·q = ' + K.n],
+            ['3', 'funzione di Eulero', 'φ(n) = (p−1)(q−1) = ' +
+              (K.p - 1) + '·' + (K.q - 1) + ' = ' + K.ph],
+            ['4', 'esponente pubblico', 'e = ' + K.e + '   (MCD(e, φ) = 1)'],
+            ['5', 'esponente privato', 'd = ' + K.d + '   perche’ ' + K.e + '·' + K.d +
+              ' = ' + (K.e * K.d) + ' = ' + Math.floor(K.e * K.d / K.ph) + '·' + K.ph + ' + 1'],
+            ['6', 'si buttano', 'p, q e φ(n): non servono piu’, e sono pericolosi']
+          ];
+          var y = 62, i;
+          for (i = 0; i < passi.length; i++) {
+            C(svg, 58, y + i * 34 - 4, 11, COL.ac, 'none');
+            T(svg, 58, y + i * 34, passi[i][0], 'lbl', 'middle', 11);
+            T(svg, 80, y + i * 34, passi[i][1], 'lbl-s');
+            T(svg, 250, y + i * 34, passi[i][2], 'lbl mono', 'start', 12.5);
+          }
+          var yb = y + passi.length * 34 + 12;
+          R(svg, 45, yb, 285, 96, 'color-mix(in srgb, ' + COL.gr + ' 12%, transparent)',
+            COL.gr, 1.6);
+          T(svg, 60, yb + 26, 'CHIAVE PUBBLICA', 'em', 'start', 12);
+          T(svg, 60, yb + 54, '( n = ' + K.n + ',  e = ' + K.e + ' )', 'lbl mono', 'start', 14);
+          T(svg, 60, yb + 78, 'si puo’ gridare in piazza', 'lbl-s');
+          R(svg, 350, yb, 285, 96, 'color-mix(in srgb, ' + COL.rd + ' 12%, transparent)',
+            COL.rd, 1.6);
+          T(svg, 365, yb + 26, 'CHIAVE PRIVATA', 'em', 'start', 12);
+          T(svg, 365, yb + 54, '( n = ' + K.n + ',  d = ' + K.d + ' )', 'lbl mono', 'start', 14);
+          T(svg, 365, yb + 78, 'non esce mai di casa', 'lbl-s');
+          cap.textContent = 'Con p = ' + K.p + ' e q = ' + K.q +
+            ' la chiave pubblica e’ (' + K.n + ', ' + K.e + ') e la privata (' +
+            K.n + ', ' + K.d + ').';
+          return;
+        }
+
+        if (vista === 'msg') {
+          var c = potmod(m, K.e, K.n), m2 = potmod(c, K.d, K.n);
+          T(svg, 40, 30, 'il viaggio del messaggio', 'lbl');
+          var bx = [50, 260, 470], bw2 = 160, by = 70, bh = 82;
+          var eti = [['messaggio', String(m), COL.ac],
+                     ['cifrato', String(c), COL.mg],
+                     ['decifrato', String(m2), m2 === m ? COL.gr : COL.rd]];
+          for (var j = 0; j < 3; j++) {
+            R(svg, bx[j], by, bw2, bh,
+              'color-mix(in srgb, ' + eti[j][2] + ' 14%, transparent)', eti[j][2], 1.8);
+            T(svg, bx[j] + bw2 / 2, by + 28, eti[j][0], 'lbl', 'middle');
+            T(svg, bx[j] + bw2 / 2, by + 62, eti[j][1], 'em', 'middle', 22);
+          }
+          for (var t2 = 0; t2 < 2; t2++) {
+            var xa = bx[t2] + bw2, xb = bx[t2 + 1];
+            L(svg, xa + 6, by + bh / 2, xb - 6, by + bh / 2, COL.mu, 1.8);
+            P(svg, 'M' + (xb - 12) + ' ' + (by + bh / 2 - 5) + 'L' + (xb - 4) + ' ' +
+              (by + bh / 2) + 'L' + (xb - 12) + ' ' + (by + bh / 2 + 5), COL.mu, 1.8);
+            T(svg, (xa + xb) / 2, by + bh / 2 - 12,
+              t2 === 0 ? ('^' + K.e) : ('^' + K.d), 'em', 'middle', 12);
+            T(svg, (xa + xb) / 2, by + bh / 2 + 24,
+              t2 === 0 ? 'pubblica' : 'privata', 'lbl-s', 'middle');
+          }
+          var righe = [
+            ['cifratura', 'c = ' + m + '^' + K.e + ' mod ' + K.n + ' = ' + c],
+            ['decifratura', 'm = ' + c + '^' + K.d + ' mod ' + K.n + ' = ' + m2],
+            ['il messaggio torna?', m2 === m ? 'sì — sempre, per il teorema di Eulero'
+                                             : 'no (segnalatelo al professore)'],
+            ['e·d mod φ(n)', String((K.e * K.d) % K.ph) +
+              '  (deve valere 1, ed e’ tutto il segreto)']
+          ];
+          var yq = 200;
+          R(svg, 45, yq - 22, 590, righe.length * 30 + 18, COL.s2, COL.ax);
+          for (var w = 0; w < righe.length; w++) {
+            T(svg, 65, yq + w * 30, righe[w][0], 'lbl-s');
+            T(svg, 615, yq + w * 30, righe[w][1], w === 2 ? 'em' : 'lbl mono', 'end', 12.5);
+          }
+          T(svg, 45, yq + righe.length * 30 + 32,
+            'chiunque puo’ cifrare: serve solo la chiave pubblica. Decifrare, no.', 'lbl-s');
+          cap.textContent = 'Il messaggio ' + m + ' viaggia come ' + c + ' e torna ' + m2 + '.';
+          return;
+        }
+
+        /* attacco */
+        T(svg, 40, 28, 'rompere la chiave: quante divisioni servono', 'lbl');
+        var att = fattorizza(K.n);
+        var pl2 = piano(svg, 60, 50, 400, 230, 0, 10000, 0, 100);
+        var dd = '';
+        for (var xn = 4; xn <= 10000; xn += 20) {
+          dd += (dd ? 'L' : 'M') + pl2.X(xn).toFixed(1) + ' ' + pl2.Y(Math.sqrt(xn)).toFixed(1);
+        }
+        P(svg, dd, COL.ac, 2.4);
+        C(svg, pl2.X(Math.min(K.n, 10000)), pl2.Y(Math.min(att.div, 100)), 6, COL.rd, COL.sf, 2);
+        for (var gg = 0; gg <= 4; gg++) {
+          T(svg, pl2.x0 - 6, pl2.Y(gg * 25) + 4, String(gg * 25), 'lbl-s', 'end');
+          T(svg, pl2.X(gg * 2500), pl2.y0 + pl2.h + 16, grp(gg * 2500), 'lbl-s', 'middle');
+        }
+        T(svg, 260, 44, 'divisioni necessarie ≈ √n', 'lbl', 'middle');
+        T(svg, 60, 296, 'modulo n', 'lbl-s');
+        R(svg, 480, 66, 165, 200, COL.s2, COL.ax);
+        T(svg, 497, 94, 'n', 'lbl-s');
+        T(svg, 630, 94, String(K.n), 'em', 'end');
+        T(svg, 497, 122, 'primo fattore', 'lbl-s');
+        T(svg, 630, 122, String(att.f), 'em', 'end');
+        T(svg, 497, 150, 'divisioni', 'lbl-s');
+        T(svg, 630, 150, String(att.div), 'em', 'end');
+        T(svg, 497, 178, '√n', 'lbl-s');
+        T(svg, 630, 178, num(Math.sqrt(K.n), 1), 'lbl', 'end');
+        T(svg, 497, 212, 'trovato p, si ricava', 'lbl-s');
+        T(svg, 497, 230, 'q, poi φ, poi d:', 'lbl-s');
+        T(svg, 497, 248, 'la chiave e’ rotta', 'lbl-s');
+        T(svg, 60, 322,
+          'Con n di 617 cifre le divisioni sarebbero circa 10³⁰⁸: piu’ degli atomi', 'lbl-s');
+        T(svg, 60, 344,
+          'dell’universo osservabile (≈ 10⁸⁰). Il migliore algoritmo noto fa molto', 'lbl-s');
+        T(svg, 60, 366,
+          'meglio di cosi’, ma resta sub-esponenziale: nessuno sa fare in fretta.', 'lbl-s');
+        cap.textContent = 'Per fattorizzare n = ' + K.n + ' bastano ' + att.div +
+          ' divisioni: e’ piccolo. Il conto cresce come √n, e con 617 cifre diventa impossibile.';
+      }
+      [sp, sq, sm].forEach(function (s) { s.addEventListener('input', draw); });
+      var bts = grab('rs-btns');
+      bts.addEventListener('click', function (e3) {
+        var b = e3.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       4 — LE FUNZIONI DI HASH
+       ================================================================== */
+    (function () {
+      var svg = grab('ha-svg'); if (!svg) { return; }
+      var txt = grab('ha-txt'), cap = grab('ha-cap');
+      var vista = 'valanga';
+
+      function draw() {
+        var s = txt.value || '';
+        clear(svg);
+
+        if (vista === 'valanga') {
+          T(svg, 40, 30, 'cambia un solo carattere e guarda che cosa succede', 'lbl');
+          var varianti = [s], etichette = ['testo originale'];
+          if (s.length > 0) {
+            varianti.push(String.fromCharCode(s.charCodeAt(0) ^ 1) + s.slice(1));
+            etichette.push('cambiato il PRIMO carattere');
+            varianti.push(s.slice(0, -1) + String.fromCharCode(s.charCodeAt(s.length - 1) ^ 1));
+            etichette.push('cambiato l’ULTIMO carattere');
+            varianti.push(s + ' ');
+            etichette.push('aggiunto uno spazio in fondo');
+          }
+          var h0 = fnv(s), y = 62, i;
+          for (i = 0; i < varianti.length; i++) {
+            var h = fnv(varianti[i]), bd = bitDiversi(h0, h);
+            R(svg, 45, y + i * 56 - 22, 590, 48,
+              i === 0 ? 'color-mix(in srgb, ' + COL.ac + ' 12%, transparent)' : COL.s2,
+              i === 0 ? COL.ac : COL.ax, i === 0 ? 1.6 : 1);
+            T(svg, 62, y + i * 56 - 4, '«' + varianti[i] + '»', 'lbl mono', 'start', 12.5);
+            T(svg, 62, y + i * 56 + 14, etichette[i], 'lbl-s');
+            T(svg, 618, y + i * 56 - 4, hex8(h), 'em mono', 'end', 15);
+            T(svg, 618, y + i * 56 + 14,
+              i === 0 ? 'impronta di riferimento' : (bd + ' bit su 32 sono cambiati'),
+              'lbl-s', 'end');
+          }
+          var ybar = y + varianti.length * 56 + 4;
+          R(svg, 45, ybar, 590, 106, COL.s2, COL.ax);
+          T(svg, 62, ybar + 26, 'un hash IDEALE cambierebbe, in media', 'lbl-s');
+          T(svg, 618, ybar + 26, '16 bit su 32', 'em', 'end');
+          T(svg, 62, ybar + 50, 'FNV-1a, misurato: cambiamento all’inizio', 'lbl-s');
+          T(svg, 618, ybar + 50, 'circa 16,5 bit', 'lbl', 'end');
+          T(svg, 62, ybar + 74, 'FNV-1a, misurato: cambiamento in fondo', 'lbl-s');
+          T(svg, 618, ybar + 74, 'circa 9,5 bit', 'em', 'end');
+          T(svg, 62, ybar + 98,
+            'la valanga si propaga in avanti, non all’indietro: un difetto vero, ' +
+            'e uno dei motivi per cui FNV-1a non e’ crittografica', 'lbl-s');
+          cap.textContent = 'L’impronta di «' + s + '» e’ ' + hex8(h0) +
+            ': cambiando un solo carattere non si somiglia piu’ per niente.';
+          return;
+        }
+
+        if (vista === 'dentro') {
+          T(svg, 40, 28, 'FNV-1a a 32 bit, carattere per carattere', 'lbl');
+          T(svg, 40, 48, 'h = 2 166 136 261;  per ogni byte:  h = (h XOR byte) × 16 777 619',
+            'lbl-s');
+          var h = 2166136261, y0 = 84, rh = 26, j;
+          T(svg, 60, y0, 'passo', 'lbl-s');
+          T(svg, 140, y0, 'carattere', 'lbl-s');
+          T(svg, 250, y0, 'byte', 'lbl-s', 'end');
+          T(svg, 420, y0, 'h dopo lo XOR', 'lbl-s', 'end');
+          T(svg, 620, y0, 'h dopo il prodotto', 'lbl-s', 'end');
+          L(svg, 55, y0 + 8, 625, y0 + 8, COL.ax, 1);
+          T(svg, 140, y0 + 28, 'inizio', 'lbl-s');
+          T(svg, 620, y0 + 28, hex8(2166136261), 'lbl mono', 'end');
+          var nmax = Math.min(s.length, 8);
+          for (j = 0; j < nmax; j++) {
+            var b = s.charCodeAt(j) & 0xff;
+            var hx = (h ^ b) >>> 0;
+            h = Math.imul(hx, 16777619) >>> 0;
+            var yy = y0 + 56 + j * rh;
+            T(svg, 60, yy, String(j + 1), 'lbl-s');
+            T(svg, 140, yy, '«' + s.charAt(j) + '»', 'lbl mono');
+            T(svg, 250, yy, String(b), 'lbl mono', 'end');
+            T(svg, 420, yy, hex8(hx), 'lbl mono', 'end');
+            T(svg, 620, yy, hex8(h), 'em mono', 'end');
+          }
+          for (j = nmax; j < s.length; j++) {
+            var b2 = s.charCodeAt(j) & 0xff;
+            h = Math.imul((h ^ b2) >>> 0, 16777619) >>> 0;
+          }
+          var yf = y0 + 56 + nmax * rh + 10;
+          R(svg, 55, yf, 570, 56, COL.s2, COL.ax);
+          T(svg, 75, yf + 34, s.length > 8 ? ('… e cosi’ via per gli altri ' +
+            (s.length - 8) + ' caratteri. Impronta finale:') : 'Impronta finale:', 'lbl-s');
+          T(svg, 605, yf + 34, hex8(fnv(s)), 'em mono', 'end', 15);
+          T(svg, 55, yf + 84,
+            'due sole operazioni — XOR e moltiplicazione — ripetute: e’ tutto qui', 'lbl-s');
+          T(svg, 55, yf + 106,
+            'SHA-256 fa la stessa cosa con 64 giri e molte piu’ mescolate, su 256 bit', 'lbl-s');
+          cap.textContent = 'Ogni carattere rimescola completamente lo stato: dopo pochi passi ' +
+            'il legame con l’input e’ irriconoscibile.';
+          return;
+        }
+
+        /* compleanni */
+        T(svg, 40, 28, 'probabilita’ di una collisione (paradosso dei compleanni)', 'lbl');
+        var Nsp = 65536;      /* spazio di 16 bit, per poterlo disegnare */
+        var pl = piano(svg, 60, 50, 400, 220, 0, 800, 0, 1);
+        var d = '', kk;
+        for (kk = 0; kk <= 800; kk += 4) {
+          /* p = 1 - exp(-k(k-1)/(2N)) */
+          var pcol = 1 - Math.exp(-kk * (kk - 1) / (2 * Nsp));
+          d += (d ? 'L' : 'M') + pl.X(kk).toFixed(1) + ' ' + pl.Y(pcol).toFixed(1);
+        }
+        P(svg, d, COL.mg, 2.6);
+        var k50 = 1.1774 * Math.sqrt(Nsp);
+        L(svg, pl.X(k50), pl.y0, pl.X(k50), pl.y0 + pl.h, COL.gr, 1.8, '5 4');
+        L(svg, pl.x0, pl.Y(0.5), pl.x0 + pl.w, pl.Y(0.5), COL.ax, 1, '3 4');
+        T(svg, pl.X(k50) + 8, pl.y0 + 22, 'k ≈ 1,177·√N = ' +
+          Math.round(k50), 'em');
+        for (kk = 0; kk <= 4; kk++) {
+          T(svg, pl.x0 - 6, pl.Y(kk / 4) + 4, (kk * 25) + '%', 'lbl-s', 'end');
+          T(svg, pl.X(kk * 200), pl.y0 + pl.h + 16, String(kk * 200), 'lbl-s', 'middle');
+        }
+        T(svg, 260, 44, 'spazio di 16 bit: N = 65 536 impronte', 'lbl', 'middle');
+        T(svg, 60, 292, 'quanti input si provano', 'lbl-s');
+        var BITS = [[32, 'FNV-1a, questo widget'], [128, 'MD5, rotto nel 2004'],
+                    [160, 'SHA-1, rotto nel 2017'], [256, 'SHA-256, in uso oggi']];
+        R(svg, 478, 60, 170, 214, COL.s2, COL.ax);
+        T(svg, 494, 86, 'sicurezza effettiva', 'lbl-s');
+        for (kk = 0; kk < BITS.length; kk++) {
+          T(svg, 494, 112 + kk * 40, BITS[kk][0] + ' bit → ' + (BITS[kk][0] / 2) + ' bit',
+            'em', 'start', 12);
+          T(svg, 494, 128 + kk * 40, BITS[kk][1], 'lbl-s', 'start', 10);
+        }
+        T(svg, 60, 320,
+          'la sicurezza contro le collisioni e’ la RADICE dello spazio, non lo spazio:', 'lbl-s');
+        T(svg, 60, 342,
+          'per questo servono 256 bit per averne 128 di sicurezza reale', 'lbl-s');
+        T(svg, 60, 366,
+          'e per questo MD5 e SHA-1 non vanno piu’ usati per niente di serio', 'lbl-s');
+        cap.textContent = 'Con 65 536 impronte possibili bastano circa ' + Math.round(k50) +
+          ' tentativi per avere il 50% di probabilita’ di una collisione.';
+      }
+      txt.addEventListener('input', draw);
+      var bts = grab('ha-btns');
+      bts.addEventListener('click', function (e4) {
+        var b = e4.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       5 — LA CATENA DI BLOCCHI
+       ================================================================== */
+    (function () {
+      var svg = grab('bc-svg'); if (!svg) { return; }
+      var sb = grab('bc-b'), si = grab('bc-i'), cap = grab('bc-cap');
+      var vista = 'catena';
+      var DIFF = 3;
+      var DATI = ['Genesi: 1000 a Anna', 'Anna paga 120 a Bruno', 'Bruno paga 45 a Carla',
+                  'Carla paga 200 a Dario', 'Dario paga 30 a Anna', 'Anna paga 75 a Carla'];
+
+      function testa(prev, dati, nonce) { return prev + '|' + dati + '|' + nonce; }
+      function mina(prev, dati) {
+        var nonce = 0, h;
+        while (nonce < 4000000) {
+          h = hex8(fnv(testa(prev, dati, nonce)));
+          if (zeriIniziali(h) >= DIFF) { return { nonce: nonce, hash: h, prove: nonce + 1 }; }
+          nonce++;
+        }
+        return { nonce: -1, hash: '????????', prove: nonce };
+      }
+      function costruisci(dati) {
+        var cat = [], prev = '00000000', i, m;
+        for (i = 0; i < dati.length; i++) {
+          m = mina(prev, dati[i]);
+          cat.push({ prev: prev, dati: dati[i], nonce: m.nonce, hash: m.hash, prove: m.prove });
+          prev = m.hash;
+        }
+        return cat;
+      }
+      var BASE = null;
+
+      function draw() {
+        var bidx = +sb.value, imp = +si.value;
+        grab('bc-bv').textContent = bidx;
+        grab('bc-iv').textContent = imp;
+        if (!BASE) { BASE = costruisci(DATI); }
+        clear(svg);
+
+        var dati2 = DATI.slice();
+        dati2[bidx] = dati2[bidx].replace(/\d+/, String(imp));
+
+        var mostra, titolo, sotto;
+        if (vista === 'catena') {
+          mostra = BASE.map(function (b) {
+            return { dati: b.dati, prev: b.prev, hash: b.hash, nonce: b.nonce,
+                     linkOk: true, powOk: true };
+          });
+          titolo = 'sei blocchi validi: ogni impronta comincia con ' + DIFF + ' zeri';
+          sotto = 'ogni blocco contiene l’impronta del precedente: e’ la catena';
+        } else if (vista === 'rotta') {
+          /* si cambia solo il dato: prev e nonce restano quelli originali */
+          mostra = BASE.map(function (b, i) {
+            var dd = (i === bidx) ? dati2[i] : b.dati;
+            var hh = hex8(fnv(testa(b.prev, dd, b.nonce)));
+            return { dati: dd, prev: b.prev, hash: hh, nonce: b.nonce,
+                     linkOk: true, powOk: zeriIniziali(hh) >= DIFF, alterato: i === bidx };
+          });
+          for (var i2 = 1; i2 < mostra.length; i2++) {
+            mostra[i2].linkOk = (mostra[i2].prev === mostra[i2 - 1].hash);
+          }
+          titolo = 'il blocco ' + bidx + ' e’ stato alterato';
+          sotto = 'la sua impronta cambia, e da li’ in poi la catena non torna piu’';
+        } else {
+          /* riparazione: si ricalcolano le impronte in avanti tenendo i vecchi nonce */
+          mostra = [];
+          var prev = BASE[0].prev;
+          for (var i3 = 0; i3 < BASE.length; i3++) {
+            var dd2 = (i3 === bidx) ? dati2[i3] : BASE[i3].dati;
+            var hh2 = hex8(fnv(testa(prev, dd2, BASE[i3].nonce)));
+            mostra.push({ dati: dd2, prev: prev, hash: hh2, nonce: BASE[i3].nonce,
+                          linkOk: true, powOk: zeriIniziali(hh2) >= DIFF,
+                          alterato: i3 === bidx });
+            prev = hh2;
+          }
+          titolo = 'impronte ricalcolate in avanti: i collegamenti tornano…';
+          sotto = '… ma la prova di lavoro salta su tutti i blocchi da ' + bidx + ' in poi';
+        }
+
+        T(svg, 40, 26, titolo, 'lbl');
+        T(svg, 40, 44, sotto, 'lbl-s');
+        var bw = 96, bh = 116, x0 = 40, gap = 8, i;
+        for (i = 0; i < mostra.length; i++) {
+          var b = mostra[i];
+          var buono = b.linkOk && b.powOk;
+          var cc = buono ? COL.gr : COL.rd;
+          var x = x0 + i * (bw + gap);
+          R(svg, x, 66, bw, bh,
+            'color-mix(in srgb, ' + cc + ' 10%, transparent)', cc, b.alterato ? 2.6 : 1.6);
+          T(svg, x + bw / 2, 84, 'blocco ' + i, 'lbl', 'middle', 11.5);
+          T(svg, x + 6, 102, 'prec.', 'lbl-s', 'start', 9);
+          T(svg, x + bw - 6, 102, b.prev, 'lbl-s mono', 'end', 9.5);
+          T(svg, x + 6, 122, b.dati.slice(0, 15), 'lbl-s', 'start', 8.5);
+          T(svg, x + 6, 138, 'nonce ' + b.nonce, 'lbl-s', 'start', 9);
+          T(svg, x + 6, 160, 'hash', 'lbl-s', 'start', 9);
+          T(svg, x + bw - 6, 160, b.hash, buono ? 'em mono' : 'lbl mono', 'end', 9.5);
+          T(svg, x + bw / 2, 178, buono ? '✓ valido' : (b.linkOk ? '✗ niente zeri'
+                                                                      : '✗ link rotto'),
+            buono ? 'lbl-s' : 'em', 'middle', 10);
+          if (i > 0) {
+            L(svg, x - gap - 1, 122, x - 1, 122, b.linkOk ? COL.mu : COL.rd, b.linkOk ? 1.4 : 2.4);
+          }
+        }
+
+        var rotti = 0, i4;
+        for (i4 = 0; i4 < mostra.length; i4++) {
+          if (!(mostra[i4].linkOk && mostra[i4].powOk)) { rotti++; }
+        }
+        var yb = 206;
+        R(svg, 40, yb, 600, 104, COL.s2, COL.ax);
+        T(svg, 60, yb + 28, 'blocchi non piu’ validi', 'lbl-s');
+        T(svg, 620, yb + 28, rotti + ' su ' + mostra.length, rotti ? 'em' : 'lbl', 'end');
+        T(svg, 60, yb + 54, 'difficolta’ richiesta', 'lbl-s');
+        T(svg, 620, yb + 54, DIFF + ' zeri esadecimali (≈ ' + grp(Math.pow(16, DIFF)) +
+          ' tentativi a blocco)', 'lbl', 'end');
+        T(svg, 60, yb + 80, 'tentativi per rimettere a posto tutto', 'lbl-s');
+        T(svg, 620, yb + 80, rotti ? ('≈ ' + grp(rotti * Math.pow(16, DIFF))) : '0',
+          rotti ? 'em' : 'lbl', 'end');
+
+        T(svg, 40, yb + 128,
+          'con 3 zeri sono migliaia di tentativi: fastidioso ma fattibile. Nella rete Bitcoin', 'lbl-s');
+        T(svg, 40, yb + 150,
+          'gli zeri sono una ventina, e i blocchi da rifare centinaia: e’ questo che ferma tutti.',
+          'lbl-s');
+
+        if (vista === 'catena') {
+          cap.textContent = 'Tutti e ' + mostra.length +
+            ' i blocchi sono validi: ogni impronta comincia con ' + DIFF +
+            ' zeri e coincide col riferimento del blocco successivo.';
+        } else if (vista === 'rotta') {
+          cap.textContent = 'Alterando il blocco ' + bidx + ' diventano invalidi ' + rotti +
+            ' blocchi: l’effetto valanga propaga il danno fino in fondo.';
+        } else {
+          cap.textContent = 'Ricalcolare le impronte ripara i collegamenti ma non la prova di ' +
+            'lavoro: restano ' + rotti + ' blocchi da riscavare, circa ' +
+            grp(rotti * Math.pow(16, DIFF)) + ' tentativi.';
+        }
+      }
+      sb.addEventListener('input', draw);
+      si.addEventListener('input', draw);
+      var bts = grab('bc-btns');
+      bts.addEventListener('click', function (e5) {
+        var b = e5.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       6 — LA PROVA DI LAVORO
+       ================================================================== */
+    (function () {
+      var svg = grab('pw-svg'); if (!svg) { return; }
+      var sz = grab('pw-z'), txt = grab('pw-txt'), cap = grab('pw-cap');
+      var vista = 'mina';
+      var LIMITE = 1500000;
+
+      function draw() {
+        var z = +sz.value, dati = txt.value || '';
+        grab('pw-zv').textContent = z;
+        clear(svg);
+
+        if (vista === 'mina') {
+          var nonce = 0, h = '', trovato = false, primi = [];
+          while (nonce < LIMITE) {
+            h = hex8(fnv(dati + '|' + nonce));
+            if (primi.length < 8) { primi.push([nonce, h, zeriIniziali(h)]); }
+            if (zeriIniziali(h) >= z) { trovato = true; break; }
+            nonce++;
+          }
+          T(svg, 40, 28, 'si prova un nonce dopo l’altro finche’ l’impronta non ha ' +
+            z + (z === 1 ? ' zero' : ' zeri'), 'lbl');
+          var y0 = 60, rh = 24, i;
+          T(svg, 60, y0, 'nonce', 'lbl-s');
+          T(svg, 300, y0, 'impronta', 'lbl-s', 'end');
+          T(svg, 430, y0, 'zeri', 'lbl-s', 'end');
+          T(svg, 560, y0, 'esito', 'lbl-s', 'end');
+          L(svg, 55, y0 + 8, 620, y0 + 8, COL.ax, 1);
+          for (i = 0; i < primi.length; i++) {
+            var yy = y0 + 30 + i * rh;
+            T(svg, 60, yy, String(primi[i][0]), 'lbl mono');
+            T(svg, 300, yy, primi[i][1], 'lbl mono', 'end');
+            T(svg, 430, yy, String(primi[i][2]), 'lbl', 'end');
+            T(svg, 560, yy, primi[i][2] >= z ? 'valido' : 'scartato',
+              primi[i][2] >= z ? 'em' : 'lbl-s', 'end');
+          }
+          if (nonce >= primi.length) {
+            T(svg, 60, y0 + 30 + primi.length * rh, '⋮', 'lbl-s');
+            T(svg, 60, y0 + 30 + (primi.length + 1) * rh,
+              '(saltiamo ' + grp(Math.max(nonce - primi.length, 0)) + ' tentativi)', 'lbl-s');
+          }
+          var yf = y0 + 30 + (primi.length + 2) * rh + 6;
+          R(svg, 50, yf, 580, 116,
+            'color-mix(in srgb, ' + (trovato ? COL.gr : COL.rd) + ' 10%, transparent)',
+            trovato ? COL.gr : COL.rd, 1.6);
+          T(svg, 70, yf + 30, 'nonce vincente', 'lbl-s');
+          T(svg, 612, yf + 30, trovato ? grp(nonce) : 'non trovato entro il limite', 'em', 'end');
+          T(svg, 70, yf + 58, 'impronta del blocco', 'lbl-s');
+          T(svg, 612, yf + 58, h, 'em mono', 'end', 15);
+          T(svg, 70, yf + 86, 'tentativi fatti / attesi', 'lbl-s');
+          T(svg, 612, yf + 86, grp(nonce + 1) + '  /  ' + grp(Math.pow(16, z)), 'lbl', 'end');
+          T(svg, 50, yf + 148,
+            'per verificarlo basta UN calcolo: chiunque controlla in un istante', 'lbl-s');
+          cap.textContent = trovato
+            ? ('Trovato il nonce ' + nonce + ' dopo ' + grp(nonce + 1) +
+               ' tentativi (attesi ' + grp(Math.pow(16, z)) + ').')
+            : 'Nessun nonce trovato entro il limite di questa pagina.';
+          return;
+        }
+
+        /* costo della difficolta */
+        T(svg, 40, 28, 'il costo della prova di lavoro cresce come una potenza di 16', 'lbl');
+        var pl = piano(svg, 70, 54, 390, 220, 0.5, 10.5, 0, 11);
+        var zz;
+        for (zz = 1; zz <= 10; zz++) {
+          var alt = Math.log(Math.pow(16, zz)) / Math.log(10);
+          var xb = pl.X(zz), hAlt = pl.y0 + pl.h - pl.Y(alt);
+          R(svg, xb - 13, pl.Y(alt), 26, hAlt,
+            'color-mix(in srgb, ' + (zz === z ? COL.mg : COL.ac) + ' 55%, transparent)',
+            zz === z ? COL.mg : COL.ac, 1.2, 2);
+          T(svg, xb, pl.y0 + pl.h + 16, String(zz), 'lbl-s', 'middle');
+        }
+        for (zz = 0; zz <= 10; zz += 2) {
+          T(svg, pl.x0 - 6, pl.Y(zz) + 4, '10^' + zz, 'lbl-s', 'end');
+        }
+        T(svg, 265, 48, 'tentativi attesi (scala logaritmica)', 'lbl', 'middle');
+        T(svg, 70, 300, 'zeri richiesti', 'lbl-s');
+        var righe = [
+          ['1 zero', grp(16) + ' tentativi'],
+          ['4 zeri', grp(65536)],
+          ['8 zeri', '4,3 miliardi'],
+          ['16 zeri', '1,8·10¹⁹'],
+          ['Bitcoin, oggi', 'circa 19 zeri'],
+          ['un blocco ogni', '10 minuti, per costruzione']
+        ];
+        R(svg, 478, 62, 172, 214, COL.s2, COL.ax);
+        for (var w = 0; w < righe.length; w++) {
+          T(svg, 494, 92 + w * 32, righe[w][0], 'lbl-s');
+          T(svg, 494, 108 + w * 32, righe[w][1], w >= 4 ? 'em' : 'lbl', 'start', 11.5);
+        }
+        T(svg, 70, 330,
+          'la difficolta’ viene ritarata ogni 2016 blocchi in modo che il tempo medio', 'lbl-s');
+        T(svg, 70, 352,
+          'resti di 10 minuti: piu’ macchine si collegano, piu’ zeri vengono richiesti.', 'lbl-s');
+        cap.textContent = 'Con ' + z + (z === 1 ? ' zero' : ' zeri') + ' servono in media ' +
+          grp(Math.pow(16, z)) + ' tentativi; ogni zero in piu’ li moltiplica per sedici.';
+      }
+      sz.addEventListener('input', draw);
+      txt.addEventListener('input', draw);
+      var bts = grab('pw-btns');
+      bts.addEventListener('click', function (e6) {
+        var b = e6.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  }());
+  </script>
+
+  <script>
+  window.quizData = [
+
+    { type: 'mc', diff: 'easy',
+      text: 'Su che cosa poggia la sicurezza di RSA?',
+      options: [
+        'sul fatto che moltiplicare due numeri primi è facile, mentre ritrovarli fattorizzando il prodotto è difficilissimo',
+        'sul fatto che l\'algoritmo è segreto e nessuno sa come funziona',
+        'sul fatto che i numeri usati sono così grandi da non entrare in un computer',
+        'sul fatto che la chiave pubblica viene cambiata ogni giorno'
+      ],
+      correct: 0,
+      explain: 'È l\'<strong>asimmetria di fatica</strong> che regge tutta la lezione: $p \\cdot q$ si calcola in un istante, mentre per riottenere $p$ e $q$ da $n$ non si conosce nessun metodo veloce. La seconda risposta contraddice il <em>principio di Kerckhoffs</em>: gli algoritmi crittografici sono <strong>pubblicati</strong>, proprio perché solo così possono essere attaccati da tutti e dimostrarsi robusti. Va detto con onestà che la difficoltà della fattorizzazione non è un teorema dimostrato: è una congettura che regge da millenni, e sulla quale poggiano i vostri pagamenti.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Quante chiavi diverse esistono per un cifrario a scorrimento come quello di Cesare?',
+      options: ['$26!$, cioè più di $4 \\cdot 10^{26}$', '$25$', '$26^2 = 676$', 'infinite'],
+      correct: 1,
+      explain: 'Lo scorrimento può valere da $1$ a $25$: con $k = 0$ (o $k = 26$) il messaggio resta in chiaro, e oltre il $26$ si ricomincia da capo, perché $k$ e $k + 26$ danno lo stesso cifrario. Sono <strong>venticinque</strong>, e un computer le prova tutte in un milionesimo di secondo. Il $26!$ è invece il numero di <em>sostituzioni</em> arbitrarie di un alfabeto: un numero enorme, e tuttavia quel cifrario cade lo stesso, perché l\'analisi delle frequenze non prova le chiavi — le <strong>conta</strong>.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Che cosa fa una funzione di hash crittografica?',
+      options: [
+        'cifra un messaggio in modo che solo il destinatario possa leggerlo',
+        'comprime un file riducendone le dimensioni senza perdere informazione',
+        'trasforma un input di lunghezza qualsiasi in un\'impronta di lunghezza fissa, dalla quale è impossibile risalire all\'input',
+        'genera la coppia di chiavi pubblica e privata'
+      ],
+      correct: 2,
+      explain: 'È un\'<strong>impronta digitale</strong>: deterministica, di lunghezza fissa, a senso unico, e con l\'<em>effetto valanga</em> — cambiando un solo bit dell\'input, l\'impronta cambia completamente. Non è cifratura, perché <strong>non è invertibile nemmeno da chi la calcola</strong>: non c\'è nessuna chiave che la disfi. E non è compressione: l\'informazione va perduta per costruzione, ed è proprio quello che serve. Serve per l\'integrità (accorgersi se un file è stato toccato) e come mattone di firme digitali e blockchain.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Che cosa afferma il principio di Kerckhoffs?',
+      options: [
+        'che ogni messaggio va cifrato almeno due volte',
+        'che le chiavi devono essere cambiate ogni ventiquattro ore',
+        'che nessun sistema crittografico può essere davvero sicuro',
+        'che un sistema deve restare sicuro anche se il nemico ne conosce il funzionamento: l\'unica cosa segreta dev\'essere la chiave'
+      ],
+      correct: 3,
+      explain: 'Formulato da Auguste Kerckhoffs nel <strong>1883</strong>, è il motivo per cui gli algoritmi che proteggono le vostre password sono <em>pubblici</em> e descritti riga per riga: sono stati attaccati da migliaia di ricercatori e hanno resistito. Il contrario — «l\'algoritmo è segreto, quindi è sicuro» — si chiama <em>security through obscurity</em> ed è una bandiera rossa: i metodi prima o poi si scoprono, e un sistema che dipende dalla propria segretezza crolla tutto in una volta, mentre una chiave compromessa si sostituisce.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Con la chiave pubblica $(n, e) = (33,\\ 7)$, come si cifra il messaggio $m = 2$?',
+      options: ['$c = 2^{7} \\bmod 33 = 29$', '$c = 7^{2} \\bmod 33 = 16$',
+                '$c = 2 \\cdot 7 \\bmod 33 = 14$', '$c = 2^{33} \\bmod 7 = 1$'],
+      correct: 0,
+      explain: 'La cifratura è $c = m^{e} \\bmod n$: si eleva il <em>messaggio</em> all\'esponente pubblico, non il contrario. Qui $2^{7} = 128$ e $128 = 3 \\cdot 33 + 29$, quindi $c = 29$. Chi possiede la chiave privata $(33, 3)$ calcola $29^{3} \\bmod 33$: conviene ridurre subito, $29 \\equiv -4 \\pmod{33}$, quindi $(-4)^3 = -64 \\equiv -64 + 66 = 2$ ✓, il messaggio originale. Le altre opzioni scambiano base ed esponente, oppure sostituiscono l\'elevamento a potenza con una moltiplicazione — che sarebbe banale da invertire.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'A che cosa serve il <em>nonce</em> in un blocco di una blockchain?',
+      options: [
+        'a identificare in modo univoco chi ha inviato la transazione',
+        'è un numero che si fa variare finché l\'impronta del blocco non comincia con un certo numero di zeri: è la prova che è stato speso lavoro',
+        'a cifrare le transazioni contenute nel blocco',
+        'a numerare i blocchi in ordine cronologico'
+      ],
+      correct: 1,
+      explain: 'L\'impronta di un blocco è imprevedibile, quindi l\'unico modo per ottenerne una che cominci con $z$ zeri è <strong>provare</strong>: si incrementa il nonce e si ricalcola, in media $16^{z}$ volte. Il nonce è dunque una <em>ricevuta di fatica</em>. Serve perché la catena da sola non basta: ricalcolare qualche impronta è istantaneo, e senza un costo chiunque potrebbe riscrivere la storia. Le transazioni, va detto, <strong>non sono cifrate affatto</strong>: il registro è pubblico e leggibile da tutti — la crittografia serve per le firme, non per la segretezza.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Come si firma digitalmente un documento?',
+      options: [
+        'si cifra il documento con la chiave pubblica del destinatario',
+        'si allega una scansione della firma autografa protetta da password',
+        'si calcola l\'impronta del documento e la si cifra con la <em>propria chiave privata</em>',
+        'si calcola l\'impronta del documento e la si cifra con la propria chiave pubblica'
+      ],
+      correct: 2,
+      explain: 'La firma inverte i ruoli: si usa la chiave <strong>privata</strong>, e chiunque verifica con quella pubblica. Il risultato non è segreto — tutti possono aprirlo — ma <em>solo io potevo produrlo</em>, ed è esattamente quello che serve per l\'autenticazione. Si firma l\'<strong>impronta</strong> e non il documento per tre motivi: RSA opera solo su numeri minori di $n$, è lento, e l\'impronta ha lunghezza fissa. Ed è per questo che una firma digitale, a differenza di quella autografa, <strong>non si può ritagliare e incollare altrove</strong>: dipende dal documento che firma.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Che cosa garantisce il lucchetto accanto all\'indirizzo di un sito?',
+      options: [
+        'che il sito è affidabile e non vi truffa',
+        'che i dati inseriti non verranno rivenduti a terzi',
+        'che il sito è stato controllato dalla polizia postale',
+        'che state parlando davvero con quel dominio e che nessuno può leggere la conversazione'
+      ],
+      correct: 3,
+      explain: 'Il lucchetto dice due cose e due sole: <strong>autenticazione del dominio</strong> (il certificato, cioè la chiave pubblica del sito firmata da un\'autorità di cui il vostro computer si fida, è stato verificato) e <strong>riservatezza</strong> (il traffico viaggia cifrato con una chiave simmetrica concordata usa-e-getta). <strong>Non</strong> dice che il sito sia onesto: un sito truffaldino ottiene un certificato valido in cinque minuti e gratis. È uno dei malintesi più costosi che circolino, e vale la pena ripeterlo: il lucchetto certifica <em>con chi</em> state parlando, non <em>se ci si può fidare</em>.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Con $p = 5$ e $q = 11$ si sceglie $e = 3$. Quanto vale l\'esponente privato $d$?',
+      options: ['$d = 27$', '$d = 3$', '$d = 13$', '$d = 40$'],
+      correct: 0,
+      explain: 'Si calcola $n = 55$ e $\\varphi(n) = (5-1)(11-1) = 40$. Serve $d$ con $3\\,d \\equiv 1 \\pmod{40}$, cioè un multiplo di $40$ aumentato di $1$ che sia divisibile per $3$: $41$ no, <strong>$81 = 3 \\cdot 27$</strong> sì. Quindi $d = 27$. Verifica: $3 \\cdot 27 = 81 = 2\\cdot 40 + 1$ ✓. Controprova completa con $m = 7$: $7^{3} = 343 = 6\\cdot55 + 13$, quindi $c = 13$; e $13^{27} \\bmod 55 = 7$. Nota: $d = 40$ non può mai essere la risposta, perché $d$ deve essere <em>coprimo</em> con $\\varphi$ e invertibile modulo $\\varphi$ — non può essere $\\varphi$ stesso.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Una funzione di hash restituisce $64$ bit. Quanti tentativi servono, all\'incirca, per trovare due input con la stessa impronta con probabilità del $50\\%$?',
+      options: ['circa $2^{64}$, cioè $18$ miliardi di miliardi',
+                'circa $2^{32}$, cioè poco più di quattro miliardi',
+                'circa $64$', 'nessuno: con $64$ bit le collisioni non esistono'],
+      correct: 1,
+      explain: 'È il <strong>paradosso dei compleanni</strong>: con $N$ impronte possibili bastano circa $1{,}177\\sqrt{N}$ tentativi, cioè dell\'ordine di $\\sqrt{2^{64}} = 2^{32}$. La sicurezza contro le collisioni è dunque la <strong>radice quadrata</strong> dello spazio, non lo spazio: una funzione a $64$ bit ne offre $32$ effettivi, e quattro miliardi di tentativi sono un pomeriggio di calcolo. Ecco perché le funzioni serie hanno $256$ bit. E le collisioni <em>esistono sempre</em> — gli input sono infiniti, le impronte finite: il punto non è che non esistano, è che non si riesca a trovarle.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Una blockchain aumenta la difficoltà da $4$ a $6$ zeri esadecimali. Di quanto cresce il lavoro necessario per scavare un blocco?',
+      options: ['di una volta e mezza', 'del $50\\%$', 'di $256$ volte', 'di $2$ volte'],
+      correct: 2,
+      explain: 'I tentativi attesi sono $16^{z}$: si passa da $16^{4} = 65\\,536$ a $16^{6} = 16\\,777\\,216$, e il rapporto è $16^{2} = \\mathbf{256}$. La crescita è <strong>esponenziale nel numero di zeri</strong>, non proporzionale: è lo stesso salto di scala della lezione 5, e qui ha una funzione di governo. La rete Bitcoin ritara la difficoltà ogni $2016$ blocchi in modo che il tempo medio resti di dieci minuti: se si collegano più macchine, gli zeri aumentano. È un termostato, e spiega anche perché il consumo energetico non cala quando le macchine diventano più efficienti.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'L\'algoritmo di Shor romperà RSA solo quando esisteranno calcolatori quantistici grandi abbastanza — forse fra decenni. Perché allora il problema è considerato urgente <em>oggi</em>?',
+      options: [
+        'perché i calcolatori quantistici sono già in vendita',
+        'perché l\'algoritmo di Shor funziona anche sui computer normali',
+        'perché RSA è già stato rotto da un computer classico nel 2024',
+        'per l\'attacco «harvest now, decrypt later»: un avversario può registrare oggi il traffico cifrato e conservarlo finché avrà la macchina per aprirlo'
+      ],
+      correct: 3,
+      explain: 'È il punto che sorprende sempre: la minaccia non riguarda il momento in cui la macchina esisterà, ma <strong>i segreti che devono durare</strong>. Una cartella clinica, un documento diplomatico o un dato industriale intercettato oggi e conservato può essere decifrato fra vent\'anni. Per questo il NIST ha standardizzato nel <strong>2024</strong> i primi algoritmi <em>post-quantistici</em> — ML-KEM (Kyber) per lo scambio di chiavi, ML-DSA (Dilithium) per la firma — e i browser negoziano già chiavi «ibride», classiche e post-quantistiche insieme. L\'algoritmo di Shor, va precisato, richiede <em>proprio</em> un calcolatore quantistico: sfrutta la sovrapposizione per trovare il periodo delle potenze, cosa che un computer classico non sa fare in fretta.' },
+
+    { type: 'open',
+      text: 'Spiega perché la crittografia a chiave pubblica risolve un problema che quella simmetrica non poteva risolvere, e perché RSA funziona davvero. Usa un esempio numerico e cita il teorema che ci sta sotto.',
+      keywords: ['scambio', 'chiave', 'incontrarsi', 'n(n-1)/2', 'pubblica', 'privata', 'Eulero', 'phi', 'φ', 'fattorizzare', 'e·d', 'coprimo'],
+      requiredMatches: 3,
+      explain: 'Il problema che la crittografia simmetrica <strong>non</strong> sa risolvere è quello dello <strong>scambio della chiave</strong>: se la stessa chiave serve per cifrare e decifrare, bisogna comunicarla al destinatario — e se la si manda sul canale che si vuole proteggere, chi ascolta ha vinto. Per secoli si è risolto <em>incontrandosi</em>: corrieri diplomatici, libri di codici. E non scala: con $n$ persone servono $\\frac{n(n-1)}{2}$ chiavi, quasi cinque miliardi per una città di centomila abitanti. Con la crittografia asimmetrica bastano <strong>$n$ coppie</strong>, una per persona, e chiunque può scrivere a chiunque senza accordi preventivi.<br><br><strong>Perché RSA funziona.</strong> Si prendono due primi $p, q$, si pone $n = pq$ e $\\varphi(n) = (p-1)(q-1)$; si sceglie $e$ coprimo con $\\varphi$ e si calcola $d$ con $e\\,d \\equiv 1 \\pmod{\\varphi(n)}$. Cifrare è $c = m^e \\bmod n$, decifrare $m = c^d \\bmod n$. La dimostrazione sta nel <strong>teorema di Eulero</strong>, $m^{\\varphi(n)} \\equiv 1 \\pmod n$: poiché $e d = 1 + k\\varphi(n)$, si ha $c^{d} = m^{ed} = m \\cdot \\left(m^{\\varphi(n)}\\right)^{k} \\equiv m$. <strong>Esempio:</strong> $p=3$, $q=11$, $n=33$, $\\varphi=20$, $e=7$, $d=3$ (perché $21 = 20+1$); $m=2$ dà $c = 2^7 \\bmod 33 = 29$ e $29^3 \\bmod 33 = 2$ ✓.<br><br><strong>Perché è sicuro.</strong> Per ricavare $d$ da $(n,e)$ serve $\\varphi(n)$, che richiede $p$ e $q$, che richiede di <strong>fattorizzare</strong> $n$ — l\'operazione per cui nessuno conosce un metodo veloce.' },
+
+    { type: 'open',
+      text: 'Un compagno dice: «la blockchain è sicura perché è matematicamente impossibile falsificarla». Spiega perché la frase è imprecisa, che cosa la rende davvero difficile da manomettere, e che cos\'è l\'attacco del 51%.',
+      keywords: ['economic', 'costa', 'impossibile', 'proof of work', 'prova di lavoro', 'ricalcolare', 'catena più lunga', '51', 'maggioranza', 'incentivo', 'reti piccole'],
+      requiredMatches: 3,
+      explain: 'La frase è imprecisa perché falsificare la catena <strong>non è impossibile: è solo costoso</strong>. La differenza è sostanziale, e sta in tre meccanismi che lavorano insieme.<br><br><strong>(1) La catena di impronte.</strong> Ogni blocco contiene l\'impronta del precedente, quindi modificare un dato cambia l\'impronta di quel blocco e rompe tutti i successivi (effetto valanga). Da sola però questa difesa è debole: ricalcolare qualche impronta è istantaneo.<br><br><strong>(2) La prova di lavoro.</strong> Un blocco è valido solo se la sua impronta comincia con $z$ zeri, il che richiede in media $16^{z}$ tentativi. Riscrivere la storia significa quindi <em>ri-scavare</em> tutti i blocchi da modificare, non solo ricalcolarli.<br><br><strong>(3) La regola della catena più lunga.</strong> Vince la catena su cui è stato speso più lavoro. L\'attaccante non deve solo raggiungere la catena onesta: deve <strong>superarla</strong> mentre lei continua a crescere. Gli serve dunque più della <strong>metà</strong> della potenza di calcolo dell\'intera rete — è l\'<em>attacco del 51%</em>.<br><br><strong>La conclusione onesta:</strong> la sicurezza è <strong>economica</strong>, non matematica. Il sistema non dice «barare è impossibile», dice «barare costa più di quanto renda» — è un equilibrio di Nash costruito apposta, esattamente come nella lezione 7. E infatti su <em>reti piccole</em>, dove conquistare il $51\\%$ costa poco, gli attacchi del $51\\%$ sono avvenuti davvero più volte.' }
+  ];
+  </script>
+
+</body>
+
+</html>

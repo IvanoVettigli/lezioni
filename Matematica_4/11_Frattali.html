@@ -1,0 +1,2617 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 11 — I frattali</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+    .storia { border-left: 4px solid var(--magenta); background: color-mix(in srgb, var(--magenta) 7%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 680px; margin: 0.3rem auto; }
+    .figbox canvas { display: block; width: 100%; height: auto; max-width: 680px; margin: 0.3rem auto;
+                     border-radius: 8px; background: var(--surface); }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+    .figbox .mono { font-family: Consolas, monospace; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.l { text-align: left; }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+    .tabwrap { overflow-x: auto; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .ric { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .ric > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                 padding: 0.8rem 0.9rem; background: var(--surface); }
+    .ric h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+
+    .codebox { background: #0d1117; color: #e6edf3; border: 1px solid var(--border); border-radius: 10px;
+               padding: 0.8rem 1rem; margin: 0.9rem 0; font-family: Consolas, monospace; font-size: 0.88rem;
+               overflow-x: auto; line-height: 1.5; }
+    .codebox .kw { color: #ff7b72; }
+    .codebox .st { color: #a5d6ff; }
+    .codebox .cm { color: #8b949e; font-style: italic; }
+    .codebox .fn { color: #d2a8ff; }
+    .codebox .nu { color: #79c0ff; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quarto anno · Lezione 11</div>
+    <h1>I frattali</h1>
+    <p>Le figure che i matematici chiamavano mostri, e che poi si sono accorti
+      di avere sotto gli occhi da sempre</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quarto anno</a>
+    <span class="sep">/</span> I frattali
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>L'idea in una riga.</strong> Per duemila anni la geometria ha descritto il mondo con rette,
+      cerchi e poliedri — e ha funzionato benissimo per le colonne dei templi e per le orbite dei pianeti.
+      Non funziona per una nuvola, una costa, un albero, un polmone. Alla fine dell'Ottocento alcuni
+      matematici costruirono, per puro spirito di contraddizione, figure così irregolari da sembrare
+      patologiche; un secolo dopo si scoprì che quelle «patologie» erano il <em>caso normale</em> in natura, e
+      che avevano una proprietà misurabile e sorprendente: una <strong>dimensione che non è un numero
+      intero</strong>.
+      <br><br><strong>Che cosa vi serve sapere già.</strong> I logaritmi delle lezioni 4-6 — sono il cuore
+      della lezione, perché la dimensione frattale è letteralmente un rapporto fra logaritmi — le
+      progressioni geometriche, e i numeri complessi di Matematica_3. Un pezzo di questa lezione riprende
+      cose che avete già visto (Koch, Sierpiński, Mandelbrot) e le porta molto più a fondo.
+    </div>
+
+    <!-- 1 — I MOSTRI -->
+    <section id="sec1">
+      <h2>1. I mostri della matematica</h2>
+
+      <div class="storia">
+        <p>Nel <strong>1872</strong> Karl Weierstrass presenta all'Accademia delle Scienze di Berlino una
+          funzione <em>continua in ogni punto e derivabile in nessuno</em>. È uno scandalo: fino a quel
+          momento tutti davano per ovvio che una curva continua dovesse avere una tangente «quasi ovunque»,
+          e diversi matematici avevano perfino provato a dimostrarlo. Weierstrass mostra che l'intuizione
+          geometrica, semplicemente, <strong>sbaglia</strong>.</p>
+        <p>La reazione è ostile. <strong>Charles Hermite</strong> scrive a Stieltjes: «<em>Mi ritraggo con
+          spavento e orrore da questa piaga lamentevole delle funzioni continue prive di derivata.</em>»
+          Henri Poincaré le chiama «<em>un'orda di mostri</em>». Per mezzo secolo restano curiosità da
+          specialisti, esempi buoni solo a dimostrare che un teorema non si può migliorare.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">La funzione di Weierstrass</div>
+        <div class="formula">$$W(x) = \sum_{n=0}^{\infty} a^{n}\cos\!\left(b^{n}\pi x\right)
+          \qquad 0 \lt a \lt 1,\quad ab \gt 1 + \tfrac{3}{2}\pi$$</div>
+        <p class="formula-note">L'idea è semplicissima e vale la pena capirla: si sommano infinite
+          cosinusoidi, ciascuna con <strong>ampiezza sempre più piccola</strong> (il fattore $a^n$) ma
+          <strong>frequenza molto più grande</strong> (il fattore $b^n$). Le ampiezze vanno a zero, quindi la
+          somma converge e la funzione è continua. Le <em>pendenze</em>, però, sono proporzionali ad
+          $(ab)^n$: se $ab \gt 1$ crescono senza limite, e la curva non riesce mai a «raddrizzarsi». Il
+          risultato è una funzione che, per quanto la si ingrandisca, resta seghettata esattamente com'era.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="we-btns">
+          <button class="btn btn-sm active" data-v="somma">le armoniche che si sommano</button>
+          <button class="btn btn-sm" data-v="zoom">ingrandisci quanto vuoi</button>
+          <button class="btn btn-sm" data-v="pend">la pendenza esplode</button>
+        </div>
+        <div class="ctrl">
+          <label>termini sommati <span class="val-badge" id="we-nv">6</span></label>
+          <input type="range" id="we-n" min="1" max="14" step="1" value="6" style="flex:1;min-width:160px">
+          <label>ingrandimento <span class="val-badge" id="we-zv">1×</span></label>
+          <input type="range" id="we-z" min="0" max="12" step="1" value="0" style="flex:1;min-width:160px">
+          <label>parametro $a$ <span class="val-badge" id="we-av">0,50</span></label>
+          <input type="range" id="we-a" min="0.2" max="0.9" step="0.05" value="0.5" style="flex:1;min-width:150px">
+        </div>
+        <svg id="we-svg" viewBox="0 0 680 400" role="img" aria-label="La funzione di Weierstrass: somma delle armoniche, ingrandimento e crescita della pendenza"></svg>
+        <p class="cap" id="we-cap"></p>
+        <p class="formula-note">Con $b = 13$ e $a = 0{,}5$ si ha $ab = 6{,}5$, sopra la soglia
+          $1 + \frac32\pi \approx 5{,}712$: la funzione è continua ovunque e derivabile in nessun punto.
+          Portate $a$ sotto $0{,}44$ e la condizione salta — la curva diventa liscia, e si vede.</p>
+      </div>
+
+      <div class="curiosita"><strong>La galleria dei mostri, in ordine di apparizione.</strong>
+        <strong>1872</strong> — Weierstrass, la funzione continua senza derivata.
+        <strong>1883</strong> — Georg Cantor costruisce il suo <em>insieme</em>: si toglie il terzo centrale
+        di un segmento, poi il terzo centrale di ciò che resta, all'infinito. Ciò che rimane ha
+        <em>lunghezza zero</em> ma contiene tanti punti quanti l'intero segmento di partenza.
+        <strong>1890</strong> — Giuseppe Peano esibisce una curva continua che <strong>riempie tutto un
+        quadrato</strong>: una linea, cioè un oggetto a una dimensione, passa per ogni punto di una
+        superficie. <strong>1904</strong> — Helge von Koch costruisce una curva di lunghezza infinita che
+        racchiude un'area finita. <strong>1915</strong> — Wacław Sierpiński pubblica il suo triangolo, di
+        area nulla e perimetro infinito. Nessuno di loro pensava di descrivere la natura: stavano
+        <em>saggiando i limiti delle definizioni</em>.</div>
+
+      <div class="storia">
+        <p>Il cambio di sguardo arriva con <strong>Benoît Mandelbrot</strong> (1924-2010), matematico
+          polacco-francese-americano che lavora all'IBM — dove ha accesso a una cosa che ai suoi predecessori
+          mancava: <strong>un computer che disegna</strong>. Nel <strong>1967</strong> pubblica su
+          <em>Science</em> l'articolo «<em>How Long Is the Coast of Britain?</em>», e nel
+          <strong>1975</strong> conia la parola <strong>frattale</strong>, dal latino <em>fractus</em>,
+          spezzato, irregolare.</p>
+        <p>La sua tesi, contenuta nel libro del 1982, è una frase che vale l'intera lezione:
+          «<em>Le nuvole non sono sfere, le montagne non sono coni, le coste non sono cerchi, la corteccia
+          non è liscia, né il fulmine viaggia in linea retta.</em>» I mostri non erano patologie: erano il
+          <strong>caso generale</strong>, e la geometria di Euclide era l'eccezione.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>① Esercizio.</strong> Nella funzione di Weierstrass con $a = 0{,}5$ e $b = 13$:
+          (a) quanto vale l'ampiezza della decima armonica rispetto alla prima? (b) e la sua frequenza?
+          (c) quanto vale, in proporzione, la sua <em>pendenza massima</em>? (d) che cosa succede se
+          $ab \lt 1$?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#f1s">Mostra la soluzione</button>
+        <div class="solution" id="f1s">
+          <p><strong>(a)</strong> L'ampiezza del termine $n$-esimo è $a^{n}$: per $n = 9$ (la decima, contando
+            da $n=0$) vale $0{,}5^{9} = \dfrac{1}{512} \approx 0{,}00195$, cioè circa <strong>due
+            millesimi</strong> della prima. Praticamente invisibile.</p>
+          <p><strong>(b)</strong> La frequenza è $b^{n}$: $13^{9} = 10\,604\,499\,373$, oltre
+            <strong>dieci miliardi</strong> di volte più fitta.</p>
+          <p><strong>(c)</strong> La pendenza di $a^n\cos(b^n\pi x)$ ha massimo $a^{n}b^{n}\pi = (ab)^{n}\pi$.
+            Per $n = 9$: $6{,}5^{9} \approx 2{,}07 \cdot 10^{7}$, cioè <strong>venti milioni</strong> di volte
+            la pendenza della prima armonica. Ecco perché la derivata non esiste: <em>ogni</em> nuova
+            armonica, per quanto invisibile a occhio, aggiunge pendenza senza limite.</p>
+          <p><strong>(d)</strong> Se $ab \lt 1$ le pendenze <em>diminuiscono</em> geometricamente, la serie
+            delle derivate converge e la funzione risulta <strong>derivabile</strong>: la curva è liscia. Il
+            mostro nasce esattamente dalla tensione fra le due successioni — ampiezze che vanno a zero e
+            pendenze che vanno all'infinito.</p>
+          <p class="formula-note">È il motivo per cui la condizione di Weierstrass mette insieme $a$ e $b$ in
+            un <em>prodotto</em>: non conta quanto sono piccole le ampiezze né quanto sono alte le
+            frequenze, conta il loro bilancio.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 — AUTOSIMILARITÀ -->
+    <section id="sec2">
+      <h2>2. L'autosimilarità: figure fatte di copie di sé stesse</h2>
+
+      <p>Tutti i mostri della sezione precedente condividono un meccanismo: si costruiscono
+        <strong>ripetendo la stessa regola su scale sempre più piccole</strong>. Il risultato è una figura
+        in cui ogni pezzo, ingrandito, somiglia al tutto. Si chiama <em>autosimilarità</em>, ed è la prima
+        delle due proprietà che definiscono un frattale.</p>
+
+      <div class="definition">
+        <div class="formula-title">La ricetta: prendi, copia, rimpicciolisci, ripeti</div>
+        <p>Un <strong>sistema di funzioni iterate</strong> è un insieme di trasformazioni che
+          <em>contraggono</em> — riducono le distanze. Applicandole tutte a una figura si ottiene una nuova
+          figura; ripetendo all'infinito si arriva sempre allo <strong>stesso</strong> risultato,
+          <em>qualunque sia la figura di partenza</em>.</p>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th>frattale</th><th>regola di costruzione</th><th>copie</th><th>fattore</th></tr>
+          <tr><td class="lab">Cantor</td><td class="l">togli il terzo centrale del segmento</td><td>$2$</td><td>$1/3$</td></tr>
+          <tr><td class="lab">Koch</td><td class="l">sostituisci il terzo centrale con due lati di un triangolo</td><td>$4$</td><td>$1/3$</td></tr>
+          <tr><td class="lab">Sierpiński</td><td class="l">togli il triangolo centrale dei quattro</td><td>$3$</td><td>$1/2$</td></tr>
+          <tr><td class="lab">tappeto di Sierpiński</td><td class="l">togli il quadratino centrale dei nove</td><td>$8$</td><td>$1/3$</td></tr>
+          <tr><td class="lab">spugna di Menger</td><td class="l">l'analogo in tre dimensioni</td><td>$20$</td><td>$1/3$</td></tr>
+        </table>
+        </div>
+        <p class="formula-note">Il fatto che il risultato non dipenda dalla figura iniziale è un teorema
+          (Hutchinson, 1981), e ha una conseguenza pratica notevole: il frattale è completamente descritto
+          dalle sue poche trasformazioni. La felce della sezione 7 sta in <strong>ventiquattro numeri</strong>
+          — ed è esattamente l'idea che sta dietro alla <em>compressione frattale</em> delle immagini.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="if-btns">
+          <button class="btn btn-sm active" data-v="koch">fiocco di Koch</button>
+          <button class="btn btn-sm" data-v="sier">triangolo di Sierpiński</button>
+          <button class="btn btn-sm" data-v="cant">insieme di Cantor</button>
+          <button class="btn btn-sm" data-v="drago">curva del drago</button>
+          <button class="btn btn-sm" data-v="albero">albero</button>
+        </div>
+        <div class="ctrl">
+          <label>iterazioni <span class="val-badge" id="if-kv">4</span></label>
+          <input type="range" id="if-k" min="0" max="9" step="1" value="4" style="flex:1;min-width:200px">
+          <label class="toggle-row"><input type="checkbox" id="if-p" checked> mostra i passi precedenti</label>
+        </div>
+        <svg id="if-svg" viewBox="0 0 680 400" role="img" aria-label="Costruzione iterativa di Koch, Sierpinski, Cantor, curva del drago e albero"></svg>
+        <p class="cap" id="if-cap"></p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>② Esercizio.</strong> La curva di Koch parte da un segmento di lunghezza $1$.
+          (a) Quanti segmenti ci sono al passo $n$, e quanto è lungo ciascuno? (b) Quanto è lunga la curva al
+          passo $n$? (c) Quanti segmenti e che lunghezza al passo $10$? (d) La curva ha lunghezza finita?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#f2s">Mostra la soluzione</button>
+        <div class="solution" id="f2s">
+          <p><strong>(a)</strong> Ogni segmento viene sostituito da <strong>quattro</strong> segmenti lunghi
+            un <strong>terzo</strong>. Quindi al passo $n$ ci sono $N_n = 4^{n}$ segmenti, ciascuno lungo
+            $\ell_n = (1/3)^{n}$.</p>
+          <p><strong>(b)</strong> La lunghezza totale è il prodotto:</p>
+          <div class="formula">$$L_n = 4^{n}\cdot\left(\frac13\right)^{n} = \left(\frac43\right)^{n}$$</div>
+          <p><strong>(c)</strong> Al passo $10$: $N = 4^{10} = 1\,048\,576$ segmenti, ciascuno lungo
+            $3^{-10} = \dfrac{1}{59\,049} \approx 1{,}69\cdot10^{-5}$; la lunghezza totale è
+            $(4/3)^{10} \approx \mathbf{17{,}76}$.</p>
+          <p><strong>(d)</strong> No: poiché $4/3 \gt 1$, la successione $(4/3)^n$ è una
+            <strong>progressione geometrica crescente</strong> e diverge. La curva di Koch ha
+            <strong>lunghezza infinita</strong>, pur stando comodamente dentro un foglio di carta.</p>
+          <p class="formula-note">È il primo dei due fatti che rendono i frattali strani. Il secondo, che
+            vedremo subito, è che a un oggetto del genere non si può assegnare sensatamente la dimensione
+            $1$: una curva di lunghezza infinita chiusa in un'area finita <em>occupa il piano</em> più di
+            quanto faccia una linea, e meno di quanto faccia una superficie.</p>
+        </div>
+      </div>
+
+      <div class="curiosita"><strong>Autosimilarità esatta e statistica.</strong> Il fiocco di Koch è
+        <em>esattamente</em> autosimile: ogni pezzo ingrandito è identico al tutto. Una costa o un albero
+        no: un ramo somiglia all'albero, ma non è una sua copia esatta. Si parla allora di autosimilarità
+        <strong>statistica</strong> — a scale diverse cambiano i dettagli, ma le <em>proprietà
+        statistiche</em> (la rugosità, la distribuzione delle irregolarità) restano le stesse. È questa,
+        non la prima, la forma che si trova in natura, ed è anche il motivo per cui in una fotografia di
+        rocce senza un riferimento non si capisce se si sta guardando un sasso o una montagna.</div>
+    </section>
+
+    <!-- 3 — LA DIMENSIONE -->
+    <section id="sec3">
+      <h2>3. La dimensione frazionaria</h2>
+
+      <p>Qui sta il cuore matematico della lezione, e la ragione per cui sta in un anno in cui si studiano i
+        logaritmi. Che cosa vuol dire, esattamente, che una figura ha dimensione $2$?</p>
+
+      <div class="definition">
+        <div class="formula-title">Dalla dimensione intera a quella qualunque</div>
+        <p>Prendiamo un oggetto e <strong>dimezziamo</strong> la scala, cioè lo copriamo con pezzi grandi la
+          metà. Quanti ne servono?</p>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th>oggetto</th><th>dimezzando il lato…</th><th>copie</th><th>relazione</th></tr>
+          <tr><td class="lab">segmento</td><td class="l">servono $2$ segmentini</td><td>$2 = 2^{1}$</td><td>$D = 1$</td></tr>
+          <tr><td class="lab">quadrato</td><td class="l">servono $4$ quadratini</td><td>$4 = 2^{2}$</td><td>$D = 2$</td></tr>
+          <tr><td class="lab">cubo</td><td class="l">servono $8$ cubetti</td><td>$8 = 2^{3}$</td><td>$D = 3$</td></tr>
+        </table>
+        </div>
+        <p>In tutti i casi, se il fattore di riduzione è $r$ e servono $N$ copie, vale $N = (1/r)^{D}$.
+          Prendendo il logaritmo di entrambi i membri — ed è <em>esattamente</em> il motivo per cui i
+          logaritmi servono a qualcosa — si ricava $D$:</p>
+        <div class="formula">$$N = \left(\frac1r\right)^{D} \quad\Longrightarrow\quad
+          D = \frac{\log N}{\log (1/r)}$$</div>
+        <p class="formula-note">Finché $N$ è una potenza esatta di $1/r$ si ottiene un intero e non si è
+          scoperto niente di nuovo. Ma <strong>niente</strong>, nella formula, obbliga il risultato a essere
+          intero: se $N$ e $r$ non sono in quella relazione, $D$ viene un numero con la virgola. Ed è
+          proprio quello che succede con i frattali.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Le dimensioni dei mostri</div>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th>figura</th><th>$N$</th><th>$1/r$</th><th>$D = \log N / \log(1/r)$</th><th>valore</th></tr>
+          <tr><td class="lab">insieme di Cantor</td><td>$2$</td><td>$3$</td><td>$\log 2/\log 3$</td><td>$0{,}6309$</td></tr>
+          <tr><td class="lab">curva di Koch</td><td>$4$</td><td>$3$</td><td>$\log 4/\log 3$</td><td>$1{,}2619$</td></tr>
+          <tr><td class="lab">triangolo di Sierpiński</td><td>$3$</td><td>$2$</td><td>$\log 3/\log 2$</td><td>$1{,}5850$</td></tr>
+          <tr><td class="lab">tappeto di Sierpiński</td><td>$8$</td><td>$3$</td><td>$\log 8/\log 3$</td><td>$1{,}8928$</td></tr>
+          <tr><td class="lab">curva di Peano</td><td>$9$</td><td>$3$</td><td>$\log 9/\log 3$</td><td>$2{,}0000$</td></tr>
+          <tr><td class="lab">spugna di Menger</td><td>$20$</td><td>$3$</td><td>$\log 20/\log 3$</td><td>$2{,}7268$</td></tr>
+        </table>
+        </div>
+        <p class="formula-note">Leggete la tabella come una <em>classifica di quanto una figura riempie lo
+          spazio</em>. L'insieme di Cantor sta fra il punto e la linea: è più di niente, meno di un
+          segmento. Koch e Sierpiński stanno fra la linea e la superficie, e Sierpiński riempie di più. Il
+          tappeto quasi riempie il piano ($1{,}89$), la curva di Peano ci riesce del tutto ($2$ esatto — e
+          infatti passa per ogni punto del quadrato). La spugna di Menger, che vive nello spazio, sta fra la
+          superficie e il solido: ha <strong>volume nullo e superficie infinita</strong>.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Contare le scatole: la dimensione si può misurare</div>
+        <p>Per una figura vera — una costa, una nuvola, un vaso sanguigno — non c'è nessuna regola di
+          costruzione da guardare. Si usa allora la <strong>dimensione di box counting</strong>: si copre la
+          figura con una griglia di lato $\varepsilon$, si contano le caselle $N(\varepsilon)$ che la
+          toccano, e si ripete rimpicciolendo la griglia. Se</p>
+        <div class="formula">$$N(\varepsilon) \sim \varepsilon^{-D} \quad\Longrightarrow\quad
+          \log N(\varepsilon) = -D\,\log\varepsilon + \text{cost}$$</div>
+        <p>allora in un grafico con <strong>entrambi gli assi logaritmici</strong> i punti stanno su una
+          retta, e $D$ è la sua <em>pendenza</em> cambiata di segno.</p>
+        <p class="formula-note">È il medesimo trucco delle scale logaritmiche della lezione 4: una legge di
+          potenza, su carta bilogaritmica, diventa una retta — e la potenza si legge come pendenza. Qui non
+          è un espediente grafico: è <strong>il modo in cui la dimensione frattale si misura davvero</strong>,
+          su fotografie di tessuti, su tracciati sismici, su immagini satellitari.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="dm-btns">
+          <button class="btn btn-sm active" data-v="griglia">la griglia sulla figura</button>
+          <button class="btn btn-sm" data-v="loglog">il grafico bilogaritmico</button>
+          <button class="btn btn-sm" data-v="tab">le dimensioni a confronto</button>
+        </div>
+        <div class="ctrl">
+          <label>figura</label>
+          <select id="dm-f" style="padding:0.3rem 0.5rem;border-radius:8px;">
+            <option value="koch">curva di Koch</option>
+            <option value="sier">triangolo di Sierpiński</option>
+            <option value="cant">insieme di Cantor</option>
+            <option value="seg">un segmento (D = 1)</option>
+            <option value="qua">un quadrato pieno (D = 2)</option>
+          </select>
+          <label>lato della griglia <span class="val-badge" id="dm-ev">1/32</span></label>
+          <input type="range" id="dm-e" min="1" max="7" step="1" value="5" style="flex:1;min-width:180px">
+        </div>
+        <svg id="dm-svg" viewBox="0 0 680 410" role="img" aria-label="Conteggio delle scatole e stima della dimensione frattale"></svg>
+        <p class="cap" id="dm-cap"></p>
+        <p class="formula-note">Il conteggio è fatto davvero, casella per casella, sulla figura disegnata:
+          la pendenza che leggete nella seconda vista è una <strong>misura</strong>, non un valore
+          scritto a mano. Il piccolo scarto rispetto al valore teorico è normale e ha due cause: la figura
+          è disegnata con un numero <em>finito</em> di iterazioni, e le griglie utilizzabili sono poche.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>③ Esercizio.</strong> Calcola la dimensione del <em>tappeto di Sierpiński</em> (si divide
+          il quadrato in $9$ quadratini e si toglie quello centrale) e della <em>spugna di Menger</em> (si
+          divide il cubo in $27$ cubetti e se ne tolgono $7$: il centrale e i sei centrali delle facce).
+          Commenta i due risultati.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#f3s">Mostra la soluzione</button>
+        <div class="solution" id="f3s">
+          <p><strong>Tappeto.</strong> Restano $N = 8$ quadratini su $9$, ciascuno ridotto di $r = 1/3$:</p>
+          <div class="formula">$$D = \frac{\log 8}{\log 3} = \frac{3\log 2}{\log 3} =
+            \frac{3 \cdot 0{,}30103}{0{,}47712} = \mathbf{1{,}8928}$$</div>
+          <p><strong>Spugna.</strong> Restano $N = 27 - 7 = 20$ cubetti, ciascuno ridotto di $r = 1/3$:</p>
+          <div class="formula">$$D = \frac{\log 20}{\log 3} = \frac{1{,}30103}{0{,}47712} =
+            \mathbf{2{,}7268}$$</div>
+          <p><strong>Commento.</strong> Il tappeto ha dimensione <em>quasi</em> $2$: è un oggetto piano
+            bucherellato all'infinito, che quasi riempie il quadrato — e infatti la sua area è nulla (a ogni
+            passo resta $8/9$ dell'area, e $(8/9)^n \to 0$) ma il perimetro è infinito. La spugna sta fra la
+            superficie e il solido: ha <strong>volume nullo</strong> ($(20/27)^n \to 0$) e
+            <strong>superficie infinita</strong>. Sono due oggetti che nessuna categoria della geometria di
+            Euclide può ospitare.</p>
+          <p class="formula-note">Osservazione da fare a mente, che spiega perché la dimensione «misura il
+            riempimento»: nel tappeto togliamo $1$ pezzo su $9$, e la dimensione scende poco sotto $2$; se ne
+            togliessimo $5$ su $9$ resterebbe $D = \log 4/\log 3 = 1{,}26$, molto più «magro». Meno si
+            conserva, più la dimensione cala.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — PERIMETRO INFINITO, AREA FINITA -->
+    <section id="sec4">
+      <h2>4. Perimetro infinito, area finita</h2>
+
+      <p>Il fiocco di neve di Koch è il modo più economico per vedere che cosa succede quando si iterano
+        all'infinito due progressioni geometriche che tirano in direzioni opposte. Partiamo da un triangolo
+        equilatero di lato $s$ e applichiamo la regola di Koch a ciascuno dei tre lati.</p>
+
+      <div class="definition">
+        <div class="formula-title">Il perimetro</div>
+        <p>Ogni segmento diventa quattro segmenti lunghi un terzo, quindi a ogni passo il perimetro si
+          moltiplica per $4/3$:</p>
+        <div class="formula">$$P_n = 3s\left(\frac43\right)^{n} \xrightarrow[\ n\to\infty\ ]{} +\infty$$</div>
+        <p class="formula-note">Progressione geometrica di ragione $4/3 \gt 1$: <strong>diverge</strong>.
+          Dopo $50$ passi il perimetro di un fiocco grande come questa pagina supererebbe la distanza
+          Terra-Sole.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">L'area</div>
+        <p>Al passo $n$ si aggiungono $3\cdot4^{\,n-1}$ triangolini di lato $s/3^{n}$, ciascuno di area
+          $A_0/9^{n}$ dove $A_0 = \frac{\sqrt3}{4}s^{2}$ è l'area del triangolo di partenza. Sommando:</p>
+        <div class="formula">$$A_\infty = A_0\left[1 + \sum_{n=1}^{\infty}\frac{3\cdot4^{\,n-1}}{9^{n}}\right]
+          = A_0\left[1 + \frac13\sum_{k=0}^{\infty}\left(\frac49\right)^{k}\right]
+          = A_0\left[1 + \frac13\cdot\frac{1}{1-\frac49}\right]$$</div>
+        <div class="formula">$$A_\infty = A_0\left[1 + \frac13\cdot\frac95\right] = A_0\left(1+\frac35\right)
+          = \frac{8}{5}\,A_0$$</div>
+        <p class="formula-note">Progressione geometrica di ragione $4/9 \lt 1$: <strong>converge</strong>.
+          L'area finale è esattamente <strong>otto quinti</strong> di quella del triangolo iniziale — un
+          numero pulito, ottenuto con la stessa formula dei chicchi di grano della lezione 5, letta al
+          contrario.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="ko-btns">
+          <button class="btn btn-sm active" data-v="fiocco">il fiocco che cresce</button>
+          <button class="btn btn-sm" data-v="graf">perimetro e area a confronto</button>
+          <button class="btn btn-sm" data-v="tab">la tabella dei valori</button>
+        </div>
+        <div class="ctrl">
+          <label>iterazione <span class="val-badge" id="ko-nv">3</span></label>
+          <input type="range" id="ko-n" min="0" max="6" step="1" value="3" style="flex:1;min-width:210px">
+        </div>
+        <svg id="ko-svg" viewBox="0 0 680 400" role="img" aria-label="Il fiocco di Koch: crescita, perimetro divergente e area convergente"></svg>
+        <p class="cap" id="ko-cap"></p>
+      </div>
+
+      <div class="warnbox"><strong>Perché non è un paradosso.</strong> Sembra assurdo che una linea infinita
+        stia dentro un'area finita, ma è la stessa cosa che succede con la serie
+        $1 + \frac12 + \frac13 + \frac14 + \dots$, che diverge pur avendo termini che vanno a zero. Il punto
+        è che <em>perimetro</em> e <em>area</em> misurano cose diverse, e non c'è nessun teorema che leghi
+        l'uno all'altra in questa direzione: si può racchiudere un'area piccola con un contorno lungo quanto
+        si vuole. Provate col filo di lana in un piatto: più lo accartocciate, più ce ne sta. La curva di
+        Koch è la versione al limite di quel gesto.</div>
+
+      <div class="exercise">
+        <p><strong>④ Esercizio.</strong> Un fiocco di Koch parte da un triangolo equilatero di lato $9$ cm.
+          (a) Quanto vale l'area iniziale? (b) E l'area finale? (c) Quanto è lungo il perimetro dopo $5$
+          iterazioni? (d) Dopo quante iterazioni il perimetro supera un chilometro?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#f4s">Mostra la soluzione</button>
+        <div class="solution" id="f4s">
+          <p><strong>(a)</strong> $A_0 = \dfrac{\sqrt3}{4}\cdot 9^{2} = \dfrac{81\sqrt3}{4} \approx \mathbf{35{,}07}$ cm².</p>
+          <p><strong>(b)</strong> $A_\infty = \dfrac85 A_0 = 1{,}6 \cdot 35{,}07 \approx \mathbf{56{,}12}$
+            cm². L'area cresce, ma solo del $60\%$: si ferma.</p>
+          <p><strong>(c)</strong> $P_5 = 3\cdot9\cdot\left(\dfrac43\right)^{5} = 27 \cdot \dfrac{1024}{243} = \mathbf{113{,}8}$ cm, poco più di un metro.</p>
+          <p><strong>(d)</strong> Serve $27\left(\frac43\right)^{n} \gt 100\,000$ cm, cioè
+            $\left(\frac43\right)^{n} \gt 3703{,}7$. Passando ai logaritmi:</p>
+          <div class="formula">$$n \gt \frac{\log 3703{,}7}{\log(4/3)} = \frac{3{,}5686}{0{,}12494}
+            = 28{,}56 \quad\Longrightarrow\quad n = \mathbf{29}$$</div>
+          <p><strong>Verifica:</strong> $27\cdot(4/3)^{29} = 113\,393$ cm $= 1{,}13$ km ✓, mentre con
+            $n = 28$ si ottengono $85\,045$ cm, cioè $0{,}85$ km.</p>
+          <p class="formula-note">Ventinove passi per un chilometro di perimetro dentro una figura larga
+            nove centimetri: è la crescita esponenziale della lezione 5, che come al solito è molto più
+            veloce di quanto l'intuizione suggerisca. E notate che il punto (d) si risolve
+            <em>esattamente</em> come i problemi di raddoppio dei batteri: prendere il logaritmo è il modo
+            standard per tirare fuori un esponente da sotto una potenza.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — LA COSTA DELLA BRETAGNA -->
+    <section id="sec5">
+      <h2>5. Quanto è lunga la costa della Gran Bretagna?</h2>
+
+      <div class="storia">
+        <p>La domanda sembra sciocca e ha una risposta imbarazzante: <strong>dipende dal righello</strong>.
+          Se ne accorse per primo <strong>Lewis Fry Richardson</strong>, meteorologo inglese e quacchero
+          pacifista, che negli anni Cinquanta studiava le cause delle guerre e cercava una correlazione con
+          la lunghezza dei confini. Consultando gli almanacchi trovò che la frontiera fra Spagna e Portogallo
+          era di $987$ km secondo i portoghesi e di $1214$ km secondo gli spagnoli. Non era un errore: i due
+          paesi avevano misurato con passi di lunghezza diversa.</p>
+        <p>Richardson misurò allora sistematicamente diverse coste con compassi di apertura decrescente, e
+          scoprì che i dati si disponevano su una <strong>retta in scala bilogaritmica</strong>. Pubblicò il
+          risultato nel 1961 in un articolo che nessuno lesse. Nel <strong>1967</strong> Mandelbrot lo
+          riprese, gli diede un'interpretazione — quell'esponente è una dimensione — e ne fece l'articolo
+          più famoso della disciplina.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">La legge di Richardson</div>
+        <p>Misurando una costa con un compasso di apertura $\varepsilon$ servono $N(\varepsilon)$ passi, e la
+          lunghezza stimata è $L(\varepsilon) = N(\varepsilon)\cdot\varepsilon$. Sperimentalmente</p>
+        <div class="formula">$$L(\varepsilon) = k\,\varepsilon^{\,1-D} \qquad\text{con } D \ge 1$$</div>
+        <p class="formula-note">Se $D = 1$ (una circonferenza, una figura liscia) l'esponente è zero e la
+          lunghezza <strong>non dipende</strong> dal righello: è la situazione normale, quella per cui la
+          parola «lunghezza» ha senso. Se $D \gt 1$ l'esponente è negativo e la lunghezza
+          <strong>cresce senza limite</strong> man mano che il righello si accorcia. La costa non ha una
+          lunghezza: ha una <em>dimensione</em>.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="co-btns">
+          <button class="btn btn-sm active" data-v="mappa">il compasso sulla costa</button>
+          <button class="btn btn-sm" data-v="rich">il grafico di Richardson</button>
+          <button class="btn btn-sm" data-v="dati">i dati reali</button>
+        </div>
+        <div class="ctrl">
+          <label>apertura del compasso <span class="val-badge" id="co-ev">71,1 km</span></label>
+          <input type="range" id="co-e" min="0" max="4" step="1" value="1" style="flex:1;min-width:210px">
+        </div>
+        <svg id="co-svg" viewBox="0 0 680 410" role="img" aria-label="Misura di una costa frattale con compassi di apertura decrescente e grafico di Richardson"></svg>
+        <p class="cap" id="co-cap"></p>
+        <p class="formula-note">La «costa» del simulatore è una <strong>curva di Koch a orientamento
+          casuale</strong>: la regola è quella della sezione 2, ma la punta di ogni terzo centrale viene
+          rivolta in su o in giù a caso. Il risultato assomiglia in modo imbarazzante a un profilo costiero
+          vero, e ha il vantaggio di avere una dimensione <em>nota in anticipo</em>,
+          $\log 4/\log 3 = 1{,}2619$: possiamo così controllare se il metodo di misura funziona. Le aperture
+          del compasso sono le scale naturali della costruzione, $640/3^{k}$ km.</p>
+      </div>
+
+      <div class="curiosita"><strong>I numeri veri di Richardson.</strong> La costa occidentale della Gran
+        Bretagna ha $D \approx 1{,}25$; quella della <strong>Norvegia</strong>, tutta fiordi, arriva a
+        $\mathbf{1{,}52}$ — è la più frastagliata mai misurata. All'estremo opposto la costa del Sudafrica,
+        liscia e regolare, sta a $1{,}02$, e una circonferenza perfetta a $1{,}00$ esatto. La dimensione
+        diventa così una <em>misura oggettiva della frastagliatura</em>, che prima non si sapeva
+        quantificare: si diceva «più frastagliata», adesso si dice «$1{,}52$ contro $1{,}25$».</div>
+
+      <div class="exercise">
+        <p><strong>⑤ Esercizio.</strong> Una costa misurata con un compasso di $100$ km richiede $28$ passi;
+          con un compasso di $50$ km ne richiede $67$. (a) Quali sono le due lunghezze stimate?
+          (b) Qual è la dimensione frattale della costa? (c) Che lunghezza si stimerebbe con un compasso di
+          $1$ km?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#f5s">Mostra la soluzione</button>
+        <div class="solution" id="f5s">
+          <p><strong>(a)</strong> $L_1 = 28 \cdot 100 = 2800$ km; &nbsp; $L_2 = 67 \cdot 50 = 3350$ km.
+            Dimezzando il righello la costa si è <em>allungata</em> del $20\%$.</p>
+          <p><strong>(b)</strong> Da $N(\varepsilon) = k\,\varepsilon^{-D}$, prendendo il rapporto fra le due
+            misure sparisce la costante $k$:</p>
+          <div class="formula">$$\frac{N_2}{N_1} = \left(\frac{\varepsilon_1}{\varepsilon_2}\right)^{D}
+            \;\Longrightarrow\; D = \frac{\log(N_2/N_1)}{\log(\varepsilon_1/\varepsilon_2)}
+            = \frac{\log(67/28)}{\log 2} = \frac{0{,}37892}{0{,}30103} = \mathbf{1{,}2587}$$</div>
+          <p>Una costa del tipo di quella britannica, quindi.</p>
+          <p><strong>(c)</strong> Da $L(\varepsilon) = k\,\varepsilon^{1-D}$ con $D = 1{,}2587$:</p>
+          <div class="formula">$$L(1) = L(100)\cdot\left(\frac{1}{100}\right)^{1-D} =
+            2800 \cdot 100^{\,0{,}258} = 2800\cdot 3{,}28 \approx \mathbf{9200}\ \text{km}$$</div>
+          <p class="formula-note">Con un righello cento volte più corto la costa risulta più che
+            <em>triplicata</em>. È il motivo per cui gli atlanti riportano lunghezze di coste che non
+            coincidono mai: non sbagliano, usano scale diverse. E la stessa cosa vale, con conseguenze molto
+            più pratiche, per la superficie di un catalizzatore, di un polmone o di una batteria — dove
+            «quanta superficie c'è» è una domanda che dipende dalla scala a cui la si guarda.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — MANDELBROT E JULIA -->
+    <section id="sec6">
+      <h2>6. L'insieme di Mandelbrot e gli insiemi di Julia</h2>
+
+      <p>Avete già incontrato l'insieme di Mandelbrot in <a href="../Matematica_3/4_Grado_superiore.html">
+        Matematica_3, lezione 4</a>, quando abbiamo costruito i numeri complessi. Qui ci torniamo per capire
+        <em>perché</em> quella figura è quella che è, e per incontrare la famiglia di cui fa parte.</p>
+
+      <div class="definition">
+        <div class="formula-title">Una sola formula</div>
+        <p>Si prende un numero complesso $c$ e si itera</p>
+        <div class="formula">$$z_0 = 0, \qquad z_{n+1} = z_n^{2} + c$$</div>
+        <p>Se la successione resta <strong>limitata</strong>, il punto $c$ appartiene all'insieme di
+          Mandelbrot $\mathcal{M}$; se scappa all'infinito, no. Il criterio pratico è comodissimo: si
+          dimostra che <strong>se $|z_n| \gt 2$ per qualche $n$, allora la successione diverge</strong>.
+          Basta dunque iterare e controllare quando si supera $2$.</p>
+        <p class="formula-note">I colori delle figure famose non fanno parte della matematica: indicano
+          <em>quanto in fretta</em> il punto scappa. Nero significa «non è ancora scappato dopo tutte le
+          iterazioni che ho fatto», e questo è il motivo per cui aumentando le iterazioni la parte nera si
+          assottiglia sempre un po'.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Gli insiemi di Julia, e il legame con Mandelbrot</div>
+        <p>Cambiamo il ruolo delle due variabili. Fissiamo $c$ e facciamo variare il <em>punto di
+          partenza</em> $z_0$: l'insieme dei punti che non scappano si chiama <strong>insieme di
+          Julia riempito</strong> di $c$ — dal nome di Gaston Julia, che li studiò nel 1918 senza poterli mai
+          vedere disegnati.</p>
+        <p>C'è un teorema che lega le due famiglie in modo bellissimo (Fatou-Julia, 1919):</p>
+        <div class="formula">$$c \in \mathcal{M} \iff \text{l'insieme di Julia di } c
+          \text{ è connesso (un pezzo solo)}$$</div>
+        <p class="formula-note">L'insieme di Mandelbrot è dunque una <strong>mappa</strong> di tutti gli
+          insiemi di Julia: dice, per ogni $c$, se il corrispondente Julia è un unico pezzo o una polvere
+          sconnessa. Nel simulatore potete spostare $c$ e vedere le due cose insieme: quando il puntatore
+          esce dal nero, il Julia si sbriciola di colpo.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="ju-btns">
+          <button class="btn btn-sm active" data-v="mandel">l'insieme di Mandelbrot</button>
+          <button class="btn btn-sm" data-v="julia">l'insieme di Julia di c</button>
+          <button class="btn btn-sm" data-v="orbita">l'orbita di un punto</button>
+        </div>
+        <div class="ctrl">
+          <label>parte reale di $c$ <span class="val-badge" id="ju-xv">−0,70</span></label>
+          <input type="range" id="ju-x" min="-2" max="0.6" step="0.01" value="-0.7" style="flex:1;min-width:170px">
+          <label>parte immaginaria <span class="val-badge" id="ju-yv">0,30</span></label>
+          <input type="range" id="ju-y" min="-1.2" max="1.2" step="0.01" value="0.3" style="flex:1;min-width:170px">
+          <label>iterazioni <span class="val-badge" id="ju-iv">80</span></label>
+          <input type="range" id="ju-i" min="20" max="300" step="10" value="80" style="flex:1;min-width:150px">
+        </div>
+        <canvas id="ju-cv" width="680" height="380" aria-label="Insieme di Mandelbrot, insiemi di Julia e orbita di un punto"></canvas>
+        <p class="cap" id="ju-cap"></p>
+      </div>
+
+      <div class="curiosita"><strong>Il bordo ha dimensione 2.</strong> È il risultato più sorprendente
+        sull'insieme di Mandelbrot, dimostrato da <strong>Mitsuhiro Shishikura</strong> nel
+        <strong>1991</strong>: il <em>contorno</em> di $\mathcal{M}$ — non l'insieme pieno, proprio la
+        frontiera — ha dimensione di Hausdorff esattamente $\mathbf{2}$, cioè quella di una superficie. Un
+        bordo, che intuitivamente dovrebbe essere una linea, è così arricciato da riempire il piano. È anche
+        il motivo per cui l'insieme di Mandelbrot è inesauribile: ogni ingrandimento rivela struttura nuova,
+        e la cosa non finisce mai — non perché il computer sia potente, ma perché <em>la matematica è fatta
+        così</em>.</div>
+
+      <div class="curiosita"><strong>Chi l'ha visto per primo.</strong> La prima immagine dell'insieme fu
+        stampata nel <strong>1978</strong> da Robert Brooks e Peter Matelski, in bianco e nero, con gli
+        asterischi di una stampante ad aghi: si intravede appena. Mandelbrot la ottenne in IBM nel
+        <strong>1980</strong> e la trovò così brutta e piena di macchie da pensare a un guasto della
+        stampante. Le macchie erano le <em>isole satelliti</em>, copie in miniatura dell'insieme sparse
+        attorno al bordo — cioè la scoperta. È un buon promemoria per chi guarda dei dati: prima di dare la
+        colpa allo strumento, conviene chiedersi se non si stia vedendo qualcosa di vero.</div>
+
+      <div class="exercise">
+        <p><strong>⑥ Esercizio.</strong> Per ciascuno dei valori $c = 0$, $c = -1$, $c = 1$, $c = -2$ e
+          $c = 0{,}3$, calcola i primi termini della successione $z_{n+1} = z_n^2 + c$ partendo da $z_0 = 0$
+          e stabilisci se il punto appartiene all'insieme di Mandelbrot.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#f6s">Mostra la soluzione</button>
+        <div class="solution" id="f6s">
+          <div class="tabwrap">
+          <table class="tabf">
+            <tr><th>$c$</th><th>$z_1$</th><th>$z_2$</th><th>$z_3$</th><th>$z_4$</th><th>comportamento</th><th>$c \in \mathcal{M}$?</th></tr>
+            <tr><td class="lab">$0$</td><td>$0$</td><td>$0$</td><td>$0$</td><td>$0$</td><td class="l">punto fisso</td><td>sì</td></tr>
+            <tr><td class="lab">$-1$</td><td>$-1$</td><td>$0$</td><td>$-1$</td><td>$0$</td><td class="l">ciclo di periodo 2</td><td>sì</td></tr>
+            <tr><td class="lab">$1$</td><td>$1$</td><td>$2$</td><td>$5$</td><td>$26$</td><td class="l">diverge</td><td>no</td></tr>
+            <tr><td class="lab">$-2$</td><td>$-2$</td><td>$2$</td><td>$2$</td><td>$2$</td><td class="l">resta a $2$</td><td>sì</td></tr>
+            <tr><td class="lab">$0{,}3$</td><td>$0{,}3$</td><td>$0{,}39$</td><td>$0{,}452$</td><td>$0{,}504$</td><td class="l">sale piano, poi <strong>diverge</strong></td><td><strong>no</strong></td></tr>
+          </table>
+          </div>
+          <p><strong>Il caso $c = -2$ merita attenzione:</strong> la successione arriva esattamente a $2$ e
+            ci resta, perché $2^2 - 2 = 2$. Il criterio dice «diverge se $|z| \gt 2$», con la
+            disuguaglianza <em>stretta</em>: qui $|z| = 2$ e non si supera mai. Il punto $-2$ è la punta
+            estrema sinistra dell'insieme di Mandelbrot, ed è per questo che l'insieme sta tutto nel
+            rettangolo $[-2;\ 0{,}5] \times [-1{,}2;\ 1{,}2]$.</p>
+          <p><strong>Il caso $c = 0{,}3$ è la trappola dell'esercizio.</strong> I primi quattro termini
+            salgono lentamente e sembrano avvicinarsi a un limite — ma nessun limite esiste. Un punto fisso
+            dovrebbe soddisfare $z = z^{2} + 0{,}3$, cioè $z^{2} - z + 0{,}3 = 0$, il cui discriminante vale
+            $1 - 1{,}2 = -0{,}2 \lt 0$: <strong>nessuna soluzione reale</strong>. Continuando i conti:
+            $0{,}554$, $0{,}607$, $0{,}669$, $0{,}747$, $0{,}859$, $1{,}037$, $1{,}376$, $2{,}193$ — superato
+            il $2$ la successione esplode, e al quattordicesimo passo vale già $26{,}4$.</p>
+          <p class="formula-note">La morale vale ben oltre i frattali: <strong>quattro termini che salgono
+            piano non dimostrano nulla</strong>. Bisogna applicare il criterio $|z| \gt 2$ fino in fondo, o
+            meglio ancora ragionare sui punti fissi. Per $c$ reale l'insieme di Mandelbrot è esattamente
+            l'intervallo $[-2;\ 0{,}25]$: il valore $0{,}25$ è quello per cui il discriminante di
+            $z^{2} - z + c = 0$ si annulla, e $0{,}3$ sta fuori di un soffio.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — I FRATTALI IN NATURA E NELLA TECNICA -->
+    <section id="sec7">
+      <h2>7. Dove si nascondono: natura, tecnologia, mercati</h2>
+
+      <p>Fin qui abbiamo costruito frattali. Adesso guardiamoli dove stanno già, e chiediamoci
+        <em>perché</em> ci stanno: in quasi tutti i casi la risposta è la stessa — la natura deve mettere
+        molta superficie dentro poco volume, o molta lunghezza dentro poco spazio, e la geometria frattale
+        è il modo per farlo.</p>
+
+      <div class="ric">
+        <div><h4>I polmoni</h4><p>Circa <strong>23 generazioni</strong> di ramificazione, dalla trachea agli
+          alveoli. Il risultato: una superficie di scambio di <strong>70-100 m²</strong> — quanto un
+          appartamento — ripiegata dentro cinque litri di torace. Dimensione frattale dell'albero bronchiale
+          $\approx 2{,}9$: quasi un solido.</p></div>
+        <div><h4>L'albero circolatorio</h4><p>Dall'aorta ai capillari, con lo stesso schema: circa
+          <strong>100 000 km</strong> di vasi in un corpo umano, e nessuna cellula più lontana di qualche
+          decimo di millimetro da un capillare. Anche qui: massima superficie di scambio, minimo
+          volume.</p></div>
+        <div><h4>Le piante</h4><p>Il <strong>broccolo romanesco</strong> è il caso da manuale: ogni cimetta è
+          una copia in scala dell'infiorescenza, per cinque o sei livelli. Felci, cavolfiori e alberi
+          seguono la stessa logica: massima superficie esposta alla luce con la minima quantità di
+          materiale.</p></div>
+        <div><h4>Fiumi, fulmini, cristalli</h4><p>I bacini idrografici obbediscono alle <em>leggi di
+          Horton</em>, che sono relazioni di autosimilarità fra ordini di ramificazione. I fulmini e le
+          scariche elettriche formano strutture frattali per <em>aggregazione limitata dalla diffusione</em>:
+          la punta che sporge di più ha più probabilità di crescere ancora.</p></div>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="fe-btns">
+          <button class="btn btn-sm active" data-v="felce">la felce di Barnsley</button>
+          <button class="btn btn-sm" data-v="sier">il gioco del caos</button>
+          <button class="btn btn-sm" data-v="albero">un albero che cresce</button>
+        </div>
+        <div class="ctrl">
+          <label>punti disegnati <span class="val-badge" id="fe-nv">30 000</span></label>
+          <input type="range" id="fe-n" min="1000" max="80000" step="1000" value="30000" style="flex:1;min-width:210px">
+        </div>
+        <canvas id="fe-cv" width="680" height="400" aria-label="Felce di Barnsley, gioco del caos e albero generati per iterazione casuale"></canvas>
+        <p class="cap" id="fe-cap"></p>
+        <p class="formula-note"><strong>Il gioco del caos.</strong> Si parte da un punto a caso e si ripete:
+          <em>scegli una delle trasformazioni con la sua probabilità, applicala, segna il punto</em>. Non c'è
+          nessun disegno programmato — eppure dopo qualche migliaio di punti compare la figura, sempre la
+          stessa. È il teorema di Hutchinson all'opera: l'attrattore non dipende da dove si comincia. La
+          felce sta in <strong>ventiquattro numeri</strong>, quattro trasformazioni affine da sei parametri
+          l'una.</p>
+      </div>
+
+      <div class="curiosita"><strong>I frattali al cinema.</strong> Nel 1980 <strong>Loren Carpenter</strong>,
+        ingegnere alla Boeing, presenta al SIGGRAPH un cortometraggio di due minuti intitolato <em>Vol
+        Libre</em>: un volo sopra montagne generate al calcolatore con lo <em>spostamento del punto
+        medio</em> — si prende un segmento, si sposta il suo punto medio a caso, si ripete sulle due metà
+        con uno spostamento ridotto. Viene assunto seduta stante dalla Lucasfilm, e due
+        anni dopo il «pianeta Genesis» di <em>Star Trek II</em> diventa la prima sequenza interamente
+        generata al computer della storia del cinema. Da quel gruppo nascerà la <strong>Pixar</strong>. Le
+        montagne, le nuvole e gli alberi di qualunque film o videogioco di oggi sono, alla base, ancora
+        quella matematica.</div>
+
+      <div class="definition">
+        <div class="formula-title">Le antenne frattali, ovvero la geometria che entra in tasca</div>
+        <p>Un'antenna funziona bene quando la sua lunghezza è confrontabile con la lunghezza d'onda che deve
+          ricevere. Un telefono deve ricevere <em>molte</em> bande diverse — GSM, LTE, 5G, Wi-Fi, GPS,
+          Bluetooth — e non ha spazio per tante antenne di lunghezze diverse.</p>
+        <p>La soluzione, brevettata da <strong>Nathan Cohen</strong> nel <strong>1988</strong>, è
+          un'antenna a forma di frattale: essendo autosimile, contiene <em>simultaneamente</em> strutture di
+          molte lunghezze diverse, e quindi risuona su molte frequenze insieme. Ripiegando una curva di Koch
+          o un tappeto di Sierpiński si mette un'antenna lunga in un centimetro quadrato.</p>
+        <p class="formula-note">Se aprite un telefono e guardate la piastra dell'antenna, vedete una linea
+          ripiegata su sé stessa in modo apparentemente insensato: è questa lezione, stampata sul rame.</p>
+      </div>
+
+      <div class="curiosita"><strong>E i mercati?</strong> Mandelbrot arrivò ai frattali <em>partendo</em>
+        dall'economia: nel 1963 studiò le variazioni del prezzo del cotone e trovò che non seguivano affatto
+        la curva gaussiana della lezione di statistica, ma una <strong>legge di potenza</strong> — code molto
+        più «grasse», cioè eventi estremi molto più frequenti di quanto il modello normale prevedesse. La
+        stessa struttura vale per l'intensità dei terremoti (legge di Gutenberg-Richter), per la dimensione
+        delle città, per la frequenza delle parole (legge di Zipf). Il punto pratico, che vale la pena
+        ricordare quando si sente parlare di «evento imprevedibile»: se un modello dice che una crisi come
+        quella del 2008 accade una volta ogni centomila anni e ne sono accadute tre in un secolo,
+        <em>il problema è il modello</em>.</div>
+
+      <div class="exercise">
+        <p><strong>⑦ Esercizio.</strong> L'albero bronchiale si ramifica in due a ogni generazione, per $23$
+          generazioni. (a) Quanti condotti terminali risultano? (b) Se ogni condotto termina in un sacco
+          alveolare da $0{,}2$ mm² di superficie, quanta superficie si ottiene? (c) Sapendo che gli alveoli
+          reali sono circa $300$ milioni per una superficie di $80$ m², commenta.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#f7s">Mostra la soluzione</button>
+        <div class="solution" id="f7s">
+          <p><strong>(a)</strong> $2^{23} = \mathbf{8\,388\,608}$ condotti terminali, poco più di otto
+            milioni.</p>
+          <p><strong>(b)</strong> $8\,388\,608 \cdot 0{,}2\ \text{mm}^2 = 1\,677\,722\ \text{mm}^2 = \mathbf{1{,}68}\ \text{m}^2$.</p>
+          <p><strong>(c)</strong> Il conto dà una superficie <em>cinquanta volte più piccola</em> di quella
+            reale. Il modello «raddoppio perfetto per 23 generazioni» è troppo grossolano: nella realtà ogni
+            condotto terminale non finisce in <em>un</em> alveolo ma in un <strong>grappolo</strong> di
+            alveoli — circa $300\,000\,000 / 8\,400\,000 \approx 36$ ciascuno — e ogni alveolo ha una
+            superficie maggiore di quella ipotizzata. Rifacendo il conto con $300$ milioni di alveoli e
+            $80$ m² si ottengono $80/(3\cdot10^{8}) \approx 2{,}7\cdot10^{-7}$ m$^2$, cioè
+            $\mathbf{0{,}27}$ mm² a testa.</p>
+          <p class="formula-note">L'esercizio serve proprio a questo: un modello frattale semplice dà
+            <em>l'ordine di grandezza e il meccanismo</em>, non il numero esatto. Il meccanismo è quello che
+            conta ed è corretto: la ramificazione raddoppia a ogni passo, quindi la superficie cresce
+            <strong>esponenzialmente</strong> mentre il volume occupato cresce molto più lentamente. È la
+            stessa relazione superficie-volume che in Matematica_3 spiegava perché gli insetti non possono
+            diventare grandi — e la soluzione che l'evoluzione ha trovato, in entrambi i casi, è una
+            geometria frattale.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑧ Esercizio.</strong> Nel gioco del caos per il triangolo di Sierpiński si parte da un
+          punto qualsiasi, si sceglie a caso uno dei tre vertici e ci si sposta a metà strada, ripetendo.
+          Spiega perché compare il triangolo di Sierpiński, e perché i primi punti vanno buttati via.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#f8s">Mostra la soluzione</button>
+        <div class="solution" id="f8s">
+          <p><strong>Perché compare.</strong> «Andare a metà strada verso il vertice $V$» è una
+            <em>contrazione</em> di fattore $1/2$ verso $V$. Le tre regole sono esattamente le tre
+            trasformazioni che generano il triangolo di Sierpiński: il triangolo è l'unico insieme che resta
+            uguale a sé stesso applicandole tutte e tre. Per il teorema di Hutchinson, iterandole a caso i
+            punti <strong>convergono all'attrattore</strong> e poi ci restano dentro per sempre, saltandoci
+            dentro in modo denso.</p>
+          <p><strong>Il punto sottile:</strong> la successione dei punti è casuale, ma l'<em>insieme</em> che
+            visitano non lo è affatto. Il caso decide l'ordine in cui i pixel si accendono, non quali pixel
+            esistono. È il senso della parola «gioco del caos»: un procedimento aleatorio che produce una
+            figura perfettamente determinata.</p>
+          <p><strong>Perché buttare i primi punti.</strong> Perché il punto di partenza in genere
+            <em>non</em> appartiene all'attrattore, e i primi passi servono ad avvicinarcisi. Ogni passo
+            dimezza la distanza dall'insieme, quindi dopo $k$ passi l'errore è $2^{-k}$ volte quello
+            iniziale: bastano una <strong>ventina</strong> di iterazioni per scendere sotto il milionesimo,
+            e infatti si scartano i primi $10$-$20$ punti. Sono i cosiddetti <em>transienti</em>, e li
+            ritroverete identici nella sezione seguente.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — ★ IL CAOS -->
+    <section id="sec8" class="optional">
+      <h2>8. Il caos deterministico, e da dove vengono i frattali</h2>
+
+      <p>C'è un'ultima domanda da farsi: <em>perché</em> in natura i frattali sono ovunque? Una risposta —
+        non l'unica, ma la più profonda — è che nascono spontaneamente da sistemi semplicissimi che si
+        ripetono nel tempo. Per vederlo torniamo a un'equazione che conoscete già.</p>
+
+      <div class="definition">
+        <div class="formula-title">La mappa logistica</div>
+        <p>Nella lezione 5 avete incontrato la <em>curva logistica</em>: una popolazione che cresce in modo
+          esponenziale finché le risorse abbondano, e poi si ferma. La versione a passi discreti — un anno,
+          una generazione — è</p>
+        <div class="formula">$$x_{n+1} = r\,x_n\,(1 - x_n) \qquad 0 \le x_n \le 1$$</div>
+        <p>dove $x_n$ è la popolazione in frazione del massimo possibile, e $r$ il tasso di riproduzione.
+          Il fattore $(1-x_n)$ è il freno: più la popolazione è vicina al massimo, meno cresce.</p>
+        <p class="formula-note">È l'equazione più semplice che si possa scrivere dopo una retta — una
+          parabola — e Robert May la propose nel <strong>1976</strong> su <em>Nature</em> con un articolo il
+          cui titolo era già un programma: «<em>Simple mathematical models with very complicated
+          dynamics</em>». Non c'è nessuna casualità dentro: dato $x_0$, tutto il futuro è determinato.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Che cosa succede al crescere di $r$</div>
+        <div class="tabwrap">
+        <table class="tabf">
+          <tr><th>intervallo di $r$</th><th>comportamento a lungo termine</th></tr>
+          <tr><td class="lab">$0 \lt r \lt 1$</td><td class="l">la popolazione si estingue: $x_n \to 0$</td></tr>
+          <tr><td class="lab">$1 \lt r \lt 3$</td><td class="l">si stabilizza su un valore fisso, $x^* = 1 - 1/r$</td></tr>
+          <tr><td class="lab">$3 \lt r \lt 3{,}4495$</td><td class="l">oscilla fra <strong>due</strong> valori (ciclo di periodo 2)</td></tr>
+          <tr><td class="lab">$3{,}4495 \lt r \lt 3{,}5441$</td><td class="l">quattro valori</td></tr>
+          <tr><td class="lab">$3{,}5441 \lt r \lt 3{,}5644$</td><td class="l">otto valori… e così via, raddoppiando</td></tr>
+          <tr><td class="lab">$r \gt 3{,}5699$</td><td class="l"><strong>caos</strong>: nessun periodo, e dipendenza sensibile dalle condizioni iniziali</td></tr>
+        </table>
+        </div>
+        <p class="formula-note">La sequenza di raddoppi si accumula a
+          $r_\infty = 3{,}569945\ldots$ — un punto di accumulazione raggiunto dopo
+          <em>infinite</em> biforcazioni in un intervallo finito. Oltre, il comportamento è
+          <strong>deterministico ma imprevedibile</strong>: due popolazioni che differiscono di un
+          milionesimo divergono completamente in poche decine di generazioni. È l'«effetto farfalla», e non
+          ha niente a che vedere col caso: è la stessa formula, applicata due volte.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="bi-btns">
+          <button class="btn btn-sm active" data-v="bifo">il diagramma delle biforcazioni</button>
+          <button class="btn btn-sm" data-v="ragna">la ragnatela di un singolo r</button>
+          <button class="btn btn-sm" data-v="sens">due inizi quasi uguali</button>
+        </div>
+        <div class="ctrl">
+          <label>tasso $r$ <span class="val-badge" id="bi-rv">3,20</span></label>
+          <input type="range" id="bi-r" min="0.5" max="4" step="0.005" value="3.2" style="flex:1;min-width:230px">
+          <label>popolazione iniziale <span class="val-badge" id="bi-xv">0,300</span></label>
+          <input type="range" id="bi-x" min="0.05" max="0.95" step="0.005" value="0.3" style="flex:1;min-width:180px">
+        </div>
+        <canvas id="bi-cv" width="680" height="400" aria-label="Diagramma delle biforcazioni della mappa logistica, ragnatela e dipendenza sensibile"></canvas>
+        <p class="cap" id="bi-cap"></p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">La costante di Feigenbaum, e perché è sconvolgente</div>
+        <p>Chiamiamo $r_k$ il valore di $r$ in cui avviene la $k$-esima biforcazione. Mitchell Feigenbaum,
+          nel <strong>1975</strong>, notò che gli intervalli fra biforcazioni successive si accorciano
+          sempre <em>nello stesso rapporto</em>:</p>
+        <div class="formula">$$\delta = \lim_{k\to\infty}\frac{r_k - r_{k-1}}{r_{k+1} - r_k}
+          = 4{,}669\,201\,609\ldots$$</div>
+        <p class="formula-note">Il fatto sorprendente non è il numero: è che <strong>lo stesso numero
+          compare in sistemi completamente diversi</strong> — altre mappe con un massimo quadratico, circuiti
+          elettronici oscillanti, la convezione dell'elio liquido, il gocciolamento di un rubinetto. È una
+          costante <em>universale</em>, come $\pi$ o $e$: non dipende dai dettagli del sistema, ma solo dal
+          fatto che ci sia una biforcazione a raddoppio di periodo. Feigenbaum la scoprì con una calcolatrice
+          tascabile, notando che i numeri si ripetevano.</p>
+      </div>
+
+      <div class="curiosita"><strong>Il legame col resto della lezione.</strong> Guardate il diagramma delle
+        biforcazioni e ingranditene un pezzo: dentro ogni «finestra» ricompare una copia dell'intero
+        diagramma. È <strong>autosimile</strong>, cioè è un frattale — e il suo insieme dei punti di
+        accumulazione ha dimensione $\approx 0{,}538$. Non è una coincidenza: l'insieme di Mandelbrot e la
+        mappa logistica sono <em>la stessa cosa</em>. Se in $z_{n+1} = z_n^2 + c$ ci si limita all'asse
+        reale, si ottiene una parabola equivalente a $x_{n+1} = rx_n(1-x_n)$ con
+        $c = \frac{r}{2} - \frac{r^2}{4}$; le «cipolle» attaccate alla cardioide di Mandelbrot sulla retta
+        reale corrispondono <strong>esattamente</strong> ai rami del diagramma delle biforcazioni. La figura
+        più famosa della matematica del Novecento e il modello più semplice di dinamica di una popolazione
+        sono due ritratti dello stesso oggetto.</div>
+
+      <div class="exercise">
+        <p><strong>⑨ Esercizio.</strong> Con $r = 2{,}8$ e $x_0 = 0{,}3$: (a) calcola i primi quattro passi
+          della mappa logistica; (b) trova il valore di equilibrio risolvendo l'equazione; (c) verifica che
+          la successione ci si stia avvicinando. (d) Perché per $r = 3{,}2$ non c'è più un equilibrio
+          stabile?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#f9s">Mostra la soluzione</button>
+        <div class="solution" id="f9s">
+          <p><strong>(a)</strong> $x_1 = 2{,}8\cdot0{,}3\cdot0{,}7 = 0{,}588$; &nbsp;
+            $x_2 = 2{,}8\cdot0{,}588\cdot0{,}412 = 0{,}6783$; &nbsp;
+            $x_3 = 2{,}8\cdot0{,}6783\cdot0{,}3217 = 0{,}6110$; &nbsp;
+            $x_4 = 2{,}8\cdot0{,}6110\cdot0{,}3890 = 0{,}6655$.</p>
+          <p><strong>(b)</strong> All'equilibrio $x = rx(1-x)$. Escludendo $x = 0$ si divide per $x$:
+            $1 = r(1-x)$, quindi</p>
+          <div class="formula">$$x^{*} = 1 - \frac1r = 1 - \frac{1}{2{,}8} = 1 - 0{,}3571 =
+            \mathbf{0{,}6429}$$</div>
+          <p><strong>(c)</strong> I valori $0{,}588$, $0{,}678$, $0{,}611$, $0{,}666$ oscillano attorno a
+            $0{,}6429$ con ampiezza decrescente: convergono <em>a spirale</em>. Dopo venti passi si è
+            praticamente sul valore di equilibrio.</p>
+          <p><strong>(d)</strong> Un equilibrio è stabile se la pendenza della funzione in quel punto ha
+            valore assoluto minore di $1$. Qui $f(x) = rx(1-x)$ ha pendenza $f'(x) = r(1-2x)$, e
+            nell'equilibrio $x^* = 1-1/r$ vale</p>
+          <div class="formula">$$f'(x^{*}) = r\left(1 - 2 + \frac2r\right) = 2 - r$$</div>
+          <p>La condizione $|2 - r| \lt 1$ dà $1 \lt r \lt 3$. Con $r = 2{,}8$ la pendenza è $-0{,}8$:
+            stabile, e il segno negativo spiega perché la convergenza è oscillante. Con $r = 3{,}2$ la
+            pendenza è $-1{,}2$, in valore assoluto maggiore di $1$: <strong>ogni piccolo scarto viene
+            amplificato</strong>, l'equilibrio si perde e nasce il ciclo di periodo $2$.</p>
+          <p class="formula-note">Il valore $r = 3$ è dunque quello in cui la pendenza tocca esattamente
+            $-1$: la prima biforcazione non è un capriccio del grafico, è la soluzione di
+            un'equazione.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑩ Esercizio.</strong> Le prime biforcazioni avvengono a $r_1 = 3$, $r_2 = 3{,}44949$,
+          $r_3 = 3{,}54409$ e $r_4 = 3{,}564407$. Stima la costante di Feigenbaum e confrontala col valore
+          vero $4{,}669202$.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#f10s">Mostra la soluzione</button>
+        <div class="solution" id="f10s">
+          <p>Si calcolano gli intervalli fra biforcazioni successive:</p>
+          <div class="tabwrap">
+          <table class="tabf">
+            <tr><th>intervallo</th><th>valore</th><th>rapporto col successivo</th></tr>
+            <tr><td class="lab">$r_2 - r_1$</td><td>$0{,}44949$</td><td rowspan="1">$0{,}44949/0{,}09460 = \mathbf{4{,}7515}$</td></tr>
+            <tr><td class="lab">$r_3 - r_2$</td><td>$0{,}09460$</td><td>$0{,}09460/0{,}020317 = \mathbf{4{,}6562}$</td></tr>
+            <tr><td class="lab">$r_4 - r_3$</td><td>$0{,}020317$</td><td>—</td></tr>
+          </table>
+          </div>
+          <p>Le due stime sono $4{,}7515$ e $4{,}6562$, contro il valore vero $4{,}669202$: la prima sbaglia
+            dell'$1{,}8\%$, la seconda dello $0{,}28\%$. La successione dei rapporti
+            <strong>converge</strong>, e già al secondo termine si hanno due cifre decimali giuste.</p>
+          <p class="formula-note">Vale la pena fermarsi un istante su che cosa significa. Con
+            <em>quattro numeri</em>, presi da un'equazione che si scrive in dieci caratteri, si è ottenuta al
+            $0{,}3\%$ una costante universale della natura, la stessa che governa la transizione al caos in
+            un rubinetto che gocciola e in un circuito elettronico. È il tipo di risultato per cui vale la
+            pena studiare matematica: nessuno lo avrebbe potuto indovinare, e chiunque lo può verificare.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="note"><strong>Il filo della lezione.</strong> Siamo partiti da alcune curve costruite per
+      dispetto, alla fine dell'Ottocento, per mostrare che l'intuizione geometrica non è affidabile. Abbiamo
+      scoperto che hanno una <strong>dimensione frazionaria</strong>, e che quella dimensione è
+      semplicemente un rapporto di logaritmi — la stessa matematica delle lezioni 4-6, in un vestito nuovo.
+      Poi abbiamo visto che quelle curve non erano affatto artificiali: coste, polmoni, alberi, fulmini e
+      mercati hanno la stessa struttura, per la ragione molto concreta che la geometria frattale è il modo
+      di mettere <em>tanta superficie in poco volume</em>. E infine, nell'approfondimento, che i frattali non
+      vanno costruiti: <strong>nascono da soli</strong>, non appena una regola semplice viene ripetuta. Se
+      dovessi tenere una sola idea sarebbe questa: <em>la complessità non richiede complicazione</em>. Nella
+      <strong>lezione 12</strong>, l'ultima dell'anno, mettiamo le mani sul codice e costruiamo qualcosa da
+      pubblicare in rete.</div>
+
+    <section id="quiz">
+      <h2>Verifica quello che hai capito</h2>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> — Prof. Vettigli</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script src="../Style/interactive.js"></script>
+  <script src="../Style/toc.js"></script>
+  <script src="../Style/quiz.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var SVGNS = 'http://www.w3.org/2000/svg';
+
+    function el(tag, attrs, txt) {
+      var n = document.createElementNS(SVGNS, tag);
+      for (var k in attrs) { if (attrs.hasOwnProperty(k)) { n.setAttribute(k, attrs[k]); } }
+      if (txt !== undefined) { n.textContent = txt; }
+      return n;
+    }
+    function clear(s) { while (s.firstChild) { s.removeChild(s.firstChild); } }
+    function L(s, x1, y1, x2, y2, col, w, dash) {
+      var a = { x1: x1, y1: y1, x2: x2, y2: y2, stroke: col, 'stroke-width': w || 1.5,
+                'stroke-linecap': 'round' };
+      if (dash) { a['stroke-dasharray'] = dash; }
+      s.appendChild(el('line', a));
+    }
+    function T(s, x, y, t, cls, anchor, size) {
+      var a = { x: x, y: y, class: cls || 'lbl' };
+      if (anchor) { a['text-anchor'] = anchor; }
+      if (size) { a['font-size'] = size; }
+      s.appendChild(el('text', a, t));
+    }
+    function C(s, cx, cy, r, fill, stroke, w) {
+      s.appendChild(el('circle', { cx: cx, cy: cy, r: r, fill: fill || 'none',
+        stroke: stroke || 'none', 'stroke-width': w || 1.5 }));
+    }
+    function P(s, d, stroke, w, fill, dash) {
+      if (!d) { return; }
+      var a = { d: d, fill: fill || 'none', stroke: stroke || 'none', 'stroke-width': w || 1.5,
+                'stroke-linejoin': 'round' };
+      if (dash) { a['stroke-dasharray'] = dash; }
+      s.appendChild(el('path', a));
+    }
+    function R(s, x, y, w, h, fill, stroke, sw, rx) {
+      s.appendChild(el('rect', { x: x, y: y, width: w, height: h, fill: fill || 'none',
+        stroke: stroke || 'none', 'stroke-width': sw === undefined ? 1.2 : sw,
+        rx: rx === undefined ? 4 : rx }));
+    }
+    function num(v, d) { return v.toFixed(d === undefined ? 2 : d).replace('.', ','); }
+    function grp(v) {
+      var s = String(Math.round(v)), out = '', c = 0;
+      for (var k = s.length - 1; k >= 0; k--) {
+        out = s.charAt(k) + out;
+        c++;
+        if (c % 3 === 0 && k > 0) { out = ' ' + out; }
+      }
+      return out;
+    }
+    function css(name, fb) {
+      var v = getComputedStyle(document.documentElement).getPropertyValue(name);
+      return (v && v.trim()) ? v.trim() : fb;
+    }
+    var COL = {};
+    function colori() {
+      COL.ax = css('--border', '#888');
+      COL.tx = css('--text', '#222');
+      COL.mu = css('--muted', '#777');
+      COL.ac = css('--accent', '#2563eb');
+      COL.mg = css('--magenta', '#c026d3');
+      COL.gd = css('--gold', '#d97706');
+      COL.gr = '#16a34a';
+      COL.rd = '#dc2626';
+      COL.s2 = css('--surface-2', '#f4f4f5');
+      COL.sf = css('--surface', '#fff');
+    }
+    colori();
+
+    var DISEGNI = [];
+    function avvia(draw, target) {
+      function protetto() {
+        try {
+          draw();
+        } catch (err) {
+          var msg = String(err && err.message ? err.message : err);
+          if (target.getContext) {
+            var g = target.getContext('2d');
+            g.setTransform(1, 0, 0, 1, 0, 0);
+            g.clearRect(0, 0, target.width, target.height);
+            g.fillStyle = COL.tx;
+            g.font = '15px Inter, sans-serif';
+            g.fillText('Simulazione non disponibile', 20, 40);
+            g.font = '12px Inter, sans-serif';
+            g.fillText(msg, 20, 66);
+            g.fillText('Segnalatelo al professore indicando questo messaggio.', 20, 88);
+          } else {
+            clear(target);
+            T(target, 20, 40, 'Simulazione non disponibile', 'em', 'start', 15);
+            T(target, 20, 66, msg, 'lbl-s');
+            T(target, 20, 88, 'Segnalatelo al professore indicando questo messaggio.', 'lbl-s');
+          }
+        }
+      }
+      DISEGNI.push(protetto);
+      protetto();
+      return protetto;
+    }
+    document.addEventListener('themechange', function () {
+      colori();
+      for (var i = 0; i < DISEGNI.length; i++) { DISEGNI[i](); }
+    });
+
+    function activate(box, btn) {
+      var b = box.querySelectorAll('button');
+      for (var i = 0; i < b.length; i++) { b[i].classList.remove('active'); }
+      if (btn) { btn.classList.add('active'); }
+    }
+    function grab(id) { return document.getElementById(id); }
+
+    function piano(svg, x0, y0, w, h, xmin, xmax, ymin, ymax) {
+      R(svg, x0, y0, w, h, COL.s2, COL.ax);
+      return { X: function (v) { return x0 + (v - xmin) / (xmax - xmin) * w; },
+               Y: function (v) { return y0 + h - (v - ymin) / (ymax - ymin) * h; },
+               x0: x0, y0: y0, w: w, h: h, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax };
+    }
+    /* generatore pseudocasuale riproducibile, lo stesso di tutte le altre lezioni */
+    function prng(seme) {
+      var s = seme;
+      return function () { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    }
+    /* regressione lineare ai minimi quadrati: restituisce pendenza e intercetta */
+    function retta(xs, ys) {
+      var n = xs.length, sx = 0, sy = 0, sxx = 0, sxy = 0, i;
+      for (i = 0; i < n; i++) { sx += xs[i]; sy += ys[i]; sxx += xs[i] * xs[i]; sxy += xs[i] * ys[i]; }
+      var m = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+      return { m: m, q: (sy - m * sx) / n };
+    }
+
+    /* ==================================================================
+       1 — LA FUNZIONE DI WEIERSTRASS
+       ================================================================== */
+    (function () {
+      var svg = grab('we-svg'); if (!svg) { return; }
+      var sn = grab('we-n'), sz = grab('we-z'), sa = grab('we-a'), cap = grab('we-cap');
+      var vista = 'somma';
+      var BW = 13;
+
+      function W(x, a, N) {
+        var s = 0, i;
+        for (i = 0; i < N; i++) { s += Math.pow(a, i) * Math.cos(Math.pow(BW, i) * Math.PI * x); }
+        return s;
+      }
+
+      function draw() {
+        var N = +sn.value, z = +sz.value, a = +sa.value;
+        grab('we-nv').textContent = N;
+        grab('we-zv').textContent = grp(Math.pow(2, z)) + '×';
+        grab('we-av').textContent = num(a, 2);
+        clear(svg);
+        var ab = a * BW, soglia = 1 + 1.5 * Math.PI;
+
+        if (vista === 'somma') {
+          var amp = 1 / (1 - a);
+          var pl = piano(svg, 55, 46, 570, 250, -1, 1, -amp * 1.05, amp * 1.05);
+          var k, i, d;
+          for (k = 1; k <= N; k++) {
+            d = '';
+            for (i = 0; i <= 1400; i++) {
+              var x = -1 + 2 * i / 1400;
+              d += (i ? 'L' : 'M') + pl.X(x).toFixed(2) + ' ' + pl.Y(W(x, a, k)).toFixed(2);
+            }
+            P(svg, d, k === N ? COL.mg : COL.ac, k === N ? 2 : 0.9, 'none',
+              k === N ? null : '3 3');
+          }
+          L(svg, pl.x0, pl.Y(0), pl.x0 + pl.w, pl.Y(0), COL.ax, 1, '3 4');
+          T(svg, 340, 38, 'somme parziali fino a ' + N + ' termini (b = 13)', 'lbl', 'middle');
+          T(svg, 55, 312, 'x', 'lbl-s');
+          T(svg, 55, 338, 'la curva finale (in colore pieno) e’ continua: le ampiezze ' +
+            'a^n vanno a zero', 'lbl-s');
+          T(svg, 55, 360, 'ma ogni nuovo termine aggiunge dentellature piu’ fitte, e ' +
+            'non si ferma mai', 'lbl-s');
+          T(svg, 55, 386, 'ampiezza del termine ' + N + ': ' +
+            num(Math.pow(a, N - 1), 5) + '   —   frequenza: ' +
+            grp(Math.pow(BW, N - 1)) + '×', 'em');
+          cap.textContent = 'Con ' + N + ' termini l’ultima armonica ha ampiezza ' +
+            num(Math.pow(a, N - 1), 5) + ' ma frequenza ' + grp(Math.pow(BW, N - 1)) +
+            ': invisibile, e decisiva.';
+          return;
+        }
+
+        if (vista === 'zoom') {
+          var larg = 1 / Math.pow(2, z), x0c = 0.15;
+          var amp2 = 0;
+          var i2, xv, yv, campioni = [];
+          for (i2 = 0; i2 <= 1600; i2++) {
+            xv = x0c - larg + 2 * larg * i2 / 1600;
+            yv = W(xv, a, 22);
+            campioni.push(yv);
+            if (Math.abs(yv) > amp2) { amp2 = Math.abs(yv); }
+          }
+          var lo = Math.min.apply(null, campioni), hi = Math.max.apply(null, campioni);
+          var mar = (hi - lo) * 0.12 + 1e-9;
+          var pl2 = piano(svg, 55, 46, 570, 250, x0c - larg, x0c + larg, lo - mar, hi + mar);
+          var d2 = '';
+          for (i2 = 0; i2 <= 1600; i2++) {
+            xv = x0c - larg + 2 * larg * i2 / 1600;
+            d2 += (i2 ? 'L' : 'M') + pl2.X(xv).toFixed(2) + ' ' + pl2.Y(campioni[i2]).toFixed(2);
+          }
+          P(svg, d2, COL.mg, 1.8);
+          T(svg, 340, 38, 'ingrandimento ' + grp(Math.pow(2, z)) + '× attorno a x = 0,15',
+            'lbl', 'middle');
+          T(svg, 55, 312, 'larghezza della finestra: ' + larg.toExponential(2).replace('.', ','),
+            'lbl-s');
+          var esc = (hi - lo);
+          T(svg, 55, 338, 'escursione verticale nella finestra: ' + num(esc, 5), 'lbl-s');
+          T(svg, 55, 364, ab > soglia
+            ? 'per quanto si ingrandisca la curva resta seghettata: nessuna tangente, mai'
+            : 'con questo valore di a la curva si raddrizza: ab = ' + num(ab, 2) +
+              ' e’ sotto la soglia', ab > soglia ? 'lbl-s' : 'em');
+          T(svg, 55, 390, 'a·b = ' + num(ab, 3) + '   soglia 1 + 3π/2 = ' +
+            num(soglia, 3) + '   →   ' + (ab > soglia ? 'MOSTRO' : 'curva liscia'), 'em');
+          cap.textContent = 'Ingrandendo ' + grp(Math.pow(2, z)) + ' volte, la curva ' +
+            (ab > soglia ? 'e’ seghettata esattamente come prima.'
+                         : 'si raddrizza: la condizione di Weierstrass non e’ soddisfatta.');
+          return;
+        }
+
+        /* pendenza */
+        var pl3 = piano(svg, 70, 50, 400, 240, 0, 13, -3, 12);
+        var k2, dp = '', da = '';
+        for (k2 = 0; k2 <= 13; k2++) {
+          var lp = Math.log(Math.pow(ab, k2) * Math.PI) / Math.log(10);
+          var la = Math.log(Math.pow(a, k2)) / Math.log(10);
+          dp += (k2 ? 'L' : 'M') + pl3.X(k2).toFixed(1) + ' ' +
+                pl3.Y(Math.max(Math.min(lp, 12), -3)).toFixed(1);
+          da += (k2 ? 'L' : 'M') + pl3.X(k2).toFixed(1) + ' ' +
+                pl3.Y(Math.max(Math.min(la, 12), -3)).toFixed(1);
+        }
+        P(svg, dp, COL.rd, 2.6);
+        P(svg, da, COL.ac, 2.6);
+        L(svg, pl3.x0, pl3.Y(0), pl3.x0 + pl3.w, pl3.Y(0), COL.ax, 1.2, '4 4');
+        for (k2 = -2; k2 <= 12; k2 += 2) {
+          T(svg, pl3.x0 - 6, pl3.Y(k2) + 4, '10^' + k2, 'lbl-s', 'end');
+        }
+        for (k2 = 0; k2 <= 12; k2 += 3) {
+          T(svg, pl3.X(k2), pl3.y0 + pl3.h + 16, String(k2), 'lbl-s', 'middle');
+        }
+        T(svg, 270, 42, 'ampiezza (blu) e pendenza massima (rossa)', 'lbl', 'middle');
+        T(svg, 70, 312, 'indice n dell’armonica', 'lbl-s');
+        R(svg, 490, 62, 158, 208, COL.s2, COL.ax);
+        T(svg, 506, 90, 'a', 'lbl-s');
+        T(svg, 632, 90, num(a, 2), 'lbl', 'end');
+        T(svg, 506, 118, 'b', 'lbl-s');
+        T(svg, 632, 118, String(BW), 'lbl', 'end');
+        T(svg, 506, 146, 'a·b', 'lbl-s');
+        T(svg, 632, 146, num(ab, 3), 'em', 'end');
+        T(svg, 506, 174, 'soglia', 'lbl-s');
+        T(svg, 632, 174, num(soglia, 3), 'lbl', 'end');
+        T(svg, 506, 208, ab > soglia ? 'ab > soglia:' : 'ab < soglia:', 'lbl-s');
+        T(svg, 506, 226, ab > soglia ? 'derivata assente' : 'curva derivabile', 'em');
+        T(svg, 506, 252, ab > 1 ? 'le pendenze esplodono' : 'le pendenze svaniscono', 'lbl-s');
+        T(svg, 70, 344,
+          'le ampiezze scendono (blu) ma le pendenze salgono (rossa): ' +
+          'e’ questo il conflitto', 'lbl-s');
+        T(svg, 70, 370,
+          'che rende la funzione continua e priva di derivata in ogni singolo punto.', 'lbl-s');
+        cap.textContent = 'Con a = ' + num(a, 2) + ' si ha a·b = ' + num(ab, 2) +
+          (ab > soglia ? ' > 5,712: la funzione non e’ deribabile in nessun punto.'
+                       : ' < 5,712: la condizione di Weierstrass non vale.');
+      }
+      [sn, sz, sa].forEach(function (s) { s.addEventListener('input', draw); });
+      var bts = grab('we-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       generatori di frattali, condivisi fra i widget
+       ================================================================== */
+    /* curva di Koch: sostituzione ripetuta di ogni segmento con quattro */
+    function kochPunti(ax, ay, bx, by, k) {
+      var pts = [[ax, ay], [bx, by]], i, j, nuovi;
+      for (i = 0; i < k; i++) {
+        nuovi = [pts[0]];
+        for (j = 0; j < pts.length - 1; j++) {
+          var x1 = pts[j][0], y1 = pts[j][1], x2 = pts[j + 1][0], y2 = pts[j + 1][1];
+          var dx = (x2 - x1) / 3, dy = (y2 - y1) / 3;
+          var px = x1 + dx, py = y1 + dy;
+          var qx = x1 + 2 * dx, qy = y1 + 2 * dy;
+          /* la punta: rotazione di -60 gradi del vettore (dx, dy) attorno a p */
+          var cs = 0.5, sn2 = Math.sqrt(3) / 2;
+          var mx = px + dx * cs + dy * sn2;
+          var my = py - dx * sn2 + dy * cs;
+          nuovi.push([px, py], [mx, my], [qx, qy], [x2, y2]);
+        }
+        pts = nuovi;
+      }
+      return pts;
+    }
+    /* triangolo di Sierpinski: elenco dei triangoli pieni al passo k */
+    function sierTri(ax, ay, bx, by, cx, cy, k) {
+      if (k === 0) { return [[ax, ay, bx, by, cx, cy]]; }
+      var abx = (ax + bx) / 2, aby = (ay + by) / 2;
+      var bcx = (bx + cx) / 2, bcy = (by + cy) / 2;
+      var cax = (cx + ax) / 2, cay = (cy + ay) / 2;
+      return sierTri(ax, ay, abx, aby, cax, cay, k - 1)
+        .concat(sierTri(abx, aby, bx, by, bcx, bcy, k - 1))
+        .concat(sierTri(cax, cay, bcx, bcy, cx, cy, k - 1));
+    }
+    /* insieme di Cantor: intervalli superstiti al passo k */
+    function cantorInt(k) {
+      var iv = [[0, 1]], i, j, out;
+      for (i = 0; i < k; i++) {
+        out = [];
+        for (j = 0; j < iv.length; j++) {
+          var a = iv[j][0], b = iv[j][1], t = (b - a) / 3;
+          out.push([a, a + t], [b - t, b]);
+        }
+        iv = out;
+      }
+      return iv;
+    }
+    /* curva del drago: sequenza di svolte dalla regola di ripiegamento */
+    function dragoPunti(k) {
+      var svolte = [], i, j;
+      for (i = 0; i < k; i++) {
+        var nuove = svolte.slice();
+        nuove.push(1);
+        for (j = svolte.length - 1; j >= 0; j--) { nuove.push(-svolte[j]); }
+        svolte = nuove;
+      }
+      var x = 0, y = 0, dir = 0, pts = [[0, 0]];
+      var dxs = [1, 0, -1, 0], dys = [0, -1, 0, 1];
+      for (i = 0; i <= svolte.length; i++) {
+        x += dxs[dir];
+        y += dys[dir];
+        pts.push([x, y]);
+        if (i < svolte.length) { dir = (dir + (svolte[i] > 0 ? 1 : 3)) % 4; }
+      }
+      return pts;
+    }
+    /* albero ricorsivo: elenco dei rami */
+    function alberoRami(x, y, ang, len, k, ramo) {
+      ramo = ramo || [];
+      if (k === 0 || len < 0.6) { return ramo; }
+      var x2 = x + len * Math.cos(ang), y2 = y + len * Math.sin(ang);
+      ramo.push([x, y, x2, y2, k]);
+      alberoRami(x2, y2, ang - 0.42, len * 0.72, k - 1, ramo);
+      alberoRami(x2, y2, ang + 0.42, len * 0.72, k - 1, ramo);
+      return ramo;
+    }
+
+    /* ==================================================================
+       2 — I SISTEMI DI FUNZIONI ITERATE
+       ================================================================== */
+    (function () {
+      var svg = grab('if-svg'); if (!svg) { return; }
+      var sk = grab('if-k'), cp = grab('if-p'), cap = grab('if-cap');
+      var vista = 'koch';
+      var MAXK = { koch: 6, sier: 7, cant: 7, drago: 13, albero: 11 };
+      var INFO = {
+        koch: ['fiocco di Koch', 4, 3],
+        sier: ['triangolo di Sierpiński', 3, 2],
+        cant: ['insieme di Cantor', 2, 3],
+        drago: ['curva del drago', 2, Math.SQRT2],
+        albero: ['albero binario', 2, 1 / 0.72]
+      };
+
+      function draw() {
+        var k = Math.min(+sk.value, MAXK[vista]);
+        grab('if-kv').textContent = k;
+        clear(svg);
+        var info = INFO[vista], D = Math.log(info[1]) / Math.log(info[2]);
+        var prec = cp.checked;
+        var i, j;
+
+        if (vista === 'koch') {
+          var cx = 340, cy = 235, rr = 130;
+          for (var pass = (prec ? 0 : k); pass <= k; pass++) {
+            var d = '';
+            for (var lato = 0; lato < 3; lato++) {
+              var a1 = -Math.PI / 2 + lato * 2 * Math.PI / 3;
+              var a2 = -Math.PI / 2 + (lato + 1) * 2 * Math.PI / 3;
+              var pts = kochPunti(cx + rr * Math.cos(a1), cy + rr * Math.sin(a1),
+                                  cx + rr * Math.cos(a2), cy + rr * Math.sin(a2), pass);
+              for (i = 0; i < pts.length; i++) {
+                d += (d ? 'L' : 'M') + pts[i][0].toFixed(2) + ' ' + pts[i][1].toFixed(2);
+              }
+            }
+            d += 'Z';
+            P(svg, d, pass === k ? COL.ac : COL.mu, pass === k ? 1.8 : 0.6, 'none',
+              pass === k ? null : '2 3');
+          }
+          T(svg, 40, 30, 'fiocco di Koch, iterazione ' + k, 'lbl');
+          T(svg, 40, 372, 'segmenti: ' + grp(3 * Math.pow(4, k)) +
+            '   —   perimetro: ' + num(3 * Math.pow(4 / 3, k), 3) +
+            ' volte quello iniziale', 'lbl-s');
+        } else if (vista === 'sier') {
+          var tri = sierTri(340, 62, 545, 330, 135, 330, k);
+          for (i = 0; i < tri.length; i++) {
+            var t = tri[i];
+            P(svg, 'M' + t[0] + ' ' + t[1] + 'L' + t[2] + ' ' + t[3] + 'L' + t[4] + ' ' +
+              t[5] + 'Z', COL.ac, 0.5,
+              'color-mix(in srgb, ' + COL.ac + ' 55%, transparent)');
+          }
+          T(svg, 40, 30, 'triangolo di Sierpiński, iterazione ' + k, 'lbl');
+          T(svg, 40, 372, 'triangoli pieni: ' + grp(Math.pow(3, k)) +
+            '   —   area residua: ' + num(Math.pow(0.75, k) * 100, 2) +
+            '% di quella iniziale', 'lbl-s');
+        } else if (vista === 'cant') {
+          var x0 = 55, ww = 570;
+          for (var p2 = 0; p2 <= k; p2++) {
+            if (!prec && p2 < k) { continue; }
+            var iv = cantorInt(p2), yy = 60 + p2 * 38;
+            for (j = 0; j < iv.length; j++) {
+              R(svg, x0 + iv[j][0] * ww, yy, Math.max((iv[j][1] - iv[j][0]) * ww, 0.7), 16,
+                p2 === k ? COL.ac : 'color-mix(in srgb, ' + COL.mu + ' 45%, transparent)',
+                'none', 0, 1);
+            }
+            T(svg, 40, yy + 12, String(p2), 'lbl-s', 'end');
+          }
+          T(svg, 40, 30, 'insieme di Cantor, iterazione ' + k, 'lbl');
+          T(svg, 40, 372, 'intervalli: ' + grp(Math.pow(2, k)) +
+            '   —   lunghezza totale: ' + num(Math.pow(2 / 3, k), 5) +
+            '   —   tende a zero', 'lbl-s');
+        } else if (vista === 'drago') {
+          var pts2 = dragoPunti(Math.min(k + 4, 15));
+          var mnx = 1e9, mxx = -1e9, mny = 1e9, mxy = -1e9;
+          for (i = 0; i < pts2.length; i++) {
+            if (pts2[i][0] < mnx) { mnx = pts2[i][0]; }
+            if (pts2[i][0] > mxx) { mxx = pts2[i][0]; }
+            if (pts2[i][1] < mny) { mny = pts2[i][1]; }
+            if (pts2[i][1] > mxy) { mxy = pts2[i][1]; }
+          }
+          var sc = Math.min(540 / Math.max(mxx - mnx, 1), 260 / Math.max(mxy - mny, 1));
+          var ox = 340 - (mnx + mxx) / 2 * sc, oy = 200 - (mny + mxy) / 2 * sc;
+          var d3 = '';
+          for (i = 0; i < pts2.length; i++) {
+            d3 += (i ? 'L' : 'M') + (ox + pts2[i][0] * sc).toFixed(2) + ' ' +
+                  (oy + pts2[i][1] * sc).toFixed(2);
+          }
+          P(svg, d3, COL.mg, 1.4);
+          T(svg, 40, 30, 'curva del drago, iterazione ' + Math.min(k + 4, 15), 'lbl');
+          T(svg, 40, 372, 'segmenti: ' + grp(pts2.length - 1) +
+            '   —   la curva non si autointerseca mai, e riempie un’area', 'lbl-s');
+        } else {
+          var rami = alberoRami(340, 340, -Math.PI / 2, 78, Math.min(k + 2, 12));
+          for (i = 0; i < rami.length; i++) {
+            var rm = rami[i];
+            L(svg, rm[0], rm[1], rm[2], rm[3],
+              rm[4] > 6 ? COL.gd : COL.gr, Math.max(0.5, rm[4] * 0.55));
+          }
+          T(svg, 40, 30, 'albero binario, ' + Math.min(k + 2, 12) + ' livelli', 'lbl');
+          T(svg, 40, 372, 'rami: ' + grp(rami.length) +
+            '   —   ogni ramo e’ lungo il 72% del precedente e ruotato di 24°',
+            'lbl-s');
+        }
+
+        R(svg, 470, 40, 172, 96, COL.s2, COL.ax);
+        T(svg, 486, 66, 'copie N', 'lbl-s');
+        T(svg, 626, 66, num(info[1], 0), 'lbl', 'end');
+        T(svg, 486, 92, 'riduzione 1/r', 'lbl-s');
+        T(svg, 626, 92, num(info[2], 3), 'lbl', 'end');
+        T(svg, 486, 120, 'dimensione D', 'lbl-s');
+        T(svg, 626, 120, num(D, 4), 'em', 'end');
+
+        cap.textContent = info[0] + ': ' + info[1] + ' copie ridotte di 1/' +
+          num(info[2], 3) + ', quindi D = log ' + num(info[1], 0) + ' / log ' +
+          num(info[2], 3) + ' = ' + num(D, 4) + '.';
+      }
+      sk.addEventListener('input', draw);
+      cp.addEventListener('change', draw);
+      var bts = grab('if-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       3 — IL CONTEGGIO DELLE SCATOLE
+       ================================================================== */
+    (function () {
+      var svg = grab('dm-svg'); if (!svg) { return; }
+      var sf = grab('dm-f'), se = grab('dm-e'), cap = grab('dm-cap');
+      var vista = 'griglia';
+      var TEO = { koch: Math.log(4) / Math.log(3), sier: Math.log(3) / Math.log(2),
+                  cant: Math.log(2) / Math.log(3), seg: 1, qua: 2 };
+      var NOMI = { koch: 'curva di Koch', sier: 'triangolo di Sierpiński',
+                   cant: 'insieme di Cantor', seg: 'segmento', qua: 'quadrato pieno' };
+
+      /* la figura come nuvola di punti nel quadrato unitario */
+      function punti(fig) {
+        var out = [], i, j;
+        if (fig === 'koch') {
+          var pts = kochPunti(0.02, 0.62, 0.98, 0.62, 6);
+          for (i = 0; i < pts.length - 1; i++) {
+            for (j = 0; j < 4; j++) {
+              out.push([pts[i][0] + (pts[i + 1][0] - pts[i][0]) * j / 4,
+                        pts[i][1] + (pts[i + 1][1] - pts[i][1]) * j / 4]);
+            }
+          }
+        } else if (fig === 'sier') {
+          var tri = sierTri(0.5, 0.03, 0.97, 0.95, 0.03, 0.95, 7);
+          for (i = 0; i < tri.length; i++) {
+            var t = tri[i];
+            out.push([(t[0] + t[2] + t[4]) / 3, (t[1] + t[3] + t[5]) / 3]);
+            out.push([(t[0] + t[2]) / 2, (t[1] + t[3]) / 2]);
+            out.push([(t[2] + t[4]) / 2, (t[3] + t[5]) / 2]);
+            out.push([(t[4] + t[0]) / 2, (t[5] + t[1]) / 2]);
+          }
+        } else if (fig === 'cant') {
+          var iv = cantorInt(7);
+          for (i = 0; i < iv.length; i++) {
+            for (j = 0; j <= 3; j++) {
+              out.push([iv[i][0] + (iv[i][1] - iv[i][0]) * j / 3, 0.5]);
+            }
+          }
+        } else if (fig === 'seg') {
+          for (i = 0; i <= 3000; i++) { out.push([0.02 + 0.96 * i / 3000, 0.5]); }
+        } else {
+          for (i = 0; i <= 220; i++) {
+            for (j = 0; j <= 220; j++) {
+              out.push([0.05 + 0.9 * i / 220, 0.05 + 0.9 * j / 220]);
+            }
+          }
+        }
+        return out;
+      }
+
+      function conta(pts, m) {
+        var visti = {}, n = 0, i, gx, gy, ch;
+        for (i = 0; i < pts.length; i++) {
+          gx = Math.floor(pts[i][0] * m);
+          gy = Math.floor(pts[i][1] * m);
+          if (gx < 0) { gx = 0; } if (gx >= m) { gx = m - 1; }
+          if (gy < 0) { gy = 0; } if (gy >= m) { gy = m - 1; }
+          ch = gx + ',' + gy;
+          if (!visti[ch]) { visti[ch] = 1; n++; }
+        }
+        return { n: n, celle: visti };
+      }
+
+      function draw() {
+        var fig = sf.value, e = +se.value, m = Math.pow(2, e);
+        grab('dm-ev').textContent = '1/' + m;
+        clear(svg);
+        var pts = punti(fig);
+
+        if (vista === 'griglia') {
+          var x0 = 60, y0 = 46, S = 300;
+          var res = conta(pts, m);
+          for (var gx = 0; gx < m; gx++) {
+            for (var gy = 0; gy < m; gy++) {
+              if (res.celle[gx + ',' + gy]) {
+                R(svg, x0 + gx * S / m, y0 + gy * S / m, S / m, S / m,
+                  'color-mix(in srgb, ' + COL.mg + ' 30%, transparent)', 'none', 0, 0);
+              }
+            }
+          }
+          if (m <= 64) {
+            for (var g = 0; g <= m; g++) {
+              L(svg, x0 + g * S / m, y0, x0 + g * S / m, y0 + S, COL.ax, 0.35);
+              L(svg, x0, y0 + g * S / m, x0 + S, y0 + g * S / m, COL.ax, 0.35);
+            }
+          }
+          var dd = '';
+          for (var i = 0; i < pts.length; i += (fig === 'qua' ? 37 : 1)) {
+            dd += 'M' + (x0 + pts[i][0] * S).toFixed(1) + ' ' +
+                  (y0 + pts[i][1] * S).toFixed(1) + 'h0.6';
+          }
+          P(svg, dd, COL.ac, fig === 'qua' ? 1.6 : 1.1);
+          R(svg, x0, y0, S, S, 'none', COL.ax, 1.4);
+          T(svg, 40, 30, NOMI[fig] + ' su una griglia ' + m + '×' + m, 'lbl');
+          var Dst = Math.log(res.n) / Math.log(m);
+          R(svg, 400, 60, 240, 226, COL.s2, COL.ax);
+          T(svg, 418, 90, 'lato della griglia ε', 'lbl-s');
+          T(svg, 624, 90, '1/' + m, 'lbl', 'end');
+          T(svg, 418, 118, 'caselle totali', 'lbl-s');
+          T(svg, 624, 118, grp(m * m), 'lbl', 'end');
+          T(svg, 418, 146, 'caselle toccate N(ε)', 'lbl-s');
+          T(svg, 624, 146, grp(res.n), 'em', 'end');
+          T(svg, 418, 174, 'log N / log(1/ε)', 'lbl-s');
+          T(svg, 624, 174, num(Dst, 4), 'em', 'end');
+          T(svg, 418, 202, 'dimensione teorica', 'lbl-s');
+          T(svg, 624, 202, num(TEO[fig], 4), 'lbl', 'end');
+          T(svg, 418, 236, 'una griglia sola da’ una stima', 'lbl-s');
+          T(svg, 418, 254, 'grezza: servono piu’ scale', 'lbl-s');
+          T(svg, 418, 272, '(seconda vista)', 'lbl-s');
+          T(svg, 60, 372, 'la figura e’ campionata con ' + grp(pts.length) +
+            ' punti, e le caselle sono contate una per una', 'lbl-s');
+          cap.textContent = 'Con una griglia ' + m + '×' + m + ' la figura tocca ' +
+            res.n + ' caselle su ' + (m * m) + '.';
+          return;
+        }
+
+        if (vista === 'loglog') {
+          var xs = [], ys = [], k;
+          for (k = 1; k <= 7; k++) {
+            var mm = Math.pow(2, k);
+            xs.push(Math.log(mm));
+            ys.push(Math.log(conta(pts, mm).n));
+          }
+          var fit = retta(xs, ys);
+          var pl = piano(svg, 68, 50, 380, 240, 0, 5.2, 0, 11);
+          var dl = '', i2;
+          for (i2 = 0; i2 < xs.length; i2++) {
+            C(svg, pl.X(xs[i2]), pl.Y(ys[i2]), 4.5, COL.mg, COL.sf, 1.6);
+          }
+          dl = 'M' + pl.X(0) + ' ' + pl.Y(fit.q) + 'L' + pl.X(5.2) + ' ' +
+               pl.Y(fit.q + fit.m * 5.2);
+          P(svg, dl, COL.ac, 2, 'none', '5 4');
+          for (i2 = 0; i2 <= 5; i2++) {
+            T(svg, pl.x0 - 6, pl.Y(i2 * 2) + 4, String(i2 * 2), 'lbl-s', 'end');
+            T(svg, pl.X(i2), pl.y0 + pl.h + 16, String(i2), 'lbl-s', 'middle');
+          }
+          T(svg, 258, 44, 'log N(ε) in funzione di log(1/ε)', 'lbl', 'middle');
+          T(svg, 68, 308, 'log(1/ε)', 'lbl-s');
+          R(svg, 470, 62, 172, 208, COL.s2, COL.ax);
+          T(svg, 487, 90, 'pendenza misurata', 'lbl-s');
+          T(svg, 628, 90, num(fit.m, 4), 'em', 'end');
+          T(svg, 487, 118, 'dimensione teorica', 'lbl-s');
+          T(svg, 628, 118, num(TEO[fig], 4), 'lbl', 'end');
+          T(svg, 487, 146, 'scarto', 'lbl-s');
+          T(svg, 628, 146, num(Math.abs(fit.m - TEO[fig]), 4), 'lbl', 'end');
+          T(svg, 487, 174, 'punti usati', 'lbl-s');
+          T(svg, 628, 174, '7 griglie', 'lbl', 'end');
+          T(svg, 487, 208, 'la pendenza della retta', 'lbl-s');
+          T(svg, 487, 226, 'E’ la dimensione:', 'lbl-s');
+          T(svg, 487, 244, 'niente di piu’', 'lbl-s');
+          T(svg, 68, 340,
+            'i punti stanno su una retta perche’ N(ε) segue una legge di potenza;',
+            'lbl-s');
+          T(svg, 68, 362,
+            'lo scarto residuo viene dal numero finito di iterazioni della figura.', 'lbl-s');
+          cap.textContent = 'La pendenza misurata vale ' + num(fit.m, 4) +
+            ', contro il valore teorico ' + num(TEO[fig], 4) + '.';
+          return;
+        }
+
+        /* tabella */
+        var RIGHE = [
+          ['insieme di Cantor', '2', '3', Math.log(2) / Math.log(3)],
+          ['curva di Koch', '4', '3', Math.log(4) / Math.log(3)],
+          ['triangolo di Sierpiński', '3', '2', Math.log(3) / Math.log(2)],
+          ['tappeto di Sierpiński', '8', '3', Math.log(8) / Math.log(3)],
+          ['curva di Peano', '9', '3', Math.log(9) / Math.log(3)],
+          ['spugna di Menger', '20', '3', Math.log(20) / Math.log(3)],
+          ['costa della Norvegia', '—', '—', 1.52],
+          ['costa della Gran Bretagna', '—', '—', 1.25],
+          ['costa del Sudafrica', '—', '—', 1.02]
+        ];
+        T(svg, 40, 30, 'le dimensioni a confronto', 'lbl');
+        var yh = 62, rh = 32;
+        T(svg, 60, yh, 'figura', 'lbl-s');
+        T(svg, 330, yh, 'N', 'lbl-s', 'end');
+        T(svg, 400, yh, '1/r', 'lbl-s', 'end');
+        T(svg, 500, yh, 'D', 'lbl-s', 'end');
+        T(svg, 630, yh, 'quanto riempie', 'lbl-s', 'end');
+        L(svg, 55, yh + 8, 635, yh + 8, COL.ax, 1);
+        for (var q = 0; q < RIGHE.length; q++) {
+          var yy2 = yh + 32 + q * rh, rg = RIGHE[q];
+          T(svg, 60, yy2, rg[0], 'lbl-s');
+          T(svg, 330, yy2, rg[1], 'lbl', 'end');
+          T(svg, 400, yy2, rg[2], 'lbl', 'end');
+          T(svg, 500, yy2, num(rg[3], 4), 'em', 'end');
+          var frac = (rg[3] - 1) / 2;
+          if (rg[3] < 1) { frac = rg[3] / 2; }
+          R(svg, 520, yy2 - 10, 110, 13, COL.s2, COL.ax, 0.8, 3);
+          R(svg, 520, yy2 - 10, 110 * Math.max(0, Math.min(1, rg[3] / 3)), 13,
+            'color-mix(in srgb, ' + COL.ac + ' 60%, transparent)', 'none', 0, 3);
+        }
+        T(svg, 55, yh + 32 + RIGHE.length * rh + 14,
+          'la barra mostra D su una scala da 0 a 3: punto, linea, superficie, solido', 'lbl-s');
+        cap.textContent = 'La dimensione ordina le figure per quanto riempiono lo spazio: ' +
+          'Cantor sta fra punto e linea, Koch e Sierpiński fra linea e superficie.';
+      }
+      sf.addEventListener('change', draw);
+      se.addEventListener('input', draw);
+      var bts = grab('dm-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       4 — IL FIOCCO DI KOCH: PERIMETRO E AREA
+       ================================================================== */
+    (function () {
+      var svg = grab('ko-svg'); if (!svg) { return; }
+      var sn = grab('ko-n'), cap = grab('ko-cap');
+      var vista = 'fiocco';
+
+      function perim(n) { return 3 * Math.pow(4 / 3, n); }
+      function area(n) {
+        /* A_n / A_0 = 1 + (3/9) * somma parziale della geometrica di ragione 4/9 */
+        var s = 0, k;
+        for (k = 1; k <= n; k++) { s += 3 * Math.pow(4, k - 1) / Math.pow(9, k); }
+        return 1 + s;
+      }
+
+      function draw() {
+        var n = +sn.value;
+        grab('ko-nv').textContent = n;
+        clear(svg);
+
+        if (vista === 'fiocco') {
+          var cx = 300, cy = 215, rr = 140;
+          var d = '', lato, i;
+          for (lato = 0; lato < 3; lato++) {
+            var a1 = -Math.PI / 2 + lato * 2 * Math.PI / 3;
+            var a2 = -Math.PI / 2 + (lato + 1) * 2 * Math.PI / 3;
+            var pts = kochPunti(cx + rr * Math.cos(a1), cy + rr * Math.sin(a1),
+                                cx + rr * Math.cos(a2), cy + rr * Math.sin(a2), n);
+            for (i = 0; i < pts.length; i++) {
+              d += (d ? 'L' : 'M') + pts[i][0].toFixed(2) + ' ' + pts[i][1].toFixed(2);
+            }
+          }
+          d += 'Z';
+          P(svg, d, COL.ac, 1.6, 'color-mix(in srgb, ' + COL.ac + ' 18%, transparent)');
+          T(svg, 40, 30, 'fiocco di Koch al passo ' + n, 'lbl');
+          R(svg, 470, 70, 175, 200, COL.s2, COL.ax);
+          T(svg, 487, 98, 'segmenti', 'lbl-s');
+          T(svg, 630, 98, grp(3 * Math.pow(4, n)), 'lbl', 'end');
+          T(svg, 487, 126, 'perimetro / P₀', 'lbl-s');
+          T(svg, 630, 126, num(Math.pow(4 / 3, n), 4), 'em', 'end');
+          T(svg, 487, 154, 'area / A₀', 'lbl-s');
+          T(svg, 630, 154, num(area(n), 4), 'em', 'end');
+          T(svg, 487, 182, 'area limite / A₀', 'lbl-s');
+          T(svg, 630, 182, num(8 / 5, 4), 'lbl', 'end');
+          T(svg, 487, 216, 'il perimetro cresce', 'lbl-s');
+          T(svg, 487, 234, 'senza limite, l’area', 'lbl-s');
+          T(svg, 487, 252, 'si ferma a 8/5', 'lbl-s');
+          T(svg, 40, 372, 'il contorno si allunga del 33% a ogni passo; l’area guadagna ' +
+            'sempre meno', 'lbl-s');
+          cap.textContent = 'Al passo ' + n + ' il perimetro vale ' +
+            num(Math.pow(4 / 3, n), 3) + ' volte quello iniziale e l’area ' +
+            num(area(n), 4) + ' volte, contro un limite di 1,6.';
+          return;
+        }
+
+        if (vista === 'graf') {
+          var pl = piano(svg, 68, 50, 400, 240, 0, 12, 0, 2);
+          var d1 = '', d2 = '', k;
+          for (k = 0; k <= 12; k++) {
+            var lp = Math.log(Math.pow(4 / 3, k)) / Math.log(10) / 1.6;
+            d1 += (k ? 'L' : 'M') + pl.X(k).toFixed(1) + ' ' + pl.Y(Math.min(lp, 2)).toFixed(1);
+            d2 += (k ? 'L' : 'M') + pl.X(k).toFixed(1) + ' ' + pl.Y(area(k)).toFixed(1);
+          }
+          P(svg, d1, COL.rd, 2.6);
+          P(svg, d2, COL.gr, 2.6);
+          L(svg, pl.x0, pl.Y(1.6), pl.x0 + pl.w, pl.Y(1.6), COL.gr, 1.4, '5 4');
+          T(svg, pl.x0 + 10, pl.Y(1.6) - 8, 'asintoto dell’area: 8/5', 'lbl-s');
+          for (k = 0; k <= 4; k++) {
+            T(svg, pl.x0 - 6, pl.Y(k / 2) + 4, num(k / 2, 1), 'lbl-s', 'end');
+            T(svg, pl.X(k * 3), pl.y0 + pl.h + 16, String(k * 3), 'lbl-s', 'middle');
+          }
+          T(svg, 268, 44, 'area (verde) e perimetro riscalato (rosso)', 'lbl', 'middle');
+          T(svg, 68, 308, 'iterazione n', 'lbl-s');
+          R(svg, 490, 66, 152, 190, COL.s2, COL.ax);
+          T(svg, 506, 94, 'perimetro', 'lbl-s');
+          T(svg, 506, 112, 'ragione 4/3 > 1', 'em', 'start', 11.5);
+          T(svg, 506, 130, 'diverge', 'lbl-s');
+          T(svg, 506, 166, 'area', 'lbl-s');
+          T(svg, 506, 184, 'ragione 4/9 < 1', 'em', 'start', 11.5);
+          T(svg, 506, 202, 'converge a 8/5', 'lbl-s');
+          T(svg, 506, 234, 'due geometriche,', 'lbl-s');
+          T(svg, 506, 252, 'destini opposti', 'lbl-s');
+          T(svg, 68, 340,
+            'il perimetro e’ disegnato in scala logaritmica compressa, ' +
+            'altrimenti uscirebbe', 'lbl-s');
+          T(svg, 68, 362, 'dal foglio gia’ alla sesta iterazione.', 'lbl-s');
+          cap.textContent = 'Perimetro e area sono due progressioni geometriche con ragioni ' +
+            'ai lati opposti di 1: la prima diverge, la seconda converge a 8/5.';
+          return;
+        }
+
+        /* tabella */
+        T(svg, 40, 30, 'i valori, iterazione per iterazione', 'lbl');
+        var yh = 62, rh = 30;
+        T(svg, 70, yh, 'n', 'lbl-s');
+        T(svg, 220, yh, 'segmenti', 'lbl-s', 'end');
+        T(svg, 350, yh, 'lato', 'lbl-s', 'end');
+        T(svg, 480, yh, 'perimetro / P₀', 'lbl-s', 'end');
+        T(svg, 630, yh, 'area / A₀', 'lbl-s', 'end');
+        L(svg, 60, yh + 8, 635, yh + 8, COL.ax, 1);
+        for (var q = 0; q <= 8; q++) {
+          var yy = yh + 30 + q * rh;
+          var evid = (q === n);
+          if (evid) {
+            R(svg, 58, yy - 16, 580, 22,
+              'color-mix(in srgb, ' + COL.ac + ' 16%, transparent)', COL.ac, 1, 3);
+          }
+          T(svg, 70, yy, String(q), evid ? 'em' : 'lbl');
+          T(svg, 220, yy, grp(3 * Math.pow(4, q)), 'lbl mono', 'end');
+          T(svg, 350, yy, '1/' + grp(Math.pow(3, q)), 'lbl mono', 'end');
+          T(svg, 480, yy, num(Math.pow(4 / 3, q), 4), evid ? 'em' : 'lbl', 'end');
+          T(svg, 630, yy, num(area(q), 5), evid ? 'em' : 'lbl', 'end');
+        }
+        T(svg, 60, yh + 30 + 9 * rh + 8, '∞', 'lbl');
+        T(svg, 480, yh + 30 + 9 * rh + 8, '+∞', 'em', 'end');
+        T(svg, 630, yh + 30 + 9 * rh + 8, '1,60000', 'em', 'end');
+        cap.textContent = 'La colonna del perimetro non si ferma; quella dell’area si ' +
+          'avvicina a 1,6 e ci resta.';
+      }
+      sn.addEventListener('input', draw);
+      var bts = grab('ko-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       5 — LA COSTA E IL COMPASSO
+       ================================================================== */
+    (function () {
+      var svg = grab('co-svg'); if (!svg) { return; }
+      var se = grab('co-e'), cap = grab('co-cap');
+      var vista = 'mappa';
+      var LKM = 640;    /* larghezza della mappa, in km */
+      /* le aperture sono le scale naturali della costruzione: 640/3, 640/9, ... */
+      var APERTURE = [];
+      (function () {
+        for (var k = 1; k <= 5; k++) { APERTURE.push(LKM / Math.pow(3, k)); }
+      }());
+
+      /* costa generata con una curva di Koch a orientamento casuale: ogni terzo
+         centrale diventa una punta rivolta a caso in su o in giu'. La dimensione
+         teorica resta log 4 / log 3 = 1,2619 */
+      function costa() {
+        var r = prng(31337);
+        var pts = [[0, 0.5], [1, 0.5]], liv, i, nuovi;
+        for (liv = 0; liv < 6; liv++) {
+          nuovi = [pts[0]];
+          for (i = 0; i < pts.length - 1; i++) {
+            var x1 = pts[i][0], y1 = pts[i][1];
+            var x2 = pts[i + 1][0], y2 = pts[i + 1][1];
+            var dx = (x2 - x1) / 3, dy = (y2 - y1) / 3;
+            var px = x1 + dx, py = y1 + dy;
+            var qx = x1 + 2 * dx, qy = y1 + 2 * dy;
+            var s = (r() < 0.5) ? 1 : -1;
+            var cs = 0.5, sn = Math.sqrt(3) / 2 * s;
+            var mx = px + dx * cs + dy * sn;
+            var my = py - dx * sn + dy * cs;
+            nuovi.push([px, py], [mx, my], [qx, qy], [x2, y2]);
+          }
+          pts = nuovi;
+        }
+        return pts;
+      }
+      var COSTA = null;
+
+      /* cammina lungo la costa con un compasso di apertura eps (in unita' di mappa) */
+      function passi(pts, eps) {
+        var n = 0, cx = pts[0][0], cy = pts[0][1], i = 0;
+        while (i < pts.length - 1) {
+          var j = i, tx = cx, ty = cy;
+          while (j < pts.length - 1) {
+            j++;
+            var dx = pts[j][0] - cx, dy = pts[j][1] - cy;
+            if (Math.sqrt(dx * dx + dy * dy) >= eps) { tx = pts[j][0]; ty = pts[j][1]; break; }
+          }
+          if (j >= pts.length - 1) { break; }
+          n++;
+          cx = tx; cy = ty; i = j;
+          if (n > 20000) { break; }
+        }
+        return n;
+      }
+
+      function draw() {
+        if (!COSTA) { COSTA = costa(); }
+        var ei = +se.value, epsKm = APERTURE[ei], eps = epsKm / LKM;
+        grab('co-ev').textContent = num(epsKm, 1) + ' km';
+        clear(svg);
+
+        if (vista === 'mappa') {
+          var x0 = 40, y0 = 60, W = 600, Hh = 200;
+          R(svg, x0, y0, W, Hh, COL.s2, COL.ax);
+          var d = '', i;
+          for (i = 0; i < COSTA.length; i++) {
+            d += (i ? 'L' : 'M') + (x0 + COSTA[i][0] * W).toFixed(2) + ' ' +
+                 (y0 + COSTA[i][1] * Hh).toFixed(2);
+          }
+          P(svg, d, COL.ac, 1.1);
+          /* il cammino del compasso */
+          var n = 0, cx = COSTA[0][0], cy = COSTA[0][1], j = 0, dd = 'M' +
+            (x0 + cx * W) + ' ' + (y0 + cy * Hh);
+          while (j < COSTA.length - 1 && n < 4000) {
+            var k = j, tx = cx, ty = cy, trovato = false;
+            while (k < COSTA.length - 1) {
+              k++;
+              var ddx = COSTA[k][0] - cx, ddy = COSTA[k][1] - cy;
+              if (Math.sqrt(ddx * ddx + ddy * ddy) >= eps) {
+                tx = COSTA[k][0]; ty = COSTA[k][1]; trovato = true; break;
+              }
+            }
+            if (!trovato) { break; }
+            n++;
+            cx = tx; cy = ty; j = k;
+            dd += 'L' + (x0 + cx * W).toFixed(2) + ' ' + (y0 + cy * Hh).toFixed(2);
+            if (n < 400) { C(svg, x0 + cx * W, y0 + cy * Hh, 2.4, COL.mg, 'none'); }
+          }
+          P(svg, dd, COL.mg, 1.6);
+          T(svg, 40, 30, 'la stessa costa misurata con un compasso di ' +
+            num(epsKm, 1) + ' km', 'lbl');
+          T(svg, 40, 48, 'in blu la costa vera, in magenta la spezzata del compasso', 'lbl-s');
+          var Lst = n * epsKm;
+          R(svg, 40, 286, 600, 92, COL.s2, COL.ax);
+          T(svg, 60, 314, 'passi del compasso', 'lbl-s');
+          T(svg, 620, 314, grp(n), 'em', 'end');
+          T(svg, 60, 342, 'lunghezza stimata della costa', 'lbl-s');
+          T(svg, 620, 342, grp(Lst) + ' km', 'em', 'end');
+          T(svg, 60, 366, 'la costa non cambia: cambia solo il righello', 'lbl-s');
+          cap.textContent = 'Con un compasso di ' + num(epsKm, 1) +
+            ' km servono ' + n + ' passi, e la costa risulta lunga ' + grp(Lst) + ' km.';
+          return;
+        }
+
+        if (vista === 'rich') {
+          var xs = [], ys = [], LL = [], i2;
+          for (i2 = 0; i2 < APERTURE.length; i2++) {
+            var e2 = APERTURE[i2] / LKM;
+            var nn = passi(COSTA, e2);
+            if (nn < 2) { continue; }
+            xs.push(Math.log(APERTURE[i2]));
+            ys.push(Math.log(nn * APERTURE[i2]));
+            LL.push([APERTURE[i2], nn, nn * APERTURE[i2]]);
+          }
+          var fit = retta(xs, ys);
+          var D = 1 - fit.m;
+          var pl = piano(svg, 70, 52, 390, 236,
+                         Math.log(1.5), Math.log(320), Math.min.apply(null, ys) - 0.25,
+                         Math.max.apply(null, ys) + 0.25);
+          for (i2 = 0; i2 < xs.length; i2++) {
+            C(svg, pl.X(xs[i2]), pl.Y(ys[i2]), 4.5, COL.mg, COL.sf, 1.6);
+          }
+          P(svg, 'M' + pl.X(pl.xmin) + ' ' + pl.Y(fit.q + fit.m * pl.xmin) +
+            'L' + pl.X(pl.xmax) + ' ' + pl.Y(fit.q + fit.m * pl.xmax), COL.ac, 2, 'none', '5 4');
+          for (i2 = 0; i2 < APERTURE.length; i2 += 1) {
+            T(svg, pl.X(Math.log(APERTURE[i2])), pl.y0 + pl.h + 16,
+              num(APERTURE[i2], 1), 'lbl-s', 'middle');
+          }
+          T(svg, 265, 46, 'lunghezza stimata in funzione del righello', 'lbl', 'middle');
+          T(svg, 70, 306, 'apertura del compasso (km, scala log)', 'lbl-s');
+          T(svg, 60, 74, 'log L', 'lbl-s');
+          R(svg, 482, 64, 162, 208, COL.s2, COL.ax);
+          T(svg, 498, 92, 'pendenza', 'lbl-s');
+          T(svg, 630, 92, num(fit.m, 4), 'em', 'end');
+          T(svg, 498, 120, 'D = 1 − pendenza', 'lbl-s');
+          T(svg, 630, 120, num(D, 4), 'em', 'end');
+          T(svg, 498, 148, 'L con 213 km', 'lbl-s');
+          T(svg, 630, 148, grp(LL[0][2]) + ' km', 'lbl', 'end');
+          T(svg, 498, 176, 'L con ' + num(LL[LL.length - 1][0], 1) + ' km', 'lbl-s');
+          T(svg, 630, 176, grp(LL[LL.length - 1][2]) + ' km', 'lbl', 'end');
+          T(svg, 498, 210, 'rapporto', 'lbl-s');
+          T(svg, 630, 210, num(LL[LL.length - 1][2] / LL[0][2], 2) + '×', 'em', 'end');
+          T(svg, 498, 244, 'se D fosse 1 la retta', 'lbl-s');
+          T(svg, 498, 262, 'sarebbe orizzontale', 'lbl-s');
+          T(svg, 70, 338,
+            'la pendenza negativa dice che accorciando il righello la costa si allunga:',
+            'lbl-s');
+          T(svg, 70, 360,
+            'e’ la legge di Richardson, e l’esponente e’ 1 − D.', 'lbl-s');
+          cap.textContent = 'La retta ha pendenza ' + num(fit.m, 3) + ', quindi la costa ' +
+            'del simulatore ha dimensione D = ' + num(D, 3) + '.';
+          return;
+        }
+
+        /* dati reali */
+        var DATI = [['circonferenza (figura liscia)', 1.00],
+                    ['costa del Sudafrica', 1.02],
+                    ['costa dell’Australia', 1.13],
+                    ['frontiera terrestre del Portogallo', 1.14],
+                    ['frontiera terrestre della Germania', 1.15],
+                    ['costa occidentale della Gran Bretagna', 1.25],
+                    ['costa della Norvegia', 1.52]];
+        T(svg, 40, 30, 'le dimensioni misurate da Richardson', 'lbl');
+        T(svg, 40, 48, 'fonte: L. F. Richardson (1961), ripreso da B. Mandelbrot, ' +
+          'Science 156 (1967)', 'lbl-s');
+        var yb = 84, rh2 = 40;
+        for (var q = 0; q < DATI.length; q++) {
+          var yy = yb + q * rh2;
+          T(svg, 60, yy, DATI[q][0], 'lbl-s');
+          var frazione = (DATI[q][1] - 1) / 0.6;
+          R(svg, 330, yy - 13, 240, 18, COL.s2, COL.ax, 0.8, 4);
+          R(svg, 330, yy - 13, Math.max(240 * frazione, 2), 18,
+            'color-mix(in srgb, ' + COL.mg + ' 55%, transparent)', COL.mg, 1, 4);
+          T(svg, 630, yy, num(DATI[q][1], 2), 'em', 'end');
+        }
+        T(svg, 40, yb + DATI.length * rh2 + 12,
+          'la Norvegia, tutta fiordi, e’ la costa piu’ frastagliata mai misurata; ' +
+          'il Sudafrica', 'lbl-s');
+        T(svg, 40, yb + DATI.length * rh2 + 34,
+          'e’ quasi liscio. La dimensione mette un numero su una parola vaga.', 'lbl-s');
+        cap.textContent = 'La dimensione frattale trasforma «piu’ frastagliata» in un ' +
+          'numero: 1,52 contro 1,02.';
+      }
+      se.addEventListener('input', draw);
+      var bts = grab('co-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, svg);
+    }());
+
+    /* ==================================================================
+       6 — MANDELBROT E JULIA  (canvas)
+       ================================================================== */
+    (function () {
+      var cv = grab('ju-cv'); if (!cv) { return; }
+      var sx = grab('ju-x'), sy = grab('ju-y'), si = grab('ju-i'), cap = grab('ju-cap');
+      var vista = 'mandel';
+
+      function fuga(zx, zy, cx, cy, maxIt) {
+        var i = 0, x = zx, y = zy, x2 = x * x, y2 = y * y;
+        while (x2 + y2 <= 4 && i < maxIt) {
+          y = 2 * x * y + cy;
+          x = x2 - y2 + cx;
+          x2 = x * x;
+          y2 = y * y;
+          i++;
+        }
+        return i;
+      }
+
+      function draw() {
+        var cx = +sx.value, cy = +sy.value, maxIt = +si.value;
+        grab('ju-xv').textContent = num(cx, 2);
+        grab('ju-yv').textContent = num(cy, 2);
+        grab('ju-iv').textContent = maxIt;
+        var g = cv.getContext('2d');
+        var W = cv.width, Hh = cv.height;
+        g.setTransform(1, 0, 0, 1, 0, 0);
+        g.fillStyle = COL.sf;
+        g.fillRect(0, 0, W, Hh);
+
+        var xmin, xmax, ymin, ymax;
+        if (vista === 'julia') { xmin = -1.7; xmax = 1.7; ymin = -0.95; ymax = 0.95; }
+        else { xmin = -2.25; xmax = 0.85; ymin = -0.866; ymax = 0.866; }
+
+        if (vista === 'mandel' || vista === 'julia') {
+          var img = g.createImageData(W, Hh);
+          var dat = img.data, px, py, it, re, im, idx, col;
+          for (py = 0; py < Hh; py += 2) {
+            for (px = 0; px < W; px += 2) {
+              re = xmin + (xmax - xmin) * px / W;
+              im = ymin + (ymax - ymin) * py / Hh;
+              it = (vista === 'mandel') ? fuga(0, 0, re, im, maxIt)
+                                        : fuga(re, im, cx, cy, maxIt);
+              var r0, g0, b0;
+              if (it >= maxIt) { r0 = 12; g0 = 14; b0 = 24; }
+              else {
+                var t = it / maxIt;
+                r0 = Math.floor(255 * Math.min(1, 1.6 * Math.pow(t, 0.42)));
+                g0 = Math.floor(255 * Math.min(1, 1.1 * Math.pow(t, 0.85)));
+                b0 = Math.floor(255 * Math.min(1, 0.55 + 0.45 * Math.cos(9 * t)));
+              }
+              for (var oy = 0; oy < 2; oy++) {
+                for (var ox = 0; ox < 2; ox++) {
+                  idx = ((py + oy) * W + (px + ox)) * 4;
+                  dat[idx] = r0; dat[idx + 1] = g0; dat[idx + 2] = b0; dat[idx + 3] = 255;
+                }
+              }
+            }
+          }
+          g.putImageData(img, 0, 0);
+          g.font = '13px Inter, sans-serif';
+          g.fillStyle = '#ffffff';
+          if (vista === 'mandel') {
+            var mx = (cx - xmin) / (xmax - xmin) * W, my = (cy - ymin) / (ymax - ymin) * Hh;
+            g.strokeStyle = '#ffffff';
+            g.lineWidth = 1.6;
+            g.beginPath(); g.arc(mx, my, 7, 0, 2 * Math.PI); g.stroke();
+            g.beginPath(); g.moveTo(mx - 13, my); g.lineTo(mx - 3, my);
+            g.moveTo(mx + 3, my); g.lineTo(mx + 13, my);
+            g.moveTo(mx, my - 13); g.lineTo(mx, my - 3);
+            g.moveTo(mx, my + 3); g.lineTo(mx, my + 13); g.stroke();
+            var dentro = fuga(0, 0, cx, cy, maxIt) >= maxIt;
+            g.fillText('c = ' + num(cx, 2) + (cy >= 0 ? ' + ' : ' − ') +
+              num(Math.abs(cy), 2) + 'i', 14, 24);
+            g.fillText(dentro ? 'c appartiene all’insieme (l’orbita resta limitata)'
+                              : 'c non appartiene: l’orbita scappa dopo ' +
+                                fuga(0, 0, cx, cy, maxIt) + ' passi', 14, 44);
+            g.fillText('il nero e’ l’insieme; i colori dicono quanto in fretta si scappa',
+              14, Hh - 16);
+            cap.textContent = 'Il punto c = ' + num(cx, 2) + ' + ' + num(cy, 2) + 'i ' +
+              (dentro ? 'sta dentro l’insieme di Mandelbrot.'
+                      : 'sta fuori: la sua orbita diverge.');
+          } else {
+            var conn = fuga(0, 0, cx, cy, maxIt) >= maxIt;
+            g.fillText('insieme di Julia per c = ' + num(cx, 2) +
+              (cy >= 0 ? ' + ' : ' − ') + num(Math.abs(cy), 2) + 'i', 14, 24);
+            g.fillText(conn ? 'c ∈ M  →  il Julia e’ CONNESSO, un pezzo solo'
+                            : 'c ∉ M  →  il Julia e’ una POLVERE sconnessa', 14, 44);
+            g.fillText('teorema di Fatou-Julia (1919)', 14, Hh - 16);
+            cap.textContent = 'Con c = ' + num(cx, 2) + ' + ' + num(cy, 2) + 'i l’insieme ' +
+              'di Julia e’ ' + (conn ? 'connesso' : 'sconnesso, una polvere di punti') + '.';
+          }
+          return;
+        }
+
+        /* orbita */
+        var ox2 = 60, oy2 = 26, OW = 300, OH = 300;
+        g.strokeStyle = COL.ax;
+        g.fillStyle = COL.s2;
+        g.fillRect(ox2, oy2, OW, OH);
+        g.strokeRect(ox2, oy2, OW, OH);
+        function GX(v) { return ox2 + (v + 2.4) / 4.8 * OW; }
+        function GY(v) { return oy2 + OH - (v + 2.4) / 4.8 * OH; }
+        g.strokeStyle = COL.ax;
+        g.lineWidth = 1;
+        g.beginPath(); g.moveTo(GX(-2.4), GY(0)); g.lineTo(GX(2.4), GY(0));
+        g.moveTo(GX(0), GY(-2.4)); g.lineTo(GX(0), GY(2.4)); g.stroke();
+        /* il cerchio di raggio 2: la soglia di fuga */
+        g.strokeStyle = COL.rd;
+        g.setLineDash([5, 4]);
+        g.beginPath();
+        g.arc(GX(0), GY(0), OW / 4.8 * 2, 0, 2 * Math.PI);
+        g.stroke();
+        g.setLineDash([]);
+        /* l'orbita di z0 = 0 */
+        var zx = 0, zy = 0, n = 0, scappa = -1, punti = [[0, 0]];
+        while (n < Math.min(maxIt, 400)) {
+          var nx = zx * zx - zy * zy + cx, ny = 2 * zx * zy + cy;
+          zx = nx; zy = ny;
+          n++;
+          punti.push([zx, zy]);
+          if (zx * zx + zy * zy > 4) { scappa = n; break; }
+        }
+        g.strokeStyle = COL.ac;
+        g.lineWidth = 1.4;
+        g.beginPath();
+        for (var q = 0; q < punti.length; q++) {
+          var vx = Math.max(-2.4, Math.min(2.4, punti[q][0]));
+          var vy = Math.max(-2.4, Math.min(2.4, punti[q][1]));
+          if (q === 0) { g.moveTo(GX(vx), GY(vy)); } else { g.lineTo(GX(vx), GY(vy)); }
+        }
+        g.stroke();
+        g.fillStyle = COL.mg;
+        for (q = 0; q < Math.min(punti.length, 60); q++) {
+          var wx = Math.max(-2.4, Math.min(2.4, punti[q][0]));
+          var wy = Math.max(-2.4, Math.min(2.4, punti[q][1]));
+          g.beginPath(); g.arc(GX(wx), GY(wy), 2.6, 0, 2 * Math.PI); g.fill();
+        }
+        g.fillStyle = COL.tx;
+        g.font = '13px Inter, sans-serif';
+        g.fillText('orbita di z₀ = 0 sotto z → z² + c', 400, 60);
+        g.font = '12px Inter, sans-serif';
+        g.fillText('c = ' + num(cx, 2) + (cy >= 0 ? ' + ' : ' − ') +
+          num(Math.abs(cy), 2) + 'i', 400, 88);
+        g.fillText('passi calcolati: ' + n, 400, 112);
+        g.fillText(scappa > 0 ? ('esce dal cerchio |z| = 2 al passo ' + scappa)
+                              : 'resta dentro il cerchio |z| = 2', 400, 136);
+        g.fillText(scappa > 0 ? 'quindi c NON appartiene a M' : 'quindi c appartiene a M',
+          400, 160);
+        g.fillText('|z| finale: ' + num(Math.sqrt(zx * zx + zy * zy), 3), 400, 190);
+        g.fillText('il cerchio rosso e’ la soglia', 400, 220);
+        g.fillText('di fuga: superarlo significa', 400, 240);
+        g.fillText('divergere di sicuro.', 400, 260);
+        g.fillText('Provate c = −0,75 + 0,1i:', 400, 292);
+        g.fillText('l’orbita gira a lungo prima', 400, 312);
+        g.fillText('di decidersi.', 400, 332);
+        cap.textContent = scappa > 0
+          ? ('L’orbita esce dal cerchio di raggio 2 al passo ' + scappa +
+             ': il punto non appartiene all’insieme.')
+          : ('Dopo ' + n + ' passi l’orbita e’ ancora dentro il cerchio: ' +
+             'il punto appartiene (o quasi) all’insieme.');
+      }
+      [sx, sy, si].forEach(function (s) { s.addEventListener('input', draw); });
+      var bts = grab('ju-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, cv);
+    }());
+
+    /* ==================================================================
+       7 — IL GIOCO DEL CAOS  (canvas)
+       ================================================================== */
+    (function () {
+      var cv = grab('fe-cv'); if (!cv) { return; }
+      var sn = grab('fe-n'), cap = grab('fe-cap');
+      var vista = 'felce';
+      /* la felce di Barnsley: quattro trasformazioni affini, 24 numeri in tutto */
+      var FELCE = [
+        [0.00, 0.00, 0.00, 0.16, 0.00, 0.00, 0.01],
+        [0.85, 0.04, -0.04, 0.85, 0.00, 1.60, 0.85],
+        [0.20, -0.26, 0.23, 0.22, 0.00, 1.60, 0.07],
+        [-0.15, 0.28, 0.26, 0.24, 0.00, 0.44, 0.07]
+      ];
+      var ALBERO = [
+        [0.00, 0.00, 0.00, 0.50, 0.00, 0.00, 0.05],
+        [0.42, -0.42, 0.42, 0.42, 0.00, 0.20, 0.40],
+        [0.42, 0.42, -0.42, 0.42, 0.00, 0.20, 0.40],
+        [0.10, 0.00, 0.00, 0.10, 0.00, 0.20, 0.15]
+      ];
+
+      function draw() {
+        var N = +sn.value;
+        grab('fe-nv').textContent = grp(N);
+        var g = cv.getContext('2d');
+        var W = cv.width, Hh = cv.height;
+        g.setTransform(1, 0, 0, 1, 0, 0);
+        g.fillStyle = COL.sf;
+        g.fillRect(0, 0, W, Hh);
+        var r = prng(11223344), x = 0, y = 0, i, k, acc, u, sistema, titolo;
+
+        if (vista === 'sier') {
+          var V = [[0.5, 0.02], [0.03, 0.96], [0.97, 0.96]];
+          g.fillStyle = COL.ac;
+          x = 0.5; y = 0.5;
+          for (i = 0; i < N; i++) {
+            k = Math.floor(r() * 3);
+            if (k > 2) { k = 2; }
+            x = (x + V[k][0]) / 2;
+            y = (y + V[k][1]) / 2;
+            if (i > 20) { g.fillRect(40 + x * 600, 10 + y * 380, 1, 1); }
+          }
+          g.fillStyle = COL.mg;
+          for (k = 0; k < 3; k++) {
+            g.beginPath();
+            g.arc(40 + V[k][0] * 600, 10 + V[k][1] * 380, 4, 0, 2 * Math.PI);
+            g.fill();
+          }
+          titolo = 'gioco del caos: si salta sempre a meta’ strada verso un vertice a caso';
+          cap.textContent = 'Con ' + grp(N) + ' salti casuali compare il triangolo di ' +
+            'Sierpiński: il caso sceglie l’ordine, non la figura.';
+        } else {
+          sistema = (vista === 'felce') ? FELCE : ALBERO;
+          var mnx = 1e9, mxx = -1e9, mny = 1e9, mxy = -1e9;
+          var buf = [];
+          x = 0; y = 0;
+          for (i = 0; i < N; i++) {
+            u = r();
+            acc = 0;
+            var t = sistema[sistema.length - 1];
+            for (k = 0; k < sistema.length; k++) {
+              acc += sistema[k][6];
+              if (u <= acc) { t = sistema[k]; break; }
+            }
+            var nx = t[0] * x + t[1] * y + t[4];
+            var ny = t[2] * x + t[3] * y + t[5];
+            x = nx; y = ny;
+            if (i > 20) {
+              buf.push([x, y]);
+              if (x < mnx) { mnx = x; } if (x > mxx) { mxx = x; }
+              if (y < mny) { mny = y; } if (y > mxy) { mxy = y; }
+            }
+          }
+          var sc = Math.min((W - 60) / Math.max(mxx - mnx, 1e-6),
+                            (Hh - 30) / Math.max(mxy - mny, 1e-6));
+          g.fillStyle = vista === 'felce' ? '#2e9e4f' : COL.gd;
+          for (i = 0; i < buf.length; i++) {
+            g.fillRect(W / 2 + (buf[i][0] - (mnx + mxx) / 2) * sc,
+                       Hh - 15 - (buf[i][1] - mny) * sc, 1, 1);
+          }
+          titolo = vista === 'felce'
+            ? 'felce di Barnsley: quattro trasformazioni affini, 24 numeri in tutto'
+            : 'un albero, con le stesse quattro regole cambiate di poco';
+          cap.textContent = grp(buf.length) + ' punti, nessuno dei quali disegnato a mano: ' +
+            'la figura e’ l’attrattore delle quattro trasformazioni.';
+        }
+        g.fillStyle = COL.tx;
+        g.font = '13px Inter, sans-serif';
+        g.fillText(titolo, 14, 22);
+        g.font = '11.5px Inter, sans-serif';
+        g.fillStyle = COL.mu;
+        g.fillText('primi 20 punti scartati (transiente)', 14, Hh - 10);
+      }
+      sn.addEventListener('input', draw);
+      var bts = grab('fe-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, cv);
+    }());
+
+    /* ==================================================================
+       8 — LA MAPPA LOGISTICA  (canvas)
+       ================================================================== */
+    (function () {
+      var cv = grab('bi-cv'); if (!cv) { return; }
+      var sr = grab('bi-r'), sx = grab('bi-x'), cap = grab('bi-cap');
+      var vista = 'bifo';
+
+      function orbita(r, x0, n) {
+        var x = x0, out = [x], i;
+        for (i = 0; i < n; i++) { x = r * x * (1 - x); out.push(x); }
+        return out;
+      }
+      function periodo(r) {
+        var x = 0.4, i;
+        for (i = 0; i < 3000; i++) { x = r * x * (1 - x); }
+        var base = x, valori = [];
+        for (i = 0; i < 400; i++) {
+          x = r * x * (1 - x);
+          valori.push(x);
+        }
+        for (var p = 1; p <= 16; p++) {
+          var ok2 = true;
+          for (i = 0; i + p < valori.length; i++) {
+            if (Math.abs(valori[i] - valori[i + p]) > 1e-5) { ok2 = false; break; }
+          }
+          if (ok2) { return p; }
+        }
+        return 0;
+      }
+
+      function draw() {
+        var r = +sr.value, x0 = +sx.value;
+        grab('bi-rv').textContent = num(r, 2);
+        grab('bi-xv').textContent = num(x0, 3);
+        var g = cv.getContext('2d');
+        var W = cv.width, Hh = cv.height;
+        g.setTransform(1, 0, 0, 1, 0, 0);
+        g.fillStyle = COL.sf;
+        g.fillRect(0, 0, W, Hh);
+        g.font = '13px Inter, sans-serif';
+
+        if (vista === 'bifo') {
+          var x0g = 55, y0g = 40, GW = 580, GH = 300;
+          g.fillStyle = COL.s2;
+          g.fillRect(x0g, y0g, GW, GH);
+          g.fillStyle = COL.ac;
+          var col, rr, xx, i;
+          for (col = 0; col < GW; col++) {
+            rr = 0.5 + 3.5 * col / GW;
+            xx = 0.4;
+            for (i = 0; i < 250; i++) { xx = rr * xx * (1 - xx); }
+            for (i = 0; i < 180; i++) {
+              xx = rr * xx * (1 - xx);
+              g.fillRect(x0g + col, y0g + GH - xx * GH, 0.8, 0.8);
+            }
+          }
+          /* la posizione dell'r scelto */
+          var xr = x0g + (r - 0.5) / 3.5 * GW;
+          g.strokeStyle = COL.mg;
+          g.lineWidth = 1.6;
+          g.beginPath(); g.moveTo(xr, y0g); g.lineTo(xr, y0g + GH); g.stroke();
+          g.strokeStyle = COL.ax;
+          g.lineWidth = 1;
+          g.strokeRect(x0g, y0g, GW, GH);
+          g.fillStyle = COL.tx;
+          g.fillText('diagramma delle biforcazioni della mappa logistica', 14, 24);
+          g.font = '11.5px Inter, sans-serif';
+          g.fillStyle = COL.mu;
+          for (i = 1; i <= 4; i++) {
+            var rv = i;
+            if (rv >= 0.5) {
+              g.fillText(String(rv), x0g + (rv - 0.5) / 3.5 * GW - 4, y0g + GH + 16);
+            }
+          }
+          g.fillText('0', x0g - 14, y0g + GH + 4);
+          g.fillText('1', x0g - 14, y0g + 8);
+          g.fillText('r', x0g + GW / 2, y0g + GH + 34);
+          g.fillStyle = COL.tx;
+          g.font = '12px Inter, sans-serif';
+          var per = periodo(r);
+          g.fillText('r = ' + num(r, 3) + '   →   ' +
+            (per === 0 ? 'nessun periodo: CAOS' : 'ciclo di periodo ' + per), 14, Hh - 12);
+          g.fillText('accumulazione dei raddoppi: r∞ = 3,569946', 380, Hh - 12);
+          cap.textContent = 'Con r = ' + num(r, 3) + ' la popolazione ' +
+            (per === 0 ? 'non si assesta su nessun ciclo: e’ caos deterministico.'
+                       : 'oscilla su un ciclo di periodo ' + per + '.');
+          return;
+        }
+
+        if (vista === 'ragna') {
+          var xa = 70, ya = 30, SS = 300;
+          g.fillStyle = COL.s2;
+          g.fillRect(xa, ya, SS, SS);
+          function PX(v) { return xa + v * SS; }
+          function PY(v) { return ya + SS - v * SS; }
+          g.strokeStyle = COL.ax;
+          g.lineWidth = 1;
+          g.strokeRect(xa, ya, SS, SS);
+          /* la bisettrice */
+          g.beginPath(); g.moveTo(PX(0), PY(0)); g.lineTo(PX(1), PY(1)); g.stroke();
+          /* la parabola */
+          g.strokeStyle = COL.ac;
+          g.lineWidth = 2;
+          g.beginPath();
+          for (var i2 = 0; i2 <= 200; i2++) {
+            var v = i2 / 200, w = r * v * (1 - v);
+            if (i2 === 0) { g.moveTo(PX(v), PY(w)); } else { g.lineTo(PX(v), PY(w)); }
+          }
+          g.stroke();
+          /* la ragnatela */
+          var orb = orbita(r, x0, 60);
+          g.strokeStyle = COL.mg;
+          g.lineWidth = 1.1;
+          g.beginPath();
+          g.moveTo(PX(orb[0]), PY(0));
+          for (var q = 0; q < orb.length - 1; q++) {
+            g.lineTo(PX(orb[q]), PY(orb[q + 1]));
+            g.lineTo(PX(orb[q + 1]), PY(orb[q + 1]));
+          }
+          g.stroke();
+          var xeq = 1 - 1 / r, pend = 2 - r;
+          g.fillStyle = COL.tx;
+          g.fillText('la ragnatela: xₙ₊₁ = r·xₙ(1−xₙ)', 14, 20);
+          g.font = '12px Inter, sans-serif';
+          var righe = [
+            ['r', num(r, 3)],
+            ['x₀', num(x0, 3)],
+            ['equilibrio 1 − 1/r', r > 1 ? num(xeq, 4) : '— (estinzione)'],
+            ['pendenza 2 − r', num(pend, 3)],
+            ['|pendenza| < 1 ?', Math.abs(pend) < 1 ? 'sì: STABILE' : 'no: INSTABILE'],
+            ['periodo osservato', periodo(r) === 0 ? 'caos' : String(periodo(r))],
+            ['x dopo 60 passi', num(orb[orb.length - 1], 5)]
+          ];
+          for (q = 0; q < righe.length; q++) {
+            g.fillStyle = COL.mu;
+            g.fillText(righe[q][0], 400, 70 + q * 34);
+            g.fillStyle = COL.tx;
+            g.fillText(righe[q][1], 400, 90 + q * 34);
+          }
+          g.fillStyle = COL.mu;
+          g.font = '11.5px Inter, sans-serif';
+          g.fillText('la spirale si stringe se |2−r| < 1, si allarga altrimenti',
+            14, Hh - 14);
+          cap.textContent = 'Con r = ' + num(r, 3) + ' l’equilibrio ' +
+            (r > 1 ? num(xeq, 4) : 'non esiste') + ' e’ ' +
+            (Math.abs(pend) < 1 ? 'stabile' : 'instabile') + ': la pendenza vale ' +
+            num(pend, 3) + '.';
+          return;
+        }
+
+        /* dipendenza sensibile */
+        var xb = 60, yb = 42, BW2 = 580, BH = 280;
+        g.fillStyle = COL.s2;
+        g.fillRect(xb, yb, BW2, BH);
+        g.strokeStyle = COL.ax;
+        g.lineWidth = 1;
+        g.strokeRect(xb, yb, BW2, BH);
+        var NP = 70;
+        var o1 = orbita(r, x0, NP), o2 = orbita(r, x0 + 1e-6, NP);
+        var cc = [COL.ac, COL.rd], oo = [o1, o2];
+        for (var s2 = 0; s2 < 2; s2++) {
+          g.strokeStyle = cc[s2];
+          g.lineWidth = 1.8;
+          g.beginPath();
+          for (var t2 = 0; t2 <= NP; t2++) {
+            var px2 = xb + t2 / NP * BW2, py2 = yb + BH - oo[s2][t2] * BH;
+            if (t2 === 0) { g.moveTo(px2, py2); } else { g.lineTo(px2, py2); }
+          }
+          g.stroke();
+        }
+        var scarto = 0, primoScarto = -1;
+        for (var t3 = 0; t3 <= NP; t3++) {
+          var dd2 = Math.abs(o1[t3] - o2[t3]);
+          if (dd2 > scarto) { scarto = dd2; }
+          if (dd2 > 0.1 && primoScarto < 0) { primoScarto = t3; }
+        }
+        g.fillStyle = COL.tx;
+        g.fillText('due popolazioni che all’inizio differiscono di un milionesimo',
+          14, 26);
+        g.font = '12px Inter, sans-serif';
+        g.fillText('r = ' + num(r, 3) + '     x₀ = ' + num(x0, 3) + '  e  ' +
+          num(x0 + 1e-6, 6), 60, yb + BH + 24);
+        g.fillText(primoScarto > 0
+          ? ('si separano visibilmente al passo ' + primoScarto +
+             ' (scarto massimo ' + num(scarto, 3) + ')')
+          : ('restano indistinguibili: scarto massimo ' + scarto.toExponential(1)),
+          60, yb + BH + 46);
+        g.fillStyle = COL.mu;
+        g.font = '11.5px Inter, sans-serif';
+        g.fillText('nessuna casualita’: la formula e’ la stessa, ' +
+          'cambia solo la sesta cifra decimale', 60, yb + BH + 68);
+        cap.textContent = primoScarto > 0
+          ? ('Con r = ' + num(r, 3) + ' due orbite che differiscono di 10⁻⁶ ' +
+             'divergono al passo ' + primoScarto + '.')
+          : ('Con r = ' + num(r, 3) + ' le due orbite restano vicine: scarto massimo ' +
+             scarto.toExponential(1) + '.');
+      }
+      sr.addEventListener('input', draw);
+      sx.addEventListener('input', draw);
+      var bts = grab('bi-btns');
+      bts.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        activate(bts, b); vista = b.dataset.v; draw();
+      });
+      avvia(draw, cv);
+    }());
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  }());
+  </script>
+
+  <script>
+  window.quizData = [
+
+    { type: 'mc', diff: 'easy',
+      text: 'Che cosa significa che una figura è <em>autosimile</em>?',
+      options: [
+        'che ogni sua parte, ingrandita, somiglia alla figura intera',
+        'che è simmetrica rispetto a un asse',
+        'che si può disegnare senza staccare la penna dal foglio',
+        'che ha la stessa area del quadrato che la contiene'
+      ],
+      correct: 0,
+      explain: 'È la proprietà che nasce dal costruire una figura <strong>ripetendo la stessa regola su scale sempre più piccole</strong>. Nel fiocco di Koch l\'autosimilarità è <em>esatta</em>: ogni pezzo ingrandito è identico al tutto. In natura è invece <strong>statistica</strong>: un ramo somiglia all\'albero, una baia alla costa, ma non ne sono copie precise — a cambiare sono i dettagli, non la rugosità. È anche il motivo per cui, in una fotografia di rocce senza un riferimento di scala, non si capisce se si stia guardando un sasso o una montagna.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'La curva di Koch è fatta di $4$ copie di sé stessa ridotte di $1/3$. Qual è la sua dimensione?',
+      options: ['$4/3 \\approx 1{,}33$', '$\\dfrac{\\log 4}{\\log 3} \\approx 1{,}26$',
+                '$1$, perché è una curva', '$2$, perché sta in un piano'],
+      correct: 1,
+      explain: 'La formula è $D = \\dfrac{\\log N}{\\log(1/r)}$ con $N = 4$ copie e $1/r = 3$, e dà $1{,}2619$. Il valore non dipende dalla base del logaritmo, perché è un <em>rapporto</em>: con i logaritmi decimali, $0{,}60206 / 0{,}47712$; con quelli naturali, $1{,}38629 / 1{,}09861$ — stesso risultato. Il numero dice che la curva riempie il piano <strong>più di una linea e meno di una superficie</strong>: è la traduzione quantitativa del fatto che ha lunghezza infinita in un\'area finita. Le risposte $1$ e $2$ sono le dimensioni <em>topologiche</em>, che qui non catturano niente.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Chi ha coniato la parola «frattale», e quando?',
+      options: ['Georg Cantor, nel 1883', 'Helge von Koch, nel 1904',
+                'Benoît Mandelbrot, nel 1975', 'Karl Weierstrass, nel 1872'],
+      correct: 2,
+      explain: 'Mandelbrot la costruì dal latino <em>fractus</em> — spezzato, irregolare. Gli altri tre nomi sono quelli dei costruttori dei «mostri» ottocenteschi: Weierstrass la funzione continua senza derivata (1872), Cantor il suo insieme (1883), von Koch la curva di lunghezza infinita (1904). <strong>Nessuno di loro pensava di descrivere la natura</strong>: stavano saggiando i limiti delle definizioni. Il contributo di Mandelbrot fu esattamente il rovesciamento di prospettiva — e lo poté fare perché all\'IBM aveva un calcolatore che <em>disegnava</em>, cosa che ai suoi predecessori mancava.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Il fiocco di neve di Koch ha…',
+      options: ['perimetro finito e area finita', 'perimetro finito e area infinita',
+                'perimetro infinito e area infinita', 'perimetro infinito e area finita'],
+      correct: 3,
+      explain: 'Il perimetro si moltiplica per $4/3$ a ogni passo: progressione geometrica di ragione maggiore di $1$, quindi <strong>diverge</strong>. L\'area invece cresce di quantità che si riducono di $4/9$ a ogni passo: ragione minore di $1$, quindi <strong>converge</strong>, e precisamente a $\\frac85$ dell\'area del triangolo iniziale. Non c\'è nessun paradosso: perimetro e area misurano cose diverse, e nulla vieta di racchiudere un\'area piccola con un contorno lungo a piacere — è quello che si fa accartocciando un filo di lana dentro un piatto.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Il triangolo di Sierpiński è fatto di $3$ copie ridotte di $1/2$. Che cosa si può dire di lui?',
+      options: [
+        'ha dimensione $\\log 3/\\log 2 \\approx 1{,}585$, area nulla e perimetro infinito',
+        'ha dimensione $1{,}5$ esatta e area pari a metà del triangolo iniziale',
+        'ha dimensione $2$, perché è una figura piana',
+        'ha dimensione $3$, come il numero delle copie'
+      ],
+      correct: 0,
+      explain: 'La dimensione è $D = \\log 3/\\log 2 = 1{,}5850$ — vicina a $1{,}5$ ma non uguale, e la differenza non è un dettaglio: $1{,}5$ sarebbe $N = 2\\sqrt{2}$ copie, che non è un numero intero. Quanto all\'<strong>area</strong>: a ogni passo ne resta $3/4$, e $(3/4)^n \\to 0$, quindi l\'area del limite è <strong>zero</strong>. Il <strong>perimetro</strong> invece si moltiplica per $3/2$ a ogni passo e diverge. È lo stesso schema del fiocco di Koch, portato all\'estremo: qui non resta nemmeno l\'area.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Perché la lunghezza della costa della Gran Bretagna «dipende dal righello»?',
+      options: [
+        'perché le maree cambiano continuamente il profilo della costa',
+        'perché a ogni scala compaiono nuove insenature che il righello più corto segue e quello più lungo salta: la lunghezza cresce senza limite',
+        'perché i cartografi usano proiezioni geografiche diverse',
+        'perché la Terra è sferica e non piana'
+      ],
+      correct: 1,
+      explain: 'È l\'osservazione di Richardson, ripresa da Mandelbrot nel 1967: misurando con un compasso di apertura $\\varepsilon$ si ottiene $L(\\varepsilon) = k\\,\\varepsilon^{1-D}$, e se $D \\gt 1$ l\'esponente è negativo, cioè <strong>la lunghezza cresce indefinitamente al ridursi del righello</strong>. Una costa non <em>ha</em> una lunghezza: ha una dimensione. Le altre risposte descrivono effetti reali — maree, proiezioni, curvatura — ma tutte producono correzioni <em>limitate</em>, mentre qui la lunghezza diverge. Il segnale che distingue i due casi è che i dati stanno su una retta in scala bilogaritmica.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Nel metodo del <em>box counting</em> si copre la figura con griglie sempre più fini e si contano le caselle toccate. Che cosa si fa poi con quei numeri?',
+      options: [
+        'se ne calcola la media, che è la dimensione',
+        'si divide il numero di caselle toccate per quelle totali',
+        'si mettono in un grafico $\\log N$ contro $\\log(1/\\varepsilon)$: la <strong>pendenza</strong> della retta è la dimensione',
+        'si conta quante caselle servono per coprire metà della figura'
+      ],
+      correct: 2,
+      explain: 'Se $N(\\varepsilon) \\sim \\varepsilon^{-D}$, allora $\\log N = -D\\log\\varepsilon + \\text{cost}$: una <strong>legge di potenza diventa una retta</strong> in scala bilogaritmica, e l\'esponente si legge come pendenza. È lo stesso trucco delle scale logaritmiche della lezione 4, ma qui non è un espediente grafico: è il modo in cui la dimensione frattale si misura davvero, su fotografie di tessuti, tracciati sismici e immagini satellitari, dove nessuna regola di costruzione è nota. La media delle misure (prima opzione) non avrebbe alcun significato, perché i conteggi dipendono dalla scala per costruzione.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Nell\'insieme di Mandelbrot si itera $z_{n+1} = z_n^2 + c$ partendo da $z_0 = 0$. Quando si può smettere di iterare e concludere che $c$ <em>non</em> appartiene all\'insieme?',
+      options: [
+        'quando $z_n$ diventa negativo',
+        'quando $z_n$ ritorna al valore di partenza',
+        'mai: bisogna sempre iterare all\'infinito',
+        'appena $|z_n| \\gt 2$: da lì in poi la successione diverge di sicuro'
+      ],
+      correct: 3,
+      explain: 'È il <strong>criterio di fuga</strong>, e rende il calcolo effettivamente eseguibile: si dimostra che se il modulo supera $2$ la successione non può più tornare indietro. Attenzione alla disuguaglianza <em>stretta</em>: il punto $c = -2$ dà la successione $0, -2, 2, 2, 2, \\dots$, che tocca $2$ senza superarlo — e infatti $-2$ <strong>appartiene</strong> all\'insieme, ed è la sua punta estrema a sinistra. Nel disegno il nero significa «non è ancora scappato dopo tutte le iterazioni che ho fatto»: aumentando le iterazioni la parte nera si assottiglia sempre un po\'.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Il <em>tappeto di Sierpiński</em> si ottiene dividendo un quadrato in $9$ quadratini e togliendo quello centrale, all\'infinito. Che cosa lo caratterizza?',
+      options: [
+        'dimensione $\\log 8/\\log 3 \\approx 1{,}893$, area nulla e perimetro infinito',
+        'dimensione $8/9 \\approx 0{,}889$, perché resta l\'$89\\%$ dell\'area',
+        'dimensione $2$ e area pari a $8/9$ di quella iniziale',
+        'dimensione $1$, perché alla fine resta solo una rete di linee'
+      ],
+      correct: 0,
+      explain: 'Restano $N = 8$ copie ridotte di $r = 1/3$, quindi $D = \\log 8/\\log 3 = 1{,}8928$: <em>quasi</em> una superficie, ma non del tutto. L\'<strong>area</strong> è nulla, perché a ogni passo ne resta $8/9$ e $(8/9)^n \\to 0$ — una successione geometrica di ragione minore di $1$ tende a zero anche se ogni passo toglie poco. La seconda risposta confonde la dimensione con la frazione di area conservata: sono due cose diverse, e infatti $8/9$ è minore di $1$ mentre la dimensione è quasi $2$.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'L\'insieme di Cantor si ottiene togliendo ripetutamente il terzo centrale di un segmento. Che cosa resta alla fine?',
+      options: [
+        'niente: dopo infiniti passi non resta alcun punto',
+        'un insieme di lunghezza totale nulla, che contiene però infiniti punti — tanti quanti il segmento di partenza',
+        'un insieme finito di punti, precisamente gli estremi degli intervalli',
+        'un insieme di lunghezza $1/3$, cioè quella che non è mai stata tolta'
+      ],
+      correct: 1,
+      explain: 'Dopo $n$ passi restano $2^{n}$ intervalli lunghi $3^{-n}$ ciascuno, per una lunghezza totale di $(2/3)^{n}$, che tende a <strong>zero</strong>. Eppure l\'insieme non è vuoto né finito: contiene tutti i numeri il cui sviluppo in base $3$ non usa la cifra $1$, e Cantor dimostrò che sono <strong>tanti quanti l\'intero segmento</strong> (hanno la stessa cardinalità). Un insieme di misura nulla e cardinalità del continuo: è esattamente il tipo di oggetto per cui i contemporanei parlavano di «mostri». La sua dimensione, $\\log 2/\\log 3 = 0{,}6309$, sta fra quella di un punto e quella di una linea.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Nella mappa logistica $x_{n+1} = r\\,x_n(1-x_n)$ l\'equilibrio $x^{*} = 1 - 1/r$ è stabile quando la pendenza $2-r$ ha modulo minore di $1$. Che cosa succede con $r = 3{,}2$?',
+      options: [
+        'la pendenza vale $-1{,}2$: l\'equilibrio è ancora stabile, ma la convergenza è lenta',
+        'la pendenza vale $0{,}8$: l\'equilibrio è stabile',
+        'la pendenza vale $-1{,}2$, in modulo maggiore di $1$: l\'equilibrio diventa instabile e nasce un ciclo di periodo $2$',
+        'la popolazione si estingue'
+      ],
+      correct: 2,
+      explain: 'La pendenza è $f\'(x^{*}) = 2 - r = -1{,}2$, e $|-1{,}2| \\gt 1$: ogni piccolo scarto dall\'equilibrio viene <strong>amplificato</strong> invece che riassorbito, quindi il punto fisso perde stabilità. Al suo posto compare un ciclo di periodo $2$: la popolazione oscilla fra due valori. La condizione $|2-r| \\lt 1$ dà esattamente $1 \\lt r \\lt 3$, e questo spiega perché la <strong>prima biforcazione cade a $r = 3$</strong>: non è un accidente del grafico, è la soluzione di un\'equazione. Il segno negativo della pendenza, per inciso, è il motivo per cui la convergenza (quando c\'è) avviene a spirale.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'La costante di Feigenbaum $\\delta = 4{,}6692\\ldots$ misura il rapporto fra gli intervalli di due biforcazioni successive. Perché è considerata un risultato profondo?',
+      options: [
+        'perché è un numero irrazionale',
+        'perché permette di calcolare esattamente dove finisce il caos',
+        'perché è stata calcolata con una calcolatrice tascabile',
+        'perché è <strong>universale</strong>: lo stesso valore compare in sistemi fisici completamente diversi, purché abbiano un raddoppio di periodo'
+      ],
+      correct: 3,
+      explain: 'Il numero in sé non sarebbe granché. Ciò che colpisce è che $\\delta$ ricompaia <em>identico</em> in altre mappe con un massimo quadratico, in circuiti elettronici oscillanti, nella convezione dell\'elio liquido e nel gocciolamento di un rubinetto: non dipende dai dettagli del sistema, ma solo dal <strong>tipo di transizione</strong>. È una costante universale come $\\pi$ o $e$, e la sua esistenza dice che il passaggio all\'ordine caotico ha una struttura matematica comune a fenomeni che non hanno nulla in comune. Feigenbaum, in effetti, la scoprì con una calcolatrice tascabile nel 1975 — ma è un aneddoto, non la ragione della sua importanza.' },
+
+    { type: 'open',
+      text: 'Spiega perché la dimensione di un frattale è un <em>rapporto di logaritmi</em>, partendo dal caso di segmento, quadrato e cubo. Poi descrivi come si misura la dimensione di una figura reale, di cui non si conosce la regola di costruzione.',
+      keywords: ['dimezz', 'copie', 'N = (1/r)^D', 'logaritmo', 'log N / log', 'intero',
+                 'box counting', 'griglia', 'bilogaritmic', 'pendenza', 'legge di potenza'],
+      requiredMatches: 3,
+      explain: 'Si parte da un\'osservazione elementare: <strong>dimezzando la scala</strong>, un segmento richiede $2$ copie, un quadrato $4$, un cubo $8$ — cioè $2^1$, $2^2$, $2^3$. In generale, se il fattore di riduzione è $r$ e servono $N$ copie, vale $N = (1/r)^{D}$, dove l\'esponente $D$ è proprio la dimensione. Prendendo il logaritmo di entrambi i membri si isola l\'esponente, ed è esattamente il mestiere del logaritmo:<br><br>$$D = \\frac{\\log N}{\\log(1/r)}$$<br>Finché $N$ è una potenza esatta di $1/r$ il risultato è intero e non si è scoperto nulla. Ma <strong>niente obbliga $D$ a essere intero</strong>: per la curva di Koch, $4$ copie ridotte di $1/3$ danno $\\log 4/\\log 3 = 1{,}2619$. Il numero misura <em>quanto la figura riempie lo spazio</em>, e sta fra la dimensione di una linea e quella di una superficie. Il rapporto non dipende dalla base scelta per i logaritmi.<br><br><strong>Su una figura reale</strong> — una costa, una radiografia, un tracciato — non c\'è nessuna regola da guardare, e si usa il <strong>box counting</strong>: si copre la figura con una griglia di lato $\\varepsilon$, si contano le caselle toccate $N(\\varepsilon)$, si ripete rimpicciolendo la griglia. Se vale la legge di potenza $N(\\varepsilon) \\sim \\varepsilon^{-D}$, allora $\\log N = -D\\log\\varepsilon + \\text{cost}$: in un grafico <strong>bilogaritmico</strong> i punti stanno su una retta, e la dimensione è la sua <strong>pendenza</strong> cambiata di segno. Il fatto che i punti stiano davvero su una retta è, di per sé, la verifica che la figura sia frattale in quell\'intervallo di scale.' },
+
+    { type: 'open',
+      text: 'Perché i frattali sono così comuni in natura? Rispondi con almeno due meccanismi diversi, portando esempi concreti, e spiega che cosa c\'entra la mappa logistica.',
+      keywords: ['superficie', 'volume', 'scambio', 'polmon', 'costa', 'ramificazione',
+                 'iterazione', 'regola semplice', 'caos', 'logistica', 'biforcazione',
+                 'autosimilarità statistica'],
+      requiredMatches: 3,
+      explain: '<strong>Primo meccanismo: massimizzare la superficie a parità di volume.</strong> Un organismo che deve scambiare qualcosa con l\'esterno — ossigeno, nutrienti, calore — ha bisogno di tanta superficie in poco spazio, e la geometria frattale è la soluzione. I <em>polmoni</em> hanno circa $23$ generazioni di ramificazione e arrivano a $70$-$100$ m² di superficie di scambio in cinque litri di torace; l\'albero <em>circolatorio</em> stipa $100\\,000$ km di vasi in un corpo, in modo che nessuna cellula sia lontana da un capillare. È la stessa relazione superficie-volume che spiega perché gli insetti non possono diventare grandi: la superficie cresce come il quadrato, il volume come il cubo, e l\'unico modo per sfuggire alla condanna è <strong>ripiegare</strong> la superficie in modo frattale.<br><br><strong>Secondo meccanismo: la ripetizione di una regola semplice.</strong> Le coste nascono dall\'erosione, che agisce allo stesso modo a tutte le scale; i fulmini e le scariche crescono per aggregazione, dove la punta che sporge di più ha più probabilità di crescere ancora; i fiumi si ramificano secondo le leggi di Horton. In tutti questi casi nessuno «disegna» un frattale: la struttura emerge dall\'<strong>iterazione</strong>, e l\'autosimilarità è statistica, non esatta.<br><br><strong>La mappa logistica</strong> mostra il secondo meccanismo allo stato puro. $x_{n+1} = rx_n(1-x_n)$ è l\'equazione più semplice dopo una retta, non contiene nessuna casualità — eppure oltre $r \\approx 3{,}57$ produce comportamento caotico, e il suo diagramma delle biforcazioni è esso stesso un frattale, autosimile a ogni ingrandimento. È la dimostrazione, in dieci caratteri, che <strong>la complessità non richiede complicazione</strong>: basta ripetere. E il legame è più stretto di un\'analogia — la mappa logistica è la restrizione all\'asse reale della stessa iterazione $z \\to z^2 + c$ che genera l\'insieme di Mandelbrot.' }
+  ];
+  </script>
+
+</body>
+
+</html>

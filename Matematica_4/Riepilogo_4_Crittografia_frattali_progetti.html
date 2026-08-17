@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riepilogo 4 — Crittografia, frattali e progetti</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    #cmap svg { width: 100%; height: auto; display: block; }
+    .cmap-node { cursor: pointer; transition: opacity .15s; }
+    .cmap-node:hover { opacity: 0.78; }
+    .cmap-node:hover rect { stroke-width: 3; }
+    .recap-topic { scroll-margin-top: 1rem; padding: 0.4rem 0 0.2rem; border-top: 1px dashed var(--border); margin-top: 1.2rem; }
+    .recap-topic:first-of-type { border-top: none; }
+    .recap-link { font-size: 0.82rem; font-weight: 500; opacity: 0.85; white-space: nowrap; margin-left: 0.4rem; }
+    .recap-flash { animation: recapflash 1.4s ease; }
+    @keyframes recapflash { 0% { background: rgba(124,160,255,0.28); } 100% { background: transparent; } }
+    section[id] { scroll-margin-top: 0.5rem; }
+    .formula-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 0.6rem; margin: 0.8rem 0; }
+    .formula-strip div { background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 0.5rem 0.7rem; text-align: center; }
+    .tabr { border-collapse: collapse; width: 100%; margin: 0.7rem 0; font-size: 0.9rem; }
+    .tabr th, .tabr td { border: 1px solid var(--border); padding: 0.4rem 0.55rem; text-align: center; }
+    .tabr th { background: var(--surface-2); }
+    .tabr td.l { text-align: left; }
+    .tabr td.mono { font-family: Consolas, monospace; text-align: left; }
+    .tabwrap { overflow-x: auto; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Quarto anno · Riepilogo 4</div>
+    <h1>Ripasso: crittografia, frattali e progetti</h1>
+    <p>Mappa concettuale e sunti dei nuclei fondamentali — sulle lezioni 10, 11 e 12</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Quarto anno</a>
+    <span class="sep">/</span> Riepilogo 4 (lez. 10-12)
+  </nav>
+
+  <main>
+
+    <section id="sec-intro">
+      <h2>Come usare questo riepilogo</h2>
+      <p>Modulo di ripasso su <a href="10_Blockchain_criptovalute.html">Crittografia, blockchain e
+        criptovalute</a>, <a href="11_Frattali.html">I frattali</a> e
+        <a href="12_Progetti.html">Progetti: dal file alla rete</a>. Clicca un argomento sulla mappa per
+        saltare al suo sunto; ogni sunto ha il link <em>↗ lezione completa</em> per approfondire. Quando ti
+        senti pronto, mettiti alla prova con la
+        <a href="Verifica_4_Crittografia_frattali_progetti.html">verifica di prova online</a>.</p>
+      <div class="note">
+        <strong>Il filo che lega le tre lezioni.</strong> Sono tre facce dello stesso mestiere: prendere una
+        regola semplice e ripeterla. Nella lezione 10 la regola è <em>elevare a potenza modulo n</em>, e
+        ripetuta produce una porta che si apre in un verso solo: da lì nascono i pagamenti sicuri, la firma
+        digitale e la blockchain. Nella lezione 11 la regola è <em>copia, rimpicciolisci, ripeti</em>, e
+        produce figure con una dimensione che non è un numero intero — figure che si sono rivelate essere la
+        forma normale delle coste, dei polmoni e degli alberi. Nella lezione 12 la regola è la più semplice
+        di tutte, <em>leggi gli ingressi, aggiorna lo stato, disegna</em>, sessanta volte al secondo, ed è
+        tutto quello che c'è dentro un videogioco. Se c'è una morale del trimestre è questa: <strong>la
+        complessità non richiede complicazione</strong>. Serve una regola chiara e la pazienza di
+        applicarla.
+      </div>
+    </section>
+
+    <section id="sec-mappa">
+      <h2>Mappa concettuale</h2>
+      <p>Clicca un riquadro per andare al ripasso dell'argomento.</p>
+      <div class="interactive-demo"><div id="cmap"></div></div>
+    </section>
+
+    <!-- ===== LEZIONE 10 ===== -->
+    <section id="g-cripto">
+      <h2>Lezione 10 · Crittografia, blockchain e criptovalute</h2>
+
+      <div class="recap-topic" id="r10-fiducia">
+        <h3>Il problema: fidarsi a distanza <a class="recap-link" href="10_Blockchain_criptovalute.html#sec1">↗ lezione completa</a></h3>
+        <p>Tre obiettivi <strong>indipendenti</strong>, che spesso si confondono:
+          <strong>riservatezza</strong> (chi ascolta non deve leggere), <strong>integrità</strong> (chi
+          ascolta non deve poter modificare senza che ci si accorga), <strong>autenticazione</strong> (devo
+          sapere con chi sto parlando). Si risolvono con tre strumenti diversi: cifratura, funzioni di hash,
+          firma digitale.</p>
+        <p><strong>Principio di Kerckhoffs (1883):</strong> il sistema deve restare sicuro <em>anche se il
+          nemico ne conosce il funzionamento</em>. L'unica cosa segreta è la chiave. È il motivo per cui gli
+          algoritmi veri sono pubblicati.</p>
+      </div>
+
+      <div class="recap-topic" id="r10-cesare">
+        <h3>Il cifrario di Cesare <a class="recap-link" href="10_Blockchain_criptovalute.html#sec2">↗ lezione completa</a></h3>
+        <div class="formula-strip">
+          <div>cifra: $c = (m+k) \bmod 26$</div>
+          <div>decifra: $m = (c-k) \bmod 26$</div>
+          <div>chiavi possibili: $25$</div>
+        </div>
+        <p>È <em>simmetrico</em>: la stessa chiave chiude e apre. Attenzione al modulo con numeri negativi —
+          $-7 \bmod 26 = 19$, non $-7$: il resto si riporta sempre in $[0,\,n-1]$.</p>
+      </div>
+
+      <div class="recap-topic" id="r10-frequenze">
+        <h3>L'analisi delle frequenze, e il vero problema <a class="recap-link" href="10_Blockchain_criptovalute.html#sec2">↗ lezione completa</a></h3>
+        <p>Il cifrario cade in due modi. <strong>Forza bruta:</strong> venticinque chiavi si provano tutte in
+          un istante. <strong>Analisi delle frequenze</strong> (al-Kindi, IX secolo): la lettera più
+          frequente dell'italiano è la <strong>E</strong> ($11{,}8\%$), quindi basta <em>contare</em>. Il
+          secondo attacco funzionerebbe anche con miliardi di chiavi, perché non le prova.</p>
+        <p><strong>Ma il problema vero non è il cifrario: è la chiave.</strong> Con $n$ persone che vogliano
+          parlarsi a coppie servono $\frac{n(n-1)}{2}$ chiavi — quasi cinque miliardi per centomila persone —
+          e vanno consegnate a mano. La crittografia simmetrica <em>non scala</em>.</p>
+      </div>
+
+      <div class="recap-topic" id="r10-modulo">
+        <h3>L'aritmetica dell'orologio <a class="recap-link" href="10_Blockchain_criptovalute.html#sec3">↗ lezione completa</a></h3>
+        <p>$a \equiv b \pmod n$ significa che $n$ divide $a-b$. Somma e prodotto si comportano bene, quindi
+          <strong>si può ridurre durante il calcolo</strong> invece che alla fine: è ciò che permette di
+          lavorare con numeri di seicento cifre.</p>
+        <p><strong>Esponenziazione veloce:</strong> da $a^{2k} = (a^k)^2$ segue che bastano
+          $\lceil \log_2 e\rceil$ passi invece di $e$. Per un esponente di $600$ cifre, circa $2000$
+          moltiplicazioni invece di $10^{600}$.</p>
+        <p class="formula-note">Le potenze modulo $n$ sono <strong>periodiche</strong>: è questo il fatto su
+          cui poggia tutto il resto (e, con un calcolatore quantistico, anche l'attacco).</p>
+      </div>
+
+      <div class="recap-topic" id="r10-rsa">
+        <h3>RSA: la chiave che si può gridare in piazza <a class="recap-link" href="10_Blockchain_criptovalute.html#sec4">↗ lezione completa</a></h3>
+        <div class="tabwrap">
+        <table class="tabr">
+          <tr><th>passo</th><th>operazione</th></tr>
+          <tr><td class="l">1-2</td><td class="l">due primi $p,q$; &nbsp; $n = pq$</td></tr>
+          <tr><td class="l">3</td><td class="l">$\varphi(n) = (p-1)(q-1)$</td></tr>
+          <tr><td class="l">4</td><td class="l">$e$ coprimo con $\varphi(n)$</td></tr>
+          <tr><td class="l">5</td><td class="l">$d$ tale che $e\,d \equiv 1 \pmod{\varphi(n)}$</td></tr>
+          <tr><td class="l">6</td><td class="l">si pubblica $(n,e)$ e si distruggono $p$, $q$, $\varphi$</td></tr>
+        </table>
+        </div>
+        <div class="formula">$$c = m^{e} \bmod n \qquad\qquad m = c^{d} \bmod n$$</div>
+        <p><strong>Esempio da saper rifare:</strong> $p=3$, $q=11$, $n=33$, $\varphi=20$, $e=7$, $d=3$
+          (perché $21 = 20+1$); con $m=2$: $c = 2^7 \bmod 33 = 29$, e $29^3 \bmod 33 = 2$ ✓.</p>
+      </div>
+
+      <div class="recap-topic" id="r10-eulero">
+        <h3>Perché funziona, e perché è sicuro <a class="recap-link" href="10_Blockchain_criptovalute.html#sec4">↗ lezione completa</a></h3>
+        <p><strong>Teorema di Eulero:</strong> $m^{\varphi(n)} \equiv 1 \pmod n$. Poiché
+          $e\,d = 1 + k\varphi(n)$:</p>
+        <div class="formula">$$c^{d} = m^{ed} = m\cdot\left(m^{\varphi(n)}\right)^{k} \equiv m \pmod n$$</div>
+        <p><strong>Perché è sicuro:</strong> per ricavare $d$ da $(n,e)$ serve $\varphi(n)$, che richiede
+          $p$ e $q$, che richiede di <strong>fattorizzare</strong> $n$ — e nessuno sa farlo in fretta. Da
+          notare l'onestà del punto: non è un teorema, è una congettura molto ben collaudata.</p>
+        <p class="formula-note">Nella realtà si usa il <em>padding</em> OAEP, l'esponente $65\,537$, e la
+          cifratura <strong>ibrida</strong>: RSA scambia una chiave simmetrica, e poi tutto viaggia con AES,
+          migliaia di volte più veloce.</p>
+      </div>
+
+      <div class="recap-topic" id="r10-hash">
+        <h3>Le funzioni di hash <a class="recap-link" href="10_Blockchain_criptovalute.html#sec5">↗ lezione completa</a></h3>
+        <p>Input di lunghezza qualunque → <strong>impronta di lunghezza fissa</strong>. Quattro proprietà:
+          deterministica, a senso unico, con <strong>effetto valanga</strong>, resistente alle collisioni.</p>
+        <p><strong>Le collisioni esistono sempre</strong> (input infiniti, impronte finite): il punto è che
+          trovarne una dev'essere impraticabile. Per il <em>paradosso dei compleanni</em> bastano circa
+          $1{,}177\sqrt{N}$ tentativi, quindi la sicurezza effettiva è <strong>metà</strong> dei bit: $256$
+          bit ne danno $128$. È per questo che MD5 ($128$) e SHA-1 ($160$) sono morti.</p>
+      </div>
+
+      <div class="recap-topic" id="r10-firma">
+        <h3>La firma digitale <a class="recap-link" href="10_Blockchain_criptovalute.html#sec5">↗ lezione completa</a></h3>
+        <p>Le due chiavi si annullano <em>in qualunque ordine</em>, quindi si può cifrare con la privata: il
+          risultato non è segreto, ma solo io potevo produrlo. Si firma l'<strong>impronta</strong>, non il
+          documento (RSA opera solo su numeri minori di $n$, ed è lento).</p>
+        <p><strong>Il lucchetto del browser</strong> dice due cose: che state parlando con quel dominio e che
+          nessuno può ascoltare. <em>Non</em> dice che il sito sia onesto.</p>
+      </div>
+
+      <div class="recap-topic" id="r10-blockchain">
+        <h3>La blockchain <a class="recap-link" href="10_Blockchain_criptovalute.html#sec6">↗ lezione completa</a></h3>
+        <p>Tre mattoni. <strong>(1) La catena:</strong> ogni blocco contiene l'impronta del precedente,
+          quindi toccare un dato rompe tutti i blocchi successivi. <strong>(2) La prova di lavoro:</strong>
+          un blocco vale solo se la sua impronta comincia con $z$ zeri, il che richiede in media $16^{z}$
+          tentativi — difficile da fare, immediato da verificare. <strong>(3) La catena più lunga:</strong>
+          vince quella su cui è stato speso più lavoro, e per riscrivere la storia serve più del $51\%$ della
+          potenza di calcolo.</p>
+        <p class="formula-note">La sicurezza è <strong>economica</strong>, non matematica: non dice «barare è
+          impossibile», dice «barare costa più di quanto renda». È un equilibrio di Nash costruito apposta —
+          e su reti piccole gli attacchi del $51\%$ sono avvenuti davvero.</p>
+      </div>
+
+      <div class="recap-topic" id="r10-cripto">
+        <h3>Le criptovalute, e che cosa non sono <a class="recap-link" href="10_Blockchain_criptovalute.html#sec7">↗ lezione completa</a></h3>
+        <p>Bitcoin nasce il <strong>31 ottobre 2008</strong> con l'articolo di Satoshi Nakamoto; il primo
+          blocco è del 3 gennaio 2009. Non esiste nessun «file bitcoin»: esiste il registro, e possedere il
+          denaro significa possedere la <strong>chiave privata</strong> con cui si firma la transazione. I
+          $21$ milioni sono il risultato di una serie geometrica: $210\,000 \cdot 50 \cdot 2$.</p>
+        <p><strong>È moneta?</strong> Con le tre funzioni della lezione 8: mezzo di scambio in parte, unità
+          di conto praticamente no (troppo volatile), riserva di valore discussa. Oggi, per chi le compra, è
+          un <strong>investimento speculativo</strong>. Da ricordare: se si perde la chiave il denaro è perso
+          per sempre; il registro è pubblico e permanente, quindi l'anonimato è un mito; le plusvalenze in
+          Italia vanno dichiarate.</p>
+      </div>
+    </section>
+
+    <!-- ===== LEZIONE 11 ===== -->
+    <section id="g-frattali">
+      <h2>Lezione 11 · I frattali</h2>
+
+      <div class="recap-topic" id="r11-mostri">
+        <h3>I mostri dell'Ottocento <a class="recap-link" href="11_Frattali.html#sec1">↗ lezione completa</a></h3>
+        <p><strong>1872</strong> Weierstrass: una funzione continua ovunque e derivabile in nessun punto,
+          $W(x) = \sum a^n\cos(b^n\pi x)$ con $ab \gt 1 + \frac32\pi$. Le ampiezze vanno a zero (quindi è
+          continua), le pendenze vanno all'infinito (quindi non ha tangenti).</p>
+        <p><strong>1883</strong> Cantor, <strong>1890</strong> Peano (una curva che riempie un quadrato),
+          <strong>1904</strong> von Koch, <strong>1915</strong> Sierpiński. Nessuno pensava di descrivere la
+          natura: <strong>1975</strong> Mandelbrot conia la parola <em>frattale</em> e rovescia la
+          prospettiva.</p>
+      </div>
+
+      <div class="recap-topic" id="r11-autosim">
+        <h3>L'autosimilarità <a class="recap-link" href="11_Frattali.html#sec2">↗ lezione completa</a></h3>
+        <p>Ogni parte, ingrandita, somiglia al tutto. <strong>Esatta</strong> nelle figure costruite (Koch,
+          Sierpiński), <strong>statistica</strong> in natura: un ramo somiglia all'albero senza esserne una
+          copia. È il motivo per cui in una foto di rocce senza riferimento non si capisce la scala.</p>
+      </div>
+
+      <div class="recap-topic" id="r11-ifs">
+        <h3>I sistemi di funzioni iterate <a class="recap-link" href="11_Frattali.html#sec2">↗ lezione completa</a></h3>
+        <p>Poche trasformazioni che <em>contraggono</em>; applicandole all'infinito si arriva sempre allo
+          stesso insieme, <strong>da qualunque figura si parta</strong> (teorema di Hutchinson, 1981). Il
+          frattale è dunque descritto dalle sole trasformazioni: la felce di Barnsley sta in
+          <strong>ventiquattro numeri</strong>.</p>
+        <p class="formula-note">Il <em>gioco del caos</em> — scegli una trasformazione a caso, applicala,
+          segna il punto — produce la stessa figura. Il caso decide l'ordine dei pixel, non quali pixel
+          esistono.</p>
+      </div>
+
+      <div class="recap-topic" id="r11-dimensione">
+        <h3>La dimensione frazionaria <a class="recap-link" href="11_Frattali.html#sec3">↗ lezione completa</a></h3>
+        <p>Dimezzando la scala servono $2$, $4$, $8$ copie per segmento, quadrato, cubo: cioè
+          $N = (1/r)^{D}$. Prendendo il logaritmo si isola l'esponente — ed è il mestiere del logaritmo:</p>
+        <div class="formula">$$D = \frac{\log N}{\log(1/r)}$$</div>
+        <div class="tabwrap">
+        <table class="tabr">
+          <tr><th>Cantor</th><th>Koch</th><th>Sierpiński</th><th>tappeto</th><th>Peano</th><th>Menger</th></tr>
+          <tr><td>$0{,}6309$</td><td>$1{,}2619$</td><td>$1{,}5850$</td><td>$1{,}8928$</td><td>$2{,}0000$</td><td>$2{,}7268$</td></tr>
+        </table>
+        </div>
+        <p>Il numero misura <strong>quanto la figura riempie lo spazio</strong>, e non dipende dalla base del
+          logaritmo perché è un rapporto.</p>
+      </div>
+
+      <div class="recap-topic" id="r11-box">
+        <h3>Misurarla davvero: il box counting <a class="recap-link" href="11_Frattali.html#sec3">↗ lezione completa</a></h3>
+        <p>Su una figura reale non c'è nessuna regola da guardare. Si copre con griglie di lato $\varepsilon$
+          sempre più fini, si contano le caselle toccate, e si sfrutta che</p>
+        <div class="formula">$$N(\varepsilon)\sim\varepsilon^{-D} \;\Longrightarrow\;
+          \log N = -D\log\varepsilon + \text{cost}$$</div>
+        <p>In scala <strong>bilogaritmica</strong> i punti stanno su una retta, e $D$ è la sua pendenza
+          cambiata di segno. È il modo in cui la dimensione si misura su radiografie, tracciati sismici e
+          immagini satellitari.</p>
+      </div>
+
+      <div class="recap-topic" id="r11-koch">
+        <h3>Perimetro infinito, area finita <a class="recap-link" href="11_Frattali.html#sec4">↗ lezione completa</a></h3>
+        <div class="formula-strip">
+          <div>$P_n = 3s\left(\frac43\right)^{n} \to +\infty$</div>
+          <div>$A_\infty = \frac85 A_0$</div>
+          <div>ragioni $4/3$ e $4/9$</div>
+        </div>
+        <p>Due progressioni geometriche con ragioni ai lati opposti di $1$: la prima diverge, la seconda
+          converge. Non è un paradosso — perimetro e area misurano cose diverse, e nulla vieta di racchiudere
+          un'area piccola con un contorno lungo a piacere.</p>
+      </div>
+
+      <div class="recap-topic" id="r11-costa">
+        <h3>La costa della Gran Bretagna <a class="recap-link" href="11_Frattali.html#sec5">↗ lezione completa</a></h3>
+        <div class="formula">$$L(\varepsilon) = k\,\varepsilon^{\,1-D}$$</div>
+        <p>Se $D = 1$ la lunghezza non dipende dal righello; se $D \gt 1$ <strong>cresce senza limite</strong>
+          man mano che il righello si accorcia. Una costa non ha una lunghezza: ha una dimensione. Richardson
+          (1961) e Mandelbrot (1967): Sudafrica $1{,}02$, Gran Bretagna $1{,}25$, Norvegia $\mathbf{1{,}52}$.
+          La dimensione mette un numero su una parola vaga.</p>
+      </div>
+
+      <div class="recap-topic" id="r11-mandelbrot">
+        <h3>Mandelbrot e Julia <a class="recap-link" href="11_Frattali.html#sec6">↗ lezione completa</a></h3>
+        <p>$z_0 = 0$, $z_{n+1} = z_n^2 + c$: se resta limitata, $c \in \mathcal{M}$. Criterio pratico: se
+          $|z_n| \gt 2$ diverge di sicuro (attenzione, disuguaglianza <em>stretta</em>: $c = -2$ appartiene
+          all'insieme). Per $c$ reale, $\mathcal{M}$ è esattamente $[-2;\ 0{,}25]$.</p>
+        <p>Fissando $c$ e variando $z_0$ si ottiene l'<strong>insieme di Julia</strong>, e vale il teorema di
+          Fatou-Julia: <em>il Julia di $c$ è connesso se e solo se $c \in \mathcal{M}$</em>. L'insieme di
+          Mandelbrot è dunque una mappa di tutti i Julia. Il suo <strong>bordo ha dimensione $2$</strong>
+          (Shishikura, 1991).</p>
+      </div>
+
+      <div class="recap-topic" id="r11-natura">
+        <h3>I frattali in natura e nella tecnica <a class="recap-link" href="11_Frattali.html#sec7">↗ lezione completa</a></h3>
+        <p><strong>Perché ci sono:</strong> per mettere molta superficie in poco volume. I polmoni, con $23$
+          generazioni di ramificazione, arrivano a $70$-$100$ m² dentro cinque litri; l'albero circolatorio
+          stipa $100\,000$ km di vasi in un corpo. È la stessa relazione superficie-volume che impedisce agli
+          insetti di crescere.</p>
+        <p><strong>Dove si usano:</strong> antenne frattali nei telefoni (Cohen, 1988), generazione di
+          terreni e nuvole al computer (Carpenter, 1980 → Pixar), compressione di immagini, e le
+          <em>leggi di potenza</em> con cui Mandelbrot descrisse i mercati nel 1963 — code molto più grasse di
+          quelle della gaussiana.</p>
+      </div>
+
+      <div class="recap-topic" id="r11-caos">
+        <h3>★ Caos e costante di Feigenbaum <a class="recap-link" href="11_Frattali.html#sec8">↗ lezione completa</a></h3>
+        <p>$x_{n+1} = r\,x_n(1-x_n)$, la logistica a passi discreti. L'equilibrio $x^{*} = 1-1/r$ è stabile
+          finché $|2-r| \lt 1$, cioè per $1 \lt r \lt 3$; poi si raddoppia il periodo, sempre più in fretta,
+          fino al caos oltre $r_\infty = 3{,}5699$.</p>
+        <div class="formula">$$\delta = \lim_{k\to\infty}\frac{r_k - r_{k-1}}{r_{k+1}-r_k} = 4{,}669\ldots$$</div>
+        <p class="formula-note">Il valore è <strong>universale</strong>: compare in circuiti elettronici,
+          nella convezione dell'elio e in un rubinetto che gocciola. Il diagramma delle biforcazioni è esso
+          stesso un frattale — e la mappa logistica è la restrizione all'asse reale della stessa iterazione
+          che genera l'insieme di Mandelbrot.</p>
+      </div>
+    </section>
+
+    <!-- ===== LEZIONE 12 ===== -->
+    <section id="g-progetti">
+      <h2>Lezione 12 · Progetti: dal file alla rete</h2>
+
+      <div class="recap-topic" id="r12-tre">
+        <h3>I tre linguaggi <a class="recap-link" href="12_Progetti.html#sec1">↗ lezione completa</a></h3>
+        <div class="tabwrap">
+        <table class="tabr">
+          <tr><th>linguaggio</th><th>mestiere</th><th>se lo togli</th></tr>
+          <tr><td class="l">HTML</td><td class="l">la struttura: che cosa c'è</td><td class="l">non c'è più niente</td></tr>
+          <tr><td class="l">CSS</td><td class="l">l'aspetto: com'è fatto</td><td class="l">leggibile ma bruttissimo</td></tr>
+          <tr><td class="l">JavaScript</td><td class="l">il comportamento: che cosa succede</td><td class="l">bello ma inerte</td></tr>
+        </table>
+        </div>
+        <p><strong>Java non è JavaScript:</strong> nomi simili per un'operazione di marketing del 1995, e
+          linguaggi profondamente diversi. Lo <code>&lt;script&gt;</code> va in fondo al <code>body</code> (o
+          con <code>defer</code>), perché quando parte deve trovare l'HTML già costruito.</p>
+      </div>
+
+      <div class="recap-topic" id="r12-cartella">
+        <h3>La cartella del progetto <a class="recap-link" href="12_Progetti.html#sec2">↗ lezione completa</a></h3>
+        <p>Tre file, una cartella, nient'altro: <code>index.html</code>, <code>stile.css</code>,
+          <code>script.js</code>. Si apre col doppio clic e funziona. Il collegamento avviene per
+          <strong>percorso relativo</strong>, e il novantanove per cento dei «non funziona niente» delle
+          prime settimane è un percorso sbagliato o una maiuscola di troppo — su Linux
+          <code>Stile.css</code> e <code>stile.css</code> sono due file diversi.</p>
+        <p class="formula-note">Regola pratica: <strong>nomi minuscoli, senza spazi e senza accenti</strong>.
+          E su Windows, attivate la visualizzazione delle estensioni prima di rinominare qualunque cosa.</p>
+      </div>
+
+      <div class="recap-topic" id="r12-calcolatrice">
+        <h3>La calcolatrice: una macchina a stati <a class="recap-link" href="12_Progetti.html#sec2">↗ lezione completa</a></h3>
+        <p>Quattro variabili bastano: <code>corrente</code> (il numero che si sta scrivendo),
+          <code>memoria</code> (il primo operando), <code>operazione</code>, e <code>nuovoNumero</code> (la
+          prossima cifra ricomincia da capo). Premendo un operatore mentre ce n'è già uno in sospeso, il
+          programma <strong>chiude il conto</strong> prima di aprirne un altro: è così che
+          <code>2 + 3 +</code> mostra $5$.</p>
+        <p class="formula-note">La separazione fra <em>dati</em> (l'attributo <code>data-tasto</code>) e
+          <em>comportamento</em> (la funzione <code>premi</code>) fa sì che aggiungere un tasto richieda una
+          riga di HTML e nient'altro.</p>
+      </div>
+
+      <div class="recap-topic" id="r12-eval">
+        <h3>Perché non si usa <code>eval()</code> <a class="recap-link" href="12_Progetti.html#sec2">↗ lezione completa</a></h3>
+        <p>Perché non «calcola un'espressione»: interpreta il testo come <strong>programma completo</strong>,
+          con accesso a tutto. Se un domani quella stringa arrivasse da un utente, avreste dato a uno
+          sconosciuto il permesso di eseguire codice. È la vulnerabilità chiamata <em>code injection</em>, e
+          la regola vale ovunque: <strong>non trattare mai come codice qualcosa che arriva da fuori</strong>.</p>
+      </div>
+
+      <div class="recap-topic" id="r12-server">
+        <h3>Server e hosting <a class="recap-link" href="12_Progetti.html#sec3">↗ lezione completa</a></h3>
+        <p>Un server non è un computer speciale: è un <strong>ruolo</strong>. Quello che gli serve, e che al
+          vostro portatile manca, sono tre cose: restare acceso, avere un IP pubblico stabile, avere un nome
+          nel DNS. Un servizio di <em>hosting</em> se ne occupa al posto vostro.</p>
+        <p>Per un sito fatto di soli file — un sito <strong>statico</strong> — bastano GitHub Pages, GitLab
+          Pages, Netlify: gratuiti e ottimi. Per provare in locale:
+          <code>python -m http.server 8000</code>.</p>
+      </div>
+
+      <div class="recap-topic" id="r12-git">
+        <h3>Git, e perché è distribuito <a class="recap-link" href="12_Progetti.html#sec3">↗ lezione completa</a></h3>
+        <p>Scritto da <strong>Linus Torvalds</strong> in dieci giorni nel <strong>2005</strong>, dopo che
+          BitKeeper smise di essere gratuito per il kernel Linux. <em>Distribuito</em> significa che ogni
+          copia contiene l'intera storia: si lavora offline.</p>
+        <div class="formula">$$\text{id}_k = \text{hash}\big(\text{id}_{k-1},\ \text{file},\
+          \text{autore},\ \text{data},\ \text{messaggio}\big)$$</div>
+        <p class="formula-note">È <strong>esattamente</strong> la catena di impronte della blockchain, e
+          precede Bitcoin di tre anni. Manca solo la prova di lavoro, perché non serve: non c'è nessuno da
+          cui difendersi in una copia che è già vostra. Corollario: <strong>non riscrivete mai la storia di
+          un ramo già condiviso</strong>.</p>
+      </div>
+
+      <div class="recap-topic" id="r12-flusso">
+        <h3>Il flusso di lavoro <a class="recap-link" href="12_Progetti.html#sec4">↗ lezione completa</a></h3>
+        <div class="tabwrap">
+        <table class="tabr">
+          <tr><th>luogo</th><th>comando per arrivarci</th></tr>
+          <tr><td class="l">cartella di lavoro</td><td class="mono">— (le modifiche le fate voi)</td></tr>
+          <tr><td class="l">area di staging</td><td class="mono">git add</td></tr>
+          <tr><td class="l">repository locale</td><td class="mono">git commit -m "…"</td></tr>
+          <tr><td class="l">repository remoto</td><td class="mono">git push</td></tr>
+        </table>
+        </div>
+        <p>L'<strong>area di staging</strong> permette di dire «di venti modifiche, queste tre vanno
+          insieme»: un commit dev'essere una <em>unità di senso</em>. Un <strong>conflitto</strong> non è un
+          errore: è git che si rifiuta di indovinare al posto vostro quando due modifiche si sovrappongono.</p>
+      </div>
+
+      <div class="recap-topic" id="r12-ciclo">
+        <h3>Il ciclo di gioco <a class="recap-link" href="12_Progetti.html#sec5">↗ lezione completa</a></h3>
+        <p><strong>Leggi gli ingressi → aggiorna lo stato → disegna</strong>, sessanta volte al secondo con
+          <code>requestAnimationFrame</code>. È il cuore di qualunque videogioco.</p>
+        <p><strong>Due trappole da ricordare.</strong> (1) Muoversi «di tanti pixel per fotogramma» rende il
+          gioco più veloce sui monitor rapidi: si moltiplica per $\Delta t$, cioè
+          $s = s_0 + v\,\Delta t$. (2) Il rimbalzo scritto come <code>vy = -vy</code> incolla la palla al
+          bordo se ci finisce dentro: si <em>forza</em> il verso con <code>Math.abs</code> e si rimette la
+          palla sul bordo. Il rimbalzo inverte solo la componente perpendicolare alla parete — è la legge
+          della riflessione.</p>
+      </div>
+
+      <div class="recap-topic" id="r12-motori">
+        <h3>I motori grafici <a class="recap-link" href="12_Progetti.html#sec6">↗ lezione completa</a></h3>
+        <p>Renderer, motore fisico, scene graph, audio, asset pipeline, editor. La matematica sotto la
+          conoscete: trasformazioni come matrici, vettori, prodotto scalare per la luce, trigonometria per le
+          telecamere. <strong>Unity</strong> (C#, mobile e indie), <strong>Unreal</strong> (C++, alto
+          budget), <strong>Godot</strong> (libero, leggero, il consiglio per chi comincia), oppure il browser
+          con Canvas, WebGL e WebGPU.</p>
+        <p class="formula-note">Il consiglio serio non è tecnico: fate un gioco <strong>piccolo e
+          completo</strong> e pubblicatelo. Dieci giochi finiti insegnano più di un capolavoro mai
+          terminato.</p>
+      </div>
+
+      <div class="recap-topic" id="r12-invio">
+        <h3>★ Che cosa succede quando premi Invio <a class="recap-link" href="12_Progetti.html#sec7">↗ lezione completa</a></h3>
+        <p><strong>DNS</strong> (dal nome all'IP) → <strong>TCP</strong> (apertura della connessione) →
+          <strong>TLS</strong> (certificato, verifica, chiave di sessione: è la lezione 10) →
+          <strong>HTTP</strong> (la richiesta e la risposta col suo codice) → <strong>file
+          secondari</strong> → <strong>rendering</strong> (DOM, layout, disegno, script).</p>
+        <p><strong>Il tempo se ne va nei viaggi</strong>, non nel server. A $6000$ km ogni andata e ritorno
+          costa $60$ ms, e le prime quattro fasi ne richiedono quattro: $240$ ms prima del primo byte. Con
+          una copia a $300$ km si scende a $12$ ms — venti volte meno. <em>La latenza non si compra, si
+          accorcia:</em> è quello che fanno le CDN, ed è il motivo per cui avvicinare i dati vale molto più
+          che ottimizzare il codice.</p>
+      </div>
+    </section>
+
+    <section id="sec-prova">
+      <h2>Come prepararsi alla verifica</h2>
+      <div class="note">
+        <p><strong>Le cinque cose che devi saper fare a occhi chiusi.</strong></p>
+        <ol>
+          <li><strong>Costruire una coppia di chiavi RSA</strong> con primi piccoli, cifrare e decifrare, e
+            spiegare perché funziona (Eulero) e perché è sicuro (fattorizzazione).</li>
+          <li><strong>Calcolare una dimensione frattale</strong> come $\log N/\log(1/r)$, e spiegare come si
+            misura su una figura reale col box counting.</li>
+          <li><strong>Riconoscere una progressione geometrica</strong> e dire se diverge o converge: il
+            perimetro di Koch, l'area del fiocco, i $21$ milioni di bitcoin, i tentativi $16^{z}$.</li>
+          <li><strong>Leggere una catena di impronte</strong>, che sia una blockchain o la storia di git, e
+            dire che cosa succede modificando un anello.</li>
+          <li><strong>Stimare un tempo</strong> con una divisione: quanti tentativi per $z$ zeri, quanti
+            millisecondi per $n$ chilometri, quanti pixel al secondo a $144$ Hz.</li>
+        </ol>
+        <p><strong>I cinque errori che costano di più:</strong> confondere «impossibile» con «troppo costoso»
+          (la blockchain, RSA); credere che la dimensione debba essere intera; dimenticare che le collisioni
+          di hash <em>esistono sempre</em>; pensare che il lucchetto del browser certifichi l'onestà del
+          sito; ottimizzare il codice quando il tempo se ne va nella latenza.</p>
+      </div>
+      <p>Quando ti senti pronto: <a href="Verifica_4_Crittografia_frattali_progetti.html">verifica di prova
+        online</a> — 10 quesiti a correzione automatica, 5 a risposta aperta e 5 di ragionamento, tutti con
+        soluzione guidata.</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> — Prof. Vettigli</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script defer src="../Style/interactive.js"></script>
+  <script defer src="../Style/toc.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const host = document.getElementById('cmap'); if (!host) return;
+      const cssVar = (n, f) => (getComputedStyle(document.documentElement).getPropertyValue(n).trim() || f);
+      const COLS = [
+        { header: 'Crittografia e blockchain', icon: '⑩', target: 'g-cripto', ck: '--primary', children: [
+          ['Il problema della fiducia', 'r10-fiducia'], ['Il cifrario di Cesare', 'r10-cesare'],
+          ['L\'analisi delle frequenze', 'r10-frequenze'], ['L\'aritmetica modulare', 'r10-modulo'],
+          ['RSA', 'r10-rsa'], ['Perché funziona: Eulero', 'r10-eulero'],
+          ['Le funzioni di hash', 'r10-hash'], ['La firma digitale', 'r10-firma'],
+          ['La blockchain', 'r10-blockchain'], ['Le criptovalute', 'r10-cripto'] ] },
+        { header: 'I frattali', icon: '⑪', target: 'g-frattali', ck: '--accent', children: [
+          ['I mostri dell\'Ottocento', 'r11-mostri'], ['L\'autosimilarità', 'r11-autosim'],
+          ['I sistemi di funzioni iterate', 'r11-ifs'], ['La dimensione frazionaria', 'r11-dimensione'],
+          ['Il box counting', 'r11-box'], ['Perimetro ∞, area finita', 'r11-koch'],
+          ['La costa e Richardson', 'r11-costa'], ['Mandelbrot e Julia', 'r11-mandelbrot'],
+          ['I frattali in natura', 'r11-natura'], ['★ Caos e Feigenbaum', 'r11-caos'] ] },
+        { header: 'Progetti', icon: '⑫', target: 'g-progetti', ck: '--magenta', children: [
+          ['HTML, CSS, JavaScript', 'r12-tre'], ['La cartella del progetto', 'r12-cartella'],
+          ['La calcolatrice', 'r12-calcolatrice'], ['Perché non eval()', 'r12-eval'],
+          ['Server e hosting', 'r12-server'], ['Git e la sua storia', 'r12-git'],
+          ['Il flusso di lavoro', 'r12-flusso'], ['Il ciclo di gioco', 'r12-ciclo'],
+          ['I motori grafici', 'r12-motori'], ['★ Premendo Invio', 'r12-invio'] ] },
+      ];
+      const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      function draw() {
+        const surf2 = cssVar('--surface-2', '#21262d'), text = cssVar('--text', '#e6edf3');
+        const cxs = [160, 480, 800], rootCx = 480, rootCy = 40, headCy = 126, childY0 = 200, step = 58;
+        let s = `<svg viewBox="0 0 960 760" preserveAspectRatio="xMidYMin meet" role="img" aria-label="Mappa concettuale">`;
+        s += `<defs><filter id="cmShadow" x="-20%" y="-40%" width="140%" height="180%"><feDropShadow dx="0" dy="2" stdDeviation="2.4" flood-color="#000" flood-opacity="0.30"/></filter></defs>`;
+        cxs.forEach((cx, i) => {
+          const c = cssVar(COLS[i].ck, '#79c0ff'); const y1 = rootCy + 26, y2 = headCy - 27, my = (y1 + y2) / 2;
+          s += `<path d="M ${rootCx} ${y1} C ${rootCx} ${my}, ${cx} ${my}, ${cx} ${y2}" fill="none" stroke="${c}" stroke-width="2" opacity="0.55"/>`;
+          const lastY = childY0 + (COLS[i].children.length - 1) * step;
+          s += `<line x1="${cx}" y1="${headCy + 26}" x2="${cx}" y2="${lastY}" stroke="${c}" stroke-width="2" opacity="0.4"/>`;
+        });
+        s += `<g class="cmap-node" data-target="sec-mappa"><rect x="${rootCx - 250}" y="${rootCy - 24}" width="500" height="48" rx="24" fill="${surf2}" stroke="${text}" stroke-width="2" filter="url(#cmShadow)"/><text x="${rootCx}" y="${rootCy + 6}" text-anchor="middle" font-family="Inter,sans-serif" font-size="16" font-weight="800" fill="${text}">🔁 Una regola semplice, ripetuta</text></g>`;
+        COLS.forEach((col, i) => {
+          const cx = cxs[i], c = cssVar(col.ck, '#79c0ff');
+          s += `<g class="cmap-node" data-target="${col.target}"><rect x="${cx - 138}" y="${headCy - 25}" width="276" height="50" rx="12" fill="${surf2}" stroke="${c}" stroke-width="2.6" filter="url(#cmShadow)"/><rect x="${cx - 138}" y="${headCy - 25}" width="8" height="50" rx="4" fill="${c}"/><text x="${cx + 4}" y="${headCy + 6}" text-anchor="middle" font-family="Inter,sans-serif" font-size="15" font-weight="800" fill="${c}">${col.icon}&#160; ${esc(col.header)}</text></g>`;
+          col.children.forEach((ch, j) => {
+            const cy = childY0 + j * step;
+            s += `<g class="cmap-node" data-target="${ch[1]}"><rect x="${cx - 124}" y="${cy - 19}" width="248" height="38" rx="9" fill="${surf2}" stroke="${c}" stroke-width="1.4" filter="url(#cmShadow)"/><circle cx="${cx - 107}" cy="${cy}" r="3.6" fill="${c}"/><text x="${cx + 8}" y="${cy + 4.5}" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5" font-weight="500" fill="${text}">${esc(ch[0])}</text></g>`;
+          });
+        });
+        s += `</svg>`; host.innerHTML = s;
+      }
+      draw();
+      document.addEventListener('themechange', draw);
+      host.addEventListener('click', (e) => {
+        const g = e.target.closest('.cmap-node'); if (!g) return;
+        const el = document.getElementById(g.dataset.target); if (!el) return;
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el.classList.remove('recap-flash'); void el.offsetWidth; el.classList.add('recap-flash');
+      });
+      document.getElementById('year').textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+
+</html>

@@ -556,9 +556,200 @@
       </div>
     </section>
 
-    <!-- 6 — SKEWNESS -->
+    <!-- 6 — PERMUTAZIONI E ANAGRAMMI -->
     <section id="sec6">
-      <h2>6. Quando la campana è storta: l'asimmetria</h2>
+      <h2>6. Le permutazioni: in quanti modi si può mescolare?</h2>
+
+      <p>Il coefficiente binomiale $\binom{n}{k}$ contava <em>in quanti modi</em> può capitare una certa cosa.
+        Vale la pena fermarsi un momento su questo «contare i modi», perché è un mestiere che serve
+        continuamente — e si può cominciare da un gioco che conoscete tutti: gli <strong>anagrammi</strong>.</p>
+
+      <div class="definition">
+        Un <strong>anagramma</strong> di una parola è una qualunque parola ottenuta <strong>rimescolandone le
+        lettere</strong>, usandole tutte e una sola volta. Ogni mescolamento si chiama, in matematica, una
+        <strong>permutazione</strong>.
+      </div>
+
+      <p>Prendiamo <strong>ROMA</strong>. Quanti rimescolamenti esistono? Non serve elencarli: basta ragionare
+        <strong>posto per posto</strong>.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il ragionamento che genera il fattoriale</div>
+        <p>Per la <strong>prima</strong> lettera posso scegliere fra $4$ possibilità. Fatta quella scelta, per la
+          <strong>seconda</strong> me ne restano $3$; per la <strong>terza</strong> $2$; per l'<strong>ultima</strong>
+          non c'è più niente da scegliere, ne resta $1$. Le scelte si moltiplicano:</p>
+        $$4 \cdot 3 \cdot 2 \cdot 1 = 24$$
+        <p class="formula-note">Ventiquattro rimescolamenti: ROMA, RAMO, MORA, AMOR, ORMA, MARO, ORAM… La maggior
+          parte non sono parole italiane, e infatti la matematica conta <em>tutte</em> le sequenze; quali di esse
+          siano parole è una questione che riguarda il vocabolario, non il calcolo.</p>
+      </div>
+
+      <p>Quel prodotto «tutti i numeri da $n$ fino a $1$» lo avete già incontrato nel paragrafo 5.1: è il
+        <strong>fattoriale</strong>.</p>
+
+      <div class="definition">
+        Il <strong>fattoriale</strong> di $n$, scritto $n!$, è il prodotto di tutti gli interi da $1$ a $n$:
+        $$n! = n \cdot (n-1) \cdot (n-2) \cdots 3 \cdot 2 \cdot 1$$
+        Le permutazioni di $n$ oggetti <strong>tutti diversi</strong> sono esattamente $n!$. Per convenzione
+        $0! = 1$ (c'è un solo modo di non mescolare niente).
+      </div>
+
+      <div class="warnbox">
+        <strong>Il fattoriale cresce in un modo che l'intuizione non regge.</strong> Guardate:
+        $3! = 6$, $5! = 120$, $10! = 3\,628\,800$, $20! \approx 2{,}4\times10^{18}$.
+        <p style="margin:0.5rem 0 0;">E adesso il colpo di scena: un mazzo di <strong>52 carte</strong> si può
+          ordinare in $52! \approx 8\times10^{67}$ modi. È un numero più grande del numero di atomi della nostra
+          galassia. Ne segue una cosa che sembra impossibile e invece è vera: quando mescolate bene un mazzo di
+          carte, l'ordine che ottenete <strong>quasi certamente non si è mai presentato prima</strong> in tutta la
+          storia dell'umanità, e non si presenterà mai più.</p>
+      </div>
+
+      <h3>6.1 — Quando ci sono lettere ripetute</h3>
+
+      <p>Proviamo con <strong>MAMMA</strong>. Cinque lettere, quindi $5! = 120$ permutazioni… ma è sbagliato.
+        Le tre M sono <strong>identiche</strong>: scambiare fra loro due M non produce una parola diversa, produce
+        la stessa identica parola. Il conto $120$ ha contato ogni anagramma <em>molte volte</em>.</p>
+
+      <p>Quante volte? Esattamente $3!$ (i modi di mescolare le tre M fra loro) moltiplicato per $2!$ (i modi di
+        mescolare le due A). Quindi si divide:</p>
+
+      <div class="formula-box">
+        $$\frac{5!}{3!\,\cdot\,2!} = \frac{120}{6 \cdot 2} = \frac{120}{12} = 10$$
+        <p class="formula-note">E infatti sono dieci: MAMMA, MAMAM, MAAMM, AMMMA, AMMAM, AMAMM, MMAMA, MMAAM,
+          MMMAA, AAMMM.</p>
+      </div>
+
+      <div class="definition">
+        <strong>Permutazioni con ripetizione.</strong> Se fra $n$ oggetti ce ne sono $n_1$ uguali fra loro, $n_2$
+        uguali fra loro e così via, i mescolamenti <em>distinguibili</em> sono
+        $$P = \frac{n!}{n_1!\,\cdot\,n_2!\,\cdots\,n_k!}$$
+      </div>
+
+      <div class="simbox">
+        <div class="controls">
+          <div class="control-group">
+            <label for="an-word">Scrivi una parola e contiamo i suoi anagrammi:</label>
+            <input type="text" id="an-word" value="MATEMATICA" maxlength="12"
+                   style="font-size:1.05rem; padding:0.4rem 0.6rem; letter-spacing:0.08em; text-transform:uppercase; width:100%; max-width:22rem;">
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><div class="n" id="an-n">10</div><div class="l">lettere</div></div>
+          <div class="stat"><div class="n" id="an-fatt">3 628 800</div><div class="l">$n!$ (se fossero tutte diverse)</div></div>
+          <div class="stat"><div class="n" id="an-tot">151 200</div><div class="l">anagrammi <strong>distinguibili</strong></div></div>
+        </div>
+        <p class="sim-out" id="an-out"></p>
+      </div>
+
+      <h3>6.2 — Il coefficiente binomiale è un contatore di anagrammi</h3>
+
+      <p>Ed ecco il punto che lega questa sezione a tutto il resto del capitolo. Torniamo ai lanci di moneta:
+        <em>in quanti modi possono uscire esattamente $2$ teste su $5$ lanci?</em></p>
+
+      <p>Un esito è una sequenza come <strong>TCTCC</strong>: cinque caselle, due T e tre C. Contare le sequenze
+        possibili è <strong>esattamente</strong> contare gli anagrammi della «parola» TTCCC — una parola di cinque
+        lettere con due lettere ripetute due volte e tre volte. Applichiamo la formula appena trovata:</p>
+
+      <div class="formula-box">
+        $$\frac{5!}{2!\,\cdot\,3!} = \frac{120}{2 \cdot 6} = 10 \qquad\text{e infatti}\qquad
+          \binom{5}{2} = \frac{5!}{2!\,(5-2)!} = 10$$
+        <p class="formula-note">Sono la <strong>stessa formula</strong>. Il coefficiente binomiale non è altro che
+          il numero di anagrammi di una parola fatta di due sole lettere diverse — e quindi il numero di modi in
+          cui $k$ «successi» possono distribuirsi fra $n$ tentativi.</p>
+      </div>
+
+      <p>Questo spiega anche perché nel triangolo di Tartaglia le righe sono simmetriche: gli anagrammi di
+        <em>due</em> T e <em>tre</em> C sono ovviamente tanti quanti quelli di <em>tre</em> T e <em>due</em> C —
+        basta scambiare i nomi delle due lettere. In simboli, $\binom{n}{k} = \binom{n}{n-k}$.</p>
+
+      <h3>6.3 — Attenzione: conta l'ordine o no?</h3>
+
+      <div class="warnbox">
+        <strong>È la domanda che decide tutto</strong>, ed è quella in cui si sbaglia.
+        <ul>
+          <li>Se l'<strong>ordine conta</strong> (chi arriva primo, secondo, terzo) si contano le
+            <strong>disposizioni</strong>: $n \cdot (n-1) \cdots$ tante volte quanti sono i posti, cioè
+            $\dfrac{n!}{(n-k)!}$.</li>
+          <li>Se l'<strong>ordine non conta</strong> (chi entra in squadra, quali numeri escono al lotto) si
+            contano le <strong>combinazioni</strong>: $\dbinom{n}{k} = \dfrac{n!}{k!\,(n-k)!}$, cioè le stesse
+            disposizioni divise per i $k!$ modi di riordinare i prescelti.</li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 1</span><span class="difficulty easy">Facile</span></div>
+        <p>Quanti anagrammi hanno le parole <strong>AMORE</strong>, <strong>PIZZA</strong> e
+          <strong>CASA</strong>?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>AMORE</strong>: cinque lettere <em>tutte diverse</em>, quindi $5! = \mathbf{120}$.</p>
+          <p><strong>PIZZA</strong>: cinque lettere, ma la Z compare due volte:
+            $\dfrac{5!}{2!} = \dfrac{120}{2} = \mathbf{60}$.</p>
+          <p><strong>CASA</strong>: quattro lettere, la A compare due volte:
+            $\dfrac{4!}{2!} = \dfrac{24}{2} = \mathbf{12}$.</p>
+          <div class="result-box"><span class="result-label">Regola</span><span class="result-value">Ogni lettera
+            ripetuta $m$ volte fa dividere per $m!$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 2</span><span class="difficulty medium">Medio</span></div>
+        <p>Quanti anagrammi ha la parola <strong>MATEMATICA</strong>?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span>Si contano le lettere: $10$ in tutto. Le ripetizioni sono
+            <strong>M</strong> ($2$ volte), <strong>A</strong> ($3$ volte), <strong>T</strong> ($2$ volte);
+            E, I, C compaiono una volta sola e non fanno dividere niente (perché $1! = 1$).</p>
+          <p><span class="step-num">2</span>Si applica la formula:</p>
+          <p style="text-align:center;">$$\frac{10!}{2!\,\cdot\,3!\,\cdot\,2!} = \frac{3\,628\,800}{2 \cdot 6 \cdot 2}
+            = \frac{3\,628\,800}{24} = 151\,200$$</p>
+          <div class="result-box"><span class="result-label">Risultato</span><span class="result-value">$151\,200$
+            anagrammi — controllabile con il contatore qui sopra</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 3</span><span class="difficulty medium">Medio</span></div>
+        <p>Lancio <strong>6 monete</strong>. In quanti modi diversi possono uscire esattamente <strong>4
+          teste</strong>? Risolvi il problema <em>due volte</em>: come anagramma e come coefficiente binomiale.</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><span class="step-num">1</span><strong>Come anagramma.</strong> Un esito è una parola di sei lettere
+            con quattro T e due C, per esempio TTCTTC. Gli anagrammi sono
+            $\dfrac{6!}{4!\,\cdot\,2!} = \dfrac{720}{24 \cdot 2} = 15$.</p>
+          <p><span class="step-num">2</span><strong>Come coefficiente binomiale.</strong>
+            $\dbinom{6}{4} = \dfrac{6!}{4!\,(6-4)!} = 15$. ✓ Identico, come deve essere.</p>
+          <p><span class="step-num">3</span><strong>Controllo sul triangolo di Tartaglia.</strong> La riga di
+            $n = 6$ è $1,\ 6,\ 15,\ 20,\ 15,\ 6,\ 1$: il termine corrispondente a $k = 4$ è proprio $15$.</p>
+          <div class="result-box"><span class="result-label">E la probabilità?</span><span class="result-value">$\dfrac{15}{2^6} = \dfrac{15}{64} \approx 23{,}4\%$</span></div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-header"><span class="ex-title">Esercizio 4</span><span class="difficulty hard">Difficile</span></div>
+        <p>A una gara partecipano <strong>8 atleti</strong>. <strong>(a)</strong> In quanti modi diversi può
+          risultare il podio (oro, argento, bronzo)? <strong>(b)</strong> E in quanti modi si possono scegliere i
+          <em>tre</em> che vanno in finale, se non conta la posizione? <strong>(c)</strong> Perché i due numeri
+          sono diversi, e di quanto?</p>
+        <div class="ex-actions"><button class="btn btn-toggle btn-solution">💡 Mostra soluzione</button></div>
+        <div class="solution">
+          <p><strong>(a)</strong> Qui l'<strong>ordine conta</strong>: oro, argento e bronzo non sono la stessa
+            cosa. Sono $8$ scelte per l'oro, $7$ per l'argento, $6$ per il bronzo:</p>
+          <p style="text-align:center;">$$8 \cdot 7 \cdot 6 = \frac{8!}{5!} = \mathbf{336}$$</p>
+          <p><strong>(b)</strong> Qui l'ordine <strong>non</strong> conta: interessa solo <em>quali</em> tre.</p>
+          <p style="text-align:center;">$$\binom{8}{3} = \frac{8!}{3!\,\cdot\,5!} = \frac{336}{6} = \mathbf{56}$$</p>
+          <p><strong>(c)</strong> Il rapporto è esattamente $3! = 6$: ogni terna di finalisti può salire sul podio
+            in $6$ ordini diversi. Le disposizioni sono le combinazioni «moltiplicate per tutti i modi di
+            ordinarle».</p>
+          <div class="result-box"><span class="result-label">Da ricordare</span><span class="result-value">Prima
+            di calcolare, chiedersi <strong>sempre</strong>: conta l'ordine?</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — SKEWNESS -->
+    <section id="sec7">
+      <h2>7. Quando la campana è storta: l'asimmetria</h2>
       <p>Non tutti i fenomeni danno una campana simmetrica. Prendi i <strong>gol segnati da un attaccante</strong> in
         una partita: quasi sempre $0$, $1$ o $2$; ogni tanto $3$; rarissimamente $5$; ma <strong>mai meno di
         zero</strong>. C'è un «muro» a sinistra: non si può scendere sotto lo $0$. Il risultato è una curva
@@ -572,8 +763,8 @@
     </section>
 
     <!-- 7 — GAUSSIANA -->
-    <section id="sec7">
-      <h2>7. La regina di tutte: la distribuzione gaussiana</h2>
+    <section id="sec8">
+      <h2>8. La regina di tutte: la distribuzione gaussiana</h2>
       <p>E se prendiamo un fenomeno <em>qualsiasi</em>? La cosa sorprendente è che, il più delle volte, viene fuori
         <strong>sempre la stessa curva</strong>: la <strong>distribuzione gaussiana</strong> (o <strong>normale</strong>,
         o <strong>a campana</strong>). L'altezza delle persone, gli errori di misura, i punteggi di un test, il peso
@@ -601,7 +792,7 @@
         <strong>discreta</strong> (a gradini) diventa <strong>continua</strong> (liscia). È il ponte tra la statistica
         di oggi e l'analisi matematica dell'ultimo anno.</p>
 
-      <h3>7.1 — Ecco perché si usa il quadrato</h3>
+      <h3>8.1 — Ecco perché si usa il quadrato</h3>
       <p>Torniamo alla promessa della sezione 3: perché nello scarto quadratico medio usiamo il <strong>quadrato</strong>
         e non il valore assoluto? Ora possiamo rispondere: perché la curva che salta fuori quasi sempre è la
         <strong>gaussiana</strong>, e la sua formula è costruita proprio sul <em>quadrato</em> dello scarto (nel suo
@@ -634,8 +825,8 @@
     </section>
 
     <!-- 8 — CORRELAZIONE E CAUSALITÀ -->
-    <section id="sec8">
-      <h2>8. Correlazione non è causalità (e la statistica non è ideologia)</h2>
+    <section id="sec9">
+      <h2>9. Correlazione non è causalità (e la statistica non è ideologia)</h2>
       <p>Chiudiamo con l'insegnamento più importante di tutta la lezione — un antidoto contro le bugie travestite da
         numeri. Quando due variabili «si muovono insieme» (crescono o calano di pari passo), diciamo che sono
         <strong>correlate</strong>. Nel grafico a dispersione, i punti si allineano lungo una tendenza:</p>
@@ -700,7 +891,7 @@
         l'autorità della scienza per mascherare una scelta di valori. La statistica ti dà i numeri; che cosa
         <em>farne</em> resta una decisione umana, di cui siamo responsabili noi.</p>
 
-      <h3>8.1 — Il pregiudizio di sopravvivenza</h3>
+      <h3>9.1 — Il pregiudizio di sopravvivenza</h3>
       <p>C'è un'altra trappola statistica, forse la più subdola di tutte, perché non si nasconde dentro un
         grafico truccato né dentro una correlazione fasulla: si nasconde <strong>nei dati che mancano</strong>.
         Si chiama <strong>pregiudizio di sopravvivenza</strong> (in inglese <em>survivorship bias</em>): succede
@@ -787,7 +978,7 @@
 
     <!-- 9 — QUIZ -->
     <section id="quiz">
-      <h2>9. Quiz finale</h2>
+      <h2>10. Quiz finale</h2>
       <p>Dieci domande su campione, media/mediana, deviazione standard, distribuzioni e correlazione. Difficoltà
         crescente.</p>
       <div id="quiz-app"></div>
@@ -1062,6 +1253,57 @@
         document.getElementById('ga-500').addEventListener('click', () => dropMany(500));
         document.getElementById('ga-reset').addEventListener('click', () => { bins = new Array(BINS).fill(0); draw(); out.textContent = ''; });
         draw();
+      })();
+
+      // ===== 6 — contatore di anagrammi (permutazioni con ripetizione) =====
+      (function () {
+        const inp = document.getElementById('an-word'); if (!inp) return;
+        const eN = document.getElementById('an-n'), eF = document.getElementById('an-fatt');
+        const eT = document.getElementById('an-tot'), out = document.getElementById('an-out');
+        // separatore delle migliaia con lo spazio fine, come si usa in matematica
+        function sep(x) {
+          const s = x.toString();
+          if (s.indexOf('e') >= 0 || s.length > 18) return x.toExponential(3).replace('.', ',');
+          let r = '', c = 0;
+          for (let i = s.length - 1; i >= 0; i--) { r = s[i] + r; if (++c % 3 === 0 && i > 0) r = ' ' + r; }
+          return r;
+        }
+        function fatt(n) { let r = 1; for (let i = 2; i <= n; i++) r *= i; return r; }
+        const ACCENTATE = 'ÀÈÉÌÒÙ';
+        function soloLettere(t) {
+          let r = '';
+          for (let i = 0; i < t.length; i++) {
+            const c = t.charAt(i);
+            if ((c >= 'A' && c <= 'Z') || ACCENTATE.indexOf(c) >= 0) r += c;
+          }
+          return r;
+        }
+        function calcola() {
+          try {
+            const lettere = soloLettere((inp.value || '').toUpperCase());
+            const n = lettere.length;
+            if (n === 0) { eN.textContent = '0'; eF.textContent = '—'; eT.textContent = '—';
+              out.textContent = 'Scrivi una parola di sole lettere.'; return; }
+            const conta = {};
+            for (let i = 0; i < n; i++) conta[lettere[i]] = (conta[lettere[i]] || 0) + 1;
+            const nf = fatt(n);
+            let div = 1, ripetute = [];
+            Object.keys(conta).sort().forEach(function (c) {
+              if (conta[c] > 1) { div *= fatt(conta[c]); ripetute.push(c + ' × ' + conta[c]); }
+            });
+            const tot = Math.round(nf / div);
+            eN.textContent = n; eF.textContent = sep(nf); eT.textContent = sep(tot);
+            if (ripetute.length === 0) {
+              out.textContent = lettere + ': ' + n + ' lettere tutte diverse, quindi gli anagrammi sono '
+                + n + '! = ' + sep(nf) + '.';
+            } else {
+              out.textContent = lettere + ': lettere ripetute → ' + ripetute.join(', ')
+                + '. Si divide ' + n + '! per ' + sep(div) + ', e restano ' + sep(tot) + ' anagrammi distinguibili.';
+            }
+          } catch (err) { out.textContent = 'Errore nel calcolo: ' + err.message; }
+        }
+        inp.addEventListener('input', calcola);
+        calcola();
       })();
 
       // ===== 6 — curva asimmetrica (skew) =====

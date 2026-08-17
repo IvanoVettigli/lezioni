@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 6 — I sistemi come intersezioni</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.8rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.l { text-align: left; }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .ric { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .ric > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                 padding: 0.8rem 0.9rem; background: var(--surface); }
+    .ric h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Terzo anno · Lezione 6</div>
+    <h1>I sistemi come intersezioni</h1>
+    <p>Due condizioni insieme sono due curve sul piano:
+      risolvere significa trovare dove si incontrano</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Terzo anno</a>
+    <span class="sep">/</span> I sistemi come intersezioni
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>Un'idea sola, per tutta la lezione.</strong> I sistemi li sapete già risolvere dall'anno scorso:
+      sostituzione, riduzione, confronto, Cramer. Oggi non impariamo un metodo nuovo — impariamo a
+      <strong>vedere</strong> che cosa stiamo facendo. Ogni equazione in due incognite descrive una
+      <em>curva</em> sul piano cartesiano; un sistema mette insieme due condizioni, e le soluzioni sono
+      esattamente i <strong>punti in cui le due curve si incontrano</strong>. Da questo punto di vista tutto
+      diventa prevedibile: si capisce in anticipo quante soluzioni aspettarsi, perché a volte non ce ne sono, e
+      perché il vostro telefono sa dove siete.
+    </div>
+
+    <!-- 1 — RIPASSO -->
+    <section id="sec1">
+      <h2>1. Ripasso: che cos'è un sistema</h2>
+
+      <div class="definition">
+        <div class="formula-title">Sistema di equazioni</div>
+        <p>Un <strong>sistema</strong> è un insieme di due o più equazioni che devono valere
+          <strong>contemporaneamente</strong>. Si scrive con una graffa:
+          $$\begin{cases} 2x + y = 7 \\ 3x - y = 8 \end{cases}$$
+          Le <strong>soluzioni</strong> sono le coppie $(x;\,y)$ che rendono vere <em>tutte</em> le equazioni
+          insieme.</p>
+        <p class="formula-note">La parola chiave è <em>contemporaneamente</em>: la graffa si legge «e», non
+          «oppure». Una coppia che soddisfa solo la prima equazione non è una soluzione del sistema.</p>
+      </div>
+
+      <p>Un sistema si dice <strong>determinato</strong> se ha un numero finito di soluzioni,
+        <strong>impossibile</strong> se non ne ha nessuna, <strong>indeterminato</strong> se ne ha infinite. E
+        adesso vediamo perché queste tre parole descrivono, in realtà, tre situazioni geometriche.</p>
+
+      <h3>1.1 — Ogni equazione è una curva</h3>
+
+      <p>Prendiamo $2x + y = 7$. Non è un'equazione da «risolvere» nel senso solito: ha infinite soluzioni. Per
+        $x = 0$ viene $y = 7$; per $x = 1$, $y = 5$; per $x = 2$, $y = 3$. Segnando tutte queste coppie sul
+        piano cartesiano si ottiene una <strong>retta</strong>.</p>
+
+      <div class="formula-box">
+        <div class="formula-title">Il principio della geometria analitica</div>
+        <p>Un'equazione in due incognite descrive l'insieme dei punti $(x;\,y)$ che la soddisfano: una
+          <strong>curva</strong> del piano.</p>
+        <div class="table-container">
+          <table class="tabf">
+            <thead><tr><th>equazione</th><th>curva</th></tr></thead>
+            <tbody>
+              <tr><td>$ax + by = c$</td><td class="l">una retta</td></tr>
+              <tr><td>$y = ax^2+bx+c$</td><td class="l">una parabola</td></tr>
+              <tr><td>$x^2 + y^2 = r^2$</td><td class="l">una circonferenza di centro l'origine e raggio $r$</td></tr>
+              <tr><td>$xy = k$</td><td class="l">un'iperbole equilatera</td></tr>
+              <tr><td>$y = 0$</td><td class="l">l'asse delle ascisse</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="curiosita"><strong>Anche una singola equazione è un'intersezione.</strong> Quando nella
+        lezione 2 risolvevate $x^2-5x+6=0$, stavate in realtà risolvendo il sistema
+        $$\begin{cases} y = x^2-5x+6 \\ y = 0 \end{cases}$$
+        cioè cercando le intersezioni della parabola con l'asse $x$. E nella lezione 3, quando abbiamo detto
+        che «risolvere $ax^2+bx+c = k$ significa intersecare con la retta orizzontale $y=k$», stavamo dicendo
+        la stessa cosa. <strong>Tutto quello che abbiamo fatto quest'anno erano già sistemi</strong>: solo che
+        una delle due curve era così semplice da non sembrare una curva.</div>
+    </section>
+
+    <!-- 2 — I SISTEMI SONO INTERSEZIONI -->
+    <section id="sec2">
+      <h2>2. Risolvere = intersecare</h2>
+
+      <div class="formula-box">
+        <div class="formula-title">La lettura geometrica di un sistema</div>
+        <p>Le soluzioni di un sistema di due equazioni in due incognite sono le <strong>coordinate dei punti di
+          intersezione</strong> delle due curve corrispondenti.</p>
+      </div>
+
+      <p>Da qui discende tutto, e conviene guardarlo prima nel caso più semplice: due rette.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>le due rette…</th><th>intersezioni</th><th>il sistema è…</th></tr></thead>
+          <tbody>
+            <tr><td class="l">si incrociano</td><td>una</td><td>determinato</td></tr>
+            <tr><td class="l">sono parallele e distinte</td><td>nessuna</td><td>impossibile</td></tr>
+            <tr><td class="l">sono la stessa retta</td><td>infinite</td><td>indeterminato</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Le tre parole che l'anno scorso avete imparato a memoria non sono etichette: sono
+        <strong>fotografie</strong>. E quando le curve non sono rette la storia si arricchisce, perché una
+        retta e una parabola possono incontrarsi in due punti, in uno solo (tangenza) o in nessuno — proprio
+        come nella lezione 3.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="in-pre"></div>
+        <div class="ctrl">
+          <label>sposto la seconda curva: <span class="val-badge" id="in-kv">—</span></label>
+          <input type="range" id="in-k" min="-60" max="60" step="2" value="0">
+          <span class="toggle-row"><input type="checkbox" id="in-lock" checked> <label for="in-lock">🔒 blocca la scala</label></span>
+        </div>
+        <svg id="in-svg" viewBox="0 0 680 420" role="img"
+             aria-label="Intersezioni fra due curve sul piano cartesiano"></svg>
+        <p class="cap" id="in-cap">—</p>
+        <div class="eq-out" id="in-out"></div>
+      </div>
+
+      <p>Muovendo lo slider si vede la cosa più istruttiva di tutte: le intersezioni <strong>non appaiono e
+        spariscono a caso</strong>. Due punti si avvicinano, diventano uno solo (la tangenza), e poi
+        scompaiono. È esattamente il comportamento del discriminante nella lezione 2 — e non è una
+        coincidenza, come vedremo subito.</p>
+    </section>
+
+    <!-- 3 — IL METODO DI SOSTITUZIONE -->
+    <section id="sec3">
+      <h2>3. Il metodo di sostituzione</h2>
+
+      <p>Geometricamente sappiamo che cosa cerchiamo. Algebricamente, il metodo che funziona quasi sempre — e
+        l'unico che funziona anche quando le curve non sono rette — è la <strong>sostituzione</strong>.</p>
+
+      <div class="method">
+        <p><span class="step-num">1</span><strong>Isolo un'incognita</strong> in una delle due equazioni,
+          scegliendo quella in cui è più facile (coefficiente $1$, oppure già isolata).</p>
+        <p><span class="step-num">2</span><strong>Sostituisco</strong> l'espressione trovata nell'altra
+          equazione. Ora c'è una sola incognita.</p>
+        <p><span class="step-num">3</span><strong>Risolvo</strong> l'equazione a una incognita: sarà di primo
+          grado, di secondo grado, o fratta — tutta roba delle lezioni precedenti.</p>
+        <p><span class="step-num">4</span><strong>Risostituisco</strong> ogni valore trovato per ricavare
+          l'altra incognita. <em>Ogni</em> valore: se l'equazione risolutiva ha due soluzioni, i punti di
+          intersezione sono due.</p>
+        <p><span class="step-num">5</span><strong>Verifico</strong> le coppie nelle equazioni di partenza.</p>
+      </div>
+
+      <div class="warnbox"><strong>Il passo 4 è quello che si dimentica.</strong> Trovare $x = 2$ e $x = -1$ non
+        è finire l'esercizio: le soluzioni di un sistema sono <strong>coppie</strong>, e vanno scritte come
+        $(2;\,4)$ e $(-1;\,1)$. Un numero solo non è un punto del piano, e la risposta «$x = 2$ e $x = -1$»
+        vale metà.</div>
+
+      <div class="curiosita"><strong>Perché ricompare il discriminante.</strong> Quando una delle due curve è
+        una parabola e l'altra una retta, dopo la sostituzione resta sempre un'<strong>equazione di secondo
+        grado</strong>. Il suo $\Delta$ dice quante intersezioni ci sono: $\Delta \gt 0$ due punti,
+        $\Delta = 0$ un solo punto (la retta è <em>tangente</em>), $\Delta \lt 0$ nessuno. Il discriminante,
+        che era nato per contare le soluzioni di un'equazione, si scopre essere uno strumento
+        <strong>geometrico</strong>: conta le intersezioni. Questa doppia natura tornerà continuamente nella
+        lezione 9, quando studieremo le coniche.</div>
+    </section>
+
+    <!-- 4 — DIECI ESERCIZI -->
+    <section id="sec4">
+      <h2>4. Dieci sistemi guidati, con il disegno</h2>
+
+      <p>Per ogni esercizio il simulatore mostra le due curve e i punti in cui si incontrano. Risolvete prima
+        a mano, poi controllate: l'obiettivo è che le coordinate che avete calcolato coincidano con i pallini
+        rossi del disegno.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="sy-pre"></div>
+        <svg id="sy-svg" viewBox="0 0 680 420" role="img"
+             aria-label="Le due curve di ciascun sistema e i loro punti di intersezione"></svg>
+        <p class="cap" id="sy-cap">—</p>
+        <div class="eq-out" id="sy-out"></div>
+      </div>
+
+      <div class="example">
+        <p><strong>① Esercizio.</strong> $\begin{cases} y = 2x - 1 \\ y = -x + 5 \end{cases}$</p>
+        <button class="btn btn-toggle" data-target="#sol-s1">Mostra la soluzione</button>
+        <div class="solution" id="sol-s1" hidden>
+          <p><span class="step-num">1</span>La $y$ è già isolata in entrambe: eguaglio i secondi membri (è il
+            metodo del <em>confronto</em>, un caso particolare della sostituzione).
+            $$2x - 1 = -x + 5 \;\Rightarrow\; 3x = 6 \;\Rightarrow\; x = 2$$</p>
+          <p><span class="step-num">2</span>Risostituisco: $y = 2(2) - 1 = 3$.</p>
+          <p><span class="step-num">3</span>$$(x;\,y) = (2;\,3)$$
+            Due rette non parallele (i coefficienti angolari sono $2$ e $-1$): una sola intersezione,
+            come previsto.</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <p><strong>② Esercizio.</strong> $\begin{cases} y = x^2 \\ y = x + 2 \end{cases}$</p>
+        <button class="btn btn-toggle" data-target="#sol-s2">Mostra la soluzione</button>
+        <div class="solution" id="sol-s2" hidden>
+          <p><span class="step-num">1</span>Confronto: $\;x^2 = x + 2 \Rightarrow x^2 - x - 2 = 0$.</p>
+          <p><span class="step-num">2</span>$\Delta = 1 + 8 = 9$; $x = \frac{1 \pm 3}{2}$, cioè $x_1 = 2$ e
+            $x_2 = -1$. <strong>$\Delta \gt 0$: due intersezioni.</strong></p>
+          <p><span class="step-num">3</span>Risostituisco in $y = x^2$: per $x=2$, $y=4$; per $x=-1$, $y=1$.
+            $$(2;\,4) \quad\text{e}\quad (-1;\,1)$$</p>
+          <p><span class="step-num">4</span><strong>Verifica</strong> nella seconda equazione:
+            $4 = 2+2$ ✔ e $1 = -1+2$ ✔</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <p><strong>③ Esercizio.</strong> $\begin{cases} y = x^2 - 4 \\ y = 0 \end{cases}$</p>
+        <button class="btn btn-toggle" data-target="#sol-s3">Mostra la soluzione</button>
+        <div class="solution" id="sol-s3" hidden>
+          <p>Sostituendo $y=0$ nella prima resta $x^2 - 4 = 0$, cioè $x = \pm 2$.
+            $$(2;\,0) \quad\text{e}\quad (-2;\,0)$$</p>
+          <p>È l'equazione di secondo grado della lezione 2, travestita da sistema. La seconda «curva» è l'asse
+            delle ascisse, e cercare gli zeri di un polinomio <em>è</em> intersecare con quell'asse.</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <p><strong>④ Esercizio.</strong> $\begin{cases} x + y = 5 \\ xy = 6 \end{cases}$</p>
+        <button class="btn btn-toggle" data-target="#sol-s4">Mostra la soluzione</button>
+        <div class="solution" id="sol-s4" hidden>
+          <p><span class="step-num">1</span>Isolo dalla prima: $y = 5 - x$, e sostituisco nella seconda:
+            $$x(5-x) = 6 \;\Rightarrow\; -x^2 + 5x - 6 = 0 \;\Rightarrow\; x^2 - 5x + 6 = 0$$</p>
+          <p><span class="step-num">2</span>$\Delta = 1$; $x_1 = 3$, $x_2 = 2$.</p>
+          <p><span class="step-num">3</span>$$(3;\,2) \quad\text{e}\quad (2;\,3)$$</p>
+          <p><span class="step-num">4</span><strong>Riconoscete il trinomio?</strong> Cercare due numeri di
+            somma $5$ e prodotto $6$ è esattamente questo sistema, e si risolve con l'equazione di secondo grado
+            $x^2 - Sx + P = 0$: sono le relazioni fra radici e coefficienti della lezione 2. Geometricamente,
+            una retta interseca un'iperbole equilatera in due punti simmetrici rispetto alla bisettrice.</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <p><strong>⑤ Esercizio.</strong> $\begin{cases} y = x^2 \\ y = 2x - 1 \end{cases}$</p>
+        <button class="btn btn-toggle" data-target="#sol-s5">Mostra la soluzione</button>
+        <div class="solution" id="sol-s5" hidden>
+          <p><span class="step-num">1</span>$x^2 = 2x - 1 \Rightarrow x^2 - 2x + 1 = 0$.</p>
+          <p><span class="step-num">2</span>$\Delta = 4 - 4 = 0$: <strong>una sola intersezione</strong>, con
+            $x = 1$ soluzione doppia. Infatti $x^2-2x+1 = (x-1)^2$.</p>
+          <p><span class="step-num">3</span>$$(1;\,1)$$
+            La retta è <strong>tangente</strong> alla parabola. E la «soluzione doppia» ha adesso un
+            significato geometrico chiarissimo: i due punti di intersezione si sono sovrapposti.</p>
+          <p class="formula-note">Questo è il metodo standard per trovare le tangenti a una curva senza usare
+            le derivate: si impone che il sistema abbia $\Delta = 0$. Lo useremo per le coniche nella lezione
+            9.</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <p><strong>⑥ Esercizio.</strong> $\begin{cases} y = x^2 \\ y = x - 2 \end{cases}$</p>
+        <button class="btn btn-toggle" data-target="#sol-s6">Mostra la soluzione</button>
+        <div class="solution" id="sol-s6" hidden>
+          <p><span class="step-num">1</span>$x^2 = x - 2 \Rightarrow x^2 - x + 2 = 0$.</p>
+          <p><span class="step-num">2</span>$\Delta = 1 - 8 = -7 \lt 0$: <strong>nessuna intersezione
+            reale</strong>. La retta passa tutta sotto la parabola.</p>
+          <p><span class="step-num">3</span>Il sistema è <strong>impossibile nei numeri reali</strong>. Ma
+            tenete a mente questo esercizio: nella sezione 7 lo riprenderemo e scopriremo che le intersezioni
+            ci sono eccome — non su questo foglio.</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <p><strong>⑦ Esercizio.</strong> $\begin{cases} x^2 + y^2 = 25 \\ y = x + 1 \end{cases}$</p>
+        <button class="btn btn-toggle" data-target="#sol-s7">Mostra la soluzione</button>
+        <div class="solution" id="sol-s7" hidden>
+          <p><span class="step-num">1</span>La prima è una <strong>circonferenza</strong> di centro l'origine e
+            raggio $5$. Sostituisco $y = x+1$:
+            $$x^2 + (x+1)^2 = 25$$</p>
+          <p><span class="step-num">2</span>Sviluppo il quadrato del binomio:
+            $$x^2 + x^2 + 2x + 1 = 25 \;\Rightarrow\; 2x^2 + 2x - 24 = 0 \;\Rightarrow\; x^2 + x - 12 = 0$$</p>
+          <p><span class="step-num">3</span>$\Delta = 1 + 48 = 49$; $x = \frac{-1 \pm 7}{2}$, cioè $x_1 = 3$ e
+            $x_2 = -4$.</p>
+          <p><span class="step-num">4</span>Risostituisco in $y = x+1$: $\;y_1 = 4$ e $y_2 = -3$.
+            $$(3;\,4) \quad\text{e}\quad (-4;\,-3)$$</p>
+          <p><span class="step-num">5</span><strong>Verifica sulla circonferenza:</strong> $9+16 = 25$ ✔ e
+            $16+9 = 25$ ✔ Sono le due terne pitagoriche più famose, e non è un caso: i punti a coordinate
+            intere su una circonferenza di raggio intero sono esattamente le terne pitagoriche.</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <p><strong>⑧ Esercizio.</strong> $\begin{cases} x^2 + y^2 = 25 \\ x = 5 \end{cases}$</p>
+        <button class="btn btn-toggle" data-target="#sol-s8">Mostra la soluzione</button>
+        <div class="solution" id="sol-s8" hidden>
+          <p><span class="step-num">1</span>Sostituisco $x = 5$: $\;25 + y^2 = 25 \Rightarrow y^2 = 0 \Rightarrow y = 0$ (doppia).</p>
+          <p><span class="step-num">2</span>$$(5;\,0)$$
+            Una sola intersezione: la retta verticale $x=5$ è <strong>tangente</strong> alla circonferenza nel
+            punto più a destra.</p>
+          <p class="formula-note">Notate che l'equazione $y^2=0$ ha «due soluzioni coincidenti»: anche qui la
+            molteplicità doppia segnala la tangenza. Una retta verticale non si può scrivere come $y = mx+q$,
+            ed è il motivo per cui nella lezione 9 useremo spesso la forma implicita.</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <p><strong>⑨ Esercizio.</strong> $\begin{cases} y = \dfrac{1}{x} \\ y = x \end{cases}$</p>
+        <button class="btn btn-toggle" data-target="#sol-s9">Mostra la soluzione</button>
+        <div class="solution" id="sol-s9" hidden>
+          <p><span class="step-num">1</span><strong>Campo di esistenza:</strong> $x \ne 0$ — è la lezione 5, e
+            non va dimenticato solo perché siamo in un sistema.</p>
+          <p><span class="step-num">2</span>Confronto: $\frac1x = x$. Moltiplico per $x$, lecito perché
+            $x \ne 0$:
+            $$1 = x^2 \;\Rightarrow\; x = \pm 1$$</p>
+          <p><span class="step-num">3</span>$$(1;\,1) \quad\text{e}\quad (-1;\,-1)$$
+            Entrambe accettabili. La bisettrice taglia l'iperbole in due punti, uno per ramo.</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <p><strong>⑩ Esercizio.</strong> $\begin{cases} 2x + 3y = 12 \\ x - y = 1 \end{cases}$</p>
+        <button class="btn btn-toggle" data-target="#sol-s10">Mostra la soluzione</button>
+        <div class="solution" id="sol-s10" hidden>
+          <p><span class="step-num">1</span>Isolo dalla seconda, dove il coefficiente è $1$: $\;x = y + 1$.</p>
+          <p><span class="step-num">2</span>Sostituisco nella prima:
+            $$2(y+1) + 3y = 12 \;\Rightarrow\; 5y + 2 = 12 \;\Rightarrow\; y = 2$$</p>
+          <p><span class="step-num">3</span>$x = 2 + 1 = 3$.
+            $$(3;\,2)$$</p>
+          <p><span class="step-num">4</span><strong>Verifica:</strong> $6 + 6 = 12$ ✔ e $3 - 2 = 1$ ✔
+            <br>Scegliere l'incognita con coefficiente $1$ evita le frazioni: è l'unica «furbizia» del metodo,
+            e fa risparmiare parecchi errori.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — SISTEMI DI DISEQUAZIONI -->
+    <section id="sec5">
+      <h2>5. I sistemi di disequazioni</h2>
+
+      <p>La stessa idea vale con le disuguaglianze, e anche lì c'è un disegno da guardare.</p>
+
+      <div class="definition">
+        <div class="formula-title">Sistema di disequazioni</div>
+        <p>Le disequazioni devono valere <strong>tutte insieme</strong>: l'insieme delle soluzioni è
+          l'<strong>intersezione</strong> degli insiemi soluzione delle singole disequazioni.</p>
+      </div>
+
+      <div class="method">
+        <p><span class="step-num">1</span>Si risolve <strong>ogni disequazione separatamente</strong>, con i
+          metodi delle lezioni 3 e 5.</p>
+        <p><span class="step-num">2</span>Si disegnano tutte le soluzioni sulla <strong>stessa retta dei
+          numeri</strong>, una riga per disequazione.</p>
+        <p><span class="step-num">3</span>La risposta è dove <strong>tutte</strong> le righe sono
+          contemporaneamente segnate.</p>
+      </div>
+
+      <div class="warnbox"><strong>Non confondete la graffa con lo schema dei segni.</strong> Sembrano lo
+        stesso disegno, ma dicono cose opposte. Nello <em>schema dei segni</em> (lezione 5) le righe sono i
+        <strong>fattori di una sola espressione</strong> e si combinano con la regola dei segni: due meno fanno
+        un più. In un <em>sistema</em> le righe sono <strong>condizioni indipendenti</strong> e si combinano
+        con la «e»: serve che siano vere tutte, e due «false» non fanno una «vera». Chiedetevi sempre:
+        sto studiando il segno di un prodotto, o sto mettendo insieme richieste diverse?</div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="sd-pre"></div>
+        <svg id="sd-svg" viewBox="0 0 680 300" role="img"
+             aria-label="Intersezione degli insiemi soluzione in un sistema di disequazioni"></svg>
+        <p class="cap" id="sd-cap">—</p>
+        <div class="eq-out" id="sd-out"></div>
+      </div>
+
+      <div class="example">
+        <p><strong>⑪ Esercizio.</strong> Risolvi
+          $\begin{cases} x^2 - 4 \gt 0 \\ x - 3 \lt 0 \end{cases}$</p>
+        <button class="btn btn-toggle" data-target="#sol-t1">Mostra la soluzione</button>
+        <div class="solution" id="sol-t1" hidden>
+          <p><span class="step-num">1</span>Prima disequazione: radici $\pm 2$, verso $\gt$ con $a \gt 0$ →
+            valori esterni: $\;x \lt -2 \vee x \gt 2$.</p>
+          <p><span class="step-num">2</span>Seconda: $\;x \lt 3$.</p>
+          <p><span class="step-num">3</span>Intersezione: dalla prima riga prendo i due tratti esterni, dalla
+            seconda tutto ciò che sta a sinistra di $3$. Rimane
+            $$x \lt -2 \;\vee\; 2 \lt x \lt 3$$</p>
+          <p><strong>Controllo:</strong> $x = 5$ soddisfa la prima ma non la seconda → escluso ✔
+            $x = 0$ soddisfa la seconda ma non la prima → escluso ✔ $x = 2{,}5$ le soddisfa entrambe ✔</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — IL GPS -->
+    <section id="sec6">
+      <h2>6. A che serve: il GPS</h2>
+
+      <p>Il vostro telefono sa dov'è. Non lo sa perché «vede» qualcosa: lo sa perché
+        <strong>risolve un sistema</strong>, decine di volte al secondo. Vale la pena capire come, perché è
+        l'applicazione più quotidiana di tutto quello che stiamo facendo.</p>
+
+      <h3>6.1 — Il principio: distanze, non direzioni</h3>
+
+      <p>Ogni satellite del sistema GPS trasmette continuamente due informazioni: <em>chi sono</em> (e quindi
+        dove mi trovo) e <em>che ora è</em> secondo il mio orologio atomico. Il ricevitore confronta l'ora
+        ricevuta con la propria e calcola quanto tempo ha impiegato il segnale ad arrivare. Poi:
+        $$\text{distanza} = c \cdot \Delta t$$
+        dove $c = 299\,792\,458$ m/s è la velocità della luce.</p>
+
+      <p>Il ricevitore non sa in che <em>direzione</em> sia il satellite: sa solo <strong>quanto è
+        lontano</strong>. E «essere a distanza $d$ da un punto noto» è precisamente un'equazione:</p>
+
+      <div class="formula-box">
+        <div class="formula-title">L'equazione di una sfera</div>
+        $$(x - x_S)^2 + (y - y_S)^2 + (z - z_S)^2 = d^2$$
+        <p class="formula-note">È l'equazione della circonferenza della lezione 9, con una dimensione in più.
+          Un satellite dà una sfera: il ricevitore è da qualche parte su quella superficie.</p>
+      </div>
+
+      <p>Determinare una posizione intersecando distanze note da punti noti si chiama
+        <strong>trilaterazione</strong> — da non confondere con la <em>triangolazione</em>, che invece usa gli
+        <em>angoli</em> ed è quella dei topografi con il teodolite. Il GPS non misura nessun angolo: misura
+        solo tempi, e da quelli distanze.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="gp-n"></div>
+        <div class="ctrl">
+          <label>errore sulla misura del terzo satellite: <span class="val-badge" id="gp-ev">—</span></label>
+          <input type="range" id="gp-e" min="-25" max="25" step="1" value="0">
+        </div>
+        <svg id="gp-svg" viewBox="0 0 680 420" role="img"
+             aria-label="Trilaterazione: come tre distanze individuano una posizione"></svg>
+        <p class="cap" id="gp-cap">—</p>
+        <div class="eq-out" id="gp-out"></div>
+      </div>
+
+      <div class="ric">
+        <div><h4>Un satellite</h4><p>Una sfera. Il ricevitore è su una superficie: infinite posizioni
+          possibili.</p></div>
+        <div><h4>Due satelliti</h4><p>Due sfere si intersecano in una <strong>circonferenza</strong>. Il
+          sistema ha ancora infinite soluzioni, ma ora sono una linea.</p></div>
+        <div><h4>Tre satelliti</h4><p>Tre sfere si incontrano in <strong>due punti</strong>. Uno dei due è di
+          solito assurdo — nello spazio profondo, o dentro la Terra — e si scarta.</p></div>
+        <div><h4>Quattro satelliti</h4><p>Servono comunque: l'orologio del telefono non è atomico e sbaglia.
+          La quarta misura fa da equazione in più per determinare anche quell'errore.</p></div>
+      </div>
+
+      <p>Il conto che il ricevitore fa è dunque un sistema di quattro equazioni in quattro incognite — le tre
+        coordinate <em>e</em> l'errore dell'orologio — con le equazioni di grado due. Non si risolve per
+        sostituzione a mano, ma il principio è identico a quello dell'esercizio ⑦: intersecare curve.</p>
+
+      <div class="warnbox"><strong>Il quarto satellite e l'orologio.</strong> Perché un orologio scadente
+        rovina tutto? Perché la luce fa $300$ metri in un <strong>microsecondo</strong>. Un errore di un
+        millesimo di secondo sull'ora significa sbagliare la posizione di $300$ chilometri. Gli orologi atomici
+        stanno sui satelliti, che costano milioni; nel telefono c'è un quarzo da pochi centesimi, e l'errore si
+        <em>calcola</em> invece di eliminarlo. È un'idea molto elegante: trasformare un difetto dello strumento
+        in un'incognita in più.</div>
+
+      <div class="curiosita"><strong>E qui entra la relatività.</strong> Gli orologi dei satelliti non battono
+        alla stessa velocità dei nostri, per due motivi opposti. Per la <em>relatività ristretta</em>, un
+        orologio in movimento rallenta: i satelliti viaggiano a circa $14\,000$ km/h e perdono $7$ microsecondi
+        al giorno. Per la <em>relatività generale</em>, un orologio più lontano da una massa corre più veloce:
+        a $20\,200$ km di quota il campo gravitazionale è più debole e guadagnano $45$ microsecondi al giorno.
+        Il saldo è $+38$ microsecondi al giorno — che, moltiplicati per la velocità della luce, farebbero
+        sbagliare la posizione di circa <strong>11 chilometri ogni giorno</strong>. I satelliti hanno la
+        correzione già cablata a bordo. Ogni volta che il navigatore vi porta a destinazione, la relatività di
+        Einstein sta funzionando nel vostro cruscotto.</div>
+
+      <div class="curiosita"><strong>Non è solo americano.</strong> GPS è il sistema statunitense, in funzione
+        dal 1978 e aperto ai civili dal 1983. Oggi esistono anche il russo <strong>GLONASS</strong>, il cinese
+        <strong>BeiDou</strong> e l'europeo <strong>Galileo</strong> — quest'ultimo con un forte contributo
+        italiano, e con un centro di controllo a Fucino, in Abruzzo. Il vostro telefono di solito li ascolta
+        tutti insieme: più satelliti significa più equazioni, e quindi una soluzione più precisa.</div>
+    </section>
+
+    <!-- 7 — INTERSEZIONI IMMAGINARIE -->
+    <section id="sec7">
+      <h2>7. E se non si incontrano?</h2>
+
+      <p>Torniamo all'esercizio ⑥, quello «impossibile»:
+        $$\begin{cases} y = x^2 \\ y = x - 2 \end{cases} \qquad\Longrightarrow\qquad x^2 - x + 2 = 0$$
+        Avevamo trovato $\Delta = -7 \lt 0$ e ci eravamo fermati. Ma dopo la lezione 4 sappiamo che
+        quell'equazione <strong>ha due soluzioni</strong>: sono complesse.</p>
+
+      <div class="example">
+        <p><strong>⑫ Esercizio.</strong> Trova le intersezioni di $y = x^2$ e $y = x-2$ nel campo complesso.</p>
+        <button class="btn btn-toggle" data-target="#sol-c1">Mostra la soluzione</button>
+        <div class="solution" id="sol-c1" hidden>
+          <p><span class="step-num">1</span>$x^2 - x + 2 = 0$ con $\Delta = -7$. Applico la formula estesa:
+            $$x = \frac{1 \pm i\sqrt7}{2}$$</p>
+          <p><span class="step-num">2</span>Ricavo la $y$ dalla retta, $y = x - 2$:
+            $$y = \frac{1 \pm i\sqrt7}{2} - 2 = \frac{-3 \pm i\sqrt7}{2}$$</p>
+          <p><span class="step-num">3</span>I due «punti» di intersezione sono
+            $$\left(\frac{1+i\sqrt7}{2};\ \frac{-3+i\sqrt7}{2}\right) \qquad
+              \left(\frac{1-i\sqrt7}{2};\ \frac{-3-i\sqrt7}{2}\right)$$
+            e sono <strong>coniugati</strong>, come devono essere due radici complesse di un polinomio a
+            coefficienti reali.</p>
+          <p><span class="step-num">4</span><strong>Verifica</strong> che stiano davvero sulla parabola: se
+            $x^2 - x + 2 = 0$ allora $x^2 = x - 2$, che è proprio la condizione $y = x^2$ con $y = x-2$. Torna
+            per costruzione ✔</p>
+        </div>
+      </div>
+
+      <div class="note"><strong>Che cosa significa.</strong> Le due curve si incontrano davvero: solo che il
+        punto d'incontro ha coordinate complesse, e il piano cartesiano che disegnamo sul quaderno contiene
+        soltanto i punti a coordinate <em>reali</em>. Non è che «non esistono»: è che il nostro foglio è troppo
+        piccolo per mostrarle. Per disegnare quei due punti servirebbero quattro dimensioni reali — due per la
+        $x$ complessa e due per la $y$.</div>
+
+      <p>Questa non è una curiosità marginale: è il motivo per cui i matematici lavorano quasi sempre nel campo
+        complesso. Nei reali bisogna distinguere continuamente casi («due intersezioni, oppure una, oppure
+        nessuna»); nei complessi il conto è sempre lo stesso, e le eccezioni spariscono.</p>
+
+      <div class="theorem">
+        <div class="formula-title">Teorema di Bézout (idea)</div>
+        <p>Due curve algebriche di grado $m$ e $n$ si intersecano in esattamente $m \cdot n$ punti, contati con
+          la molteplicità, purché si lavori nel <strong>piano proiettivo complesso</strong>.</p>
+        <p class="formula-note">Una retta ($m=1$) e una parabola ($n=2$) si incontrano <em>sempre</em> in
+          $1 \times 2 = 2$ punti. Se ne vedete due, sono reali e distinti; se ne vedete uno, sono due
+          coincidenti (tangenza); se non ne vedete nessuno, sono due complessi coniugati. Il conto non cambia
+          mai: cambia solo quanti se ne riescono a disegnare.</p>
+      </div>
+
+      <div class="warnbox"><strong>Un'eccezione onesta: le rette parallele.</strong> Il sistema
+        $\begin{cases} y = 2x+1 \\ y = 2x+3 \end{cases}$ porta a $1 = 3$, che è falso e resta falso anche nei
+        complessi: non c'è nessuna incognita in cui rifugiarsi. Due rette parallele non si incontrano nemmeno
+        in $\mathbb{C}$. Il teorema di Bézout se la cava aggiungendo al piano dei <em>punti all'infinito</em>,
+        uno per ogni direzione: in quel piano allargato — il <strong>piano proiettivo</strong> — le parallele
+        si incontrano lì. È l'idea che sta dietro alla prospettiva dei pittori del Rinascimento: nel disegno,
+        due binari paralleli si incontrano nel <em>punto di fuga</em>. I matematici hanno formalizzato tre
+        secoli dopo quello che i pittori disegnavano già.</div>
+
+      <div class="note"><strong>Il filo della lezione.</strong> Abbiamo preso i sistemi, che sapevate già
+        risolvere, e li abbiamo <em>guardati</em>: ogni equazione è una curva, ogni soluzione è un punto di
+        incontro. Da questa sola idea sono seguiti il significato geometrico del discriminante, il metodo per
+        trovare le tangenti, il funzionamento del GPS e il motivo per cui conviene lavorare nei numeri
+        complessi. Nella lezione 9 useremo esattamente questi strumenti per studiare le coniche, dove il
+        gioco fra algebra e disegno diventa il contenuto stesso della materia.</div>
+    </section>
+
+    <section id="quiz">
+      <h2>Verifica quello che hai capito</h2>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> — Prof. Vettigli</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script src="../Style/interactive.js"></script>
+  <script src="../Style/toc.js"></script>
+  <script src="../Style/quiz.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var SVGNS = 'http://www.w3.org/2000/svg';
+    function el(tag, attrs, txt) {
+      var n = document.createElementNS(SVGNS, tag);
+      for (var k in attrs) { if (attrs.hasOwnProperty(k)) { n.setAttribute(k, attrs[k]); } }
+      if (txt !== undefined) { n.textContent = txt; }
+      return n;
+    }
+    function fmt(v, d) {
+      if (d === undefined) { d = 2; }
+      var s = (Math.abs(v) < 5e-11 ? 0 : v).toFixed(d);
+      return s.replace('.', ',');
+    }
+    function clear(svg) { while (svg.firstChild) { svg.removeChild(svg.firstChild); } }
+    function css(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#888';
+    }
+    function bottoni(box, voci, onPick, start) {
+      var bs = [];
+      voci.forEach(function (v, i) {
+        var b = document.createElement('button');
+        b.className = 'btn btn-secondary' + (i === start ? ' active' : '');
+        b.type = 'button';
+        b.textContent = v;
+        b.addEventListener('click', function () {
+          bs.forEach(function (o) { o.classList.remove('active'); });
+          b.classList.add('active');
+          onPick(i);
+        });
+        box.appendChild(b);
+        bs.push(b);
+      });
+      return bs;
+    }
+    function mathIn(node) { if (window.renderMathIn) { window.renderMathIn(node); } }
+
+    // disegna gli assi e la griglia su un riquadro
+    function assi(svg, X0, Y0, W, H, xmin, xmax, ymin, ymax) {
+      var g = css('--border'), t = css('--text'), i;
+      function px(x) { return X0 + (x - xmin) / (xmax - xmin) * W; }
+      function py(y) { return Y0 + (ymax - y) / (ymax - ymin) * H; }
+      for (i = Math.ceil(xmin); i <= Math.floor(xmax); i++) {
+        svg.appendChild(el('line', { x1: px(i), y1: Y0, x2: px(i), y2: Y0 + H, stroke: g, 'stroke-width': 1, 'stroke-opacity': 0.32 }));
+      }
+      for (i = Math.ceil(ymin); i <= Math.floor(ymax); i++) {
+        svg.appendChild(el('line', { x1: X0, y1: py(i), x2: X0 + W, y2: py(i), stroke: g, 'stroke-width': 1, 'stroke-opacity': 0.32 }));
+      }
+      if (ymin < 0 && ymax > 0) {
+        svg.appendChild(el('line', { x1: X0, y1: py(0), x2: X0 + W, y2: py(0), stroke: t, 'stroke-width': 2 }));
+      }
+      if (xmin < 0 && xmax > 0) {
+        svg.appendChild(el('line', { x1: px(0), y1: Y0, x2: px(0), y2: Y0 + H, stroke: t, 'stroke-width': 2 }));
+      }
+      for (i = Math.ceil(xmin); i <= Math.floor(xmax); i += 2) {
+        if (i !== 0) {
+          svg.appendChild(el('text', {
+            x: px(i), y: Math.min(Y0 + H - 4, py(0) + 15), class: 'lbl-s', 'text-anchor': 'middle'
+          }, String(i)));
+        }
+      }
+      return { px: px, py: py };
+    }
+
+    // traccia una curva esplicita y = f(x), spezzandola sui salti
+    function curva(svg, m, f, xmin, xmax, ymin, ymax, col, sp, dash) {
+      var d = '', staccato = true, i, n = 800;
+      for (i = 0; i <= n; i++) {
+        var x = xmin + (xmax - xmin) * i / n, y = f(x);
+        if (!isFinite(y) || y < ymin - 40 || y > ymax + 40) { staccato = true; continue; }
+        var yy = Math.max(-50, Math.min(1000, m.py(y)));
+        d += (staccato ? 'M ' : 'L ') + m.px(x).toFixed(2) + ' ' + yy.toFixed(2) + ' ';
+        staccato = false;
+      }
+      var at = { d: d, fill: 'none', stroke: col, 'stroke-width': sp };
+      if (dash) { at['stroke-dasharray'] = '7 5'; }
+      svg.appendChild(el('path', at));
+    }
+
+    // =========================================================
+    // 1) INTERSEZIONI: due curve che si muovono
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('in-svg');
+      if (!svg) { return; }
+      var sk = document.getElementById('in-k'), lk = document.getElementById('in-lock');
+      var CASI = [
+        { nome: 'due rette', f1: function (x) { return 2 * x - 1; },
+          f2: function (x, k) { return -x + 5 + k; },
+          t1: 'y = 2x − 1', t2: function (k) { return 'y = −x + ' + fmt(5 + k, 1); } },
+        { nome: 'rette parallele', f1: function (x) { return 2 * x - 1; },
+          f2: function (x, k) { return 2 * x + 1 + k; },
+          t1: 'y = 2x − 1', t2: function (k) { return 'y = 2x + ' + fmt(1 + k, 1); } },
+        { nome: 'retta e parabola', f1: function (x) { return x * x; },
+          f2: function (x, k) { return 2 * x - 1 + k; },
+          t1: 'y = x²', t2: function (k) { return 'y = 2x + ' + fmt(-1 + k, 1); } },
+        { nome: 'parabola e parabola', f1: function (x) { return x * x - 2; },
+          f2: function (x, k) { return -x * x + 2 + k; },
+          t1: 'y = x² − 2', t2: function (k) { return 'y = −x² + ' + fmt(2 + k, 1); } }
+      ];
+      var ci = 0;
+      bottoni(document.getElementById('in-pre'),
+        CASI.map(function (c) { return c.nome; }), function (i) { ci = i; disegna(); }, 0);
+
+      function disegna() {
+        var C = CASI[ci], k = parseFloat(sk.value) / 10, i;
+        document.getElementById('in-kv').textContent = fmt(k, 1);
+        var xmin = -6, xmax = 6, ymin = -8, ymax = 12;
+        if (!lk.checked) { ymin = -14; ymax = 18; }
+        clear(svg);
+        var m = assi(svg, 55, 20, 590, 350, xmin, xmax, ymin, ymax);
+        curva(svg, m, C.f1, xmin, xmax, ymin, ymax, css('--accent'), 2.8, false);
+        curva(svg, m, function (x) { return C.f2(x, k); }, xmin, xmax, ymin, ymax, '#f59e0b', 2.8, false);
+
+        // intersezioni per campionamento fine e raffinamento per bisezione
+        var g = function (x) { return C.f1(x) - C.f2(x, k); };
+        var punti = [], n = 4000, prec = g(xmin), px2;
+        for (i = 1; i <= n; i++) {
+          var x = xmin + (xmax - xmin) * i / n, v = g(x);
+          if (prec === 0) { punti.push(xmin + (xmax - xmin) * (i - 1) / n); }
+          else if ((prec < 0) !== (v < 0)) {
+            var lo = xmin + (xmax - xmin) * (i - 1) / n, hi = x, j;
+            for (j = 0; j < 60; j++) {
+              var mm = (lo + hi) / 2;
+              if ((g(mm) < 0) === (g(lo) < 0)) { lo = mm; } else { hi = mm; }
+            }
+            punti.push((lo + hi) / 2);
+          }
+          prec = v;
+        }
+        // tangenza: minimo di |g| molto vicino a zero senza cambio di segno
+        if (punti.length === 0) {
+          var best = null, bv = Infinity;
+          for (i = 0; i <= n; i++) {
+            var xx = xmin + (xmax - xmin) * i / n, av = Math.abs(g(xx));
+            if (av < bv) { bv = av; best = xx; }
+          }
+          if (bv < 0.004) { punti.push(best); }
+        }
+        punti.forEach(function (p) {
+          px2 = m.px(p);
+          svg.appendChild(el('circle', { cx: px2, cy: m.py(C.f1(p)), r: 6.5, fill: '#e11d48' }));
+          svg.appendChild(el('text', {
+            x: px2, y: m.py(C.f1(p)) - 13, class: 'em', 'text-anchor': 'middle'
+          }, '(' + fmt(p, 2) + '; ' + fmt(C.f1(p), 2) + ')'));
+        });
+        svg.appendChild(el('text', { x: 62, y: 40, class: 'em' }, C.t1));
+        svg.appendChild(el('text', { x: 62, y: 60, class: 'lbl', fill: '#f59e0b' }, C.t2(k)));
+
+        document.getElementById('in-cap').textContent =
+          punti.length === 0 ? 'nessuna intersezione reale'
+            : (punti.length === 1 ? 'una sola intersezione: le curve sono tangenti'
+              : punti.length + ' intersezioni');
+        var o = document.getElementById('in-out');
+        o.innerHTML = punti.length === 0
+          ? 'Il sistema è <strong>impossibile nei reali</strong>: le soluzioni esistono, ma sono complesse (sezione 7).'
+          : (punti.length === 1
+            ? 'Una sola soluzione, <strong>doppia</strong>: le due intersezioni si sono sovrapposte. È il caso $\\Delta = 0$.'
+            : 'Il sistema ha <strong>' + punti.length + '</strong> soluzioni reali: una per ogni punto d\'incontro.');
+        mathIn(o);
+      }
+      sk.addEventListener('input', disegna);
+      lk.addEventListener('change', disegna);
+      disegna();
+    }());
+
+    // =========================================================
+    // 2) I DIECI SISTEMI
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('sy-svg');
+      if (!svg) { return; }
+      // curve: {tipo:'f', f} funzione esplicita; {tipo:'v', x} retta verticale;
+      //        {tipo:'c', r} circonferenza centrata nell'origine
+      var ES = [
+        { t: 'y = 2x − 1 ; y = −x + 5', c1: { tipo: 'f', f: function (x) { return 2 * x - 1; } },
+          c2: { tipo: 'f', f: function (x) { return -x + 5; } }, sol: [[2, 3]], w: 8 },
+        { t: 'y = x² ; y = x + 2', c1: { tipo: 'f', f: function (x) { return x * x; } },
+          c2: { tipo: 'f', f: function (x) { return x + 2; } }, sol: [[2, 4], [-1, 1]], w: 6 },
+        { t: 'y = x² − 4 ; y = 0', c1: { tipo: 'f', f: function (x) { return x * x - 4; } },
+          c2: { tipo: 'f', f: function () { return 0; } }, sol: [[2, 0], [-2, 0]], w: 6 },
+        { t: 'x + y = 5 ; xy = 6', c1: { tipo: 'f', f: function (x) { return 5 - x; } },
+          c2: { tipo: 'f', f: function (x) { return 6 / x; } }, sol: [[3, 2], [2, 3]], w: 8 },
+        { t: 'y = x² ; y = 2x − 1', c1: { tipo: 'f', f: function (x) { return x * x; } },
+          c2: { tipo: 'f', f: function (x) { return 2 * x - 1; } }, sol: [[1, 1]], w: 6 },
+        { t: 'y = x² ; y = x − 2', c1: { tipo: 'f', f: function (x) { return x * x; } },
+          c2: { tipo: 'f', f: function (x) { return x - 2; } }, sol: [], w: 6 },
+        { t: 'x² + y² = 25 ; y = x + 1', c1: { tipo: 'c', r: 5 },
+          c2: { tipo: 'f', f: function (x) { return x + 1; } }, sol: [[3, 4], [-4, -3]], w: 8 },
+        { t: 'x² + y² = 25 ; x = 5', c1: { tipo: 'c', r: 5 },
+          c2: { tipo: 'v', x: 5 }, sol: [[5, 0]], w: 8 },
+        { t: 'y = 1/x ; y = x', c1: { tipo: 'f', f: function (x) { return 1 / x; } },
+          c2: { tipo: 'f', f: function (x) { return x; } }, sol: [[1, 1], [-1, -1]], w: 5 },
+        { t: '2x + 3y = 12 ; x − y = 1', c1: { tipo: 'f', f: function (x) { return (12 - 2 * x) / 3; } },
+          c2: { tipo: 'f', f: function (x) { return x - 1; } }, sol: [[3, 2]], w: 8 }
+      ];
+      var k = 0;
+      bottoni(document.getElementById('sy-pre'),
+        ES.map(function (e, i) { return '①②③④⑤⑥⑦⑧⑨⑩'.charAt(i); }),
+        function (i) { k = i; disegna(); }, 0);
+
+      function disegnaCurva(svg, m, C, xmin, xmax, ymin, ymax, col) {
+        if (C.tipo === 'f') {
+          curva(svg, m, C.f, xmin, xmax, ymin, ymax, col, 2.8, false);
+        } else if (C.tipo === 'v') {
+          svg.appendChild(el('line', { x1: m.px(C.x), y1: 20, x2: m.px(C.x), y2: 370, stroke: col, 'stroke-width': 2.8 }));
+        } else {
+          var d = '', i;
+          for (i = 0; i <= 240; i++) {
+            var a = 2 * Math.PI * i / 240;
+            d += (i === 0 ? 'M ' : 'L ') + m.px(C.r * Math.cos(a)).toFixed(2) + ' ' + m.py(C.r * Math.sin(a)).toFixed(2) + ' ';
+          }
+          svg.appendChild(el('path', { d: d + 'Z', fill: 'none', stroke: col, 'stroke-width': 2.8 }));
+        }
+      }
+
+      function disegna() {
+        var E = ES[k];
+        var xmin = -E.w, xmax = E.w, ymin = -E.w * 0.62, ymax = E.w * 0.62;
+        if (k === 1 || k === 4 || k === 5) { ymin = -3; ymax = 9; }
+        if (k === 2) { ymin = -6; ymax = 6; }
+        clear(svg);
+        var m = assi(svg, 55, 20, 590, 350, xmin, xmax, ymin, ymax);
+        disegnaCurva(svg, m, E.c1, xmin, xmax, ymin, ymax, css('--accent'));
+        disegnaCurva(svg, m, E.c2, xmin, xmax, ymin, ymax, '#f59e0b');
+        E.sol.forEach(function (p) {
+          svg.appendChild(el('circle', { cx: m.px(p[0]), cy: m.py(p[1]), r: 6.5, fill: '#e11d48' }));
+          svg.appendChild(el('text', {
+            x: m.px(p[0]) + 10, y: m.py(p[1]) - 10, class: 'em'
+          }, '(' + p[0] + '; ' + p[1] + ')'));
+        });
+        svg.appendChild(el('text', { x: 62, y: 40, class: 'em' },
+          'esercizio ' + '①②③④⑤⑥⑦⑧⑨⑩'.charAt(k) + ' — ' + E.t));
+        document.getElementById('sy-cap').textContent =
+          E.sol.length === 0 ? 'le due curve non si incontrano nel piano reale'
+            : (E.sol.length === 1 ? 'una sola soluzione' : E.sol.length + ' soluzioni');
+        var o = document.getElementById('sy-out');
+        o.innerHTML = E.sol.length === 0
+          ? 'Sistema <strong>impossibile</strong> nei reali: $\\Delta = -7$. Le due soluzioni complesse sono nell\'esercizio ⑫.'
+          : 'Soluzioni: ' + E.sol.map(function (p) { return '$(' + p[0] + ';\\,' + p[1] + ')$'; }).join(' e ') + '.';
+        mathIn(o);
+      }
+      disegna();
+    }());
+
+    // =========================================================
+    // 3) SISTEMI DI DISEQUAZIONI
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('sd-svg');
+      if (!svg) { return; }
+      var CASI = [
+        { t: 'x² − 4 > 0  e  x − 3 < 0',
+          righe: [{ e: 'x² − 4 > 0', f: function (x) { return x * x - 4 > 0; } },
+                  { e: 'x − 3 < 0', f: function (x) { return x - 3 < 0; } }] },
+        { t: 'x + 1 ≥ 0  e  x² − 9 < 0',
+          righe: [{ e: 'x + 1 ≥ 0', f: function (x) { return x + 1 >= 0; } },
+                  { e: 'x² − 9 < 0', f: function (x) { return x * x - 9 < 0; } }] },
+        { t: 'x² − x − 6 ≤ 0  e  x > 0  e  x ≠ 1',
+          righe: [{ e: 'x² − x − 6 ≤ 0', f: function (x) { return x * x - x - 6 <= 0; } },
+                  { e: 'x > 0', f: function (x) { return x > 0; } },
+                  { e: 'x ≠ 1', f: function (x) { return Math.abs(x - 1) > 1e-9; } }] },
+        { t: 'x − 4 > 0  e  x + 1 < 0   (incompatibili)',
+          righe: [{ e: 'x − 4 > 0', f: function (x) { return x - 4 > 0; } },
+                  { e: 'x + 1 < 0', f: function (x) { return x + 1 < 0; } }] }
+      ];
+      var ci = 0;
+      bottoni(document.getElementById('sd-pre'),
+        ['esempio 1', 'esempio 2', 'esempio 3', 'incompatibili'],
+        function (i) { ci = i; disegna(); }, 0);
+      var X0 = 90, W = 540, xmin = -6, xmax = 6;
+
+      function disegna() {
+        var C = CASI[ci], i, j;
+        clear(svg);
+        var t = css('--text');
+        function px(x) { return X0 + (x - xmin) / (xmax - xmin) * W; }
+        var n = 2400;
+        C.righe.forEach(function (r, idx) {
+          var y = 60 + idx * 46;
+          svg.appendChild(el('line', { x1: X0, y1: y, x2: X0 + W, y2: y, stroke: css('--border'), 'stroke-width': 1.5 }));
+          svg.appendChild(el('text', { x: X0 - 10, y: y + 4, class: 'lbl-s', 'text-anchor': 'end' }, r.e));
+          var ini = null;
+          for (i = 0; i <= n; i++) {
+            var x = xmin + (xmax - xmin) * i / n, ok2 = r.f(x);
+            if (ok2 && ini === null) { ini = x; }
+            if ((!ok2 || i === n) && ini !== null) {
+              svg.appendChild(el('line', { x1: px(ini), y1: y, x2: px(x), y2: y, stroke: '#3b82f6', 'stroke-width': 6, 'stroke-opacity': 0.7 }));
+              ini = null;
+            }
+          }
+        });
+        var yr = 60 + C.righe.length * 46 + 26;
+        svg.appendChild(el('line', { x1: X0, y1: yr, x2: X0 + W, y2: yr, stroke: t, 'stroke-width': 2 }));
+        svg.appendChild(el('text', { x: X0 - 10, y: yr + 4, class: 'lbl', 'text-anchor': 'end' }, 'sistema'));
+        var ini2 = null, trovato = false;
+        for (i = 0; i <= n; i++) {
+          var xx = xmin + (xmax - xmin) * i / n;
+          var tutte = C.righe.every(function (r) { return r.f(xx); });
+          if (tutte && ini2 === null) { ini2 = xx; }
+          if ((!tutte || i === n) && ini2 !== null) {
+            svg.appendChild(el('line', { x1: px(ini2), y1: yr, x2: px(xx), y2: yr, stroke: '#10b981', 'stroke-width': 8, 'stroke-opacity': 0.85 }));
+            ini2 = null; trovato = true;
+          }
+        }
+        for (j = Math.ceil(xmin); j <= Math.floor(xmax); j++) {
+          svg.appendChild(el('line', { x1: px(j), y1: 40, x2: px(j), y2: yr + 6, stroke: css('--border'), 'stroke-width': 1, 'stroke-dasharray': '3 4' }));
+          svg.appendChild(el('text', { x: px(j), y: yr + 22, class: 'lbl-s', 'text-anchor': 'middle' }, String(j)));
+        }
+        svg.appendChild(el('text', { x: X0, y: 30, class: 'em' }, C.t));
+        document.getElementById('sd-cap').textContent =
+          'In blu le soluzioni delle singole disequazioni, in verde dove valgono tutte insieme.';
+        var o = document.getElementById('sd-out');
+        o.innerHTML = trovato
+          ? 'La soluzione del sistema è l\'<strong>intersezione</strong>: solo dove tutte le righe blu si sovrappongono.'
+          : 'Le condizioni sono <strong>incompatibili</strong>: nessun numero le soddisfa tutte, quindi $S = \\emptyset$.';
+        mathIn(o);
+      }
+      disegna();
+    }());
+
+    // =========================================================
+    // 4) IL GPS: TRILATERAZIONE
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('gp-svg');
+      if (!svg) { return; }
+      var se = document.getElementById('gp-e');
+      var nsat = 0;
+      bottoni(document.getElementById('gp-n'),
+        ['1 satellite', '2 satelliti', '3 satelliti'], function (i) { nsat = i; disegna(); }, 0);
+      var SAT = [[-4.5, 3.2], [4.2, 3.6], [0.5, -3.8]];
+      var VERO = [-0.6, 0.4];
+
+      function disegna() {
+        var err = parseFloat(se.value) / 100, i;
+        document.getElementById('gp-ev').textContent = fmt(err, 2);
+        clear(svg);
+        var xmin = -7, xmax = 7, ymin = -5, ymax = 5;
+        var m = assi(svg, 55, 20, 590, 380, xmin, xmax, ymin, ymax);
+        var COL = ['#3b82f6', '#f59e0b', '#8b5cf6'];
+        for (i = 0; i <= nsat; i++) {
+          var S = SAT[i];
+          var r = Math.hypot(VERO[0] - S[0], VERO[1] - S[1]) + (i === 2 ? err : 0);
+          var d = '', j;
+          for (j = 0; j <= 240; j++) {
+            var a = 2 * Math.PI * j / 240;
+            d += (j === 0 ? 'M ' : 'L ') + m.px(S[0] + r * Math.cos(a)).toFixed(2) + ' ' +
+                 m.py(S[1] + r * Math.sin(a)).toFixed(2) + ' ';
+          }
+          svg.appendChild(el('path', { d: d + 'Z', fill: COL[i], 'fill-opacity': 0.07, stroke: COL[i], 'stroke-width': 2.2 }));
+          svg.appendChild(el('circle', { cx: m.px(S[0]), cy: m.py(S[1]), r: 7, fill: COL[i] }));
+          svg.appendChild(el('text', { x: m.px(S[0]) + 10, y: m.py(S[1]) - 8, class: 'lbl', fill: COL[i] }, 'sat ' + (i + 1)));
+          svg.appendChild(el('line', {
+            x1: m.px(S[0]), y1: m.py(S[1]), x2: m.px(VERO[0]), y2: m.py(VERO[1]),
+            stroke: COL[i], 'stroke-width': 1.2, 'stroke-dasharray': '4 4', 'stroke-opacity': 0.7
+          }));
+        }
+        svg.appendChild(el('circle', { cx: m.px(VERO[0]), cy: m.py(VERO[1]), r: 6.5, fill: '#e11d48' }));
+        svg.appendChild(el('text', { x: m.px(VERO[0]) + 11, y: m.py(VERO[1]) + 18, class: 'em' }, 'tu sei qui'));
+
+        var testi = [
+          'Con <strong>un</strong> satellite sai solo di essere su una circonferenza (nello spazio: una sfera). Infinite posizioni possibili.',
+          'Con <strong>due</strong> le circonferenze si tagliano in due punti (nello spazio: una circonferenza intera). Ancora troppe.',
+          'Con <strong>tre</strong> resta un punto solo. Nello spazio ne restano due, ma uno è assurdo — sotto terra o in orbita — e si scarta.'
+        ];
+        var extra = (nsat === 2 && Math.abs(err) > 0.02)
+          ? ' <br><strong style="color:#dc2626">Con un errore di misura</strong> le tre circonferenze non passano più per uno stesso punto: resta un triangolino di incertezza. Ecco perché un orologio impreciso costa precisione — e perché serve il quarto satellite.'
+          : '';
+        document.getElementById('gp-cap').textContent =
+          'Ogni satellite dice soltanto «sei a questa distanza da me»: una circonferenza, non una direzione.';
+        var o = document.getElementById('gp-out');
+        o.innerHTML = testi[nsat] + extra;
+        mathIn(o);
+      }
+      se.addEventListener('input', disegna);
+      disegna();
+    }());
+
+    var y = document.getElementById('year');
+    if (y) { y.textContent = new Date().getFullYear(); }
+  }());
+  </script>
+
+  <script>
+  window.quizData = [
+    { type: 'mc', diff: 'easy',
+      text: 'Sul piano cartesiano, le soluzioni di un sistema di due equazioni in due incognite sono:',
+      options: ['le coordinate dei punti in cui le due curve si intersecano',
+                'i punti in cui ciascuna curva taglia l\'asse $x$',
+                'la somma delle due curve', 'i vertici delle due curve'],
+      correct: 0,
+      explain: 'Ogni equazione descrive una curva; il sistema chiede che valgano <em>entrambe</em>, cioè che il punto stia su tutte e due. Da qui segue tutto: quante soluzioni ci sono, e perché a volte non ce ne sono.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Un sistema di due equazioni di primo grado le cui rette sono parallele e distinte è:',
+      options: ['determinato', 'indeterminato', 'impossibile', 'di secondo grado'],
+      correct: 2,
+      explain: 'Rette parallele distinte non si incontrano mai: nessuna soluzione. Se invece le due equazioni descrivessero la <em>stessa</em> retta, le soluzioni sarebbero infinite e il sistema sarebbe indeterminato.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Risolvendo $\\begin{cases} y = x^2 \\\\ y = x+2 \\end{cases}$ si ottiene:',
+      options: ['$(1;\\,1)$ soltanto', 'nessuna soluzione',
+                '$x = 2$ e $x = -1$, e basta così', '$(2;\\,4)$ e $(-1;\\,1)$'],
+      correct: 3,
+      explain: 'Dal confronto viene $x^2-x-2=0$, con $x=2$ e $x=-1$; ma le soluzioni di un sistema sono <strong>coppie</strong>, e vanno completate risostituendo per trovare la $y$. Fermarsi ai valori di $x$ è l\'errore più comune.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Nel metodo di sostituzione conviene isolare:',
+      options: ['sempre la $x$', 'l\'incognita che ha coefficiente $1$, per evitare le frazioni',
+                'sempre la $y$', 'l\'incognita di grado più alto'],
+      correct: 1,
+      explain: 'È l\'unica «furbizia» del metodo, ed evita parecchi errori di calcolo. In $\\begin{cases} 2x+3y=12 \\\\ x-y=1\\end{cases}$ conviene ricavare $x = y+1$ dalla seconda.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Sostituendo la retta nella parabola si ottiene un\'equazione di secondo grado con $\\Delta = 0$. Che cosa significa geometricamente?',
+      options: ['la retta è tangente alla parabola', 'le curve non si incontrano',
+                'la retta coincide con la parabola', 'ci sono due intersezioni distinte'],
+      correct: 0,
+      explain: 'Le due intersezioni si sono sovrapposte: un solo punto di contatto, contato due volte. È il metodo standard per trovare le rette tangenti a una curva <em>senza</em> usare le derivate — basta imporre $\\Delta = 0$.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Il sistema $\\begin{cases} x+y=5 \\\\ xy=6 \\end{cases}$ ha per soluzioni:',
+      options: ['$(5;\\,6)$', '$(1;\\,6)$ e $(6;\\,1)$', '$(3;\\,2)$ e $(2;\\,3)$', 'nessuna'],
+      correct: 2,
+      explain: 'Cercare due numeri di somma 5 e prodotto 6 equivale a risolvere $x^2-5x+6=0$: sono 2 e 3. È esattamente il trinomio «somma e prodotto» della lezione 1, e le relazioni fra radici e coefficienti della lezione 2.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Quante equazioni servono al ricevitore GPS, e perché?',
+      options: ['tre, una per ogni coordinata',
+                'due, perché la Terra è una superficie',
+                'una sola, quella del satellite più vicino',
+                'quattro: tre per le coordinate e una per correggere l\'errore dell\'orologio del ricevitore'],
+      correct: 3,
+      explain: 'Tre sfere basterebbero a individuare il punto, ma l\'orologio del telefono è un quarzo economico e sbaglia: il suo errore diventa una quarta incognita, e serve una quarta misura per determinarlo. Un difetto dello strumento trasformato in incognita.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'In un <strong>sistema</strong> di disequazioni, le righe disegnate sulla retta dei numeri si combinano:',
+      options: ['con la regola dei segni, come nello schema dei segni',
+                'prendendo l\'unione delle soluzioni',
+                'prendendo l\'intersezione: serve che tutte le condizioni siano vere insieme',
+                'sommando gli intervalli'],
+      correct: 2,
+      explain: 'La graffa si legge «e». Attenzione a non confonderlo con lo <em>schema dei segni</em> della lezione 5: là le righe sono i fattori di una sola espressione e due «meno» fanno un «più»; qui sono condizioni indipendenti, e due «false» restano false.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Il sistema $\\begin{cases} x^2+y^2=25 \\\\ y = x+1 \\end{cases}$ ha per soluzioni:',
+      options: ['$(3;\\,4)$ e $(-4;\\,-3)$', '$(5;\\,0)$ e $(0;\\,5)$',
+                '$(4;\\,3)$ e $(-3;\\,-4)$', 'nessuna'],
+      correct: 0,
+      explain: 'Sostituendo si ottiene $2x^2+2x-24=0$, cioè $x^2+x-12=0$, con $x=3$ e $x=-4$; la $y$ si ricava dalla retta. La terza risposta inverte le coordinate: sono punti della circonferenza, ma non stanno sulla retta $y=x+1$.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Il sistema $\\begin{cases} y=x^2 \\\\ y=x-2 \\end{cases}$ non ha soluzioni reali. Nel campo complesso:',
+      options: ['continua a non averne',
+                'ne ha due, complesse coniugate',
+                'ne ha infinite', 'ne ha una sola'],
+      correct: 1,
+      explain: 'L\'equazione risolutiva è $x^2-x+2=0$ con $\\Delta=-7$: nel campo complesso ha due radici coniugate, $x = \\frac{1 \\pm i\\sqrt7}{2}$. I due punti di intersezione esistono, ma hanno coordinate complesse e il piano cartesiano — che contiene solo punti reali — non li può disegnare.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Perché un errore di un millesimo di secondo sull\'orologio rovinerebbe il GPS?',
+      options: ['perché i satelliti si muoverebbero troppo',
+                'perché il segnale si perderebbe',
+                'perché il calcolo diventerebbe troppo lento',
+                'perché la luce percorre circa 300 km in un millesimo di secondo, e la distanza calcolata sbaglierebbe di altrettanto'],
+      correct: 3,
+      explain: 'La distanza si ottiene moltiplicando il tempo di volo per $c \\approx 3 \\cdot 10^8$ m/s: un microsecondo vale 300 metri, un millisecondo 300 chilometri. È anche il motivo per cui i satelliti devono correggere gli effetti relativistici, che sfasano i loro orologi di 38 microsecondi al giorno.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Due rette parallele distinte non si incontrano nemmeno nel campo complesso. Come si sistema questa eccezione?',
+      options: ['si accetta come un caso a parte, senza rimedio',
+                'si aggiungono al piano i <em>punti all\'infinito</em>, uno per direzione: nel piano proiettivo le parallele si incontrano lì',
+                'si cambia il sistema di riferimento',
+                'si dimostra che le parallele non esistono'],
+      correct: 1,
+      explain: 'Nel piano proiettivo complesso vale il teorema di Bézout: due curve di grado $m$ e $n$ si incontrano sempre in $m \\cdot n$ punti contati con la molteplicità. È la stessa idea del <em>punto di fuga</em> nella prospettiva dei pittori rinascimentali, formalizzata tre secoli dopo.' },
+
+    { type: 'open',
+      text: 'Spiega perché il discriminante, nato per contare le soluzioni di un\'equazione di secondo grado, finisce per contare le intersezioni fra due curve.',
+      keywords: ['sostituz', 'una incognita', 'secondo grado', 'tangent', 'due punti', 'nessun', 'delta', 'intersez'],
+      requiredMatches: 3,
+      explain: 'Perché il metodo di sostituzione trasforma il sistema in una <strong>sola equazione in una sola incognita</strong>, e quando una delle curve è una parabola (o una circonferenza) quell\'equazione è di secondo grado. Ogni sua soluzione corrisponde a un punto di intersezione, quindi il numero di soluzioni <em>è</em> il numero di intersezioni: $\\Delta \\gt 0$ due punti, $\\Delta = 0$ un punto doppio (tangenza), $\\Delta \\lt 0$ nessun punto reale.' },
+
+    { type: 'open',
+      text: 'Descrivi come fa un ricevitore GPS a stabilire dove si trova, e spiega che ruolo ha il tempo in questo calcolo.',
+      keywords: ['distanza', 'satellit', 'sfer', 'intersez', 'tempo', 'luce', 'orologio', 'quattro', 'sistema'],
+      requiredMatches: 4,
+      explain: 'Ogni satellite trasmette la propria posizione e l\'ora del proprio orologio atomico. Il ricevitore misura quanto tempo ha impiegato il segnale e ricava la <strong>distanza</strong> moltiplicando per la velocità della luce. Essere a distanza nota da un punto noto è l\'equazione di una <strong>sfera</strong>: con tre satelliti si intersecano tre sfere e resta un punto solo (l\'altro è assurdo e si scarta). Serve un <strong>quarto</strong> satellite perché l\'orologio del ricevitore non è preciso: il suo errore diventa la quarta incognita del sistema. Il tempo è quindi la grandezza <em>misurata</em>, e la posizione ne è la conseguenza.' }
+  ];
+  </script>
+
+</body>
+
+</html>

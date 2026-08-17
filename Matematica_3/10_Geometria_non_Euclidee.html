@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lezione 10 — Le geometrie non euclidee</title>
+
+  <script src="../Style/theme.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+          onload="renderMathInDocument()"></script>
+
+  <link rel="stylesheet" href="../Style/theme.css">
+  <link rel="stylesheet" href="../Style/components.css">
+  <link rel="stylesheet" href="../Style/interactive.css">
+
+  <style>
+    .formula-title { font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+    .formula-note { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
+    .curiosita { border-left: 4px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, var(--surface)); border-radius: 8px; padding: 0.8rem 1rem; margin: 1rem 0; }
+    .warnbox { border-left: 4px solid #ef4444; background: color-mix(in srgb, #ef4444 9%, var(--surface)); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1rem 0; }
+
+    .figbox { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 0.7rem; margin: 1.1rem 0; }
+    .figbox svg { display: block; width: 100%; height: auto; max-width: 660px; margin: 0.3rem auto; }
+    .figbox .cap { font-size: 0.87rem; color: var(--muted); text-align: center; margin: 0.35rem 0 0; }
+    .figbox .lbl { fill: var(--text); font-size: 13px; font-weight: 600; }
+    .figbox .lbl-s { fill: var(--muted); font-size: 11.5px; }
+    .figbox .em { fill: var(--magenta); font-size: 13px; font-weight: 700; }
+
+    .sim-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; align-items: center; }
+    .sim-btns .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-secondary { background: var(--surface); color: var(--text-soft); }
+    .eq-out { font-size: 1rem; margin-top: 0.6rem; min-height: 1.5em; }
+    .ctrl { display: flex; flex-wrap: wrap; gap: 0.5rem 1.1rem; align-items: center; margin: 0.5rem 0; }
+    .ctrl label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .val-badge { display: inline-block; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 8px; padding: 0.15rem 0.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .sp-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; }
+    .toggle-row { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+    .tabf { border-collapse: collapse; width: 100%; margin: 0.9rem 0; font-size: 0.92rem; }
+    .tabf th, .tabf td { border: 1px solid var(--border); padding: 0.45rem 0.6rem; text-align: center; }
+    .tabf th { background: var(--surface-2); }
+    .tabf td.l { text-align: left; }
+    .tabf td.lab { text-align: left; font-weight: 600; }
+
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem;
+                border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 800;
+                margin-right: 0.45rem; flex: 0 0 auto; }
+
+    .ric { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 0.9rem; margin: 1.1rem 0; }
+    .ric > div { border: 1px solid var(--border); border-top: 4px solid var(--accent); border-radius: 10px;
+                 padding: 0.8rem 0.9rem; background: var(--surface); }
+    .ric h4 { margin: 0 0 0.35rem; color: var(--accent); font-size: 1.02rem; }
+
+    .postulati { counter-reset: pst; margin: 1.1rem 0; }
+    .postulati > div { position: relative; padding: 0.7rem 0.9rem 0.7rem 3.2rem; margin-bottom: 0.6rem;
+      border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+    .postulati > div::before { counter-increment: pst; content: counter(pst);
+      position: absolute; left: 0.85rem; top: 0.72rem; width: 1.7rem; height: 1.7rem; border-radius: 50%;
+      background: var(--accent); color: #fff; font-weight: 800; display: flex; align-items: center;
+      justify-content: center; font-size: 0.9rem; }
+    .postulati > div.quinto { border-color: var(--gold); border-width: 2px;
+      background: color-mix(in srgb, var(--gold) 7%, var(--surface)); }
+    .postulati > div.quinto::before { background: var(--gold); color: #1a1a1a; }
+
+    .timeline { border-left: 3px solid var(--accent); margin: 1.1rem 0 1.1rem 0.6rem; padding-left: 1.1rem; }
+    .timeline > div { position: relative; margin-bottom: 0.9rem; }
+    .timeline > div::before { content: ''; position: absolute; left: -1.52rem; top: 0.42rem;
+      width: 0.62rem; height: 0.62rem; border-radius: 50%; background: var(--accent); }
+    .timeline .anno { font-weight: 800; color: var(--accent); margin-right: 0.4rem; }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="subtitle">Matematica · Terzo anno · Lezione 10</div>
+    <h1>Le geometrie non euclidee</h1>
+    <p>Duemila anni per dimostrare un postulato,
+      e la scoperta che non si poteva</p>
+  </header>
+
+  <nav class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">/</span>
+    <a href="index.html">Matematica — Terzo anno</a>
+    <span class="sep">/</span> Le geometrie non euclidee
+  </nav>
+
+  <main>
+
+    <div class="note">
+      <strong>La lezione più filosofica dell'anno.</strong> Fin qui abbiamo fatto conti; adesso ci chiediamo
+      <em>da dove vengono le regole</em>. Per duemila anni la geometria di Euclide è stata considerata non una
+      teoria fra le tante, ma <strong>la descrizione vera dello spazio</strong> — talmente ovvia che Kant la
+      riteneva una struttura della mente umana. Poi, nell'Ottocento, tre matematici hanno scoperto
+      indipendentemente che si può costruire una geometria diversa, altrettanto coerente. E cinquant'anni
+      dopo Einstein ha scoperto che è proprio quella diversa a descrivere l'universo in cui viviamo.
+    </div>
+
+    <!-- 1 — I POSTULATI -->
+    <section id="sec1">
+      <h2>1. I cinque postulati di Euclide</h2>
+
+      <p>Attorno al 300 a.C. <strong>Euclide di Alessandria</strong> scrive gli <em>Elementi</em>, tredici
+        libri che restano il libro di testo della matematica per oltre due millenni — secondo solo alla Bibbia
+        per numero di edizioni. La sua idea è ancora oggi il modello di ogni teoria matematica: si parte da
+        pochissime affermazioni accettate senza dimostrazione, e si <em>deduce</em> tutto il resto.</p>
+
+      <div class="postulati">
+        <div>Fra due punti qualsiasi si può tracciare <strong>una e una sola retta</strong>.</div>
+        <div>Un segmento si può <strong>prolungare indefinitamente</strong> in linea retta.</div>
+        <div>Dato un punto e una lunghezza, si può tracciare una <strong>circonferenza</strong> con quel
+          centro e quel raggio.</div>
+        <div>Tutti gli <strong>angoli retti sono uguali</strong> fra loro.</div>
+        <div class="quinto">Se una retta che taglia altre due forma dallo stesso lato angoli interni la cui
+          somma è <strong>minore di due retti</strong>, quelle due rette, prolungate abbastanza, si incontrano
+          da quella parte.</div>
+      </div>
+
+      <p>Guardateli e ditemi se non notate qualcosa. I primi quattro si leggono in una riga e sono
+        talmente semplici da sembrare superflui. Il quinto ha bisogno di una frase intera, parla di
+        prolungamenti «abbastanza lunghi» e di somme di angoli: sembra <strong>un teorema travestito da
+        postulato</strong>.</p>
+
+      <div class="curiosita"><strong>Il sospetto è antico quanto il libro.</strong> Euclide stesso sembra a
+        disagio: nelle sue prime 28 proposizioni <em>non lo usa mai</em>, e lo tira fuori solo quando è
+        costretto. Per duemila anni i matematici hanno pensato la stessa cosa: che fosse dimostrabile a partire
+        dagli altri quattro, e che trovare quella dimostrazione fosse solo questione di ingegno. Ci hanno
+        provato Proclo nel V secolo, il persiano <strong>Omar Khayyam</strong> — sì, quello delle poesie —
+        nell'XI, Nasir al-Din al-Tusi nel XIII, John Wallis nel Seicento, Lambert e Legendre nel
+        Settecento. Tutti hanno fallito, e quasi tutti nello stesso modo: senza accorgersene, davano per
+        buona qualche affermazione che <em>equivale</em> al quinto postulato.</div>
+    </section>
+
+    <!-- 2 — GLI EQUIVALENTI -->
+    <section id="sec2">
+      <h2>2. Le tante facce del quinto postulato</h2>
+
+      <p>Il quinto si può sostituire con altre affermazioni: se si accetta una di queste, il quinto si dimostra,
+        e viceversa. Sono tutte <strong>logicamente equivalenti</strong>, ed è per questo che i tentativi di
+        dimostrazione fallivano — si assumeva un equivalente credendolo ovvio.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>formulazione</th><th>dovuta a</th></tr></thead>
+          <tbody>
+            <tr><td class="l">Per un punto esterno a una retta passa <strong>una e una sola</strong> parallela
+              a quella retta.</td><td>Playfair, 1795</td></tr>
+            <tr><td class="l">La somma degli angoli interni di un triangolo vale <strong>esattamente un angolo
+              piatto</strong>.</td><td>già in Euclide</td></tr>
+            <tr><td class="l">Esistono due triangoli <strong>simili ma non congruenti</strong> (cioè si può
+              ingrandire una figura mantenendone la forma).</td><td>Wallis, 1663</td></tr>
+            <tr><td class="l">Vale il <strong>teorema di Pitagora</strong>.</td><td>—</td></tr>
+            <tr><td class="l">Per tre punti non allineati passa <strong>una circonferenza</strong>.</td>
+              <td>Bolyai padre</td></tr>
+            <tr><td class="l">Esiste un <strong>rettangolo</strong> (un quadrilatero con quattro angoli
+              retti).</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warnbox"><strong>Fermatevi un attimo su questa lista.</strong> Vi sta dicendo che
+        <em>Pitagora</em> — il teorema che usate dalla seconda media, che avete usato tre lezioni fa per
+        ricavare l'equazione della circonferenza — non è una verità assoluta: <strong>è equivalente al quinto
+        postulato</strong>. In una geometria in cui il quinto non vale, Pitagora è falso. E lo stesso per la
+        somma degli angoli di un triangolo, e per l'esistenza dei rettangoli. Tutto ciò che vi sembra ovvio in
+        geometria poggia su quell'unica frase lunga.</div>
+
+      <div class="curiosita"><strong>La formulazione che si usa oggi.</strong> È quella di
+        <strong>John Playfair</strong>, del 1795, ed è quella che avete studiato alle medie: «per un punto
+        esterno a una retta passa una sola parallela». È più corta e più chiara dell'originale, e soprattutto
+        rende evidente <em>come negarla</em>: o non ne passa nessuna, o ne passano più di una. Sono
+        esattamente le due geometrie non euclidee.</div>
+    </section>
+
+    <!-- 3 — SACCHERI -->
+    <section id="sec3">
+      <h2>3. Saccheri, o come sfiorare una scoperta</h2>
+
+      <p>Il tentativo più bello e più tragico è quello di un gesuita italiano, <strong>Girolamo
+        Saccheri</strong> (1667-1733), professore di matematica a Pavia. La sua idea è di attaccare il problema
+        con la <strong>dimostrazione per assurdo</strong>: nego il quinto postulato, sviluppo le conseguenze, e
+        quando arrivo a una contraddizione avrò dimostrato che il quinto era vero.</p>
+
+      <div class="method">
+        <p><strong>Ripasso: come funziona una dimostrazione per assurdo.</strong></p>
+        <p><span class="step-num">1</span>Voglio dimostrare che $P$ è vera.</p>
+        <p><span class="step-num">2</span>Suppongo che $P$ sia <strong>falsa</strong>.</p>
+        <p><span class="step-num">3</span>Da questa supposizione deduco correttamente delle conseguenze.</p>
+        <p><span class="step-num">4</span>Se arrivo a una <strong>contraddizione</strong> — qualcosa che è
+          insieme vero e falso — allora la supposizione era sbagliata, e quindi $P$ è vera.</p>
+      </div>
+
+      <div class="curiosita"><strong>La critica classica al metodo.</strong> È vecchia quanto il metodo, e
+        merita di essere presa sul serio: «in qualche modo devi <em>sapere in partenza</em> che quella cosa è
+        assurda, altrimenti non sai che cosa stai cercando». E c'è di più: una dimostrazione per assurdo ti
+        dice <em>che</em> una cosa è vera, ma spesso non ti dice <em>perché</em> — non costruisce niente, si
+        limita a chiudere le altre strade. C'è un'intera scuola di pensiero, i <strong>costruttivisti</strong>,
+        che rifiuta questo tipo di ragionamento quando serve a dimostrare che un oggetto <em>esiste</em>: se
+        non me lo sai costruire, dicono, non mi hai convinto che ci sia.</p>
+        <p>Detto questo: la dimostrazione per assurdo è spesso <strong>enormemente più semplice</strong> di
+          quella diretta, e in alcuni casi è l'unica che si sa fare. La dimostrazione dell'irrazionalità di
+          $\sqrt2$ e quella dell'infinità dei numeri primi, che avete visto al primo anno, sono entrambe per
+          assurdo, ed entrambe stanno in mezza pagina. Nessuno se ne priva volentieri.</div>
+
+      <h3>3.1 — Il quadrilatero di Saccheri</h3>
+
+      <p>Saccheri costruisce una figura semplicissima: un quadrilatero $ABCD$ con la base $AB$, due lati
+        $AD$ e $BC$ <strong>uguali e perpendicolari</strong> alla base. Senza usare il quinto postulato si
+        dimostra facilmente che gli angoli in alto, $\hat D$ e $\hat C$, sono uguali fra loro. Ma quanto
+        valgono?</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>ipotesi di Saccheri</th><th>gli angoli in alto sono…</th><th>che geometria è</th>
+            <th>somma angoli del triangolo</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">dell'angolo retto</td><td>retti</td><td class="l">euclidea</td>
+                <td>esattamente $180°$</td></tr>
+            <tr><td class="lab">dell'angolo ottuso</td><td>ottusi</td><td class="l">sferica (o ellittica)</td>
+                <td>maggiore di $180°$</td></tr>
+            <tr><td class="lab">dell'angolo acuto</td><td>acuti</td><td class="l">iperbolica</td>
+                <td>minore di $180°$</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Saccheri elimina rapidamente l'ipotesi dell'angolo ottuso — e ha ragione, <em>dati i suoi altri
+        assunti</em>: il secondo postulato, quello che dice di poter prolungare un segmento
+        <strong>indefinitamente</strong>, esclude la geometria sferica, dove le rette sono chiuse e hanno
+        lunghezza finita. Poi si dedica all'ipotesi dell'angolo acuto e dimostra decine di teoremi, uno dopo
+        l'altro, senza mai trovare una contraddizione.</p>
+
+      <div class="warnbox"><strong>Il momento della verità mancata.</strong> Saccheri sta costruendo, senza
+        saperlo, la <strong>geometria iperbolica</strong>. I suoi teoremi sono corretti e sono ancora oggi
+        teoremi di quella geometria. Ma non trova nessuna contraddizione, e dopo pagine e pagine conclude che
+        l'ipotesi dell'angolo acuto è «<em>repugnans naturae lineae rectae</em>», ripugnante alla natura della
+        linea retta. Cioè: non l'ho dimostrata falsa, ma non mi piace. Pubblica il libro nel 1733 col titolo
+        <em>Euclides ab omni naevo vindicatus</em> — «Euclide liberato da ogni macchia» — e muore pochi mesi
+        dopo, convinto di aver salvato Euclide. Aveva invece scoperto un'altra geometria, e non se n'era
+        accorto.</div>
+
+      <div class="note"><strong>Che cosa impariamo da questo.</strong> Saccheri aveva i teoremi giusti e la
+        conclusione sbagliata, e il motivo non è tecnico: è che <em>non riusciva a immaginare</em> che potesse
+        esistere una geometria diversa da quella dello spazio in cui viviamo. Gli mancava l'idea che una teoria
+        matematica possa essere <strong>coerente senza essere vera del mondo</strong>. Quell'idea arriverà un
+        secolo dopo, ed è forse la più importante di tutta la matematica moderna.</div>
+    </section>
+
+    <!-- 4 — LA GEOMETRIA SFERICA -->
+    <section id="sec4">
+      <h2>4. La geometria sferica</h2>
+
+      <p>Cominciamo dalla geometria non euclidea più facile da immaginare, perché ce l'abbiamo sotto i piedi:
+        quella sulla <strong>superficie di una sfera</strong>.</p>
+
+      <p>La domanda da cui partire è: che cos'è una «retta» su una sfera? Non può essere una retta dello spazio,
+        perché uscirebbe dalla superficie. Ma il ruolo che la retta ha nel piano — <em>il cammino più
+        breve fra due punti</em> — se lo prende un'altra curva.</p>
+
+      <div class="definition">
+        <div class="formula-title">Geodetica</div>
+        <p>Su una superficie, la <strong>geodetica</strong> è il cammino più breve fra due punti. Sulla sfera
+          le geodetiche sono gli archi di <strong>cerchio massimo</strong>: le circonferenze ottenute
+          tagliando la sfera con un piano che passa per il <em>centro</em>.</p>
+        <p class="formula-note">L'equatore è un cerchio massimo; i meridiani lo sono tutti; i
+          <strong>paralleli no</strong>, tranne l'equatore. È il motivo per cui volando da Milano a New York
+          non si segue il parallelo ma si passa sopra la Groenlandia — e sembra un giro assurdo solo perché
+          siamo abituati a guardare la carta sbagliata.</p>
+      </div>
+
+      <div class="ric">
+        <div><h4>Non esistono parallele</h4><p>Due cerchi massimi qualsiasi si incontrano <strong>sempre</strong>,
+          e per giunta in due punti opposti. Il quinto postulato è negato nel modo più radicale: per un punto
+          esterno a una «retta» non passa <em>nessuna</em> parallela.</p></div>
+        <div><h4>Le rette sono chiuse</h4><p>Percorrendo un cerchio massimo si torna al punto di partenza. È
+          il motivo per cui questa geometria viola anche il secondo postulato, come aveva capito
+          Saccheri.</p></div>
+        <div><h4>I triangoli sono «gonfi»</h4><p>La somma degli angoli interni è <strong>sempre maggiore</strong>
+          di $180°$, e — questa è la sorpresa — di quanto lo sia dipende dall'<em>area</em> del
+          triangolo.</p></div>
+      </div>
+
+      <h3>4.1 — Il teorema di Girard</h3>
+
+      <p>Provate a immaginare questo triangolo: partite dal Polo Nord, scendete lungo un meridiano fino
+        all'equatore, camminate lungo l'equatore per un quarto di giro, poi risalite lungo un altro meridiano
+        fino al Polo. Avete tracciato un triangolo con <strong>tre angoli retti</strong>: somma $270°$.
+        In un triangolo!</p>
+
+      <div class="theorem">
+        <div class="formula-title">Teorema di Girard (1629)</div>
+        <p>Su una sfera di raggio $R$, un triangolo geodetico con angoli $\alpha$, $\beta$, $\gamma$ (in
+          radianti) ha area
+          $$\mathcal{A} = R^2 \left(\alpha + \beta + \gamma - \pi\right)$$</p>
+        <p class="formula-note">La quantità $E = \alpha+\beta+\gamma-\pi$ si chiama <strong>eccesso
+          sferico</strong>. Il teorema dice una cosa notevolissima: <em>di quanto la somma degli angoli supera
+          un angolo piatto è proporzionale all'area</em>. Triangoli piccoli hanno un eccesso quasi nullo — ecco
+          perché nella stanza in cui siete la geometria di Euclide funziona benissimo.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>apertura in longitudine: <span class="val-badge" id="sf-dv">—</span></label>
+          <input type="range" id="sf-d" min="10" max="170" step="1" value="90">
+          <label>latitudine del terzo vertice: <span class="val-badge" id="sf-fv">—</span></label>
+          <input type="range" id="sf-f" min="10" max="89" step="1" value="89">
+        </div>
+        <svg id="sf-svg" viewBox="0 0 680 420" role="img"
+             aria-label="Triangolo sferico con la somma degli angoli e l'eccesso"></svg>
+        <div class="sp-cols">
+          <div>angoli: <span class="val-badge" id="sf-ang">—</span></div>
+          <div>somma: <span class="val-badge" id="sf-som">—</span></div>
+          <div>eccesso $E$: <span class="val-badge" id="sf-ecc">—</span></div>
+          <div>area (frazione di sfera): <span class="val-badge" id="sf-area">—</span></div>
+        </div>
+        <div class="eq-out" id="sf-out"></div>
+      </div>
+
+      <p>Muovete i cursori e guardate le due caselle di destra: <strong>eccesso e area crescono
+        insieme</strong>, e il loro rapporto resta costante. Portate il triangolo a essere piccolissimo e
+        la somma degli angoli tende a $180°$: la geometria di Euclide è il caso limite di quella sferica per
+        figure molto piccole rispetto al raggio.</p>
+
+      <div class="curiosita"><strong>Come si misura la Terra con un triangolo.</strong> Il teorema di Girard
+        si può usare al contrario: misurando accuratamente i tre angoli di un grande triangolo sul terreno e
+        calcolandone l'area, si ricava $R$. Gauss lo fece davvero — per il rilievo geodetico del regno di
+        Hannover, negli anni Venti dell'Ottocento, misurò il triangolo Hohehagen-Brocken-Inselsberg, con lati di
+        decine di chilometri. Si è a lungo raccontato che volesse verificare se lo spazio fosse euclideo; gli
+        storici oggi ritengono che lo scopo fosse cartografico. In ogni caso l'eccesso misurato era di appena
+        <strong>quindici secondi d'arco</strong>: su un triangolo di quel tipo la geometria di Euclide sbaglia
+        di un quattro-millesimo di grado. Ecco perché nessuno se n'era accorto in duemila anni.</div>
+
+      <div class="example">
+        <p><strong>① Esercizio.</strong> Un triangolo sferico sulla Terra ($R \approx 6371$ km) ha tre angoli
+          retti. Quanto vale la sua area?</p>
+        <button class="btn btn-toggle" data-target="#sol-g1">Mostra la soluzione</button>
+        <div class="solution" id="sol-g1" hidden>
+          <p><span class="step-num">1</span>Tre angoli retti: $\alpha = \beta = \gamma = \frac{\pi}{2}$, quindi
+            la somma è $\frac{3\pi}{2}$.</p>
+          <p><span class="step-num">2</span>Eccesso: $E = \frac{3\pi}{2} - \pi = \frac{\pi}{2}$.</p>
+          <p><span class="step-num">3</span>$$\mathcal{A} = R^2 \cdot \frac{\pi}{2}
+             = 6371^2 \cdot \frac{\pi}{2} \approx 6{,}38 \cdot 10^7\ \text{km}^2$$</p>
+          <p><span class="step-num">4</span><strong>Controllo:</strong> la superficie totale della sfera è
+            $4\pi R^2 \approx 5{,}10 \cdot 10^8$ km². Il rapporto è
+            $\frac{\pi/2}{4\pi} = \frac18$: il nostro triangolo è esattamente <strong>un ottavo</strong> della
+            sfera ✔ E ha senso: tre piani perpendicolari tagliano la sfera in otto spicchi uguali, e il nostro
+            è uno di quelli.</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <p><strong>② Esercizio.</strong> Un triangolo sferico ha angoli di $90°$, $80°$ e $70°$. Che frazione
+          della sfera occupa?</p>
+        <button class="btn btn-toggle" data-target="#sol-g2">Mostra la soluzione</button>
+        <div class="solution" id="sol-g2" hidden>
+          <p><span class="step-num">1</span>Somma: $90+80+70 = 240°$, cioè $\frac{4\pi}{3}$ radianti.</p>
+          <p><span class="step-num">2</span>Eccesso: $E = 240° - 180° = 60° = \frac{\pi}{3}$.</p>
+          <p><span class="step-num">3</span>Area $= R^2 \cdot \frac{\pi}{3}$; la sfera intera è $4\pi R^2$.
+            Frazione:
+            $$\frac{\pi/3}{4\pi} = \frac{1}{12}$$</p>
+          <p><span class="step-num">4</span>Un dodicesimo della sfera. Notate la scorciatoia: la frazione è
+            $\frac{E}{4\pi}$, e con $E$ in gradi diventa $\frac{E°}{720°}$ — qui $\frac{60}{720} = \frac1{12}$
+            ✔ Un modo comodo per fare il conto a mente.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — LE CARTE GEOGRAFICHE -->
+    <section id="sec5">
+      <h2>5. Perché le carte geografiche mentono</h2>
+
+      <p>Adesso il problema pratico più importante di tutta questa storia. La Terra è (quasi) una sfera; le
+        carte geografiche sono piane. Come si passa dall'una all'altra?</p>
+
+      <div class="theorem">
+        <div class="formula-title">Il <em>Theorema Egregium</em> di Gauss (1827)</div>
+        <p>La <strong>curvatura</strong> di una superficie è una sua proprietà intrinseca: non cambia se la
+          superficie viene piegata senza stirarla. Di conseguenza <strong>una sfera non si può appiattire</strong>
+          su un piano senza deformarla.</p>
+        <p class="formula-note">Gauss lo chiamò «egregio», cioè notevole, e aveva ragione: dice che chi vive su
+          una superficie può <em>misurare</em> la curvatura senza uscirne, semplicemente facendo geometria —
+          per esempio misurando gli angoli di un triangolo. È l'idea che permetterà a Einstein di parlare di
+          spazio curvo senza dover immaginare una quinta dimensione da cui guardarlo.</p>
+      </div>
+
+      <div class="warnbox"><strong>La conseguenza brutale.</strong> <em>Ogni</em> carta geografica deforma
+        qualcosa: non è un limite tecnico che prima o poi si risolverà, è un teorema. Si può scegliere
+        <em>che cosa</em> conservare, mai conservare tutto. Provate a spianare una buccia d'arancia: o si
+        strappa o si accavalla.</div>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>proiezione</th><th>conserva</th><th>deforma</th><th>si usa per</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">Mercatore (1569)</td><td>gli <strong>angoli</strong> (è conforme)</td>
+                <td class="l">le aree, sempre di più verso i poli</td>
+                <td class="l">navigazione, mappe online</td></tr>
+            <tr><td class="lab">Peters, Mollweide</td><td>le <strong>aree</strong> (è equivalente)</td>
+                <td class="l">le forme, che risultano schiacciate</td>
+                <td class="l">confronti fra paesi, cartografia tematica</td></tr>
+            <tr><td class="lab">azimutale equidistante</td><td>le <strong>distanze</strong> da un punto</td>
+                <td class="l">tutto il resto</td><td class="l">rotte aeree, sismologia</td></tr>
+            <tr><td class="lab">gnomonica</td><td>trasforma i cerchi massimi in <strong>rette</strong></td>
+                <td class="l">angoli e aree, moltissimo</td><td class="l">tracciare rotte ortodromiche</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>5.1 — La proiezione di Mercatore</h3>
+
+      <p>Gerardo Mercatore, cartografo fiammingo, la pubblica nel <strong>1569</strong> con uno scopo preciso:
+        rendere la navigazione semplice. La sua carta ha una proprietà unica — <strong>una rotta a
+        bussola costante è una linea retta sulla mappa</strong>. Per un capitano del Cinquecento è una
+        rivoluzione: si traccia una riga fra partenza e arrivo, si legge l'angolo, si tiene quella rotta.</p>
+
+      <p>Il prezzo lo si paga sulle aree. La formula che dà la posizione verticale sulla carta è
+        $$y = R \ln\left(\tan\left(\frac{\pi}{4} + \frac{\varphi}{2}\right)\right)$$
+        e l'effetto è che alla latitudine $\varphi$ tutto viene ingrandito in larghezza <em>e</em> in altezza
+        di un fattore $\frac{1}{\cos\varphi}$, quindi le <strong>aree</strong> risultano moltiplicate per
+        $$\frac{1}{\cos^2\varphi}$$</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>latitudine: <span class="val-badge" id="mc-lv">—</span></label>
+          <input type="range" id="mc-l" min="0" max="80" step="1" value="60">
+          <span class="toggle-row"><input type="checkbox" id="mc-conf" checked> <label for="mc-conf">confronta Groenlandia e Africa</label></span>
+        </div>
+        <svg id="mc-svg" viewBox="0 0 680 420" role="img"
+             aria-label="Deformazione delle aree nella proiezione di Mercatore"></svg>
+        <div class="sp-cols">
+          <div>fattore lineare $1/\cos\varphi$: <span class="val-badge" id="mc-lin">—</span></div>
+          <div>fattore d'area $1/\cos^2\varphi$: <span class="val-badge" id="mc-ar">—</span></div>
+          <div>altezza sulla carta: <span class="val-badge" id="mc-y">—</span></div>
+          <div>1000 km appaiono lunghi: <span class="val-badge" id="mc-km">—</span></div>
+        </div>
+        <div class="eq-out" id="mc-out"></div>
+      </div>
+
+      <div class="curiosita"><strong>La Groenlandia e l'Africa.</strong> Sulla carta di Mercatore sembrano
+        grandi uguali. In realtà l'Africa misura circa $30{,}4$ milioni di km², la Groenlandia $2{,}2$: l'Africa
+        è <strong>quattordici volte</strong> più grande. Il motivo è che la Groenlandia sta attorno ai $72°$
+        di latitudine, dove il fattore d'area vale $\frac{1}{\cos^2 72°} \approx 10{,}5$, mentre l'Africa è a
+        cavallo dell'equatore, dove il fattore è $1$. La stessa cosa succede alla Russia, al Canada e
+        all'Antartide, che sulle mappe online sembrano sterminati.</p>
+        <p>Questa deformazione ha avuto conseguenze culturali vere: per generazioni si è cresciuti con
+          un'immagine del mondo in cui l'Europa e il Nord America sembravano molto più grandi di quanto siano.
+          Non era un complotto — Mercatore voleva solo aiutare i naviganti — ma l'effetto c'è stato, ed è il
+          motivo per cui oggi molte scuole affiancano una proiezione equivalente.</div>
+
+      <div class="example">
+        <p><strong>③ Esercizio.</strong> Di quanto sono ingrandite le aree, sulla carta di Mercatore, alla
+          latitudine di Milano ($45°$) e a quella di Oslo ($60°$)?</p>
+        <button class="btn btn-toggle" data-target="#sol-g3">Mostra la soluzione</button>
+        <div class="solution" id="sol-g3" hidden>
+          <p><strong>A $45°$:</strong> $\cos 45° = \frac{\sqrt2}{2} \approx 0{,}7071$, quindi
+            $$\frac{1}{\cos^2 45°} = \frac{1}{0{,}5} = 2$$
+            Le aree appaiono <strong>doppie</strong>.</p>
+          <p><strong>A $60°$:</strong> $\cos 60° = \frac12$, quindi
+            $$\frac{1}{\cos^2 60°} = \frac{1}{0{,}25} = 4$$
+            Le aree appaiono <strong>quadruplicate</strong>.</p>
+          <p>Quindici gradi di latitudine in più raddoppiano l'errore. E all'equatore il fattore vale $1$: lì
+            la carta è fedele.</p>
+          <p class="formula-note">Notate il collegamento con la lezione 1: il fattore <em>lineare</em> è
+            $\frac{1}{\cos\varphi}$ e quello d'<em>area</em> è il suo quadrato. Le aree scalano come il
+            quadrato delle lunghezze, esattamente come per lo schermo del televisore.</p>
+        </div>
+      </div>
+
+      <div class="example">
+        <p><strong>④ Esercizio.</strong> Perché il volo Milano-New York passa sopra la Groenlandia invece di
+          seguire il parallelo?</p>
+        <button class="btn btn-toggle" data-target="#sol-g4">Mostra la soluzione</button>
+        <div class="solution" id="sol-g4" hidden>
+          <p>Perché il cammino più breve fra due punti della sfera è l'arco di <strong>cerchio
+            massimo</strong>, e il parallelo del $45°$ non è un cerchio massimo — non è una geodetica.</p>
+          <p>Seguire il parallelo significa tenere sempre la stessa latitudine, cioè percorrere una
+            circonferenza di raggio $R\cos\varphi$, più piccola della sfera. È la rotta più semplice da
+            navigare (bussola costante: è la <em>lossodromia</em>, la retta sulla carta di Mercatore) ma non la
+            più corta.</p>
+          <p>La rotta più corta, detta <strong>ortodromia</strong>, è l'arco di cerchio massimo, e sulla carta
+            di Mercatore appare come una curva che piega verso il polo. Su una rotta transatlantica la
+            differenza è di qualche centinaio di chilometri — abbastanza da valere qualche tonnellata di
+            carburante a volo.</p>
+          <p class="formula-note">È il paradosso didattico più utile di questa lezione: la rotta che
+            <em>sembra</em> assurda sulla carta è quella giusta, e a sembrare assurda è la carta, non la
+            rotta.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — LA GEOMETRIA IPERBOLICA -->
+    <section id="sec6">
+      <h2>6. La geometria iperbolica</h2>
+
+      <p>L'altra strada per negare il quinto postulato è l'opposta: invece di dire che <em>non</em> passa
+        nessuna parallela, si dice che ne passano <strong>infinite</strong>. È l'ipotesi dell'angolo acuto di
+        Saccheri, ed è la geometria che porta i nomi di Bolyai e Lobačevskij.</p>
+
+      <div class="definition">
+        <div class="formula-title">Il postulato iperbolico</div>
+        <p>Per un punto esterno a una retta passano <strong>infinite rette</strong> che non la incontrano.</p>
+      </div>
+
+      <p>Sembra assurdo, e per un secolo è sembrato assurdo a tutti. Il problema è che siamo abituati a
+        superfici piatte o sferiche; ci serve una superficie con la <strong>curvatura negativa</strong>, cioè
+        che in ogni punto si comporti come una <em>sella</em>: curva verso l'alto in una direzione e verso il
+        basso in quella perpendicolare.</p>
+
+      <div class="table-container">
+        <table class="tabf">
+          <thead><tr><th>curvatura $K$</th><th>superficie</th><th>parallele per un punto</th>
+            <th>somma angoli triangolo</th></tr></thead>
+          <tbody>
+            <tr><td>$K \gt 0$</td><td class="l">sfera</td><td>nessuna</td><td>$\gt 180°$</td></tr>
+            <tr><td>$K = 0$</td><td class="l">piano (o cilindro!)</td><td>una sola</td><td>$= 180°$</td></tr>
+            <tr><td>$K \lt 0$</td><td class="l">sella, pseudosfera</td><td>infinite</td><td>$\lt 180°$</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="curiosita"><strong>Il cilindro è piatto.</strong> Sembra una provocazione e invece è una
+        conseguenza del <em>Theorema Egregium</em>: un foglio di carta si arrotola in un cilindro senza
+        stirarsi, quindi la curvatura non cambia e resta zero. Sul cilindro la somma degli angoli di un
+        triangolo è esattamente $180°$ e Pitagora funziona. Ecco perché si può srotolare l'etichetta di una
+        lattina e leggerla senza deformazioni, mentre non si riesce a fare lo stesso con un pallone.</div>
+
+      <h3>6.1 — Il disco di Poincaré</h3>
+
+      <p>Per <em>vedere</em> la geometria iperbolica si usa un modello: si prende un disco, si dichiara che i
+        suoi punti interni sono «il piano» e che le «rette» sono gli archi di circonferenza
+        <strong>perpendicolari al bordo</strong> (più i diametri). Il bordo non fa parte del piano: è
+        l'infinito.</p>
+
+      <div class="curiosita"><strong>Un incontro con la lezione 9.</strong> Per disegnare la geodetica fra due
+        punti del disco serve trovare la circonferenza che passa per quei due punti ed è ortogonale al bordo.
+        E si costruisce così: si prende l'<em>inverso</em> di uno dei due punti rispetto alla circonferenza
+        unitaria, cioè il punto $P^* = P/|P|^2$ sulla stessa semiretta, e si traccia la
+        <strong>circonferenza per i tre punti</strong> $P$, $Q$, $P^*$. È esattamente l'esercizio ② della
+        lezione 9, usato qui per costruire una geometria intera. Il simulatore fa proprio questo conto.</div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label>dimensione del triangolo: <span class="val-badge" id="ib-sv">—</span></label>
+          <input type="range" id="ib-s" min="8" max="97" step="1" value="55">
+          <label>rotazione: <span class="val-badge" id="ib-rv">—</span></label>
+          <input type="range" id="ib-r" min="0" max="120" step="2" value="0">
+          <span class="toggle-row"><input type="checkbox" id="ib-par" checked> <label for="ib-par">mostra le parallele</label></span>
+        </div>
+        <svg id="ib-svg" viewBox="0 0 680 420" role="img"
+             aria-label="Triangolo iperbolico nel disco di Poincare"></svg>
+        <div class="sp-cols">
+          <div>angoli: <span class="val-badge" id="ib-ang">—</span></div>
+          <div>somma: <span class="val-badge" id="ib-som">—</span></div>
+          <div>difetto $\pi - $ somma: <span class="val-badge" id="ib-dif">—</span></div>
+          <div>area (in unità $|K|^{-1}$): <span class="val-badge" id="ib-area">—</span></div>
+        </div>
+        <div class="eq-out" id="ib-out"></div>
+      </div>
+
+      <p>Ingrandite il triangolo e guardate: la somma degli angoli <strong>diminuisce</strong>, e i lati si
+        incurvano sempre di più verso l'interno. Rimpicciolitelo e la somma torna verso $180°$: anche qui la
+        geometria di Euclide è il caso limite delle figure piccole.</p>
+
+      <div class="theorem">
+        <div class="formula-title">Area di un triangolo iperbolico</div>
+        $$\mathcal{A} = \pi - (\alpha+\beta+\gamma)$$
+        <p class="formula-note">È il teorema di Girard col segno cambiato: là c'era un <em>eccesso</em>, qui
+          c'è un <strong>difetto</strong>. E c'è una conseguenza curiosa: siccome la somma degli angoli è
+          sempre positiva, il difetto non può superare $\pi$, e quindi <strong>nella geometria iperbolica non
+          esistono triangoli di area arbitrariamente grande</strong>. Il triangolo massimo ha i tre vertici
+          all'infinito e tutti gli angoli nulli.</p>
+      </div>
+
+      <div class="warnbox"><strong>Il modello deforma, ma coerentemente.</strong> Nel disco di Poincaré le
+        figure sembrano rimpicciolirsi avvicinandosi al bordo: è un effetto del modello, non della geometria.
+        Per un abitante di quel mondo tutti quei triangoli sono <em>uguali</em>, e il bordo è
+        infinitamente lontano. Il modello ha però una virtù preziosa: è <strong>conforme</strong>, cioè gli
+        angoli si leggono come angoli euclidei fra le tangenti. Ed è quello che permette al simulatore di
+        misurarli davvero.</div>
+
+      <div class="curiosita"><strong>Dove si incontra.</strong> Le incisioni <em>Cerchio limite</em> di
+        <strong>Escher</strong>, con i pesci e gli angeli che si rimpiccioliscono verso il bordo, sono disegni
+        del disco di Poincaré — Escher le fece dopo aver visto una figura in un articolo del matematico
+        Coxeter, con cui poi si scrisse per anni. In natura la curvatura negativa è dappertutto: le foglie di
+        insalata riccia, i coralli, alcune alghe crescono così perché una superficie a sella ha
+        <strong>più area a parità di ingombro</strong> — la stessa logica dei polmoni e delle branchie della
+        lezione 1. E in informatica, le reti di calcolatori e i grafi dei social network hanno una struttura
+        «iperbolica»: da un nodo il numero di vicini a distanza $n$ cresce esponenzialmente, esattamente come
+        l'area di un cerchio nel piano iperbolico.</div>
+    </section>
+
+    <!-- 7 — GAUSS, BOLYAI, LOBACEVSKIJ, RIEMANN -->
+    <section id="sec7">
+      <h2>7. Gauss, i due ragazzi e Riemann</h2>
+
+      <div class="timeline">
+        <div><span class="anno">1792-1817</span> — <strong>Gauss</strong>, a partire dai quindici anni, lavora
+          al problema e arriva alla conclusione giusta: esiste una geometria coerente in cui il quinto
+          postulato è falso. La chiama «geometria antieuclidea», poi «astrale». <strong>Non pubblica
+          nulla.</strong> In una lettera del 1829 a Bessel spiega il perché: teme «il clamore dei Beoti»,
+          cioè le urla degli stupidi — un'espressione greca per dire «i provinciali». Kant aveva appena
+          dichiarato che lo spazio euclideo è una struttura a priori della mente, e contraddirlo significava
+          uno scontro filosofico che Gauss non aveva voglia di affrontare.</div>
+        <div><span class="anno">1829</span> — il russo <strong>Nikolaj Lobačevskij</strong>, professore a
+          Kazan, pubblica <em>Sui principi della geometria</em>. In russo, su una rivista locale. Viene
+          ignorato, e quando qualcuno lo legge viene deriso: una recensione lo definisce una «caricatura della
+          geometria».</div>
+        <div><span class="anno">1832</span> — l'ungherese <strong>János Bolyai</strong>, ufficiale
+          dell'esercito, pubblica le stesse idee in ventisei pagine, come <em>appendice</em> al libro di
+          matematica di suo padre Farkas. Suo padre lo aveva supplicato di non occuparsene: «per amor di Dio,
+          lascia stare le parallele, ti prendono tutto il tempo, la salute e la felicità». János gli aveva
+          risposto con una frase rimasta famosa: «<em>Dal nulla ho creato un nuovo, strano universo</em>».</div>
+        <div><span class="anno">1832</span> — Farkas manda l'appendice al vecchio amico Gauss, aspettandosi
+          entusiasmo. Gauss risponde che non può lodare quel lavoro «perché lodarlo significherebbe lodare me
+          stesso», avendoci pensato per trent'anni. Tecnicamente era vero; per il giovane Bolyai fu un colpo
+          da cui non si riprese: non pubblicò mai più nulla.</div>
+        <div><span class="anno">1854</span> — <strong>Bernhard Riemann</strong>, ventottenne, tiene la sua
+          lezione di abilitazione a Gottinga: <em>Sulle ipotesi che stanno alla base della geometria</em>.
+          Nel pubblico c'è Gauss, ormai vecchio e malato. Riemann non si limita alle due geometrie note: mostra
+          come costruirne <strong>infinite</strong>, in qualsiasi numero di dimensioni, definendo la curvatura
+          punto per punto. Gauss, che non si entusiasmava mai, esce dalla sala visibilmente colpito e ne parla
+          con ammirazione. È forse l'unica volta in cui usò la propria autorevolezza a favore di queste
+          idee — e bastò a renderle rispettabili.</div>
+        <div><span class="anno">1868</span> — l'italiano <strong>Eugenio Beltrami</strong> costruisce il primo
+          <em>modello</em>: mostra che la geometria iperbolica si realizza sulla pseudosfera, e quindi che
+          <strong>se è contraddittoria lo è anche quella di Euclide</strong>. È la mossa decisiva: da quel
+          momento la questione non è più «è vera?» ma «è coerente?», e la risposta è sì. Seguiranno i modelli di
+          Klein e di Poincaré.</div>
+        <div><span class="anno">1915</span> — <strong>Einstein</strong> pubblica la relatività generale, che
+          descrive la gravità come <strong>curvatura dello spaziotempo</strong> e usa esattamente la geometria
+          di Riemann. Le misure lo confermano: la luce delle stelle, passando vicino al Sole, devia. Lo spazio
+          in cui viviamo <em>non è</em> euclideo, e la geometria che sembrava un gioco astratto era la
+          descrizione giusta.</div>
+      </div>
+
+      <div class="note"><strong>Le due lezioni di questa storia.</strong> La prima riguarda la matematica: una
+        teoria non deve essere «vera» per avere valore, deve essere <strong>coerente</strong>. Quando i
+        matematici hanno smesso di chiedersi quale geometria fosse quella giusta e hanno cominciato a
+        studiarle tutte, la disciplina è esplosa — ed è la stessa idea che avete incontrato nella lezione 1
+        con le strutture algebriche.</p>
+        <p>La seconda riguarda le persone. Gauss aveva ragione trent'anni prima di tutti e non pubblicò per
+          paura delle critiche; Lobačevskij pubblicò e fu deriso; Bolyai pubblicò e fu schiacciato da una
+          frase. Le idee arrivarono lo stesso, ma con decenni di ritardo e con un costo umano altissimo.
+          Chi ha un'idea nuova ha il dovere di scriverla — e chi la riceve ha il dovere di leggerla prima di
+          riderne.</div>
+    </section>
+
+    <section id="quiz">
+      <h2>Verifica quello che hai capito</h2>
+      <div id="quiz-app"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© <span id="year"></span> — Prof. Vettigli</p>
+  </footer>
+
+  <script src="../Style/math-render.js"></script>
+  <script src="../Style/interactive.js"></script>
+  <script src="../Style/toc.js"></script>
+  <script src="../Style/quiz.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var SVGNS = 'http://www.w3.org/2000/svg';
+    function el(tag, attrs, txt) {
+      var n = document.createElementNS(SVGNS, tag);
+      for (var k in attrs) { if (attrs.hasOwnProperty(k)) { n.setAttribute(k, attrs[k]); } }
+      if (txt !== undefined) { n.textContent = txt; }
+      return n;
+    }
+    function fmt(v, d) {
+      if (d === undefined) { d = 2; }
+      if (!isFinite(v)) { return '—'; }
+      var s = (Math.abs(v) < 5e-11 ? 0 : v).toFixed(d);
+      return s.replace('.', ',');
+    }
+    function clear(svg) { while (svg.firstChild) { svg.removeChild(svg.firstChild); } }
+    function css(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#888';
+    }
+    function mathIn(node) { if (window.renderMathIn) { window.renderMathIn(node); } }
+    var RAD = Math.PI / 180, DEG = 180 / Math.PI;
+
+    // =========================================================
+    // 1) IL TRIANGOLO SFERICO E IL TEOREMA DI GIRARD
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('sf-svg');
+      if (!svg) { return; }
+      var sd = document.getElementById('sf-d'), sf = document.getElementById('sf-f');
+      var CX = 340, CY = 215, R = 175, VISTA = 22 * RAD;   // inclinazione del punto di vista
+
+      function versore(lat, lon) {
+        var cf = Math.cos(lat), sfi = Math.sin(lat);
+        return [cf * Math.sin(lon), sfi, cf * Math.cos(lon)];
+      }
+      function proietta(P) {
+        var y = P[1] * Math.cos(VISTA) - P[2] * Math.sin(VISTA);
+        var z = P[1] * Math.sin(VISTA) + P[2] * Math.cos(VISTA);
+        return { x: CX + R * P[0], y: CY - R * y, vis: z > -0.02 };
+      }
+      function angolo(P, Q) {
+        var d = P[0] * Q[0] + P[1] * Q[1] + P[2] * Q[2];
+        return Math.acos(Math.max(-1, Math.min(1, d)));
+      }
+      function arco(P, Q, n) {
+        var om = angolo(P, Q), out = [], i;
+        for (i = 0; i <= n; i++) {
+          var t = i / n, s = Math.sin(om);
+          if (s < 1e-9) { out.push(P); continue; }
+          var a = Math.sin((1 - t) * om) / s, b = Math.sin(t * om) / s;
+          out.push([a * P[0] + b * Q[0], a * P[1] + b * Q[1], a * P[2] + b * Q[2]]);
+        }
+        return out;
+      }
+      function tracciaArco(P, Q, col, sp) {
+        var pts = arco(P, Q, 80), d = '', staccato = true, i;
+        for (i = 0; i < pts.length; i++) {
+          var pr = proietta(pts[i]);
+          if (!pr.vis) { staccato = true; continue; }
+          d += (staccato ? 'M ' : 'L ') + pr.x.toFixed(2) + ' ' + pr.y.toFixed(2) + ' ';
+          staccato = false;
+        }
+        svg.appendChild(el('path', { d: d, fill: 'none', stroke: col, 'stroke-width': sp }));
+      }
+
+      function disegna() {
+        var dl = parseFloat(sd.value) * RAD, fi = parseFloat(sf.value) * RAD, i;
+        document.getElementById('sf-dv').textContent = sd.value + '°';
+        document.getElementById('sf-fv').textContent = sf.value + '°';
+        var A = versore(0, -dl / 2), B = versore(0, dl / 2), C = versore(fi, 0);
+
+        // lati (archi) opposti ai vertici
+        var la = angolo(B, C), lb = angolo(A, C), lc = angolo(A, B);
+        function ang(x, y, z) {
+          var num = Math.cos(x) - Math.cos(y) * Math.cos(z);
+          var den = Math.sin(y) * Math.sin(z);
+          if (Math.abs(den) < 1e-12) { return 0; }
+          return Math.acos(Math.max(-1, Math.min(1, num / den)));
+        }
+        var aA = ang(la, lb, lc), aB = ang(lb, la, lc), aC = ang(lc, la, lb);
+        var som = aA + aB + aC, E = som - Math.PI;
+
+        clear(svg);
+        var g = css('--border'), t = css('--text'), ac = css('--accent');
+        svg.appendChild(el('circle', { cx: CX, cy: CY, r: R, fill: css('--surface'), 'fill-opacity': 0.5, stroke: t, 'stroke-width': 2 }));
+        // reticolato: meridiani e paralleli
+        for (i = -180; i < 180; i += 30) {
+          tracciaArco(versore(-Math.PI / 2 + 0.001, i * RAD), versore(Math.PI / 2 - 0.001, i * RAD), g, 1);
+        }
+        for (i = -60; i <= 60; i += 30) {
+          var d = '', staccato = true, j;
+          for (j = 0; j <= 180; j++) {
+            var pr = proietta(versore(i * RAD, -Math.PI + 2 * Math.PI * j / 180));
+            if (!pr.vis) { staccato = true; continue; }
+            d += (staccato ? 'M ' : 'L ') + pr.x.toFixed(2) + ' ' + pr.y.toFixed(2) + ' ';
+            staccato = false;
+          }
+          svg.appendChild(el('path', { d: d, fill: 'none', stroke: g, 'stroke-width': i === 0 ? 1.8 : 1 }));
+        }
+        // il triangolo
+        [[A, B], [B, C], [C, A]].forEach(function (L) { tracciaArco(L[0], L[1], ac, 3.4); });
+        [[A, 'A'], [B, 'B'], [C, 'C']].forEach(function (V) {
+          var pr = proietta(V[0]);
+          if (!pr.vis) { return; }
+          svg.appendChild(el('circle', { cx: pr.x, cy: pr.y, r: 5.5, fill: '#e11d48' }));
+          svg.appendChild(el('text', { x: pr.x + 9, y: pr.y - 8, class: 'em' }, V[1]));
+        });
+        svg.appendChild(el('text', { x: 20, y: 30, class: 'em' }, 'triangolo geodetico sulla sfera'));
+
+        document.getElementById('sf-ang').textContent =
+          fmt(aA * DEG, 1) + '° + ' + fmt(aB * DEG, 1) + '° + ' + fmt(aC * DEG, 1) + '°';
+        document.getElementById('sf-som').textContent = fmt(som * DEG, 2) + '°';
+        document.getElementById('sf-ecc').textContent = fmt(E * DEG, 2) + '°';
+        document.getElementById('sf-area').textContent = fmt(E / (4 * Math.PI) * 100, 3) + '%';
+        var o = document.getElementById('sf-out');
+        o.innerHTML = 'Somma $= ' + fmt(som * DEG, 2) + '°$, eccesso $E = ' + fmt(E * DEG, 2) + '° = ' + fmt(E, 4) + '$ rad. Per Girard l\'area vale $R^2E$, cioè la frazione ' +
+          '$\\frac{E}{4\\pi} = ' + fmt(E / (4 * Math.PI) * 100, 3) + '\\%$ della sfera. <strong>Eccesso e area crescono insieme</strong>, e il loro rapporto è sempre $R^2$.';
+        mathIn(o);
+      }
+      [sd, sf].forEach(function (s) { s.addEventListener('input', disegna); });
+      disegna();
+    }());
+
+    // =========================================================
+    // 2) LA PROIEZIONE DI MERCATORE
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('mc-svg');
+      if (!svg) { return; }
+      var sl = document.getElementById('mc-l'), cc = document.getElementById('mc-conf');
+      var MX = 40, MY = 30, MW = 340, MH = 350;
+
+      function ymerc(f) { return Math.log(Math.tan(Math.PI / 4 + f * RAD / 2)); }
+      var YMAX = ymerc(80);
+
+      function disegna() {
+        var fi = parseFloat(sl.value), i;
+        document.getElementById('mc-lv').textContent = fi + '°';
+        var lin = 1 / Math.cos(fi * RAD), ar = lin * lin;
+
+        clear(svg);
+        var g = css('--border'), t = css('--text'), ac = css('--accent');
+        function py(f) { return MY + MH - ymerc(f) / YMAX * MH; }
+        svg.appendChild(el('rect', { x: MX, y: MY, width: MW, height: MH, fill: 'none', stroke: t, 'stroke-width': 1.6 }));
+        for (i = 0; i <= 80; i += 10) {
+          svg.appendChild(el('line', { x1: MX, y1: py(i), x2: MX + MW, y2: py(i), stroke: g, 'stroke-width': i === 0 ? 1.8 : 1 }));
+          svg.appendChild(el('text', { x: MX - 6, y: py(i) + 4, class: 'lbl-s', 'text-anchor': 'end' }, i + '°'));
+        }
+        for (i = 0; i <= 6; i++) {
+          svg.appendChild(el('line', { x1: MX + MW * i / 6, y1: MY, x2: MX + MW * i / 6, y2: MY + MH, stroke: g, 'stroke-width': 1 }));
+        }
+        // un quadrato di 1000 km, all'equatore e alla latitudine scelta
+        var LATO = 26;   // 1000 km all'equatore, in pixel
+        svg.appendChild(el('rect', { x: MX + 40, y: py(0) - LATO, width: LATO, height: LATO, fill: '#10b981', 'fill-opacity': 0.5, stroke: '#065f46', 'stroke-width': 1.6 }));
+        svg.appendChild(el('text', { x: MX + 40 + LATO + 6, y: py(0) - 6, class: 'lbl-s' }, '1000 km'));
+        var L2 = LATO * lin;
+        svg.appendChild(el('rect', { x: MX + 40, y: py(fi) - L2, width: L2, height: L2, fill: '#e11d48', 'fill-opacity': 0.45, stroke: '#9f1239', 'stroke-width': 1.6 }));
+        svg.appendChild(el('text', { x: MX + 46 + L2, y: py(fi) - 6, class: 'em' }, '× ' + fmt(ar, 2) + ' in area'));
+        svg.appendChild(el('text', { x: MX, y: 20, class: 'em' }, 'carta di Mercatore'));
+
+        // confronto Groenlandia / Africa
+        if (cc.checked) {
+          var BX = 420, BY = 70, BW = 220;
+          var dati = [
+            ['Groenlandia', 2.166, 2.166 * 10.5, '#e11d48'],
+            ['Africa', 30.37, 30.37 * 1.02, '#10b981']
+          ];
+          svg.appendChild(el('text', { x: BX, y: 30, class: 'em' }, 'area vera e area apparente'));
+          svg.appendChild(el('text', { x: BX, y: 48, class: 'lbl-s' }, '(milioni di km², scala arbitraria)'));
+          dati.forEach(function (d, k) {
+            var y0 = BY + k * 100;
+            var wv = BW * d[1] / 32, wa = BW * d[2] / 32;
+            svg.appendChild(el('text', { x: BX, y: y0, class: 'lbl' }, d[0]));
+            svg.appendChild(el('rect', { x: BX, y: y0 + 8, width: wv, height: 20, fill: d[3], 'fill-opacity': 0.75 }));
+            svg.appendChild(el('text', { x: BX + wv + 8, y: y0 + 23, class: 'lbl-s' }, 'vera: ' + fmt(d[1], 1)));
+            svg.appendChild(el('rect', { x: BX, y: y0 + 34, width: Math.min(wa, BW + 20), height: 20, fill: d[3], 'fill-opacity': 0.32, stroke: d[3], 'stroke-width': 1.4, 'stroke-dasharray': '4 3' }));
+            svg.appendChild(el('text', { x: BX + Math.min(wa, BW + 20) + 8, y: y0 + 49, class: 'lbl-s' }, 'sulla carta: ' + fmt(d[2], 1)));
+          });
+          svg.appendChild(el('text', { x: BX, y: BY + 232, class: 'em' }, 'in realtà l\'Africa è 14 volte'));
+          svg.appendChild(el('text', { x: BX, y: BY + 250, class: 'em' }, 'più grande della Groenlandia'));
+        }
+
+        document.getElementById('mc-lin').textContent = fmt(lin, 3);
+        document.getElementById('mc-ar').textContent = fmt(ar, 3);
+        document.getElementById('mc-y').textContent = fmt(ymerc(fi), 3) + ' R';
+        document.getElementById('mc-km').textContent = fmt(1000 * lin, 0) + ' km';
+        var o = document.getElementById('mc-out');
+        o.innerHTML = 'A $\\varphi = ' + fi + '°$: fattore lineare $\\frac{1}{\\cos\\varphi} = ' + fmt(lin, 3) + '$, fattore d\'area $\\frac{1}{\\cos^2\\varphi} = ' + fmt(ar, 3) + '$. Il quadrato rosso e quello verde rappresentano <strong>la stessa area reale</strong>: ' +
+          'la differenza è tutta della proiezione.';
+        mathIn(o);
+      }
+      sl.addEventListener('input', disegna);
+      cc.addEventListener('change', disegna);
+      disegna();
+    }());
+
+    // =========================================================
+    // 3) IL DISCO DI POINCARE
+    // =========================================================
+    (function () {
+      var svg = document.getElementById('ib-svg');
+      if (!svg) { return; }
+      var ss = document.getElementById('ib-s'), sr = document.getElementById('ib-r'),
+          cp = document.getElementById('ib-par');
+      var CX = 250, CY = 210, R = 180;
+
+      function px(p) { return { x: CX + R * p[0], y: CY - R * p[1] }; }
+
+      // circonferenza per tre punti: e' l'esercizio della lezione 9
+      function perTre(P, Q, S) {
+        var d = 2 * (P[0] * (Q[1] - S[1]) + Q[0] * (S[1] - P[1]) + S[0] * (P[1] - Q[1]));
+        if (Math.abs(d) < 1e-12) { return null; }
+        var p2 = P[0] * P[0] + P[1] * P[1], q2 = Q[0] * Q[0] + Q[1] * Q[1], s2 = S[0] * S[0] + S[1] * S[1];
+        var ux = (p2 * (Q[1] - S[1]) + q2 * (S[1] - P[1]) + s2 * (P[1] - Q[1])) / d;
+        var uy = (p2 * (S[0] - Q[0]) + q2 * (P[0] - S[0]) + s2 * (Q[0] - P[0])) / d;
+        return { c: [ux, uy], r: Math.hypot(P[0] - ux, P[1] - uy) };
+      }
+      // geodetica del disco fra P e Q: circonferenza per P, Q e l'inverso di P
+      function geodetica(P, Q) {
+        var n2 = P[0] * P[0] + P[1] * P[1];
+        if (n2 < 1e-9) { return null; }
+        var Pi = [P[0] / n2, P[1] / n2];
+        return perTre(P, Q, Pi);
+      }
+      // punti dell'arco fra P e Q sulla circonferenza G
+      function arco(G, P, Q, n) {
+        var a1 = Math.atan2(P[1] - G.c[1], P[0] - G.c[0]);
+        var a2 = Math.atan2(Q[1] - G.c[1], Q[0] - G.c[0]);
+        var da = a2 - a1;
+        while (da > Math.PI) { da -= 2 * Math.PI; }
+        while (da < -Math.PI) { da += 2 * Math.PI; }
+        var out = [], i;
+        for (i = 0; i <= n; i++) {
+          var a = a1 + da * i / n;
+          out.push([G.c[0] + G.r * Math.cos(a), G.c[1] + G.r * Math.sin(a)]);
+        }
+        return out;
+      }
+      function tracciaPunti(pts, col, sp, dash) {
+        var d = '', i;
+        for (i = 0; i < pts.length; i++) {
+          var q = px(pts[i]);
+          d += (i === 0 ? 'M ' : 'L ') + q.x.toFixed(2) + ' ' + q.y.toFixed(2) + ' ';
+        }
+        var at = { d: d, fill: 'none', stroke: col, 'stroke-width': sp };
+        if (dash) { at['stroke-dasharray'] = '6 5'; }
+        svg.appendChild(el('path', at));
+      }
+
+      function disegna() {
+        var s = parseFloat(ss.value) / 100, rot = parseFloat(sr.value) * RAD, i;
+        document.getElementById('ib-sv').textContent = fmt(s, 2);
+        document.getElementById('ib-rv').textContent = sr.value + '°';
+        var V = [0, 1, 2].map(function (k) {
+          var a = rot + Math.PI / 2 + 2 * Math.PI * k / 3;
+          return [s * Math.cos(a), s * Math.sin(a)];
+        });
+
+        clear(svg);
+        var g = css('--border'), t = css('--text'), ac = css('--accent');
+        svg.appendChild(el('circle', { cx: CX, cy: CY, r: R, fill: css('--surface'), 'fill-opacity': 0.35, stroke: t, 'stroke-width': 2.4 }));
+        svg.appendChild(el('text', { x: CX, y: CY + R + 20, class: 'lbl-s', 'text-anchor': 'middle' }, 'il bordo è l\'infinito: non fa parte del piano'));
+
+        // i tre lati e le direzioni tangenti nei vertici
+        var tang = [[], [], []];
+        [[0, 1], [1, 2], [2, 0]].forEach(function (L) {
+          var P = V[L[0]], Q = V[L[1]], G = geodetica(P, Q), pts;
+          if (G === null || G.r > 400) {
+            pts = [P, Q];
+          } else {
+            pts = arco(G, P, Q, 90);
+          }
+          tracciaPunti(pts, ac, 3.2, false);
+          // direzione tangente in P (verso Q) e in Q (verso P)
+          var dP = [pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]];
+          var n = pts.length - 1;
+          var dQ = [pts[n - 1][0] - pts[n][0], pts[n - 1][1] - pts[n][1]];
+          tang[L[0]].push(dP);
+          tang[L[1]].push(dQ);
+        });
+        var somma = 0, angoli = [];
+        for (i = 0; i < 3; i++) {
+          var u = tang[i][0], v = tang[i][1];
+          var cosang = (u[0] * v[0] + u[1] * v[1]) / (Math.hypot(u[0], u[1]) * Math.hypot(v[0], v[1]));
+          var a = Math.acos(Math.max(-1, Math.min(1, cosang)));
+          angoli.push(a);
+          somma += a;
+          var q = px(V[i]);
+          svg.appendChild(el('circle', { cx: q.x, cy: q.y, r: 5.5, fill: '#e11d48' }));
+          svg.appendChild(el('text', { x: q.x + 9, y: q.y - 8, class: 'em' }, fmt(a * DEG, 1) + '°'));
+        }
+
+        // le infinite parallele
+        if (cp.checked) {
+          var r0 = [[0, -0.985], [0, 0.985]];
+          tracciaPunti(r0, '#8b5cf6', 2.6, false);
+          svg.appendChild(el('text', { x: px([0, 0])['x'] + 8, y: 40, class: 'em', fill: '#8b5cf6' }, 'la retta r'));
+          var P0 = [0.5, 0];
+          var q0 = px(P0);
+          svg.appendChild(el('circle', { cx: q0.x, cy: q0.y, r: 5, fill: '#f59e0b' }));
+          svg.appendChild(el('text', { x: q0.x + 8, y: q0.y + 18, class: 'lbl', fill: '#f59e0b' }, 'P'));
+          [-0.75, -0.35, 0, 0.35, 0.75].forEach(function (k) {
+            var C = [1.25, k], rr = Math.sqrt(1.5625 + k * k - 1);
+            var pts = [], j;
+            for (j = 0; j <= 120; j++) {
+              var a = Math.PI * 0.55 + Math.PI * 0.9 * j / 120;
+              var Pp = [C[0] + rr * Math.cos(a), C[1] + rr * Math.sin(a)];
+              if (Pp[0] * Pp[0] + Pp[1] * Pp[1] < 0.985) { pts.push(Pp); }
+            }
+            if (pts.length > 2) { tracciaPunti(pts, '#f59e0b', 1.8, true); }
+          });
+        }
+
+        var dif = Math.PI - somma;
+        document.getElementById('ib-ang').textContent =
+          angoli.map(function (a) { return fmt(a * DEG, 1) + '°'; }).join(' + ');
+        document.getElementById('ib-som').textContent = fmt(somma * DEG, 2) + '°';
+        document.getElementById('ib-dif').textContent = fmt(dif * DEG, 2) + '°';
+        document.getElementById('ib-area').textContent = fmt(dif, 4);
+        var o = document.getElementById('ib-out');
+        o.innerHTML = 'La somma degli angoli vale $' + fmt(somma * DEG, 2) + '° \\lt 180°$: il <strong>difetto</strong> è $' + fmt(dif * DEG, 2) + '°$, e per il teorema dell\'area vale proprio $\\pi - (\\alpha+\\beta+\\gamma) = ' + fmt(dif, 4) + '$. Ingrandendo il triangolo la somma cala, rimpicciolendolo tende a $180°$.' +
+          (cp.checked ? ' In arancione, <strong>cinque delle infinite parallele</strong> alla retta viola passanti per $P$: nessuna la incontra.' : '');
+        mathIn(o);
+      }
+      [ss, sr].forEach(function (x) { x.addEventListener('input', disegna); });
+      cp.addEventListener('change', disegna);
+      disegna();
+    }());
+
+    var y = document.getElementById('year');
+    if (y) { y.textContent = new Date().getFullYear(); }
+  }());
+  </script>
+
+  <script>
+  window.quizData = [
+    { type: 'mc', diff: 'easy',
+      text: 'Che cosa afferma il quinto postulato di Euclide, nella formulazione di Playfair?',
+      options: ['due rette parallele non si incontrano mai',
+                'per un punto esterno a una retta passa una e una sola parallela',
+                'la somma degli angoli di un triangolo è $180°$',
+                'due punti individuano una retta'],
+      correct: 1,
+      explain: 'È la formulazione del 1795, equivalente all\'originale ma più chiara — e soprattutto più facile da <em>negare</em>: o non passa nessuna parallela (geometria sferica) o ne passano infinite (geometria iperbolica). La terza risposta è un altro equivalente del quinto postulato, non la sua formulazione.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Su una sfera, le «rette» — cioè i cammini più brevi — sono:',
+      options: ['gli archi di cerchio massimo', 'i paralleli', 'i meridiani soltanto', 'le spirali'],
+      correct: 0,
+      explain: 'Si chiamano <strong>geodetiche</strong>, e sono le circonferenze ottenute tagliando la sfera con un piano passante per il centro. I meridiani lo sono tutti, ma dei paralleli solo l\'equatore: è per questo che un volo transatlantico non segue il parallelo.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'La somma degli angoli interni di un triangolo su una sfera:',
+      options: ['è sempre $180°$', 'è sempre minore di $180°$',
+                'dipende dal raggio soltanto', 'è sempre maggiore di $180°$'],
+      correct: 3,
+      explain: 'C\'è sempre un <strong>eccesso</strong>, e per il teorema di Girard è proporzionale all\'area del triangolo. Un triangolo con tre angoli retti — polo, equatore, equatore — ha somma $270°$ e occupa un ottavo della sfera.' },
+
+    { type: 'mc', diff: 'easy',
+      text: 'Che cosa ha dimostrato in realtà Girolamo Saccheri nel 1733?',
+      options: ['che il quinto postulato è falso',
+                'che la geometria sferica non esiste',
+                'decine di teoremi di quella che oggi chiamiamo geometria iperbolica, credendo di stare cercando un assurdo',
+                'il teorema di Pitagora senza il quinto postulato'],
+      correct: 2,
+      explain: 'Voleva dimostrare il quinto postulato per assurdo, negandolo e cercando una contraddizione. Non la trovò mai — perché non c\'è — ma invece di concludere che quella geometria era coerente la dichiarò «ripugnante alla natura della linea retta». Sfiorò la scoperta e la lasciò andare.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Quale delle seguenti affermazioni <strong>non</strong> è equivalente al quinto postulato?',
+      options: ['vale il teorema di Pitagora',
+                'esistono triangoli simili ma non congruenti',
+                'esiste un rettangolo',
+                'per due punti passa una sola retta'],
+      correct: 3,
+      explain: 'L\'ultima è il <em>primo</em> postulato, e vale in tutte e tre le geometrie. Le altre tre sono equivalenti al quinto: in una geometria non euclidea Pitagora è falso, i rettangoli non esistono e due figure simili sono per forza congruenti — non si può ingrandire una figura mantenendone la forma.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Un triangolo sferico ha angoli di $90°$, $80°$ e $70°$. Che frazione della sfera occupa?',
+      options: ['$\\frac{1}{8}$', '$\\frac{1}{12}$', '$\\frac{1}{4}$', '$\\frac{1}{6}$'],
+      correct: 1,
+      explain: 'L\'eccesso è $240°-180° = 60°$. La frazione di sfera vale $\\frac{E}{4\\pi}$, che con $E$ in gradi diventa $\\frac{E°}{720°} = \\frac{60}{720} = \\frac{1}{12}$.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Sulla carta di Mercatore, alla latitudine di $60°$ le aree appaiono:',
+      options: ['uguali a quelle reali', 'doppie', 'quadruplicate', 'dimezzate'],
+      correct: 2,
+      explain: 'Il fattore d\'area è $\\frac{1}{\\cos^2\\varphi}$, e $\\cos 60° = \\frac12$, quindi il fattore vale $\\frac{1}{0{,}25} = 4$. A $45°$ vale invece 2: quindici gradi di latitudine raddoppiano l\'errore.' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Il <em>Theorema Egregium</em> di Gauss implica che:',
+      options: ['nessuna carta geografica può conservare insieme angoli e aree',
+                'ogni superficie si può appiattire',
+                'la Terra è una sfera perfetta',
+                'la proiezione di Mercatore è la migliore possibile'],
+      correct: 0,
+      explain: 'La curvatura è una proprietà intrinseca e non cambia piegando la superficie senza stirarla: una sfera ($K \\gt 0$) non può diventare un piano ($K = 0$) senza deformazioni. Non è un limite tecnico da superare, è un teorema — si può solo scegliere <em>che cosa</em> conservare.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Nella geometria iperbolica, l\'area di un triangolo vale $\\pi - (\\alpha+\\beta+\\gamma)$. Che conseguenza notevole ne segue?',
+      options: ['i triangoli hanno tutti la stessa area',
+                'l\'area è sempre negativa',
+                'i triangoli non esistono',
+                'non esistono triangoli di area arbitrariamente grande, perché il difetto non può superare $\\pi$'],
+      correct: 3,
+      explain: 'La somma degli angoli è positiva, quindi il difetto $\\pi - $ somma è minore di $\\pi$: l\'area è limitata. Il triangolo più grande possibile ha i tre vertici all\'infinito e tutti gli angoli nulli. È l\'opposto del piano euclideo, dove i triangoli possono essere grandi quanto si vuole.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Perché il cilindro ha curvatura zero come il piano?',
+      options: ['perché è rotondo',
+                'perché ha un asse di simmetria',
+                'perché un foglio di carta si arrotola in un cilindro senza stirarsi, e per il Theorema Egregium la curvatura non cambia',
+                'perché la sua sezione è una circonferenza'],
+      correct: 2,
+      explain: 'La curvatura è <em>intrinseca</em>: dipende dalle distanze misurate sulla superficie, non da come questa è immersa nello spazio. Sul cilindro la somma degli angoli di un triangolo è esattamente $180°$ e Pitagora funziona — ed è per questo che si può srotolare l\'etichetta di una lattina, ma non appiattire un pallone.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Perché la scoperta di Beltrami del 1868 fu decisiva?',
+      options: ['perché costruì un <em>modello</em> della geometria iperbolica, mostrando che se è contraddittoria lo è anche quella di Euclide',
+                'perché dimostrò che il quinto postulato è vero',
+                'perché misurò la curvatura dello spazio',
+                'perché convinse Gauss a pubblicare'],
+      correct: 0,
+      explain: 'Prima di lui restava il dubbio che prima o poi qualcuno trovasse una contraddizione. Beltrami realizzò la geometria iperbolica dentro quella euclidea (sulla pseudosfera): da quel momento la domanda non fu più «è vera?» ma «è coerente?», e la risposta era sì — tanto quanto lo è la geometria di Euclide.' },
+
+    { type: 'mc', diff: 'hard',
+      text: 'Perché Gauss non pubblicò le sue scoperte sulle geometrie non euclidee?',
+      options: ['perché non era sicuro dei conti',
+                'perché temeva «il clamore dei Beoti», cioè le polemiche di chi considerava la geometria euclidea una verità assoluta',
+                'perché voleva lasciare la scoperta a Riemann',
+                'perché non le riteneva importanti'],
+      correct: 1,
+      explain: 'Lo scrive lui stesso in una lettera a Bessel del 1829. Kant aveva appena sostenuto che lo spazio euclideo è una struttura a priori della mente, e contraddirlo significava aprire uno scontro filosofico. Il risultato fu che Lobačevskij e Bolyai arrivarono alle stesse conclusioni anni dopo, e furono derisi o ignorati.' },
+
+    { type: 'open',
+      text: 'Spiega perché una carta geografica non può essere fedele, e che cosa sceglie di conservare la proiezione di Mercatore.',
+      keywords: ['curvatura', 'egregium', 'sfera', 'piano', 'stirare', 'angoli', 'aree', 'conforme', 'deform'],
+      requiredMatches: 3,
+      explain: 'Per il <strong>Theorema Egregium</strong> di Gauss la curvatura è una proprietà intrinseca della superficie e non cambia se questa viene piegata senza stirarla. La sfera ha curvatura positiva, il piano zero: passare dall\'una all\'altro richiede per forza di <em>deformare</em>. Non è un limite tecnico, è un teorema — provate a spianare una buccia d\'arancia. Si può quindi solo scegliere che cosa salvare: Mercatore conserva gli <strong>angoli</strong> (è una proiezione <em>conforme</em>, e serviva ai naviganti perché una rotta a bussola costante diventa una retta) al prezzo delle <strong>aree</strong>, che vengono moltiplicate per $\\frac{1}{\\cos^2\\varphi}$ e quindi gonfiate enormemente verso i poli.' },
+
+    { type: 'open',
+      text: 'Che cosa hanno in comune la geometria sferica e quella iperbolica, e in che senso la geometria di Euclide sta «in mezzo»? Usa il concetto di curvatura.',
+      keywords: ['curvatura', 'positiv', 'negativ', 'zero', 'somma', 'angoli', 'parallel', 'area', 'eccesso', 'difetto', 'limite', 'piccol'],
+      requiredMatches: 4,
+      explain: 'Sono entrambe geometrie ottenute <strong>negando il quinto postulato</strong>, in due modi opposti: nella sferica non passa <em>nessuna</em> parallela, nell\'iperbolica ne passano <em>infinite</em>. La differenza si riassume nella <strong>curvatura</strong>: positiva sulla sfera, negativa sulla sella, <strong>zero</strong> nel piano euclideo, che sta esattamente in mezzo. La stessa graduatoria si legge sui triangoli: somma degli angoli maggiore di $180°$ (con un <em>eccesso</em> proporzionale all\'area, teorema di Girard), esattamente $180°$, minore di $180°$ (con un <em>difetto</em> proporzionale all\'area). E in entrambi i casi non euclidei, per figure <strong>piccole</strong> rispetto al raggio di curvatura la differenza tende a zero: ecco perché la geometria di Euclide funziona benissimo in una stanza, e perché nessuno si è accorto del problema per duemila anni.' }
+  ];
+  </script>
+
+</body>
+
+</html>
