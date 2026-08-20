@@ -477,6 +477,256 @@
         in un intervallo così breve che le forze esterne, per quanto presenti, non fanno in tempo a trasferire
         un impulso apprezzabile rispetto a quelle interne, che sono enormi. È l'ipotesi che useremo in tutti gli
         esercizi sugli urti — compreso il pendolo balistico della lezione scorsa.</div>
+
+      <!-- ============================================================ -->
+      <!--  MOTORE A REAZIONE E MASSA VARIABILE                         -->
+      <!-- ============================================================ -->
+      <h3>6.1 — Il motore a reazione: quando la massa cambia nel tempo</h3>
+
+      <p>Finora abbiamo applicato la conservazione della quantità di moto a sistemi in cui le masse restano
+        costanti. Esiste però una classe di sistemi straordinariamente importante in cui questo non vale:
+        i <strong>razzi</strong> e, più in generale, tutti i motori a reazione. In questi sistemi la massa
+        del corpo che si muove <strong>cambia nel tempo</strong>, perché parte della massa viene espulsa
+        ad alta velocità per produrre spinta.</p>
+
+      <div class="definition">
+        <strong>Il principio fisico.</strong> In assenza di forze esterne, la quantità di moto totale
+        del sistema (razzo + gas espulso) si conserva. Se in un intervallo $\mathrm{d}t$ il razzo
+        di massa $m$ espelle una massa $|\mathrm{d}m|$ alla velocità $u$ <em>rispetto al razzo</em>,
+        applicando la conservazione si ottiene l'<strong>equazione del razzo</strong>:
+        $$m\,\mathrm{d}v = -u\,\mathrm{d}m$$
+        Integrando da massa iniziale $m_i$ a massa finale $m_f$:
+        $$\boxed{\Delta v = u \ln\!\frac{m_i}{m_f}}$$
+        Questa è l'<strong>equazione di Tsiolkovsky</strong> (1903). Dice una cosa fondamentale e un po'
+        crudele: la velocità guadagnata dipende dal <em>logaritmo</em> del rapporto delle masse.
+        Per raddoppiare $\Delta v$ non serve il doppio del carburante ma il <em>quadrato</em>
+        del rapporto massico. È il motivo per cui i razzi pesano per il 90 % carburante.
+      </div>
+
+      <div class="warnbox">
+        <strong>Attenzione: la massa totale del sistema non si conserva, ma la quantità di moto sì.</strong>
+        La massa del <em>razzo</em> diminuisce. La massa del <em>sistema razzo + gas</em> resta costante
+        (non stiamo creando né distruggendo materia). È la distribuzione che cambia: parte della massa
+        passa dal razzo ai getti di gas. È un errore classico confondere «la massa di un oggetto diminuisce»
+        con «la massa dell'universo diminuisce» — non è così.
+      </div>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="rk-u">velocità gas (m/s): <span class="val-badge" id="rk-uv">3 000</span></label>
+          <input type="range" id="rk-u" min="500" max="5000" step="100" value="3000">
+          <label for="rk-m0">massa iniziale (kg): <span class="val-badge" id="rk-m0v">10 000</span></label>
+          <input type="range" id="rk-m0" min="2000" max="30000" step="500" value="10000">
+          <label for="rk-mf">massa finale (% del tot.): <span class="val-badge" id="rk-mfv">20</span> %</label>
+          <input type="range" id="rk-mf" min="5" max="60" step="1" value="20">
+          <button class="btn" id="rk-start" type="button">🚀 Accendi i motori</button>
+          <button class="btn btn-secondary" id="rk-reset" type="button">↺ Reset</button>
+        </div>
+        <canvas id="rk-canvas" width="660" height="320"
+                aria-label="Simulazione del razzo: la massa diminuisce mentre la velocità aumenta"
+                style="display:block;width:100%;height:auto;border-radius:10px;"></canvas>
+        <div class="sp-cols" style="margin-top:0.5rem;">
+          <div>Massa attuale: <span class="val-badge" id="rk-mass">—</span></div>
+          <div>Velocità: <span class="val-badge" id="rk-vel">—</span></div>
+          <div>ΔV Tsiolkovsky: <span class="val-badge" id="rk-dv">—</span></div>
+          <div>Carburante bruciato: <span class="val-badge" id="rk-fuel">—</span></div>
+        </div>
+        <p class="cap">Il razzo brucia carburante (arancione) ed espelle gas verso sinistra.
+          La curva verde mostra la velocità teorica secondo Tsiolkovsky; i punti rossi la velocità
+          simulata. Il grafico di destra mostra come massa e velocità evolvono nel tempo.</p>
+      </div>
+
+      <script>
+      (function(){
+        const canvas = document.getElementById('rk-canvas');
+        const ctx = canvas.getContext('2d');
+        const slU  = document.getElementById('rk-u');
+        const slM0 = document.getElementById('rk-m0');
+        const slMf = document.getElementById('rk-mf');
+        const btnStart = document.getElementById('rk-start');
+        const btnReset = document.getElementById('rk-reset');
+        const spMass = document.getElementById('rk-mass');
+        const spVel  = document.getElementById('rk-vel');
+        const spDv   = document.getElementById('rk-dv');
+        const spFuel = document.getElementById('rk-fuel');
+
+        let animId = null;
+        let t = 0, m = 0, v = 0, m0 = 0, mf = 0, u = 0;
+        let burnRate = 0;
+        let history = []; // {t, m, v}
+
+        function fmt(x, d=0){ return x.toLocaleString('it-IT',{maximumFractionDigits:d}); }
+
+        function getParams(){
+          u   = +slU.value;
+          m0  = +slM0.value;
+          mf  = m0 * (+slMf.value) / 100;
+          burnRate = (m0 - mf) / 15; // kg/s — brucia tutto in ~15s
+        }
+
+        function updateBadges(){
+          document.getElementById('rk-uv').textContent  = fmt(+slU.value);
+          document.getElementById('rk-m0v').textContent = fmt(+slM0.value);
+          document.getElementById('rk-mfv').textContent = slMf.value;
+        }
+
+        [slU, slM0, slMf].forEach(s=>s.addEventListener('input', updateBadges));
+        updateBadges();
+
+        function reset(){
+          if(animId){ cancelAnimationFrame(animId); animId=null; }
+          getParams();
+          t=0; m=m0; v=0; history=[];
+          spMass.textContent='—'; spVel.textContent='—';
+          spDv.textContent='—'; spFuel.textContent='—';
+          drawFrame();
+        }
+
+        function drawFrame(){
+          const W=660, H=320;
+          const plotX=320, plotW=330, plotH=260, plotY=30;
+          ctx.clearRect(0,0,W,H);
+
+          // ---- sfondo ----
+          const bg = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim()||'#1e2030';
+          ctx.fillStyle = bg;
+          ctx.fillRect(0,0,W,H);
+
+          // ---- cielo stellato (solo a sinistra) ----
+          ctx.fillStyle = '#000816';
+          ctx.fillRect(0,0,310,H);
+          const stars=[[30,20],[80,60],[150,30],[200,80],[260,15],[50,110],[120,140],[240,100],[280,50],[10,80]];
+          ctx.fillStyle='#ffffff88';
+          stars.forEach(([sx,sy])=>{ ctx.beginPath(); ctx.arc(sx,sy,1.2,0,Math.PI*2); ctx.fill(); });
+
+          // ---- razzo ----
+          const rocketX = 140;
+          const rocketY = H/2;
+          const fuelFrac = m0>mf ? Math.max(0,(m-mf)/(m0-mf)) : 0;
+
+          // corpo razzo
+          ctx.save();
+          ctx.translate(rocketX, rocketY);
+          // corpo
+          ctx.fillStyle = '#94a3b8';
+          ctx.beginPath();
+          ctx.roundRect(-40,-18,80,36,6);
+          ctx.fill();
+          // muso
+          ctx.fillStyle = '#64748b';
+          ctx.beginPath();
+          ctx.moveTo(40,-18); ctx.lineTo(70,0); ctx.lineTo(40,18); ctx.closePath();
+          ctx.fill();
+          // serbatoio carburante (arancione, si svuota)
+          if(fuelFrac>0){
+            ctx.fillStyle = '#f97316';
+            const fw = 72*fuelFrac;
+            ctx.beginPath();
+            ctx.roundRect(-38,-14, fw, 28, 4);
+            ctx.fill();
+          }
+          // finestre
+          ctx.fillStyle='#7dd3fc';
+          ctx.beginPath(); ctx.arc(20,0,7,0,Math.PI*2); ctx.fill();
+          // ugello
+          ctx.fillStyle='#475569';
+          ctx.beginPath();
+          ctx.moveTo(-40,-8); ctx.lineTo(-60,-14); ctx.lineTo(-60,14); ctx.lineTo(-40,8); ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+
+          // ---- fiamma/gas (se in moto) ----
+          if(v>0 && m>mf+1){
+            const gx = rocketX-62;
+            const gy = rocketY;
+            const len = 20 + (v/50)*30;
+            const grad = ctx.createLinearGradient(gx,gy,gx-len,gy);
+            grad.addColorStop(0,'#fbbf24');
+            grad.addColorStop(0.5,'#ef4444');
+            grad.addColorStop(1,'transparent');
+            ctx.fillStyle=grad;
+            ctx.beginPath();
+            ctx.moveTo(gx, gy-10);
+            ctx.lineTo(gx-len, gy);
+            ctx.lineTo(gx, gy+10);
+            ctx.closePath();
+            ctx.fill();
+          }
+
+          // ---- grafico a destra ----
+          ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--border').trim()||'#334155';
+          ctx.lineWidth=1;
+          ctx.strokeRect(plotX, plotY, plotW, plotH);
+          ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#94a3b8';
+          ctx.font='11px sans-serif';
+          ctx.fillText('Massa (blu) e Velocità (verde) nel tempo', plotX+4, plotY-8);
+
+          if(history.length>1){
+            const tMax = Math.max(history[history.length-1].t, 1);
+            const vMax = Math.max(...history.map(h=>h.v), 1000);
+            const mMax = m0;
+            function px(tt){ return plotX + (tt/tMax)*plotW; }
+            function pmass(mm){ return plotY+plotH - (mm/mMax)*plotH; }
+            function pvel(vv){ return plotY+plotH - (vv/vMax)*plotH; }
+            // massa
+            ctx.beginPath(); ctx.strokeStyle='#60a5fa'; ctx.lineWidth=2;
+            history.forEach((h,i)=>{ i===0?ctx.moveTo(px(h.t),pmass(h.m)):ctx.lineTo(px(h.t),pmass(h.m)); });
+            ctx.stroke();
+            // velocità simulata
+            ctx.beginPath(); ctx.strokeStyle='#4ade80'; ctx.lineWidth=2;
+            history.forEach((h,i)=>{ i===0?ctx.moveTo(px(h.t),pvel(h.v)):ctx.lineTo(px(h.t),pvel(h.v)); });
+            ctx.stroke();
+            // legenda
+            ctx.font='10px sans-serif';
+            ctx.fillStyle='#60a5fa'; ctx.fillText('massa',plotX+6,plotY+14);
+            ctx.fillStyle='#4ade80'; ctx.fillText('velocità',plotX+6,plotY+28);
+          }
+        }
+
+        function step(dt){
+          if(m<=mf){ v = u*Math.log(m0/mf); return true; }
+          const dm = Math.min(burnRate*dt, m-mf);
+          // conservazione QdM: m dv = -u dm  =>  dv = -u*dm/m (dm<0 => dv>0)
+          const dv = u * dm / m;
+          m -= dm;
+          v += dv;
+          t += dt;
+          history.push({t, m, v});
+          return false;
+        }
+
+        let lastTs = null;
+        function animate(ts){
+          if(!lastTs) lastTs=ts;
+          const dt = Math.min((ts-lastTs)/1000, 0.1);
+          lastTs=ts;
+          const done = step(dt);
+          spMass.textContent = fmt(m,0)+' kg';
+          spVel.textContent  = fmt(v,1)+' m/s';
+          spDv.textContent   = fmt(u*Math.log(m0/mf),1)+' m/s';
+          spFuel.textContent = fmt(m0-m,0)+' kg ('+fmt((m0-m)/m0*100,1)+' %)';
+          drawFrame();
+          if(!done) animId=requestAnimationFrame(animate);
+          else { lastTs=null; }
+        }
+
+        btnStart.addEventListener('click', ()=>{
+          if(animId){ cancelAnimationFrame(animId); animId=null; }
+          getParams(); t=0; m=m0; v=0; history=[]; lastTs=null;
+          animId=requestAnimationFrame(animate);
+        });
+        btnReset.addEventListener('click', reset);
+        reset();
+      })();
+      </script>
+
+      <div class="curiosita"><strong>Perché i razzi sono a stadi.</strong> Dalla formula di Tsiolkovsky
+        si vede che $\Delta v$ dipende dal rapporto $m_i/m_f$. I serbatoi vuoti sono struttura morta:
+        pesano e non producono spinta. Separandoli e abbandonandoli in volo si «azzera» il denominatore —
+        il razzo successivo riparte con un rapporto massico favorevole. Un Saturn V a tre stadi poteva
+        mettere 45 tonnellate in orbita bassa; a uno stadio solo, con la stessa quantità di carburante,
+        ci riuscirebbe a malapena a qualche decina di kg. Il logaritmo è spietato, ma la fisica degli stadi
+        lo batte.</div>
     </section>
 
     <!-- 7 — GLI URTI -->

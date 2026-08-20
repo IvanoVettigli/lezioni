@@ -1951,6 +1951,381 @@
         nella lezione 12 diventerà uno degli strumenti più potenti di tutta la fisica.</p>
     </section>
 
+    <!-- 9bis — I PIANETI E GLI EPICICLI -->
+    <section id="sec9b">
+      <h2>9bis. Il moto dei pianeti: epicicli, cicli e il cambio di osservatore</h2>
+
+      <p>Ora che sappiamo cos'è il moto circolare uniforme e la frequenza, possiamo affrontare uno dei
+        problemi più antichi e più affascinanti della storia della scienza: <strong>come si muovono i
+        pianeti nel cielo?</strong></p>
+
+      <p>Per migliaia di anni gli esseri umani hanno osservato il cielo notturno e si sono accorti di qualcosa
+        di strano. La maggior parte degli oggetti luminosi — le stelle — restano ferme le une rispetto alle
+        altre, formando le costellazioni. Ma alcuni oggetti brillanti si muovono: avanzano lentamente tra le
+        stelle, poi <strong>si fermano, tornano indietro, si fermano di nuovo, e riprendono ad avanzare</strong>.
+        I greci li chiamarono «pianeti», dal greco <em>πλανήτης</em>: «vagabondo».</p>
+
+      <div class="rule">
+        <p class="formula-title">La retrogradazione</p>
+        <p>Il fenomeno in cui un pianeta sembra invertire la sua direzione di moto rispetto alle stelle di
+          fondo si chiama <strong>moto retrogrado</strong>. È osservato da millenni ed è reale:
+          Marte, ad esempio, diventa retrogrado ogni ~26 mesi.</p>
+      </div>
+
+      <h3>9bis.1 — La soluzione di Tolomeo: cicli ed epicicli</h3>
+
+      <p>Il grande astronomo Claudio Tolomeo (II secolo d.C.), nell'<em>Almagesto</em>, sistematizzò
+        la descrizione matematica del moto planetario partendo dall'ipotesi che la Terra fosse
+        <strong>ferma al centro dell'universo</strong> (sistema geocentrico). Per spiegare i moti
+        osservati costruì un sistema geometrico ingegnoso:</p>
+
+      <div class="prop">
+        <div class="prop-card">
+          <h4>Il deferente (ciclo)</h4>
+          <p>È una grande circumferenza centrata <em>vicino</em> alla Terra (ma non esattamente su di essa
+            — il centro si chiama <strong>eccentrico</strong>). Il pianeta non si muove direttamente su
+            questa, ma ci si muove sopra il centro dell'<em>epiciclo</em>.</p>
+        </div>
+        <div class="prop-card">
+          <h4>L'epiciclo</h4>
+          <p>È una piccola circonferenza il cui centro si muove a velocità costante lungo il deferente.
+            Il pianeta vero si muove lungo l'epiciclo. La combinazione dei due moti circolari uniformi
+            produce una traiettoria che replica abbastanza bene i moti osservati,
+            <strong>inclusa la retrogradazione</strong>.</p>
+        </div>
+      </div>
+
+      <div class="definition">
+        <strong>La posizione del pianeta in coordinate geocentriche</strong> è semplicemente la
+        <em>somma vettoriale</em> di due moti circolari uniformi:
+        $$x(t) = R\cos(\omega_D t) + r\cos(\omega_E t)$$
+        $$y(t) = R\sin(\omega_D t) + r\sin(\omega_E t)$$
+        dove $R$ e $\omega_D$ sono il raggio e la velocità angolare del deferente, $r$ e $\omega_E$
+        quelli dell'epiciclo. Quando $\omega_E > \omega_D$ e $r$ è confrontabile con $R$, la curva fa
+        dei <strong>loop</strong> — ed è esattamente quello che vediamo nel moto retrogrado.
+      </div>
+
+      <p>La simulazione qui sotto mostra esattamente questo. Il punto arancione si muove lungo il deferente
+        (il cerchio grande), e il punto azzurro (il pianeta) si muove lungo l'epiciclo. La traiettoria
+        lasciata dal pianeta mostra i caratteristici loop della retrogradazione.</p>
+
+      <div class="figbox">
+        <div class="ctrl">
+          <label for="ep-R">raggio deferente: <span class="val-badge" id="ep-Rv">140</span> u.a.</label>
+          <input type="range" id="ep-R" min="80" max="180" step="5" value="140">
+          <label for="ep-r">raggio epiciclo: <span class="val-badge" id="ep-rv">55</span> u.a.</label>
+          <input type="range" id="ep-r" min="10" max="100" step="5" value="55">
+          <label for="ep-wD">vel. ang. deferente: <span class="val-badge" id="ep-wDv">1,0</span></label>
+          <input type="range" id="ep-wD" min="0.2" max="2.0" step="0.1" value="1.0">
+          <label for="ep-wE">vel. ang. epiciclo: <span class="val-badge" id="ep-wEv">2,8</span></label>
+          <input type="range" id="ep-wE" min="1.0" max="6.0" step="0.1" value="2.8">
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <button class="btn" id="ep-start" type="button">▶ Avvia</button>
+            <button class="btn btn-secondary" id="ep-reset" type="button">↺ Reset</button>
+            <label style="display:flex;align-items:center;gap:0.3rem;font-size:0.9rem;">
+              <input type="checkbox" id="ep-helio"> Vista dal Sole (eliocentrico)
+            </label>
+          </div>
+        </div>
+        <canvas id="ep-canvas" width="660" height="400"
+                aria-label="Simulazione cicli ed epicicli: traiettoria geocentrica e eliocentrica"
+                style="display:block;width:100%;height:auto;border-radius:10px;"></canvas>
+        <p class="cap" id="ep-cap">
+          <span style="color:#f97316;">●</span> Terra (origine) &nbsp;
+          <span style="color:#60a5fa;">●</span> Centro epiciclo (su deferente) &nbsp;
+          <span style="color:#4ade80;">●</span> Pianeta &nbsp;
+          <span style="color:#a78bfa;">—</span> Traiettoria geocentrica
+        </p>
+      </div>
+
+      <script>
+      (function(){
+        const canvas = document.getElementById('ep-canvas');
+        const ctx = canvas.getContext('2d');
+        const slR  = document.getElementById('ep-R');
+        const slr  = document.getElementById('ep-r');
+        const slwD = document.getElementById('ep-wD');
+        const slwE = document.getElementById('ep-wE');
+        const chkH = document.getElementById('ep-helio');
+        const btnStart = document.getElementById('ep-start');
+        const btnReset = document.getElementById('ep-reset');
+        const cap = document.getElementById('ep-cap');
+
+        let animId = null, running = false;
+        let t = 0;
+        let trail = [];   // traiettoria geocentrica
+        const maxTrail = 800;
+
+        function getP(){
+          return {
+            R: +slR.value, r: +slr.value,
+            wD: +slwD.value * 0.5, wE: +slwE.value * 0.5
+          };
+        }
+
+        function updateBadges(){
+          document.getElementById('ep-Rv').textContent  = slR.value;
+          document.getElementById('ep-rv').textContent  = slr.value;
+          document.getElementById('ep-wDv').textContent = (+slwD.value).toFixed(1).replace('.',',');
+          document.getElementById('ep-wEv').textContent = (+slwE.value).toFixed(1).replace('.',',');
+        }
+
+        [slR, slr, slwD, slwE].forEach(s => s.addEventListener('input', ()=>{ updateBadges(); trail=[]; drawFrame(); }));
+        updateBadges();
+
+        // Posizioni in coordinate geocentriche (Terra = origine)
+        function positions(p, time){
+          // centro epiciclo sul deferente
+          const Cx = p.R * Math.cos(p.wD * time);
+          const Cy = p.R * Math.sin(p.wD * time);
+          // pianeta sull'epiciclo
+          const Px = Cx + p.r * Math.cos(p.wE * time);
+          const Py = Cy + p.r * Math.sin(p.wE * time);
+          return { Cx, Cy, Px, Py };
+        }
+
+        // In vista eliocentrica: la "Terra" si muove su una circonferenza
+        // e il pianeta ha un'orbita più semplice (circa circolare)
+        // Simuliamo: Terra orbita attorno al Sole a R0, pianeta a R_planet
+        const R0 = 120, RP = 80;
+        const wT = 1.0 * 0.5, wP = 1.6 * 0.5; // vel angolari diverse
+
+        function positionsHelio(time){
+          // Terra
+          const Tx = R0 * Math.cos(wT * time);
+          const Ty = R0 * Math.sin(wT * time);
+          // Pianeta (orbita più interna, o esterna)
+          const Hx = RP * Math.cos(wP * time);
+          const Hy = RP * Math.sin(wP * time);
+          // Traiettoria del pianeta vista dalla Terra (diff):
+          const Px_geo = Hx - Tx;
+          const Py_geo = Hy - Ty;
+          return { Tx, Ty, Hx, Hy, Px_geo, Py_geo };
+        }
+
+        function drawFrame(){
+          const W=660, H=400, CX=W/2, CY=H/2;
+          ctx.clearRect(0,0,W,H);
+
+          // sfondo
+          const bg = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim()||'#1a1b2e';
+          ctx.fillStyle='#06070f';
+          ctx.fillRect(0,0,W,H);
+          // stelle
+          const stars=[[50,30],[120,80],[200,20],[350,60],[500,30],[580,100],[620,200],
+                        [70,200],[150,350],[450,380],[30,320],[600,350],[300,10],[250,390]];
+          ctx.fillStyle='#ffffff55';
+          stars.forEach(([sx,sy])=>{ ctx.beginPath(); ctx.arc(sx,sy,1,0,Math.PI*2); ctx.fill(); });
+
+          const helio = chkH.checked;
+
+          if(!helio){
+            // ========= VISTA GEOCENTRICA (epicicli) =========
+            const p = getP();
+            const {Cx,Cy,Px,Py} = positions(p, t);
+
+            // deferente
+            ctx.beginPath();
+            ctx.arc(CX, CY, p.R, 0, Math.PI*2);
+            ctx.strokeStyle='#334155'; ctx.lineWidth=1; ctx.stroke();
+
+            // epiciclo
+            ctx.beginPath();
+            ctx.arc(CX+Cx, CY+Cy, p.r, 0, Math.PI*2);
+            ctx.strokeStyle='#1e40af'; ctx.lineWidth=1; ctx.stroke();
+
+            // traiettoria
+            if(trail.length > 1){
+              ctx.beginPath();
+              ctx.moveTo(CX+trail[0].x, CY+trail[0].y);
+              trail.forEach(pt => ctx.lineTo(CX+pt.x, CY+pt.y));
+              ctx.strokeStyle='#a78bfa'; ctx.lineWidth=1.5; ctx.stroke();
+            }
+
+            // Terra (origine)
+            ctx.beginPath(); ctx.arc(CX, CY, 8, 0, Math.PI*2);
+            ctx.fillStyle='#f97316'; ctx.fill();
+            ctx.fillStyle='#fff'; ctx.font='11px sans-serif'; ctx.fillText('Terra',CX+10,CY-10);
+
+            // centro epiciclo
+            ctx.beginPath(); ctx.arc(CX+Cx, CY+Cy, 5, 0, Math.PI*2);
+            ctx.fillStyle='#60a5fa'; ctx.fill();
+
+            // pianeta
+            ctx.beginPath(); ctx.arc(CX+Px, CY+Py, 7, 0, Math.PI*2);
+            ctx.fillStyle='#4ade80'; ctx.fill();
+            ctx.fillStyle='#fff'; ctx.fillText('Pianeta',CX+Px+9,CY+Py-9);
+
+            // linee di connessione
+            ctx.beginPath();
+            ctx.moveTo(CX, CY); ctx.lineTo(CX+Cx, CY+Cy);
+            ctx.strokeStyle='#334155bb'; ctx.lineWidth=1; ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(CX+Cx, CY+Cy); ctx.lineTo(CX+Px, CY+Py);
+            ctx.strokeStyle='#1e40af88'; ctx.lineWidth=1; ctx.stroke();
+
+            cap.innerHTML = '<span style="color:#f97316;">●</span> Terra (origine) &nbsp; ' +
+              '<span style="color:#60a5fa;">●</span> Centro epiciclo &nbsp; ' +
+              '<span style="color:#4ade80;">●</span> Pianeta &nbsp; ' +
+              '<span style="color:#a78bfa;">—</span> Traiettoria geocentrica';
+
+          } else {
+            // ========= VISTA ELIOCENTRICA =========
+            const {Tx,Ty,Hx,Hy,Px_geo,Py_geo} = positionsHelio(t);
+
+            // orbita Terra
+            ctx.beginPath(); ctx.arc(CX, CY, R0, 0, Math.PI*2);
+            ctx.strokeStyle='#334155'; ctx.lineWidth=1; ctx.stroke();
+            // orbita pianeta
+            ctx.beginPath(); ctx.arc(CX, CY, RP, 0, Math.PI*2);
+            ctx.strokeStyle='#1e40af55'; ctx.lineWidth=1; ctx.stroke();
+
+            // traiettoria vista dalla Terra
+            if(trail.length > 1){
+              ctx.beginPath();
+              ctx.moveTo(CX+trail[0].x, CY+trail[0].y);
+              trail.forEach(pt => ctx.lineTo(CX+pt.x, CY+pt.y));
+              ctx.strokeStyle='#a78bfa'; ctx.lineWidth=1.5; ctx.stroke();
+            }
+
+            // Sole
+            ctx.beginPath(); ctx.arc(CX, CY, 10, 0, Math.PI*2);
+            const sunGrad = ctx.createRadialGradient(CX,CY,2,CX,CY,10);
+            sunGrad.addColorStop(0,'#fff7'); sunGrad.addColorStop(1,'#fbbf24');
+            ctx.fillStyle=sunGrad; ctx.fill();
+            ctx.fillStyle='#fff'; ctx.font='11px sans-serif'; ctx.fillText('Sole',CX+12,CY-12);
+
+            // Terra
+            ctx.beginPath(); ctx.arc(CX+Tx, CY+Ty, 7, 0, Math.PI*2);
+            ctx.fillStyle='#3b82f6'; ctx.fill();
+            ctx.fillStyle='#fff'; ctx.fillText('Terra',CX+Tx+9,CY+Ty-9);
+
+            // Pianeta
+            ctx.beginPath(); ctx.arc(CX+Hx, CY+Hy, 6, 0, Math.PI*2);
+            ctx.fillStyle='#ef4444'; ctx.fill();
+            ctx.fillStyle='#fff'; ctx.fillText('Pianeta',CX+Hx+9,CY+Hy-9);
+
+            cap.innerHTML = '<span style="color:#fbbf24;">●</span> Sole &nbsp; ' +
+              '<span style="color:#3b82f6;">●</span> Terra (in orbita) &nbsp; ' +
+              '<span style="color:#ef4444;">●</span> Pianeta &nbsp; ' +
+              '<span style="color:#a78bfa;">—</span> Traiettoria vista dalla Terra (geocentrica)';
+          }
+
+          // label modo
+          ctx.fillStyle = helio ? '#fbbf24' : '#a78bfa';
+          ctx.font='bold 12px sans-serif';
+          ctx.fillText(helio ? 'Vista ELIOCENTRICA (dal Sole)' : 'Vista GEOCENTRICA (dalla Terra)', 12, 20);
+        }
+
+        function tickTrail(){
+          const helio = chkH.checked;
+          if(!helio){
+            const p = getP();
+            const {Px,Py} = positions(p, t);
+            trail.push({x:Px, y:Py});
+          } else {
+            const {Px_geo,Py_geo} = positionsHelio(t);
+            trail.push({x:Px_geo, y:Py_geo});
+          }
+          if(trail.length > maxTrail) trail.shift();
+        }
+
+        let lastTs2 = null;
+        function animate(ts){
+          if(!lastTs2) lastTs2 = ts;
+          const dt = Math.min((ts-lastTs2)/1000, 0.05);
+          lastTs2 = ts;
+          t += dt;
+          tickTrail();
+          drawFrame();
+          if(running) animId = requestAnimationFrame(animate);
+        }
+
+        chkH.addEventListener('change', ()=>{ trail=[]; drawFrame(); });
+
+        btnStart.addEventListener('click', ()=>{
+          if(running){
+            running=false; btnStart.textContent='▶ Avvia';
+            if(animId){ cancelAnimationFrame(animId); animId=null; }
+          } else {
+            running=true; btnStart.textContent='⏸ Pausa';
+            lastTs2=null; animId=requestAnimationFrame(animate);
+          }
+        });
+
+        btnReset.addEventListener('click', ()=>{
+          running=false; btnStart.textContent='▶ Avvia';
+          if(animId){ cancelAnimationFrame(animId); animId=null; }
+          t=0; trail=[]; drawFrame();
+        });
+
+        drawFrame();
+      })();
+      </script>
+
+      <div class="curiosita"><strong>Provate voi stessi.</strong> Nella simulazione, premete «Avvia» con la
+        vista geocentrica: vedrete il pianeta fare dei loop (la retrogradazione). Poi spuntate «Vista dal Sole»
+        e resettate: la traiettoria del pianeta stesso (rispetto al Sole) è quasi una <em>circonferenza</em>;
+        la traiettoria viola — che è quella che vedremmo dalla Terra — è di nuovo complicata.
+        È la differenza tra la matematica che descrive il moto <em>vero</em> e quella che descrive
+        l'apparenza per un osservatore in moto.</div>
+
+      <h3>9bis.2 — Perché gli epicicli funzionano: la matematica</h3>
+
+      <p>Il sistema di Tolomeo non era solo un'invenzione arbitraria. Era, in un certo senso, matematicamente
+        <strong>esatto</strong>. Qualunque traiettoria periodica può essere scritta come somma di moti circolari
+        uniformi (è il contenuto del <em>teorema di Fourier</em>). Con abbastanza epicicli si può approssimare
+        qualunque curva con precisione arbitraria. Il problema non era che il sistema di Tolomeo non funzionasse:
+        <em>funzionava benissimo</em>, e fu usato per prevedere le posizioni dei pianeti con sufficiente
+        accuratezza per l'astronomia pratica per oltre mille anni.</p>
+
+      <div class="definition">
+        <strong>Il metodo di calcolo delle posizioni.</strong> Con cicli ed epicicli (tutti moti circolari
+        uniformi) la posizione di un astro al tempo $t$ è:
+        $$x(t) = \sum_{k} r_k \cos(\omega_k t + \phi_k), \qquad y(t) = \sum_{k} r_k \sin(\omega_k t + \phi_k)$$
+        dove $r_k$, $\omega_k$ e $\phi_k$ sono raggio, frequenza angolare e fase di ciascun cerchio.
+        Ogni termine è un moto circolare uniforme. Questo è esattamente un <strong>sviluppo in serie di
+        Fourier complessa</strong>: la matematica di Tolomeo era quella giusta, l'ipotesi fisica (Terra ferma)
+        era quella sbagliata.
+      </div>
+
+      <h3>9bis.3 — Il cambio di osservatore: la rivoluzione di Copernico</h3>
+
+      <p>Nel 1543 Niccolò Copernico pubblicò il <em>De revolutionibus orbium coelestium</em>. La sua proposta
+        era semplice e rivoluzionaria: <strong>non è la Terra al centro, ma il Sole</strong>. Spostare
+        l'origine del sistema di riferimento dal centro della Terra al centro del Sole cambia tutto.</p>
+
+      <div class="method">
+        <p><strong>Cosa succede quando si sposta l'osservatore dal centro della Terra al centro del Sole.</strong></p>
+        <p><span class="step-num">1</span>Nel sistema <strong>geocentrico</strong> il moto di ciascun pianeta
+          è la somma di <em>almeno due</em> moti circolari: il deferente e l'epiciclo principale. Il Sole stesso
+          deve girare attorno alla Terra.</p>
+        <p><span class="step-num">2</span>Nel sistema <strong>eliocentrico</strong> ogni pianeta percorre
+          (in prima approssimazione) una sola circonferenza attorno al Sole. Il moto diventa
+          <em>semplicissimo</em>: un cerchio, un parametro.</p>
+        <p><span class="step-num">3</span>La retrogradazione non è più un moto reale del pianeta, ma
+          solo un <em>effetto di parallasse</em>: quando la Terra supera un pianeta esterno (o viene superata
+          da uno interno), lo vediamo temporaneamente spostarsi «all'indietro» rispetto alle stelle di fondo.
+          Nessun loop, nessun epiciclo: solo la geometria relativa di due corpi in orbita.</p>
+        <p><span class="step-num">4</span>Keplero (1609–1619) aggiunse la precisione: le orbite non sono
+          cerchi ma <strong>ellissi</strong>, con il Sole in un fuoco. Le tre leggi di Keplero descrivono
+          esattamente il moto senza bisogno di alcun epiciclo — solo matematica delle sezioni coniche.</p>
+      </div>
+
+      <div class="note">
+        <strong>La lezione metodologica più importante dell'astronomia.</strong>
+        Il cambio di sistema di riferimento — da geocentrico a eliocentrico — <em>non cambia i fatti osservati</em>:
+        le posizioni misurate degli astri restano le stesse. Cambia la <em>semplicità della descrizione</em>.
+        Nella fisica moderna si dice che il sistema di riferimento è una scelta arbitraria: tutte le descrizioni
+        fisiche di un fenomeno reale devono essere equivalenti (è il principio di relatività, in senso lato).
+        Ma alcune scelte rendono le equazioni molto più semplici di altre.
+        <br><br>
+        Il Sole non sta «davvero» fermo — anche lui orbita attorno al centro della galassia. Ma per descrivere
+        il moto dei pianeti del Sistema Solare, è il sistema di riferimento che rende il conto più semplice.
+        Tolomeo aveva una buona matematica. Copernico aveva il sistema di riferimento giusto.
+      </div>
+    </section>
+
     <!-- 10 — LA FORZA -->
     <section id="sec10">
       <h2>10. Ma chi è che li fa muovere? La forza</h2>

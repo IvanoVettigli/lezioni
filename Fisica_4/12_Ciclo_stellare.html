@@ -743,6 +743,202 @@
           pianeta.</p>
       </div>
 
+      <div class="figbox">
+        <canvas id="vs-canvas" width="660" height="420"
+                aria-label="Grafico della valle di stabilità: piano neutroni-protoni con nuclidi stabili e numeri magici"
+                style="display:block;width:100%;height:auto;border-radius:10px;cursor:crosshair;"></canvas>
+        <p class="cap">La <strong>valle di stabilità</strong> nel piano neutroni ($N$) – protoni ($Z$). Ogni
+          punto è un nuclide stabile o a lunga vita. La linea tratteggiata gialla è $N = Z$: notate come la valle si
+          piega verso $N > Z$ per i nuclei pesanti. Le linee grigie tratteggiate indicano i
+          <strong>numeri magici</strong>.</p>
+        <div class="sp-cols" style="margin-top:0.4rem;">
+          <div>Nuclide: <span class="val-badge" id="vs-nuc">passa il mouse sul grafico</span></div>
+          <div>Numeri magici: <span class="val-badge" id="vs-mag">2, 8, 20, 28, 50, 82, 126</span></div>
+        </div>
+      </div>
+
+      <script>
+      (function(){
+        var canvas = document.getElementById('vs-canvas');
+        if(!canvas) return;
+        var ctx = canvas.getContext('2d');
+        var W = 660, H = 420;
+        var MX = 60, MY = 30, MR = 30, MB = 50;
+        var PW = W - MX - MR, PH = H - MY - MB;
+        var NMAX = 160, ZMAX = 110;
+
+        // Nuclidi stabili rappresentativi (Z, N) — ~286 punti
+        var STABILI = [
+          [1,0],[1,1],[2,1],[2,2],[3,3],[3,4],[4,5],[5,5],[5,6],
+          [6,6],[6,7],[7,7],[7,8],[8,8],[8,9],[8,10],[9,10],
+          [10,10],[10,11],[10,12],[11,12],[12,12],[12,13],[12,14],
+          [13,14],[14,14],[14,15],[14,16],[15,16],[16,16],[16,17],[16,18],[16,20],
+          [17,18],[17,20],[18,18],[18,20],[18,22],[19,20],[19,22],
+          [20,20],[20,22],[20,23],[20,24],[20,26],[20,28],
+          [21,24],[22,24],[22,25],[22,26],[22,27],[22,28],
+          [23,28],[24,26],[24,28],[24,29],[24,30],
+          [25,30],[26,28],[26,30],[26,31],[26,32],
+          [27,32],[28,30],[28,32],[28,33],[28,34],[28,36],
+          [29,34],[29,36],[30,34],[30,36],[30,37],[30,38],[30,40],
+          [31,38],[31,40],[32,38],[32,40],[32,41],[32,42],[32,44],
+          [33,42],[34,40],[34,42],[34,43],[34,44],[34,46],[34,48],
+          [35,44],[35,46],[36,42],[36,44],[36,46],[36,47],[36,48],[36,50],
+          [37,48],[37,50],[38,46],[38,48],[38,50],[38,52],
+          [39,50],[40,50],[40,51],[40,52],[40,54],[40,56],
+          [41,52],[42,50],[42,52],[42,53],[42,54],[42,55],[42,56],[42,58],
+          [44,52],[44,55],[44,56],[44,57],[44,58],[44,60],[44,62],
+          [45,58],[46,56],[46,58],[46,59],[46,60],[46,62],[46,64],
+          [47,60],[47,62],[48,58],[48,62],[48,64],[48,65],[48,66],[48,68],[48,70],
+          [49,64],[49,66],[50,62],[50,64],[50,66],[50,67],[50,68],[50,69],[50,70],[50,72],[50,74],
+          [51,70],[51,72],[52,68],[52,70],[52,72],[52,73],[52,74],[52,76],[52,78],
+          [53,74],[53,78],[54,70],[54,74],[54,76],[54,77],[54,78],[54,79],[54,80],[54,82],
+          [55,78],[55,82],[56,74],[56,78],[56,79],[56,80],[56,81],[56,82],
+          [57,82],[58,78],[58,80],[58,82],[58,84],
+          [59,82],[60,82],[60,83],[60,84],[60,86],[60,88],
+          [62,82],[62,85],[62,87],[62,88],[62,90],[62,92],
+          [63,88],[63,90],[64,88],[64,90],[64,91],[64,92],[64,94],[64,96],
+          [65,94],[66,90],[66,92],[66,94],[66,95],[66,96],[66,98],
+          [67,98],[68,94],[68,96],[68,98],[68,99],[68,100],
+          [69,100],[70,98],[70,100],[70,101],[70,102],[70,103],[70,104],
+          [71,104],[72,102],[72,104],[72,105],[72,106],[72,108],
+          [73,108],[74,106],[74,108],[74,109],[74,110],[74,112],
+          [75,110],[75,112],[76,108],[76,110],[76,111],[76,112],[76,114],[76,116],
+          [77,114],[77,116],[78,112],[78,114],[78,116],[78,117],[78,118],[78,120],
+          [79,118],[80,116],[80,118],[80,119],[80,120],[80,121],[80,122],[80,124],
+          [81,122],[81,124],[82,122],[82,124],[82,125],[82,126],
+          [83,126]
+        ];
+
+        var MAGIC = [2, 8, 20, 28, 50, 82, 126];
+        // Nomi degli elementi per tooltip
+        var ELEM = ['?','H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg','Al','Si','P','S','Cl','Ar',
+          'K','Ca','Sc','Ti','V','Cr','Mn','Fe','Co','Ni','Cu','Zn','Ga','Ge','As','Se','Br','Kr',
+          'Rb','Sr','Y','Zr','Nb','Mo','Tc','Ru','Rh','Pd','Ag','Cd','In','Sn','Sb','Te','I','Xe',
+          'Cs','Ba','La','Ce','Pr','Nd','Pm','Sm','Eu','Gd','Tb','Dy','Ho','Er','Tm','Yb','Lu',
+          'Hf','Ta','W','Re','Os','Ir','Pt','Au','Hg','Tl','Pb','Bi','Po','At','Rn',
+          'Fr','Ra','Ac','Th','Pa','U','Np','Pu','Am','Cm','Bk','Cf','Es','Fm','Md','No','Lr',
+          'Rf','Db','Sg','Bh','Hs','Mt','Ds','Rg','Cn','Nh','Fl','Mc','Lv','Ts','Og'];
+
+        function px(n){ return MX + (n/NMAX)*PW; }
+        function py(z){ return MY + PH - (z/ZMAX)*PH; }
+
+        function draw(){
+          ctx.clearRect(0,0,W,H);
+          ctx.fillStyle = '#0a0b14';
+          ctx.fillRect(0,0,W,H);
+
+          // griglia leggera
+          ctx.strokeStyle = '#1e2030'; ctx.lineWidth = 0.5;
+          for(var n=0; n<=NMAX; n+=20){
+            ctx.beginPath(); ctx.moveTo(px(n),MY); ctx.lineTo(px(n),MY+PH); ctx.stroke();
+          }
+          for(var z=0; z<=ZMAX; z+=20){
+            ctx.beginPath(); ctx.moveTo(MX,py(z)); ctx.lineTo(MX+PW,py(z)); ctx.stroke();
+          }
+
+          // numeri magici
+          ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
+          ctx.setLineDash([4,4]);
+          MAGIC.forEach(function(m){
+            if(m <= NMAX){ ctx.beginPath(); ctx.moveTo(px(m),MY); ctx.lineTo(px(m),MY+PH); ctx.stroke(); }
+            if(m <= ZMAX){ ctx.beginPath(); ctx.moveTo(MX,py(m)); ctx.lineTo(MX+PW,py(m)); ctx.stroke(); }
+          });
+          ctx.setLineDash([]);
+
+          // etichette numeri magici
+          ctx.fillStyle = '#475569'; ctx.font = '9px sans-serif';
+          MAGIC.forEach(function(m){
+            if(m <= NMAX) ctx.fillText(m, px(m)-4, MY+PH+12);
+            if(m <= ZMAX) ctx.fillText(m, MX-18, py(m)+3);
+          });
+
+          // linea N = Z
+          ctx.beginPath();
+          ctx.moveTo(px(0), py(0));
+          var lim = Math.min(NMAX, ZMAX);
+          ctx.lineTo(px(lim), py(lim));
+          ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.5;
+          ctx.setLineDash([6,4]); ctx.stroke(); ctx.setLineDash([]);
+          ctx.fillStyle = '#fbbf24'; ctx.font = '11px sans-serif';
+          ctx.fillText('N = Z', px(lim*0.65)+5, py(lim*0.65)-8);
+
+          // nuclidi stabili
+          var dotR = Math.max(2.2, PW/NMAX * 0.42);
+          STABILI.forEach(function(nuc){
+            var z = nuc[0], n = nuc[1];
+            var hue = 200 + (z/ZMAX)*160;
+            ctx.fillStyle = 'hsl('+hue+',75%,55%)';
+            ctx.beginPath(); ctx.arc(px(n), py(z), dotR, 0, Math.PI*2); ctx.fill();
+          });
+
+          // isola di stabilità ipotetica
+          ctx.beginPath();
+          ctx.arc(px(Math.min(184,NMAX)), py(120), 18, 0, Math.PI*2);
+          ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1.5;
+          ctx.setLineDash([3,3]); ctx.stroke(); ctx.setLineDash([]);
+          ctx.fillStyle = '#ef4444'; ctx.font = '10px sans-serif';
+          ctx.fillText('Isola di', px(Math.min(184,NMAX))-14, py(120)-22);
+          ctx.fillText('stabilità?', px(Math.min(184,NMAX))-16, py(120)-12);
+
+          // assi
+          ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(MX,MY+PH); ctx.lineTo(MX+PW,MY+PH); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(MX,MY); ctx.lineTo(MX,MY+PH); ctx.stroke();
+
+          // etichette assi
+          ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 12px sans-serif';
+          ctx.fillText('Numero di neutroni (N)', MX + PW/2 - 70, H - 8);
+          ctx.save();
+          ctx.translate(14, MY + PH/2 + 60);
+          ctx.rotate(-Math.PI/2);
+          ctx.fillText('Numero di protoni (Z)', 0, 0);
+          ctx.restore();
+
+          // tacche
+          ctx.font = '10px sans-serif'; ctx.fillStyle = '#64748b';
+          for(var n=0; n<=NMAX; n+=20) ctx.fillText(n, px(n)-6, MY+PH+24);
+          for(var z=0; z<=ZMAX; z+=20) ctx.fillText(z, MX-24, py(z)+4);
+
+          // titolo
+          ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 13px sans-serif';
+          ctx.fillText('La valle di stabilità nucleare', MX+4, MY-8);
+
+          // legenda
+          var lx = MX+PW-155, ly = MY+6;
+          ctx.fillStyle = '#fbbf24'; ctx.fillRect(lx, ly, 10, 10);
+          ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif';
+          ctx.fillText('N = Z (diag.)', lx+14, ly+9);
+          ctx.fillStyle = 'hsl(260,75%,55%)';
+          ctx.beginPath(); ctx.arc(lx+5, ly+22, 4, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle = '#94a3b8'; ctx.fillText('nuclidi stabili', lx+14, ly+26);
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath(); ctx.arc(lx+5, ly+38, 4, 0, Math.PI*2); ctx.stroke();
+          ctx.fillStyle = '#94a3b8'; ctx.fillText('isola ipotetica', lx+14, ly+42);
+        }
+
+        // tooltip
+        canvas.addEventListener('mousemove', function(e){
+          var rect = canvas.getBoundingClientRect();
+          var scaleX = W / rect.width, scaleY = H / rect.height;
+          var mx = (e.clientX - rect.left) * scaleX;
+          var my = (e.clientY - rect.top) * scaleY;
+          var n = Math.round((mx - MX)/PW * NMAX);
+          var z = Math.round((MY + PH - my)/PH * ZMAX);
+          var el = document.getElementById('vs-nuc');
+          if(n >= 0 && z >= 1 && n <= NMAX && z <= ZMAX){
+            var a = z + n;
+            var nome = z < ELEM.length ? ELEM[z] : 'Z='+z;
+            var stab = STABILI.some(function(s){ return s[0]===z && s[1]===n; });
+            el.textContent = nome + '-' + a + '  (Z='+z+', N='+n+')' + (stab ? ' ✓ stabile' : '');
+          } else {
+            el.textContent = 'passa il mouse sul grafico';
+          }
+        });
+
+        draw();
+      })();
+      </script>
+
       <p>Un nucleo fuori dalla valle vi «rotola» dentro: se ha troppi neutroni fa un decadimento beta meno (un
         neutrone diventa protone), se ne ha troppo pochi fa un beta più. Se è semplicemente troppo grosso, fa
         un alfa. Le <strong>catene di decadimento</strong> naturali sono lunghe scalinate di questo tipo: quella
@@ -762,6 +958,79 @@
         pesantissimi e ottenendo, quando va bene, <em>un atomo alla volta</em>. Chi ci arriverà per primo si
         porta a casa il Nobel, e la conferma che il modello a gusci del nucleo funziona anche là dove non
         l'abbiamo mai messo alla prova.</div>
+
+      <h3>9.2 — La reazione a catena: controllare l'incontrollabile</h3>
+
+      <p>Torniamo alla fissione. Ogni nucleo di uranio-235 colpito da un neutrone <strong>non solo si spezza</strong>:
+        rilascia anche $2$–$3$ neutroni liberi. Se ognuno di questi neutroni riesce a innescare un'altra fissione,
+        e ognuna di quelle rilascia altri neutroni, e così via, il numero di reazioni cresce come una funzione
+        <strong>esponenziale</strong> del tempo. Ecco la <strong>reazione a catena</strong>.</p>
+
+      <div class="definition">
+        <strong>Il fattore di moltiplicazione $k$.</strong> Si definisce
+        $$k = \frac{\text{neutroni della generazione successiva}}{\text{neutroni della generazione precedente}}$$
+        <ul>
+          <li>$k < 1$ — la catena si spegne da sola: regime <strong>sottocritico</strong>.</li>
+          <li>$k = 1$ — ogni fissione ne innesca esattamente un'altra: regime <strong>critico</strong>.
+            La potenza è costante. È l'obiettivo di un reattore nucleare.</li>
+          <li>$k > 1$ — la potenza cresce esponenzialmente: regime <strong>sovracritico</strong>.
+            Nelle armi, $k \gg 1$ per un tempo brevissimo. Nei reattori, $k > 1$ anche di pochissimo
+            porterebbe a una fusione del nocciolo.</li>
+        </ul>
+      </div>
+
+      <div class="method">
+        <p><strong>Come si controlla $k$ in un reattore.</strong></p>
+        <p><span class="step-num">1</span><strong>Il moderatore.</strong> I neutroni emessi dalla fissione
+          sono veloci (~$2$ MeV). L'U-235 fissiona preferibilmente con neutroni <em>lenti</em> (termici,
+          ~$0.025$ eV). Il moderatore (acqua, acqua pesante, grafite) rallenta i neutroni per collisioni
+          elastiche, aumentando la probabilità di cattura e permettendo un combustibile meno arricchito.</p>
+        <p><span class="step-num">2</span><strong>Le barre di controllo.</strong> Barre di cadmio o boro,
+          inserite nel nocciolo, assorbono i neutroni senza fissionare. Abbassandole si riduce $k$;
+          alzandole si aumenta. Sono il "freno" del reattore.</p>
+        <p><span class="step-num">3</span><strong>I neutroni ritardati.</strong> Non tutti i neutroni di
+          fissione sono emessi istantaneamente: una piccola frazione ($\sim 0.65\%$ per l'U-235) viene emessa
+          da frammenti di fissione con ritardi da millisecondi a minuti. Senza di loro la catena
+          sarebbe troppo rapida per qualunque sistema di controllo meccanico. Grazie ai neutroni ritardati
+          il tempo di risposta del reattore è dell'ordine di decine di secondi: <em>abbastanza lento
+          da poter essere governato</em>.</p>
+      </div>
+
+      <div class="curiosita" style="border-left-color: #ef4444; background: color-mix(in srgb, #ef4444 8%, var(--surface));">
+        <strong>☢️ La paura di bruciare l'atmosfera — Progetto Manhattan, luglio 1945</strong>
+        <p>Prima del test Trinity (16 luglio 1945, deserto del Nuovo Messico) — la prima detonazione atomica
+          della storia — un gruppo di fisici del Progetto Manhattan, guidati da Hans Bethe, si pose una
+          domanda che aveva del terrificante: <em>e se la bomba innescasse una reazione a catena
+          nell'atmosfera?</em></p>
+        <p>Il ragionamento era questo: l'atmosfera contiene azoto-14. Se la temperatura del fireball fosse
+          stata abbastanza alta, le reazioni nucleari nel plasma avrebbero potuto in teoria coinvolgere
+          l'azoto, liberando energia sufficiente per auto-sostenersi e propagarsi. L'atmosfera intera
+          avrebbe potuto <strong>prendere fuoco</strong>.</p>
+        <p>Bethe, Teller e Konopinski analizzarono il problema in dettaglio e pubblicarono un rapporto
+          classificato nel 1946 (poi desecretato: <em>«Ignition of the Atmosphere with Nuclear Bombs»</em>).
+          La conclusione fu rassicurante ma non banale:</p>
+        <div class="warnbox" style="margin:0.6rem 0;">
+          La probabilità di accensione dell'atmosfera era <strong>essenzialmente zero</strong>, per due
+          ragioni fisiche precise:
+          <ul>
+            <li>Le sezioni d'urto delle reazioni N–N alle temperature del fireball erano troppo piccole
+              per sostenere una catena.</li>
+            <li>L'espansione rapidissima del plasma disperde l'energia molto più velocemente di quanto
+              qualunque reazione possa produrne.</li>
+          </ul>
+        </div>
+        <p>Ma la cosa più straordinaria è questa: <em>gli scienziati fecero il test sapendo che avevano
+          calcolato che sarebbe andato bene</em>, non sapendo con certezza assoluta. Oppenheimer scrisse
+          che la probabilità era «praticamente nulla», ma non riuscì ad escluderla con assoluta certezza
+          matematica. Fermi, con il suo solito umorismo nero, propose addirittura una scommessa sul
+          margine tra «solo il New Mexico» o «tutta l'atmosfera terrestre». Era una battuta —
+          ma diceva qualcosa di molto serio sulla responsabilità di chi lavora alla frontiera della fisica.</p>
+        <p class="formula-note">La risposta corretta è: no, l'atmosfera non avrebbe bruciato, e la fisica
+          lo dice con certezza. Ma il fatto che la domanda sia stata posta, e che sia stata considerata
+          abbastanza seria da richiedere mesi di calcoli da parte dei più grandi fisici del mondo,
+          racconta qualcosa di importante su cosa significa portare la scienza in territori mai
+          esplorati prima.</p>
+      </div>
 
       <div class="note">
         <strong>Fine dell'anno.</strong> Siamo partiti dai principi della dinamica e da una gallina sferica nel
