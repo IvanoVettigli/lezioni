@@ -785,8 +785,8 @@
           <input type="range" id="ea-n" min="10" max="40" step="1" value="25" style="flex:1;min-width:120px">
         </div>
         <div class="ctrl">
-          <label>anni già pagati <span class="val-badge" id="ea-mv">10</span></label>
-          <input type="range" id="ea-m" min="1" max="39" step="1" value="10" style="flex:1;min-width:180px">
+          <label>anni mancanti da pagare <span class="val-badge" id="ea-rv">15 anni (dopo 10 pagati)</span></label>
+          <input type="range" id="ea-r" min="1" max="24" step="1" value="15" style="flex:1;min-width:180px">
           <label>tasso investimento netto <span class="val-badge" id="ea-jv">1,0%</span></label>
           <input type="range" id="ea-j" min="0.5" max="6" step="0.1" value="1" style="flex:1;min-width:180px">
         </div>
@@ -1969,23 +1969,24 @@
     (function () {
       var svg = grab('ea-svg'); if (!svg) { return; }
       var sc = grab('ea-c'), si = grab('ea-i'), sn = grab('ea-n');
-      var sm = grab('ea-m'), sj = grab('ea-j'), cap = grab('ea-cap');
+      var sr = grab('ea-r'), sj = grab('ea-j'), cap = grab('ea-cap');
 
-      function clampM() {
-        var maxM = +sn.value - 1;
-        if (+sm.value > maxM) { sm.value = maxM; }
-        sm.max = maxM;
+      function clampR() {
+        var maxR = +sn.value - 1;
+        sr.max = maxR;
+        if (+sr.value > maxR) { sr.value = maxR; }
+        if (+sr.value < 1) { sr.value = 1; }
       }
 
       function draw() {
-        clampM();
+        clampR();
         var Cc = +sc.value, ta = +si.value / 100, anni = +sn.value;
-        var m = +sm.value, j = +sj.value / 100;
-        var r = anni - m;
+        var r = +sr.value, j = +sj.value / 100;
+        var m = anni - r;
         grab('ea-cv').textContent = eur(Cc, 0) + ' €';
         grab('ea-iv').textContent = num(+si.value, 1) + '%';
         grab('ea-nv').textContent = anni + ' anni';
-        grab('ea-mv').textContent = m;
+        grab('ea-rv').textContent = r + ' anni (dopo ' + m + ' pagati)';
         grab('ea-jv').textContent = num(+sj.value, 1) + '%';
         clear(svg);
 
@@ -1993,9 +1994,9 @@
         var Rr = Cc * im / (1 - Math.pow(1 + im, -nTot));
         var rateRest = r * 12;
         var Dm = Rr * (1 - Math.pow(1 + im, -rateRest)) / im;
-        var T = Rr * rateRest;
+        var totRate = Rr * rateRest;
         var M = Dm * Math.pow(1 + j, r);
-        var conviene = M > T;
+        var conviene = M > totRate;
 
         /* ---- grafico: montante vs rate al variare di r ---- */
         var maxR = anni - 1;
@@ -2063,9 +2064,9 @@
         T(svg, px + 8, 130, 'debito residuo D', 'lbl-s');
         T(svg, px + 180, 130, eur(Dm, 0) + ' €', 'em', 'end');
         T(svg, px + 8, 158, 'totale rate restanti', 'lbl-s');
-        T(svg, px + 180, 158, eur(T, 0) + ' €', 'lbl', 'end');
+        T(svg, px + 180, 158, eur(totRate, 0) + ' €', 'lbl', 'end');
         T(svg, px + 8, 186, 'interessi futuri', 'lbl-s');
-        T(svg, px + 180, 186, eur(T - Dm, 0) + ' €', 'em', 'end');
+        T(svg, px + 180, 186, eur(totRate - Dm, 0) + ' €', 'em', 'end');
         L(svg, px + 5, 198, px + 185, 198, COL.ax, 0.8);
         T(svg, px + 8, 220, 'montante investim.', 'lbl-s');
         T(svg, px + 180, 220, eur(M, 0) + ' €', 'em', 'end');
@@ -2087,7 +2088,7 @@
         }
         /* tasso di pareggio esatto per r corrente */
         if (r >= 1) {
-          var jStar = Math.pow(T / Dm, 1 / r) - 1;
+          var jStar = Math.pow(totRate / Dm, 1 / r) - 1;
           T(svg, px + 8, 346, 'tasso pareggio j*', 'lbl-s');
           T(svg, px + 180, 346, num(jStar * 100, 2) + '%', 'em', 'end');
         }
@@ -2095,12 +2096,12 @@
         cap.textContent = r >= 1
           ? (conviene
             ? 'Con ' + r + ' anni restanti al ' + num(+sj.value, 1) + '% conviene INVESTIRE: ' +
-              'il montante (' + eur(M, 0) + ' €) supera le rate restanti (' + eur(T, 0) + ' €).'
+              'il montante (' + eur(M, 0) + ' €) supera le rate restanti (' + eur(totRate, 0) + ' €).'
             : 'Con ' + r + ' anni restanti al ' + num(+sj.value, 1) + '% conviene ESTINGUERE: ' +
-              'le rate restanti (' + eur(T, 0) + ' €) superano il montante (' + eur(M, 0) + ' €).')
+              'le rate restanti (' + eur(totRate, 0) + ' €) superano il montante (' + eur(M, 0) + ' €).')
           : 'Il mutuo è già terminato.';
       }
-      [sc, si, sn, sm, sj].forEach(function (s) { s.addEventListener('input', draw); });
+      [sc, si, sn, sr, sj].forEach(function (s) { s.addEventListener('input', draw); });
       avvia(draw, svg);
     }());
 
@@ -2414,8 +2415,8 @@
                  rovina: 100 * rov / RIP, L: L, giorni: giorni };
       }
       function draw() {
-        var L = +grab('lv-l').value, giorni = +grab('lv-g').value;
-        grab('lv-lv').textContent = L;
+        var leva = +grab('lv-l').value, giorni = +grab('lv-g').value;
+        grab('lv-lv').textContent = leva;
         grab('lv-gv').textContent = giorni;
         clear(svg);
         if (!ris) {
