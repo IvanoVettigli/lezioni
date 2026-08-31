@@ -761,9 +761,141 @@
       </div>
     </section>
 
-    <!-- 12 — CRITTOGRAFIA -->
+    <!-- 12 — LA RICORSIONE -->
     <section id="sec12">
-      <h2>12. Un problema vero: la crittografia</h2>
+      <h2>12. Quando una cosa contiene sé stessa: la ricorsione</h2>
+
+      <p>Il metodo top-down spezza un problema in sottoproblemi <em>diversi</em>: per la carbonara, cuocere la
+        pasta e preparare la crema sono due cose distinte. Ma esiste un caso speciale, e sorprendente, in cui il
+        sottoproblema è <strong>lo stesso problema, più piccolo</strong>.</p>
+
+      <div class="definition">
+        Si chiama <strong>ricorsione</strong> quando qualcosa è definito, o risolto, <strong>in termini di sé
+        stesso</strong> — con l'accortezza che ogni volta il «sé stesso» sia un pezzetto più piccolo, e che
+        prima o poi si arrivi a un caso talmente semplice da poter rispondere senza rilanciare la palla.
+      </div>
+
+      <h3>12.1 — Prima di tutto: la ricorsione è dappertutto</h3>
+
+      <p>Non è un'invenzione degli informatici. Ci siete già dentro:</p>
+      <ul>
+        <li><strong>Due specchi uno di fronte all'altro.</strong> Ogni specchio riflette l'altro, che riflette
+          l'altro, che riflette l'altro… un corridoio di immagini che si rimpiccioliscono.</li>
+        <li><strong>Le matrioske.</strong> Una matrioska è una bambola che contiene una matrioska, fino a
+          quella piccolissima che non si apre: quella è il <em>caso base</em>.</li>
+        <li><strong>La copertina di un libro</strong> che raffigura sé stessa, l'etichetta di un formaggio con
+          sopra la stessa etichetta.</li>
+        <li><strong>Una cartella del computer</strong> che contiene cartelle, che contengono cartelle.</li>
+        <li><strong>Un albero genealogico:</strong> ogni persona ha due genitori, ciascuno dei quali ha due
+          genitori…</li>
+      </ul>
+
+      <div class="curiosita">
+        <strong>Il dizionario scherzoso degli informatici.</strong> Alla voce <em>«Ricorsione»</em>, c'è scritto:
+        <strong>«Ricorsione: vedi Ricorsione».</strong>
+        <p style="margin:0.5rem 0 0;">È una battuta, ma illustra alla perfezione il pericolo: quella
+          definizione non finisce mai, perché <strong>manca il caso base</strong>. Una ricorsione senza caso
+          base è come il ciclo infinito della sezione 4 — e il computer se ne accorge subito, di solito
+          bloccandosi con un messaggio che si chiama, non a caso, <em>stack overflow</em>.</p>
+      </div>
+
+      <h3>12.2 — La ricorsione in informatica</h3>
+
+      <p>In programmazione la ricorsione è una funzione (un sottoprogramma) che, per fare il proprio lavoro,
+        <strong>chiama sé stessa</strong> su un caso più semplice. Servono sempre e solo due ingredienti:</p>
+
+      <div class="rule">
+        <p><span class="step-num">1</span><strong>Il caso base:</strong> la situazione così semplice che la
+          risposta si dà subito, senza chiamare nessuno.</p>
+        <p><span class="step-num">2</span><strong>Il passo ricorsivo:</strong> come ricondurre il caso $n$ al
+          caso più piccolo, garantendo che ci si avvicini <em>sempre</em> al caso base.</p>
+        <p class="formula-note">Se riconoscete lo schema, non è un caso: sono gli stessi due ingredienti della
+          dimostrazione per induzione che avete visto nella lezione sull'algebra. La ricorsione è l'induzione
+          scritta in un linguaggio di programmazione.</p>
+      </div>
+
+      <p><strong>Esempio 1 — il fattoriale.</strong> Il fattoriale di $n$ è il prodotto di tutti i numeri da $1$
+        a $n$. Guardatelo con occhi ricorsivi: $5! = 5 \times 4!$, e $4! = 4 \times 3!$, e così via.</p>
+
+      <div class="code-flow">
+        <pre><code>funzione fattoriale(n):
+    se n = 0:                    ← caso base
+        restituisci 1
+    altrimenti:                  ← passo ricorsivo
+        restituisci n × fattoriale(n − 1)</code></pre>
+      </div>
+
+      <p>Seguiamo che cosa succede con $\text{fattoriale}(4)$: la funzione non sa rispondere e chiama
+        $\text{fattoriale}(3)$, che chiama $\text{fattoriale}(2)$, che chiama $\text{fattoriale}(1)$, che chiama
+        $\text{fattoriale}(0)$ — e <em>quello</em> sa rispondere: $1$. Da lì le risposte tornano indietro,
+        moltiplicandosi: $1 \to 1 \to 2 \to 6 \to 24$.</p>
+
+      <div class="note">
+        <strong>L'immagine da tenere a mente</strong> è quella di una pila di piatti. Ogni chiamata mette un
+        piatto sopra la pila e aspetta; quando il caso base risponde, i piatti si tolgono uno alla volta
+        dall'alto. Se il caso base non arriva mai, la pila cresce finché la memoria finisce: ecco lo
+        <em>stack overflow</em>.
+      </div>
+
+      <p><strong>Esempio 2 — contare i file di una cartella.</strong> Qui la ricorsione non è un vezzo, è
+        l'unica strada sensata: nessuno sa in anticipo quante cartelle dentro cartelle ci siano.</p>
+
+      <div class="code-flow">
+        <pre><code>funzione conta(cartella):
+    totale ← 0
+    per ogni elemento dentro cartella:
+        se è un file:      totale ← totale + 1
+        se è una cartella: totale ← totale + conta(elemento)   ← chiama sé stessa
+    restituisci totale</code></pre>
+      </div>
+
+      <p><strong>Esempio 3 — la successione di Fibonacci</strong> ($1, 1, 2, 3, 5, 8, 13\ldots$, ogni termine è
+        la somma dei due precedenti) è ricorsiva per definizione: $F(n) = F(n-1) + F(n-2)$, con i due casi base
+        $F(1) = F(2) = 1$.</p>
+
+      <div class="warning">
+        <strong>Ricorsione contro iterazione: quando conviene.</strong> Tutto ciò che si fa con la ricorsione si
+        può fare anche con un ciclo (sezione 8), e viceversa. La ricorsione è preferibile quando il problema
+        <em>è</em> ricorsivo per natura — cartelle dentro cartelle, alberi, labirinti — perché il programma
+        somiglia alla descrizione a parole. Il ciclo è preferibile quando conta la velocità: ogni chiamata
+        costa memoria.
+        <p style="margin:0.5rem 0 0;">Un esempio istruttivo è proprio Fibonacci: scritto ricorsivamente in modo
+          ingenuo, per calcolare $F(40)$ il computer rifà lo stesso conto <strong>milioni di volte</strong>
+          (calcola $F(38)$ due volte, $F(37)$ tre volte…), mentre con un ciclo bastano quaranta somme. Elegante
+          non vuol dire efficiente — e la sezione sulla complessità vi ha già avvisati.</p>
+      </div>
+
+      <h3>12.3 — Una favola ricorsiva</h3>
+
+      <p>Per chiudere, un modo diverso di ricordarsela. Provate a leggerla ad alta voce fino in fondo.</p>
+
+      <div class="curiosita" style="font-style:italic;">
+        <p style="margin:0;"><strong>La nonna che raccontava le favole</strong></p>
+        <p style="margin:0.6rem 0 0;">C'era una volta una nonna che raccontava una favola.<br>
+          E la favola diceva: «C'era una volta una nonna che raccontava una favola.<br>
+          E la favola diceva: “C'era una volta una nonna che raccontava una favola…”»</p>
+        <p style="margin:0.6rem 0 0;">E così per sempre, di nonna in nonna, di favola in favola,<br>
+          finché una bambina — l'ultima, la più piccola —<br>
+          non alzò la mano e disse: <strong>«Nonna, io ho sonno.»</strong><br>
+          E quello fu il <strong>caso base</strong>: la favola finì.<br>
+          Allora tutte le nonne, una dopo l'altra, poterono dire<br>
+          «e vissero felici e contenti» — e andare a dormire anche loro.</p>
+      </div>
+
+      <div class="note">
+        <strong>La favola è il programma.</strong> Ogni nonna «chiama» la nonna successiva e resta in attesa;
+        nessuna può finire il proprio racconto prima che finisca quella dentro. Quando la bambina dice «ho
+        sonno» — il caso base — le conclusioni tornano indietro una alla volta, dalla più interna alla più
+        esterna, esattamente come le moltiplicazioni del fattoriale.
+        <p style="margin:0.5rem 0 0;">E se la bambina non avesse mai avuto sonno? La favola non sarebbe finita
+          mai: <em>stack overflow</em>. Provate a scriverne una vostra — in tre righe, con un caso base
+          diverso.</p>
+      </div>
+    </section>
+
+    <!-- 13 — CRITTOGRAFIA -->
+    <section id="sec13">
+      <h2>13. Un problema vero: la crittografia</h2>
 
       <p>Proviamo il metodo su un problema serio, di quelli che riguardano la vostra vita quotidiana ogni volta che
         pagate online: come faccio a <strong>mandare un messaggio segreto</strong> a qualcuno, sapendo che altri
@@ -886,8 +1018,8 @@
     </section>
 
     <!-- 13 — RSA GIOCATTOLO (FACOLTATIVA) -->
-    <section id="sec13" class="optional">
-      <h2>13. Vediamolo davvero: RSA in miniatura</h2>
+    <section id="sec14" class="optional">
+      <h2>14. Vediamolo davvero: RSA in miniatura</h2>
 
       <p>Sezione per i più curiosi: proviamo a <strong>cifrare e decifrare per davvero</strong> un messaggio con il
         metodo a chiave pubblica più famoso, l'<strong>RSA</strong> (dalle iniziali di Rivest, Shamir e Adleman, che
@@ -929,8 +1061,8 @@
     </section>
 
     <!-- 14 — I CODICI QR -->
-    <section id="sec14">
-      <h2>14. I codici QR: disegni che parlano</h2>
+    <section id="sec15">
+      <h2>15. I codici QR: disegni che parlano</h2>
 
       <p>Chiudiamo con un algoritmo che hai in tasca e usi ogni giorno senza accorgertene. Quei quadrati pieni di
         puntini bianchi e neri — i <strong>codici QR</strong> — sono un modo per <strong>codificare</strong> un
@@ -1048,7 +1180,7 @@
 
     <!-- 15 — QUIZ -->
     <section id="quiz">
-      <h2>15. Quiz finale</h2>
+      <h2>16. Quiz finale</h2>
       <p>Dieci domande su algoritmi, cicli, complessità e crittografia. Difficoltà crescente.</p>
       <div id="quiz-app"></div>
     </section>
