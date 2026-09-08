@@ -588,7 +588,7 @@ document.<span class="fn">querySelectorAll</span>(<span class="st">".tasti butto
           progetto: senza connessione non si poteva fare nulla, e se il server si perdeva si perdeva tutto.
           In git <strong>ogni copia contiene l'intera storia</strong>: si lavora offline, si fanno commit sul
           treno, e ci si sincronizza dopo.</p>
-        <p>La struttura interna è quella della lezione 10: ogni <em>commit</em> è identificato
+        <p>La struttura interna è quella della lezione 11: ogni <em>commit</em> è identificato
           dall'<strong>impronta SHA-1 (oggi SHA-256)</strong> del suo contenuto, che include l'impronta del
           commit precedente. Vi ricorda qualcosa?</p>
         <div class="formula">$$\text{id}_k = \text{hash}\big(\text{id}_{k-1},\ \text{albero dei file},\
@@ -797,9 +797,442 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       </div>
     </section>
 
-    <!-- 5 — PONG -->
+    <!-- 5 — CASCATA E AGILE -->
     <section id="sec5">
-      <h2>5. Pong: il primo videogioco, e come si costruisce</h2>
+      <h2>5. Come si organizza un progetto: cascata e agile</h2>
+
+      <p>La calcolatrice della sezione 2 l'avete scritta in un pomeriggio, da soli, e il «metodo di lavoro»
+        era: apro il file e comincio. Funziona benissimo fino a una certa dimensione, e poi smette di
+        funzionare — non per colpa vostra, ma per aritmetica. Se il progetto dura due anni e ci lavorano
+        venti persone, nessuno ha in testa il tutto, ogni modifica ne rompe un'altra, e la domanda «a che
+        punto siamo?» diventa impossibile da rispondere. A quel punto il problema non è più scrivere il
+        codice: è <strong>organizzare chi lo scrive</strong>.</p>
+
+      <div class="note">
+        <strong>Un ripasso, e poi si va oltre.</strong> I due metodi li avete incontrati nella
+        <strong>lezione 11 del terzo anno</strong>, quella sull'azienda: lì c'è la storia, il Manifesto
+        Agile per esteso e la meccanica di Scrum, e conviene riaprirla. Qui li riprendiamo da un lato
+        diverso, che è quello che riguarda voi adesso: <strong>i numeri</strong> — quanto costa davvero
+        cambiare idea, e a che condizioni conviene un metodo o l'altro — e <strong>il vostro progetto</strong>,
+        cioè come si organizzano quattro settimane di lavoro su un sito da pubblicare.
+      </div>
+
+      <h3>5.1 — Il modello a cascata, fase per fase</h3>
+
+      <p>Si chiama <em>a cascata</em> perché le fasi scendono una nell'altra e non si risale. Ogni fase
+        produce un <strong>documento</strong>, il documento viene approvato, e solo allora comincia la fase
+        successiva. È il metodo con cui si costruiscono i ponti, e la trasposizione al software è del
+        <strong>1970</strong>.</p>
+
+      <div class="method">
+        <p><span class="step-num">1</span> <strong>Analisi dei requisiti.</strong> Si parla con il committente
+          e si scrive che cosa il software dovrà fare — <em>tutto</em>, fin nei dettagli. Il documento va
+          firmato. Da quel momento è un contratto: quello che non c'è scritto non si farà, e chiederlo dopo
+          costerà.</p>
+        <p><span class="step-num">2</span> <strong>Progettazione dell'architettura.</strong> Quali
+          componenti, quali basi di dati, chi parla con chi, con quali formati. Nessuno ha ancora scritto una
+          riga di codice.</p>
+        <p><span class="step-num">3</span> <strong>Progettazione di dettaglio.</strong> Ogni componente viene
+          descritto internamente: strutture dati, algoritmi, interfacce. È il livello a cui un programmatore
+          può cominciare senza fare domande.</p>
+        <p><span class="step-num">4</span> <strong>Codifica.</strong> Si scrive il codice. Se il passo 3 è
+          fatto bene, è la fase più veloce e più noiosa.</p>
+        <p><span class="step-num">5</span> <strong>Integrazione e collaudo.</strong> Si mettono insieme i
+          pezzi e si verifica che facciano quello che c'era scritto al passo 1. È qui che tipicamente esplode
+          tutto, perché è il primo momento in cui il sistema esiste davvero.</p>
+        <p><span class="step-num">6</span> <strong>Rilascio.</strong> Si consegna, si installa, si forma il
+          personale.</p>
+        <p><span class="step-num">7</span> <strong>Manutenzione.</strong> Tutto quello che viene dopo — e
+          statisticamente è la fase che costa di più di tutte le altre messe insieme.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>Verifica e validazione non sono la stessa cosa.</strong> Il modello a cascata si disegna
+        spesso a <strong>V</strong>: la discesa sono le fasi di progetto, la risalita i collaudi
+        corrispondenti, e ogni collaudo verifica il documento che gli sta di fronte. Nasce da lì la
+        distinzione che in italiano si perde e in inglese no:
+        <ul style="margin:0.5rem 0 0;">
+          <li><strong>verifica</strong> — «stiamo costruendo il prodotto <em>correttamente</em>?»,
+            cioè rispetta le specifiche;</li>
+          <li><strong>validazione</strong> — «stiamo costruendo il prodotto <em>giusto</em>?»,
+            cioè è quello che serviva davvero.</li>
+        </ul>
+        <p style="margin:0.5rem 0 0;">Un software può superare tutti i collaudi e essere completamente
+          inutile: verifica superata, validazione fallita. È il modo tecnico di dire «hanno fatto
+          esattamente quello che avevo chiesto, e non era quello che volevo».</p>
+      </div>
+
+      <p>Perché tanta insistenza sui documenti firmati? Perché il modello a cascata nasce da
+        un'osservazione empirica che è il cuore di tutta la faccenda: <strong>correggere un errore costa
+        tanto più quanto più tardi lo si scopre</strong>. L'ordine di grandezza, secondo le stime classiche
+        di Barry Boehm (1981), è questo:</p>
+
+      <div class="figbox">
+        <svg viewBox="0 0 680 240" role="img" aria-label="Il costo di correggere un errore cresce di due ordini di grandezza dalle prime fasi al dopo-rilascio">
+          <line x1="70" y1="196" x2="650" y2="196" stroke="var(--border)" stroke-width="1.5"/>
+          <rect x="90" y="188" width="70" height="8" rx="3" fill="var(--green)"/>
+          <text x="125" y="214" text-anchor="middle" class="lbl-s">requisiti</text>
+          <text x="125" y="178" text-anchor="middle" class="lbl">1×</text>
+          <rect x="210" y="168" width="70" height="28" rx="3" fill="var(--green)"/>
+          <text x="245" y="214" text-anchor="middle" class="lbl-s">progettazione</text>
+          <text x="245" y="158" text-anchor="middle" class="lbl">5×</text>
+          <rect x="330" y="140" width="70" height="56" rx="3" fill="var(--gold)"/>
+          <text x="365" y="214" text-anchor="middle" class="lbl-s">codifica</text>
+          <text x="365" y="130" text-anchor="middle" class="lbl">10×</text>
+          <rect x="450" y="84" width="70" height="112" rx="3" fill="var(--gold)"/>
+          <text x="485" y="214" text-anchor="middle" class="lbl-s">collaudo</text>
+          <text x="485" y="74" text-anchor="middle" class="lbl">20×</text>
+          <rect x="570" y="30" width="70" height="166" rx="3" fill="var(--red)"/>
+          <text x="605" y="214" text-anchor="middle" class="lbl-s">dopo il rilascio</text>
+          <text x="605" y="22" text-anchor="middle" class="lbl">100× e oltre</text>
+          <text x="70" y="20" class="lbl">costo di correggere lo stesso errore</text>
+        </svg>
+        <p class="cap">La scala verticale è compressa: fra la prima e l'ultima colonna ci sono due ordini di
+          grandezza. I moltiplicatori precisi sono discussi da decenni — c'è chi sostiene che le misure
+          originali fossero poche e mal documentate — ma sul fatto che la curva <em>salga</em>, e che salga
+          molto, non discute nessuno.</p>
+      </div>
+
+      <div class="ric">
+        <div><h4>Quando la cascata è la scelta giusta</h4>
+          <p>Quando i requisiti sono <strong>davvero</strong> noti e stabili: li scrive un ente normativo, o
+            una legge, o la fisica. Quando il collaudo deve essere documentato per una certificazione.
+            Quando rilasciare costa moltissimo — un satellite, un impianto, un dispositivo medico. E quando
+            l'appalto è a prezzo fisso, perché un prezzo fisso richiede un elenco fisso di cose da fare.</p></div>
+        <div><h4>Dove si rompe</h4>
+          <p>Nell'ipotesi del passo 1: che il committente sappia in partenza quello che vuole. Nel software
+            succede raramente, perché il committente capisce che cosa gli serve <em>vedendo</em> il
+            software — cioè alla fine, quando il grafico qui sopra dice che cambiare costa cento volte
+            tanto.</p></div>
+      </div>
+
+      <h3>5.2 — Il modello agile, iterazione per iterazione</h3>
+
+      <p>L'idea alternativa è disarmante nella sua semplicità: se scoprire gli errori tardi costa caro,
+        <strong>facciamo in modo di scoprirli presto</strong>. Non c'è un altro trucco. Tutto il resto —
+        gli sprint, le riunioni in piedi, i post-it colorati — è meccanica al servizio di quest'unica idea.</p>
+
+      <div class="method">
+        <p><span class="step-num">1</span> <strong>Il registro del lavoro (<em>backlog</em>).</strong> Non
+          una specifica, ma un elenco <em>ordinato per priorità</em> di cose da fare, scritte dal punto di
+          vista di chi le userà: «come studente, voglio vedere i miei voti per materia, per capire dove sono
+          indietro». Si chiamano <strong>storie</strong>, e sono scritte così apposta: una storia dice
+          <em>chi</em>, <em>che cosa</em> e soprattutto <strong>perché</strong>, che è l'informazione che
+          nelle specifiche tradizionali sparisce sempre.</p>
+        <p><span class="step-num">2</span> <strong>La stima, in punti e non in ore.</strong> Le storie si
+          stimano in <em>punti</em>, con una scala volutamente grossolana (spesso $1, 2, 3, 5, 8, 13$: sono
+          i numeri di Fibonacci della lezione 1 del terzo anno). Il motivo è serio: le persone sono
+          pessime a stimare in ore e discrete a stimare <em>confronti</em> — «questa è il doppio di
+          quella». E una scala che salta i valori vicini impedisce di litigare per un'ora.</p>
+        <p><span class="step-num">3</span> <strong>La pianificazione dell'iterazione.</strong> Il gruppo
+          guarda quanti punti ha completato nelle iterazioni precedenti — la <strong>velocità</strong> — e
+          prende dal registro tanti punti quanti ne ha storicamente chiusi. Non «quanti ne servono»: quanti
+          <em>ne ha chiusi</em>. È l'unico modo onesto di stimare, ed è statistica applicata, non ottimismo.</p>
+        <p><span class="step-num">4</span> <strong>L'iterazione (<em>sprint</em>), da una a quattro
+          settimane.</strong> Durata <strong>fissa</strong>: se il lavoro non entra, si toglie lavoro, non si
+          allunga il tempo. Ogni mattina una riunione in piedi di un quarto d'ora: che cosa ho chiuso, che
+          cosa apro, che cosa mi blocca. In piedi perché duri poco.</p>
+        <p><span class="step-num">5</span> <strong>Alla fine: qualcosa che funziona.</strong> Non una
+          relazione, non delle diapositive: <strong>software che si può usare</strong>. Questo è il punto
+          non negoziabile del metodo, ed è anche il più difficile da rispettare.</p>
+        <p><span class="step-num">6</span> <strong>Due riunioni diverse.</strong> La <em>revisione</em> si fa
+          con il committente e riguarda il <em>prodotto</em>: guarda, prova, cambia idea — ed è esattamente
+          quello che si voleva. La <em>retrospettiva</em> si fa fra chi lavora e riguarda il <em>metodo</em>:
+          che cosa ci ha rallentati, che cosa cambiamo la prossima volta.</p>
+        <p><span class="step-num">7</span> <strong>Si ricomincia</strong> dal registro aggiornato. La
+          differenza con la cascata non è la velocità: è che il ciclo si chiude, e ogni giro porta
+          informazione nuova.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">La definizione di «fatto»</div>
+        <p>È la regola che tiene in piedi tutto il resto, e la più disattesa. Una cosa è
+          <strong>fatta</strong> non quando funziona sul computer di chi l'ha scritta, ma quando soddisfa un
+          elenco stabilito prima e uguale per tutti: per esempio <em>scritta, provata con test automatici,
+          riletta da un'altra persona, unita al ramo principale, pubblicata e documentata</em>. Senza questa
+          definizione, «fatto all'ottanta per cento» si accumula per mesi, e l'ultimo venti per cento —
+          quello vero — arriva tutto insieme alla fine. È il modo più comune in cui un progetto agile
+          fallisce restando formalmente agile.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>Kanban e una legge che vale anche per il traffico.</strong> Una variante molto diffusa,
+        nata negli stabilimenti Toyota, rinuncia agli sprint e usa una lavagna con colonne
+        (<em>da fare</em>, <em>in corso</em>, <em>in prova</em>, <em>fatto</em>) e un <strong>limite al
+        numero di lavori contemporanei</strong> in ciascuna colonna. Sembra una regola burocratica, e
+        invece è matematica: vale la <strong>legge di Little</strong>,
+        <div class="formula">$$\text{tempo di attraversamento} = \frac{\text{lavori in corso}}{\text{lavori conclusi per unità di tempo}}$$</div>
+        Un gruppo che chiude $2$ lavori a settimana e ne tiene aperti $8$ impiega
+        $8/2 = \mathbf{4}$ settimane a portarne uno dall'inizio alla fine. Se ne tiene aperti $4$, a parità
+        di ritmo, ne impiega <strong>due</strong>. Aprire meno cose contemporaneamente non riduce la
+        produttività: <em>dimezza il tempo di attesa</em>. È la stessa legge per cui un'autostrada con meno
+        auto in circolazione le fa arrivare prima, ed è il motivo per cui «stiamo lavorando a venti cose»
+        è quasi sempre una cattiva notizia.
+      </div>
+
+      <h3>5.3 — Il confronto, con i numeri</h3>
+
+      <p>Le discussioni fra i due metodi durano da vent'anni e sono quasi sempre inconcludenti, perché si
+        confrontano opinioni. Proviamo invece a costruire un <strong>modello</strong> — grossolano, e lo
+        diremo — e a vedere che cosa risponde. Serve poco: un progetto di $N$ unità di lavoro, e quattro
+        numeri.</p>
+
+      <div class="definition">
+        <div class="formula-title">Un modellino del costo</div>
+        <p>Chiamiamo $q$ la probabilità che una singola unità di lavoro sia <em>sbagliata</em> — cioè che il
+          committente, vedendola, dica «non intendevo questo»; $m$ il moltiplicatore di costo per correggere
+          tardi (la curva della sezione precedente); $d$ il sovraccarico di documentazione della cascata;
+          $c$ il sovraccarico di ogni iterazione dell'agile (riunioni, integrazione, ricollaudo, rilascio).</p>
+        <div class="formula">$$\text{Cascata} = N(1+d) + q\,N\,m$$</div>
+        <div class="formula">$$\text{Agile} = N(1+c) + q\,N\left(1 + \frac{m-1}{k}\right)$$</div>
+        <p class="formula-note">Nella cascata l'errore si scopre <em>alla consegna</em>, e paga il
+          moltiplicatore pieno $m$. Nell'agile si scopre alla fine della propria iterazione: il ritardo è al
+          massimo $1/k$ del progetto, e il moltiplicatore scende a $1 + (m-1)/k$. Con $k = 1$ le due formule
+          coincidono, come è giusto: <em>un'iterazione sola è una cascata</em>.</p>
+      </div>
+
+      <p>La formula del moltiplicatore spiega da sola perché iterare funziona, e anche perché non conviene
+        esagerare: con $m = 10$, passare da una a quattro iterazioni fa crollare il costo di una correzione
+        da $10$ a $3{,}25$; da quattro a otto si scende solo a $2{,}12$. <strong>I primi tagli valgono
+        moltissimo, gli ultimi quasi niente</strong> — mentre il sovraccarico $c$ si paga a ogni giro.</p>
+
+      <div class="figbox">
+        <div class="sim-btns" id="wa-btn">
+          <button class="btn btn-sm active" data-v="barre">i due costi, a confronto</button>
+          <button class="btn btn-sm" data-v="curva">al variare dell'incertezza</button>
+          <button class="btn btn-sm" data-v="tab">quando conviene la cascata</button>
+        </div>
+        <div class="ctrl">
+          <label>requisiti sbagliati <span class="val-badge" id="wa-qv">20%</span></label>
+          <input type="range" id="wa-q" min="0" max="60" step="1" value="20" style="flex:1;min-width:150px">
+          <label>costo di correggere tardi <span class="val-badge" id="wa-mv">10×</span></label>
+          <input type="range" id="wa-m" min="2" max="30" step="1" value="10" style="flex:1;min-width:150px">
+        </div>
+        <div class="ctrl">
+          <label>iterazioni <span class="val-badge" id="wa-kv">5</span></label>
+          <input type="range" id="wa-k" min="1" max="20" step="1" value="5" style="flex:1;min-width:150px">
+          <label>costo di un rilascio <span class="val-badge" id="wa-cv">0,15</span></label>
+          <input type="range" id="wa-c" min="0" max="120" step="5" value="15" style="flex:1;min-width:150px">
+          <label class="toggle-row"><input type="checkbox" id="wa-blocca" checked> blocca la scala</label>
+        </div>
+        <svg id="wa-svg" viewBox="0 0 680 380" role="img" aria-label="Confronto quantitativo fra il modello a cascata e quello agile al variare dell'incertezza dei requisiti"></svg>
+        <p class="cap" id="wa-cap"></p>
+      </div>
+
+      <p>Con i valori tipici di un progetto web — un requisito sbagliato su cinque, correzioni tardive che
+        costano dieci volte, cinque iterazioni, un rilascio che costa il $15\%$ — il modello dà
+        <strong>$310$ contro $171$</strong>: l'agile costa il <strong>$45\%$ in meno</strong>. Ma la
+        risposta interessante non è questa, è l'altra: <em>a che punto si pareggia?</em> Uguagliando le due
+        formule si ricava</p>
+
+      <div class="formula">$$q^{*} = \frac{c - d}{(m-1)\left(1 - \dfrac{1}{k}\right)}$$</div>
+
+      <p>e questo numero dice una cosa che nessuna discussione di principio dice:</p>
+
+      <div class="tabwrap">
+        <table class="tabf">
+          <thead><tr><th>quanto costa un rilascio</th><th>esempio</th><th>pareggio $q^{*}$</th><th>che cosa conviene</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">$c = 0{,}15$</td><td class="l">un sito: si ripubblica in trenta secondi</td>
+                <td>$0{,}7\%$</td><td class="l">agile, praticamente sempre</td></tr>
+            <tr><td class="lab">$c = 0{,}30$</td><td class="l">un programma che i clienti installano</td>
+                <td>$2{,}8\%$</td><td class="l">agile, salvo requisiti molto stabili</td></tr>
+            <tr><td class="lab">$c = 0{,}60$</td><td class="l">software che va ricertificato a ogni versione</td>
+                <td>$6{,}9\%$</td><td class="l">dipende: serve incertezza vera</td></tr>
+            <tr><td class="lab">$c = 1{,}20$</td><td class="l">una sonda spaziale: il rilascio è il lancio</td>
+                <td>$15{,}3\%$</td><td class="l">cascata, quasi sempre</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        <strong>La conclusione, e non è una questione di moda.</strong> Il modello non dice «agile è
+        meglio»: dice che <strong>la scelta dipende da quanto costa rilasciare</strong>. Se pubblicare una
+        versione nuova costa trenta secondi, basta che <em>un requisito su cento</em> sia sbagliato perché
+        iterare convenga. Se rilasciare significa lanciare un razzo, ci vuole un requisito sbagliato ogni
+        sei perché convenga. Chi faceva software a cascata negli anni Ottanta non era meno intelligente di
+        noi: aveva $c$ altissimo, perché rilasciare voleva dire stampare e spedire migliaia di dischetti.
+        <strong>È cambiato il canale di distribuzione, e il metodo di lavoro è cambiato di conseguenza.</strong>
+      </div>
+
+      <div class="warnbox">
+        <strong>I limiti del modello, detti chiaramente.</strong> Tratta le unità di lavoro come
+        indipendenti (non lo sono: una scelta di architettura sbagliata le invalida tutte insieme), suppone
+        che l'errore si scopra sempre alla fine dell'iterazione (a volte non si scopre affatto), ignora che
+        consegnare prima ha un <em>valore</em> e non solo un costo, e non sa niente di come stanno le
+        persone. Serve a mostrare la <strong>struttura</strong> del problema — che c'è un pareggio, e da
+        che cosa dipende — non a decidere al posto di nessuno. Un modello che vi dicesse che cosa fare
+        sarebbe da diffidare molto più di questo.
+      </div>
+
+      <h3>5.4 — Quando il software era un prodotto finito</h3>
+
+      <p>C'è un pezzo di storia che rende tutto quello che avete letto molto più chiaro, e per capirlo
+        bisogna dimenticare per un attimo che il software si aggiorna.</p>
+
+      <div class="storia">
+        <p><strong>Fino agli anni Novanta il software era un oggetto.</strong> Si comprava in una scatola di
+          cartone, dentro c'erano dei dischetti o un CD e un manuale stampato, e quello che c'era sui
+          dischetti <em>era</em> il programma, per sempre. Un videogioco su cartuccia era ancora più
+          definitivo: il codice stava in una memoria di sola lettura saldata dentro la plastica. Il momento
+          in cui l'azienda dichiarava finita una versione si chiamava — e in parte si chiama ancora —
+          <em>gold master</em>: da lì il nastro andava in fabbrica, e non tornava indietro.</p>
+        <p style="margin:0.6rem 0 0;">Che cosa succedeva se c'era un errore? Succedeva che restava lì.
+          Correggerlo significava stampare nuovi supporti, spedirli, convincere i clienti a installarli:
+          settimane di lavoro e un costo che si misurava in milioni. Nel <strong>1994</strong> Intel scoprì
+          che un suo processore, il <strong>Pentium</strong>, sbagliava certe divisioni alla nona cifra
+          decimale. Il difetto era rarissimo e quasi nessuno lo avrebbe mai incontrato; l'azienda finì per
+          sostituire i processori a chiunque lo chiedesse, e mise a bilancio
+          <strong>475 milioni di dollari</strong>. Quando non si può correggere dopo, si paga prima — e
+          questo, esattamente questo, è il motivo per cui si collaudava per mesi.</p>
+      </div>
+
+      <p>Poi è cambiato il canale. E il cambiamento è stato così graduale da passare inosservato, mentre
+        rovesciava il mestiere:</p>
+
+      <div class="tabwrap">
+        <table class="tabf">
+          <thead><tr><th>quando</th><th>come arrivava una correzione</th><th>quanto costava rilasciare</th></tr></thead>
+          <tbody>
+            <tr><td class="lab">anni '80</td><td class="l">non arrivava: si aspettava la versione successiva,
+                l'anno dopo</td><td class="l">altissimo (stampa e distribuzione fisica)</td></tr>
+            <tr><td class="lab">primi anni '90</td><td class="l">dischetti spediti per posta ai clienti
+                registrati, o allegati alle riviste</td><td class="l">alto</td></tr>
+            <tr><td class="lab">1998-2004</td><td class="l"><strong>Windows Update</strong>, poi gli
+                aggiornamenti automatici: la correzione arriva da sola</td><td class="l">medio</td></tr>
+            <tr><td class="lab">2003-2008</td><td class="l">distribuzione digitale (Steam, poi i negozi di
+                applicazioni): non esiste più il supporto fisico</td><td class="l">basso</td></tr>
+            <tr><td class="lab">oggi</td><td class="l"><strong>consegna continua</strong>: si pubblica più
+                volte al giorno, automaticamente, a ogni modifica approvata</td>
+                <td class="l">quasi nullo</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Quanto «quasi nullo»? Nel 2011 Amazon dichiarò di effettuare in media <strong>un rilascio in
+        produzione ogni $11{,}6$ secondi</strong>: sono circa <span class="val-badge">7400 al giorno</span>.
+        Non è un vanto tecnologico fine a sé stesso: è la stessa idea del modello di prima, portata al
+        limite. Se $c \to 0$ e $k \to \infty$, il costo di sbagliare crolla, e allora conviene sbagliare
+        spesso e presto invece che raramente e tardi.</p>
+
+      <div class="curiosita">
+        <strong>Come si misura, oggi, se un gruppo lavora bene.</strong> Non a righe di codice — quella è la
+        metrica peggiore mai inventata, perché premia chi scrive di più per fare la stessa cosa. Le quattro
+        misure che si usano davvero (le chiamano <em>metriche DORA</em>) sono: <strong>ogni quanto si
+        rilascia</strong>; <strong>quanto tempo passa</strong> fra il momento in cui si scrive una modifica
+        e quello in cui è in produzione; <strong>quale frazione dei rilasci causa un guasto</strong>; e
+        <strong>quanto ci vuole a rimettere in piedi</strong> il servizio quando succede. Sono tutte e
+        quattro misure del <em>ciclo</em>, non del prodotto: si misura quanto è stretto l'anello di
+        retroazione, che è precisamente quello che l'agile cerca di stringere.
+      </div>
+
+      <div class="ric">
+        <div><h4>Quello che ci abbiamo guadagnato</h4>
+          <p>Un errore di sicurezza si chiude in ore invece che in mesi. Il software migliora dopo essere
+            stato comprato, cosa che per un'automobile o un frigorifero non succede. E si possono
+            costruire sistemi che nessuno saprebbe progettare per intero in anticipo: si rilascia un pezzo,
+            si guarda come va, si continua.</p></div>
+        <div><h4>Quello che ci abbiamo perso</h4>
+          <p>La disciplina che veniva dalla paura. Sapendo di poter correggere dopo, si collauda meno prima:
+            le correzioni «del primo giorno» nei videogiochi sono diventate normali. Il software cambia
+            sotto i piedi di chi lo usa, senza che lo abbia chiesto. E non si compra più niente: si affitta,
+            e quando l'affitto finisce non resta nulla.</p></div>
+      </div>
+
+      <div class="warnbox">
+        <strong>Le eccezioni, che sono istruttive.</strong> Ci sono ancora sistemi in cui non si aggiorna
+        con leggerezza, e sono quelli in cui la sonda ha lasciato il porto — letteralmente. Il software di
+        volo di un aereo di linea va ricertificato a ogni versione, con costi che il nostro $c$ non riesce
+        nemmeno a rappresentare. Un pacemaker si aggiorna in ospedale. E la <strong>Voyager 1</strong>, che
+        nel 2024 ha ricevuto una correzione del proprio programma da $24$ miliardi di chilometri di
+        distanza, obbliga a un dettaglio che vale la pena calcolare: la luce impiega
+        $24\cdot 10^{9}/300\,000 \approx 81\,000$ secondi, cioè <strong>circa 22 ore</strong> per
+        arrivare, e altrettante per tornare. Ogni comando ha un ciclo di prova di <strong>due giorni
+        buoni</strong>, e se il comando sbagliato spegne la sonda non c'è nessun secondo tentativo. Lì il
+        collaudo si fa prima, e si fa per mesi. La regola generale, se ne volete una sola:
+        <strong>si itera dove tornare indietro è possibile</strong>.
+      </div>
+
+      <h3>5.5 — E adesso il vostro progetto</h3>
+
+      <p>Tutto questo diventa concreto sul sito che state costruendo. Ecco come si organizzano quattro
+        settimane di lavoro in gruppo, usando gli strumenti della sezione 4:</p>
+
+      <div class="method">
+        <p><span class="step-num">1</span> <strong>Scrivete il registro.</strong> Una riga per ogni cosa da
+          fare, nella forma «<em>come visitatore, voglio ..., per ...</em>». Ordinatele: in cima quella
+          senza la quale il sito non ha senso. Se ne avete più di venti, il progetto è troppo grande.</p>
+        <p><span class="step-num">2</span> <strong>Stimate a confronto.</strong> Prendete la storia più
+          piccola, chiamatela $1$, e misurate tutte le altre rispetto a quella con la scala
+          $1, 2, 3, 5, 8$. Se qualcosa vale $13$ o più, spezzatelo: non è una storia, è un progetto.</p>
+        <p><span class="step-num">3</span> <strong>Un'iterazione = una settimana.</strong> All'inizio
+          scegliete le storie che stanno in una settimana; alla fine <em>ci deve essere il sito online</em>,
+          anche se fa poche cose. Un ramo git per ogni storia (<code>git switch -c galleria-foto</code>),
+          fusione nel ramo principale solo quando la storia è «fatta».</p>
+        <p><span class="step-num">4</span> <strong>Scrivete la vostra definizione di «fatto»</strong> il
+          primo giorno, e appendetela: <em>funziona anche da telefono, l'ha guardata un compagno, è
+          pubblicata, ha un commento che spiega la parte difficile</em>. Poi rispettatela, che è la parte
+          difficile.</p>
+        <p><span class="step-num">5</span> <strong>Dieci minuti di retrospettiva ogni venerdì.</strong> Due
+          domande: che cosa ci ha fatto perdere tempo, e che cosa cambiamo lunedì. Una cosa sola per volta:
+          se ne cambiate cinque non saprete quale ha funzionato — che è poi il metodo sperimentale della
+          lezione 1 di fisica, applicato a un gruppo di lavoro.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑦ Esercizio.</strong> Un gruppo tiene aperti $12$ lavori contemporaneamente e ne chiude
+          $3$ a settimana. (a) Quanto tempo passa, in media, fra l'inizio e la fine di un lavoro?
+          (b) La direzione chiede di «andare più veloci» e assegna altri $6$ lavori, senza aggiungere
+          persone: che cosa succede al tempo di attraversamento? (c) Che cosa bisognerebbe fare invece, e
+          perché non riduce la produttività?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p7s">Mostra la soluzione</button>
+        <div class="solution" id="p7s">
+          <p><strong>(a)</strong> Legge di Little: $\text{tempo} = 12/3 = \mathbf{4}$ settimane.</p>
+          <p><strong>(b)</strong> I lavori in corso salgono a $18$, ma il ritmo con cui si chiudono dipende
+            dalle persone, non da quanti fogli ci sono sulla lavagna: resta $3$ a settimana. Il tempo di
+            attraversamento diventa $18/3 = \mathbf{6}$ settimane, cioè <strong>il 50% in più</strong>.
+            Assegnando più lavoro si è ottenuto che ogni singola cosa arrivi <em>più tardi</em>. È un
+            risultato controintuitivo solo finché non si scrive la formula.</p>
+          <p><strong>(c)</strong> Bisognerebbe <strong>abbassare</strong> il numero di lavori aperti, per
+            esempio a $6$: il tempo scenderebbe a $2$ settimane. La produttività non cala, perché il
+            denominatore — quanti lavori si chiudono a settimana — dipende dalle persone e non dalla
+            coda; anzi tipicamente <em>migliora</em>, perché meno cose aperte significano meno passaggi da
+            un lavoro all'altro, e ogni passaggio costa tempo di riavvio mentale. È lo stesso motivo per
+            cui studiare tre materie in parallelo la sera prima funziona peggio che studiarne una per
+            volta.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑧ Esercizio.</strong> Usando il modellino della sezione 5.3 con $d = 0{,}10$: un'azienda
+          produce software di controllo per macchinari industriali. Ogni versione va certificata da un ente
+          esterno, e questo porta il costo di un rilascio a $c = 0{,}60$; correggere dopo la certificazione
+          costa $m = 15$ volte; il progetto si potrebbe dividere in $k = 6$ iterazioni. (a) Sotto quale
+          incertezza dei requisiti conviene la cascata? (b) L'azienda stima che circa un requisito su venti
+          si riveli sbagliato: che cosa dovrebbe fare? (c) E se riuscisse a far scendere il costo della
+          certificazione a $c = 0{,}25$?</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p8s">Mostra la soluzione</button>
+        <div class="solution" id="p8s">
+          <p><strong>(a)</strong> $q^{*} = \dfrac{0{,}60 - 0{,}10}{(15-1)\left(1 - \frac16\right)}
+            = \dfrac{0{,}50}{14 \cdot 0{,}8333} = \dfrac{0{,}50}{11{,}67} = \mathbf{0{,}043}$, cioè il
+            <strong>4,3%</strong>. Sotto quella soglia conviene la cascata.</p>
+          <p><strong>(b)</strong> Un requisito su venti è $q = 0{,}05 = 5\%$, appena <em>sopra</em> la
+            soglia: conviene iterare, ma di poco. È esattamente il tipo di situazione in cui le discussioni
+            di principio non servono a niente e la risposta onesta è «dipende, e siamo al limite» — magari
+            con poche iterazioni lunghe invece che molte brevi.</p>
+          <p><strong>(c)</strong> Con $c = 0{,}25$ la soglia scende a
+            $\dfrac{0{,}15}{11{,}67} = \mathbf{0{,}0129}$, cioè l'$1{,}3\%$: adesso l'agile conviene
+            largamente. <strong>La cosa più utile che quell'azienda può fare non è cambiare metodo: è
+            rendere meno costosa la certificazione</strong> — automatizzando i collaudi, per esempio.
+            Abbassare $c$ sposta il pareggio molto più di qualsiasi discussione sul metodo, ed è la vera
+            lezione del modello.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — PONG -->
+    <section id="sec6">
+      <h2>6. Pong: il primo videogioco, e come si costruisce</h2>
 
       <div class="storia">
         <p><strong>Pong</strong> esce nel <strong>1972</strong>, prodotto da Atari, e fu il primo videogioco
@@ -900,13 +1333,13 @@ git push                      <span class="cm"># li mando entrambi</span></div>
         hardware.</div>
 
       <div class="exercise">
-        <p><strong>⑦ Esercizio.</strong> Nel codice il rimbalzo su soffitto e pavimento è
+        <p><strong>⑨ Esercizio.</strong> Nel codice il rimbalzo su soffitto e pavimento è
           <code>p.vy = -p.vy</code>. (a) Perché non si tocca <code>vx</code>? (b) Che cosa succederebbe
           scrivendo <code>p.vy = -Math.abs(p.vy)</code>? (c) C'è un difetto noto in
           <code>if (p.y - p.r &lt; 0 || p.y + p.r &gt; H) p.vy = -p.vy;</code>: quale, e come si
           corregge?</p>
-        <button class="btn btn-toggle btn-solution" data-target="#p7s">Mostra la soluzione</button>
-        <div class="solution" id="p7s">
+        <button class="btn btn-toggle btn-solution" data-target="#p9s">Mostra la soluzione</button>
+        <div class="solution" id="p9s">
           <p><strong>(a)</strong> Perché il muro è <em>orizzontale</em>: la riflessione inverte solo la
             componente <strong>perpendicolare</strong> alla superficie, e lascia intatta quella parallela. È
             la legge della riflessione dell'ottica geometrica, la stessa di Fisica_3: angolo di incidenza
@@ -934,11 +1367,11 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       </div>
 
       <div class="exercise">
-        <p><strong>⑧ Esercizio.</strong> La palla si muove di <code>vx = 4</code> pixel per fotogramma a
+        <p><strong>⑩ Esercizio.</strong> La palla si muove di <code>vx = 4</code> pixel per fotogramma a
           $60$ fotogrammi al secondo. (a) Quanti pixel al secondo? (b) Su un monitor a $144$ Hz, che cosa
           succede? (c) Come si scrive il codice perché la velocità sia la stessa su qualunque monitor?</p>
-        <button class="btn btn-toggle btn-solution" data-target="#p8s">Mostra la soluzione</button>
-        <div class="solution" id="p8s">
+        <button class="btn btn-toggle btn-solution" data-target="#p10s">Mostra la soluzione</button>
+        <div class="solution" id="p10s">
           <p><strong>(a)</strong> $4 \times 60 = \mathbf{240}$ pixel al secondo. Su un campo largo $680$
             pixel, la palla lo attraversa in $680/240 = 2{,}83$ secondi.</p>
           <p><strong>(b)</strong> A $144$ Hz il ciclo viene chiamato $144$ volte al secondo, quindi la palla
@@ -970,9 +1403,9 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       </div>
     </section>
 
-    <!-- 6 — I MOTORI GRAFICI -->
-    <section id="sec6">
-      <h2>6. I motori grafici</h2>
+    <!-- 7 — I MOTORI GRAFICI -->
+    <section id="sec7">
+      <h2>7. I motori grafici</h2>
 
       <p>Il Pong sta in sessanta righe. Un gioco vero richiede modelli tridimensionali, luci, ombre, fisica
         dei corpi rigidi, audio posizionale, animazioni, salvataggi, rete, e la stessa cosa su cinque
@@ -1028,11 +1461,11 @@ git push                      <span class="cm"># li mando entrambi</span></div>
         giochi come per tutto il resto: <em>finito è meglio che perfetto</em>.</div>
 
       <div class="exercise">
-        <p><strong>⑨ Esercizio.</strong> Vuoi fare un gioco 2D a scorrimento da pubblicare sul web, da solo,
+        <p><strong>⑪ Esercizio.</strong> Vuoi fare un gioco 2D a scorrimento da pubblicare sul web, da solo,
           con poca esperienza di programmazione. Quali strumenti scegli e perché? E che cosa cambierebbe se
           il gioco dovesse uscire su PlayStation con un team di quaranta persone?</p>
-        <button class="btn btn-toggle btn-solution" data-target="#p9s">Mostra la soluzione</button>
-        <div class="solution" id="p9s">
+        <button class="btn btn-toggle btn-solution" data-target="#p11s">Mostra la soluzione</button>
+        <div class="solution" id="p11s">
           <p><strong>Da solo, sul web:</strong> <em>Godot</em> con GDScript, oppure direttamente Canvas 2D e
             JavaScript. Le ragioni sono tre: (1) <strong>tempo di partenza</strong> — si scarica e si è
             operativi in mezz'ora; (2) <strong>pubblicazione</strong> — Godot esporta in HTML5, quindi il
@@ -1056,9 +1489,9 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       </div>
     </section>
 
-    <!-- 7 — ★ CHE COSA SUCCEDE QUANDO PREMI INVIO -->
-    <section id="sec7" class="optional">
-      <h2>7. Che cosa succede davvero quando premi Invio</h2>
+    <!-- 8 — ★ CHE COSA SUCCEDE QUANDO PREMI INVIO -->
+    <section id="sec8" class="optional">
+      <h2>8. Che cosa succede davvero quando premi Invio</h2>
 
       <p>Chiudiamo l'anno con una domanda che sembra banale e che tiene insieme metà del programma: scrivete
         un indirizzo nella barra, premete Invio, e in due decimi di secondo compare una pagina. Che cosa è
@@ -1082,7 +1515,7 @@ git push                      <span class="cm"># li mando entrambi</span></div>
         <p><span class="step-num">2</span> <strong>TCP.</strong> Si apre una connessione con quell'indirizzo
           sulla porta $443$, con la stretta di mano in tre passi (SYN, SYN-ACK, ACK). Costa un giro completo
           di andata e ritorno.</p>
-        <p><span class="step-num">3</span> <strong>TLS.</strong> È la lezione 10: il server manda il suo
+        <p><span class="step-num">3</span> <strong>TLS.</strong> È la lezione 11: il server manda il suo
           <em>certificato</em>, cioè la sua chiave pubblica firmata da un'autorità di cui il browser si fida;
           il browser verifica la firma e concorda una <strong>chiave simmetrica usa e getta</strong>. Da qui
           in poi tutto viaggia cifrato. È il momento in cui compare il lucchetto.</p>
@@ -1106,12 +1539,12 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       </div>
 
       <div class="exercise">
-        <p><strong>⑩ Esercizio.</strong> Un server sta a $6000$ km di distanza e la luce nella fibra viaggia
+        <p><strong>⑫ Esercizio.</strong> Un server sta a $6000$ km di distanza e la luce nella fibra viaggia
           a $200\,000$ km/s. (a) Quanto dura un viaggio di andata e ritorno? (b) Se caricare la pagina
           richiede DNS + TCP + TLS + HTTP, cioè quattro viaggi, quanto si aspetta come minimo?
           (c) Che cosa cambia mettendo una copia del sito a $300$ km?</p>
-        <button class="btn btn-toggle btn-solution" data-target="#p10s">Mostra la soluzione</button>
-        <div class="solution" id="p10s">
+        <button class="btn btn-toggle btn-solution" data-target="#p12s">Mostra la soluzione</button>
+        <div class="solution" id="p12s">
           <p><strong>(a)</strong> Andata e ritorno sono $12\,000$ km:</p>
           <div class="formula">$$t = \frac{12\,000\ \text{km}}{200\,000\ \text{km/s}} = 0{,}06\ \text{s}
             = \mathbf{60}\ \text{ms}$$</div>
@@ -1135,7 +1568,7 @@ git push                      <span class="cm"># li mando entrambi</span></div>
 
     <div class="note"><strong>Il filo della lezione — e dell'anno.</strong> Questa lezione non ha aggiunto
       teoria: ha chiuso il cerchio. La calcolatrice è la <em>funzione</em> del primo anno che diventa un
-      bottone; il grafo dei commit è la stessa catena di impronte della lezione 10; il rimbalzo della palla
+      bottone; il grafo dei commit è la stessa catena di impronte della lezione 11; il rimbalzo della palla
       è la riflessione dell'ottica e il moto uniforme della fisica; il conto sulla latenza è una divisione
       di terza media che decide come si progetta un sito. Se dovessi lasciarvi una sola cosa dell'anno
       sarebbe questa: <strong>gli strumenti che vi sembrano magici sono fatti di cose che sapete già</strong>,
@@ -1144,7 +1577,7 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       qualcosa di brutto e finito invece di qualcosa di bello e immaginario.</div>
 
     <section id="quiz">
-      <h2>8. Quiz finale</h2>
+      <h2>9. Quiz finale</h2>
       <div id="quiz-app"></div>
     </section>
 
@@ -1886,6 +2319,162 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       avvia(draw, svg);
     }());
 
+
+    /* ==================================================================
+       wa — CASCATA CONTRO AGILE: IL MODELLINO DI COSTO
+       ================================================================== */
+    (function () {
+      var svg = grab('wa-svg'); if (!svg) { return; }
+      var sq = grab('wa-q'), sm = grab('wa-m'), sk = grab('wa-k'), sc = grab('wa-c');
+      var qv = grab('wa-qv'), mv = grab('wa-mv'), kv = grab('wa-kv'), cv = grab('wa-cv');
+      var cap = grab('wa-cap'), bl = grab('wa-blocca');
+      var vista = 'barre', N = 100, DDOC = 0.10;
+
+      function cCascata(q, m) { return N * (1 + DDOC) + q * N * m; }
+      function cAgile(q, m, k, c) { return N * (1 + c) + q * N * (1 + (m - 1) / k); }
+      function qPareggio(m, k, c) {
+        var den = (m - 1) * (1 - 1 / k);
+        return den <= 0 ? null : (c - DDOC) / den;
+      }
+      function pia(x0, y0, w, h, xmax, ymax) {
+        R(svg, x0, y0, w, h, COL.s2, COL.ax, 1.2, 6);
+        return { X: function (v) { return x0 + v / xmax * w; },
+                 Y: function (v) { return y0 + h - Math.min(v, ymax) / ymax * h; },
+                 x0: x0, y0: y0, w: w, h: h };
+      }
+      function barra(x, y, larg, alt, col, valore) {
+        if (larg <= 0.5) { return; }
+        R(svg, x, y, larg, alt, 'color-mix(in srgb, ' + col + ' 34%, transparent)', col, 1.6, 5);
+        if (larg > 54) { T(svg, x + larg / 2, y + alt / 2 + 5, valore, 'lbl', 'middle'); }
+      }
+
+      function draw() {
+        clear(svg);
+        var q = (+sq.value) / 100, m = +sm.value, k = +sk.value, c = (+sc.value) / 100;
+        qv.textContent = sq.value + '%';
+        mv.textContent = m + '×';
+        kv.textContent = k;
+        cv.textContent = num(c, 2);
+        var CC = cCascata(q, m), CA = cAgile(q, m, k, c), qp = qPareggio(m, k, c);
+
+        if (vista === 'barre') {
+          var maxv = bl.checked ? 900 : Math.max(CC, CA) * 1.1;
+          var x0 = 130, w = 480, sca = w / maxv;
+          T(svg, 40, 40, 'costo totale del progetto (100 = lavoro utile)', 'lbl', 'start');
+          /* cascata */
+          var y1 = 86;
+          T(svg, 40, y1 + 26, 'cascata', 'em', 'start');
+          barra(x0, y1, N * sca, 42, COL.ac, '100');
+          barra(x0 + N * sca, y1, N * DDOC * sca, 42, COL.mu, 'doc');
+          barra(x0 + N * (1 + DDOC) * sca, y1, q * N * m * sca, 42, COL.rd, num(q * N * m, 0));
+          T(svg, x0 + Math.max(CC * sca + 12, 40), y1 + 26, 'totale ' + num(CC, 0), 'em', 'start');
+          /* agile */
+          var y2 = 176, molt = 1 + (m - 1) / k;
+          T(svg, 40, y2 + 26, 'agile', 'em', 'start');
+          barra(x0, y2, N * sca, 42, COL.ac, '100');
+          barra(x0 + N * sca, y2, N * c * sca, 42, COL.mu, 'iter.');
+          barra(x0 + N * (1 + c) * sca, y2, q * N * molt * sca, 42, COL.rd, num(q * N * molt, 0));
+          T(svg, x0 + Math.max(CA * sca + 12, 40), y2 + 26, 'totale ' + num(CA, 0), 'em', 'start');
+          /* legenda */
+          R(svg, 130, 260, 16, 16, 'color-mix(in srgb, ' + COL.ac + ' 34%, transparent)', COL.ac, 1.6, 4);
+          T(svg, 152, 273, 'lavoro utile', 'lbl-s', 'start');
+          R(svg, 260, 260, 16, 16, 'color-mix(in srgb, ' + COL.mu + ' 34%, transparent)', COL.mu, 1.6, 4);
+          T(svg, 282, 273, 'sovraccarico del metodo', 'lbl-s', 'start');
+          R(svg, 452, 260, 16, 16, 'color-mix(in srgb, ' + COL.rd + ' 34%, transparent)', COL.rd, 1.6, 4);
+          T(svg, 474, 273, 'lavoro rifatto', 'lbl-s', 'start');
+          T(svg, 340, 320, CA < CC ? ('l\'agile costa il ' + num(100 * (1 - CA / CC), 0) +
+            '% in meno') : ('la cascata costa il ' + num(100 * (1 - CC / CA), 0) + '% in meno'),
+            'em', 'middle');
+          T(svg, 340, 348, 'una correzione, in agile, costa ' + num(molt, 2) +
+            ' invece di ' + m, 'lbl-s', 'middle');
+        } else if (vista === 'curva') {
+          var ymax = bl.checked ? 800 : Math.max(cCascata(0.6, m), cAgile(0.6, m, k, c)) * 1.1;
+          var pl = pia(70, 26, 570, 254, 0.6, ymax), i, dA = '', dC = '';
+          for (i = 0; i <= 120; i++) {
+            var qq = 0.6 * i / 120;
+            dC += (i ? 'L' : 'M') + pl.X(qq).toFixed(1) + ' ' + pl.Y(cCascata(qq, m)).toFixed(1);
+            dA += (i ? 'L' : 'M') + pl.X(qq).toFixed(1) + ' ' + pl.Y(cAgile(qq, m, k, c)).toFixed(1);
+          }
+          P(svg, dC, COL.rd, 2.8);
+          P(svg, dA, COL.gr, 2.8);
+          if (qp !== null && qp > 0 && qp < 0.6) {
+            C(svg, pl.X(qp), pl.Y(cCascata(qp, m)), 6, 'none', COL.gd, 2.6);
+            L(svg, pl.X(qp), pl.Y(cCascata(qp, m)), pl.X(qp), pl.y0 + pl.h, COL.gd, 1.4, '5 4');
+            T(svg, pl.X(qp), pl.y0 + pl.h + 34, 'pareggio: ' + num(100 * qp, 1) + '%', 'em', 'middle');
+          }
+          L(svg, pl.X(q), pl.y0, pl.X(q), pl.y0 + pl.h, COL.ax, 1.2, '3 4');
+          for (i = 0; i <= 6; i++) {
+            T(svg, pl.X(0.6 * i / 6), pl.y0 + pl.h + 18, num(100 * 0.6 * i / 6, 0) + '%',
+              'lbl-s', 'middle');
+          }
+          for (i = 0; i <= 4; i++) {
+            T(svg, 64, pl.Y(ymax * i / 4) + 4, num(ymax * i / 4, 0), 'lbl-s', 'end');
+          }
+          T(svg, 355, 336, 'quota di requisiti sbagliati', 'lbl', 'middle');
+          T(svg, 70, 18, 'costo totale', 'lbl', 'start');
+          T(svg, 620, 60, 'cascata', 'em', 'end');
+          T(svg, 620, 82, 'agile', 'lbl', 'end');
+          T(svg, 355, 364, 'a sinistra del pareggio conviene la cascata, a destra l\'agile',
+            'lbl-s', 'middle');
+        } else {
+          var RIGHE = [[0.15, 'un sito: si ripubblica in trenta secondi'],
+                       [0.30, 'un programma che i clienti installano'],
+                       [0.60, 'software da ricertificare a ogni versione'],
+                       [1.20, 'una sonda spaziale: il rilascio è il lancio']];
+          T(svg, 60, 40, 'costo di un rilascio', 'lbl', 'start');
+          T(svg, 250, 40, 'esempio', 'lbl', 'start');
+          T(svg, 600, 40, 'pareggio', 'lbl', 'middle');
+          L(svg, 50, 50, 650, 50, COL.ax, 1.2);
+          var j;
+          for (j = 0; j < RIGHE.length; j++) {
+            var cc = RIGHE[j][0], yy = 86 + j * 52, qz = qPareggio(m, k, cc);
+            if (Math.abs(cc - c) < 0.03) {
+              R(svg, 50, yy - 18, 600, 34, 'color-mix(in srgb, ' + COL.ac + ' 12%, transparent)',
+                'none', 0, 6);
+            }
+            T(svg, 60, yy + 4, 'c = ' + num(cc, 2), 'lbl', 'start');
+            T(svg, 250, yy + 4, RIGHE[j][1], 'lbl-s', 'start');
+            T(svg, 600, yy + 4, qz === null || qz < 0 ? 'sempre agile' :
+              num(100 * qz, 1) + '%', 'em', 'middle');
+          }
+          T(svg, 350, 316, 'con m = ' + m + ' e k = ' + k + ' iterazioni', 'lbl', 'middle');
+          T(svg, 350, 344, 'sotto la soglia conviene la cascata, sopra conviene iterare',
+            'lbl-s', 'middle');
+          T(svg, 350, 366, 'e la soglia dipende quasi tutta da quanto costa rilasciare',
+            'lbl-s', 'middle');
+        }
+
+        var testo = 'Con requisiti sbagliati al <strong>' + sq.value + '%</strong>, correzioni tardive ' +
+          'che costano <strong>' + m + ' volte</strong>, <strong>' + k + '</strong> iterazioni e un ' +
+          'rilascio che costa <strong>' + num(c, 2) + '</strong>: la cascata viene <strong>' +
+          num(CC, 0) + '</strong>, l\'agile <strong>' + num(CA, 0) + '</strong>. ';
+        if (qp === null || qp <= 0) {
+          testo += 'Qui non c\'è nessun pareggio: rilasciare costa meno che documentare, ' +
+            'quindi iterare conviene per qualunque livello di incertezza.';
+        } else if (qp >= 1) {
+          testo += 'Il pareggio cadrebbe oltre il 100%: con questi costi di rilascio la cascata ' +
+            'conviene sempre.';
+        } else {
+          testo += 'Il pareggio cade al <strong>' + num(100 * qp, 1) + '%</strong>: ' +
+            (q > qp ? 'siamo sopra, quindi conviene iterare.' :
+                      'siamo sotto, quindi conviene pianificare tutto in anticipo.');
+        }
+        cap.innerHTML = testo;
+      }
+
+      var dis = avvia(draw, svg);
+      sq.addEventListener('input', dis);
+      sm.addEventListener('input', dis);
+      sk.addEventListener('input', dis);
+      sc.addEventListener('input', dis);
+      bl.addEventListener('change', dis);
+      var box = grab('wa-btn');
+      box.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        vista = b.getAttribute('data-v'); activate(box, b); dis();
+      });
+    }());
+
     document.getElementById('year').textContent = new Date().getFullYear();
   }());
   </script>
@@ -1990,7 +2579,7 @@ git push                      <span class="cm"># li mando entrambi</span></div>
         'non li cambia: solo quel commit viene modificato'
       ],
       correct: 0,
-      explain: 'È <strong>esattamente</strong> la struttura della blockchain della lezione 10 — e git è del 2005, Bitcoin del 2008. Ogni commit contiene l\'impronta del padre, quindi cambiarne uno cambia il suo identificatore, che è dentro il figlio, che cambia a sua volta, e così via fino alla fine. Per l\'effetto valanga i nuovi identificatori non somigliano ai vecchi. Da qui la regola pratica più importante del lavoro in gruppo: <strong>non riscrivete mai la storia di un ramo già condiviso</strong>, perché la copia degli altri diventa incompatibile con la vostra.' },
+      explain: 'È <strong>esattamente</strong> la struttura della blockchain della lezione 11 — e git è del 2005, Bitcoin del 2008. Ogni commit contiene l\'impronta del padre, quindi cambiarne uno cambia il suo identificatore, che è dentro il figlio, che cambia a sua volta, e così via fino alla fine. Per l\'effetto valanga i nuovi identificatori non somigliano ai vecchi. Da qui la regola pratica più importante del lavoro in gruppo: <strong>non riscrivete mai la storia di un ramo già condiviso</strong>, perché la copia degli altri diventa incompatibile con la vostra.' },
 
     { type: 'mc', diff: 'hard',
       text: 'Due persone modificano la stessa riga dello stesso file. Perché git si ferma e chiede, invece di scegliere da solo?',
@@ -2033,7 +2622,7 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       keywords: ['DNS', 'IP', 'TCP', 'connessione', 'TLS', 'certificato', 'HTTP', 'GET',
                  'DOM', 'rendering', 'latenza', 'andata e ritorno', 'CDN', 'velocità della luce'],
       requiredMatches: 4,
-      explain: '<strong>Le sei fasi.</strong><br>(1) <strong>DNS</strong>: il nome del sito non serve a nulla alla rete, serve un indirizzo IP. Il computer interroga un resolver, che risale l\'albero dei server dei nomi. Se l\'indirizzo è già in cache questa fase costa zero.<br>(2) <strong>TCP</strong>: si apre la connessione con la stretta di mano in tre passi (SYN, SYN-ACK, ACK). Costa un giro completo.<br>(3) <strong>TLS</strong>: è la lezione 10. Il server manda il <em>certificato</em>, cioè la sua chiave pubblica firmata da un\'autorità di cui il browser si fida; il browser verifica la firma e si concorda una chiave simmetrica usa e getta. È il momento in cui compare il lucchetto.<br>(4) <strong>HTTP</strong>: il browser manda <code>GET /pagina</code>; il server risponde con un codice (<code>200</code>, <code>404</code>, <code>301</code>) e il contenuto.<br>(5) <strong>Richieste secondarie</strong>: leggendo l\'HTML il browser scopre che servono CSS, JavaScript e immagini, e li chiede — ogni file è un viaggio in più.<br>(6) <strong>Rendering</strong>: costruzione del DOM, applicazione del CSS, calcolo del layout, disegno, esecuzione degli script.<br><br><strong>Perché ottimizzare il codice serve poco.</strong> Perché il tempo se ne va quasi tutto nei <strong>viaggi di andata e ritorno</strong>, e quelli sono limitati dalla <em>velocità della luce nella fibra</em>, circa $200\\,000$ km/s. Un server a $6000$ km costa $60$ ms per viaggio, e le prime quattro fasi ne richiedono almeno quattro: $240$ ms prima che arrivi il primo byte. Nessuna riscrittura del codice li recupera. Le cose che funzionano davvero sono <em>geografiche e architetturali</em>: mettere una copia del sito vicino a chi la chiede (una <strong>CDN</strong>: a $300$ km si scende a $12$ ms, venti volte meno), ridurre il <em>numero</em> di file da scaricare, e usare protocolli che richiedono meno viaggi — è esattamente quello che fa HTTP/3. La lezione generale: prima di ottimizzare, <strong>misurate dove va il tempo</strong>, perché quasi mai è dove pensate.' }
+      explain: '<strong>Le sei fasi.</strong><br>(1) <strong>DNS</strong>: il nome del sito non serve a nulla alla rete, serve un indirizzo IP. Il computer interroga un resolver, che risale l\'albero dei server dei nomi. Se l\'indirizzo è già in cache questa fase costa zero.<br>(2) <strong>TCP</strong>: si apre la connessione con la stretta di mano in tre passi (SYN, SYN-ACK, ACK). Costa un giro completo.<br>(3) <strong>TLS</strong>: è la lezione 11. Il server manda il <em>certificato</em>, cioè la sua chiave pubblica firmata da un\'autorità di cui il browser si fida; il browser verifica la firma e si concorda una chiave simmetrica usa e getta. È il momento in cui compare il lucchetto.<br>(4) <strong>HTTP</strong>: il browser manda <code>GET /pagina</code>; il server risponde con un codice (<code>200</code>, <code>404</code>, <code>301</code>) e il contenuto.<br>(5) <strong>Richieste secondarie</strong>: leggendo l\'HTML il browser scopre che servono CSS, JavaScript e immagini, e li chiede — ogni file è un viaggio in più.<br>(6) <strong>Rendering</strong>: costruzione del DOM, applicazione del CSS, calcolo del layout, disegno, esecuzione degli script.<br><br><strong>Perché ottimizzare il codice serve poco.</strong> Perché il tempo se ne va quasi tutto nei <strong>viaggi di andata e ritorno</strong>, e quelli sono limitati dalla <em>velocità della luce nella fibra</em>, circa $200\\,000$ km/s. Un server a $6000$ km costa $60$ ms per viaggio, e le prime quattro fasi ne richiedono almeno quattro: $240$ ms prima che arrivi il primo byte. Nessuna riscrittura del codice li recupera. Le cose che funzionano davvero sono <em>geografiche e architetturali</em>: mettere una copia del sito vicino a chi la chiede (una <strong>CDN</strong>: a $300$ km si scende a $12$ ms, venti volte meno), ridurre il <em>numero</em> di file da scaricare, e usare protocolli che richiedono meno viaggi — è esattamente quello che fa HTTP/3. La lezione generale: prima di ottimizzare, <strong>misurate dove va il tempo</strong>, perché quasi mai è dove pensate.' }
   ];
   </script>
 
