@@ -32,8 +32,20 @@
     } else if (btn.classList.contains('btn-graph')) {
       btn.textContent = shown ? '🙈 Nascondi grafico' : '📈 Mostra grafico';
     } else if (t) {
-      btn.textContent = t; // lascia invariato
+      // tasti con una scritta propria («Mostra la soluzione», «💡 Mostra i passaggi»...):
+      // si scambia soltanto il verbo, così la scritta dice sempre che cosa farà il prossimo clic
+      btn.textContent = scambiaVerbo(t, shown);
     }
+  }
+
+  const VERBI = [['Mostra', 'Nascondi'], ['mostra', 'nascondi']];
+  function scambiaVerbo(t, shown) {
+    for (let i = 0; i < VERBI.length; i++) {
+      const m = VERBI[i][0], n = VERBI[i][1];
+      if (shown && t.indexOf(m) !== -1) { return t.replace(m, n).replace('💡', '🙈'); }
+      if (!shown && t.indexOf(n) !== -1) { return t.replace(n, m).replace('🙈', '💡'); }
+    }
+    return t;
   }
 
   function toggleEl(el) {
