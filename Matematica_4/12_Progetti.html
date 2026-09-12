@@ -1230,9 +1230,425 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       </div>
     </section>
 
-    <!-- 6 — PONG -->
+    <!-- 6 — I TICKET -->
     <section id="sec6">
-      <h2>6. Pong: il primo videogioco, e come si costruisce</h2>
+      <h2>6. Gestire il lavoro: i ticket</h2>
+
+      <p>La sezione precedente ha risposto alla domanda «con che <em>metodo</em> si organizza un progetto».
+        Resta aperta quella pratica, che si pone identica in cascata e in agile: <strong>dove sta scritto
+        quello che c'è da fare, chi lo sta facendo e a che punto è?</strong> La risposta, in qualunque
+        azienda di software del mondo, è la stessa: in un sistema di <strong>ticket</strong>.</p>
+
+      <div class="note">
+        <strong>Il problema, in una scena.</strong> Il committente vi ferma in corridoio: «senti, il modulo
+        di accesso ogni tanto non va». Voi annuite. Tre settimane dopo nessuno ricorda se qualcuno ci ha
+        guardato, chi fosse quel qualcuno, se il problema c'è ancora, che cosa volesse dire «ogni tanto», e
+        se per caso non ve l'avesse già detto un altro a marzo. Non è una questione di memoria: è che
+        <strong>quella richiesta non esiste da nessuna parte</strong>. Le conversazioni evaporano; le cose
+        scritte in chat scendono in fondo e non risalgono più. Un progetto grande non può poggiare su
+        questo.
+      </div>
+
+      <h3>6.1 — Da «me lo fai?» a <code>PROJ-142</code></h3>
+
+      <div class="definition">
+        <div class="formula-title">Che cos'è un ticket</div>
+        <p>Un <strong>ticket</strong> — detto anche <em>issue</em>, <em>segnalazione</em>, <em>scheda</em> —
+          è un pezzo di lavoro trasformato in un <strong>oggetto durevole</strong>. Non un messaggio, non un
+          promemoria: una cosa che esiste, ha un nome proprio e sopravvive a chi l'ha creata. Ha almeno:</p>
+        <ul>
+          <li>un <strong>identificatore</strong> irripetibile, come <code>PROJ-142</code>;</li>
+          <li>un <strong>titolo</strong> e una <strong>descrizione</strong>;</li>
+          <li>uno <strong>stato</strong>: da fare, in corso, in revisione, fatto…;</li>
+          <li>un <strong>assegnatario</strong>: una persona, non «il gruppo»;</li>
+          <li>un <strong>tipo</strong> (difetto, funzionalità nuova, lavoro tecnico) e una
+            <strong>priorità</strong>;</li>
+          <li><strong>collegamenti</strong>: ad altri ticket, ai commit, alla discussione che l'ha generato;</li>
+          <li>una <strong>storia</strong>: chi ha cambiato che cosa e quando, per sempre.</li>
+        </ul>
+      </div>
+
+      <p>Di tutte queste, la più sottovalutata è la prima. Un identificatore sembra burocrazia e invece è la
+        cosa che fa funzionare tutto il resto, perché diventa il <strong>nome condiviso</strong> di quel
+        lavoro. Riprendete il flusso della <a href="#sec4">sezione 4</a> e guardate che cosa succede quando
+        c'è un numero:</p>
+
+      <div class="codebox"><span class="cm"># il ramo porta il numero del ticket</span>
+git switch -c <span class="st">PROJ-142-accesso-scade</span>
+
+<span class="cm"># il messaggio del commit lo cita</span>
+git commit -m <span class="st">"PROJ-142: rinnova la sessione prima della scadenza"</span>
+
+<span class="cm"># la richiesta di unione lo chiude da sola</span>
+<span class="st">Closes PROJ-142</span></div>
+
+      <div class="curiosita">
+        <strong>Perché questo conta davvero.</strong> Fra due anni qualcuno guarderà quella riga di codice e
+        si chiederà <em>perché diavolo è scritta così</em>. Con <code>git blame</code> risalirà al commit;
+        dal commit al ticket; dal ticket alla discussione, alla segnalazione originale e alla decisione. Il
+        codice dice <em>che cosa</em> fa il programma; il ticket dice <strong>perché</strong> — ed è l'unica
+        informazione che il codice non può contenere. Un progetto con i numeri di ticket nei commit ha una
+        memoria; uno senza, no. Costa tre secondi per commit.
+      </div>
+
+      <h3>6.2 — «Gestire i task» vuol dire questo: una macchina a stati</h3>
+
+      <p>Quando si dice che un gruppo «gestisce i task», si sta dicendo una cosa precisa, e non è tenere una
+        lista. Una lista ha due stati soli — c'è, non c'è più — e non basta a rispondere alla domanda
+        fondamentale, che è <em>a che punto siamo</em>. Gestire i task significa che ogni pezzo di lavoro
+        <strong>attraversa una sequenza di stati definiti in anticipo</strong>, e che i passaggi ammessi fra
+        uno stato e l'altro sono anch'essi definiti in anticipo.</p>
+
+      <p>È esattamente la stessa idea con cui nella <a href="#sec2">sezione 2</a> avete tenuto insieme la
+        calcolatrice: uno stato fatto di poche variabili, e regole precise su come si passa da uno stato al
+        successivo. Qui lo stato non è di un programma ma di un <em>pezzo di lavoro</em>, e la macchina non
+        gira nel computer: gira nel gruppo.</p>
+
+      <div class="figbox">
+        <svg viewBox="0 0 680 250" role="img"
+             aria-label="Il ciclo di vita di un ticket come macchina a stati: aperto, in corso, in revisione, fatto, con i ritorni indietro">
+          <rect x="18" y="96" width="104" height="46" rx="8" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>
+          <text x="70" y="118" text-anchor="middle" class="lbl">aperto</text>
+          <text x="70" y="134" text-anchor="middle" class="lbl-s">nel registro</text>
+
+          <rect x="180" y="96" width="104" height="46" rx="8" fill="color-mix(in srgb, var(--accent) 16%, var(--surface))" stroke="var(--accent)" stroke-width="2"/>
+          <text x="232" y="118" text-anchor="middle" class="lbl">in corso</text>
+          <text x="232" y="134" text-anchor="middle" class="lbl-s">assegnato</text>
+
+          <rect x="342" y="96" width="114" height="46" rx="8" fill="color-mix(in srgb, var(--gold) 18%, var(--surface))" stroke="var(--gold)" stroke-width="2"/>
+          <text x="399" y="118" text-anchor="middle" class="lbl">in revisione</text>
+          <text x="399" y="134" text-anchor="middle" class="lbl-s">letto da un altro</text>
+
+          <rect x="514" y="96" width="104" height="46" rx="8" fill="color-mix(in srgb, #16a34a 18%, var(--surface))" stroke="#16a34a" stroke-width="2"/>
+          <text x="566" y="118" text-anchor="middle" class="lbl">fatto</text>
+          <text x="566" y="134" text-anchor="middle" class="lbl-s">in produzione</text>
+
+          <line x1="122" y1="119" x2="172" y2="119" stroke="var(--muted)" stroke-width="2"/>
+          <polygon points="180,119 170,114 170,124" fill="var(--muted)"/>
+          <text x="147" y="110" text-anchor="middle" class="lbl-s">preso</text>
+
+          <line x1="284" y1="119" x2="334" y2="119" stroke="var(--muted)" stroke-width="2"/>
+          <polygon points="342,119 332,114 332,124" fill="var(--muted)"/>
+          <text x="309" y="110" text-anchor="middle" class="lbl-s">proposto</text>
+
+          <line x1="456" y1="119" x2="506" y2="119" stroke="var(--muted)" stroke-width="2"/>
+          <polygon points="514,119 504,114 504,124" fill="var(--muted)"/>
+          <text x="481" y="110" text-anchor="middle" class="lbl-s">accettato</text>
+
+          <path d="M399 96 C 399 52, 232 52, 232 92" fill="none" stroke="var(--gold)" stroke-width="2" stroke-dasharray="5 4"/>
+          <polygon points="232,96 227,86 237,86" fill="var(--gold)"/>
+          <text x="316" y="46" text-anchor="middle" class="em">servono modifiche</text>
+
+          <path d="M566 142 C 566 206, 70 206, 70 146" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"/>
+          <polygon points="70,142 65,152 75,152" fill="#dc2626"/>
+          <text x="318" y="222" text-anchor="middle" style="fill:#dc2626; font-size:12.5px; font-weight:700;">riaperto: non era davvero risolto</text>
+
+          <text x="18" y="28" class="lbl">il ciclo di vita di un ticket</text>
+          <text x="18" y="48" class="lbl-s">le frecce continue sono i passaggi normali; quelle tratteggiate i ritorni indietro</text>
+        </svg>
+        <p class="cap">Gli stati sono pochi apposta. Ogni stato in più è una casella che qualcuno dovrà
+          spostare a mano, e una domanda in più a cui rispondere quando il ticket ci resta bloccato.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Le tre regole che rendono utile una macchina a stati</div>
+        <p><span class="step-num">1</span> <strong>Gli stati sono pochi e hanno un significato condiviso.</strong>
+          «Fatto» deve voler dire la stessa cosa per tutti — ed è precisamente la <em>definizione di fatto</em>
+          della sezione 5.2. Senza quella, gli stati sono etichette colorate.</p>
+        <p><span class="step-num">2</span> <strong>I passaggi ammessi sono dichiarati.</strong> Da «aperto»
+          non si salta a «fatto»: si passa da «in revisione», perché la revisione è il punto in cui
+          un'altra persona guarda il lavoro. Vietare le scorciatoie è tutto il valore del sistema.</p>
+        <p><span class="step-num">3</span> <strong>Ogni ticket ha un solo stato in ogni istante.</strong>
+          Niente «fatto all'ottanta per cento»: o è in corso o non lo è. È scomodo, ed è il punto — costringe
+          a spezzare i lavori grandi in lavori che si possono davvero chiudere.</p>
+      </div>
+
+      <div class="warnbox">
+        <strong>Il ticket che sta fermo in «in revisione» per due settimane.</strong> È il difetto più comune
+        di tutti, e la macchina a stati lo rende <em>visibile</em>, che è già metà del lavoro. Un lavoro
+        fermo in uno stato intermedio è finito all'ottanta per cento: costa come se fosse fatto, ma non vale
+        niente finché non arriva in fondo. Per questo i gruppi che funzionano hanno una regola tipo «prima di
+        aprire qualcosa di nuovo, guarda se c'è qualcosa da rivedere»: <strong>chiudere vale più che
+        iniziare</strong>. La prossima sottosezione lo trasforma in un numero.
+      </div>
+
+      <h3>6.3 — La lavagna, il flusso, e di nuovo la legge di Little</h3>
+
+      <p>Gli stati diventano le <strong>colonne</strong> di una lavagna, e i ticket le schede che ci
+        scorrono dentro da sinistra a destra. Da qui in poi si può smettere di discutere e cominciare a
+        contare, perché una lavagna produce numeri: quanti lavori sono aperti, quanti se ne chiudono a
+        settimana, quanto tempo passa fra l'inizio e la fine.</p>
+
+      <div class="definition">
+        <div class="formula-title">Le tre grandezze, e l'unica formula</div>
+        <ul>
+          <li><strong>Lavori in corso</strong> (WIP): quanti ticket sono contemporaneamente fra la prima
+            colonna e l'ultima.</li>
+          <li><strong>Ritmo di uscita</strong>: quanti ticket arrivano a «fatto» per unità di tempo.</li>
+          <li><strong>Tempo di attraversamento</strong>: quanto passa, per un singolo ticket, dall'ingresso
+            all'uscita.</li>
+        </ul>
+        <div class="formula">$\text{tempo di attraversamento} = \frac{\text{lavori in corso}}{\text{ritmo di uscita}}$</div>
+        <p class="formula-note">È la <strong>legge di Little</strong> della sezione 5.2, che qui ritorna
+          perché è lo stesso identico problema. Il simulatore qui sotto la verifica su ogni configurazione
+          che proverete: la colonna «controllo» confronta il tempo misurato con quello previsto dalla
+          formula.</p>
+      </div>
+
+      <div class="figbox">
+        <div class="sim-btns" id="tk-btn">
+          <button class="btn btn-sm active" data-v="lavagna">la lavagna</button>
+          <button class="btn btn-sm" data-v="flusso">il flusso cumulato</button>
+          <button class="btn btn-sm" data-v="little">al variare del limite</button>
+        </div>
+        <div class="ctrl">
+          <label>limite di lavori aperti <span class="val-badge" id="tk-wipv">5</span></label>
+          <input type="range" id="tk-wip" min="1" max="16" step="1" value="5" style="flex:1;min-width:140px">
+          <label>sviluppatori <span class="val-badge" id="tk-devv">3</span></label>
+          <input type="range" id="tk-dev" min="1" max="8" step="1" value="3" style="flex:1;min-width:110px">
+          <label>revisori <span class="val-badge" id="tk-revv">1</span></label>
+          <input type="range" id="tk-rev" min="1" max="4" step="1" value="1" style="flex:1;min-width:110px">
+        </div>
+        <div class="sim-btns">
+          <button class="btn" id="tk-via">▶ avvia</button>
+          <button class="btn btn-secondary" id="tk-passo">▸ un giorno</button>
+          <button class="btn btn-secondary" id="tk-reset">↺ azzera</button>
+          <span class="lbl-s" id="tk-giorno" style="margin-left:0.4rem;"></span>
+        </div>
+        <svg id="tk-svg" viewBox="0 0 680 360" role="img"
+             aria-label="Simulatore del flusso dei ticket su una lavagna a colonne, col diagramma di flusso cumulato"></svg>
+        <div class="tabwrap">
+          <table class="tabf">
+            <thead><tr><th>lavori in corso</th><th>ritmo di uscita</th><th>tempo di attraversamento</th><th>controllo: WIP ÷ ritmo</th></tr></thead>
+            <tbody><tr>
+              <td><span class="val-badge" id="tk-wipm">—</span></td>
+              <td><span class="val-badge" id="tk-thr">—</span></td>
+              <td><span class="val-badge" id="tk-lead">—</span></td>
+              <td><span class="val-badge" id="tk-check">—</span></td>
+            </tr></tbody>
+          </table>
+        </div>
+        <p class="cap" id="tk-cap"></p>
+      </div>
+
+      <div class="note">
+        <strong>Due esperimenti da fare adesso, in quest'ordine.</strong>
+        <p style="margin:0.5rem 0 0;"><strong>Primo.</strong> Lasciate tre sviluppatori e un revisore e
+          portate il limite da $4$ a $16$. Il ritmo di uscita non si muove di un centesimo — resta
+          $0{,}64$ ticket al giorno — mentre il tempo di attraversamento passa da $6{,}2$ a $25{,}0$
+          giorni. <strong>Quadruplicando il lavoro aperto si ottiene lo stesso identico risultato, quattro
+          volte più tardi.</strong> È la legge di Little, vista dal lato in cui fa male.</p>
+        <p style="margin:0.5rem 0 0;"><strong>Secondo.</strong> Rimettete il limite a $6$ e aumentate gli
+          <em>sviluppatori</em>: da $3$ a $5$, poi a $8$. Il ritmo di uscita resta $0{,}64$, identico fino
+          al centesimo, e il tempo di attraversamento resta $9{,}3$ giorni. Poi rimettete $3$ sviluppatori e
+          aggiungete <em>un solo revisore</em>: il ritmo salta a $1{,}11$, cioè <strong>il 73% in
+          più</strong>, e l'attesa crolla da $9{,}3$ a $5{,}4$ giorni.</p>
+      </div>
+
+      <div class="curiosita">
+        <strong>Il collo di bottiglia, e la frase di Goldratt.</strong> Il secondo esperimento è una
+        dimostrazione in miniatura della <strong>teoria dei vincoli</strong>, che Eliyahu Goldratt rese
+        famosa nel 1984 con un romanzo su una fabbrica, <em>The Goal</em>. La tesi sta in una frase:
+        <em>un'ora guadagnata dove non c'è il collo di bottiglia è un miraggio; un'ora persa nel collo di
+        bottiglia è persa per l'intero sistema</em>. Qui il collo è il revisore — con uno solo, la
+        revisione smaltisce al massimo $1/1{,}5 \approx 0{,}67$ ticket al giorno, ed è quello il tetto,
+        qualunque cosa facciano gli sviluppatori. Aggiungere programmatori a un sistema che è in coda sulla
+        revisione non produce software: produce <strong>una coda più lunga</strong>.
+        <p style="margin:0.5rem 0 0;">Ed è il motivo tecnico dietro una delle frasi più citate
+          dell'informatica, la <strong>legge di Brooks</strong> (1975): <em>aggiungere persone a un progetto
+          in ritardo lo fa ritardare di più</em>.</p>
+      </div>
+
+      <div class="definition">
+        <div class="formula-title">Il diagramma di flusso cumulato</div>
+        <p>È il grafico che si trova in ogni strumento serio, e la seconda vista del simulatore. Sull'asse
+          orizzontale il tempo; in verticale, una sopra l'altra, le curve dei ticket <em>entrati</em>,
+          <em>iniziati</em> e <em>finiti</em>. Non serve saperlo leggere a memoria: basta sapere che
+          <strong>le due distanze significano due cose</strong>.</p>
+        <ul>
+          <li>La distanza <strong>verticale</strong> fra la curva di sopra e quella di sotto è il numero di
+            lavori in corso.</li>
+          <li>La distanza <strong>orizzontale</strong> fra le stesse due curve è il tempo di
+            attraversamento.</li>
+        </ul>
+        <p class="formula-note">E dato che la pendenza della curva di sotto è il ritmo di uscita, la legge
+          di Little diventa un fatto di geometria elementare: <em>verticale = pendenza × orizzontale</em>.
+          Una banda che si allarga è un gruppo che accumula lavoro senza chiuderlo — si vede a colpo
+          d'occhio, molto prima che lo dica qualcuno in riunione.</p>
+      </div>
+
+      <h3>6.4 — Gli strumenti: JIRA e gli altri</h3>
+
+      <p>Tutto quello che avete letto finora si può fare con dei foglietti attaccati a un muro, e per un
+        gruppo di cinque persone in una stanza è spesso la scelta migliore. Gli strumenti servono quando il
+        muro non basta più: perché le persone sono duecento, perché stanno in fusi orari diversi, perché
+        serve sapere che cosa è successo sei mesi fa, o perché un contratto impone di dimostrarlo.</p>
+
+      <div class="storia">
+        <p><strong>Da dove viene il nome JIRA.</strong> Lo strumento più diffuso al mondo per la gestione dei
+          ticket è <strong>JIRA</strong>, dell'azienda australiana <strong>Atlassian</strong>, uscito nel
+          <strong>2002</strong>. Il nome non è una sigla e non vuol dire niente: i programmatori che lo
+          scrivevano usavano prima <em>Bugzilla</em>, il tracciatore libero nato in casa Mozilla nel 1998, e
+          per scherzo lo chiamavano fra loro <em>Gojira</em> — che è il nome giapponese di Godzilla. Da
+          <em>Gojira</em>, accorciato, è rimasto <strong>JIRA</strong>. È il raro caso di un prodotto
+          serissimo battezzato con il soprannome del suo predecessore.</p>
+      </div>
+
+      <div class="ric">
+        <div><h4>Che cosa aggiunge uno strumento grande</h4>
+          <p><strong>Flussi personalizzati</strong> (gli stati e i passaggi ammessi si disegnano, e il
+            sistema li impone), <strong>gerarchia</strong> del lavoro,
+            <strong>permessi</strong> (chi può chiudere che cosa), <strong>ricerca</strong> con un
+            linguaggio di interrogazione, <strong>rapporti</strong> automatici, e
+            <strong>collegamento</strong> con il sistema di versione: il ticket si chiude da solo quando il
+            codice entra nel ramo principale.</p></div>
+        <div><h4>La gerarchia, dal grande al piccolo</h4>
+          <p><strong>Epica</strong> — un obiettivo da mesi («rifare l'accesso»). <strong>Storia</strong> —
+            qualcosa di utile a un utente, da giorni. <strong>Task</strong> — un pezzo tecnico, da ore.
+            <strong>Sotto-task</strong> — un passo dentro un task. La regola pratica: se non si chiude in
+            due giorni, <strong>va spezzato</strong>. Un ticket enorme è un ticket che resterà «in corso»
+            per settimane senza dire niente a nessuno.</p></div>
+        <div><h4>Gli altri, e quando bastano</h4>
+          <p><strong>GitHub Issues</strong> e <strong>GitLab</strong>: semplici e già dentro al deposito del
+            codice — per un progetto come il vostro sono la scelta giusta.
+            <strong>Trello</strong> (2011): lavagne a schede, bellissimo per cose piccole.
+            <strong>Linear</strong>, <strong>Azure DevOps</strong>, <strong>Redmine</strong>,
+            <strong>Bugzilla</strong>. Il criterio non è quale sia il migliore, ma quale sia il più piccolo
+            che risolve il vostro problema.</p></div>
+      </div>
+
+      <div class="warnbox">
+        <strong>Lo strumento non è il metodo.</strong> È l'errore più costoso di questa sezione, e si vede
+        in aziende vere: si compra JIRA, si configura un flusso con quattordici stati e nove campi
+        obbligatori, e si è convinti di essere diventati agili. È successo l'opposto — si è aggiunta
+        burocrazia. Lo strumento <em>rende visibile</em> come lavorate: se lavorate male, lo mostra con
+        grande precisione. Un gruppo che funziona con i foglietti funzionerà con JIRA; un gruppo che non
+        funziona, con JIRA funzionerà peggio e con più grafici.
+      </div>
+
+      <h3>6.5 — Come si scrive un ticket che serve a qualcosa</h3>
+
+      <p>Questa è una competenza vera, si impara in mezz'ora e quasi nessuno la insegna. Un ticket è scritto
+        bene quando <strong>chi lo legge fra sei mesi, senza avervi mai parlato, può lavorarci</strong>.</p>
+
+      <div class="method">
+        <p><span class="step-num">1</span> <strong>Il titolo dice il problema, non la reazione.</strong>
+          Non «l'accesso è rotto», ma «la sessione scade dopo 5 minuti invece di 30».</p>
+        <p><span class="step-num">2</span> <strong>Per un difetto servono tre righe, sempre le stesse:</strong>
+          che cosa <em>ho fatto</em>, che cosa <em>mi aspettavo</em>, che cosa è <em>successo</em>. Più
+          l'ambiente (browser, sistema, versione) e la frequenza («sempre» o «una volta su dieci» sono
+          problemi diversissimi).</p>
+        <p><span class="step-num">3</span> <strong>I passi per riprodurlo.</strong> È la parte che fa la
+          differenza fra una segnalazione e uno sfogo: un difetto che non si sa riprodurre non si sa nemmeno
+          verificare quando è stato risolto.</p>
+        <p><span class="step-num">4</span> <strong>Per una funzionalità nuova, il perché.</strong> La forma
+          della sezione 5.2 — <em>come ⟨chi⟩, voglio ⟨che cosa⟩, per ⟨perché⟩</em> — serve proprio a
+          questo: chi lo realizzerà spesso trova una strada migliore di quella immaginata, ma solo se sa a
+          che cosa serve.</p>
+        <p><span class="step-num">5</span> <strong>I criteri di accettazione.</strong> L'elenco delle cose
+          che devono essere vere perché il ticket sia chiudibile. Si scrivono <em>prima</em>, e valgono come
+          il collaudo.</p>
+        <p><span class="step-num">6</span> <strong>Una cosa sola per ticket.</strong> Se il titolo contiene
+          una «e», probabilmente sono due ticket.</p>
+      </div>
+
+      <div class="tabwrap">
+        <table class="tabf">
+          <thead><tr><th>scritto male</th><th>perché non funziona</th><th>scritto bene</th></tr></thead>
+          <tbody>
+            <tr><td class="l">«Non funziona niente»</td><td class="l">non si può né assegnare né verificare</td>
+                <td class="l">«Il pulsante “Salva” non risponde su Safari 17 dopo aver caricato un allegato &gt; 5 MB»</td></tr>
+            <tr><td class="l">«Migliorare le prestazioni»</td><td class="l">non si saprà mai quando è finito</td>
+                <td class="l">«La pagina dei voti impiega 8 s a caricare con 500 studenti: portarla sotto i 2 s»</td></tr>
+            <tr><td class="l">«Sistemare il sito e aggiungere il calendario»</td><td class="l">due lavori diversi, con priorità diverse</td>
+                <td class="l">due ticket separati, collegati se serve</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="curiosita">
+        <strong>La cernita.</strong> In un progetto vivo arrivano più segnalazioni di quante se ne possano
+        affrontare, e il registro cresce da solo. Per questo i gruppi fanno periodicamente una
+        <strong>cernita</strong> (in inglese <em>triage</em>, la stessa parola del pronto soccorso, e
+        l'origine militare è la stessa): si passa l'arretrato e per ogni ticket si decide una cosa sola —
+        è reale? è un doppione? quanto è urgente? lo faremo <em>davvero</em>? Chiudere un ticket con «non lo
+        faremo» è una decisione legittima e onesta; lasciarlo aperto per tre anni non lo è, perché finge una
+        promessa che nessuno manterrà.
+      </div>
+
+      <h3>6.6 — Quando il numero diventa l'obiettivo</h3>
+
+      <div class="warnbox">
+        <strong>La legge di Goodhart.</strong> Tutti i numeri di questa sezione sono utili per
+        <em>capire</em> e pericolosi per <em>giudicare</em>. L'economista Charles Goodhart osservò nel 1975
+        una cosa che vale ben oltre l'economia, e che si riassume così (nella formulazione resa celebre da
+        Marilyn Strathern): <strong>quando una misura diventa un obiettivo, smette di essere una buona
+        misura</strong>.
+        <p style="margin:0.5rem 0 0;">Provate a immaginare che cosa succede se si premia chi
+          <em>chiude più ticket</em>: i ticket diventano minuscoli, e chi affronta il problema difficile —
+          quello che vale un mese e un ticket solo — risulta il meno produttivo di tutti. Se si premia la
+          <em>velocità</em> in punti, le stime si gonfiano, e il numero cresce senza che cresca il software.
+          Se si premia il <em>numero di difetti risolti</em>, conviene che ce ne siano parecchi.</p>
+        <p style="margin:0.5rem 0 0;">La conseguenza pratica è netta: queste misure servono a un gruppo per
+          guardare <strong>sé stesso nel tempo</strong> — «stiamo accumulando lavoro aperto?» — e non
+          servono <em>mai</em> a confrontare due gruppi diversi o a valutare le persone. La velocità di un
+          gruppo non è paragonabile a quella di un altro, perché i punti non sono un'unità di misura: sono
+          una convenzione interna.</p>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑨ Esercizio.</strong> Un gruppo lavora con un limite di $10$ lavori aperti e chiude $2$
+          ticket al giorno. (a) Quanto vale il tempo di attraversamento? (b) Il responsabile vuole dimezzarlo
+          e propone di assumere una persona in più. Sapendo che il collo di bottiglia è la revisione e che la
+          persona nuova sarebbe uno sviluppatore, che cosa succederà? (c) Indicate due modi che funzionano
+          davvero, e dite quale dei due costa meno.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p9s">Mostra la soluzione</button>
+        <div class="solution" id="p9s">
+          <p><strong>(a)</strong> Legge di Little: $10/2 = \mathbf{5}$ giorni.</p>
+          <p><strong>(b)</strong> <strong>Niente</strong>, o peggio. Se il vincolo è la revisione, il ritmo di
+            uscita resta $2$ al giorno qualunque sia il numero di sviluppatori: il lavoro in più si accumula
+            davanti alla revisione, e se il limite di lavori aperti viene alzato per «tenere occupato» il
+            nuovo assunto, il tempo di attraversamento <em>aumenta</em>. È esattamente il secondo esperimento
+            del simulatore, ed è la legge di Brooks.</p>
+          <p><strong>(c)</strong> Due strade, e nella formula si vedono entrambe. <em>Abbassare il
+            numeratore</em>: portare il limite da $10$ a $5$ dà $5/2 = 2{,}5$ giorni, subito e a costo zero —
+            si smette di iniziare cose nuove finché non se ne chiudono. <em>Alzare il denominatore</em>:
+            agire sul collo di bottiglia, cioè aggiungere un revisore o ridurre il tempo di revisione (per
+            esempio con collaudi automatici che tolgono lavoro manuale a chi rivede); se il ritmo sale a $4$
+            al giorno, il tempo scende a $2{,}5$ giorni anche tenendo il limite a $10$.</p>
+          <p>Il primo modo è gratuito e immediato, il secondo costa; si comincia sempre dal primo. La cosa
+            che <em>non</em> funziona è aggiungere persone dove non c'è il vincolo.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <p><strong>⑩ Esercizio.</strong> Riscrivete questa segnalazione in modo che sia lavorabile:
+          «<em>Il sito a volte fa i capricci quando carico le foto, e comunque anche il menù è brutto.</em>»
+          Poi dite quanti ticket ne devono uscire e di che tipo.</p>
+        <button class="btn btn-toggle btn-solution" data-target="#p10s">Mostra la soluzione</button>
+        <div class="solution" id="p10s">
+          <p><strong>Due ticket</strong>, perché ci sono due cose diverse con priorità e destinatari diversi —
+            e lo tradisce la «e» nel testo.</p>
+          <p><strong>Ticket 1, difetto.</strong> Titolo: «Il caricamento di una foto fallisce senza messaggio
+            di errore se il file supera i 5 MB». Passi per riprodurlo: (1) entro come utente qualsiasi,
+            (2) apro «Galleria», (3) carico un JPEG da 8 MB. Atteso: la foto compare in galleria, oppure un
+            messaggio chiaro che dice qual è il limite. Ottenuto: la barra arriva al 100%, la pagina resta
+            uguale, nessun errore. Ambiente: Firefox 128 su Windows 11. Frequenza: sempre, sopra i 5 MB.</p>
+          <p><strong>Ticket 2, miglioria.</strong> Titolo: «Il menù non si capisce su schermo stretto».
+            Forma a storia: <em>come visitatore da telefono, voglio raggiungere le sezioni principali in un
+            tocco, per non dover ingrandire la pagina</em>. Criteri di accettazione: sotto i 600 px compare un
+            menù a comparsa; ogni voce ha un'area toccabile di almeno 44 px; funziona con la tastiera.</p>
+          <p><strong>Che cosa si è guadagnato.</strong> «A volte fa i capricci» è diventato un enunciato
+            <em>falsificabile</em>: si può riprodurre, si può verificare, e si sa con certezza quando è
+            risolto. E «brutto», che è un'opinione su cui si può discutere all'infinito, è diventato tre
+            condizioni misurabili — che è poi l'unico modo di trasformare un giudizio estetico in lavoro.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 — PONG -->
+    <section id="sec7">
+      <h2>7. Pong: il primo videogioco, e come si costruisce</h2>
 
       <div class="storia">
         <p><strong>Pong</strong> esce nel <strong>1972</strong>, prodotto da Atari, e fu il primo videogioco
@@ -1333,13 +1749,13 @@ git push                      <span class="cm"># li mando entrambi</span></div>
         hardware.</div>
 
       <div class="exercise">
-        <p><strong>⑨ Esercizio.</strong> Nel codice il rimbalzo su soffitto e pavimento è
+        <p><strong>⑪ Esercizio.</strong> Nel codice il rimbalzo su soffitto e pavimento è
           <code>p.vy = -p.vy</code>. (a) Perché non si tocca <code>vx</code>? (b) Che cosa succederebbe
           scrivendo <code>p.vy = -Math.abs(p.vy)</code>? (c) C'è un difetto noto in
           <code>if (p.y - p.r &lt; 0 || p.y + p.r &gt; H) p.vy = -p.vy;</code>: quale, e come si
           corregge?</p>
-        <button class="btn btn-toggle btn-solution" data-target="#p9s">Mostra la soluzione</button>
-        <div class="solution" id="p9s">
+        <button class="btn btn-toggle btn-solution" data-target="#p11s">Mostra la soluzione</button>
+        <div class="solution" id="p11s">
           <p><strong>(a)</strong> Perché il muro è <em>orizzontale</em>: la riflessione inverte solo la
             componente <strong>perpendicolare</strong> alla superficie, e lascia intatta quella parallela. È
             la legge della riflessione dell'ottica geometrica, la stessa di Fisica_3: angolo di incidenza
@@ -1367,11 +1783,11 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       </div>
 
       <div class="exercise">
-        <p><strong>⑩ Esercizio.</strong> La palla si muove di <code>vx = 4</code> pixel per fotogramma a
+        <p><strong>⑫ Esercizio.</strong> La palla si muove di <code>vx = 4</code> pixel per fotogramma a
           $60$ fotogrammi al secondo. (a) Quanti pixel al secondo? (b) Su un monitor a $144$ Hz, che cosa
           succede? (c) Come si scrive il codice perché la velocità sia la stessa su qualunque monitor?</p>
-        <button class="btn btn-toggle btn-solution" data-target="#p10s">Mostra la soluzione</button>
-        <div class="solution" id="p10s">
+        <button class="btn btn-toggle btn-solution" data-target="#p12s">Mostra la soluzione</button>
+        <div class="solution" id="p12s">
           <p><strong>(a)</strong> $4 \times 60 = \mathbf{240}$ pixel al secondo. Su un campo largo $680$
             pixel, la palla lo attraversa in $680/240 = 2{,}83$ secondi.</p>
           <p><strong>(b)</strong> A $144$ Hz il ciclo viene chiamato $144$ volte al secondo, quindi la palla
@@ -1403,9 +1819,9 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       </div>
     </section>
 
-    <!-- 7 — I MOTORI GRAFICI -->
-    <section id="sec7">
-      <h2>7. I motori grafici</h2>
+    <!-- 8 — I MOTORI GRAFICI -->
+    <section id="sec8">
+      <h2>8. I motori grafici</h2>
 
       <p>Il Pong sta in sessanta righe. Un gioco vero richiede modelli tridimensionali, luci, ombre, fisica
         dei corpi rigidi, audio posizionale, animazioni, salvataggi, rete, e la stessa cosa su cinque
@@ -1461,11 +1877,11 @@ git push                      <span class="cm"># li mando entrambi</span></div>
         giochi come per tutto il resto: <em>finito è meglio che perfetto</em>.</div>
 
       <div class="exercise">
-        <p><strong>⑪ Esercizio.</strong> Vuoi fare un gioco 2D a scorrimento da pubblicare sul web, da solo,
+        <p><strong>⑬ Esercizio.</strong> Vuoi fare un gioco 2D a scorrimento da pubblicare sul web, da solo,
           con poca esperienza di programmazione. Quali strumenti scegli e perché? E che cosa cambierebbe se
           il gioco dovesse uscire su PlayStation con un team di quaranta persone?</p>
-        <button class="btn btn-toggle btn-solution" data-target="#p11s">Mostra la soluzione</button>
-        <div class="solution" id="p11s">
+        <button class="btn btn-toggle btn-solution" data-target="#p13s">Mostra la soluzione</button>
+        <div class="solution" id="p13s">
           <p><strong>Da solo, sul web:</strong> <em>Godot</em> con GDScript, oppure direttamente Canvas 2D e
             JavaScript. Le ragioni sono tre: (1) <strong>tempo di partenza</strong> — si scarica e si è
             operativi in mezz'ora; (2) <strong>pubblicazione</strong> — Godot esporta in HTML5, quindi il
@@ -1489,9 +1905,9 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       </div>
     </section>
 
-    <!-- 8 — ★ CHE COSA SUCCEDE QUANDO PREMI INVIO -->
-    <section id="sec8" class="optional">
-      <h2>8. Che cosa succede davvero quando premi Invio</h2>
+    <!-- 9 — ★ CHE COSA SUCCEDE QUANDO PREMI INVIO -->
+    <section id="sec9" class="optional">
+      <h2>9. Che cosa succede davvero quando premi Invio</h2>
 
       <p>Chiudiamo l'anno con una domanda che sembra banale e che tiene insieme metà del programma: scrivete
         un indirizzo nella barra, premete Invio, e in due decimi di secondo compare una pagina. Che cosa è
@@ -1539,12 +1955,12 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       </div>
 
       <div class="exercise">
-        <p><strong>⑫ Esercizio.</strong> Un server sta a $6000$ km di distanza e la luce nella fibra viaggia
+        <p><strong>⑭ Esercizio.</strong> Un server sta a $6000$ km di distanza e la luce nella fibra viaggia
           a $200\,000$ km/s. (a) Quanto dura un viaggio di andata e ritorno? (b) Se caricare la pagina
           richiede DNS + TCP + TLS + HTTP, cioè quattro viaggi, quanto si aspetta come minimo?
           (c) Che cosa cambia mettendo una copia del sito a $300$ km?</p>
-        <button class="btn btn-toggle btn-solution" data-target="#p12s">Mostra la soluzione</button>
-        <div class="solution" id="p12s">
+        <button class="btn btn-toggle btn-solution" data-target="#p14s">Mostra la soluzione</button>
+        <div class="solution" id="p14s">
           <p><strong>(a)</strong> Andata e ritorno sono $12\,000$ km:</p>
           <div class="formula">$$t = \frac{12\,000\ \text{km}}{200\,000\ \text{km/s}} = 0{,}06\ \text{s}
             = \mathbf{60}\ \text{ms}$$</div>
@@ -1577,7 +1993,7 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       qualcosa di brutto e finito invece di qualcosa di bello e immaginario.</div>
 
     <section id="quiz">
-      <h2>9. Quiz finale</h2>
+      <h2>10. Quiz finale</h2>
       <div id="quiz-app"></div>
     </section>
 
@@ -2475,12 +2891,369 @@ git push                      <span class="cm"># li mando entrambi</span></div>
       });
     }());
 
+
+    /* ==================================================================
+       tk — IL FLUSSO DEI TICKET SULLA LAVAGNA
+       ================================================================== */
+    (function () {
+      var svg = grab('tk-svg'); if (!svg) { return; }
+      var sw = grab('tk-wip'), sd = grab('tk-dev'), sr = grab('tk-rev');
+      var vista = 'lavagna', raf = null, timer = null;
+
+      /* generatore pseudocasuale con seme: la stessa configurazione da sempre
+         lo stesso risultato, cosi due studenti confrontano gli stessi numeri */
+      function rng(seed) {
+        var s = seed >>> 0;
+        return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+      }
+
+      /* --- il motore: un passo = un giorno ---------------------------- */
+      function nuovoStato(p) {
+        return { R: rng(20250912), pros: 1, attivi: [], fatti: [], serie: [],
+                 cumEntrati: 0, cumFatti: 0, cumIniziati: 0, giorno: 0, p: p };
+      }
+      function passo(S) {
+        var p = S.p, i, t;
+        /* 1 — si tira dentro lavoro nuovo finche' c'e' posto sotto il limite */
+        while (S.attivi.length < p.wip) {
+          S.attivi.push({ id: S.pros++, stato: 'corso',
+                          dev: 1 + Math.floor(S.R() * 4), rev: 1 + Math.floor(S.R() * 2),
+                          entrata: S.giorno });
+          S.cumEntrati++; S.cumIniziati++;
+        }
+        /* il WIP va contato ORA: sono i ticket presenti durante la giornata.
+           Contarli dopo le uscite lo sottostimerebbe esattamente del ritmo di uscita. */
+        var wipOggi = S.attivi.length;
+        /* 2 — gli sviluppatori lavorano, in ordine di arrivo */
+        var d = p.dev;
+        for (i = 0; i < S.attivi.length && d > 0; i++) {
+          if (S.attivi[i].stato === 'corso') { S.attivi[i].dev--; d--; }
+        }
+        /* 3 — i revisori */
+        var r = p.rev;
+        for (i = 0; i < S.attivi.length && r > 0; i++) {
+          if (S.attivi[i].stato === 'revisione') { S.attivi[i].rev--; r--; }
+        }
+        /* 4 — avanzamenti di stato */
+        for (i = S.attivi.length - 1; i >= 0; i--) {
+          t = S.attivi[i];
+          if (t.stato === 'corso' && t.dev <= 0) { t.stato = 'revisione'; }
+          else if (t.stato === 'revisione' && t.rev <= 0) {
+            t.fine = S.giorno + 1; S.fatti.push(t); S.cumFatti++; S.attivi.splice(i, 1);
+          }
+        }
+        S.giorno++;
+        S.serie.push({ g: S.giorno, wip: wipOggi, ent: S.cumEntrati, fin: S.cumFatti });
+        if (S.serie.length > 400) { S.serie.shift(); }
+        if (S.fatti.length > 600) { S.fatti.splice(0, S.fatti.length - 600); }
+      }
+      /* misure a regime: si scarta la prima meta' del periodo osservato */
+      function misure(S) {
+        if (S.giorno < 12) { return null; }
+        var da = S.giorno / 2;
+        var tardi = S.fatti.filter(function (t) { return t.fine > da; });
+        if (tardi.length < 3) { return null; }
+        var lead = tardi.reduce(function (a, t) { return a + (t.fine - t.entrata); }, 0) / tardi.length;
+        var thr = tardi.length / (S.giorno - da);
+        var ser = S.serie.filter(function (s) { return s.g > da; });
+        var wip = ser.reduce(function (a, s) { return a + s.wip; }, 0) / (ser.length || 1);
+        return { lead: lead, thr: thr, wip: wip, previsto: thr > 0 ? wip / thr : 0 };
+      }
+      /* simulazione senza disegno, per la terza vista */
+      function veloce(wip, dev, rev, giorni) {
+        var S = nuovoStato({ wip: wip, dev: dev, rev: rev });
+        for (var g = 0; g < giorni; g++) { passo(S); }
+        return misure(S);
+      }
+
+      var S = nuovoStato(par());
+      function par() {
+        return { wip: +sw.value, dev: +sd.value, rev: +sr.value };
+      }
+      function azzera() {
+        ferma();
+        S = nuovoStato(par());
+        for (var g = 0; g < 40; g++) { passo(S); }     // si parte gia' a regime
+        dis();
+      }
+      function ferma() {
+        if (timer) { clearInterval(timer); timer = null; }
+        if (raf) { cancelAnimationFrame(raf); raf = null; }
+        grab('tk-via').textContent = '▶ avvia';
+      }
+
+      /* --- le tre viste ---------------------------------------------- */
+      function vistaLavagna() {
+        var COLONNE = [
+          { k: 'coda', n: 'da fare', c: COL.mu },
+          { k: 'corso', n: 'in corso', c: COL.ac },
+          { k: 'revisione', n: 'in revisione', c: COL.gd },
+          { k: 'fatto', n: 'fatto', c: COL.gr }
+        ];
+        var LW = 150, GAP = 14, X0 = 22, YT = 30, H = 300;
+        COLONNE.forEach(function (co, j) {
+          var x = X0 + j * (LW + GAP);
+          R(svg, x, YT, LW, H, COL.s2, COL.ax, 1.2, 8);
+          R(svg, x, YT, LW, 26, co.c, 'none', 0, 8);
+          T(svg, x + LW / 2, YT + 18, co.n, 'lbl', 'middle', 12.5);
+        });
+        /* le schede */
+        var perCol = { coda: [], corso: [], revisione: [], fatto: [] };
+        S.attivi.forEach(function (t) { perCol[t.stato].push(t); });
+        var ultimi = S.fatti.slice(-7);
+        ultimi.forEach(function (t) { perCol.fatto.push(t); });
+        /* la colonna "da fare" e' un serbatoio: si mostra quanto arretrato c'e' */
+        COLONNE.forEach(function (co, j) {
+          var x = X0 + j * (LW + GAP), lista = perCol[co.k], i;
+          if (co.k === 'coda') {
+            for (i = 0; i < 6; i++) {
+              R(svg, x + 10, YT + 38 + i * 30, LW - 20, 24, COL.sf, COL.ax, 1, 5);
+              T(svg, x + 18, YT + 54 + i * 30, 'PROJ-' + (S.pros + i), 'lbl-s', 'start', 11);
+            }
+            T(svg, x + LW / 2, YT + H - 12, 'arretrato: sempre pieno', 'lbl-s', 'middle', 11);
+            return;
+          }
+          for (i = 0; i < lista.length && i < 8; i++) {
+            var t = lista[i];
+            var y = YT + 38 + i * 31;
+            R(svg, x + 10, y, LW - 20, 26, COL.sf, co.c, 1.6, 5);
+            T(svg, x + 18, y + 17, 'PROJ-' + t.id, 'lbl-s', 'start', 11);
+            if (co.k === 'corso') {
+              T(svg, x + LW - 18, y + 17, t.dev + 'g', 'lbl-s', 'end', 10.5);
+            } else if (co.k === 'revisione') {
+              T(svg, x + LW - 18, y + 17, t.rev + 'g', 'lbl-s', 'end', 10.5);
+            } else {
+              T(svg, x + LW - 18, y + 17, (t.fine - t.entrata) + 'g', 'lbl-s', 'end', 10.5);
+            }
+          }
+          if (lista.length > 8) {
+            T(svg, x + LW / 2, YT + 38 + 8 * 31 + 14, '+ altri ' + (lista.length - 8), 'lbl-s', 'middle', 11);
+          }
+          if (co.k !== 'fatto') {
+            T(svg, x + LW / 2, YT + H - 12, lista.length + ' aperti', 'lbl-s', 'middle', 11);
+          } else {
+            T(svg, x + LW / 2, YT + H - 12, S.cumFatti + ' in totale', 'lbl-s', 'middle', 11);
+          }
+        });
+        T(svg, X0, 18, 'le colonne sono gli stati; il numero sulla scheda è il lavoro che resta',
+          'lbl-s', 'start', 11.5);
+        T(svg, X0 + (LW + GAP) + LW / 2, YT + H + 22,
+          'limite di lavori aperti: ' + S.p.wip, 'em', 'middle', 12.5);
+      }
+
+      function vistaFlusso() {
+        var m = misure(S);
+        var X0 = 62, Y0 = 30, W = 560, H = 268;
+        var finestra = Math.max(22, Math.ceil((m ? m.lead : 8) * 2.4));
+        var ser = S.serie.slice(-finestra);
+        if (ser.length < 4) { T(svg, X0, 60, 'avvia la simulazione', 'lbl'); return; }
+        var g0 = ser[0].g, g1 = ser[ser.length - 1].g;
+        var vmax = ser[ser.length - 1].ent;
+        var vmin = ser[0].fin;
+        var margine = Math.max(2, (vmax - vmin) * 0.12);
+        vmax += margine; vmin -= margine;
+        function px(g) { return X0 + (g - g0) / Math.max(1, g1 - g0) * W; }
+        function py(v) { return Y0 + H - (v - vmin) / Math.max(1, vmax - vmin) * H; }
+        R(svg, X0, Y0, W, H, COL.s2, COL.ax, 1.2, 4);
+        /* la banda fra "entrati" e "finiti" e' il lavoro in corso */
+        var dEnt = '', dFin = '', i;
+        for (i = 0; i < ser.length; i++) {
+          dEnt += (i ? 'L' : 'M') + px(ser[i].g).toFixed(1) + ' ' + py(ser[i].ent).toFixed(1);
+        }
+        for (i = ser.length - 1; i >= 0; i--) {
+          dFin += 'L' + px(ser[i].g).toFixed(1) + ' ' + py(ser[i].fin).toFixed(1);
+        }
+        svg.appendChild(el('path', { d: dEnt + dFin + 'Z', fill: COL.ac,
+          'fill-opacity': 0.18, stroke: 'none' }));
+        P(svg, dEnt, COL.ac, 2.4);
+        var dF = '';
+        for (i = 0; i < ser.length; i++) {
+          dF += (i ? 'L' : 'M') + px(ser[i].g).toFixed(1) + ' ' + py(ser[i].fin).toFixed(1);
+        }
+        P(svg, dF, COL.gr, 2.4);
+        T(svg, X0 + W - 6, py(ser[ser.length - 1].ent) - 8, 'entrati in lavorazione', 'lbl-s', 'end', 11.5);
+        T(svg, X0 + W - 6, py(ser[ser.length - 1].fin) + 16, 'finiti', 'lbl-s', 'end', 11.5);
+
+        /* le due distanze che contano */
+        if (m) {
+          var idx = Math.max(0, Math.floor(ser.length * 0.45));
+          var gm = ser[idx].g;
+          var vEnt = ser[idx].ent;
+          var vFin = vEnt - m.wip;
+          L(svg, px(gm), py(vEnt), px(gm), py(vFin), COL.mg, 2.4);
+          T(svg, px(gm) + 8, (py(vEnt) + py(vFin)) / 2 + 4,
+            'lavori in corso ≈ ' + num(m.wip, 1), 'em', 'start', 12);
+          var gFin = gm + m.lead;
+          L(svg, px(gm), py(vFin), px(Math.min(gFin, g1)), py(vFin), COL.mg, 2.4, '5 4');
+          T(svg, px(gm) + 8, py(vFin) + 20,
+            'tempo di attraversamento ≈ ' + num(m.lead, 1) + ' giorni', 'em', 'start', 12);
+        }
+        T(svg, X0, 18, 'la distanza verticale è il lavoro aperto, quella orizzontale il tempo di attesa',
+          'lbl-s', 'start', 11.5);
+        T(svg, X0 + W / 2, Y0 + H + 24,
+          'gli ultimi ' + ser.length + ' giorni', 'lbl-s', 'middle', 11.5);
+        T(svg, X0 - 8, Y0 + 10, num(vmax, 0), 'lbl-s', 'end', 11);
+        T(svg, X0 - 8, Y0 + H, num(vmin, 0), 'lbl-s', 'end', 11);
+        T(svg, 16, Y0 + H / 2, 'ticket', 'lbl-s', 'middle', 11);
+      }
+
+      var cacheSweep = null, cacheChiave = '';
+      function sweep(dev, rev) {
+        var chiave = dev + '/' + rev;
+        if (cacheChiave === chiave && cacheSweep) { return cacheSweep; }
+        var dati = [];
+        for (var i = 1; i <= 16; i++) {
+          var r = veloce(i, dev, rev, 900);
+          if (r) { dati.push({ w: i, thr: r.thr, lead: r.lead }); }
+        }
+        cacheChiave = chiave; cacheSweep = dati;
+        return dati;
+      }
+      function vistaLittle() {
+        var p = par(), X0 = 62, Y0 = 34, W = 556, H = 246, i;
+        var dati = sweep(p.dev, p.rev);
+        if (!dati.length) { T(svg, X0, 60, 'nessun dato', 'lbl'); return; }
+        var thrMax = Math.max.apply(null, dati.map(function (d) { return d.thr; })) * 1.25;
+        var leadMax = Math.max.apply(null, dati.map(function (d) { return d.lead; })) * 1.12;
+        function px(w) { return X0 + (w - 1) / 15 * W; }
+        function pyT(v) { return Y0 + H - v / thrMax * H; }
+        function pyL(v) { return Y0 + H - v / leadMax * H; }
+        R(svg, X0, Y0, W, H, COL.s2, COL.ax, 1.2, 4);
+        for (i = 2; i <= 16; i += 2) {
+          L(svg, px(i), Y0, px(i), Y0 + H, COL.ax, 0.7, '3 4');
+          T(svg, px(i), Y0 + H + 18, String(i), 'lbl-s', 'middle', 11);
+        }
+        var dT = '', dL = '';
+        dati.forEach(function (d, j) {
+          dT += (j ? 'L' : 'M') + px(d.w).toFixed(1) + ' ' + pyT(d.thr).toFixed(1);
+          dL += (j ? 'L' : 'M') + px(d.w).toFixed(1) + ' ' + pyL(d.lead).toFixed(1);
+        });
+        P(svg, dL, COL.mg, 2.6);
+        P(svg, dT, COL.gr, 2.6);
+        dati.forEach(function (d) {
+          C(svg, px(d.w), pyT(d.thr), 3, COL.gr, 'none');
+          C(svg, px(d.w), pyL(d.lead), 3, COL.mg, 'none');
+        });
+        /* il limite scelto ora */
+        L(svg, px(p.wip), Y0, px(p.wip), Y0 + H, COL.ac, 2, '6 4');
+        T(svg, px(p.wip), Y0 - 8, 'limite attuale', 'em', 'middle', 11.5);
+        T(svg, X0 + 8, Y0 + 18, 'tempo di attraversamento (cresce)', 'lbl-s', 'start', 11.5);
+        T(svg, X0 + 8, Y0 + 36, 'ritmo di uscita (si ferma)', 'lbl-s', 'start', 11.5);
+        C(svg, X0 + 4, Y0 + 14, 3.4, COL.mg, 'none');
+        C(svg, X0 + 4, Y0 + 32, 3.4, COL.gr, 'none');
+        T(svg, X0 + W / 2, Y0 + H + 38, 'limite di lavori aperti contemporaneamente', 'lbl', 'middle', 12.5);
+        /* il punto in cui il ritmo smette di crescere */
+        var sat = dati[dati.length - 1].thr;
+        var ginocchio = null;
+        for (i = 0; i < dati.length; i++) {
+          if (dati[i].thr > sat * 0.985) { ginocchio = dati[i]; break; }
+        }
+        if (ginocchio) {
+          C(svg, px(ginocchio.w), pyT(ginocchio.thr), 6, 'none', COL.gr, 2.4);
+          T(svg, px(ginocchio.w) + 10, pyT(ginocchio.thr) - 10,
+            'da qui in poi il ritmo non cresce più', 'lbl-s', 'start', 11);
+        }
+        return ginocchio;
+      }
+
+      /* --- disegno e numeri ------------------------------------------- */
+      function dis() {
+        clear(svg);
+        grab('tk-wipv').textContent = sw.value;
+        grab('tk-devv').textContent = sd.value;
+        grab('tk-revv').textContent = sr.value;
+        grab('tk-giorno').textContent = 'giorno ' + S.giorno;
+        var ginocchio = null;
+        if (vista === 'lavagna') { vistaLavagna(); }
+        else if (vista === 'flusso') { vistaFlusso(); }
+        else { ginocchio = vistaLittle(); }
+
+        var m = misure(S), cap = grab('tk-cap');
+        if (!m) {
+          ['tk-wipm', 'tk-thr', 'tk-lead', 'tk-check'].forEach(function (id) {
+            grab(id).textContent = '—';
+          });
+          cap.textContent = 'Fai girare qualche giorno per avere delle medie sensate.';
+          return;
+        }
+        grab('tk-wipm').textContent = num(m.wip, 2);
+        grab('tk-thr').textContent = num(m.thr, 2) + ' al giorno';
+        grab('tk-lead').textContent = num(m.lead, 1) + ' giorni';
+        grab('tk-check').textContent = num(m.previsto, 1) + ' giorni';
+
+        var p = par();
+        var capDev = p.dev / 2.5, capRev = p.rev / 1.5;
+        var collo = capRev < capDev ? 'la revisione' : 'lo sviluppo';
+        var tetto = Math.min(capDev, capRev);
+        var scarto = Math.abs(m.previsto - m.lead) / m.lead * 100;
+
+        if (vista === 'little') {
+          cap.textContent = 'Ogni punto è una simulazione completa con quel limite. Il ritmo di uscita ' +
+            'smette di crescere' + (ginocchio ? ' intorno a ' + ginocchio.w : '') +
+            ', perché è il collo di bottiglia a fissarlo; il tempo di attraversamento invece continua a ' +
+            'salire, in proporzione. Alzare il limite oltre il ginocchio non compra niente: fa solo ' +
+            'aspettare di più ogni singolo ticket.';
+        } else if (vista === 'flusso') {
+          cap.textContent = 'La banda colorata è il lavoro aperto. La legge di Little dice che la sua ' +
+            'altezza divisa per la pendenza del bordo inferiore dà la larghezza: ' +
+            num(m.wip, 2) + ' ÷ ' + num(m.thr, 2) + ' = ' + num(m.previsto, 1) +
+            ' giorni, contro i ' + num(m.lead, 1) + ' misurati (scarto ' + num(scarto, 1) + '%).';
+        } else {
+          cap.textContent = 'Con ' + p.dev + ' sviluppatori e ' + p.rev + ' revisori il collo di bottiglia è ' +
+            collo + ': al massimo ' + num(tetto, 2) + ' ticket al giorno, qualunque sia il limite. ' +
+            'Misurati: ' + num(m.thr, 2) + ' al giorno, ' + num(m.lead, 1) + ' giorni di attesa. ' +
+            'Il controllo della legge di Little cade entro il ' + num(scarto, 1) + '%.';
+        }
+      }
+
+      /* --- comandi ---------------------------------------------------- */
+      [sw, sd, sr].forEach(function (x) { x.addEventListener('input', azzera); });
+      grab('tk-via').addEventListener('click', function () {
+        if (timer) { ferma(); return; }
+        this.textContent = '⏸ ferma';
+        timer = setInterval(function () { passo(S); dis(); }, 110);
+      });
+      grab('tk-passo').addEventListener('click', function () { ferma(); passo(S); dis(); });
+      grab('tk-reset').addEventListener('click', azzera);
+      var box = grab('tk-btn');
+      box.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) { return; }
+        vista = b.getAttribute('data-v'); activate(box, b); dis();
+      });
+      document.addEventListener('visibilitychange', function () { if (document.hidden) { ferma(); } });
+
+      for (var g = 0; g < 40; g++) { passo(S); }
+      avvia(dis, svg);
+    }());
+
     document.getElementById('year').textContent = new Date().getFullYear();
   }());
   </script>
 
   <script>
   window.quizData = [
+    { type: 'mc', diff: 'medium',
+      text: 'Un gruppo tiene aperti $12$ ticket e ne chiude $3$ al giorno. Raddoppia il limite di lavori aperti portandolo a $24$, senza assumere nessuno. Che cosa succede?',
+      options: [
+        'Si chiudono $6$ ticket al giorno invece di $3$',
+        'Il ritmo di uscita resta $3$ al giorno e il tempo di attraversamento raddoppia, da $4$ a $8$ giorni',
+        'Il tempo di attraversamento resta $4$ giorni, ma si lavora su più cose insieme',
+        'Raddoppiano sia il ritmo di uscita sia il tempo di attraversamento'
+      ],
+      correct: 1,
+      explain: 'Il ritmo di uscita dipende dalle persone e dal collo di bottiglia, non da quante schede stanno sulla lavagna: resta $3$ al giorno. La legge di Little dà allora $24/3 = 8$ giorni invece di $4$. <strong>Aprire il doppio delle cose non ne fa uscire il doppio: fa uscire le stesse cose, il doppio più tardi.</strong>' },
+
+    { type: 'mc', diff: 'medium',
+      text: 'Perché in un ticket che segnala un difetto si mettono sempre i <strong>passi per riprodurlo</strong>?',
+      options: [
+        'Per ragioni burocratiche: lo impone lo strumento',
+        'Perché senza non si sa né come cercare il difetto né come verificare che sia stato risolto',
+        'Per dimostrare a chi legge di aver lavorato sul problema',
+        'Perché servono allo strumento per calcolare da solo la priorità'
+      ],
+      correct: 1,
+      explain: 'Un difetto che non si sa riprodurre non si sa nemmeno <em>chiudere</em>: chi lo corregge non può vederlo fallire prima né funzionare dopo, e il collaudo non ha niente da controllare. I passi per riprodurlo trasformano «a volte fa i capricci» in un enunciato <strong>falsificabile</strong> — ed è la stessa idea del metodo scientifico.' },
+
 
     { type: 'mc', diff: 'easy',
       text: 'Di che cosa si occupa il CSS in una pagina web?',
