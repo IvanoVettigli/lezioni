@@ -1504,8 +1504,6 @@
 
       <div class="figbox">
         <div class="ctrl">
-          <label for="ro-a">ampiezza <em>a</em>: <span class="val-badge" id="ro-av">2</span></label>
-          <input type="range" id="ro-a" min="1" max="4" step="1" value="2">
           <label for="ro-p">numeratore di <em>k</em>: <span class="val-badge" id="ro-pv">2</span></label>
           <input type="range" id="ro-p" min="1" max="9" step="1" value="2">
           <label for="ro-q">denominatore di <em>k</em>: <span class="val-badge" id="ro-qv">1</span></label>
@@ -2825,7 +2823,11 @@
        ================================================================== */
     (function () {
       var svg = grab('ro-svg'); if (!svg) { return; }
-      var sa = grab('ro-a'), sp = grab('ro-p'), sq = grab('ro-q'), st = grab('ro-t');
+      var sp = grab('ro-p'), sq = grab('ro-q'), st = grab('ro-t');
+      /* l'ampiezza non ha un cursore: non cambia la forma della rosa ne' il numero
+         di petali, scala soltanto il disegno. La fissano i preset, che la citano
+         nella propria formula. */
+      var amp = 2;
       var usaSin = grab('ro-sin'), epi = grab('ro-epi'), play = grab('ro-play');
       var cap = grab('ro-cap'), raf = null;
 
@@ -2839,10 +2841,9 @@
       }
 
       function draw() {
-        var a = +sa.value, np = +sp.value, nq = +sq.value, giri = +st.value;
+        var a = amp, np = +sp.value, nq = +sq.value, giri = +st.value;
         var k = np / nq, sin = usaSin.checked;
         var info = petali(np, nq);
-        grab('ro-av').textContent = a;
         grab('ro-pv').textContent = np;
         grab('ro-qv').textContent = nq;
         grab('ro-tv').textContent = num(giri, 2);
@@ -2946,7 +2947,7 @@
         cap.textContent = testo;
       }
 
-      [sa, sp, sq, st].forEach(function (x) {
+      [sp, sq, st].forEach(function (x) {
         x.addEventListener('input', function () {
           if (raf) { cancelAnimationFrame(raf); raf = null; play.textContent = '▶ disegna'; }
           draw();
@@ -2974,7 +2975,7 @@
       bts.addEventListener('click', function (e) {
         var b = e.target.closest('button'); if (!b) { return; }
         activate(bts, b);
-        sp.value = b.dataset.p; sq.value = b.dataset.q; sa.value = b.dataset.a;
+        sp.value = b.dataset.p; sq.value = b.dataset.q; amp = +b.dataset.a;
         usaSin.checked = b.dataset.s === '1';
         var info = petali(+b.dataset.p, +b.dataset.q);
         st.value = info.chiusura / (2 * Math.PI);
