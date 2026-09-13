@@ -2097,6 +2097,7 @@
         var CX = 330, CY = 172, SC = 42;
         var VC = Math.sqrt(MU / R0);
         var tracce = [];
+        var volo = null, raf = null;   // la sonda attualmente in viaggio
 
         function orbita(v, alfa) {
           var vt = v * Math.cos(alfa), vr = v * Math.sin(alfa);
@@ -2132,17 +2133,59 @@
           return pts;
         }
 
+        function colore(esito) {
+          return esito === 'impatto' ? 'var(--muted)' : (esito === 'orbita' ? 'var(--green)' : 'var(--magenta)');
+        }
+        function polilinea(pts, fino, esito, op) {
+          if (fino < 1) { return ''; }
+          var s = [], i;
+          for (i = 0; i <= fino; i++) {
+            s.push((CX + pts[i][0] * SC).toFixed(1) + ',' + (CY - pts[i][1] * SC).toFixed(1));
+          }
+          return '<polyline points="' + s.join(' ') + '" fill="none" stroke="' + colore(esito) +
+            '" stroke-width="2.2" opacity="' + op + '" stroke-linejoin="round"/>';
+        }
+
+        /* I punti sono campionati a intervalli di tempo uguali, quindi far scorrere l'indice a
+           ritmo costante riproduce da sola la seconda legge di Keplero: la sonda rallenta
+           all'afelio e sfreccia al perielio. */
+        function archivia() {
+          if (!volo) { return; }
+          tracce.push({ pts: volo.pts, esito: volo.esito });
+          if (tracce.length > 7) { tracce.shift(); }
+          volo = null;
+        }
+        function fermaVolo() {
+          if (raf) { cancelAnimationFrame(raf); raf = null; }
+          archivia();
+        }
+        function passo(ts) {
+          if (!volo) { raf = null; return; }
+          if (volo.ultimo === null) { volo.ultimo = ts; }
+          var dt = Math.min(0.05, (ts - volo.ultimo) / 1000);   // niente salti tornando da un'altra scheda
+          volo.ultimo = ts;
+          volo.f = Math.min(1, volo.f + dt / volo.dur);
+          if (volo.f >= 1) { archivia(); raf = null; disegna(); return; }
+          disegna();
+          raf = requestAnimationFrame(passo);
+        }
+
         function disegna() {
-          var g = '', k, i;
+          var g = '', k;
           g += '<circle cx="' + CX + '" cy="' + CY + '" r="' + (RP * SC) + '" fill="var(--accent)" opacity="0.35" stroke="var(--accent)" stroke-width="2"/>';
           g += '<text x="' + CX + '" y="' + (CY + 5) + '" text-anchor="middle" class="lbl">pianeta</text>';
-          g += '<circle cx="' + (CX + R0 * SC) + '" cy="' + CY + '" r="4" fill="var(--gold)"/>';
+          /* il punto di lancio resta vuoto, così non si confonde con la sonda, che è piena */
+          g += '<circle cx="' + (CX + R0 * SC) + '" cy="' + CY + '" r="5" fill="none" stroke="var(--gold)" stroke-width="2"/>';
           g += '<text x="' + (CX + R0 * SC + 8) + '" y="' + (CY + 20) + '" class="lbl-s">lancio</text>';
           for (k = 0; k < tracce.length; k++) {
-            var pts = tracce[k].pts, s = [];
-            for (i = 0; i < pts.length; i++) { s.push((CX + pts[i][0] * SC).toFixed(1) + ',' + (CY - pts[i][1] * SC).toFixed(1)); }
-            var col = tracce[k].esito === 'impatto' ? 'var(--muted)' : (tracce[k].esito === 'orbita' ? 'var(--green)' : 'var(--magenta)');
-            g += '<polyline points="' + s.join(' ') + '" fill="none" stroke="' + col + '" stroke-width="2.2" opacity="0.9"/>';
+            g += polilinea(tracce[k].pts, tracce[k].pts.length - 1, tracce[k].esito, 0.9);
+          }
+          if (volo) {
+            var iv = Math.round(volo.f * (volo.pts.length - 1));
+            g += polilinea(volo.pts, iv, volo.esito, 1);
+            var sx = CX + volo.pts[iv][0] * SC, sy = CY - volo.pts[iv][1] * SC;
+            g += '<circle cx="' + sx.toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="9" fill="var(--gold)" opacity="0.25"/>';
+            g += '<circle cx="' + sx.toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="4.5" fill="var(--gold)"/>';
           }
           g += '<text x="20" y="26" class="lbl-s">grigio: impatto · verde: orbita chiusa · magenta: fuga</text>';
           svg.innerHTML = g;
@@ -2154,9 +2197,14 @@
           var v = parseFloat(document.getElementById('pm-v').value) * VC;
           var al = parseFloat(document.getElementById('pm-a').value) * Math.PI / 180;
           var o = orbita(v, al);
-          tracce.push({ pts: traiettoria(v, al), esito: o.esito });
-          if (tracce.length > 7) { tracce.shift(); }
+          fermaVolo();                       // se una sonda era in viaggio, la sua traccia resta
+          var pts = traiettoria(v, al);
+          /* durata proporzionale al tempo di volo simulato, ma entro limiti guardabili:
+             un'orbita circolare ci mette circa quattro secondi. */
+          var dur = Math.min(7, Math.max(1.5, (pts.length - 1) * 0.015));
+          volo = { pts: pts, esito: o.esito, f: 0, dur: dur, ultimo: null };
           disegna();
+          raf = requestAnimationFrame(passo);
           document.getElementById('pm-esito').textContent =
             o.esito === 'impatto' ? 'cade sul pianeta' : (o.esito === 'orbita' ? 'orbita chiusa' : 'sfugge per sempre');
           document.getElementById('pm-ecc').textContent = nf(o.e, 3) +
@@ -2181,7 +2229,13 @@
           }
           if (typeof renderMathIn === 'function') { renderMathIn(el); }
         });
-        document.getElementById('pm-pulisci').addEventListener('click', function () { tracce = []; disegna(); });
+        document.getElementById('pm-pulisci').addEventListener('click', function () {
+          if (raf) { cancelAnimationFrame(raf); raf = null; }
+          volo = null; tracce = []; disegna();
+        });
+        document.addEventListener('visibilitychange', function () {
+          if (document.hidden) { fermaVolo(); disegna(); }
+        });
         ['pm-v', 'pm-a'].forEach(function (id) { document.getElementById(id).addEventListener('input', disegna); });
         document.getElementById('pm-cap').textContent =
           'Il lancio avviene sempre dallo stesso punto, a 1,6 raggi dal centro. La velocità è misurata in multipli di quella circolare.';
