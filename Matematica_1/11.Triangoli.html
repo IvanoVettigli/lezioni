@@ -1029,9 +1029,66 @@
       </div>
     </section>
 
-    <!-- 10 — QUIZ -->
+    <!-- 10 — CURIOSITÀ: ARCO FINITO E RETTA INFINITA -->
+    <section id="sec10">
+      <h2>10. Curiosità: quanti punti ha una retta?</h2>
+
+      <p>Prima di chiudere con il quiz, fermiamoci su una piccola magia geometrica che vi farà guardare
+        l'infinito con occhi diversi. Servono solo tre ingredienti: una <strong>retta</strong>,
+        un <strong>punto</strong> e una <strong>circonferenza</strong>.</p>
+
+      <h3>10.1 — La costruzione</h3>
+      <p>Prendiamo una retta $r$ e un punto $P$ <em>esterno</em> ad essa (cioè non sulla retta).
+        Ora tracciamo una circonferenza con centro in $P$ e raggio $R$ <strong>minore della distanza</strong>
+        fra $P$ e la retta. La circonferenza non tocca la retta: sta tutta «sospesa» sopra di essa.</p>
+
+      <p>Fin qui niente di strano. Adesso viene il bello.</p>
+
+      <h3>10.2 — I raggi che collegano tutto</h3>
+      <p>Facciamo partire da $P$ <strong>tutti i possibili raggi</strong> — cioè tutte le semirette che
+        nascono in $P$ e puntano «verso il basso», verso la retta. Ognuno di questi raggi fa due cose:</p>
+      <ol>
+        <li>prima <strong>attraversa la circonferenza</strong>, toccando un punto dell'arco inferiore;</li>
+        <li>poi <strong>prosegue fino alla retta</strong>, colpendo un punto di $r$.</li>
+      </ol>
+
+      <p>Ogni raggio associa esattamente <strong>un punto dell'arco a un punto della retta</strong>, e
+        viceversa: raggi diversi toccano punti diversi. Nessun punto dell'arco resta «orfano», nessun punto
+        della retta resta «scoperto». In matematica si dice che abbiamo costruito una
+        <strong>corrispondenza biunivoca</strong> (o <em>biezione</em>) fra l'arco e la retta.</p>
+
+      <div class="curiosita">
+        <strong>🤯 Ma la retta è infinita e l'arco no!</strong> Esatto, ed è proprio qui la magia. La retta
+        $r$ si estende all'infinito in entrambe le direzioni, mentre l'arco di circonferenza ha una lunghezza
+        <em>finita</em> — eppure hanno lo <strong>stesso numero di punti</strong>. Non «circa lo stesso»:
+        <em>esattamente</em> lo stesso, punto per punto, senza che ne avanzi nemmeno uno da una parte o
+        dall'altra. Sembra impossibile, eppure la costruzione lo dimostra davanti ai vostri occhi.
+      </div>
+
+      <p>Provate voi: muovete il raggio e osservate come ogni punto dell'arco corrisponde a un punto della
+        retta — e come, avvicinandosi ai bordi dell'arco, il punto sulla retta schizza verso
+        l'infinito.</p>
+
+      <div class="controls">
+        <div class="control-group"><label>Angolo del raggio: <span class="val" id="bij-a-val">0°</span></label>
+          <input type="range" id="bij-a" min="-80" max="80" step="0.5" value="0"></div>
+        <button class="btn" id="bij-sweep" type="button">▶ Animazione automatica</button>
+      </div>
+      <div class="ckt"><svg id="bij-svg" viewBox="0 0 700 380" aria-label="Biezione tra arco di circonferenza e retta: un raggio da P attraversa l'arco e colpisce la retta"></svg></div>
+      <p class="eq-out" id="bij-out"></p>
+
+      <div class="note">
+        <strong>Che cosa significa?</strong> Significa che «infinito» non vuol dire «più punti»: un segmento
+        di un centimetro contiene <em>lo stesso tipo di infinito</em> di una retta lunga quanto l'universo.
+        Georg <strong>Cantor</strong>, alla fine dell'Ottocento, costruì una teoria rigorosa di tutto questo —
+        e scoprì che esistono <em>infiniti diversi</em> (alcuni «più grandi» di altri!). Ma questa è
+        un'altra storia, che incontrerete più avanti.
+      </div>
+    </section>
+
+    <!-- 11 — QUIZ -->
     <section id="quiz">
-      <h2>10. Quiz finale</h2>
+      <h2>11. Quiz finale</h2>
       <p>Dieci domande su triangoli, Pitagora, poligoni regolari e circonferenza. Difficoltà crescente.</p>
       <div id="quiz-app"></div>
     </section>
@@ -1407,6 +1464,152 @@
         keywords: ['scompo', 'divid', 'rettangol', 'diagonale', 'metà', 'poligon', 'trapezio', 'apotema', 'area', 'triangol', '180', 'mattone'], requiredMatches: 4,
         explain: 'Ogni poligono si può scomporre in triangoli: un rettangolo è formato da due triangoli rettangoli uguali (da cui il "diviso 2" nella formula dell\'area del triangolo), un trapezio da un rettangolo più due triangoli, e un poligono qualsiasi si spezza con le diagonali in (n−2) triangoli — da cui la formula della somma degli angoli interni. Anche l\'area dei poligoni regolari (perimetro × apotema : 2) nasce dalla somma di n triangoli. Il triangolo è quindi il "mattone universale" da cui discendono tutte le altre formule; è inoltre la figura più rigida, ed è per questo che si usa nelle strutture (capriate, ponti, gru).' }
     ];
+  </script>
+
+  <!-- 10 — Demo biezione arco / retta -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const svg = document.getElementById('bij-svg');
+      if (!svg) return;
+      const slider = document.getElementById('bij-a');
+      const valLbl = document.getElementById('bij-a-val');
+      const out = document.getElementById('bij-out');
+      const sweepBtn = document.getElementById('bij-sweep');
+
+      const W = 700, H = 380;
+      // Geometry
+      const Px = 350, Py = 100;       // centre P
+      const R = 70;                     // radius (< distance to line)
+      const lineY = 340;                // y of the line r
+      const lineX0 = 0, lineX1 = W;
+
+      const ns = 'http://www.w3.org/2000/svg';
+      function el(tag, attrs) {
+        const e = document.createElementNS(ns, tag);
+        for (const k in attrs) e.setAttribute(k, attrs[k]);
+        return e;
+      }
+
+      // Static elements
+      // Line r
+      svg.appendChild(el('line', { x1: lineX0, y1: lineY, x2: lineX1, y2: lineY,
+        stroke: 'var(--text-soft)', 'stroke-width': 2 }));
+      svg.appendChild(el('text', { x: W - 12, y: lineY - 10, 'text-anchor': 'end',
+        'font-size': 14, fill: 'var(--muted)', 'font-weight': 600 })).textContent = 'r';
+
+      // Circle
+      svg.appendChild(el('circle', { cx: Px, cy: Py, r: R,
+        fill: 'none', stroke: 'var(--primary)', 'stroke-width': 2.2 }));
+
+      // Point P
+      svg.appendChild(el('circle', { cx: Px, cy: Py, r: 4, fill: 'var(--accent)' }));
+      svg.appendChild(el('text', { x: Px + 10, y: Py - 10,
+        'font-size': 15, fill: 'var(--accent)', 'font-weight': 700 })).textContent = 'P';
+
+      // Distance label
+      svg.appendChild(el('line', { x1: Px + 85, y1: Py, x2: Px + 85, y2: lineY,
+        stroke: 'var(--muted)', 'stroke-width': 1, 'stroke-dasharray': '4 3' }));
+      const distLbl = el('text', { x: Px + 95, y: (Py + lineY) / 2 + 4,
+        'font-size': 11, fill: 'var(--muted)' });
+      distLbl.textContent = 'distanza > R';
+      svg.appendChild(distLbl);
+
+      // Fan of faint reference rays
+      for (let a = -75; a <= 75; a += 15) {
+        if (a === 0) continue;
+        const rad = a * Math.PI / 180;
+        const dx = Math.sin(rad), dy = Math.cos(rad);
+        const arcX = Px + R * dx, arcY = Py + R * dy;
+        const t = (lineY - Py) / dy;
+        const lx = Px + t * dx;
+        if (lx > 10 && lx < W - 10) {
+          svg.appendChild(el('line', { x1: Px, y1: Py, x2: lx, y2: lineY,
+            stroke: 'var(--border)', 'stroke-width': 0.7, opacity: 0.5 }));
+        }
+      }
+
+      // Dynamic elements
+      const ray = el('line', { 'stroke-width': 2.2, stroke: 'var(--accent)' });
+      const dotArc = el('circle', { r: 5, fill: 'var(--primary)' });
+      const dotLine = el('circle', { r: 5, fill: 'var(--green)' });
+      const lblArc = el('text', { 'font-size': 12, fill: 'var(--primary)', 'font-weight': 600 });
+      const lblLine = el('text', { 'font-size': 12, fill: 'var(--green)', 'font-weight': 600 });
+      svg.appendChild(ray);
+      svg.appendChild(dotArc);
+      svg.appendChild(dotLine);
+      svg.appendChild(lblArc);
+      svg.appendChild(lblLine);
+
+      function draw(angleDeg) {
+        const rad = angleDeg * Math.PI / 180;
+        const dx = Math.sin(rad), dy = Math.cos(rad);
+
+        // Arc intersection (lower semicircle)
+        const arcX = Px + R * dx, arcY = Py + R * dy;
+
+        // Line intersection
+        const t = (lineY - Py) / dy;
+        const lx = Px + t * dx;
+        const clampX = Math.max(5, Math.min(W - 5, lx));
+        const offscreen = lx < 5 || lx > W - 5;
+
+        ray.setAttribute('x1', Px);
+        ray.setAttribute('y1', Py);
+        ray.setAttribute('x2', offscreen ? clampX : lx);
+        ray.setAttribute('y2', lineY);
+
+        dotArc.setAttribute('cx', arcX);
+        dotArc.setAttribute('cy', arcY);
+        dotLine.setAttribute('cx', offscreen ? clampX : lx);
+        dotLine.setAttribute('cy', lineY);
+
+        lblArc.setAttribute('x', arcX + (angleDeg < 0 ? -14 : 14));
+        lblArc.setAttribute('y', arcY - 10);
+        lblArc.setAttribute('text-anchor', angleDeg < 0 ? 'end' : 'start');
+        lblArc.textContent = 'A';
+
+        lblLine.setAttribute('x', (offscreen ? clampX : lx) + (angleDeg < 0 ? -14 : 14));
+        lblLine.setAttribute('y', lineY - 10);
+        lblLine.setAttribute('text-anchor', angleDeg < 0 ? 'end' : 'start');
+        lblLine.textContent = offscreen ? 'B → ∞' : 'B';
+
+        valLbl.textContent = angleDeg.toFixed(1) + '°';
+
+        const absA = Math.abs(angleDeg);
+        if (absA > 78) {
+          out.innerHTML = '<strong>Il punto B schizza verso l\'infinito!</strong> Ai bordi dell\'arco il raggio diventa quasi parallelo alla retta — e il punto B si allontana senza limite. Eppure <em>c\'è ancora</em> un punto dell\'arco che gli corrisponde.';
+        } else if (absA < 2) {
+          out.innerHTML = 'Raggio verticale: A è in basso sulla circonferenza, B è il punto della retta esattamente sotto P.';
+        } else {
+          out.innerHTML = 'Ogni raggio collega un punto A dell\'arco a un punto B della retta — <strong>uno a uno</strong>, senza eccezioni.';
+        }
+      }
+
+      slider.addEventListener('input', function () { draw(+this.value); });
+      draw(0);
+
+      // Sweep animation
+      let sweepId = null;
+      sweepBtn.addEventListener('click', function () {
+        if (sweepId) {
+          cancelAnimationFrame(sweepId);
+          sweepId = null;
+          sweepBtn.textContent = '▶ Animazione automatica';
+          return;
+        }
+        sweepBtn.textContent = '⏸ Ferma';
+        let angle = -80, dir = 0.4;
+        function step() {
+          angle += dir;
+          if (angle > 80) { angle = 80; dir = -dir; }
+          if (angle < -80) { angle = -80; dir = -dir; }
+          slider.value = angle;
+          draw(angle);
+          sweepId = requestAnimationFrame(step);
+        }
+        sweepId = requestAnimationFrame(step);
+      });
+    });
   </script>
 
 </body>
